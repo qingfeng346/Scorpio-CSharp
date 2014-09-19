@@ -1,0 +1,17 @@
+a = 
+{
+    a = 100,
+    b = function ()
+    {
+        print("b")
+    },
+    function c()
+    {
+        print("this " + this.a)
+        print("self " + self.a)
+    }
+}
+a.d = 200
+a.b()
+a.c()
+print(a.d)
