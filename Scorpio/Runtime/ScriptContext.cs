@@ -13,16 +13,16 @@ namespace Scorpio.Runtime
     //执行命令
     public class ScriptContext
     {
-        private Script m_script;                                        //脚本类
-        private ScriptContext m_parent;                                 //父级执行命令
-        private ScriptExecutable m_scriptExecutable;                    //执行命令堆栈
-        private ScriptInstruction m_scriptInstruction;                  //当前执行
-        private VariableDictionary m_variableDictionary = new VariableDictionary();  //本地变量
-        private ScriptObject m_returnObject = null;                     //返回值
-        private Executable_Block m_block;                               //堆栈类型
-        private bool m_Break = false;                                   //break跳出
-        private bool m_Over = false;                                    //函数是否已经结束
-        private int m_InstructionCount = 0;                             //指令数量
+        private Script m_script;                                                        //脚本类
+        private ScriptContext m_parent;                                                 //父级执行命令
+        private ScriptExecutable m_scriptExecutable;                                    //执行命令堆栈
+        private ScriptInstruction m_scriptInstruction;                                  //当前执行
+        private VariableDictionary m_variableDictionary = new VariableDictionary();     //当前作用域所有变量
+        private ScriptObject m_returnObject = null;                                     //返回值
+        private Executable_Block m_block;                                               //堆栈类型
+        private bool m_Break = false;                                                   //break跳出
+        private bool m_Over = false;                                                    //函数是否已经结束
+        private int m_InstructionCount = 0;                                             //指令数量
         public ScriptContext(Script script, ScriptExecutable scriptExecutable) : this(script, scriptExecutable, null, Executable_Block.None) { }
         public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent, Executable_Block block)
         {
@@ -33,28 +33,28 @@ namespace Scorpio.Runtime
             m_block = block;
             m_InstructionCount = m_scriptExecutable != null ? m_scriptExecutable.Count : 0;
         }
-        public bool IsBreak { get { return m_Break; } }                 //是否已经Break
-        public bool IsOver { get { return m_Break || m_Over; } }        //此逻辑块是否已经执行完成
+        private bool IsBreak { get { return m_Break; } }                 //是否已经Break
+        private bool IsOver { get { return m_Break || m_Over; } }        //此逻辑块是否已经执行完成
         public void Initialize(VariableDictionary variable)
         {
             m_variableDictionary = variable;
         }
-        public void Initialize(string name, ScriptObject obj)
+        private void Initialize(string name, ScriptObject obj)
         {
             m_variableDictionary.Clear();
             m_variableDictionary.Add(name, obj);
         }
-        public void Initialize(ScriptContext parent)
+        private void Initialize(ScriptContext parent)
         {
             m_parent = parent;
             m_variableDictionary.Clear();
         }
-        public void ApplyVariableObject(string name)
+        private void ApplyVariableObject(string name)
         {
             if (!m_variableDictionary.ContainsKey(name))
                 m_variableDictionary.Add(name, ScriptNull.Instance);
         }
-        public ScriptObject GetVariableObject(string name)
+        private ScriptObject GetVariableObject(string name)
         {
             if (m_variableDictionary.ContainsKey(name))
                 return m_variableDictionary[name];
@@ -62,7 +62,7 @@ namespace Scorpio.Runtime
                 return m_parent.GetVariableObject(name);
             return ScriptNull.Instance;
         }
-        public bool SetVariableObject(string name, ScriptObject obj)
+        private bool SetVariableObject(string name, ScriptObject obj)
         {
             if (Util.SetObject(m_variableDictionary, name, obj)) {
                 return true;
@@ -72,7 +72,7 @@ namespace Scorpio.Runtime
             }
             return false;
         }
-        public bool ContainsVariable(string name)
+        private bool ContainsVariable(string name)
         {
             if (m_variableDictionary.ContainsKey(name))
                 return true;
@@ -80,7 +80,7 @@ namespace Scorpio.Runtime
                 return m_parent.ContainsVariable(name);
             return false;
         }
-        public ScriptObject GetVariable(CodeMember member)
+        private ScriptObject GetVariable(CodeMember member)
         {
             ScriptObject ret = null;
             if (member.Parent == null) {
@@ -89,18 +89,18 @@ namespace Scorpio.Runtime
                 ret = obj.IsNull ? m_script.GetObject(name) : obj;
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
-                if (parent == null) throw new ExecutionException("GetVariable parent is null");
+                if (parent == null) throw new ExecutionException("GetVariable parent is null", member);
                 if (parent is ScriptArray) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
                         ScriptArray array = (ScriptArray)parent;
-                        ret = array.GetValue(member.MemberNumber);
+                        ret = array.GetValue(member.MemberNumber, member);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptNumber mem = ResolveOperand(member.Member) as ScriptNumber;
-                        if (mem == null) throw new ExecutionException("GetVariable Array Element is must a number");
+                        if (mem == null) throw new ExecutionException("GetVariable Array Element is must a number", member);
                         ScriptArray array = (ScriptArray)parent;
-                        ret = array.GetValue(mem.ToInt32());
+                        ret = array.GetValue(mem.ToInt32(), member);
                     } else {
-                        throw new ExecutionException("GetVariable Array Element is must a number");
+                        throw new ExecutionException("GetVariable Array Element is must a number", member);
                     }
                 } else if (parent is ScriptTable) {
                     if (member.Type == MEMBER_TYPE.STRING) {
@@ -108,25 +108,25 @@ namespace Scorpio.Runtime
                         return table.GetValue(member.MemberString);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
+                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
                         ScriptTable table = (ScriptTable)parent;
                         ret = table.GetValue(mem.Value);
                     } else {
-                        throw new ExecutionException("GetVariable Table Element is must a string");
+                        throw new ExecutionException("GetVariable Table Element is must a string", member);
                     }
                 } else {
-                    throw new ExecutionException("GetVariable member parent is not table or array");
+                    throw new ExecutionException("GetVariable member parent is not table or array", member);
                 }
             }
-            if (ret == null) throw new ExecutionException("GetVariable member is error");
+            if (ret == null) throw new ExecutionException("GetVariable member is error", member);
             if (member.Calc != CALC.NONE) {
                 ScriptNumber num = ret as ScriptNumber;
-                if (num == null) throw new ExecutionException("++或者--只能应用于Number类型");
+                if (num == null) throw new ExecutionException("++或者--只能应用于Number类型", member);
                 return num.Calc(member.Calc);
             }
             return ret;
         }
-        public void SetVariable(CodeMember member, CodeObject obj)
+        private void SetVariable(CodeMember member, CodeObject obj)
         {
             if (member.Parent == null) {
                 string name = member.MemberString;
@@ -135,18 +135,18 @@ namespace Scorpio.Runtime
                     m_script.SetObject(name, variable);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
-                if (parent == null) throw new ExecutionException("SetVariable parent is null");
+                if (parent == null) throw new ExecutionException("SetVariable parent is null", member);
                 if (parent is ScriptArray) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
                         ScriptArray array = (ScriptArray)parent;
-                        array.SetValue(member.MemberNumber, ResolveOperand(obj));
+                        array.SetValue(member.MemberNumber, ResolveOperand(obj), member);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptNumber mem = ResolveOperand(member.Member) as ScriptNumber;
-                        if (mem == null) throw new ExecutionException("SetVariable Array Element is must a number");
+                        if (mem == null) throw new ExecutionException("SetVariable Array Element is must a number", member);
                         ScriptArray array = (ScriptArray)parent;
-                        array.SetValue(mem.ToInt32(), ResolveOperand(obj));
+                        array.SetValue(mem.ToInt32(), ResolveOperand(obj), member);
                     } else {
-                        throw new ExecutionException("SetVariable Array Element is must a number");
+                        throw new ExecutionException("SetVariable Array Element is must a number", member);
                     }
                 } else if (parent is ScriptTable) {
                     if (member.Type == MEMBER_TYPE.STRING) {
@@ -154,18 +154,18 @@ namespace Scorpio.Runtime
                         table.SetValue(member.MemberString, ResolveOperand(obj));
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
+                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
                         ScriptTable table = (ScriptTable)parent;
                         table.SetValue(mem.Value, ResolveOperand(obj));
                     } else {
-                        throw new ExecutionException("GetVariable Table Element is must a string");
+                        throw new ExecutionException("GetVariable Table Element is must a string", member);
                     }
                 } else {
-                    throw new ExecutionException("SetVariable member parent is not table or array");
+                    throw new ExecutionException("SetVariable member parent is not table or array", member);
                 }
             }
         }
-        public void Reset()
+        private void Reset()
         {
             m_returnObject = null;
             m_Over = false;
@@ -183,7 +183,7 @@ namespace Scorpio.Runtime
             }
             return m_returnObject;
         }
-        public ScriptObject Execute(ScriptExecutable executable)
+        private ScriptObject Execute(ScriptExecutable executable)
         {
             if (executable == null) return null;
             Reset();
@@ -221,11 +221,11 @@ namespace Scorpio.Runtime
             var ret = ResolveOperand_impl(value);
             if (value.Not) {
                 ScriptBoolean b = ret as ScriptBoolean;
-                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [!] sign");
+                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [!] sign", value);
                 ret = b.Inverse();
             }  else if (value.Negative) {
                 ScriptNumber b = ret as ScriptNumber;
-                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [-] sign");
+                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [-] sign", value);
                 ret = b.Negative();
             }
             return ret;
@@ -270,11 +270,11 @@ namespace Scorpio.Runtime
         }
         void ProcessContinue()
         {
-            InvokeContinue();
+            InvokeContinue(m_scriptInstruction.Operand0);
         }
         void ProcessBreak()
         {
-            InvokeBreak();
+            InvokeBreak(m_scriptInstruction.Operand0);
         }
         void ProcessCallFor()
         {
@@ -288,7 +288,8 @@ namespace Scorpio.Runtime
             {
                 if (code.Condition != null) {
                     Condition = context.ResolveOperand(code.Condition) as ScriptBoolean;
-                    if (Condition == null || !Condition.Value) break;
+                    if (Condition == null) throw new ExecutionException("for 跳出件必须是一个bool型", code.Condition);
+                    if (!Condition.Value) break;
                 }
                 blockContext.Initialize(context);
                 blockContext.Execute();
@@ -300,7 +301,7 @@ namespace Scorpio.Runtime
         {
             CodeForeach code = (CodeForeach)m_scriptInstruction.Operand0;
             ScriptObject loop = ResolveOperand(code.LoopObject);
-            if (!loop.IsFunction) throw new ExecutionException("foreach is must a function");
+            if (!loop.IsFunction) throw new ExecutionException("foreach函数必须返回一个ScriptFunction", code);
             ScriptContext context = new ScriptContext(m_script, code.Executable, this, Executable_Block.Foreach);
             for ( ; ; )
             {
@@ -329,7 +330,7 @@ namespace Scorpio.Runtime
             if (con.Allow != null)
             {
                 ScriptBoolean b = ResolveOperand(con.Allow) as ScriptBoolean;
-                if (b == null) throw new ExecutionException("If Condition is not bool");
+                if (b == null) throw new ExecutionException("if 条件必须是一个bool型", con.Allow);
                 if (b.Value == false) return false;
             }
             con.Context.Initialize(this);
@@ -373,24 +374,22 @@ namespace Scorpio.Runtime
                 m_parent.InvokeReturnValue(value);
             }
         }
-        private void InvokeContinue()
+        private void InvokeContinue(CodeObject con)
         {
             m_Over = true;
-            if (!SupportContinue())
-            {
+            if (!SupportContinue()) {
                 if (m_parent == null)
-                    throw new ExecutionException("this block is not support continue");
-                m_parent.InvokeContinue();
+                    throw new ExecutionException("this block is not support continue", con);
+                m_parent.InvokeContinue(con);
             }
         }
-        private void InvokeBreak()
+        private void InvokeBreak(CodeObject bre)
         {
             m_Break = true;
-            if (!SupportBreak())
-            {
+            if (!SupportBreak()) {
                 if (m_parent == null)
-                    throw new ExecutionException("this block is not support break");
-                m_parent.InvokeBreak();
+                    throw new ExecutionException("this block is not support break", bre);
+                m_parent.InvokeBreak(bre);
             }
         }
         ScriptObject ParseScriptObject(CodeScriptObject obj)
@@ -405,8 +404,7 @@ namespace Scorpio.Runtime
         ScriptObject ParseCall(CodeCallFunction scriptFunction)
         {
             ScriptObject func = ResolveOperand(scriptFunction.Member);
-            if (!func.IsFunction)
-                throw new ExecutionException("member is not a func");
+            if (!func.IsFunction) throw new ExecutionException("要调用的变量不是一个Function", scriptFunction);
             int num = scriptFunction.Parameters.Count;
             ScriptObject[] parameters = new ScriptObject[num];
             for (int i = 0; i < num; ++i) {
@@ -447,7 +445,7 @@ namespace Scorpio.Runtime
                     if (left.IsString || right.IsString || (left.IsNumber && right.IsNumber)) {
                         return left.Plus(right);
                     } else {
-                        throw new ExecutionException("[operate + ] left right is not same type");
+                        throw new ExecutionException("operate [+] left right is not same type", operate);
                     }
                 } else {
                     if (left.IsBoolean) {
@@ -455,30 +453,30 @@ namespace Scorpio.Runtime
                             bool b1 = ((ScriptBoolean)left).Value;
                             if (b1 == false) return ScriptBoolean.False;
                             ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [&&] right is not a bool");
+                            if (right == null) throw new ExecutionException("operate [&&] right is not a bool", operate);
                             return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
                         } else if (type == TokenType.Or) {
                             bool b1 = ((ScriptBoolean)left).Value;
                             if (b1 == true) return ScriptBoolean.True;
                             ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [||] right is not a bool");
+                            if (right == null) throw new ExecutionException("operate [||] right is not a bool", operate);
                             return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
                         } else {
                             bool b1 = ((ScriptBoolean)left).Value;
                             ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [== !=] right is not a bool");
+                            if (right == null) throw new ExecutionException("operate [==] [!=] right is not a bool", operate);
                             bool b2 = right.Value;
                             if (type == TokenType.Equal)
                                 return b1 == b2 ? ScriptBoolean.True : ScriptBoolean.False;
                             else if (type == TokenType.NotEqual)
                                 return b1 != b2 ? ScriptBoolean.True : ScriptBoolean.False;
                             else
-                                throw new ExecutionException("nonsupport " + type + "  with bool");
+                                throw new ExecutionException("nonsupport operate [" + type + "]  with bool", operate);
                         }
                     } else {
                         ScriptObject right = ResolveOperand(operate.Right);
                         if (left.Type != right.Type)
-                            throw new ExecutionException("[operate] left right is not same type");
+                            throw new ExecutionException("[operate] left right is not same type", operate);
                         if (left.IsString) {
                             string str1 = ((ScriptString)left).Value;
                             string str2 = ((ScriptString)right).Value;
@@ -496,7 +494,7 @@ namespace Scorpio.Runtime
                             else if (type == TokenType.LessOrEqual)
                                 ret = string.Compare(str1, str2) >= 0;
                             else
-                                throw new ExecutionException("nonsupport " + type + "  with string");
+                                throw new ExecutionException("nonsupport operate [" + type + "] with string", operate);
                             return ret ? ScriptBoolean.True : ScriptBoolean.False;
                         } else if (left.IsNumber) {
                             double num1 = ((ScriptNumber)left).Value;
@@ -515,15 +513,15 @@ namespace Scorpio.Runtime
                             else if (type == TokenType.LessOrEqual)
                                 ret = num1 <= num2;
                             else
-                                throw new ExecutionException("nonsupport " + type + "  with number");
+                                throw new ExecutionException("nonsupport operate [" + type + "]  with number", operate);
                             return ret ? ScriptBoolean.True : ScriptBoolean.False;
                         } 
                     }
                 }
             } else {
-                if (!left.IsNumber) throw new ExecutionException("[operate] left is not primitive object");
+                if (!left.IsNumber) throw new ExecutionException("operate [+ - * /] left is not number", operate);
                 ScriptObject right = ResolveOperand(operate.Right);
-                if (!right.IsNumber) throw new ExecutionException("[operate] right is not primitive object");
+                if (!right.IsNumber) throw new ExecutionException("operate [+ - * /] right is not number", operate);
                 if (operate.Operator == TokenType.Minus)
                     return left.Minus(right);
                 else if (operate.Operator == TokenType.Multiply)
@@ -533,7 +531,7 @@ namespace Scorpio.Runtime
                 else if (operate.Operator == TokenType.Modulo)
                     return left.Modulo(right);
             }
-            throw new ExecutionException("错误的操作符号 " + operate.Operator);
+            throw new ExecutionException("错误的操作符号 " + operate.Operator, operate);
         }
     }
 }

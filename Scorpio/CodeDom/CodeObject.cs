@@ -9,6 +9,13 @@ namespace Scorpio.CodeDom
     {
         public bool Not;            // ! 标识（非xxx）
         public bool Negative;       // - 标识（负数）
-        public Token Token;         // 变量起始关键字
+        public string Breviary;     // 摘要
+        public int Line;            // 起始关键字所在行数
+        public CodeObject() { }
+        public CodeObject(string breviary, int line)
+        {
+            this.Breviary = breviary;
+            this.Line = line;
+        }
     }
 }

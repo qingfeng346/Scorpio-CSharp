@@ -14,7 +14,6 @@ namespace Scorpio
     {
         //全局变量
         private VariableDictionary m_GlobalObject = new VariableDictionary();
-        private String m_strBreviary = "";
         public ReadOnlyDictionary<String, ScriptObject> GlobalObject { get { return ReadOnlyDictionary<String, ScriptObject>.AsReadOnly(m_GlobalObject); } }
         public void LoadFile(String strFileName)
         {
@@ -26,20 +25,20 @@ namespace Scorpio
                 stream.Close();
                 LoadString(strFileName,Encoding.UTF8.GetString(buffer));
             } catch (System.Exception e) {
-                throw new ScriptException(e, "load file " + strFileName + " is error ");
+                throw new ScriptException("load file [" + strFileName + "] is error : " + e.ToString());
             }
         }
         public ScriptObject LoadString(String strName, String strBuffer)
         {
+            string strBreviary = "";
             try {
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer);
-                m_strBreviary = scriptLexer.GetBreviary();
-                List<Token> tokens = scriptLexer.GetTokens();
-                ScriptParser scriptParser = new ScriptParser(this, tokens);
+                strBreviary = string.IsNullOrEmpty(strName) ? scriptLexer.GetBreviary() : strName;
+                ScriptParser scriptParser = new ScriptParser(this, scriptLexer.GetTokens(), strBreviary);
                 ScriptExecutable scriptExecutable = scriptParser.Parse();
                 return new ScriptContext(this, scriptExecutable, null, Executable_Block.Context).Execute();
             } catch (System.Exception e) {
-                throw new ScriptException(e, "load buffer " + m_strBreviary + " is error ");
+                throw new ScriptException("load buffer [" + strBreviary + "] is error : " + e.ToString());
             }
         }
         public bool HasObject(String strName)
@@ -63,13 +62,17 @@ namespace Scorpio
         {
             m_GlobalObject[strName] = new ScriptFunction(strName, handle);
         }
+        public void RegisterFunction(String strName, Delegate dele)
+        {
+            m_GlobalObject[strName] = new ScriptFunction(strName, dele);
+        }
         public ScriptObject CallFunction(String strName, params ScriptObject[] args)
         {
             if (m_GlobalObject.ContainsKey(strName))
             {
-                ScriptObject obj = m_GlobalObject[strName];
-                if (obj.IsFunction)
-                    return ((ScriptFunction)obj).Call(args);
+                ScriptFunction func = m_GlobalObject[strName] as ScriptFunction;
+                if (func != null)
+                    return func.Call(args);
             }
             return null;
         }

@@ -4,7 +4,8 @@ using System.Text;
 using Scorpio;
 namespace Scorpio.Variable
 {
-    public class IScriptPrimitiveObject : ScriptObject
+    public abstract class IScriptPrimitiveObject : ScriptObject
     {
+        public abstract object ObjectValue { get; }
     }
 }

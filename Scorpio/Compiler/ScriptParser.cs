@@ -6,22 +6,22 @@ using Scorpio.Exception;
 using Scorpio.Runtime;
 using Scorpio.CodeDom;
 using Scorpio.CodeDom.Temp;
+using Scorpio.Variable;
 namespace Scorpio.Compiler
 {
     //上下文解析
     internal partial class ScriptParser
     {
         private Script m_script;                                                        //脚本类
+        private string m_strBreviary;                                                   //当前解析的脚本摘要
         private int m_iNextToken;                                                       //当前读到token
         private List<Token> m_listTokens;                                               //token列表
         private Stack<ScriptExecutable> m_Executables = new Stack<ScriptExecutable>();  //指令栈
         private ScriptExecutable m_scriptExecutable;                                    //当前指令栈
-        private Stack<TempOperator> m_operateTemp = new Stack<TempOperator>();          //运算符栈
-        private Stack<CodeOperator> m_operateCode = new Stack<CodeOperator>();          //表达式栈
-
-        public ScriptParser(Script script, List<Token> listTokens)
+        public ScriptParser(Script script, List<Token> listTokens, string strBreviary)
         {
             m_script = script;
+            m_strBreviary = strBreviary;
             m_iNextToken = 0;
             m_listTokens = new List<Token>(listTokens);
         }
@@ -109,10 +109,10 @@ namespace Scorpio.Compiler
                     ParseExpression();
                     break;
                 case TokenType.Break:
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.BREAK));
+                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.BREAK, new CodeObject(m_strBreviary, token.SourceLine)));
                     break;
                 case TokenType.Continue:
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CONTINUE));
+                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CONTINUE, new CodeObject(m_strBreviary, token.SourceLine)));
                     break;
                 case TokenType.Function:
                     ParseFunction();
@@ -163,7 +163,7 @@ namespace Scorpio.Compiler
             }
             ReadRightParenthesis();
             var executable = ParseStatementBlock(Executable_Block.Function);
-            return new ScriptFunction(m_script, strFunctionName, listParameters, executable);
+            return new ScriptFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable));
         }
         //解析普通代码块 {}
         private void ParseBlock()
@@ -306,7 +306,7 @@ namespace Scorpio.Compiler
         {
             TempOperator curr = TempOperator.GetOper(PeekToken().Type);
             if (curr == null) return false;
-            Token token = ReadToken();
+            ReadToken();
             while (operateStack.Count > 0) {
                 TempOperator oper = operateStack.Peek();
                 if (oper.Level >= curr.Level) {
@@ -374,6 +374,8 @@ namespace Scorpio.Compiler
             ret = GetVariable(ret);
             ret.Not = not;
             ret.Negative = negative;
+            ret.Breviary = m_strBreviary;
+            ret.Line = token.SourceLine;
             if (ret is CodeMember) {
                 if (calc != CALC.NONE) {
                     ((CodeMember)ret).Calc = calc;

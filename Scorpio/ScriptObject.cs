@@ -39,7 +39,8 @@ namespace Scorpio
             } else if (type == typeof(sbyte) || type == typeof(byte) ||
                        type == typeof(short) || type == typeof(ushort) ||
                        type == typeof(int)   || type == typeof(uint) ||
-                       type == typeof(float) || type == typeof(double)) {
+                       type == typeof(float) || type == typeof(double) || 
+                       type == typeof(decimal)) {
                 return new ScriptNumber(Convert.ToDouble(obj));
             }
             return new ScriptUserdata(obj);

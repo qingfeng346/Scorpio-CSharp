@@ -34,5 +34,15 @@ namespace Scorpio
                 }
             }
         }
+        public static bool IsNumber(object obj)
+        {
+            Type type = obj.GetType();
+            return (type == typeof(sbyte) || type == typeof(byte) ||
+                    type == typeof(short) || type == typeof(ushort) ||
+                    type == typeof(int) || type == typeof(uint) ||
+                    type == typeof(float) || type == typeof(double) ||
+                    type == typeof(decimal) || type == typeof(long) ||
+                    type == typeof(ulong));
+        }
     }
 }

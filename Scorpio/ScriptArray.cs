@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Scorpio.CodeDom;
 using Scorpio.Exception;
 namespace Scorpio
 {
@@ -13,16 +14,24 @@ namespace Scorpio
             Type = ObjectType.Array;
             m_listObject = new List<ScriptObject>();
         }
-        public ScriptObject GetValue(int index)
+        public ScriptObject GetValue(int index, CodeObject member)
         {
             if (index < 0 || index >= m_listObject.Count)
-                throw new ExecutionException("index is < 0 or out of count ");
+                throw new ExecutionException("index is < 0 or out of count ", member);
+            return m_listObject[index];
+        }
+        public void SetValue(int index, ScriptObject obj, CodeObject member)
+        {
+            if (index < 0 || index >= m_listObject.Count)
+                throw new ExecutionException("index is < 0 or out of count ", member);
+            m_listObject[index] = obj;
+        }
+        public ScriptObject GetValue(int index)
+        {
             return m_listObject[index];
         }
         public void SetValue(int index, ScriptObject obj)
         {
-            if (index < 0 || index >= m_listObject.Count)
-                throw new ExecutionException("index is < 0 or out of count ");
             m_listObject[index] = obj;
         }
         public void Add(ScriptObject obj)

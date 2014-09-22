@@ -57,11 +57,13 @@ namespace Scorpio.Compiler
         private String m_strToken = null;
         private int m_iSourceLine;
         private int m_iSourceChar;
+        private String m_strBreviary;
         private List<String> m_listSourceLines = new List<String>();
         public ScriptLexer(String buffer)
         {
             String strSource = buffer.Replace("\r\n", "\r");
             string[] strLines = strSource.Split('\r');
+            m_strBreviary = strLines.Length > 0 ? strLines[0] : "";
             foreach (String strLine in strLines)
                 m_listSourceLines.Add(strLine + "\r\n");
             m_iSourceLine = 0;
@@ -71,9 +73,7 @@ namespace Scorpio.Compiler
         /// <summary> 获得整段字符串的摘要 </summary>
         public String GetBreviary()
         {
-            if (m_listSourceLines.Count > 0)
-                return m_listSourceLines[0];
-            return "";
+            return m_strBreviary;
         }
         bool EndOfSource { get { return m_iSourceLine >= m_listSourceLines.Count; } }
         bool EndOfLine { get { return m_iSourceChar >= m_listSourceLines[m_iSourceLine].Length; } }

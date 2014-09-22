@@ -8,6 +8,7 @@ namespace Scorpio.Variable
     {
         protected T m_Value;
         public T Value { get { return m_Value; } set { m_Value = value; } }
+        public override object ObjectValue { get { return Value; } }
         public ScriptPrimitiveObject()
         {
             this.Value = default(T);
