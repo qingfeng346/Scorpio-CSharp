@@ -54,9 +54,16 @@ namespace Scorpio.Variable
                 methodInfo = m_Methods[0];
                 if (parameters.Length != methodInfo.ParameterType.Length) throw new ScriptException("Method [" + m_MethodName + "] is cannot find fit");
             } else {
-                //for (int i=0;i<m_Methods.Length;++i) {
-                //    FunctionMethod method = m_Methods[i];
-                //}
+                for (int i = 0; i < m_Methods.Length; ++i)
+                {
+                    FunctionMethod method = m_Methods[i];
+                    if (method.ParameterType.Length == parameters.Length && Util.CanChangeType(parameters, method.ParameterType))
+                    {
+                        methodInfo = method;
+                        break;
+                    }
+                }
+                if (methodInfo == null) throw new ScriptException("Method [" + m_MethodName + "] is cannot find fit");
             }
             int length = methodInfo.ParameterType.Length;
             object[] objs = new object[length];

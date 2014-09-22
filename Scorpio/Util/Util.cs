@@ -35,9 +35,8 @@ namespace Scorpio
                 }
             }
         }
-        public static bool IsNumber(object obj)
+        private static bool IsNumber(Type type)
         {
-            Type type = obj.GetType();
             return (type == typeof(sbyte) || type == typeof(byte) ||
                     type == typeof(short) || type == typeof(ushort) ||
                     type == typeof(int) || type == typeof(uint) ||
@@ -56,9 +55,27 @@ namespace Scorpio
             }
             return par;
         }
+        public static bool CanChangeType(ScriptObject[] pars, Type[] types)
+        {
+            for (int i = 0; i < pars.Length;++i )
+            {
+                if (!CanChangeType(pars[i], types[i]))
+                    return false;
+            }
+            return true;
+        }
         public static bool CanChangeType(ScriptObject par, Type type)
         {
-            return true;
+            if (par.GetType() == type) {
+                return true;
+            } else if (par.IsString && type == typeof(string)) {
+                return true;
+            } else if (par.IsNumber && IsNumber(type)) {
+                return true;
+            } else if (par.IsUserData && ((ScriptUserdata)par).ValueType == type) {
+                return true;
+            }
+            return false;
         }
     }
 }
