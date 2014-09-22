@@ -47,12 +47,18 @@ namespace Scorpio
         }
         public static object ChangeType(ScriptObject par, Type type)
         {
-            if (par is IScriptPrimitiveObject) {
+            if (par.GetType() == type) {
+                return par;
+            } else if (par is IScriptPrimitiveObject) {
                 return Convert.ChangeType(((IScriptPrimitiveObject)par).ObjectValue, type);
             } else if (par is ScriptUserdata) {
                 return ((ScriptUserdata)par).Value;
             }
             return par;
+        }
+        public static bool CanChangeType(ScriptObject par, Type type)
+        {
+            return true;
         }
     }
 }

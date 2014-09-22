@@ -17,7 +17,7 @@ namespace Scorpio
         {
             Type = ObjectType.UserData;
             Value = value;
-            ValueType = value.GetType();
+            ValueType = (Value is Type) ? (Type)value : value.GetType();
         }
         private FieldInfo GetField(string strName)
         {
@@ -45,7 +45,7 @@ namespace Scorpio
         public ScriptObject Call(string strName, params object[] args)
         {
             ScriptFunction func = GetValue(strName) as ScriptFunction;
-            if (func == null) throw new ScriptException("");
+            if (func == null) throw new ScriptException(strName + " 不是一个函数");
             return func.Call(args);
         }
         public override string ToString() { return "Userdata"; }
