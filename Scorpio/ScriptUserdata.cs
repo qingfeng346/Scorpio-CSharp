@@ -40,12 +40,13 @@ namespace Scorpio
         public void SetValue(string strName, ScriptObject value)
         {
             FieldInfo field = GetField(strName);
-            if (field != null) field.SetValue(Value, Util.ChangeType(value, field.FieldType));
+            if (field == null) throw new ScriptException("Type[" + ValueType + "] 变量 [" + strName + "] 不存在");
+            field.SetValue(Value, Util.ChangeType(value, field.FieldType));
         }
         public ScriptObject Call(string strName, params object[] args)
         {
             ScriptFunction func = GetValue(strName) as ScriptFunction;
-            if (func == null) throw new ScriptException(strName + " 不是一个函数");
+            if (func == null) throw new ScriptException("Type[" + ValueType + "] 变量 [" + strName + "] 不是一个函数");
             return func.Call(args);
         }
         public override string ToString() { return "Userdata"; }
