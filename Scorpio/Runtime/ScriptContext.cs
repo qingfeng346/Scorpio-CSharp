@@ -114,6 +114,18 @@ namespace Scorpio.Runtime
                     } else {
                         throw new ExecutionException("GetVariable Table Element is must a string", member);
                     }
+                } else if (parent is ScriptUserdata) {
+                    if (member.Type == MEMBER_TYPE.STRING) {
+                        ScriptUserdata data = (ScriptUserdata)parent;
+                        return data.GetValue(member.MemberString);
+                    } else if (member.Type == MEMBER_TYPE.OBJECT) {
+                        ScriptString mem = ResolveOperand(member.Member) as ScriptString;
+                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        ScriptUserdata data = (ScriptUserdata)parent;
+                        ret = data.GetValue(mem.Value);
+                    } else {
+                        throw new ExecutionException("GetVariable Table Element is must a string", member);
+                    }
                 } else {
                     throw new ExecutionException("GetVariable member parent is not table or array", member);
                 }
@@ -157,6 +169,18 @@ namespace Scorpio.Runtime
                         if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
                         ScriptTable table = (ScriptTable)parent;
                         table.SetValue(mem.Value, ResolveOperand(obj));
+                    } else {
+                        throw new ExecutionException("GetVariable Table Element is must a string", member);
+                    }
+                } else if (parent is ScriptUserdata) {
+                    if (member.Type == MEMBER_TYPE.STRING) {
+                        ScriptUserdata data = (ScriptUserdata)parent;
+                        data.SetValue(member.MemberString, ResolveOperand(obj));
+                    } else if (member.Type == MEMBER_TYPE.OBJECT) {
+                        ScriptString mem = ResolveOperand(member.Member) as ScriptString;
+                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        ScriptUserdata data = (ScriptUserdata)parent;
+                        data.SetValue(mem.Value, ResolveOperand(obj));
                     } else {
                         throw new ExecutionException("GetVariable Table Element is must a string", member);
                     }

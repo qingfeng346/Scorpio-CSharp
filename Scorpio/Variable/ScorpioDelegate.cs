@@ -34,20 +34,12 @@ namespace Scorpio.Variable
         public object Call(ScriptObject[] parameters)
         {
             FunctionParameter parameter;
-            ScriptObject par;
             for (int i = 0; i < m_ParameterCount; i++) {
                 parameter = m_Parameters[i];
                 if (i >= parameters.Length) {
                     m_Objects[i] = parameter.DefaultValue;
                 }  else {
-                    par = parameters[i];
-                    if (par is IScriptPrimitiveObject) {
-                        m_Objects[i] = Convert.ChangeType(((IScriptPrimitiveObject)par).ObjectValue, parameter.ParameterType);
-                    } else if (par is ScriptUserdata) {
-                        m_Objects[i] = ((ScriptUserdata)par).Value;
-                    } else {
-                        m_Objects[i] = par;
-                    }
+                    m_Objects[i] = Util.ChangeType(parameters[i], parameter.ParameterType);
                 }
             }
             return m_Delegate.DynamicInvoke(m_Objects);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Collections;
+using Scorpio.Variable;
 namespace Scorpio
 {
     public static class Util
@@ -43,6 +44,15 @@ namespace Scorpio
                     type == typeof(float) || type == typeof(double) ||
                     type == typeof(decimal) || type == typeof(long) ||
                     type == typeof(ulong));
+        }
+        public static object ChangeType(ScriptObject par, Type type)
+        {
+            if (par is IScriptPrimitiveObject) {
+                return Convert.ChangeType(((IScriptPrimitiveObject)par).ObjectValue, type);
+            } else if (par is ScriptUserdata) {
+                return ((ScriptUserdata)par).Value;
+            }
+            return par;
         }
     }
 }

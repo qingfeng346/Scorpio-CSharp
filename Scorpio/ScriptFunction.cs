@@ -24,6 +24,8 @@ namespace Scorpio
         Handle,
         //动态委托
         Delegate,
+        //函数
+        Method,
     }
     //脚本函数类型
     public class ScriptFunction : ScriptObject
@@ -35,6 +37,7 @@ namespace Scorpio
         private ScorpioFunction m_Function;                         //程序函数指针
         private ScorpioHandle m_Handle;                             //程序函数执行类
         private ScorpioDelegate m_Delegate;                         //程序函数动态委托
+        private ScorpioMethod m_Method;                             //程序函数
         public ScriptFunction(ScorpioFunction function) : this(function.Method.Name, function) { }
         public ScriptFunction(String strName, ScorpioFunction function)
         {
@@ -52,6 +55,11 @@ namespace Scorpio
         {
             this.m_Delegate = new ScorpioDelegate(dele);
             Initialize(strName, FunstionType.Delegate);
+        }
+        public ScriptFunction(String strName, ScorpioMethod method)
+        {
+            this.m_Method = method;
+            Initialize(strName, FunstionType.Method);
         }
         public ScriptFunction(String strName, ScorpioScriptFunction function)
         {
@@ -91,6 +99,8 @@ namespace Scorpio
                     return CreateObject(m_Handle.run(par));
                 } else if (FunctionType == FunstionType.Delegate) {
                     return CreateObject(m_Delegate.Call(par));
+                } else if (FunctionType == FunstionType.Method) {
+                    return CreateObject(m_Method.Call(par));
                 }
             }
             return null;
