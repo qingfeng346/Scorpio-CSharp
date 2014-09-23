@@ -7,6 +7,20 @@ namespace Scorpio
 {
     public static class Util
     {
+        private static readonly Type TYPE_BOOL = typeof(bool);
+        private static readonly Type TYPE_STRING = typeof(string);
+        private static readonly Type TYPE_SBYTE = typeof(sbyte);
+        private static readonly Type TYPE_BYTE = typeof(byte);
+        private static readonly Type TYPE_SHORT = typeof(short);
+        private static readonly Type TYPE_USHORT = typeof(ushort);
+        private static readonly Type TYPE_INT = typeof(int);
+        private static readonly Type TYPE_UINT = typeof(uint);
+        private static readonly Type TYPE_LONG = typeof(long);
+        private static readonly Type TYPE_ULONG = typeof(ulong);
+        private static readonly Type TYPE_FLOAT = typeof(float);
+        private static readonly Type TYPE_DOUBLE = typeof(double);
+        private static readonly Type TYPE_DECIMAL = typeof(decimal);
+
         public static bool SetObject(VariableDictionary variables, string str, ScriptObject obj)
         {
             if (!variables.ContainsKey(str)) return false;
@@ -35,14 +49,33 @@ namespace Scorpio
                 }
             }
         }
+        public static bool IsBool(Type type)
+        {
+            return type == TYPE_BOOL;
+        }
+        public static bool IsString(Type type)
+        {
+            return type == TYPE_STRING;
+        }
+        public static bool IsDouble(Type type)
+        {
+            return (type == TYPE_SBYTE || type == TYPE_BYTE ||
+                    type == TYPE_SHORT || type == TYPE_USHORT ||
+                    type == TYPE_INT || type == TYPE_UINT ||
+                    type == TYPE_FLOAT || type == TYPE_DOUBLE ||
+                    type == TYPE_DECIMAL);
+        }
+        public static bool IsLong(Type type)
+        {
+            return type == TYPE_LONG;
+        }
+        public static bool IsULong(Type type)
+        {
+            return type == TYPE_ULONG;
+        }
         private static bool IsNumber(Type type)
         {
-            return (type == typeof(sbyte) || type == typeof(byte) ||
-                    type == typeof(short) || type == typeof(ushort) ||
-                    type == typeof(int) || type == typeof(uint) ||
-                    type == typeof(float) || type == typeof(double) ||
-                    type == typeof(decimal) || type == typeof(long) ||
-                    type == typeof(ulong));
+            return IsDouble(type) || IsLong(type) || IsULong(type);
         }
         public static object ChangeType(ScriptObject par, Type type)
         {

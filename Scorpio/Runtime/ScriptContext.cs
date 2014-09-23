@@ -521,24 +521,7 @@ namespace Scorpio.Runtime
                                 throw new ExecutionException("nonsupport operate [" + type + "] with string", operate);
                             return ret ? ScriptBoolean.True : ScriptBoolean.False;
                         } else if (left.IsNumber) {
-                            double num1 = ((ScriptNumber)left).Value;
-                            double num2 = ((ScriptNumber)right).Value;
-                            bool ret = false;
-                            if (type == TokenType.Equal)
-                                ret = num1 == num2;
-                            else if (type == TokenType.NotEqual)
-                                ret = num1 != num2;
-                            else if (type == TokenType.Greater)
-                                ret = num1 > num2;
-                            else if (type == TokenType.GreaterOrEqual)
-                                ret = num1 >= num2;
-                            else if (type == TokenType.Less)
-                                ret = num1 < num2;
-                            else if (type == TokenType.LessOrEqual)
-                                ret = num1 <= num2;
-                            else
-                                throw new ExecutionException("nonsupport operate [" + type + "]  with number", operate);
-                            return ret ? ScriptBoolean.True : ScriptBoolean.False;
+                            return ((ScriptNumber)left).Compare(type, operate, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
                         } 
                     }
                 }

@@ -379,6 +379,14 @@ namespace Scorpio.Compiler
                     case LexState.Number:
                         if (char.IsDigit(ch)) {
                             m_strToken += ch;
+                        } else if (ch == 'L') {
+                            long value = long.Parse(m_strToken);
+                            listTokens.Add(new Token(TokenType.Number, value, m_iSourceLine, m_iSourceChar));
+                            lexState = LexState.None;
+                        } else if (ch == 'U') {
+                            ulong value = ulong.Parse(m_strToken);
+                            listTokens.Add(new Token(TokenType.Number, value, m_iSourceLine, m_iSourceChar));
+                            lexState = LexState.None;
                         } else {
                             double value = double.Parse(m_strToken);
                             listTokens.Add(new Token(TokenType.Number, value, m_iSourceLine, m_iSourceChar));

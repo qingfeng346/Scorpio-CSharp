@@ -94,6 +94,6 @@ namespace Scorpio
             if (field == null) throw new ScriptException("Type[" + ValueType + "] 变量 [" + strName + "] 不存在");
             field.SetValue(Value, Util.ChangeType(value, field.fieldType));
         }
-        public override string ToString() { return "Userdata"; }
+        public override string ToString() { return Value.ToString(); }
     }
 }

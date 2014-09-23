@@ -20,5 +20,9 @@ namespace Scorpio
         {
             return Value ? False : True;
         }
+        public static ScriptBoolean Get(bool b)
+        {
+            return b ? True : False;
+        }
     }
 }

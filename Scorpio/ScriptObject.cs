@@ -25,23 +25,17 @@ namespace Scorpio
                 return ScriptNull.Instance;
             else if (obj is ScriptObject)
                 return (ScriptObject)obj;
-            else if (obj is CodeScriptObject)
-                return (obj as CodeScriptObject).Object;
-            else if (obj is ScorpioFunction)
-                return new ScriptFunction((ScorpioFunction)obj);
-            else if (obj is ScorpioHandle)
-                return new ScriptFunction((ScorpioHandle)obj);
             Type type = obj.GetType();
-            if (type == typeof(bool)) {
-                return new ScriptBoolean((bool)obj);
-            } else if (type == typeof(string)) {
+            if (Util.IsBool(type)) {
+                return ScriptBoolean.Get((bool)obj);
+            } else if (Util.IsString(type)) {
                 return new ScriptString((string)obj);
-            } else if (type == typeof(sbyte) || type == typeof(byte) ||
-                       type == typeof(short) || type == typeof(ushort) ||
-                       type == typeof(int)   || type == typeof(uint) ||
-                       type == typeof(float) || type == typeof(double) || 
-                       type == typeof(decimal)) {
+            } else if (Util.IsDouble(type)) {
                 return new ScriptNumber(Convert.ToDouble(obj));
+            } else if (Util.IsLong(type)) {
+                return new ScriptNumber(Convert.ToInt64(obj));
+            } else if (Util.IsULong(type)) {
+                return new ScriptNumber(Convert.ToUInt64(obj));
             }
             return new ScriptUserdata(obj);
         }
