@@ -36,13 +36,23 @@ namespace Scorpio
         }
         public object Value { get; private set; }
         public Type ValueType { get; private set; }
-        private Dictionary<string, Field> FieldInfos = new Dictionary<string, Field>();
-        private Dictionary<string, ScriptFunction> Functions = new Dictionary<string, ScriptFunction>();
+        private bool IsEnum = false;
+        private Dictionary<string, Field> FieldInfos = new Dictionary<string, Field>();                         //所有的变量 以及 get set函数
+        private Dictionary<string, ScriptUserdata> NestedTypes = new Dictionary<string, ScriptUserdata>();      //所有的类中类
+        private Dictionary<string, ScriptFunction> Functions = new Dictionary<string, ScriptFunction>();        //所有的函数
+        private Dictionary<string, ScriptNumber> Enums = new Dictionary<string, ScriptNumber>();                //如果是枚举的话 所有枚举的值
         public ScriptUserdata(object value)
         {
             Type = ObjectType.UserData;
             Value = value;
             ValueType = (Value is Type) ? (Type)value : value.GetType();
+            IsEnum = ValueType.IsEnum;
+            if (IsEnum) {
+                Array values = Enum.GetValues(ValueType);
+                foreach (var v in values) {
+                    Enums[v.ToString()] = new ScriptNumber(Convert.ToInt64(v));
+                }
+            }
         }
         private Field GetField(string strName)
         {
@@ -80,19 +90,37 @@ namespace Scorpio
         }
         public ScriptObject GetValue(string strName)
         {
-            if (Functions.ContainsKey(strName))
-                return Functions[strName];
-            Field field = GetField(strName);
-            if (field != null) return ScriptObject.CreateObject(field.GetValue(Value));
-            ScriptFunction func = new ScriptFunction("", new ScorpioMethod(ValueType, strName, Value));
-            Functions[strName] = func;
-            return func;
+            if (IsEnum) {
+                if (!Enums.ContainsKey(strName)) throw new ScriptException("Enum[" + ValueType.ToString() + "] Element[" + strName + "] 不存在");
+                return Enums[strName];
+            } else {
+                if (Functions.ContainsKey(strName))
+                    return Functions[strName];
+                if (NestedTypes.ContainsKey(strName))
+                    return NestedTypes[strName];
+                Field field = GetField(strName);
+                if (field != null)
+                    return ScriptObject.CreateObject(field.GetValue(Value));
+                Type nestedType = ValueType.GetNestedType(strName);
+                if (nestedType != null) {
+                    ScriptUserdata ret = new ScriptUserdata(nestedType);
+                    NestedTypes.Add(strName, ret);
+                    return ret;
+                }
+                ScriptFunction func = new ScriptFunction("", new ScorpioMethod(ValueType, strName, Value));
+                Functions[strName] = func;
+                return func;
+            }
         }
         public void SetValue(string strName, ScriptObject value)
         {
-            Field field = GetField(strName);
-            if (field == null) throw new ScriptException("Type[" + ValueType + "] 变量 [" + strName + "] 不存在");
-            field.SetValue(Value, Util.ChangeType(value, field.fieldType));
+            if (IsEnum) {
+                throw new ScriptException("Enum 不支持 SetValue");
+            } else {
+                Field field = GetField(strName);
+                if (field == null) throw new ScriptException("Type[" + ValueType + "] 变量 [" + strName + "] 不存在");
+                field.SetValue(Value, Util.ChangeType(value, field.fieldType));
+            }
         }
         public override string ToString() { return Value.ToString(); }
     }

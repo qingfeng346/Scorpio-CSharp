@@ -103,7 +103,7 @@ namespace Scorpio
                 return true;
             } else if (par.IsString && type == typeof(string)) {
                 return true;
-            } else if (par.IsNumber && IsNumber(type)) {
+            } else if (par.IsNumber && (IsNumber(type) || type.IsEnum)) {
                 return true;
             } else if (par.IsUserData && ((ScriptUserdata)par).ValueType == type) {
                 return true;
