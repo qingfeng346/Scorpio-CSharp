@@ -219,6 +219,9 @@ namespace Scorpio
             }
             return false;
         }
-
+        public override string ToString()
+        {
+            return ObjectValue.ToString();
+        }
     }
 }
