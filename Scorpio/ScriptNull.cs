@@ -9,7 +9,7 @@ namespace Scorpio
     {
         private static ScriptNull s_ScriptNull;
         public static ScriptNull Instance { get { if (s_ScriptNull == null) s_ScriptNull = new ScriptNull(); return s_ScriptNull; } }
-        private ScriptNull() { Type = ObjectType.Null; }
+        public override ObjectType Type { get { return ObjectType.Null; } }
         public override string ToString() { return "Null"; }
         public override bool Equals(object obj)
         {

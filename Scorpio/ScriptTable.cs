@@ -10,9 +10,9 @@ namespace Scorpio
     public class ScriptTable : ScriptObject
     {
         private Dictionary<String, ScriptObject> m_listObject;               //所有的数据(函数和数据都在一个数组)
+        public override ObjectType Type { get { return ObjectType.Table; } }
         public ScriptTable()
         {
-            Type = ObjectType.Table;
             m_listObject = new Dictionary<String, ScriptObject>();
         }
         public void SetValue(String strName, ScriptObject scriptObject)

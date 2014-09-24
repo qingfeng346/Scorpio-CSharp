@@ -9,9 +9,9 @@ namespace Scorpio
     public class ScriptArray : ScriptObject
     {
         public List<ScriptObject> m_listObject;
+        public override ObjectType Type { get { return ObjectType.Array; } }
         public ScriptArray()
         {
-            Type = ObjectType.Array;
             m_listObject = new List<ScriptObject>();
         }
         public ScriptObject GetValue(int index, CodeObject member)

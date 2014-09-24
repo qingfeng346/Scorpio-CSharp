@@ -40,14 +40,19 @@ namespace Scorpio.Library
         }
         public static void Load(Script script)
         {
-            script.SetObject("print", new ScriptFunction(new print()));
-            script.SetObject("pair", new ScriptFunction(new pair()));
+            script.SetObjectInternal("print", script.CreateFunction(new print()));
+            script.SetObjectInternal("pair", script.CreateFunction(new pair(script)));
         }
         private class pair : ScorpioHandle
         {
+            private Script m_script;
+            public pair(Script script)
+            {
+                m_script = script;
+            }
             public object run(object[] args)
             {
-                return new ScriptFunction(new TablePair((ScriptObject)args[0]));
+                return m_script.CreateFunction(new TablePair((ScriptObject)args[0]));
             }
         }
         private class print : ScorpioHandle

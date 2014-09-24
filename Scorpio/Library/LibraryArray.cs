@@ -9,13 +9,10 @@ namespace Scorpio.Library
         public static ScriptTable Table = new ScriptTable();
         public static void Load(Script script)
         {
-            script.SetObject("array", Table);
-        }
-        static LibraryArray()
-        {
-            Table.SetValue("count", new ScriptFunction(new count()));
-            Table.SetValue("insert", new ScriptFunction(new insert()));
-            Table.SetValue("add", new ScriptFunction(new add()));
+            Table.SetValue("count", script.CreateFunction(new count()));
+            Table.SetValue("insert", script.CreateFunction(new insert()));
+            Table.SetValue("add", script.CreateFunction(new add()));
+            script.SetObjectInternal("array", Table);
         }
         private class count : ScorpioHandle
         {

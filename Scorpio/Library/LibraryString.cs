@@ -9,12 +9,9 @@ namespace Scorpio.Library
         public static ScriptTable Table = new ScriptTable();
         public static void Load(Script script)
         {
-            script.SetObject("string", Table);
-        }
-        static LibraryString()
-        {
-            Table.SetValue("format", new ScriptFunction(new format()));
-            Table.SetValue("substring", new ScriptFunction(new substring()));
+            Table.SetValue("format", script.CreateFunction(new format()));
+            Table.SetValue("substring", script.CreateFunction(new substring()));
+            script.SetObjectInternal("string", Table);
         }
         const string DELIM_STR = "{}";
         private class format : ScorpioHandle

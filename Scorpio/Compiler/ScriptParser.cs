@@ -163,7 +163,7 @@ namespace Scorpio.Compiler
             }
             ReadRightParenthesis();
             var executable = ParseStatementBlock(Executable_Block.Function);
-            return new ScriptFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable));
+            return m_script.CreateFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable));
         }
         //解析普通代码块 {}
         private void ParseBlock()
@@ -366,7 +366,7 @@ namespace Scorpio.Compiler
                 case TokenType.Boolean:
                 case TokenType.Number:
                 case TokenType.String:
-                    ret = new CodeScriptObject(token.Lexeme);
+                    ret = new CodeScriptObject(m_script.CreateObject(token.Lexeme));
                     break;
                 default:
                     throw new ParserException("parse is error ", token);

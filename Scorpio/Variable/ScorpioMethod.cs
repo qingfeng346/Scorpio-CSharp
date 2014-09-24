@@ -21,13 +21,13 @@ namespace Scorpio.Variable
         private Type m_Type;
         private int m_Count;
         private FunctionMethod[] m_Methods;
-        private string m_MethodName;
+        public string MethodName { get; private set; }
         public ScorpioMethod(Type type, string methodName) : this(type, methodName, null) { }
         public ScorpioMethod(Type type, string methodName, object obj)
         {
             m_Object = obj;
             m_Type = type;
-            m_MethodName = methodName;
+            MethodName = methodName;
             List<FunctionMethod> functionMethod = new List<FunctionMethod>();
             MethodInfo[] methods = type.GetMethods();
             int length = methods.Length;
@@ -48,11 +48,11 @@ namespace Scorpio.Variable
         }
         public object Call(ScriptObject[] parameters)
         {
-            if (m_Count == 0) throw new ScriptException("Method [" + m_MethodName + "] is cannot find");
+            if (m_Count == 0) throw new ScriptException("Method [" + MethodName + "] is cannot find");
             FunctionMethod methodInfo = null;
             if (m_Count == 1) {
                 methodInfo = m_Methods[0];
-                if (parameters.Length != methodInfo.ParameterType.Length) throw new ScriptException("Method [" + m_MethodName + "] is cannot find fit");
+                if (parameters.Length != methodInfo.ParameterType.Length) throw new ScriptException("Method [" + MethodName + "] is cannot find fit");
             } else {
                 for (int i = 0; i < m_Methods.Length; ++i)
                 {
@@ -63,7 +63,7 @@ namespace Scorpio.Variable
                         break;
                     }
                 }
-                if (methodInfo == null) throw new ScriptException("Method [" + m_MethodName + "] is cannot find fit");
+                if (methodInfo == null) throw new ScriptException("Method [" + MethodName + "] is cannot find fit");
             }
             int length = methodInfo.ParameterType.Length;
             object[] objs = new object[length];

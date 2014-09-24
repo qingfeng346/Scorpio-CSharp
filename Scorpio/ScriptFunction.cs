@@ -30,6 +30,7 @@ namespace Scorpio
     //脚本函数类型
     public class ScriptFunction : ScriptObject
     {
+        public Script Script { get; private set; }                  //所在脚本
         public String Name { get; private set; }                    //函数名字
         public FunstionType FunctionType { get; private set; }      //函数类型 （是 脚本函数 还是 程序函数）
 
@@ -38,38 +39,39 @@ namespace Scorpio
         private ScorpioHandle m_Handle;                             //程序函数执行类
         private ScorpioDelegate m_Delegate;                         //程序函数动态委托
         private ScorpioMethod m_Method;                             //程序函数
-        public ScriptFunction(ScorpioFunction function) : this(function.Method.Name, function) { }
-        public ScriptFunction(String strName, ScorpioFunction function)
+        public override ObjectType Type { get { return ObjectType.Function; } }
+        public ScriptFunction(Script script, ScorpioFunction function) : this(script, function.Method.Name, function) { }
+        public ScriptFunction(Script script, String strName, ScorpioFunction function)
         {
             this.m_Function = function;
-            Initialize(strName, FunstionType.Function);
+            Initialize(script, strName, FunstionType.Function);
         }
-        public ScriptFunction(ScorpioHandle handle) : this(handle.GetType().Name, handle) { }
-        public ScriptFunction(String strName, ScorpioHandle handle)
+        public ScriptFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().Name, handle) { }
+        public ScriptFunction(Script script, String strName, ScorpioHandle handle)
         {
             this.m_Handle = handle;
-            Initialize(strName, FunstionType.Handle);
+            Initialize(script, strName, FunstionType.Handle);
         }
-        public ScriptFunction(Delegate dele) : this(dele.Method.Name, dele) { }
-        public ScriptFunction(String strName, Delegate dele)
+        public ScriptFunction(Script script, Delegate dele) : this(script, dele.Method.Name, dele) { }
+        public ScriptFunction(Script script, String strName, Delegate dele)
         {
             this.m_Delegate = new ScorpioDelegate(dele);
-            Initialize(strName, FunstionType.Delegate);
+            Initialize(script, strName, FunstionType.Delegate);
         }
-        public ScriptFunction(String strName, ScorpioMethod method)
+        public ScriptFunction(Script script, ScorpioMethod method) : this(script, method.MethodName, method) { }
+        public ScriptFunction(Script script, String strName, ScorpioMethod method)
         {
             this.m_Method = method;
-            Initialize(strName, FunstionType.Method);
+            Initialize(script, strName, FunstionType.Method);
         }
-        public ScriptFunction(String strName, ScorpioScriptFunction function)
+        internal ScriptFunction(Script script, String strName, ScorpioScriptFunction function)
         {
             this.m_ScriptFunction = function;
-            Initialize(strName, FunstionType.Script);
+            Initialize(script, strName, FunstionType.Script);
         }
-        private void Initialize(String strName, FunstionType funcType)
+        private void Initialize(Script script, String strName, FunstionType funcType)
         {
-            GetType().GetMethod("");
-            Type = ObjectType.Function;
+            Script = script;
             Name = strName;
             FunctionType = funcType;
         }
@@ -91,16 +93,16 @@ namespace Scorpio
                 int length = args.Length;
                 ScriptObject[] par = new ScriptObject[length];
                 for (int i = 0; i < length; ++i) {
-                    par[i] = CreateObject(args[i]);
+                    par[i] = Script.CreateObject(args[i]);
                 }
                 if (FunctionType == FunstionType.Function) {
-                    return CreateObject(m_Function(par));
+                    return Script.CreateObject(m_Function(par));
                 } else if (FunctionType == FunstionType.Handle) {
-                    return CreateObject(m_Handle.run(par));
+                    return Script.CreateObject(m_Handle.run(par));
                 } else if (FunctionType == FunstionType.Delegate) {
-                    return CreateObject(m_Delegate.Call(par));
+                    return Script.CreateObject(m_Delegate.Call(par));
                 } else if (FunctionType == FunstionType.Method) {
-                    return CreateObject(m_Method.Call(par));
+                    return Script.CreateObject(m_Method.Call(par));
                 }
             }
             return null;

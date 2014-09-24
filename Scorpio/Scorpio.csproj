@@ -56,10 +56,13 @@
     <Compile Include="Compiler\ScriptParserBase.cs" />
     <Compile Include="Compiler\Token.cs" />
     <Compile Include="Compiler\TokenType.cs" />
+    <Compile Include="Userdata\DefaultScriptUserdata.cs" />
+    <Compile Include="Userdata\DefaultScriptUserdataFactory.cs" />
     <Compile Include="Exception\ExecutionException.cs" />
     <Compile Include="Exception\LexerException.cs" />
     <Compile Include="Exception\ParserException.cs" />
     <Compile Include="Exception\ScriptException.cs" />
+    <Compile Include="IScriptUserdataFactory.cs" />
     <Compile Include="Library\LibraryArray.cs" />
     <Compile Include="Library\LibraryBasis.cs" />
     <Compile Include="Library\LibraryString.cs" />

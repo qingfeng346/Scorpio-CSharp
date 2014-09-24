@@ -20,36 +20,28 @@ namespace Scorpio
         private double m_Double;
         private long m_Long;
         private ulong m_ULong;
-        public ScriptNumber(double value)
-        {
-            Initialize(value);
-        }
-        public ScriptNumber(long value)
-        {
-            Initialize(value);
-        }
-        public ScriptNumber(ulong value)
+        public override ObjectType Type { get { return ObjectType.Number; } }
+        public ScriptNumber(object value)
         {
             Initialize(value);
         }
         private void Initialize(object value)
         {
-            if (value is long) {
-                m_Long = (long)value;
-                m_NumberType = NUMBER_TYPE.LONG;
-            } else if (value is ulong) {
-                m_ULong = (ulong)value;
-                m_NumberType = NUMBER_TYPE.ULONG;
-            } else {
+            Type type = value.GetType();
+            if (Util.IsDouble(type)) {
                 m_Double = Convert.ToDouble(value);
                 m_NumberType = NUMBER_TYPE.DOUBLE;
+            } else if (Util.IsLong(type)) {
+                m_Long = (long)value;
+                m_NumberType = NUMBER_TYPE.LONG;
+            } else if (Util.IsULong(type)) {
+                m_ULong = (ulong)value;
+                m_NumberType = NUMBER_TYPE.ULONG;
             }
-            Type = ObjectType.Number;
         }
         public override object ObjectValue
         {
-            get 
-            {
+            get {
                 if (m_NumberType == NUMBER_TYPE.DOUBLE)
                     return m_Double;
                 else if (m_NumberType == NUMBER_TYPE.LONG)

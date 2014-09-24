@@ -144,7 +144,7 @@ namespace Scorpio.Runtime
                 string name = member.MemberString;
                 ScriptObject variable = ResolveOperand(obj);
                 if (!SetVariableObject(name, variable))
-                    m_script.SetObject(name, variable);
+                    m_script.SetObjectInternal(name, variable);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
                 if (parent == null) throw new ExecutionException("SetVariable parent is null", member);

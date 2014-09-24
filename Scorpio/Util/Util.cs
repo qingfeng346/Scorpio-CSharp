@@ -73,7 +73,7 @@ namespace Scorpio
         {
             return type == TYPE_ULONG;
         }
-        private static bool IsNumber(Type type)
+        public static bool IsNumber(Type type)
         {
             return IsDouble(type) || IsLong(type) || IsULong(type);
         }

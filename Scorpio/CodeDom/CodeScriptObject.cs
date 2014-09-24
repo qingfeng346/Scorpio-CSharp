@@ -6,8 +6,8 @@ namespace Scorpio.CodeDom
 {
     public class CodeScriptObject : CodeObject
     {
-        public CodeScriptObject(object obj) {
-            Object = ScriptObject.CreateObject(obj);
+        public CodeScriptObject(ScriptObject obj) {
+            Object = obj;
         }
         public ScriptObject Object { get; private set; }
     }
