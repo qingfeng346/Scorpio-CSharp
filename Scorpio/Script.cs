@@ -14,9 +14,8 @@ namespace Scorpio
     //脚本类
     public class Script
     {
-        //全局变量
-        private IScriptUserdataFactory m_UserdataFactory = null;
-        private VariableDictionary m_GlobalObject = new VariableDictionary();
+        private IScriptUserdataFactory m_UserdataFactory = null;                        //Userdata工厂
+        private VariableDictionary m_GlobalObject = new VariableDictionary();           //所有全局变量
         public ReadOnlyDictionary<String, ScriptObject> GlobalObject { get { return ReadOnlyDictionary<String, ScriptObject>.AsReadOnly(m_GlobalObject); } }
         public void LoadFile(String strFileName)
         {

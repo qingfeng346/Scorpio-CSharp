@@ -312,7 +312,7 @@ namespace Scorpio.Runtime
             {
                 if (code.Condition != null) {
                     Condition = context.ResolveOperand(code.Condition) as ScriptBoolean;
-                    if (Condition == null) throw new ExecutionException("for 跳出件必须是一个bool型", code.Condition);
+                    if (Condition == null) throw new ExecutionException("for 跳出条件必须是一个bool型", code.Condition);
                     if (!Condition.Value) break;
                 }
                 blockContext.Initialize(context);

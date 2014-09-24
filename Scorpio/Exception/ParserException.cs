@@ -5,6 +5,7 @@ using Scorpio.Compiler;
 
 namespace Scorpio.Exception
 {
+    //解析语法异常
     public class ParserException : ScriptException
     {
         public ParserException(String strMessage) : base(strMessage) { }
