@@ -50,7 +50,7 @@ namespace Scorpio
             if (IsEnum) {
                 Array values = Enum.GetValues(ValueType);
                 foreach (var v in values) {
-                    Enums[v.ToString()] = new ScriptNumber(Convert.ToInt64(v));
+                    Enums[v.ToString()] = new ScriptNumber(Convert.ToDouble(v));
                 }
             }
         }
