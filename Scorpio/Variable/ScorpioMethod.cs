@@ -57,7 +57,7 @@ namespace Scorpio.Variable
                 for (int i = 0; i < m_Methods.Length; ++i)
                 {
                     FunctionMethod method = m_Methods[i];
-                    if (method.ParameterType.Length == parameters.Length && Util.CanChangeType(parameters, method.ParameterType))
+                    if (Util.CanChangeType(parameters, method.ParameterType))
                     {
                         methodInfo = method;
                         break;

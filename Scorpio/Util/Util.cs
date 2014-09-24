@@ -67,7 +67,7 @@ namespace Scorpio
         }
         public static bool IsLong(Type type)
         {
-            return type == TYPE_LONG;
+            return type == TYPE_LONG || type.IsEnum;
         }
         public static bool IsULong(Type type)
         {
@@ -79,10 +79,12 @@ namespace Scorpio
         }
         public static object ChangeType(ScriptObject par, Type type)
         {
-            if (par.GetType() == type) {
-                return par;
+            if (type.IsAssignableFrom(par.GetType())) {
+                return true;
+            } else if (par.IsNumber) {
+                return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : Convert.ChangeType(((ScriptNumber)par).ObjectValue, type);
             } else if (par is IScriptPrimitiveObject) {
-                return Convert.ChangeType(((IScriptPrimitiveObject)par).ObjectValue, type);
+                return ((IScriptPrimitiveObject)par).ObjectValue;
             } else if (par is ScriptUserdata) {
                 return ((ScriptUserdata)par).Value;
             }
@@ -90,8 +92,9 @@ namespace Scorpio
         }
         public static bool CanChangeType(ScriptObject[] pars, Type[] types)
         {
-            for (int i = 0; i < pars.Length;++i )
-            {
+            if (pars.Length != types.Length) 
+                return false;
+            for (int i = 0; i < pars.Length;++i ) {
                 if (!CanChangeType(pars[i], types[i]))
                     return false;
             }
@@ -99,13 +102,15 @@ namespace Scorpio
         }
         public static bool CanChangeType(ScriptObject par, Type type)
         {
-            if (par.GetType() == type) {
+            if (type.IsAssignableFrom(par.GetType())) {
                 return true;
-            } else if (par.IsString && type == typeof(string)) {
+            } else if (par.IsString && Util.IsString(type)) {
                 return true;
-            } else if (par.IsNumber && (IsNumber(type) || type.IsEnum)) {
+            } else if (par.IsNumber && IsNumber(type)) {
                 return true;
-            } else if (par.IsUserData && ((ScriptUserdata)par).ValueType == type) {
+            } else if (par.IsBoolean && IsBool(type)) {
+                return true;
+            } else if (par.IsUserData && type.IsAssignableFrom(((ScriptUserdata)par).ValueType)) {
                 return true;
             }
             return false;

@@ -377,7 +377,7 @@ namespace Scorpio.Compiler
                         }
                         break;
                     case LexState.Number:
-                        if (char.IsDigit(ch)) {
+                        if (char.IsDigit(ch) || ch == '.') {
                             m_strToken += ch;
                         } else if (ch == 'L') {
                             long value = long.Parse(m_strToken);
