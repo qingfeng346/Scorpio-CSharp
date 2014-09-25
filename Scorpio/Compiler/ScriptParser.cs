@@ -371,12 +371,11 @@ namespace Scorpio.Compiler
                 default:
                     throw new ParserException("parse is error ", token);
             }
+            ret.StackInfo = new StackInfo(m_strBreviary, token.SourceLine);
             ret = GetVariable(ret);
             ret.Not = not;
             ret = GetTernary(ret);
             ret.Negative = negative;
-            ret.Breviary = m_strBreviary;
-            ret.Line = token.SourceLine;
             if (ret is CodeMember) {
                 if (calc != CALC.NONE) {
                     ((CodeMember)ret).Calc = calc;

@@ -168,7 +168,7 @@ namespace Scorpio
         public bool Compare(TokenType type, CodeOperator oper, ScriptNumber num)
         {
             if (m_NumberType != num.m_NumberType) 
-                throw new ExecutionException("数字比较 两边的数字类型不一致 请先转换再比较 ", oper);
+                throw new ExecutionException("数字比较 两边的数字类型不一致 请先转换再比较 ");
             if (m_NumberType == NUMBER_TYPE.DOUBLE) {
                 if (type == TokenType.Equal)
                     return m_Double == num.m_Double;

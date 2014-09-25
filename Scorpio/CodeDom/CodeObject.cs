@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Compiler;
+using Scorpio.Exception;
 
 namespace Scorpio.CodeDom
 {
@@ -10,13 +11,11 @@ namespace Scorpio.CodeDom
     {
         public bool Not;            // ! 标识（非xxx）
         public bool Negative;       // - 标识（负数）
-        public string Breviary;     // 摘要
-        public int Line;            // 起始关键字所在行数
+        public StackInfo StackInfo;     // 堆栈数据
         public CodeObject() { }
         public CodeObject(string breviary, int line)
         {
-            this.Breviary = breviary;
-            this.Line = line;
+            StackInfo = new StackInfo(breviary, line);
         }
     }
 }

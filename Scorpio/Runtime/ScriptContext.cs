@@ -89,18 +89,18 @@ namespace Scorpio.Runtime
                 ret = obj.IsNull ? m_script.GetObject(name) : obj;
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
-                if (parent == null) throw new ExecutionException("GetVariable parent is null", member);
+                if (parent == null) throw new ExecutionException("GetVariable parent is null");
                 if (parent is ScriptArray) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
                         ScriptArray array = (ScriptArray)parent;
-                        ret = array.GetValue(member.MemberNumber, member);
+                        ret = array.GetValue(member.MemberNumber);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptNumber mem = ResolveOperand(member.Member) as ScriptNumber;
-                        if (mem == null) throw new ExecutionException("GetVariable Array Element is must a number", member);
+                        if (mem == null) throw new ExecutionException("GetVariable Array Element is must a number");
                         ScriptArray array = (ScriptArray)parent;
-                        ret = array.GetValue(mem.ToInt32(), member);
+                        ret = array.GetValue(mem.ToInt32());
                     } else {
-                        throw new ExecutionException("GetVariable Array Element is must a number", member);
+                        throw new ExecutionException("GetVariable Array Element is must a number");
                     }
                 } else if (parent is ScriptTable) {
                     if (member.Type == MEMBER_TYPE.STRING) {
@@ -108,11 +108,11 @@ namespace Scorpio.Runtime
                         return table.GetValue(member.MemberString);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
                         ScriptTable table = (ScriptTable)parent;
                         ret = table.GetValue(mem.Value);
                     } else {
-                        throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        throw new ExecutionException("GetVariable Table Element is must a string");
                     }
                 } else if (parent is ScriptUserdata) {
                     if (member.Type == MEMBER_TYPE.STRING) {
@@ -120,20 +120,20 @@ namespace Scorpio.Runtime
                         return data.GetValue(member.MemberString);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
                         ScriptUserdata data = (ScriptUserdata)parent;
                         ret = data.GetValue(mem.Value);
                     } else {
-                        throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        throw new ExecutionException("GetVariable Table Element is must a string");
                     }
                 } else {
-                    throw new ExecutionException("GetVariable member parent is not table or array", member);
+                    throw new ExecutionException("GetVariable member parent is not table or array");
                 }
             }
-            if (ret == null) throw new ExecutionException("GetVariable member is error", member);
+            if (ret == null) throw new ExecutionException("GetVariable member is error");
             if (member.Calc != CALC.NONE) {
                 ScriptNumber num = ret as ScriptNumber;
-                if (num == null) throw new ExecutionException("++或者--只能应用于Number类型", member);
+                if (num == null) throw new ExecutionException("++或者--只能应用于Number类型");
                 return num.Calc(member.Calc);
             }
             return ret;
@@ -147,18 +147,18 @@ namespace Scorpio.Runtime
                     m_script.SetObjectInternal(name, variable);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
-                if (parent == null) throw new ExecutionException("SetVariable parent is null", member);
+                if (parent == null) throw new ExecutionException("SetVariable parent is null");
                 if (parent is ScriptArray) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
                         ScriptArray array = (ScriptArray)parent;
-                        array.SetValue(member.MemberNumber, ResolveOperand(obj), member);
+                        array.SetValue(member.MemberNumber, ResolveOperand(obj));
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptNumber mem = ResolveOperand(member.Member) as ScriptNumber;
-                        if (mem == null) throw new ExecutionException("SetVariable Array Element is must a number", member);
+                        if (mem == null) throw new ExecutionException("SetVariable Array Element is must a number");
                         ScriptArray array = (ScriptArray)parent;
-                        array.SetValue(mem.ToInt32(), ResolveOperand(obj), member);
+                        array.SetValue(mem.ToInt32(), ResolveOperand(obj));
                     } else {
-                        throw new ExecutionException("SetVariable Array Element is must a number", member);
+                        throw new ExecutionException("SetVariable Array Element is must a number");
                     }
                 } else if (parent is ScriptTable) {
                     if (member.Type == MEMBER_TYPE.STRING) {
@@ -166,11 +166,11 @@ namespace Scorpio.Runtime
                         table.SetValue(member.MemberString, ResolveOperand(obj));
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
                         ScriptTable table = (ScriptTable)parent;
                         table.SetValue(mem.Value, ResolveOperand(obj));
                     } else {
-                        throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        throw new ExecutionException("GetVariable Table Element is must a string");
                     }
                 } else if (parent is ScriptUserdata) {
                     if (member.Type == MEMBER_TYPE.STRING) {
@@ -178,14 +178,14 @@ namespace Scorpio.Runtime
                         data.SetValue(member.MemberString, ResolveOperand(obj));
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
                         ScriptUserdata data = (ScriptUserdata)parent;
                         data.SetValue(mem.Value, ResolveOperand(obj));
                     } else {
-                        throw new ExecutionException("GetVariable Table Element is must a string", member);
+                        throw new ExecutionException("GetVariable Table Element is must a string");
                     }
                 } else {
-                    throw new ExecutionException("SetVariable member parent is not table or array", member);
+                    throw new ExecutionException("SetVariable member parent is not table or array");
                 }
             }
         }
@@ -279,7 +279,7 @@ namespace Scorpio.Runtime
             {
                 if (code.Condition != null) {
                     Condition = context.ResolveOperand(code.Condition) as ScriptBoolean;
-                    if (Condition == null) throw new ExecutionException("for 跳出条件必须是一个bool型", code.Condition);
+                    if (Condition == null) throw new ExecutionException("for 跳出条件必须是一个bool型");
                     if (!Condition.Value) break;
                 }
                 blockContext.Initialize(context);
@@ -292,7 +292,7 @@ namespace Scorpio.Runtime
         {
             CodeForeach code = (CodeForeach)m_scriptInstruction.Operand0;
             ScriptObject loop = ResolveOperand(code.LoopObject);
-            if (!loop.IsFunction) throw new ExecutionException("foreach函数必须返回一个ScriptFunction", code);
+            if (!loop.IsFunction) throw new ExecutionException("foreach函数必须返回一个ScriptFunction");
             ScriptContext context = new ScriptContext(m_script, code.Executable, this, Executable_Block.Foreach);
             for ( ; ; )
             {
@@ -321,7 +321,7 @@ namespace Scorpio.Runtime
             if (con.Allow != null)
             {
                 ScriptBoolean b = ResolveOperand(con.Allow) as ScriptBoolean;
-                if (b == null) throw new ExecutionException("if 条件必须是一个bool型", con.Allow);
+                if (b == null) throw new ExecutionException("if 条件必须是一个bool型");
                 if (b.Value == false) return false;
             }
             con.Context.Initialize(this);
@@ -370,7 +370,7 @@ namespace Scorpio.Runtime
             m_Over = true;
             if (!SupportContinue()) {
                 if (m_parent == null)
-                    throw new ExecutionException("this block is not support continue", con);
+                    throw new ExecutionException("this block is not support continue");
                 m_parent.InvokeContinue(con);
             }
         }
@@ -379,7 +379,7 @@ namespace Scorpio.Runtime
             m_Break = true;
             if (!SupportBreak()) {
                 if (m_parent == null)
-                    throw new ExecutionException("this block is not support break", bre);
+                    throw new ExecutionException("this block is not support break");
                 m_parent.InvokeBreak(bre);
             }
         }
@@ -406,14 +406,15 @@ namespace Scorpio.Runtime
         }
         private ScriptObject ResolveOperand(CodeObject value)
         {
+            m_script.SetStackInfo(value.StackInfo);
             var ret = ResolveOperand_impl(value);
             if (value.Not) {
                 ScriptBoolean b = ret as ScriptBoolean;
-                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [!] sign", value);
+                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [!] sign");
                 ret = b.Inverse();
             }  else if (value.Negative) {
                 ScriptNumber b = ret as ScriptNumber;
-                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [-] sign", value);
+                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [-] sign");
                 ret = b.Negative();
             }
             return ret;
@@ -430,12 +431,13 @@ namespace Scorpio.Runtime
         ScriptObject ParseCall(CodeCallFunction scriptFunction)
         {
             ScriptObject func = ResolveOperand(scriptFunction.Member);
-            if (!func.IsFunction) throw new ExecutionException("要调用的变量不是一个Function", scriptFunction);
+            if (!func.IsFunction) throw new ExecutionException("要调用的变量不是一个Function");
             int num = scriptFunction.Parameters.Count;
             ScriptObject[] parameters = new ScriptObject[num];
             for (int i = 0; i < num; ++i) {
                 parameters[i] = ResolveOperand(scriptFunction.Parameters[i]);
             }
+            m_script.PushStackInfo();
             return ((ScriptFunction)func).Call(parameters);
         }
         ScriptArray ParseArray(CodeArray array)
@@ -471,7 +473,7 @@ namespace Scorpio.Runtime
                     if (left.IsString || right.IsString || (left.IsNumber && right.IsNumber)) {
                         return left.Plus(right);
                     } else {
-                        throw new ExecutionException("operate [+] left right is not same type", operate);
+                        throw new ExecutionException("operate [+] left right is not same type");
                     }
                 } else {
                     if (left.IsBoolean) {
@@ -479,30 +481,30 @@ namespace Scorpio.Runtime
                             bool b1 = ((ScriptBoolean)left).Value;
                             if (b1 == false) return ScriptBoolean.False;
                             ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [&&] right is not a bool", operate);
+                            if (right == null) throw new ExecutionException("operate [&&] right is not a bool");
                             return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
                         } else if (type == TokenType.Or) {
                             bool b1 = ((ScriptBoolean)left).Value;
                             if (b1 == true) return ScriptBoolean.True;
                             ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [||] right is not a bool", operate);
+                            if (right == null) throw new ExecutionException("operate [||] right is not a bool");
                             return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
                         } else {
                             bool b1 = ((ScriptBoolean)left).Value;
                             ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [==] [!=] right is not a bool", operate);
+                            if (right == null) throw new ExecutionException("operate [==] [!=] right is not a bool");
                             bool b2 = right.Value;
                             if (type == TokenType.Equal)
                                 return b1 == b2 ? ScriptBoolean.True : ScriptBoolean.False;
                             else if (type == TokenType.NotEqual)
                                 return b1 != b2 ? ScriptBoolean.True : ScriptBoolean.False;
                             else
-                                throw new ExecutionException("nonsupport operate [" + type + "]  with bool", operate);
+                                throw new ExecutionException("nonsupport operate [" + type + "]  with bool");
                         }
                     } else {
                         ScriptObject right = ResolveOperand(operate.Right);
                         if (left.Type != right.Type)
-                            throw new ExecutionException("[operate] left right is not same type", operate);
+                            throw new ExecutionException("[operate] left right is not same type");
                         if (left.IsString) {
                             string str1 = ((ScriptString)left).Value;
                             string str2 = ((ScriptString)right).Value;
@@ -520,7 +522,7 @@ namespace Scorpio.Runtime
                             else if (type == TokenType.LessOrEqual)
                                 ret = string.Compare(str1, str2) >= 0;
                             else
-                                throw new ExecutionException("nonsupport operate [" + type + "] with string", operate);
+                                throw new ExecutionException("nonsupport operate [" + type + "] with string");
                             return ret ? ScriptBoolean.True : ScriptBoolean.False;
                         } else if (left.IsNumber) {
                             return ((ScriptNumber)left).Compare(type, operate, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
@@ -528,9 +530,9 @@ namespace Scorpio.Runtime
                     }
                 }
             } else {
-                if (!left.IsNumber) throw new ExecutionException("operate [+ - * /] left is not number", operate);
+                if (!left.IsNumber) throw new ExecutionException("operate [+ - * /] left is not number");
                 ScriptObject right = ResolveOperand(operate.Right);
-                if (!right.IsNumber) throw new ExecutionException("operate [+ - * /] right is not number", operate);
+                if (!right.IsNumber) throw new ExecutionException("operate [+ - * /] right is not number");
                 if (operate.Operator == TokenType.Minus)
                     return left.Minus(right);
                 else if (operate.Operator == TokenType.Multiply)
@@ -540,12 +542,12 @@ namespace Scorpio.Runtime
                 else if (operate.Operator == TokenType.Modulo)
                     return left.Modulo(right);
             }
-            throw new ExecutionException("错误的操作符号 " + operate.Operator, operate);
+            throw new ExecutionException("错误的操作符号 " + operate.Operator);
         }
         ScriptObject ParseTernary(CodeTernary ternary)
         {
             ScriptBoolean b = ResolveOperand(ternary.Allow) as ScriptBoolean;
-            if (b == null) throw new ExecutionException("三目运算符 条件必须是一个bool型", ternary.Allow);
+            if (b == null) throw new ExecutionException("三目运算符 条件必须是一个bool型");
             return b.Value ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
         }
     }

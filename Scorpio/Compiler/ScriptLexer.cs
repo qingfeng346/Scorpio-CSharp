@@ -42,8 +42,14 @@ namespace Scorpio.Compiler
             LessOrLessEqual,
             /// <summary> " 字符串 </summary>
             String,
-            /// <summary> "\ 换行字符串 </summary>
+            /// <summary> \ 格式符 </summary>
             StringEscape,
+            /// <summary> @ 开始字符串 </summary>
+            SimpleStringStart,
+            /// <summary> @" 不格式化的字符串 类似c# @符号 </summary>
+            SimpleString,
+            /// <summary> 字符串内出现"是引号还是结束符 </summary>
+            SimpleStringQuotationMarkOrOver,
             /// <summary> 数字 </summary>
             Number,
             /// <summary> 描述符 </summary>
@@ -64,6 +70,7 @@ namespace Scorpio.Compiler
             String strSource = buffer.Replace("\r\n", "\r");
             string[] strLines = strSource.Split('\r');
             m_strBreviary = strLines.Length > 0 ? strLines[0] : "";
+            if (m_strBreviary.Length > 10) m_strBreviary = m_strBreviary.Substring(0, 10);
             foreach (String strLine in strLines)
                 m_listSourceLines.Add(strLine + "\r\n");
             m_iSourceLine = 0;
@@ -198,6 +205,9 @@ namespace Scorpio.Compiler
                                 break;
                             case '<':
                                 lexState = LexState.LessOrLessEqual;
+                                break;
+                            case '@':
+                                lexState = LexState.SimpleStringStart;
                                 break;
                             case '\"':
                                 lexState = LexState.String;
@@ -362,6 +372,30 @@ namespace Scorpio.Compiler
                             m_strToken += ch;
                         }
                         break;
+                    case LexState.SimpleStringStart:
+                        if (ch == '\"') {
+                            lexState = LexState.SimpleString;
+                        } else {
+                            ThrowInvalidCharacterException(ch);
+                        }
+                        break;
+                    case LexState.SimpleString:
+                        if (ch == '\"') {
+                            lexState = LexState.SimpleStringQuotationMarkOrOver;
+                        } else {
+                            m_strToken += ch;
+                        }
+                        break;
+                    case LexState.SimpleStringQuotationMarkOrOver:
+                        if (ch == '\"') {
+                            m_strToken += '\"';
+                            lexState = LexState.SimpleString;
+                        } else {
+                            listTokens.Add(new Token(TokenType.String, m_strToken, m_iSourceLine, m_iSourceChar));
+                            UndoChar();
+                            lexState = LexState.None;
+                        }
+                        break;
                     case LexState.StringEscape:
                         if (ch == '\\' || ch == '\"') {
                             m_strToken += ch;
@@ -402,38 +436,67 @@ namespace Scorpio.Compiler
                             m_strToken += ch;
                         } else {
                             TokenType tokenType;
-                            if (m_strToken == "global")
-                                tokenType = TokenType.Global;
-                            else if (m_strToken == "var" || m_strToken == "local")
-                                tokenType = TokenType.Var;
-                            else if (m_strToken == "if")
-                                tokenType = TokenType.If;
-                            else if (m_strToken == "else")
-                                tokenType = TokenType.Else;
-                            else if (m_strToken == "elseif" || m_strToken == "elif")
-                                tokenType = TokenType.ElseIf;
-                            else if (m_strToken == "while")
-                                tokenType = TokenType.While;
-                            else if (m_strToken == "for")
-                                tokenType = TokenType.For;
-                            else if (m_strToken == "foreach")
-                                tokenType = TokenType.Foreach;
-                            else if (m_strToken == "in")
-                                tokenType = TokenType.In;
-                            else if (m_strToken == "break")
-                                tokenType = TokenType.Break;
-                            else if (m_strToken == "continue")
-                                tokenType = TokenType.Continue;
-                            else if (m_strToken == "function")
-                                tokenType = TokenType.Function;
-                            else if (m_strToken == "return")
-                                tokenType = TokenType.Return;
-                            else if (m_strToken == "null" || m_strToken == "nil")
-                                tokenType = TokenType.Null;
-                            else if (m_strToken == "true" || m_strToken == "false")
-                                tokenType = TokenType.Boolean;
-                            else
-                                tokenType = TokenType.Identifier;
+                            switch (m_strToken)
+                            {
+                                case "require":
+                                case "include":
+                                case "import":
+                                case "using":
+                                    tokenType = TokenType.Require;
+                                    break;
+                                case "global":
+                                    tokenType = TokenType.Global;
+                                    break;
+                                case "var":
+                                case "local":
+                                    tokenType = TokenType.Var;
+                                    break;
+                                case "function":
+                                    tokenType = TokenType.Function;
+                                    break;
+                                case "if":
+                                    tokenType = TokenType.If;
+                                    break;
+                                case "elseif":
+                                case "elif":
+                                    tokenType = TokenType.ElseIf;
+                                    break;
+                                case "else":
+                                    tokenType = TokenType.Else;
+                                    break;
+                                case "while":
+                                    tokenType = TokenType.While;
+                                    break;
+                                case "for":
+                                    tokenType = TokenType.For;
+                                    break;
+                                case "foreach":
+                                    tokenType = TokenType.Foreach;
+                                    break;
+                                case "in":
+                                    tokenType = TokenType.In;
+                                    break;
+                                case "continue":
+                                    tokenType = TokenType.Continue;
+                                    break;
+                                case "break":
+                                    tokenType = TokenType.Break;
+                                    break;
+                                case "return":
+                                    tokenType = TokenType.Return;
+                                    break;
+                                case "null":
+                                case "nil":
+                                    tokenType = TokenType.Null;
+                                    break;
+                                case "true":
+                                case "false":
+                                    tokenType = TokenType.Boolean;
+                                    break;
+                                default:
+                                    tokenType = TokenType.Identifier;
+                                    break;
+                            }
                             if (tokenType == TokenType.Boolean) {
                                 listTokens.Add(new Token(tokenType, m_strToken == "true", m_iSourceLine, m_iSourceChar));
                             } else if (tokenType == TokenType.Null) {

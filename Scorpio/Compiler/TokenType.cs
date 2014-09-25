@@ -216,6 +216,10 @@ namespace Scorpio.Compiler
         /// </summary>
         Null,
         /// <summary>
+        /// require,include,import,using
+        /// </summary>
+        Require,
+        /// <summary>
         /// 说明符
         /// </summary>
         Identifier,

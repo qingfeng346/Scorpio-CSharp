@@ -14,9 +14,11 @@ namespace Scorpio
     //脚本类
     public class Script
     {
-        private IScriptUserdataFactory m_UserdataFactory = null;                        //Userdata工厂
-        private VariableDictionary m_GlobalObject = new VariableDictionary();           //所有全局变量
+        private IScriptUserdataFactory m_UserdataFactory = null;                      //Userdata工厂
+        private VariableDictionary m_GlobalObject = new VariableDictionary();         //所有全局变量
         public ReadOnlyDictionary<String, ScriptObject> GlobalObject { get { return ReadOnlyDictionary<String, ScriptObject>.AsReadOnly(m_GlobalObject); } }
+        private List<StackInfo> m_StackInfoStack = new List<StackInfo>();             //堆栈数据
+        private StackInfo m_StackInfo = new StackInfo();                              //最近堆栈数据
         public void LoadFile(String strFileName)
         {
             try {
@@ -38,6 +40,7 @@ namespace Scorpio
         {
             string strBreviary = "";
             try {
+                m_StackInfoStack.Clear();
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer);
                 strBreviary = string.IsNullOrEmpty(strName) ? scriptLexer.GetBreviary() : strName;
                 ScriptParser scriptParser = new ScriptParser(this, scriptLexer.GetTokens(), strBreviary);
@@ -46,6 +49,23 @@ namespace Scorpio
             } catch (System.Exception e) {
                 throw new ScriptException("load buffer [" + strBreviary + "] is error : " + e.ToString());
             }
+        }
+        internal void SetStackInfo(StackInfo info)
+        {
+            m_StackInfo = info;
+        }
+        internal void PushStackInfo()
+        {
+            m_StackInfoStack.Add(m_StackInfo);
+        }
+        public string GetStackInfo()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("Source [ " + m_StackInfo.Breviary + "] Line [" + m_StackInfo.Line + "]");
+            for (int i = m_StackInfoStack.Count - 1; i >= 0;--i ) {
+                builder.AppendLine("        Source [" + m_StackInfoStack[i].Breviary + "] Line [" + m_StackInfoStack[i].Line + "]");
+            }
+            return builder.ToString();
         }
         public bool HasObject(String strName)
         {
@@ -67,13 +87,11 @@ namespace Scorpio
         }
         public ScriptObject CallFunction(String strName, params ScriptObject[] args)
         {
-            if (m_GlobalObject.ContainsKey(strName))
-            {
-                ScriptFunction func = m_GlobalObject[strName] as ScriptFunction;
-                if (func != null)
-                    return func.Call(args);
-            }
-            return null;
+            if (!m_GlobalObject.ContainsKey(strName)) throw new ScriptException("找不到函数[" + strName + "]");
+            ScriptFunction func = m_GlobalObject[strName] as ScriptFunction;
+            if (func == null) throw new ScriptException("找不到函数[" + strName + "]");
+            m_StackInfoStack.Clear();
+            return func.Call(args);
         }
         public ScriptObject CreateObject(object value)
         {
