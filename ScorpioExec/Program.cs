@@ -14,7 +14,6 @@ namespace ScorpioExec
                     string str = File.ReadAllText(args[0]);
                     Script script = new Script();
                     script.LoadLibrary();
-                    script.RegisterFunction("time", time);
                     Console.WriteLine("返回值为:" + script.LoadString("", str));
                 }
             } catch (System.Exception ex) {
