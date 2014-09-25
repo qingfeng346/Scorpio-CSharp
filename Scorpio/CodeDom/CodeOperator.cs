@@ -4,6 +4,7 @@ using System.Text;
 using Scorpio.Compiler;
 namespace Scorpio.CodeDom
 {
+    //运算符号   
     public class CodeOperator : CodeObject
     {
         public CodeObject Left;             //左边值

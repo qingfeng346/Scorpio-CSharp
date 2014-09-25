@@ -117,5 +117,12 @@ namespace Scorpio.Compiler
             if (token.Type != TokenType.In)
                 throw new ParserException("In 'in' expected.", token);
         }
+        /// <summary> 读取: </summary>
+        private void ReadColon()
+        {
+            Token token = ReadToken();
+            if (token.Type != TokenType.Colon)
+                throw new ParserException("Colon ';' expected.", token);
+        }
     }
 }

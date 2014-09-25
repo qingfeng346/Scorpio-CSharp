@@ -14,6 +14,7 @@ namespace Scorpio.CodeDom
             this.Value = value;
         }
     }
+    //返回一个table类型 t = { a = "1", b = "2", function hello() { } }
     public class CodeTable : CodeObject
     {
         public List<TableVariable> Variables = new List<TableVariable>();

@@ -5,6 +5,7 @@ using Scorpio.Compiler;
 
 namespace Scorpio.CodeDom
 {
+    //一个需要解析的Object
     public class CodeObject
     {
         public bool Not;            // ! 标识（非xxx）

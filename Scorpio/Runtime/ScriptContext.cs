@@ -221,39 +221,6 @@ namespace Scorpio.Runtime
             }
             return m_returnObject;
         }
-        private ScriptObject ResolveOperand_impl(CodeObject value)
-        {
-            if (value is CodeScriptObject) {
-                return ParseScriptObject((CodeScriptObject)value);
-            } else if (value is CodeFunction) {
-                return ParseFunction((CodeFunction)value);
-            } else if (value is CodeCallFunction) {
-                return ParseCall(value as CodeCallFunction);
-            } else if (value is CodeMember) {
-                return GetVariable(value as CodeMember);
-            } else if (value is CodeArray) {
-                return ParseArray(value as CodeArray);
-            } else if (value is CodeTable) {
-                return ParseTable(value as CodeTable);
-            } else if (value is CodeOperator) {
-                return ParseOperate(value as CodeOperator);
-            }
-            return ScriptNull.Instance;
-        }
-        private ScriptObject ResolveOperand(CodeObject value)
-        {
-            var ret = ResolveOperand_impl(value);
-            if (value.Not) {
-                ScriptBoolean b = ret as ScriptBoolean;
-                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [!] sign", value);
-                ret = b.Inverse();
-            }  else if (value.Negative) {
-                ScriptNumber b = ret as ScriptNumber;
-                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [-] sign", value);
-                ret = b.Negative();
-            }
-            return ret;
-        }
         private void ExecuteInstruction()
         {
             switch (m_scriptInstruction.Opcode)
@@ -416,6 +383,41 @@ namespace Scorpio.Runtime
                 m_parent.InvokeBreak(bre);
             }
         }
+        private ScriptObject ResolveOperand_impl(CodeObject value)
+        {
+            if (value is CodeScriptObject) {
+                return ParseScriptObject((CodeScriptObject)value);
+            } else if (value is CodeFunction) {
+                return ParseFunction((CodeFunction)value);
+            } else if (value is CodeCallFunction) {
+                return ParseCall(value as CodeCallFunction);
+            } else if (value is CodeMember) {
+                return GetVariable(value as CodeMember);
+            } else if (value is CodeArray) {
+                return ParseArray(value as CodeArray);
+            } else if (value is CodeTable) {
+                return ParseTable(value as CodeTable);
+            } else if (value is CodeOperator) {
+                return ParseOperate(value as CodeOperator);
+            } else if (value is CodeTernary) {
+                return ParseTernary(value as CodeTernary);
+            }
+            return ScriptNull.Instance;
+        }
+        private ScriptObject ResolveOperand(CodeObject value)
+        {
+            var ret = ResolveOperand_impl(value);
+            if (value.Not) {
+                ScriptBoolean b = ret as ScriptBoolean;
+                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [!] sign", value);
+                ret = b.Inverse();
+            }  else if (value.Negative) {
+                ScriptNumber b = ret as ScriptNumber;
+                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [-] sign", value);
+                ret = b.Negative();
+            }
+            return ret;
+        }
         ScriptObject ParseScriptObject(CodeScriptObject obj)
         {
             return obj.Object;
@@ -539,6 +541,12 @@ namespace Scorpio.Runtime
                     return left.Modulo(right);
             }
             throw new ExecutionException("错误的操作符号 " + operate.Operator, operate);
+        }
+        ScriptObject ParseTernary(CodeTernary ternary)
+        {
+            ScriptBoolean b = ResolveOperand(ternary.Allow) as ScriptBoolean;
+            if (b == null) throw new ExecutionException("三目运算符 条件必须是一个bool型", ternary.Allow);
+            return b.Value ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
         }
     }
 }

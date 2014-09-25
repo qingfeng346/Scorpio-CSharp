@@ -45,6 +45,7 @@
     <Compile Include="CodeDom\CodeOperator.cs" />
     <Compile Include="CodeDom\CodeScriptObject.cs" />
     <Compile Include="CodeDom\CodeTable.cs" />
+    <Compile Include="CodeDom\CodeTernary.cs" />
     <Compile Include="CodeDom\CodeWhile.cs" />
     <Compile Include="CodeDom\Temp\TempCondition.cs" />
     <Compile Include="CodeDom\Temp\TempOperator.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Compiler\ScriptParserBase.cs" />
     <Compile Include="Compiler\Token.cs" />
     <Compile Include="Compiler\TokenType.cs" />
+    <Compile Include="Exception\StackInfo.cs" />
     <Compile Include="Userdata\DefaultScriptUserdata.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataFactory.cs" />
     <Compile Include="Exception\ExecutionException.cs" />

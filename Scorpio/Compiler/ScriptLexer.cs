@@ -160,6 +160,9 @@ namespace Scorpio.Compiler
                             case ';':
                                 listTokens.Add(new Token(TokenType.SemiColon, ch, m_iSourceLine, m_iSourceChar));
                                 break;
+                            case '?':
+                                listTokens.Add(new Token(TokenType.QuestionMark, ch, m_iSourceLine, m_iSourceChar));
+                                break;
                             case '+':
                                 lexState = LexState.PlusOrIncrementOrAssignPlus;
                                 break;

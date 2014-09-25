@@ -373,6 +373,7 @@ namespace Scorpio.Compiler
             }
             ret = GetVariable(ret);
             ret.Not = not;
+            ret = GetTernary(ret);
             ret.Negative = negative;
             ret.Breviary = m_strBreviary;
             ret.Line = token.SourceLine;
@@ -429,6 +430,21 @@ namespace Scorpio.Compiler
                 }
             }
             return ret;
+        }
+        //返回三元运算符
+        private CodeObject GetTernary(CodeObject parent)
+        {
+            if (PeekToken().Type == TokenType.QuestionMark)
+            {
+                CodeTernary ret = new CodeTernary();
+                ret.Allow = parent;
+                ReadToken();
+                ret.True = GetObject();
+                ReadColon();
+                ret.False = GetObject();
+                return ret;
+            }
+            return parent;
         }
         //返回一个调用函数 Object
         private CodeCallFunction GetFunction(CodeObject member)
@@ -490,19 +506,18 @@ namespace Scorpio.Compiler
                         if (peek.Type == TokenType.Comma || peek.Type == TokenType.SemiColon) {
                             ReadToken();
                         } else if (peek.Type != TokenType.RightBrace) {
-                            throw new ParserException("element next is nosupport", next);
+                            throw new ParserException("Table变量分隔符必须是[,]或者[;]", next);
                         }
                     } else {
-                        throw new ParserException("Identifier next is must a [=] or [:] ", token);
+                        throw new ParserException("Table变量赋值符号为[=]或者[:]", token);
                     }
                 } else if (token.Type == TokenType.Function) {
                     UndoToken();
                     ScriptFunction func = ParseFunctionDeclaration();
-                    if (string.IsNullOrEmpty(func.Name))
-                        throw new ParserException("Table Function is not name", token);
+                    if (string.IsNullOrEmpty(func.Name)) throw new ParserException("Table内部函数名称 不能为空", token);
                     ret.Functions.Add(func);
                 } else {
-                    throw new ParserException("start is must a Identifier or function", token);
+                    throw new ParserException("Table开始关键字必须为 变量名称或者function关键字", token);
                 }
             }
             ReadRightBrace();

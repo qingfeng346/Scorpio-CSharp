@@ -13,12 +13,14 @@ namespace Scorpio.CodeDom
         PRE_DECREMENT,      //前置--
         POST_DECREMENT,     //后置--
     }
+    //成员类型
     public enum MEMBER_TYPE
     {
         STRING,
         NUMBER,
         OBJECT,
     }
+    //成员类型  a.b["c"].d[1]
     public class CodeMember : CodeObject
     {
         public CodeObject Parent;

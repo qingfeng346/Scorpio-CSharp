@@ -60,6 +60,10 @@ namespace Scorpio.Compiler
         /// </summary>
         SemiColon,
         /// <summary>
+        /// ?
+        /// </summary>
+        QuestionMark,
+        /// <summary>
         /// +
         /// </summary>
         Plus,

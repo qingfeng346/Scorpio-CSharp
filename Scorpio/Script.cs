@@ -30,6 +30,10 @@ namespace Scorpio
                 throw new ScriptException("load file [" + strFileName + "] is error : " + e.ToString());
             }
         }
+        public ScriptObject LoadString(String strBuffer)
+        {
+            return LoadString("", strBuffer);
+        }
         public ScriptObject LoadString(String strName, String strBuffer)
         {
             string strBreviary = "";
@@ -77,7 +81,7 @@ namespace Scorpio
                 return ScriptNull.Instance;
             else if (value is ScriptObject)
                 return (ScriptObject)value;
-            else if (value is ScriptFunction)
+            else if (value is ScorpioFunction)
                 return CreateFunction((ScorpioFunction)value);
             else if (value is ScorpioHandle)
                 return CreateFunction((ScorpioHandle)value);

@@ -5,6 +5,7 @@ using Scorpio.CodeDom.Temp;
 
 namespace Scorpio.CodeDom
 {
+    //if语句  if(true) {} elseif () {} else {}
     public class CodeIf : CodeObject
     {
         internal TempCondition If;
