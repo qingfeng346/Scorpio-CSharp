@@ -39,8 +39,7 @@ namespace CancerDemo
                 m_txtScriptOutput.Text = "";
                 Script script = new Script();
                 script.LoadLibrary();
-                script.RegisterFunction("print", print);
-                script.RegisterFunction("time", time);
+                script.SetObject("print", new ScorpioFunction(print));
                 BuildOutPut("返回值为 " + script.LoadString("", textBox1.Text));
             } catch (System.Exception ex) {
                 BuildOutPut(ex.ToString());
@@ -65,7 +64,6 @@ namespace CancerDemo
         {
             m_txtScriptOutput.Text += (message + "\r\n");
         }
-
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             File.WriteAllText(PATH, textBox1.Text, Encoding.UTF8);
