@@ -9,14 +9,15 @@ namespace ScorpioExec
     {
         static void Main(string[] args)
         {
+            Script script = new Script();
             try {
                 if (args.Length >= 1) {
                     string str = File.ReadAllText(args[0]);
-                    Script script = new Script();
                     script.LoadLibrary();
                     Console.WriteLine("返回值为:" + script.LoadString("", str));
                 }
             } catch (System.Exception ex) {
+                Console.WriteLine(script.GetStackInfo());
                 Console.WriteLine(ex.ToString());
             }
             Console.ReadKey();
