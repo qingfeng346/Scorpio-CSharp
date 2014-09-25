@@ -36,21 +36,21 @@ namespace Scorpio.Userdata
         }
         public override object Value { get; protected set; }
         public override Type ValueType { get; protected set; }
-        private bool IsEnum = false;
+        private bool m_IsEnum = false;
         private Dictionary<string, Field> FieldInfos = new Dictionary<string, Field>();                         //所有的变量 以及 get set函数
         private Dictionary<string, ScriptUserdata> NestedTypes = new Dictionary<string, ScriptUserdata>();      //所有的类中类
         private Dictionary<string, ScriptFunction> Functions = new Dictionary<string, ScriptFunction>();        //所有的函数
-        private Dictionary<string, ScriptNumber> Enums = new Dictionary<string, ScriptNumber>();                //如果是枚举的话 所有枚举的值
+        private Dictionary<string, ScriptEnum> Enums = new Dictionary<string, ScriptEnum>();                    //如果是枚举的话 所有枚举的值
         public DefaultScriptUserdata(Script script, object value)
         {
             this.Script = script;
             this.Value = value;
             this.ValueType = (Value is Type) ? (Type)value : value.GetType();
-            IsEnum = ValueType.IsEnum;
-            if (IsEnum) {
+            m_IsEnum = ValueType.IsEnum;
+            if (m_IsEnum) {
                 Array values = Enum.GetValues(ValueType);
                 foreach (var v in values) {
-                    Enums[v.ToString()] = script.CreateNumber(Convert.ToDouble(v));
+                    Enums[v.ToString()] = script.CreateEnum(v);
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace Scorpio.Userdata
         }
         public override ScriptObject GetValue(string strName)
         {
-            if (IsEnum) {
+            if (m_IsEnum) {
                 if (!Enums.ContainsKey(strName)) throw new ScriptException("Enum[" + ValueType.ToString() + "] Element[" + strName + "] 不存在");
                 return Enums[strName];
             } else {
@@ -118,7 +118,7 @@ namespace Scorpio.Userdata
         }
         public override void SetValue(string strName, ScriptObject value)
         {
-            if (IsEnum) {
+            if (m_IsEnum) {
                 throw new ScriptException("Enum 不支持 SetValue");
             } else {
                 Field field = GetField(strName);

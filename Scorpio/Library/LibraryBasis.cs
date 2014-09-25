@@ -45,6 +45,8 @@ namespace Scorpio.Library
         {
             script.SetObjectInternal("print", script.CreateFunction(new print()));
             script.SetObjectInternal("pair", script.CreateFunction(new pair(script)));
+            script.SetObjectInternal("tonumber", script.CreateFunction(new tonumber(script)));
+            script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
         }
         private class pair : ScorpioHandle
         {
@@ -56,9 +58,9 @@ namespace Scorpio.Library
             public object run(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
-                if (obj.IsArray)
+                if (obj is ScriptArray)
                     return m_script.CreateFunction(new ArrayPair(obj));
-                else if (obj.IsTable)
+                else if (obj is ScriptTable)
                     return m_script.CreateFunction(new TablePair(obj));
                 throw new ExecutionException("pair必须用语table或array类型");
             }
@@ -71,6 +73,34 @@ namespace Scorpio.Library
                     Console.WriteLine(args[i].ToString());
                 }
                 return null;
+            }
+        }
+        public class tonumber : ScorpioHandle
+        {
+            private Script m_script;
+            public tonumber(Script script)
+            {
+                m_script = script;
+            }
+            public object run(object[] args)
+            {
+                ScriptObject obj = args[0] as ScriptObject;
+                if (obj is ScriptNumber) return obj;
+                return m_script.CreateNumber(obj.ObjectValue);
+            }
+        }
+        public class tostring : ScorpioHandle
+        {
+            private Script m_script;
+            public tostring(Script script)
+            {
+                m_script = script;
+            }
+            public object run(object[] args)
+            {
+                ScriptObject obj = args[0] as ScriptObject;
+                if (obj is ScriptString) return obj;
+                return m_script.CreateString(obj.ToString());
             }
         }
     }

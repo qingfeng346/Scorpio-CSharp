@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Scorpio.Variable
 {
-    public abstract class ScriptPrimitiveObject<T> : IScriptPrimitiveObject
+    public abstract class ScriptPrimitiveObject<T> : ScriptObject
     {
         protected T m_Value;
         public T Value { get { return m_Value; } set { m_Value = value; } }
@@ -12,18 +12,11 @@ namespace Scorpio.Variable
         public ScriptPrimitiveObject()
         {
             this.Value = default(T);
-            Initialize();
         }
         public ScriptPrimitiveObject(T value)
         {
             this.Value = value;
-            Initialize();
         }
-        private void Initialize()
-        {
-            Initialize_impl();
-        }
-        protected abstract void Initialize_impl();
         public override string ToString()
         {
             return Value.ToString();

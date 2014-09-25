@@ -54,11 +54,9 @@ namespace Scorpio.Variable
                 methodInfo = m_Methods[0];
                 if (parameters.Length != methodInfo.ParameterType.Length) throw new ScriptException("Method [" + MethodName + "] is cannot find fit");
             } else {
-                for (int i = 0; i < m_Methods.Length; ++i)
-                {
+                for (int i = 0; i < m_Methods.Length; ++i) {
                     FunctionMethod method = m_Methods[i];
-                    if (Util.CanChangeType(parameters, method.ParameterType))
-                    {
+                    if (Util.CanChangeType(parameters, method.ParameterType)) {
                         methodInfo = method;
                         break;
                     }

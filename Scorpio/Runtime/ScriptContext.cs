@@ -60,7 +60,7 @@ namespace Scorpio.Runtime
                 return m_variableDictionary[name];
             if (m_parent != null)
                 return m_parent.GetVariableObject(name);
-            return ScriptNull.Instance;
+            return null;
         }
         private bool SetVariableObject(string name, ScriptObject obj)
         {
@@ -86,7 +86,7 @@ namespace Scorpio.Runtime
             if (member.Parent == null) {
                 string name = member.MemberString;
                 ScriptObject obj = GetVariableObject(name);
-                ret = obj.IsNull ? m_script.GetObject(name) : obj;
+                ret = (obj == null ? m_script.GetObject(name) : obj);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
                 if (parent == null) throw new ExecutionException("GetVariable parent is null");
@@ -465,74 +465,17 @@ namespace Scorpio.Runtime
         {
             TokenType type = operate.Operator;
             ScriptObject left = ResolveOperand(operate.Left);
-            if (type == TokenType.Plus || type == TokenType.Equal || type == TokenType.NotEqual || type == TokenType.And || type == TokenType.Or ||
-                type == TokenType.Greater || type == TokenType.GreaterOrEqual || type == TokenType.Less || type == TokenType.LessOrEqual)
-            {
-                if (type == TokenType.Plus) {
-                    ScriptObject right = ResolveOperand(operate.Right);
-                    if (left.IsString || right.IsString || (left.IsNumber && right.IsNumber)) {
-                        return left.Plus(right);
-                    } else {
-                        throw new ExecutionException("operate [+] left right is not same type");
-                    }
-                } else {
-                    if (left.IsBoolean) {
-                        if (type == TokenType.And) {
-                            bool b1 = ((ScriptBoolean)left).Value;
-                            if (b1 == false) return ScriptBoolean.False;
-                            ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [&&] right is not a bool");
-                            return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
-                        } else if (type == TokenType.Or) {
-                            bool b1 = ((ScriptBoolean)left).Value;
-                            if (b1 == true) return ScriptBoolean.True;
-                            ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [||] right is not a bool");
-                            return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
-                        } else {
-                            bool b1 = ((ScriptBoolean)left).Value;
-                            ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                            if (right == null) throw new ExecutionException("operate [==] [!=] right is not a bool");
-                            bool b2 = right.Value;
-                            if (type == TokenType.Equal)
-                                return b1 == b2 ? ScriptBoolean.True : ScriptBoolean.False;
-                            else if (type == TokenType.NotEqual)
-                                return b1 != b2 ? ScriptBoolean.True : ScriptBoolean.False;
-                            else
-                                throw new ExecutionException("nonsupport operate [" + type + "]  with bool");
-                        }
-                    } else {
-                        ScriptObject right = ResolveOperand(operate.Right);
-                        if (left.Type != right.Type)
-                            throw new ExecutionException("[operate] left right is not same type");
-                        if (left.IsString) {
-                            string str1 = ((ScriptString)left).Value;
-                            string str2 = ((ScriptString)right).Value;
-                            bool ret = false;
-                            if (type == TokenType.Equal)
-                                ret = str1 == str2;
-                            else if (type == TokenType.NotEqual)
-                                ret = str1 != str2;
-                            else if (type == TokenType.Greater)
-                                ret = string.Compare(str1, str2) < 0;
-                            else if (type == TokenType.GreaterOrEqual)
-                                ret = string.Compare(str1, str2) <= 0;
-                            else if (type == TokenType.Less)
-                                ret = string.Compare(str1, str2) > 0;
-                            else if (type == TokenType.LessOrEqual)
-                                ret = string.Compare(str1, str2) >= 0;
-                            else
-                                throw new ExecutionException("nonsupport operate [" + type + "] with string");
-                            return ret ? ScriptBoolean.True : ScriptBoolean.False;
-                        } else if (left.IsNumber) {
-                            return ((ScriptNumber)left).Compare(type, operate, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
-                        }
-                    }
-                }
-            } else {
-                if (!left.IsNumber) throw new ExecutionException("operate [+ - * /] left is not number");
+            if (type == TokenType.Plus) {
                 ScriptObject right = ResolveOperand(operate.Right);
-                if (!right.IsNumber) throw new ExecutionException("operate [+ - * /] right is not number");
+                if (left is ScriptString || right is ScriptString || (left is ScriptString && right is ScriptString)) {
+                    return left.Plus(right);
+                } else {
+                    throw new ExecutionException("operate [+] left right is not same type");
+                }
+            } else if (type == TokenType.Minus || type == TokenType.Multiply || type == TokenType.Divide || type == TokenType.Modulo) {
+                if (!(left is ScriptNumber)) throw new ExecutionException("operate [+ - * /] left is not number");
+                ScriptObject right = ResolveOperand(operate.Right);
+                if (!(right is ScriptNumber)) throw new ExecutionException("operate [+ - * /] right is not number");
                 if (operate.Operator == TokenType.Minus)
                     return left.Minus(right);
                 else if (operate.Operator == TokenType.Multiply)
@@ -541,6 +484,68 @@ namespace Scorpio.Runtime
                     return left.Divide(right);
                 else if (operate.Operator == TokenType.Modulo)
                     return left.Modulo(right);
+            } else {
+                if (left is ScriptBoolean) {
+                    if (type == TokenType.And) {
+                        bool b1 = ((ScriptBoolean)left).Value;
+                        if (b1 == false) return ScriptBoolean.False;
+                        ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
+                        if (right == null) throw new ExecutionException("operate [&&] right is not a bool");
+                        return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
+                    } else if (type == TokenType.Or) {
+                        bool b1 = ((ScriptBoolean)left).Value;
+                        if (b1 == true) return ScriptBoolean.True;
+                        ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
+                        if (right == null) throw new ExecutionException("operate [||] right is not a bool");
+                        return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
+                    } else {
+                        bool b1 = ((ScriptBoolean)left).Value;
+                        ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
+                        if (right == null) throw new ExecutionException("operate [==] [!=] right is not a bool");
+                        bool b2 = right.Value;
+                        if (type == TokenType.Equal)
+                            return b1 == b2 ? ScriptBoolean.True : ScriptBoolean.False;
+                        else if (type == TokenType.NotEqual)
+                            return b1 != b2 ? ScriptBoolean.True : ScriptBoolean.False;
+                        else
+                            throw new ExecutionException("nonsupport operate [" + type + "]  with bool");
+                    }
+                } else {
+                    ScriptObject right = ResolveOperand(operate.Right);
+                    if (left.Type != right.Type)
+                        throw new ExecutionException("[operate] left right is not same type");
+                    if (left is ScriptString) {
+                        string str1 = ((ScriptString)left).Value;
+                        string str2 = ((ScriptString)right).Value;
+                        bool ret = false;
+                        if (type == TokenType.Equal)
+                            ret = str1 == str2;
+                        else if (type == TokenType.NotEqual)
+                            ret = str1 != str2;
+                        else if (type == TokenType.Greater)
+                            ret = string.Compare(str1, str2) < 0;
+                        else if (type == TokenType.GreaterOrEqual)
+                            ret = string.Compare(str1, str2) <= 0;
+                        else if (type == TokenType.Less)
+                            ret = string.Compare(str1, str2) > 0;
+                        else if (type == TokenType.LessOrEqual)
+                            ret = string.Compare(str1, str2) >= 0;
+                        else
+                            throw new ExecutionException("nonsupport operate [" + type + "] with string");
+                        return ret ? ScriptBoolean.True : ScriptBoolean.False;
+                    } else if (left is ScriptNumber) {
+                        return ((ScriptNumber)left).Compare(type, operate, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
+                    } else if (left is ScriptEnum) {
+                        bool ret = false;
+                        if (type == TokenType.Equal)
+                            ret = (left.ObjectValue == right.ObjectValue);
+                        else if (type == TokenType.NotEqual)
+                            ret = (left.ObjectValue != right.ObjectValue);
+                        else
+                            throw new ExecutionException("nonsupport operate [" + type + "] with enum");
+                        return ret ? ScriptBoolean.True : ScriptBoolean.False;
+                    }
+                }
             }
             throw new ExecutionException("错误的操作符号 " + operate.Operator);
         }

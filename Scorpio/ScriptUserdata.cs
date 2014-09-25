@@ -11,6 +11,7 @@ namespace Scorpio
     {
         protected Script Script { get; set; }
         public abstract object Value { get; protected set; }
+        public override object ObjectValue { get { return Value; } }
         public abstract Type ValueType { get; protected set; }
         public abstract ScriptObject GetValue(string strName);
         public abstract void SetValue(string strName, ScriptObject value);

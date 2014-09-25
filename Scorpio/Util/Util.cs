@@ -41,10 +41,8 @@ namespace Scorpio
             ScriptObject el = variables[str];
             if (el.Type != obj.Type) {
                 variables[str] = obj;
-            } else {
-                if (el.IsNull || el.IsNumber || el.IsString) {
-                    el.Assign(obj);
-                } else if (el.IsNumber && el.GetType() == obj.GetType()) {
+            } else if (!(el is ScriptNull)) {
+                if ((el is ScriptNumber && el.BranchType == obj.BranchType) || (el.IsString)) {
                     el.Assign(obj);
                 } else {
                     variables[str] = obj;
@@ -61,15 +59,11 @@ namespace Scorpio
         }
         public static bool IsDouble(Type type)
         {
-            return (type == TYPE_SBYTE || type == TYPE_BYTE ||
-                    type == TYPE_SHORT || type == TYPE_USHORT ||
-                    type == TYPE_INT || type == TYPE_UINT ||
-                    type == TYPE_FLOAT || type == TYPE_DOUBLE ||
-                    type == TYPE_DECIMAL);
+            return type == TYPE_DOUBLE;
         }
         public static bool IsLong(Type type)
         {
-            return type == TYPE_LONG || type.IsEnum;
+            return type == TYPE_LONG;
         }
         public static bool IsULong(Type type)
         {
@@ -77,20 +71,57 @@ namespace Scorpio
         }
         public static bool IsNumber(Type type)
         {
-            return IsDouble(type) || IsLong(type) || IsULong(type);
+            return (type == TYPE_SBYTE || type == TYPE_BYTE ||
+                    type == TYPE_SHORT || type == TYPE_USHORT ||
+                    type == TYPE_INT || type == TYPE_UINT ||
+                    type == TYPE_FLOAT || type == TYPE_DOUBLE ||
+                    type == TYPE_DECIMAL || type == TYPE_LONG || type == TYPE_ULONG);
+        }
+        public static bool IsEnum(Type type)
+        {
+            return type.IsEnum;
+        }
+        public static bool IsBoolObject(object obj)
+        {
+            return obj is bool;
+        }
+        public static bool IsStringObject(object obj)
+        {
+            return obj is string;
+        }
+        public static bool IsDoubleObject(object obj)
+        {
+            return obj is double;
+        }
+        public static bool IsLongObject(object obj)
+        {
+            return obj is long;
+        }
+        public static bool IsULongObject(object obj)
+        {
+            return obj is ulong;
+        }
+        public static bool IsNumberObject(object obj)
+        {
+            return (obj is sbyte || obj is byte ||
+                    obj is short || obj is ushort ||
+                    obj is int || obj is uint ||
+                    obj is float || obj is double ||
+                    obj is decimal || obj is long || obj is ulong);
+        }
+        public static bool IsEnumObject(object obj)
+        {
+            return obj.GetType().IsEnum;
         }
         public static object ChangeType(ScriptObject par, Type type)
         {
             if (type.IsAssignableFrom(par.GetType())) {
-                return true;
-            } else if (par.IsNumber) {
-                return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : Convert.ChangeType(((ScriptNumber)par).ObjectValue, type);
-            } else if (par is IScriptPrimitiveObject) {
-                return ((IScriptPrimitiveObject)par).ObjectValue;
-            } else if (par is ScriptUserdata) {
-                return ((ScriptUserdata)par).Value;
+                return par;
+            } else if (par is ScriptNumber) {
+                return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : Convert.ChangeType(par.ObjectValue, type);
+            } else {
+                return par.ObjectValue;
             }
-            return par;
         }
         public static bool CanChangeType(ScriptObject[] pars, Type[] types)
         {
@@ -106,13 +137,15 @@ namespace Scorpio
         {
             if (type.IsAssignableFrom(par.GetType())) {
                 return true;
-            } else if (par.IsString && Util.IsString(type)) {
+            } else if (par is ScriptString && Util.IsString(type)) {
                 return true;
-            } else if (par.IsNumber && IsNumber(type)) {
+            } else if (par is ScriptNumber && (IsNumber(type) || IsEnum(type))) {
                 return true;
-            } else if (par.IsBoolean && IsBool(type)) {
+            } else if (par is ScriptBoolean && IsBool(type)) {
                 return true;
-            } else if (par.IsUserData && type.IsAssignableFrom(((ScriptUserdata)par).ValueType)) {
+            } else if (par is ScriptEnum && (par as ScriptEnum).EnumType == type) {
+                return true;
+            } else if (par is ScriptUserdata && type.IsAssignableFrom(((ScriptUserdata)par).ValueType)) {
                 return true;
             }
             return false;

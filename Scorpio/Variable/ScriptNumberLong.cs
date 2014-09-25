@@ -10,7 +10,7 @@ namespace Scorpio.Variable
     public class ScriptNumberLong : ScriptNumber
     {
         public override ObjectType Type { get { return ObjectType.Number; } }
-        public override NUMBER_TYPE NumberType { get { return NUMBER_TYPE.DOUBLE; } }
+        public override int BranchType { get { return 1; } }
         public override object ObjectValue { get { return Value; } }
         public long Value { get; private set; }
         private Script m_Script;
@@ -40,6 +40,10 @@ namespace Scorpio.Variable
         {
             Value = -Value;
             return this;
+        }
+        public override long ToLong()
+        {
+            return Value;
         }
         public override void Assign(ScriptObject obj)
         {
@@ -74,18 +78,21 @@ namespace Scorpio.Variable
         {
             ScriptNumberLong val = num as ScriptNumberLong;
             if (val == null) throw new ExecutionException("数字比较 两边的数字类型不一致 请先转换再比较 ");
-            if (type == TokenType.Equal)
-                return Value == val.Value;
-            else if (type == TokenType.NotEqual)
-                return Value != val.Value;
-            else if (type == TokenType.Greater)
-                return Value > val.Value;
-            else if (type == TokenType.GreaterOrEqual)
-                return Value >= val.Value;
-            else if (type == TokenType.Less)
-                return Value < val.Value;
-            else if (type == TokenType.LessOrEqual)
-                return Value <= val.Value;
+            switch (type)
+            {
+                case TokenType.Equal:
+                    return Value == val.Value;
+                case TokenType.NotEqual:
+                    return Value != val.Value;
+                case TokenType.Greater:
+                    return Value > val.Value;
+                case TokenType.GreaterOrEqual:
+                    return Value >= val.Value;
+                case TokenType.Less:
+                    return Value < val.Value;
+                case TokenType.LessOrEqual:
+                    return Value <= val.Value;
+            }
             return false;
         }
     }

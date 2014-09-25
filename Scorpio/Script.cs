@@ -107,13 +107,14 @@ namespace Scorpio
                 return CreateFunction((Delegate)value);
             else if (value is ScorpioMethod)
                 return CreateFunction((ScorpioMethod)value);
-            Type type = value.GetType();
-            if (Util.IsBool(type))
+            else if (Util.IsBoolObject(value))
                 return CreateBool((bool)value);
-            else if (Util.IsString(type))
+            else if (Util.IsStringObject(value))
                 return CreateString((string)value);
-            else if (Util.IsNumber(type))
+            else if (Util.IsNumberObject(value))
                 return CreateNumber(value);
+            else if (Util.IsEnumObject(value))
+                return CreateEnum(value);
             return CreateUserdata(value);
         }
         public ScriptBoolean CreateBool(bool value)
@@ -126,12 +127,17 @@ namespace Scorpio
         }
         public ScriptNumber CreateNumber(object value)
         {
-            Type type = value.GetType();
-            if (Util.IsLong(type))
+            if (Util.IsLongObject(value))
                 return new ScriptNumberLong(this, (long)value);
-            else if (Util.IsULong(type))
+            else if (Util.IsULongObject(value))
                 return new ScriptNumberULong(this, (ulong)value);
+            else if (Util.IsDoubleObject(value))
+                return new ScriptNumberDouble(this, (double)value);
             return new ScriptNumberDouble(this, Convert.ToDouble(value));
+        }
+        public ScriptEnum CreateEnum(object value)
+        {
+            return new ScriptEnum(this, value);
         }
         public ScriptUserdata CreateUserdata(object value)
         {
