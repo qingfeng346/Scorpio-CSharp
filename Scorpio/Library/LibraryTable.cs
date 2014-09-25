@@ -16,9 +16,7 @@ namespace Scorpio.Library
         {
             public object run(object[] args)
             {
-                if (args.Length > 0 && args[0] is ScriptTable)
-                    return ((ScriptTable)args[0]).Count();
-                return 0;
+                return ((ScriptTable)args[0]).Count();
             }
         }
     }

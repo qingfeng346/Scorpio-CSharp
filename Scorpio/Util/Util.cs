@@ -44,6 +44,8 @@ namespace Scorpio
             } else {
                 if (el.IsNull || el.IsNumber || el.IsString) {
                     el.Assign(obj);
+                } else if (el.IsNumber && el.GetType() == obj.GetType()) {
+                    el.Assign(obj);
                 } else {
                     variables[str] = obj;
                 }

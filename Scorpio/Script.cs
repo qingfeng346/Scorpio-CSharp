@@ -126,7 +126,12 @@ namespace Scorpio
         }
         public ScriptNumber CreateNumber(object value)
         {
-            return new ScriptNumber(value);
+            Type type = value.GetType();
+            if (Util.IsLong(type))
+                return new ScriptNumberLong(this, (long)value);
+            else if (Util.IsULong(type))
+                return new ScriptNumberULong(this, (ulong)value);
+            return new ScriptNumberDouble(this, Convert.ToDouble(value));
         }
         public ScriptUserdata CreateUserdata(object value)
         {

@@ -11,6 +11,11 @@ namespace Scorpio.Library
         {
             Table.SetValue("format", script.CreateFunction(new format()));
             Table.SetValue("substring", script.CreateFunction(new substring()));
+            Table.SetValue("length", script.CreateFunction(new length()));
+            Table.SetValue("tolower", script.CreateFunction(new tolower()));
+            Table.SetValue("toupper", script.CreateFunction(new toupper()));
+            Table.SetValue("trim", script.CreateFunction(new trim()));
+            Table.SetValue("replace", script.CreateFunction(new replace()));
             script.SetObjectInternal("string", Table);
         }
         const string DELIM_STR = "{}";
@@ -50,15 +55,50 @@ namespace Scorpio.Library
         private class substring : ScorpioHandle
         {
             public object run(object[] args) {
-                if (args == null || args.Length == 0) {
-                    return null;
-                }
                 string messagePattern = (args[0] as ScriptString).Value;
-                if (args.Length == 1)
-                    return messagePattern;
+                if (args.Length == 1) return messagePattern;
                 int index = (args[1] as ScriptNumber).ToInt32();
                 int length = (args[2] as ScriptNumber).ToInt32();
                 return messagePattern.Substring(index, length);
+            }
+        }
+        private class length : ScorpioHandle
+        {
+            public object run(object[] args)
+            {
+                var a = string.Empty;
+                return (args[0] as ScriptString).Value.Length;
+            }
+        }
+        private class tolower : ScorpioHandle
+        {
+            public object run(object[] args)
+            {
+                return (args[0] as ScriptString).Value.ToLowerInvariant();
+            }
+        }
+        private class toupper : ScorpioHandle
+        {
+            public object run(object[] args)
+            {
+                return (args[0] as ScriptString).Value.ToUpperInvariant();
+            }
+        }
+        private class trim : ScorpioHandle
+        {
+            public object run(object[] args)
+            {
+                return (args[0] as ScriptString).Value.Trim();
+            }
+        }
+        private class replace : ScorpioHandle
+        {
+            public object run(object[] args)
+            {
+                string str = (args[0] as ScriptString).Value;
+                string oldValue = (args[1] as ScriptString).Value;
+                string newValue = (args[2] as ScriptString).Value;
+                return str.Replace(oldValue, newValue);
             }
         }
     }

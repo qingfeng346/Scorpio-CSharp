@@ -526,7 +526,7 @@ namespace Scorpio.Runtime
                             return ret ? ScriptBoolean.True : ScriptBoolean.False;
                         } else if (left.IsNumber) {
                             return ((ScriptNumber)left).Compare(type, operate, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
-                        } 
+                        }
                     }
                 }
             } else {

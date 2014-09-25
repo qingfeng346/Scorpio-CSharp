@@ -89,6 +89,9 @@
     <Compile Include="Variable\IScriptPrimitiveObject.cs" />
     <Compile Include="Variable\ScorpioMethod.cs" />
     <Compile Include="Variable\ScorpioScriptFunction.cs" />
+    <Compile Include="Variable\ScriptNumberDouble.cs" />
+    <Compile Include="Variable\ScriptNumberLong.cs" />
+    <Compile Include="Variable\ScriptNumberULong.cs" />
     <Compile Include="Variable\ScriptPrimitiveObject.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
