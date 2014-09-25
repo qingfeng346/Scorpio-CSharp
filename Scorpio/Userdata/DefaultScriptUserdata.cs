@@ -36,28 +36,32 @@ namespace Scorpio.Userdata
         }
         public override object Value { get; protected set; }
         public override Type ValueType { get; protected set; }
-        private bool m_IsEnum = false;
-        private Dictionary<string, Field> FieldInfos = new Dictionary<string, Field>();                         //所有的变量 以及 get set函数
-        private Dictionary<string, ScriptUserdata> NestedTypes = new Dictionary<string, ScriptUserdata>();      //所有的类中类
-        private Dictionary<string, ScriptFunction> Functions = new Dictionary<string, ScriptFunction>();        //所有的函数
-        private Dictionary<string, ScriptEnum> Enums = new Dictionary<string, ScriptEnum>();                    //如果是枚举的话 所有枚举的值
+        private bool m_IsEnum;
+        private Dictionary<string, Field> m_FieldInfos;                 //所有的变量 以及 get set函数
+        private Dictionary<string, ScriptUserdata> m_NestedTypes;       //所有的类中类
+        private Dictionary<string, ScriptFunction> m_Functions;         //所有的函数
+        private Dictionary<string, ScriptEnum> m_Enums;                 //如果是枚举的话 所有枚举的值
         public DefaultScriptUserdata(Script script, object value)
         {
             this.Script = script;
             this.Value = value;
             this.ValueType = (Value is Type) ? (Type)value : value.GetType();
+            m_FieldInfos = new Dictionary<string, Field>();
+            m_NestedTypes = new Dictionary<string, ScriptUserdata>();
+            m_Functions = new Dictionary<string, ScriptFunction>();
+            m_Enums = new Dictionary<string, ScriptEnum>();
             m_IsEnum = ValueType.IsEnum;
             if (m_IsEnum) {
                 Array values = Enum.GetValues(ValueType);
                 foreach (var v in values) {
-                    Enums[v.ToString()] = script.CreateEnum(v);
+                    m_Enums[v.ToString()] = script.CreateEnum(v);
                 }
             }
         }
         private Field GetField(string strName)
         {
-            if (FieldInfos.ContainsKey(strName))
-                return FieldInfos[strName];
+            if (m_FieldInfos.ContainsKey(strName))
+                return m_FieldInfos[strName];
             Field field = new Field();
             field.name = strName;
             FieldInfo info = ValueType.GetField(strName);
@@ -65,7 +69,7 @@ namespace Scorpio.Userdata
             {
                 field.field = info;
                 field.fieldType = info.FieldType;
-                FieldInfos.Add(strName, field);
+                m_FieldInfos.Add(strName, field);
                 return field;
             }
             MethodInfo method = ValueType.GetMethod("get_" + strName);
@@ -74,7 +78,7 @@ namespace Scorpio.Userdata
                 field.getMethod = method;
                 field.fieldType = method.ReturnType;
                 field.setMethod = ValueType.GetMethod("set_" + strName);
-                FieldInfos.Add(strName, field);
+                m_FieldInfos.Add(strName, field);
                 return field;
             }
             method = ValueType.GetMethod("set_" + strName);
@@ -83,7 +87,7 @@ namespace Scorpio.Userdata
                 field.setMethod = method;
                 field.fieldType = method.GetParameters()[0].ParameterType;
                 field.getMethod = ValueType.GetMethod("get_" + strName);
-                FieldInfos.Add(strName, field);
+                m_FieldInfos.Add(strName, field);
                 return field;
             }
             return null;
@@ -91,26 +95,26 @@ namespace Scorpio.Userdata
         public override ScriptObject GetValue(string strName)
         {
             if (m_IsEnum) {
-                if (!Enums.ContainsKey(strName)) throw new ScriptException("Enum[" + ValueType.ToString() + "] Element[" + strName + "] 不存在");
-                return Enums[strName];
+                if (!m_Enums.ContainsKey(strName)) throw new ScriptException("Enum[" + ValueType.ToString() + "] Element[" + strName + "] 不存在");
+                return m_Enums[strName];
             } else {
-                if (Functions.ContainsKey(strName))
-                    return Functions[strName];
-                if (NestedTypes.ContainsKey(strName))
-                    return NestedTypes[strName];
+                if (m_Functions.ContainsKey(strName))
+                    return m_Functions[strName];
+                if (m_NestedTypes.ContainsKey(strName))
+                    return m_NestedTypes[strName];
                 Field field = GetField(strName);
                 if (field != null) return Script.CreateObject(field.GetValue(Value));
                 MethodInfo method = ValueType.GetMethod(strName);
                 if (method != null)
                 {
                     ScriptFunction func = Script.CreateFunction(new ScorpioMethod(ValueType, strName, Value));
-                    Functions[strName] = func;
+                    m_Functions[strName] = func;
                     return func;
                 }
                 Type nestedType = ValueType.GetNestedType(strName);
                 if (nestedType != null) {
                     ScriptUserdata ret = Script.CreateUserdata(nestedType);
-                    NestedTypes.Add(strName, ret);
+                    m_NestedTypes.Add(strName, ret);
                     return ret;
                 }
                 throw new ScriptException("Type[" + ValueType.ToString() + "] Variable[" + strName + "] 不存在");

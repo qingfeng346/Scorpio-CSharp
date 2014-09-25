@@ -18,7 +18,6 @@ namespace Scorpio.Variable
             }
         }
         private object m_Object;
-        private Type m_Type;
         private int m_Count;
         private FunctionMethod[] m_Methods;
         public string MethodName { get; private set; }
@@ -26,7 +25,6 @@ namespace Scorpio.Variable
         public ScorpioMethod(Type type, string methodName, object obj)
         {
             m_Object = obj;
-            m_Type = type;
             MethodName = methodName;
             List<FunctionMethod> functionMethod = new List<FunctionMethod>();
             MethodInfo[] methods = type.GetMethods();

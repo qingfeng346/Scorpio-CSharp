@@ -66,7 +66,6 @@ namespace Scorpio.Library
         {
             public object run(object[] args)
             {
-                var a = string.Empty;
                 return (args[0] as ScriptString).Value.Length;
             }
         }
