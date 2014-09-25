@@ -12,11 +12,11 @@ namespace Scorpio
         public ScriptString(string value) : base(value) { }
         public override void Assign(ScriptObject obj)
         {
-            m_Value = obj.ToString();
+            Value = obj.ToString();
         }
         public override ScriptObject Plus(ScriptObject obj)
         {
-            m_Value += obj.ToString();
+            Value += obj.ToString();
             return this;
         }
     }
