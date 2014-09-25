@@ -11,18 +11,18 @@ namespace CancerDemo
 {
     public partial class Form1 : Form
     {
-        private readonly string PATH = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/a.txt";
+        private readonly string PATH = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/a.sco";
         public Form1()
         {
             InitializeComponent();
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            //try {
-            //    textBox1.Text = File.ReadAllText(PATH);
-            //} catch (System.Exception ex) {
-            //    BuildOutPut("Load is error : " + ex.ToString());
-            //}
+            try {
+                textBox1.Text = File.ReadAllText(PATH);
+            } catch (System.Exception ex) {
+                BuildOutPut("Load is error : " + ex.ToString());
+            }
         }
         private void Form1_Activated(object sender, EventArgs e)
         {
@@ -34,20 +34,18 @@ namespace CancerDemo
         }
         private void Run_Click(object sender, EventArgs e)
         {
+            Script script = new Script();
             try {
                 m_txtBuildOutput.Text = "";
                 m_txtScriptOutput.Text = "";
-                Script script = new Script();
                 script.LoadLibrary();
                 script.SetObject("print", new ScorpioFunction(print));
                 BuildOutPut("返回值为 " + script.LoadString("", textBox1.Text));
+                BuildOutPut("堆栈数据为 " + script.GetStackInfo());
             } catch (System.Exception ex) {
+                BuildOutPut("堆栈数据为 " + script.GetStackInfo());
                 BuildOutPut(ex.ToString());
             }
-        }
-        private object time(object[] Parameters)
-        {
-            return Environment.TickCount;
         }
         private object print(object[] Parameters)
         {
