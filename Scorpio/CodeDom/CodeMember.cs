@@ -27,6 +27,7 @@ namespace Scorpio.CodeDom
         public CodeObject Member;
         public string MemberString;
         public int MemberNumber;
+        public object MemberNumberObject;
         public MEMBER_TYPE Type;
         public CALC Calc;
         public CodeMember(string name) : this (name, null) { }
@@ -36,10 +37,11 @@ namespace Scorpio.CodeDom
             this.MemberString = name;
             this.Type = MEMBER_TYPE.STRING;
         }
-        public CodeMember(int mem, CodeObject parent)
+        public CodeMember(ScriptNumber mem, CodeObject parent)
         {
             this.Parent = parent;
-            this.MemberNumber = mem;
+            this.MemberNumber = mem.ToInt32();
+            this.MemberNumberObject = mem.ObjectValue;
             this.Type = MEMBER_TYPE.NUMBER;
         }
         public CodeMember(CodeObject member, CodeObject parent)

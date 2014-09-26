@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Scorpio;
 using Scorpio.Exception;
+using Scorpio.Collections;
 namespace Scorpio.Library
 {
     public class LibraryBasis
@@ -23,18 +24,20 @@ namespace Scorpio.Library
         }
         private class TablePair : ScorpioHandle
         {
-            Dictionary<String, ScriptObject>.Enumerator m_TableEnumerator;
-            public TablePair(ScriptObject obj)
+            Script m_Script;
+            TableDictionary.Enumerator m_TableEnumerator;
+            public TablePair(Script script, ScriptObject obj)
             {
+                m_Script = script;
                 m_TableEnumerator = ((ScriptTable)obj).GetIterator();
             }
             public object run(object[] args)
             {
                 if (m_TableEnumerator.MoveNext())
                 {
-                    KeyValuePair<string, ScriptObject> v = m_TableEnumerator.Current;
+                    KeyValuePair<object, ScriptObject> v = m_TableEnumerator.Current;
                     ScriptTable table = new ScriptTable();
-                    table.SetValue("key", new ScriptString(v.Key));
+                    table.SetValue("key", m_Script.CreateObject(v.Key));
                     table.SetValue("value", v.Value);
                     return table;
                 }
@@ -46,6 +49,8 @@ namespace Scorpio.Library
             script.SetObjectInternal("print", script.CreateFunction(new print()));
             script.SetObjectInternal("pair", script.CreateFunction(new pair(script)));
             script.SetObjectInternal("tonumber", script.CreateFunction(new tonumber(script)));
+            script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
+            script.SetObjectInternal("toulong", script.CreateFunction(new toulong(script)));
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
         }
         private class pair : ScorpioHandle
@@ -61,7 +66,7 @@ namespace Scorpio.Library
                 if (obj is ScriptArray)
                     return m_script.CreateFunction(new ArrayPair(obj));
                 else if (obj is ScriptTable)
-                    return m_script.CreateFunction(new TablePair(obj));
+                    return m_script.CreateFunction(new TablePair(m_script, obj));
                 throw new ExecutionException("pair必须用语table或array类型");
             }
         }
@@ -85,8 +90,39 @@ namespace Scorpio.Library
             public object run(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
-                if (obj is ScriptNumber) return obj;
-                return m_script.CreateNumber(obj.ObjectValue);
+                if (obj is ScriptNumber || obj is ScriptString)
+                    return m_script.CreateNumber(Convert.ToDouble(obj.ObjectValue));
+                throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Number类型");
+            }
+        }
+        public class tolong : ScorpioHandle
+        {
+            private Script m_script;
+            public tolong(Script script)
+            {
+                m_script = script;
+            }
+            public object run(object[] args)
+            {
+                ScriptObject obj = args[0] as ScriptObject;
+                if (obj is ScriptNumber || obj is ScriptString)
+                    return m_script.CreateNumber(Convert.ToInt64(obj.ObjectValue));
+                throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Long类型");
+            }
+        }
+        public class toulong : ScorpioHandle
+        {
+            private Script m_script;
+            public toulong(Script script)
+            {
+                m_script = script;
+            }
+            public object run(object[] args)
+            {
+                ScriptObject obj = args[0] as ScriptObject;
+                if (obj is ScriptNumber || obj is ScriptString)
+                    return m_script.CreateNumber(Convert.ToUInt64(obj.ObjectValue));
+                throw new ExecutionException("不能从类型 " + obj.Type + " 转换成ULong类型");
             }
         }
         public class tostring : ScorpioHandle

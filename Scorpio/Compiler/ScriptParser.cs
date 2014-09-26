@@ -412,7 +412,7 @@ namespace Scorpio.Compiler
                     if (member is CodeScriptObject) {
                         ScriptObject obj = ((CodeScriptObject)member).Object;
                         if (obj.IsNumber)
-                            ret = new CodeMember(((ScriptNumber)obj).ToInt32(), ret);
+                            ret = new CodeMember((ScriptNumber)obj, ret);
                         else if (obj.IsString)
                             ret = new CodeMember(((ScriptString)obj).Value, ret);
                         else

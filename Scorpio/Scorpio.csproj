@@ -53,6 +53,7 @@
     <Compile Include="CodeDom\Temp\TempOperator.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Collections\ReadOnlyICollection.cs" />
+    <Compile Include="Collections\TableDictionary.cs" />
     <Compile Include="Collections\VariableDictionary.cs" />
     <Compile Include="Compiler\ScriptLexer.cs" />
     <Compile Include="Compiler\ScriptParser.cs" />

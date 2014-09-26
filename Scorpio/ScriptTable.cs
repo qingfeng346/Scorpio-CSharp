@@ -3,29 +3,29 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-
+using Scorpio.Collections;
 namespace Scorpio
 {
     //脚本table类型
     public class ScriptTable : ScriptObject
     {
-        private Dictionary<String, ScriptObject> m_listObject;               //所有的数据(函数和数据都在一个数组)
+        private TableDictionary m_listObject;                                   //所有的数据(函数和数据都在一个数组)
         public override ObjectType Type { get { return ObjectType.Table; } }
         public ScriptTable()
         {
-            m_listObject = new Dictionary<String, ScriptObject>();
+            m_listObject = new TableDictionary();
         }
-        public void SetValue(String strName, ScriptObject scriptObject)
+        public void SetValue(object strName, ScriptObject scriptObject)
         {
             m_listObject[strName] = scriptObject;
         }
-        public ScriptObject GetValue(string strName)
+        public ScriptObject GetValue(object strName)
         {
-            if (HasValue(strName))
+            if (m_listObject.ContainsKey(strName))
                 return m_listObject[strName];
             return ScriptNull.Instance;
         }
-        public bool HasValue(String strName)
+        public bool HasValue(object strName)
         {
             return m_listObject.ContainsKey(strName);
         }
@@ -33,7 +33,7 @@ namespace Scorpio
         {
             return m_listObject.Count;
         }
-        public Dictionary<String, ScriptObject>.Enumerator GetIterator()
+        public TableDictionary.Enumerator GetIterator()
         {
             return m_listObject.GetEnumerator();
         }
