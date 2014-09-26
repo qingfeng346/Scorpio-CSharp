@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Reflection;
 using Scorpio.Collections;
 using Scorpio.Runtime;
 using Scorpio.Compiler;
@@ -18,6 +19,7 @@ namespace Scorpio
         private IScriptUserdataFactory m_UserdataFactory = null;                //Userdata工厂
         private ScriptTable m_GlobalTable = new ScriptTable();                  //全局Table
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
+        private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
         public ScriptObject LoadFile(String strFileName)
         {
@@ -49,6 +51,23 @@ namespace Scorpio
             } catch (System.Exception e) {
                 throw new ScriptException("load buffer [" + strBreviary + "] is error : " + e.ToString());
             }
+        }
+        public void PushAssembly(Assembly assembly)
+        {
+            if (assembly == null) return;
+            if (!m_Assembly.Contains(assembly))
+                m_Assembly.Add(assembly);
+        }
+        public ScriptObject LoadType(string str)
+        {
+            for (int i = 0; i < m_Assembly.Count;++i )
+            {
+                Type type = m_Assembly[i].GetType(str);
+                if (type != null)
+                    return CreateUserdata(type);
+            }
+            UnityEngine.Debug.Log("类型 " + str + " 为空" + m_Assembly.Count);
+            return ScriptNull.Instance;
         }
         internal void SetStackInfo(StackInfo info)
         {

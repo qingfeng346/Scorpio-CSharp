@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
 using Scorpio;
 using Scorpio.Exception;
 using Scorpio.Collections;
@@ -53,6 +54,8 @@ namespace Scorpio.Library
             script.SetObjectInternal("toulong", script.CreateFunction(new toulong(script)));
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
             script.SetObjectInternal("clone", script.CreateFunction(new clone()));
+            script.SetObjectInternal("load_assembly", script.CreateFunction(new load_assembly(script)));
+            script.SetObjectInternal("import_type", script.CreateFunction(new import_type(script)));
         }
         private class pair : ScorpioHandle
         {
@@ -81,7 +84,7 @@ namespace Scorpio.Library
                 return null;
             }
         }
-        public class tonumber : ScorpioHandle
+        private class tonumber : ScorpioHandle
         {
             private Script m_script;
             public tonumber(Script script)
@@ -96,7 +99,7 @@ namespace Scorpio.Library
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Number类型");
             }
         }
-        public class tolong : ScorpioHandle
+        private class tolong : ScorpioHandle
         {
             private Script m_script;
             public tolong(Script script)
@@ -111,7 +114,7 @@ namespace Scorpio.Library
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Long类型");
             }
         }
-        public class toulong : ScorpioHandle
+        private class toulong : ScorpioHandle
         {
             private Script m_script;
             public toulong(Script script)
@@ -126,7 +129,7 @@ namespace Scorpio.Library
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成ULong类型");
             }
         }
-        public class tostring : ScorpioHandle
+        private class tostring : ScorpioHandle
         {
             private Script m_script;
             public tostring(Script script)
@@ -140,11 +143,50 @@ namespace Scorpio.Library
                 return m_script.CreateString(obj.ToString());
             }
         }
-        public class clone : ScorpioHandle
+        private class clone : ScorpioHandle
         {
             public object Call(object[] args)
             {
                 return ((ScriptObject)args[0]).Clone();
+            }
+        }
+        private class load_assembly : ScorpioHandle
+        {
+            private Script m_script;
+            public load_assembly(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(object[] args)
+            {
+                ScriptString str = args[0] as ScriptString;
+                if (str == null) throw new ExecutionException("load_assembly 参数必须是 string");
+                string assemblyName = str.Value;
+                Assembly assembly = null;
+                try {
+                    assembly = Assembly.Load(assemblyName);
+                } catch (BadImageFormatException) {
+                    // The assemblyName was invalid.  It is most likely a path.
+                }
+                if (assembly == null) {
+                    assembly = Assembly.Load(AssemblyName.GetAssemblyName(assemblyName));
+                }
+                m_script.PushAssembly(assembly);
+                return null;
+            }
+        }
+        private class import_type : ScorpioHandle
+        {
+            private Script m_script;
+            public import_type(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(object[] args)
+            {
+                ScriptString str = args[0] as ScriptString;
+                if (str == null) throw new ExecutionException("import_type 参数必须是 string");
+                return m_script.LoadType(str.Value);
             }
         }
     }

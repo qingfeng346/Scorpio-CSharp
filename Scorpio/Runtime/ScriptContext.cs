@@ -129,7 +129,7 @@ namespace Scorpio.Runtime
                         throw new ExecutionException("GetVariable Table Element is must a string");
                     }
                 } else {
-                    throw new ExecutionException("GetVariable member parent is not table or array");
+                    throw new ExecutionException("GetVariable member parent is not table or array or userdata");
                 }
             }
             if (ret == null) throw new ExecutionException("GetVariable member is error");

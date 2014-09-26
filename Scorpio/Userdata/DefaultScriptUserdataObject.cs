@@ -47,6 +47,13 @@ namespace Scorpio.Userdata
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, ScriptFunction>();
             m_Constructor = new ScorpioMethod(ValueType.ToString(), ValueType.GetConstructors());
+            MethodInfo[] methods = ValueType.GetMethods();
+            for (int i = 0; i < methods.Length;++i )
+            {
+                string name = methods[i].Name;
+                if (!m_Functions.ContainsKey(name))
+                    m_Functions.Add(name, m_Script.CreateFunction(new ScorpioMethod(ValueType, name, Value)));
+            }
         }
         public override ScriptObject Call(ScriptObject[] parameters)
         {
@@ -94,13 +101,6 @@ namespace Scorpio.Userdata
                 return m_NestedTypes[strName];
             Field field = GetField(strName);
             if (field != null) return m_Script.CreateObject(field.GetValue(Value));
-            MethodInfo method = ValueType.GetMethod(strName);
-            if (method != null)
-            {
-                ScriptFunction func = m_Script.CreateFunction(new ScorpioMethod(ValueType, strName, Value));
-                m_Functions[strName] = func;
-                return func;
-            }
             Type nestedType = ValueType.GetNestedType(strName);
             if (nestedType != null) {
                 ScriptUserdata ret = m_Script.CreateUserdata(nestedType);
