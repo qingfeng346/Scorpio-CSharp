@@ -9,12 +9,8 @@ namespace Scorpio
     //脚本table类型
     public class ScriptTable : ScriptObject
     {
-        private TableDictionary m_listObject;                                   //所有的数据(函数和数据都在一个数组)
         public override ObjectType Type { get { return ObjectType.Table; } }
-        public ScriptTable()
-        {
-            m_listObject = new TableDictionary();
-        }
+        private TableDictionary m_listObject = new TableDictionary();  //所有的数据(函数和数据都在一个数组)
         public void SetValue(object key, ScriptObject scriptObject)
         {
             Util.AssignObject(m_listObject, key, scriptObject);
@@ -34,6 +30,21 @@ namespace Scorpio
         public TableDictionary.Enumerator GetIterator()
         {
             return m_listObject.GetEnumerator();
+        }
+        public override ScriptObject Clone()
+        {
+            ScriptTable ret = new ScriptTable();
+            ScriptObject obj = null;
+            ScriptFunction func = null;
+            foreach (var pair in m_listObject) {
+                obj = pair.Value.Clone();
+                if (obj is ScriptFunction) {
+                    func = (ScriptFunction)obj;
+                    if (!func.IsStatic) func.SetTable(ret);
+                }
+                ret.m_listObject[pair.Key] = obj;
+            }
+            return ret;
         }
         public override string ToString() { return "Table"; }
     }

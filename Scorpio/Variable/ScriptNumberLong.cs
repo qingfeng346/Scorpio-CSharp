@@ -95,5 +95,9 @@ namespace Scorpio.Variable
             }
             return false;
         }
+        public override ScriptObject Clone()
+        {
+            return new ScriptNumberLong(m_Script, Value);
+        }
     }
 }

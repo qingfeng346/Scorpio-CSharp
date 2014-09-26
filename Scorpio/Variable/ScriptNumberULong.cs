@@ -98,5 +98,9 @@ namespace Scorpio.Variable
         {
             return ObjectValue.ToString();
         }
+        public override ScriptObject Clone()
+        {
+            return new ScriptNumberULong(m_Script, Value);
+        }
     }
 }

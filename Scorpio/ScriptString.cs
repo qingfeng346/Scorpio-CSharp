@@ -19,5 +19,9 @@ namespace Scorpio
             Value += obj.ToString();
             return this;
         }
+        public override ScriptObject Clone()
+        {
+            return new ScriptString(Value);
+        }
     }
 }

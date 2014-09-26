@@ -16,6 +16,10 @@ namespace Scorpio
         {
             return Value ? False : True;
         }
+        public override ScriptObject Clone()
+        {
+            return this;
+        }
         public static ScriptBoolean Get(bool b)
         {
             return b ? True : False;

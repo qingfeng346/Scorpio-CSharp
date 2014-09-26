@@ -14,6 +14,10 @@ namespace Scorpio
         {
             m_listObject = new List<ScriptObject>();
         }
+        private ScriptArray(List<ScriptObject> objs)
+        {
+            m_listObject = objs;
+        }
         public ScriptObject GetValue(int index)
         {
             if (index < 0 || index >= m_listObject.Count)
@@ -41,6 +45,14 @@ namespace Scorpio
         public List<ScriptObject>.Enumerator GetIterator()
         {
             return m_listObject.GetEnumerator();
+        }
+        public override ScriptObject Clone()
+        {
+            List<ScriptObject> objs = new List<ScriptObject>();
+            for (int i = 0; i < m_listObject.Count; ++i) {
+                objs.Add(m_listObject[i].Clone());
+            }
+            return new ScriptArray(objs);
         }
         public override string ToString() { return "Array"; }
     }

@@ -30,6 +30,7 @@ namespace Scorpio
         public virtual ScriptObject Modulo(ScriptObject obj) { return null; }           // %=
         public ScriptObject Call() { return Call(NOPARAMETER); }                        // 无参调用
         public virtual ScriptObject Call(ScriptObject[] parameters) { throw new ExecutionException("类型 " + Type + " 不支持函数调用"); }        //函数调用
+        public virtual ScriptObject Clone() { return this; }                            // 复制一个变量
         public abstract ObjectType Type { get; }                                        // 变量类型
         public virtual int BranchType { get { return 0; } }                             // 分支类型
         public virtual object ObjectValue { get { return null; } }                      // 变量值

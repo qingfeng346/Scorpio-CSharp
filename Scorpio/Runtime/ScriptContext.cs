@@ -35,8 +35,9 @@ namespace Scorpio.Runtime
         }
         private bool IsBreak { get { return m_Break; } }                 //是否已经Break
         private bool IsOver { get { return m_Break || m_Over; } }        //此逻辑块是否已经执行完成
-        public void Initialize(VariableDictionary variable)
+        public void Initialize(ScriptContext parent, VariableDictionary variable)
         {
+            m_parent = parent;
             m_variableDictionary = variable;
         }
         private void Initialize(string name, ScriptObject obj)

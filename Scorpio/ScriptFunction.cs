@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using Scorpio.Runtime;
 using Scorpio.Variable;
-
+using Scorpio.Collections;
 namespace Scorpio
 {
     //C#函数指针
@@ -30,15 +30,17 @@ namespace Scorpio
     //脚本函数类型
     public class ScriptFunction : ScriptObject
     {
-        public Script Script { get; private set; }                  //所在脚本
-        public String Name { get; private set; }                    //函数名字
-        public FunstionType FunctionType { get; private set; }      //函数类型 （是 脚本函数 还是 程序函数）
+        public Script Script { get; private set; }                              //所在脚本
+        public String Name { get; private set; }                                //函数名字
+        public FunstionType FunctionType { get; private set; }                  //函数类型 （是 脚本函数 还是 程序函数）
+        public bool IsStatic { get; private set; }                              //是否是静态函数（不是table内部函数）
 
-        private ScorpioScriptFunction m_ScriptFunction;             //脚本函数
-        private ScorpioFunction m_Function;                         //程序函数指针
-        private ScorpioHandle m_Handle;                             //程序函数执行类
-        private ScorpioDelegate m_Delegate;                         //程序函数动态委托
-        private ScorpioMethod m_Method;                             //程序函数
+        private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数
+        private ScorpioFunction m_Function;                                     //程序函数指针
+        private ScorpioHandle m_Handle;                                         //程序函数执行类
+        private ScorpioDelegate m_Delegate;                                     //程序函数动态委托
+        private ScorpioMethod m_Method;                                         //程序函数
+        private VariableDictionary m_stackObject = new VariableDictionary();    //函数变量
         public override ObjectType Type { get { return ObjectType.Function; } }
         public ScriptFunction(Script script, ScorpioFunction function) : this(script, function.Method.Name, function) { }
         public ScriptFunction(Script script, String strName, ScorpioFunction function)
@@ -66,6 +68,7 @@ namespace Scorpio
         }
         internal ScriptFunction(Script script, String strName, ScorpioScriptFunction function)
         {
+            this.IsStatic = true;
             this.m_ScriptFunction = function;
             Initialize(script, strName, FunstionType.Script);
         }
@@ -77,8 +80,11 @@ namespace Scorpio
         }
         public void SetTable(ScriptTable table)
         {
-            if (FunctionType == FunstionType.Script)
-                m_ScriptFunction.SetTable(table);
+            if (FunctionType == FunstionType.Script) {
+                IsStatic = false;
+                m_stackObject["this"] = table;
+                m_stackObject["self"] = table;
+            }
         }
         public void SetParentContext(ScriptContext context)
         {
@@ -88,7 +94,7 @@ namespace Scorpio
         public override ScriptObject Call(ScriptObject[] parameters)
         {
             if (FunctionType == FunstionType.Script) {
-                return m_ScriptFunction.Call(parameters);
+                return m_ScriptFunction.Call(m_stackObject, parameters);
             } else {
                 if (FunctionType == FunstionType.Function) {
                     return Script.CreateObject(m_Function(parameters));
@@ -101,6 +107,14 @@ namespace Scorpio
                 }
             }
             return null;
+        }
+        public override ScriptObject Clone()
+        {
+            if (FunctionType != FunstionType.Script)
+                return base.Clone();
+            ScriptFunction ret = new ScriptFunction(Script, Name, m_ScriptFunction);
+            ret.IsStatic = IsStatic;
+            return ret;
         }
         public override string ToString() { return "Function(" + Name + ")"; }
     }

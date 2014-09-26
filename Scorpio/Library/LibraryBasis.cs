@@ -52,6 +52,7 @@ namespace Scorpio.Library
             script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
             script.SetObjectInternal("toulong", script.CreateFunction(new toulong(script)));
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
+            script.SetObjectInternal("clone", script.CreateFunction(new clone()));
         }
         private class pair : ScorpioHandle
         {
@@ -137,6 +138,13 @@ namespace Scorpio.Library
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptString) return obj;
                 return m_script.CreateString(obj.ToString());
+            }
+        }
+        public class clone : ScorpioHandle
+        {
+            public object Call(object[] args)
+            {
+                return ((ScriptObject)args[0]).Clone();
             }
         }
     }
