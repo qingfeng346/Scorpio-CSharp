@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.Run = new System.Windows.Forms.Button();
             this.m_txtScriptOutput = new System.Windows.Forms.TextBox();
@@ -117,6 +118,7 @@
             this.Controls.Add(this.m_txtScriptOutput);
             this.Controls.Add(this.Run);
             this.Controls.Add(this.textBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "Form1";
             this.Activated += new System.EventHandler(this.Form1_Activated);
