@@ -62,7 +62,8 @@
     <Compile Include="Compiler\TokenType.cs" />
     <Compile Include="Exception\StackInfo.cs" />
     <Compile Include="ScriptEnum.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdata.cs" />
+    <Compile Include="Userdata\DefaultScriptUserdataObject.cs" />
+    <Compile Include="Userdata\DefaultScriptUserdataEnum.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataFactory.cs" />
     <Compile Include="Exception\ExecutionException.cs" />
     <Compile Include="Exception\LexerException.cs" />

@@ -7,7 +7,7 @@ using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
     //语言数据
-    public class DefaultScriptUserdata : ScriptUserdata
+    public class DefaultScriptUserdataObject : ScriptUserdata
     {
         private class Field
         {
@@ -34,14 +34,10 @@ namespace Scorpio.Userdata
                     throw new ScriptException("变量 [" + name + "] 不支持SetValue");
             }
         }
-        public override object Value { get; protected set; }
-        public override Type ValueType { get; protected set; }
-        private bool m_IsEnum;
         private Dictionary<string, Field> m_FieldInfos;                 //所有的变量 以及 get set函数
         private Dictionary<string, ScriptUserdata> m_NestedTypes;       //所有的类中类
         private Dictionary<string, ScriptFunction> m_Functions;         //所有的函数
-        private Dictionary<string, ScriptEnum> m_Enums;                 //如果是枚举的话 所有枚举的值
-        public DefaultScriptUserdata(Script script, object value)
+        public DefaultScriptUserdataObject(Script script, object value)
         {
             this.Script = script;
             this.Value = value;
@@ -49,14 +45,6 @@ namespace Scorpio.Userdata
             m_FieldInfos = new Dictionary<string, Field>();
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, ScriptFunction>();
-            m_Enums = new Dictionary<string, ScriptEnum>();
-            m_IsEnum = ValueType.IsEnum;
-            if (m_IsEnum) {
-                Array values = Enum.GetValues(ValueType);
-                foreach (var v in values) {
-                    m_Enums[v.ToString()] = script.CreateEnum(v);
-                }
-            }
         }
         private Field GetField(string strName)
         {
@@ -94,42 +82,32 @@ namespace Scorpio.Userdata
         }
         public override ScriptObject GetValue(string strName)
         {
-            if (m_IsEnum) {
-                if (!m_Enums.ContainsKey(strName)) throw new ScriptException("Enum[" + ValueType.ToString() + "] Element[" + strName + "] 不存在");
-                return m_Enums[strName];
-            } else {
-                if (m_Functions.ContainsKey(strName))
-                    return m_Functions[strName];
-                if (m_NestedTypes.ContainsKey(strName))
-                    return m_NestedTypes[strName];
-                Field field = GetField(strName);
-                if (field != null) return Script.CreateObject(field.GetValue(Value));
-                MethodInfo method = ValueType.GetMethod(strName);
-                if (method != null)
-                {
-                    ScriptFunction func = Script.CreateFunction(new ScorpioMethod(ValueType, strName, Value));
-                    m_Functions[strName] = func;
-                    return func;
-                }
-                Type nestedType = ValueType.GetNestedType(strName);
-                if (nestedType != null) {
-                    ScriptUserdata ret = Script.CreateUserdata(nestedType);
-                    m_NestedTypes.Add(strName, ret);
-                    return ret;
-                }
-                throw new ScriptException("Type[" + ValueType.ToString() + "] Variable[" + strName + "] 不存在");
+            if (m_Functions.ContainsKey(strName))
+                return m_Functions[strName];
+            if (m_NestedTypes.ContainsKey(strName))
+                return m_NestedTypes[strName];
+            Field field = GetField(strName);
+            if (field != null) return Script.CreateObject(field.GetValue(Value));
+            MethodInfo method = ValueType.GetMethod(strName);
+            if (method != null)
+            {
+                ScriptFunction func = Script.CreateFunction(new ScorpioMethod(ValueType, strName, Value));
+                m_Functions[strName] = func;
+                return func;
             }
+            Type nestedType = ValueType.GetNestedType(strName);
+            if (nestedType != null) {
+                ScriptUserdata ret = Script.CreateUserdata(nestedType);
+                m_NestedTypes.Add(strName, ret);
+                return ret;
+            }
+            throw new ScriptException("Type[" + ValueType.ToString() + "] Variable[" + strName + "] 不存在");
         }
         public override void SetValue(string strName, ScriptObject value)
         {
-            if (m_IsEnum) {
-                throw new ScriptException("Enum 不支持 SetValue");
-            } else {
-                Field field = GetField(strName);
-                if (field == null) throw new ScriptException("Type[" + ValueType + "] 变量 [" + strName + "] 不存在");
-                field.SetValue(Value, Util.ChangeType(value, field.fieldType));
-            }
+            Field field = GetField(strName);
+            if (field == null) throw new ScriptException("Type[" + ValueType + "] 变量 [" + strName + "] 不存在");
+            field.SetValue(Value, Util.ChangeType(value, field.fieldType));
         }
-        public override string ToString() { return Value.ToString(); }
     }
 }
