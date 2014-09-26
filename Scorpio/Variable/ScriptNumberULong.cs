@@ -50,28 +50,23 @@ namespace Scorpio.Variable
         }
         public override ScriptObject Plus(ScriptObject obj)
         {
-            Value += ((ScriptNumber)obj).ToULong();
-            return this;
+            return new ScriptNumberULong(m_Script, Value + ((ScriptNumber)obj).ToULong());
         }
         public override ScriptObject Minus(ScriptObject obj)
         {
-            Value -= ((ScriptNumber)obj).ToULong();
-            return this;
+            return new ScriptNumberULong(m_Script, Value - ((ScriptNumber)obj).ToULong());
         }
         public override ScriptObject Multiply(ScriptObject obj)
         {
-            Value *= ((ScriptNumber)obj).ToULong();
-            return this;
+            return new ScriptNumberULong(m_Script, Value * ((ScriptNumber)obj).ToULong());
         }
         public override ScriptObject Divide(ScriptObject obj)
         {
-            Value /= ((ScriptNumber)obj).ToULong();
-            return this;
+            return new ScriptNumberULong(m_Script, Value / ((ScriptNumber)obj).ToULong());
         }
         public override ScriptObject Modulo(ScriptObject obj)
         {
-            Value %= ((ScriptNumber)obj).ToULong();
-            return this;
+            return new ScriptNumberULong(m_Script, Value % ((ScriptNumber)obj).ToULong());
         }
         public override bool Compare(TokenType type, CodeOperator oper, ScriptNumber num)
         {
