@@ -7,6 +7,7 @@ namespace Scorpio
 {
     public static class Util
     {
+        private static readonly Type TYPE_OBJECT = typeof(object);
         private static readonly Type TYPE_BOOL = typeof(bool);
         private static readonly Type TYPE_STRING = typeof(string);
         private static readonly Type TYPE_SBYTE = typeof(sbyte);
@@ -142,12 +143,20 @@ namespace Scorpio
         }
         public static object ChangeType(ScriptObject par, Type type)
         {
-            if (type.IsAssignableFrom(par.GetType())) {
-                return par;
-            } else if (par is ScriptNumber) {
-                return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : Convert.ChangeType(par.ObjectValue, type);
+            if (type == TYPE_OBJECT) {
+                if (par is ScriptNumber) {
+                    return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : Convert.ChangeType(par.ObjectValue, type);
+                } else {
+                    return par.ObjectValue;
+                }
             } else {
-                return par.ObjectValue;
+                if (type.IsAssignableFrom(par.GetType())) {
+                    return par;
+                } else if (par is ScriptNumber) {
+                    return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : Convert.ChangeType(par.ObjectValue, type);
+                } else {
+                    return par.ObjectValue;
+                }
             }
         }
         public static bool CanChangeType(ScriptObject[] pars, Type[] types)
@@ -162,18 +171,22 @@ namespace Scorpio
         }
         public static bool CanChangeType(ScriptObject par, Type type)
         {
-            if (type.IsAssignableFrom(par.GetType())) {
+            if (type == TYPE_OBJECT) {
                 return true;
-            } else if (par is ScriptString && Util.IsString(type)) {
-                return true;
-            } else if (par is ScriptNumber && (IsNumber(type) || IsEnum(type))) {
-                return true;
-            } else if (par is ScriptBoolean && IsBool(type)) {
-                return true;
-            } else if (par is ScriptEnum && (par as ScriptEnum).EnumType == type) {
-                return true;
-            } else if (par is ScriptUserdata && type.IsAssignableFrom(((ScriptUserdata)par).ValueType)) {
-                return true;
+            } else {
+                if (par is ScriptString && Util.IsString(type)) {
+                    return true;
+                } else if (par is ScriptNumber && (IsNumber(type) || IsEnum(type))) {
+                    return true;
+                } else if (par is ScriptBoolean && IsBool(type)) {
+                    return true;
+                } else if (par is ScriptEnum && (par as ScriptEnum).EnumType == type) {
+                    return true;
+                } else if (par is ScriptUserdata && type.IsAssignableFrom(((ScriptUserdata)par).ValueType)) {
+                    return true;
+                } else if (type.IsAssignableFrom(par.GetType())) {
+                    return true;
+                }
             }
             return false;
         }
