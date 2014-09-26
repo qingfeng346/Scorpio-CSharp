@@ -15,7 +15,7 @@ namespace Scorpio.Library
             {
                 m_ListEnumerator = ((ScriptArray)obj).GetIterator();
             }
-            public object run(object[] args)
+            public object Call(object[] args)
             {
                 if (m_ListEnumerator.MoveNext())
                     return m_ListEnumerator.Current;
@@ -31,7 +31,7 @@ namespace Scorpio.Library
                 m_Script = script;
                 m_TableEnumerator = ((ScriptTable)obj).GetIterator();
             }
-            public object run(object[] args)
+            public object Call(object[] args)
             {
                 if (m_TableEnumerator.MoveNext())
                 {
@@ -60,7 +60,7 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object run(object[] args)
+            public object Call(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptArray)
@@ -72,7 +72,7 @@ namespace Scorpio.Library
         }
         private class print : ScorpioHandle
         {
-            public object run(object[] args)
+            public object Call(object[] args)
             {
                 for (int i = 0; i < args.Length; ++i) {
                     Console.WriteLine(args[i].ToString());
@@ -87,7 +87,7 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object run(object[] args)
+            public object Call(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptNumber || obj is ScriptString)
@@ -102,7 +102,7 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object run(object[] args)
+            public object Call(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptNumber || obj is ScriptString)
@@ -117,7 +117,7 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object run(object[] args)
+            public object Call(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptNumber || obj is ScriptString)
@@ -132,7 +132,7 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object run(object[] args)
+            public object Call(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptString) return obj;

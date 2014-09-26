@@ -16,13 +16,13 @@ namespace Scorpio.Library
         }
         private class count : ScorpioHandle
         {
-            public object run(object[] args) {
+            public object Call(object[] args) {
                 return ((ScriptArray)args[0]).Count();
             }
         }
         private class insert : ScorpioHandle
         {
-            public object run(object[] args) {
+            public object Call(object[] args) {
                 ScriptArray array = (ScriptArray)args[0];
                 int index = ((ScriptNumber)args[1]).ToInt32();
                 ScriptObject obj = (ScriptObject)args[2];
@@ -32,7 +32,7 @@ namespace Scorpio.Library
         }
         private class add : ScorpioHandle
         {
-            public object run(object[] args) {
+            public object Call(object[] args) {
                 ScriptArray array = (ScriptArray)args[0];
                 ScriptObject obj = (ScriptObject)args[1];
                 array.Add(obj);

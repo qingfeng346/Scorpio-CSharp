@@ -32,11 +32,11 @@ namespace Scorpio.Variable
         }
         public int ParameterCount { get { return m_listParameters.Count; } }
         public ReadOnlyCollection<String> Parameters { get { return m_listParameters.AsReadOnly(); } }
-        public ScriptObject Call(object[] parameters)
+        public ScriptObject Call(ScriptObject[] parameters)
         {
             int length = parameters.Length;
             for (int i = 0; i < m_listParameters.Count; ++i) {
-                m_scriptStackObject[m_listParameters[i]] = (parameters != null && length > i) ? m_script.CreateObject(parameters[i]) : ScriptNull.Instance;
+                m_scriptStackObject[m_listParameters[i]] = (parameters != null && length > i) ? parameters[i] : ScriptNull.Instance;
             }
             ScriptContext context = new ScriptContext(m_script, m_scriptExecutable, m_parentContext, Executable_Block.Function);
             context.Initialize(m_scriptStackObject);

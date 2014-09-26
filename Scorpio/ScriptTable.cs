@@ -15,19 +15,17 @@ namespace Scorpio
         {
             m_listObject = new TableDictionary();
         }
-        public void SetValue(object strName, ScriptObject scriptObject)
+        public void SetValue(object key, ScriptObject scriptObject)
         {
-            m_listObject[strName] = scriptObject;
+            Util.AssignObject(m_listObject, key, scriptObject);
         }
-        public ScriptObject GetValue(object strName)
+        public ScriptObject GetValue(object key)
         {
-            if (m_listObject.ContainsKey(strName))
-                return m_listObject[strName];
-            return ScriptNull.Instance;
+            return m_listObject.ContainsKey(key) ? m_listObject[key] : ScriptNull.Instance;
         }
-        public bool HasValue(object strName)
+        public bool HasValue(object key)
         {
-            return m_listObject.ContainsKey(strName);
+            return m_listObject.ContainsKey(key);
         }
         public int Count()
         {

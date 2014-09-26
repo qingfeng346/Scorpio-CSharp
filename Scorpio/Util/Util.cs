@@ -21,31 +21,58 @@ namespace Scorpio
         private static readonly Type TYPE_DOUBLE = typeof(double);
         private static readonly Type TYPE_DECIMAL = typeof(decimal);
 
-        public static bool SetObject(VariableDictionary variables, string str, ScriptObject obj)
+        public static bool SetObject(TableDictionary variables, object key, ScriptObject obj)
         {
-            if (!variables.ContainsKey(str)) return false;
-            Set_impl(variables, str, obj);
+            if (!variables.ContainsKey(key)) return false;
+            Set_impl(variables, key, obj);
             return true;
         }
-        public static void AssignObject(VariableDictionary variables, string str, ScriptObject obj)
+        public static void AssignObject(TableDictionary variables, object key, ScriptObject obj)
         {
-            if (!variables.ContainsKey(str))
+            if (!variables.ContainsKey(key))
             {
-                variables.Add(str, obj);
+                variables.Add(key, obj);
                 return;
             }
-            Set_impl(variables, str, obj);
+            Set_impl(variables, key, obj);
         }
-        private static void Set_impl(VariableDictionary variables, string str, ScriptObject obj)
+        private static void Set_impl(TableDictionary variables, object key, ScriptObject obj)
         {
-            ScriptObject el = variables[str];
+            ScriptObject el = variables[key];
             if (el.Type != obj.Type) {
-                variables[str] = obj;
+                variables[key] = obj;
             } else if (!(el is ScriptNull)) {
                 if ((el is ScriptNumber && el.BranchType == obj.BranchType) || (el.IsString)) {
                     el.Assign(obj);
                 } else {
-                    variables[str] = obj;
+                    variables[key] = obj;
+                }
+            }
+        }
+        public static bool SetObject(VariableDictionary variables, string key, ScriptObject obj)
+        {
+            if (!variables.ContainsKey(key)) return false;
+            Set_impl(variables, key, obj);
+            return true;
+        }
+        public static void AssignObject(VariableDictionary variables, string key, ScriptObject obj)
+        {
+            if (!variables.ContainsKey(key)) {
+                variables.Add(key, obj);
+                return;
+            }
+            Set_impl(variables, key, obj);
+        }
+        private static void Set_impl(VariableDictionary variables, string key, ScriptObject obj)
+        {
+            ScriptObject el = variables[key];
+            if (el.Type != obj.Type) {
+                variables[key] = obj;
+            } else if (!(el is ScriptNull)) {
+                if ((el is ScriptNumber && el.BranchType == obj.BranchType) || (el.IsString)) {
+                    el.Assign(obj);
+                } else {
+                    variables[key] = obj;
                 }
             }
         }

@@ -510,7 +510,7 @@ namespace Scorpio.Compiler
                         break;
                 }
             }
-            listTokens.Add(new Token(TokenType.Finished, null, m_iSourceLine, m_iSourceChar));
+            listTokens.Add(new Token(TokenType.Finished, "", m_iSourceLine, m_iSourceChar));
             return listTokens;
         }
     }

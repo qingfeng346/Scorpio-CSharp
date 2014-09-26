@@ -86,7 +86,7 @@ namespace Scorpio.Runtime
             if (member.Parent == null) {
                 string name = member.MemberString;
                 ScriptObject obj = GetVariableObject(name);
-                ret = (obj == null ? m_script.GetObject(name) : obj);
+                ret = (obj == null ? m_script.GetValue(name) : obj);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
                 if (parent == null) throw new ExecutionException("GetVariable parent is null");
@@ -432,15 +432,14 @@ namespace Scorpio.Runtime
         }
         ScriptObject ParseCall(CodeCallFunction scriptFunction)
         {
-            ScriptObject func = ResolveOperand(scriptFunction.Member);
-            if (!func.IsFunction) throw new ExecutionException("要调用的变量不是一个Function");
+            ScriptObject obj = ResolveOperand(scriptFunction.Member);
             int num = scriptFunction.Parameters.Count;
             ScriptObject[] parameters = new ScriptObject[num];
             for (int i = 0; i < num; ++i) {
                 parameters[i] = ResolveOperand(scriptFunction.Parameters[i]);
             }
             m_script.PushStackInfo();
-            return ((ScriptFunction)func).Call(parameters);
+            return obj.Call(parameters);
         }
         ScriptArray ParseArray(CodeArray array)
         {
@@ -514,6 +513,17 @@ namespace Scorpio.Runtime
                     }
                 } else {
                     ScriptObject right = ResolveOperand(operate.Right);
+                    if (left is ScriptNull || right is ScriptNull)
+                    {
+                        bool ret = false;
+                        if (type == TokenType.Equal)
+                            ret = (left == right);
+                        else if (type == TokenType.NotEqual)
+                            ret = (left != right);
+                        else
+                            throw new ExecutionException("nonsupport operate [" + type + "] with null");
+                        return ret ? ScriptBoolean.True : ScriptBoolean.False;
+                    }
                     if (left.Type != right.Type)
                         throw new ExecutionException("[operate] left right is not same type");
                     if (left is ScriptString) {

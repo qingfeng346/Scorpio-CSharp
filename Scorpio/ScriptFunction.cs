@@ -11,7 +11,7 @@ namespace Scorpio
     public delegate object ScorpioFunction(object[] Parameters);
     //C#类执行
     public interface ScorpioHandle {
-        object run(object[] Parameters);
+        object Call(object[] Parameters);
     }
     /// <summary> 函数类型 </summary>
     public enum FunstionType
@@ -85,24 +85,19 @@ namespace Scorpio
             if (FunctionType == FunstionType.Script)
                 m_ScriptFunction.SetParentContext(context);
         }
-        public ScriptObject Call(params object[] args)
+        public override ScriptObject Call(ScriptObject[] parameters)
         {
             if (FunctionType == FunstionType.Script) {
-                return m_ScriptFunction.Call(args);
+                return m_ScriptFunction.Call(parameters);
             } else {
-                int length = args.Length;
-                ScriptObject[] par = new ScriptObject[length];
-                for (int i = 0; i < length; ++i) {
-                    par[i] = Script.CreateObject(args[i]);
-                }
                 if (FunctionType == FunstionType.Function) {
-                    return Script.CreateObject(m_Function(par));
+                    return Script.CreateObject(m_Function(parameters));
                 } else if (FunctionType == FunstionType.Handle) {
-                    return Script.CreateObject(m_Handle.run(par));
+                    return Script.CreateObject(m_Handle.Call(parameters));
                 } else if (FunctionType == FunstionType.Delegate) {
-                    return Script.CreateObject(m_Delegate.Call(par));
+                    return Script.CreateObject(m_Delegate.Call(parameters));
                 } else if (FunctionType == FunstionType.Method) {
-                    return Script.CreateObject(m_Method.Call(par));
+                    return Script.CreateObject(m_Method.Call(parameters));
                 }
             }
             return null;

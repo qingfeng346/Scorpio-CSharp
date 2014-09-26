@@ -14,12 +14,12 @@ namespace Scorpio
     //脚本类
     public class Script
     {
-        private IScriptUserdataFactory m_UserdataFactory = null;                      //Userdata工厂
-        private VariableDictionary m_GlobalObject = new VariableDictionary();         //所有全局变量
-        public ReadOnlyDictionary<String, ScriptObject> GlobalObject { get { return ReadOnlyDictionary<String, ScriptObject>.AsReadOnly(m_GlobalObject); } }
-        private List<StackInfo> m_StackInfoStack = new List<StackInfo>();             //堆栈数据
-        private StackInfo m_StackInfo = new StackInfo();                              //最近堆栈数据
-        public void LoadFile(String strFileName)
+        private const string GLOBAL_TABLE = "_G";
+        private IScriptUserdataFactory m_UserdataFactory = null;                //Userdata工厂
+        private ScriptTable m_GlobalTable = new ScriptTable();                  //全局Table
+        private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
+        private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
+        public ScriptObject LoadFile(String strFileName)
         {
             try {
                 FileStream stream = File.OpenRead(strFileName);
@@ -27,7 +27,7 @@ namespace Scorpio
                 byte[] buffer = new byte[length];
                 stream.Read(buffer, 0, Convert.ToInt32(length));
                 stream.Close();
-                LoadString(strFileName,Encoding.UTF8.GetString(buffer));
+                return LoadString(Path.GetFileName(strFileName), Encoding.UTF8.GetString(buffer));
             } catch (System.Exception e) {
                 throw new ScriptException("load file [" + strFileName + "] is error : " + e.ToString());
             }
@@ -67,31 +67,35 @@ namespace Scorpio
             }
             return builder.ToString();
         }
-        public bool HasObject(String strName)
+        public bool HasValue(String key)
         {
-            return m_GlobalObject.ContainsKey(strName);
+            return (key == GLOBAL_TABLE) || m_GlobalTable.HasValue(key);
         }
-        public ScriptObject GetObject(string strName)
+        public ScriptObject GetValue(string key)
         {
-            return m_GlobalObject.ContainsKey(strName) ? m_GlobalObject[strName] : ScriptNull.Instance;
+            if (key == GLOBAL_TABLE)
+                return m_GlobalTable;
+            return m_GlobalTable.GetValue(key);
         }
-        public void SetObject(string strName, object value)
+        public void SetObject(string key, object value)
         {
-            if (value == null) return;
-            Util.AssignObject(m_GlobalObject, strName, CreateObject(value));
+            m_GlobalTable.SetValue(key, CreateObject(value));
         }
-        internal void SetObjectInternal(string strName, ScriptObject value)
+        internal void SetObjectInternal(string key, ScriptObject value)
         {
-            if (value == null) return;
-            Util.AssignObject(m_GlobalObject, strName, value);
+            m_GlobalTable.SetValue(key, value);
         }
-        public ScriptObject CallFunction(String strName, params ScriptObject[] args)
+        public ScriptObject Call(String strName, params object[] args)
         {
-            if (!m_GlobalObject.ContainsKey(strName)) throw new ScriptException("找不到函数[" + strName + "]");
-            ScriptFunction func = m_GlobalObject[strName] as ScriptFunction;
-            if (func == null) throw new ScriptException("找不到函数[" + strName + "]");
+            ScriptObject obj = m_GlobalTable.GetValue(strName);
+            if (obj is ScriptNull) throw new ScriptException("找不到变量[" + strName + "]");
+            int length = args.Length;
+            ScriptObject[] parameters = new ScriptObject[length];
+            for (int i = 0; i < length;++i ) {
+                parameters[i] = CreateObject(args[i]);
+            }
             m_StackInfoStack.Clear();
-            return func.Call(args);
+            return obj.Call(parameters);
         }
         public ScriptObject CreateObject(object value)
         {

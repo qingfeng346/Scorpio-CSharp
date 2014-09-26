@@ -9,12 +9,18 @@ namespace Scorpio.Variable
     {
         private class FunctionMethod
         {
-            public MethodInfo Method;
+            public MethodBase Method;
             public Type[] ParameterType;
-            public FunctionMethod(MethodInfo Method, Type[] ParameterType)
+            public FunctionMethod(MethodBase Method, Type[] ParameterType)
             {
                 this.Method = Method;
                 this.ParameterType = ParameterType;
+            }
+            public object Invoke(object obj, object[] parameters)
+            {
+                if (Method is ConstructorInfo)
+                    return ((ConstructorInfo)Method).Invoke(parameters);
+                return Method.Invoke(obj, parameters);
             }
         }
         private object m_Object;
@@ -44,6 +50,25 @@ namespace Scorpio.Variable
             m_Methods = functionMethod.ToArray();
             m_Count = m_Methods.Length;
         }
+        public ScorpioMethod(string typeName, ConstructorInfo[] methods)
+        {
+            MethodName = typeName;
+            List<FunctionMethod> functionMethod = new List<FunctionMethod>();
+            int length = methods.Length;
+            List<Type> parameters = new List<Type>();
+            for (int i = 0; i < length; ++i)
+            {
+                var method = methods[i];
+                parameters.Clear();
+                var pars = methods[i].GetParameters();
+                foreach (var par in pars) {
+                    parameters.Add(par.ParameterType);
+                }
+                functionMethod.Add(new FunctionMethod(method, parameters.ToArray()));
+            }
+            m_Methods = functionMethod.ToArray();
+            m_Count = m_Methods.Length;
+        }
         public object Call(ScriptObject[] parameters)
         {
             if (m_Count == 0) throw new ScriptException("Method [" + MethodName + "] is cannot find");
@@ -66,7 +91,7 @@ namespace Scorpio.Variable
             for (int i = 0; i < length; i++) {
                 objs[i] = Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
             }
-            return methodInfo.Method.Invoke(m_Object, objs);
+            return methodInfo.Invoke(m_Object, objs);
         }
     }
 }
