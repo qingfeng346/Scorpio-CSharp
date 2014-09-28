@@ -18,13 +18,13 @@ namespace Scorpio
         {
             m_listObject = objs;
         }
-        public ScriptObject GetValue(int index)
+        public override ScriptObject GetValue(int index)
         {
             if (index < 0 || index >= m_listObject.Count)
                 throw new ExecutionException("index is < 0 or out of count ");
             return m_listObject[index];
         }
-        public void SetValue(int index, ScriptObject obj)
+        public override void SetValue(int index, ScriptObject obj)
         {
             if (index < 0 || index >= m_listObject.Count)
                 throw new ExecutionException("index is < 0 or out of count ");

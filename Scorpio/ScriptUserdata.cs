@@ -15,8 +15,6 @@ namespace Scorpio
         protected Script m_Script;
         public object Value { get; protected set; }
         public Type ValueType { get; protected set; }
-        public abstract ScriptObject GetValue(string strName);
-        public abstract void SetValue(string strName, ScriptObject value);
         public override string ToString() { return Value.ToString(); }
     }
 }

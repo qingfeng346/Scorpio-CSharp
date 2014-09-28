@@ -93,38 +93,33 @@ namespace Scorpio.Runtime
                 if (parent == null) throw new ExecutionException("GetVariable parent is null");
                 if (parent is ScriptArray) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
-                        ScriptArray array = (ScriptArray)parent;
-                        ret = array.GetValue(member.MemberNumber);
+                        ret = parent.GetValue(member.MemberNumber);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptNumber mem = ResolveOperand(member.Member) as ScriptNumber;
                         if (mem == null) throw new ExecutionException("GetVariable Array Element is must a number");
-                        ScriptArray array = (ScriptArray)parent;
-                        ret = array.GetValue(mem.ToInt32());
+                        ret = parent.GetValue(mem.ToInt32());
                     } else {
                         throw new ExecutionException("GetVariable Array Element is must a number");
                     }
                 } else if (parent is ScriptTable) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
-                        ScriptTable table = (ScriptTable)parent;
-                        return table.GetValue(member.MemberNumberObject);
+                        return parent.GetValue(member.MemberNumberObject);
                     } else if (member.Type == MEMBER_TYPE.STRING) {
-                        ScriptTable table = (ScriptTable)parent;
-                        return table.GetValue(member.MemberString);
+                        return parent.GetValue(member.MemberString);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptObject mem = ResolveOperand(member.Member);
                         if (!(mem is ScriptString || mem is ScriptNumber)) throw new ExecutionException("GetVariable Table Element is must a string or number");
-                        ScriptTable table = (ScriptTable)parent;
-                        ret = table.GetValue(mem.ObjectValue);
+                        ret = parent.GetValue(mem.ObjectValue);
                     }
                 } else if (parent is ScriptUserdata) {
-                    if (member.Type == MEMBER_TYPE.STRING) {
-                        ScriptUserdata data = (ScriptUserdata)parent;
-                        return data.GetValue(member.MemberString);
+                    if (member.Type == MEMBER_TYPE.NUMBER) {
+                        return parent.GetValue(member.MemberNumberObject);
+                    } else if (member.Type == MEMBER_TYPE.STRING) {
+                        return parent.GetValue(member.MemberString);
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
                         if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
-                        ScriptUserdata data = (ScriptUserdata)parent;
-                        ret = data.GetValue(mem.Value);
+                        ret = parent.GetValue(mem.Value);
                     } else {
                         throw new ExecutionException("GetVariable Table Element is must a string");
                     }
@@ -152,38 +147,33 @@ namespace Scorpio.Runtime
                 if (parent == null) throw new ExecutionException("SetVariable parent is null");
                 if (parent is ScriptArray) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
-                        ScriptArray array = (ScriptArray)parent;
-                        array.SetValue(member.MemberNumber, ResolveOperand(obj));
+                        parent.SetValue(member.MemberNumber, ResolveOperand(obj));
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptNumber mem = ResolveOperand(member.Member) as ScriptNumber;
                         if (mem == null) throw new ExecutionException("SetVariable Array Element is must a number");
-                        ScriptArray array = (ScriptArray)parent;
-                        array.SetValue(mem.ToInt32(), ResolveOperand(obj));
+                        parent.SetValue(mem.ToInt32(), ResolveOperand(obj));
                     } else {
                         throw new ExecutionException("SetVariable Array Element is must a number");
                     }
                 } else if (parent is ScriptTable) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
-                        ScriptTable table = (ScriptTable)parent;
-                        table.SetValue(member.MemberNumberObject, ResolveOperand(obj));
+                        parent.SetValue(member.MemberNumberObject, ResolveOperand(obj));
                     } else if (member.Type == MEMBER_TYPE.STRING) {
-                        ScriptTable table = (ScriptTable)parent;
-                        table.SetValue(member.MemberString, ResolveOperand(obj));
+                        parent.SetValue(member.MemberString, ResolveOperand(obj));
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
                         if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string or number");
-                        ScriptTable table = (ScriptTable)parent;
-                        table.SetValue(mem.Value, ResolveOperand(obj));
+                        parent.SetValue(mem.Value, ResolveOperand(obj));
                     }
                 } else if (parent is ScriptUserdata) {
-                    if (member.Type == MEMBER_TYPE.STRING) {
-                        ScriptUserdata data = (ScriptUserdata)parent;
-                        data.SetValue(member.MemberString, ResolveOperand(obj));
+                    if (member.Type == MEMBER_TYPE.NUMBER) {
+                        parent.SetValue(member.MemberNumberObject, ResolveOperand(obj));
+                    } else if (member.Type == MEMBER_TYPE.STRING) {
+                        parent.SetValue(member.MemberString, ResolveOperand(obj));
                     } else if (member.Type == MEMBER_TYPE.OBJECT) {
                         ScriptString mem = ResolveOperand(member.Member) as ScriptString;
                         if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
-                        ScriptUserdata data = (ScriptUserdata)parent;
-                        data.SetValue(mem.Value, ResolveOperand(obj));
+                        parent.SetValue(mem.Value, ResolveOperand(obj));
                     } else {
                         throw new ExecutionException("GetVariable Table Element is must a string");
                     }

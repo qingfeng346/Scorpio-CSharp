@@ -28,8 +28,22 @@ namespace Scorpio
         public virtual ScriptObject Multiply(ScriptObject obj) { return null; }         // *=
         public virtual ScriptObject Divide(ScriptObject obj) { return null; }           // /=
         public virtual ScriptObject Modulo(ScriptObject obj) { return null; }           // %=
-        public ScriptObject Call() { return Call(NOPARAMETER); }                        // 无参调用
-        public virtual ScriptObject Call(ScriptObject[] parameters) { throw new ExecutionException("类型 " + Type + " 不支持函数调用"); }        //函数调用
+        //设置变量
+        public virtual void SetValue(int key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(int)"); }
+        //获取变量
+        public virtual ScriptObject GetValue(int key) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(int)"); }
+        //设置变量
+        public virtual void SetValue(string key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(string)"); }
+        //获取变量
+        public virtual ScriptObject GetValue(string key) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(string)"); }
+        //设置变量
+        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(object)"); }
+        //获取变量
+        public virtual ScriptObject GetValue(object key) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(object)"); }
+        //调用无参函数
+        public ScriptObject Call() { return Call(NOPARAMETER); }
+        //调用函数
+        public virtual ScriptObject Call(ScriptObject[] parameters) { throw new ExecutionException("类型[" + Type + "]不支持函数调用"); }
         public virtual ScriptObject Clone() { return this; }                            // 复制一个变量
         public abstract ObjectType Type { get; }                                        // 变量类型
         public virtual int BranchType { get { return 0; } }                             // 分支类型

@@ -27,9 +27,5 @@ namespace Scorpio.Userdata
             if (!m_Enums.ContainsKey(strName)) throw new ScriptException("枚举[" + ValueType.ToString() + "] 元素[" + strName + "] 不存在");
             return m_Enums[strName];
         }
-        public override void SetValue(string strName, ScriptObject value)
-        {
-            throw new ScriptException("枚举不支持赋值");
-        }
     }
 }

@@ -55,10 +55,6 @@ namespace Scorpio.Userdata
                     m_Functions.Add(name, m_Script.CreateFunction(new ScorpioMethod(ValueType, name, Value)));
             }
         }
-        public override ScriptObject Call(ScriptObject[] parameters)
-        {
-            return m_Script.CreateObject(m_Constructor.Call(parameters));
-        }
         private Field GetField(string strName)
         {
             if (m_FieldInfos.ContainsKey(strName))
@@ -92,6 +88,10 @@ namespace Scorpio.Userdata
                 return field;
             }
             return null;
+        }
+        public override ScriptObject Call(ScriptObject[] parameters)
+        {
+            return m_Script.CreateObject(m_Constructor.Call(parameters));
         }
         public override ScriptObject GetValue(string strName)
         {
