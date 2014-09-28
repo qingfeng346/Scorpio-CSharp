@@ -66,7 +66,6 @@ namespace Scorpio
                 if (type != null)
                     return CreateUserdata(type);
             }
-            UnityEngine.Debug.Log("类型 " + str + " 为空" + m_Assembly.Count);
             return ScriptNull.Instance;
         }
         internal void SetStackInfo(StackInfo info)

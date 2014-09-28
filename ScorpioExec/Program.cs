@@ -11,7 +11,6 @@ namespace ScorpioExec
     {
         static void Main(string[] args)
         {
-            
             Script script = new Script();
             try {
                 if (args.Length >= 1) {
