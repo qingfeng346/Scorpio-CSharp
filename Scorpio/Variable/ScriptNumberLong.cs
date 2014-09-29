@@ -13,7 +13,6 @@ namespace Scorpio.Variable
         public override int BranchType { get { return 1; } }
         public override object ObjectValue { get { return Value; } }
         public long Value { get; private set; }
-        private Script m_Script;
         public ScriptNumberLong(Script script, long value)
         {
             m_Script = script;
@@ -24,9 +23,11 @@ namespace Scorpio.Variable
             switch (c)
             {
                 case CALC.PRE_INCREMENT:
-                    return m_Script.CreateNumber(++Value);
+                    ++Value;
+                    break;
                 case CALC.PRE_DECREMENT:
-                    return m_Script.CreateNumber(--Value);
+                    --Value;
+                    break;
                 case CALC.POST_INCREMENT:
                     return m_Script.CreateNumber(Value++);
                 case CALC.POST_DECREMENT:

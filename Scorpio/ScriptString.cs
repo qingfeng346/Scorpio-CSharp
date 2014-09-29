@@ -9,14 +9,22 @@ namespace Scorpio
     public class ScriptString : ScriptPrimitiveObject<string>
     {
         public override ObjectType Type { get { return ObjectType.String; } }
-        public ScriptString(string value) : base(value) { }
+        private Script m_Script;
+        public ScriptString(Script script, string value) : base(value)
+        {
+            m_Script = script;
+        }
+        public override ScriptObject Assign()
+        {
+            return m_Script.CreateString(Value);
+        }
         public override ScriptObject Plus(ScriptObject obj)
         {
-            return new ScriptString(Value + obj.ToString());
+            return m_Script.CreateString(Value + obj.ToString());
         }
         public override ScriptObject Clone()
         {
-            return new ScriptString(Value);
+            return m_Script.CreateString(Value);
         }
     }
 }

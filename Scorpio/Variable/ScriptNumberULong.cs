@@ -13,7 +13,6 @@ namespace Scorpio.Variable
         public override int BranchType { get { return 2; } }
         public override object ObjectValue { get { return Value; } }
         public ulong Value { get; private set; }
-        private Script m_Script;
         public ScriptNumberULong(Script script, ulong value)
         {
             m_Script = script;

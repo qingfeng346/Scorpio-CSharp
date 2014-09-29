@@ -40,7 +40,7 @@ namespace Scorpio
         }
         private static void Set_impl(TableDictionary variables, object key, ScriptObject obj)
         {
-            variables[key] = obj;
+            variables[key] = obj.Assign();
         }
         public static bool SetObject(VariableDictionary variables, string key, ScriptObject obj)
         {
@@ -58,7 +58,7 @@ namespace Scorpio
         }
         private static void Set_impl(VariableDictionary variables, string key, ScriptObject obj)
         {
-            variables[key] = obj;
+            variables[key] = obj.Assign();
         }
         public static bool IsBool(Type type)
         {

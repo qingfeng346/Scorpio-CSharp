@@ -145,7 +145,7 @@ namespace Scorpio
         }
         public ScriptString CreateString(string value)
         {
-            return new ScriptString(value);
+            return new ScriptString(this, value);
         }
         public ScriptNumber CreateNumber(object value)
         {
