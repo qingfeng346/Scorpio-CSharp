@@ -11,7 +11,7 @@ namespace Scorpio
         public static readonly ScriptBoolean True = new ScriptBoolean(true);
         public static readonly ScriptBoolean False = new ScriptBoolean(false);
         public override ObjectType Type { get { return ObjectType.Boolean; } }
-        public ScriptBoolean(bool value) : base(value) { }
+        private ScriptBoolean(bool value) : base(value) { }
         public ScriptBoolean Inverse()
         {
             return Value ? False : True;

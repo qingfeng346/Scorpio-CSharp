@@ -49,6 +49,9 @@ namespace Scorpio.Library
         {
             script.SetObjectInternal("print", script.CreateFunction(new print()));
             script.SetObjectInternal("pair", script.CreateFunction(new pair(script)));
+            script.SetObjectInternal("type", script.CreateFunction(new type()));
+            script.SetObjectInternal("branchtype", script.CreateFunction(new branchtype()));
+            script.SetObjectInternal("typeof", script.CreateFunction(new userdatatype()));
             script.SetObjectInternal("tonumber", script.CreateFunction(new tonumber(script)));
             script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
             script.SetObjectInternal("toulong", script.CreateFunction(new toulong(script)));
@@ -82,6 +85,27 @@ namespace Scorpio.Library
                     Console.WriteLine(args[i].ToString());
                 }
                 return null;
+            }
+        }
+        private class type : ScorpioHandle
+        {
+            public object Call(object[] args)
+            {
+                return ((ScriptObject)args[0]).Type;
+            }
+        }
+        private class branchtype : ScorpioHandle
+        {
+            public object Call(object[] args)
+            {
+                return ((ScriptObject)args[0]).BranchType;
+            }
+        }
+        private class userdatatype : ScorpioHandle
+        {
+            public object Call(object[] args)
+            {
+                return ((ScriptUserdata)args[0]).ValueType;
             }
         }
         private class tonumber : ScorpioHandle

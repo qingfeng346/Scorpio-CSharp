@@ -98,7 +98,7 @@ namespace Scorpio.Compiler
                 case TokenType.Return:
                     Token peek = PeekToken();
                     if (peek.Type == TokenType.RightBrace)
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(ScriptNull.Instance)));
+                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(null)));
                     else
                         m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
                     break;
@@ -366,7 +366,7 @@ namespace Scorpio.Compiler
                 case TokenType.Boolean:
                 case TokenType.Number:
                 case TokenType.String:
-                    ret = new CodeScriptObject(m_script.CreateObject(token.Lexeme));
+                    ret = new CodeScriptObject(token.Lexeme);
                     break;
                 default:
                     throw new ParserException("parse is error ", token);
@@ -410,13 +410,13 @@ namespace Scorpio.Compiler
                     CodeObject member = GetObject();
                     ReadRightBracket();
                     if (member is CodeScriptObject) {
-                        ScriptObject obj = ((CodeScriptObject)member).Object;
+                        ScriptObject obj = m_script.CreateObject(((CodeScriptObject)member).Object);
                         if (obj.IsNumber)
                             ret = new CodeMember((ScriptNumber)obj, ret);
                         else if (obj.IsString)
                             ret = new CodeMember(((ScriptString)obj).Value, ret);
                         else
-                            ret = new CodeMember(member, ret);
+                            throw new ParserException("获取变量只能是 number或string");
                     } else {
                          ret = new CodeMember(member, ret);
                     }
@@ -504,8 +504,6 @@ namespace Scorpio.Compiler
                         Token peek = PeekToken();
                         if (peek.Type == TokenType.Comma || peek.Type == TokenType.SemiColon) {
                             ReadToken();
-                        } else if (peek.Type != TokenType.RightBrace) {
-                            throw new ParserException("Table变量分隔符必须是[,]或者[;]", next);
                         }
                     } else {
                         throw new ParserException("Table变量赋值符号为[=]或者[:]", token);

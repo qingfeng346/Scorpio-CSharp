@@ -33,7 +33,7 @@ namespace Scorpio.Variable
             m_Object = obj;
             MethodName = methodName;
             List<FunctionMethod> functionMethod = new List<FunctionMethod>();
-            MethodInfo[] methods = type.GetMethods();
+            MethodInfo[] methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             int length = methods.Length;
             List<Type> parameters = new List<Type>();
             for (int i = 0; i < length;++i ) {

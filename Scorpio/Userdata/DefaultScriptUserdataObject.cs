@@ -42,12 +42,12 @@ namespace Scorpio.Userdata
         {
             this.m_Script = script;
             this.Value = value;
-            this.ValueType = (Value is Type) ? (Type)value : value.GetType();
+            this.ValueType = (Value is Type) ? (Type)Value : Value.GetType();
             m_FieldInfos = new Dictionary<string, Field>();
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, ScriptFunction>();
             m_Constructor = new ScorpioMethod(ValueType.ToString(), ValueType.GetConstructors());
-            MethodInfo[] methods = ValueType.GetMethods();
+            MethodInfo[] methods = ValueType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             for (int i = 0; i < methods.Length;++i )
             {
                 string name = methods[i].Name;

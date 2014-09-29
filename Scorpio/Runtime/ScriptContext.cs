@@ -414,7 +414,7 @@ namespace Scorpio.Runtime
         }
         ScriptObject ParseScriptObject(CodeScriptObject obj)
         {
-            return obj.Object;
+            return m_script.CreateObject(obj.Object);
         }
         ScriptFunction ParseFunction(CodeFunction func)
         {
