@@ -1,0 +1,99 @@
+load_assembly("System")
+load_assembly("UnityEngine")
+load_assembly("Assembly-CSharp")
+
+GameObject = import_type("UnityEngine.GameObject")
+Color = import_type("UnityEngine.Color")
+UICheckbox = import_type("UICheckbox")
+UISprite = import_type("UISprite")
+UIGrid = import_type("UIGrid")
+Util = import_type("Util")
+ScriptEventListener = import_type("ScriptEventListener")
+
+
+colors = [Color.blue, Color.cyan, Color.gray, Color.green, Color.red, Color.white, Color.yellow, Color.magenta]
+window = 
+{
+    m_Item = null,
+    m_Grid = null,
+    m_Sel = null,
+    m_Sel2 = null,
+    registerFunction = ["Awake"],
+    function Awake()
+    {
+        this.m_Grid = Util.FindChild(this.com, "Grid", UIGrid)
+        this.m_Item = Util.FindChild(this.com, "Check")
+        this.m_Grid.sorted = true
+        Util.ClearChildren(this.m_Grid)
+        for (var i=0;i<8;++i)
+        {
+            for (var j=0;j<2;++j)
+            {
+                var obj = GameObject.Instantiate(this.m_Item)
+                Util.AddChild(this.m_Grid, obj)
+                Util.SetActive(obj, true)
+                obj.name = tostring(Util.Range(100,200))
+                var com = clone(item)
+                Util.AddComponent(obj, com)
+                com.Initialize(i)
+            }
+        }
+        this.m_Grid.Reposition()
+    }
+    function OnClick(i)
+    {
+        if (this.m_Sel == null)
+        {
+            this.m_Sel = i
+            i.Show()
+        }
+        elseif (this.m_Sel.m_Index == i.m_Index)
+        {
+            GameObject.Destroy(this.m_Sel.com.gameObject)
+            GameObject.Destroy(i.com.gameObject)
+            this.m_Sel = null
+        }
+        else
+        {
+            this.m_Sel.Hide()
+            this.m_Sel = i
+            i.Show()
+        }
+    }
+}
+item = 
+{
+    m_Check = null,
+    m_Image = null,
+    m_Back = null,
+    m_Index = null,
+    m_Show = false,
+    registerFunction = ["Awake"],
+    function Awake()
+    {
+        this.m_Check = Util.GetComponent(this.com, UICheckbox)
+        this.m_Back = Util.FindChild(this.com, "Sprite")
+        this.m_Image = Util.FindChild(this.com, "Image", UISprite)
+    }
+    function Initialize(index)
+    {
+        this.m_Index = index
+        this.m_Image.color = colors[index]
+        ScriptEventListener.Get(this.com).onClick = this.OnClickSelf
+    }
+    function Show()
+    {
+        this.m_Show = true
+        Util.SetActive(this.m_Back, false)
+    }
+    function Hide()
+    {
+        this.m_Show = false
+        Util.SetActive(this.m_Back, true)
+    }
+    function OnClickSelf()
+    {
+        if (this.m_Show) { return }
+        window.OnClick(this)
+    }
+}
