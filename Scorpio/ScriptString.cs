@@ -10,10 +10,6 @@ namespace Scorpio
     {
         public override ObjectType Type { get { return ObjectType.String; } }
         public ScriptString(string value) : base(value) { }
-        public override void Assign(ScriptObject obj)
-        {
-            Value = obj.ToString();
-        }
         public override ScriptObject Plus(ScriptObject obj)
         {
             return new ScriptString(Value + obj.ToString());

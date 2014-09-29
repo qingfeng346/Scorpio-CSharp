@@ -22,7 +22,6 @@ namespace Scorpio
     public abstract class ScriptObject
     {
         private static readonly ScriptObject[] NOPARAMETER = new ScriptObject[0];       // 没有参数
-        public virtual void Assign(ScriptObject obj) { }                                // 赋值
         public virtual ScriptObject Plus(ScriptObject obj) { return null; }             // +=
         public virtual ScriptObject Minus(ScriptObject obj) { return null; }            // -=
         public virtual ScriptObject Multiply(ScriptObject obj) { return null; }         // *=

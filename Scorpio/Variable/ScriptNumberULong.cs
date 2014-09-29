@@ -44,10 +44,6 @@ namespace Scorpio.Variable
         {
             return Value;
         }
-        public override void Assign(ScriptObject obj)
-        {
-            Value = ((ScriptNumberULong)obj).Value;
-        }
         public override ScriptObject Plus(ScriptObject obj)
         {
             return new ScriptNumberULong(m_Script, Value + ((ScriptNumber)obj).ToULong());

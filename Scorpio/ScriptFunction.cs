@@ -91,6 +91,16 @@ namespace Scorpio
             if (FunctionType == FunstionType.Script)
                 m_ScriptFunction.SetParentContext(context);
         }
+        public ScriptObject call(params object[] args)
+        {
+            int length = args.Length;
+            ScriptObject[] parameters = new ScriptObject[length];
+            for (int i = 0; i < length; ++i)
+            {
+                parameters[i] = Script.CreateObject(args[i]);
+            }
+            return Call(parameters);
+        }
         public override ScriptObject Call(ScriptObject[] parameters)
         {
             if (FunctionType == FunstionType.Script) {

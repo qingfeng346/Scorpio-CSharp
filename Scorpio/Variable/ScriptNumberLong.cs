@@ -24,11 +24,9 @@ namespace Scorpio.Variable
             switch (c)
             {
                 case CALC.PRE_INCREMENT:
-                    ++Value;
-                    break;
+                    return m_Script.CreateNumber(++Value);
                 case CALC.PRE_DECREMENT:
-                    --Value;
-                    break;
+                    return m_Script.CreateNumber(--Value);
                 case CALC.POST_INCREMENT:
                     return m_Script.CreateNumber(Value++);
                 case CALC.POST_DECREMENT:
@@ -44,10 +42,6 @@ namespace Scorpio.Variable
         public override long ToLong()
         {
             return Value;
-        }
-        public override void Assign(ScriptObject obj)
-        {
-            Value = ((ScriptNumberLong)obj).Value;
         }
         public override ScriptObject Plus(ScriptObject obj)
         {

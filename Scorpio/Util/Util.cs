@@ -40,16 +40,7 @@ namespace Scorpio
         }
         private static void Set_impl(TableDictionary variables, object key, ScriptObject obj)
         {
-            ScriptObject el = variables[key];
-            if (el.Type != obj.Type) {
-                variables[key] = obj;
-            } else if (!(el is ScriptNull)) {
-                if ((el is ScriptNumber && el.BranchType == obj.BranchType) || (el.IsString)) {
-                    el.Assign(obj);
-                } else {
-                    variables[key] = obj;
-                }
-            }
+            variables[key] = obj;
         }
         public static bool SetObject(VariableDictionary variables, string key, ScriptObject obj)
         {
@@ -67,16 +58,7 @@ namespace Scorpio
         }
         private static void Set_impl(VariableDictionary variables, string key, ScriptObject obj)
         {
-            ScriptObject el = variables[key];
-            if (el.Type != obj.Type) {
-                variables[key] = obj;
-            } else if (!(el is ScriptNull)) {
-                if ((el is ScriptNumber && el.BranchType == obj.BranchType) || (el.IsString)) {
-                    el.Assign(obj);
-                } else {
-                    variables[key] = obj;
-                }
-            }
+            variables[key] = obj;
         }
         public static bool IsBool(Type type)
         {
