@@ -58,6 +58,7 @@ namespace Scorpio.Library
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
             script.SetObjectInternal("clone", script.CreateFunction(new clone()));
             script.SetObjectInternal("load_assembly", script.CreateFunction(new load_assembly(script)));
+            script.SetObjectInternal("load_assembly_safe", script.CreateFunction(new load_assembly_safe(script)));
             script.SetObjectInternal("import_type", script.CreateFunction(new import_type(script)));
         }
         private class pair : ScorpioHandle
@@ -185,17 +186,24 @@ namespace Scorpio.Library
             {
                 ScriptString str = args[0] as ScriptString;
                 if (str == null) throw new ExecutionException("load_assembly 参数必须是 string");
-                string assemblyName = str.Value;
-                Assembly assembly = null;
+                m_script.PushAssembly(Assembly.Load(str.Value));
+                return null;
+            }
+        }
+        private class load_assembly_safe : ScorpioHandle
+        {
+            private Script m_script;
+            public load_assembly_safe(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(object[] args)
+            {
                 try {
-                    assembly = Assembly.Load(assemblyName);
-                } catch (BadImageFormatException) {
-                    // The assemblyName was invalid.  It is most likely a path.
-                }
-                if (assembly == null) {
-                    assembly = Assembly.Load(AssemblyName.GetAssemblyName(assemblyName));
-                }
-                m_script.PushAssembly(assembly);
+                    ScriptString str = args[0] as ScriptString;
+                    if (str == null) throw new ExecutionException("load_assembly 参数必须是 string");
+                    m_script.PushAssembly(Assembly.Load(str.Value));
+                } catch (System.Exception ) { }
                 return null;
             }
         }

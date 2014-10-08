@@ -47,7 +47,7 @@ namespace Scorpio.Userdata
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, ScriptFunction>();
             m_Constructor = new ScorpioMethod(ValueType.ToString(), ValueType.GetConstructors());
-            MethodInfo[] methods = ValueType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            MethodInfo[] methods = ValueType.GetMethods(Script.BindingFlag);
             for (int i = 0; i < methods.Length;++i )
             {
                 string name = methods[i].Name;
@@ -101,7 +101,7 @@ namespace Scorpio.Userdata
                 return m_NestedTypes[strName];
             Field field = GetField(strName);
             if (field != null) return m_Script.CreateObject(field.GetValue(Value));
-            Type nestedType = ValueType.GetNestedType(strName);
+            Type nestedType = ValueType.GetNestedType(strName, Script.BindingFlag);
             if (nestedType != null) {
                 ScriptUserdata ret = m_Script.CreateUserdata(nestedType);
                 m_NestedTypes.Add(strName, ret);

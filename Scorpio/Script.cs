@@ -15,6 +15,7 @@ namespace Scorpio
     //脚本类
     public class Script
     {
+        public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         private const string GLOBAL_TABLE = "_G";
         private IScriptUserdataFactory m_UserdataFactory = null;                //Userdata工厂
         private ScriptTable m_GlobalTable = new ScriptTable();                  //全局Table
@@ -23,13 +24,17 @@ namespace Scorpio
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
         public ScriptObject LoadFile(String strFileName)
         {
+            return LoadFile(strFileName, Encoding.UTF8);
+        }
+        public ScriptObject LoadFile(String strFileName, Encoding encoding)
+        {
             try {
                 FileStream stream = File.OpenRead(strFileName);
                 long length = stream.Length;
                 byte[] buffer = new byte[length];
                 stream.Read(buffer, 0, Convert.ToInt32(length));
                 stream.Close();
-                return LoadString(Path.GetFileName(strFileName), Encoding.UTF8.GetString(buffer));
+                return LoadString(Path.GetFileName(strFileName), encoding.GetString(buffer, 0, buffer.Length));
             } catch (System.Exception e) {
                 throw new ScriptException("load file [" + strFileName + "] is error : " + e.ToString());
             }
