@@ -16,6 +16,8 @@ namespace ScorpioExec
                 if (args.Length >= 1) {
                     double start = Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
                     script.LoadLibrary();
+                    script.PushAssembly(typeof(Program).Assembly);
+                    script.PushAssembly(typeof(System.Environment).Assembly);
                     script.SetObject("Environment", typeof(Environment));
                     Console.WriteLine("返回值为:" + script.LoadFile(args[0]));
                     Console.WriteLine("运行时间:" + (Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds - start) + " ms");
