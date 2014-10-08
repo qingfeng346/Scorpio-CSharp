@@ -156,6 +156,10 @@ namespace Scorpio.Compiler
         /// </summary>
         LessOrEqual,
         /// <summary>
+        /// ...
+        /// </summary>
+        Params,
+        /// <summary>
         /// if
         /// </summary>
         If,

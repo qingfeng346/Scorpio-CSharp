@@ -56,6 +56,7 @@
     <Compile Include="Collections\TableDictionary.cs" />
     <Compile Include="Collections\VariableDictionary.cs" />
     <Compile Include="Compiler\ScriptLexer.cs" />
+    <Compile Include="Compiler\ScriptLexerBase.cs" />
     <Compile Include="Compiler\ScriptParser.cs" />
     <Compile Include="Compiler\ScriptParserBase.cs" />
     <Compile Include="Compiler\Token.cs" />

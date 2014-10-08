@@ -6,71 +6,25 @@ using Scorpio.Exception;
 namespace Scorpio.Compiler
 {
     /// <summary> 脚本语法解析 </summary>
-    public class ScriptLexer
+    public partial class ScriptLexer
     {
-        public enum LexState
-        {
-            /// <summary> 没有关键字 </summary>
-            None,
-            /// <summary> = 等于或者相等 </summary>
-            AssignOrEqual,
-            /// <summary> / 注释或者除号 </summary>
-            CommentOrDivideOrAssignDivide,
-            /// <summary> 行注释 </summary>
-            LineComment,
-            /// <summary> 区域注释开始 </summary>
-            BlockCommentStart,
-            /// <summary> 区域注释结束 </summary>
-            BlockCommentEnd,
-            /// <summary> + 或者 ++ 或者 += </summary>
-            PlusOrIncrementOrAssignPlus,
-            /// <summary> - 或者 -= </summary>
-            MinusOrDecrementOrAssignMinus,
-            /// <summary> * 或者 *= </summary>
-            MultiplyOrAssignMultiply,
-            /// <summary> % 或者 %= </summary>
-            ModuloOrAssignModulo,
-            /// <summary> & 并且 </summary>
-            And,
-            /// <summary> | 或者 </summary>
-            Or,
-            /// <summary> ! 非或者不等于 </summary>
-            NotOrNotEqual,
-            /// <summary> > 大于或者大于等于 </summary>
-            GreaterOrGreaterEqual,
-            /// <summary> < 小于或者小于等于 </summary>
-            LessOrLessEqual,
-            /// <summary> " 字符串 </summary>
-            String,
-            /// <summary> \ 格式符 </summary>
-            StringEscape,
-            /// <summary> @ 开始字符串 </summary>
-            SimpleStringStart,
-            /// <summary> @" 不格式化的字符串 类似c# @符号 </summary>
-            SimpleString,
-            /// <summary> 字符串内出现"是引号还是结束符 </summary>
-            SimpleStringQuotationMarkOrOver,
-            /// <summary> 数字 </summary>
-            Number,
-            /// <summary> 描述符 </summary>
-            Identifier,
-        }
-        private LexState m_lexState;
-        private LexState lexState {
-            get { return m_lexState; }
-            set { m_lexState = value; if (m_lexState == LexState.None) { m_strToken = ""; } }
-        }
-        private String m_strToken = null;
-        private int m_iSourceLine;
-        private int m_iSourceChar;
-        private String m_strBreviary;
-        private List<String> m_listSourceLines = new List<String>();
+
+        private LexState m_lexState;                //当前解析状态
+        private String m_strToken = null;           //字符串token
+        private int m_iSourceLine;                  //当前解析行数
+        private int m_iSourceChar;                  //当前解析字符
+        private String m_strBreviary;               //字符串的摘要 取第一行字符串的前20个字符
+        private List<String> m_listSourceLines;     //所有行
+        private List<Token> m_listTokens;           //解析后所得Token
+        private char ch;                            //当前的解析的字符
         public ScriptLexer(String buffer)
         {
+            m_listSourceLines = new List<string>();
+            m_listTokens = new List<Token>();
             String strSource = buffer.Replace("\r\n", "\r");
             string[] strLines = strSource.Split('\r');
             m_strBreviary = strLines.Length > 0 ? strLines[0] : "";
-            if (m_strBreviary.Length > 10) m_strBreviary = m_strBreviary.Substring(0, 10);
+            if (m_strBreviary.Length > BREVIARY_CHAR) m_strBreviary = m_strBreviary.Substring(0, BREVIARY_CHAR);
             foreach (String strLine in strLines)
                 m_listSourceLines.Add(strLine + "\r\n");
             m_iSourceLine = 0;
@@ -82,46 +36,13 @@ namespace Scorpio.Compiler
         {
             return m_strBreviary;
         }
-        bool EndOfSource { get { return m_iSourceLine >= m_listSourceLines.Count; } }
-        bool EndOfLine { get { return m_iSourceChar >= m_listSourceLines[m_iSourceLine].Length; } }
-        char ReadChar()
-        {
-            if (EndOfSource)
-                throw new LexerException("End of source reached.", m_iSourceLine);
-            char ch = m_listSourceLines[m_iSourceLine][m_iSourceChar++];
-            if (m_iSourceChar >= m_listSourceLines[m_iSourceLine].Length)
-            {
-                m_iSourceChar = 0;
-                ++m_iSourceLine;
-            }
-            return ch;
-        }
-        void UndoChar()
-        {
-            if (m_iSourceLine == 0 && m_iSourceChar == 0)
-                throw new LexerException("Cannot undo char beyond start of source.", m_iSourceLine);
-            --m_iSourceChar;
-            if (m_iSourceChar < 0)
-            {
-                --m_iSourceLine;
-                m_iSourceChar = m_listSourceLines[m_iSourceLine].Length - 1;
-            }
-        }
-        void IgnoreLine()
-        {
-            ++m_iSourceLine;
-            m_iSourceChar = 0;
-        }
-        void ThrowInvalidCharacterException(char ch)
-        {
-            throw new ScriptException("Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) +" Column:" + m_iSourceChar + " [" + m_listSourceLines[m_iSourceLine] + "]");
-        }
+        /// <summary> 解析字符串 </summary>
         public List<Token> GetTokens()
         {
             m_iSourceLine = 0;
             m_iSourceChar = 0;
             lexState = LexState.None;
-            List<Token> listTokens = new List<Token>();
+            m_listTokens.Clear();
             while (!EndOfSource)
             {
                 if (EndOfLine)
@@ -129,7 +50,7 @@ namespace Scorpio.Compiler
                     IgnoreLine();
                     continue;
                 }
-                char ch = ReadChar();
+                ch = ReadChar();
                 switch (lexState)
                 {
                     case LexState.None:
@@ -141,34 +62,37 @@ namespace Scorpio.Compiler
                             case '\r':
                                 break;
                             case '(':
-                                listTokens.Add(new Token(TokenType.LeftPar, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.LeftPar);
                                 break;
                             case ')':
-                                listTokens.Add(new Token(TokenType.RightPar, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.RightPar);
                                 break;
                             case '[':
-                                listTokens.Add(new Token(TokenType.LeftBracket, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.LeftBracket);
                                 break;
                             case ']':
-                                listTokens.Add(new Token(TokenType.RightBracket, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.RightBracket);
                                 break;
                             case '{':
-                                listTokens.Add(new Token(TokenType.LeftBrace, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.LeftBrace);
                                 break;
                             case '}':
-                                listTokens.Add(new Token(TokenType.RightBrace, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.RightBrace);
                                 break;
                             case ',':
-                                listTokens.Add(new Token(TokenType.Comma, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.Comma);
                                 break;
                             case ':':
-                                listTokens.Add(new Token(TokenType.Colon, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.Colon);
                                 break;
                             case ';':
-                                listTokens.Add(new Token(TokenType.SemiColon, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.SemiColon);
                                 break;
                             case '?':
-                                listTokens.Add(new Token(TokenType.QuestionMark, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.QuestionMark);
+                                break;
+                            case '.':
+                                lexState = LexState.PeriodOrParams;
                                 break;
                             case '+':
                                 lexState = LexState.PlusOrIncrementOrAssignPlus;
@@ -184,9 +108,6 @@ namespace Scorpio.Compiler
                                 break;
                             case '%':
                                 lexState = LexState.ModuloOrAssignModulo;
-                                break;
-                            case '.':
-                                listTokens.Add(new Token(TokenType.Period, ".", m_iSourceLine, m_iSourceChar));
                                 break;
                             case '=':
                                 lexState = LexState.AssignOrEqual;
@@ -225,40 +146,47 @@ namespace Scorpio.Compiler
                                 break;
                         }
                         break;
+                    case LexState.PeriodOrParams:
+                        if (ch == '.') {
+                            lexState = LexState.Params;
+                        } else {
+                            AddToken(TokenType.Period, ".");
+                            UndoChar();
+                        }
+                        break;
+                    case LexState.Params:
+                        if (ch == '.') {
+                            AddToken(TokenType.Params, "...");
+                        } else {
+                            ThrowInvalidCharacterException(ch);
+                        }
+                        break;
                     case LexState.PlusOrIncrementOrAssignPlus:
                         if (ch == '+') {
-                            listTokens.Add(new Token(TokenType.Increment, "++", m_iSourceChar, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.Increment, "++");
                         } else if (ch == '=') {
-                            listTokens.Add(new Token(TokenType.AssignPlus, "+=", m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.AssignPlus, "+=");
                         } else {
-                            listTokens.Add(new Token(TokenType.Plus, "+", m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.Plus, "+");
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.MinusOrDecrementOrAssignMinus:
                         if (ch == '-') {
-                            listTokens.Add(new Token(TokenType.Decrement, "--", m_iSourceChar, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.Decrement, "--");
                         } else if (ch == '=') {
-                            listTokens.Add(new Token(TokenType.AssignMinus, "-=", m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.AssignMinus, "-=");
                         } else {
-                            listTokens.Add(new Token(TokenType.Minus, "-", m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.Minus, "-");
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.MultiplyOrAssignMultiply:
                         if (ch == '=') {
-                            listTokens.Add(new Token(TokenType.AssignMultiply, "*=", m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.AssignMultiply, "*=");
                         } else {
-                            listTokens.Add(new Token(TokenType.Multiply, "*", m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.Multiply, "*");
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.CommentOrDivideOrAssignDivide:
@@ -270,24 +198,20 @@ namespace Scorpio.Compiler
                                 lexState = LexState.BlockCommentStart;
                                 break;
                             case '=':
-                                listTokens.Add(new Token(TokenType.AssignDivide, "/=", m_iSourceLine, m_iSourceChar));
-                                lexState = LexState.None;
+                                AddToken(TokenType.AssignDivide, "/=");
                                 break;
                             default:
-                                listTokens.Add(new Token(TokenType.Divide, ch, m_iSourceLine, m_iSourceChar));
+                                AddToken(TokenType.Divide, "/");
                                 UndoChar();
-                                lexState = LexState.None;
                                 break;
                         }
                         break;
                     case LexState.ModuloOrAssignModulo:
                         if (ch == '=') {
-                            listTokens.Add(new Token(TokenType.AssignModulo, "%=", m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.AssignModulo, "%=");
                         } else {
-                            listTokens.Add(new Token(TokenType.Modulo, "%", m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.AssignModulo, "%");
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.LineComment:
@@ -306,64 +230,53 @@ namespace Scorpio.Compiler
                         break;
                     case LexState.AssignOrEqual:
                         if (ch == '=') {
-                            listTokens.Add(new Token(TokenType.Equal, "==", m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.Equal, "==");
                         } else {
-                            listTokens.Add(new Token(TokenType.Assign, "=", m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.Assign, "=");
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.And:
                         if (ch == '&') {
-                            listTokens.Add(new Token(TokenType.And, "&&", m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.And, "&&");
                         } else {
                             ThrowInvalidCharacterException(ch);
                         }
                         break;
                     case LexState.Or:
                         if (ch == '|') {
-                            listTokens.Add(new Token(TokenType.Or, "||", m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.Or, "||");
                         } else {
                             ThrowInvalidCharacterException(ch);
                         }
                         break;
                     case LexState.NotOrNotEqual:
                         if (ch == '=') {
-                            listTokens.Add(new Token(TokenType.NotEqual, "!=",m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.NotEqual, "!=");
                         } else {
-                            listTokens.Add(new Token(TokenType.Not, "!",m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.Not, "!");
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.GreaterOrGreaterEqual:
                         if (ch == '=') {
-                            listTokens.Add(new Token(TokenType.GreaterOrEqual, ">=", m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.GreaterOrEqual, ">=");
                         } else {
-                            listTokens.Add(new Token(TokenType.Greater, ">", m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.Greater, ">");
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.LessOrLessEqual:
                         if (ch == '=') {
-                            listTokens.Add(new Token(TokenType.LessOrEqual, "<=",m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.LessOrEqual, "<=");
                         } else {
-                            listTokens.Add(new Token(TokenType.Less, "<",m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.Less, "<");
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.String:
                         if (ch == '\"') {
-                            listTokens.Add(new Token(TokenType.String, m_strToken, m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.String, m_strToken);
                         } else if (ch == '\\') {
                             lexState = LexState.StringEscape;
                         } else if (ch == '\r' || ch == '\n') {
@@ -391,9 +304,8 @@ namespace Scorpio.Compiler
                             m_strToken += '\"';
                             lexState = LexState.SimpleString;
                         } else {
-                            listTokens.Add(new Token(TokenType.String, m_strToken, m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.String, m_strToken);
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.StringEscape:
@@ -418,17 +330,14 @@ namespace Scorpio.Compiler
                             m_strToken += ch;
                         } else if (ch == 'L') {
                             long value = long.Parse(m_strToken);
-                            listTokens.Add(new Token(TokenType.Number, value, m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.Number, value);
                         } else if (ch == 'U') {
                             ulong value = ulong.Parse(m_strToken);
-                            listTokens.Add(new Token(TokenType.Number, value, m_iSourceLine, m_iSourceChar));
-                            lexState = LexState.None;
+                            AddToken(TokenType.Number, value);
                         } else {
                             double value = double.Parse(m_strToken);
-                            listTokens.Add(new Token(TokenType.Number, value, m_iSourceLine, m_iSourceChar));
+                            AddToken(TokenType.Number, value);
                             UndoChar();
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.Identifier:
@@ -498,11 +407,11 @@ namespace Scorpio.Compiler
                                     break;
                             }
                             if (tokenType == TokenType.Boolean) {
-                                listTokens.Add(new Token(tokenType, m_strToken == "true", m_iSourceLine, m_iSourceChar));
+                                m_listTokens.Add(new Token(tokenType, m_strToken == "true", m_iSourceLine, m_iSourceChar));
                             } else if (tokenType == TokenType.Null) {
-                                listTokens.Add(new Token(tokenType, ScriptNull.Instance, m_iSourceLine, m_iSourceChar));
+                                m_listTokens.Add(new Token(tokenType, ScriptNull.Instance, m_iSourceLine, m_iSourceChar));
                             } else {
-                                listTokens.Add(new Token(tokenType, m_strToken, m_iSourceLine, m_iSourceChar));
+                                m_listTokens.Add(new Token(tokenType, m_strToken, m_iSourceLine, m_iSourceChar));
                             }
                             UndoChar();
                             lexState = LexState.None;
@@ -510,8 +419,8 @@ namespace Scorpio.Compiler
                         break;
                 }
             }
-            listTokens.Add(new Token(TokenType.Finished, "", m_iSourceLine, m_iSourceChar));
-            return listTokens;
+            m_listTokens.Add(new Token(TokenType.Finished, "", m_iSourceLine, m_iSourceChar));
+            return m_listTokens;
         }
     }
 }

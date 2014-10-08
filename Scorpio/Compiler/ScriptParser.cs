@@ -145,15 +145,21 @@ namespace Scorpio.Compiler
                 strFunctionName = ReadIdentifier();
             ReadLeftParenthesis();
             List<String> listParameters = new List<String>();
+            bool bParams = false;
             if (PeekToken().Type != TokenType.RightPar) {
                 while (true) {
                     token = ReadToken();
-                    if (token.Type != TokenType.Identifier)
+                    if (token.Type == TokenType.Params) {
+                        token = ReadToken();
+                        bParams = true;
+                    }
+                    if (token.Type != TokenType.Identifier) {
                         throw new ParserException("Unexpected token '" + token.Lexeme + "' in function declaration.", token);
+                    }
                     String strParameterName = token.Lexeme.ToString();
                     listParameters.Add(strParameterName);
                     token = PeekToken();
-                    if (token.Type == TokenType.Comma)
+                    if (token.Type == TokenType.Comma && !bParams)
                         ReadComma();
                     else if (token.Type == TokenType.RightPar)
                         break;
@@ -163,7 +169,7 @@ namespace Scorpio.Compiler
             }
             ReadRightParenthesis();
             var executable = ParseStatementBlock(Executable_Block.Function);
-            return m_script.CreateFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable));
+            return m_script.CreateFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable, bParams));
         }
         //解析普通代码块 {}
         private void ParseBlock()

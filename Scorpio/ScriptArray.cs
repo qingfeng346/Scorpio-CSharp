@@ -38,6 +38,10 @@ namespace Scorpio
         {
             m_listObject.Insert(index, obj);
         }
+        public void Clear()
+        {
+            m_listObject.Clear();
+        }
         public int Count()
         {
             return m_listObject.Count;
