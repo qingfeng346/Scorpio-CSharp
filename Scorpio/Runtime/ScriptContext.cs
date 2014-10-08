@@ -90,7 +90,7 @@ namespace Scorpio.Runtime
                 ret = (obj == null ? m_script.GetValue(name) : obj);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
-                if (parent == null) throw new ExecutionException("GetVariable parent is null");
+                if (parent == null || parent is ScriptNull) throw new ExecutionException("GetVariable parent is null");
                 if (parent is ScriptArray) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
                         ret = parent.GetValue(member.MemberNumber);
@@ -144,7 +144,7 @@ namespace Scorpio.Runtime
                     m_script.SetObjectInternal(name, variable);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
-                if (parent == null) throw new ExecutionException("SetVariable parent is null");
+                if (parent == null || parent is ScriptNull) throw new ExecutionException("SetVariable parent is null");
                 if (parent is ScriptArray) {
                     if (member.Type == MEMBER_TYPE.NUMBER) {
                         parent.SetValue(member.MemberNumber, ResolveOperand(obj));
