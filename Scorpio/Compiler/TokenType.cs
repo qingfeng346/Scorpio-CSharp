@@ -224,6 +224,10 @@ namespace Scorpio.Compiler
         /// </summary>
         Require,
         /// <summary>
+        /// eval
+        /// </summary>
+        Eval,
+        /// <summary>
         /// 说明符
         /// </summary>
         Identifier,

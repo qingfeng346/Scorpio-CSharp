@@ -105,6 +105,7 @@ namespace Scorpio.Compiler
                 case TokenType.Identifier:
                 case TokenType.Increment:
                 case TokenType.Decrement:
+                case TokenType.Eval:
                     UndoToken();
                     ParseExpression();
                     break;
@@ -282,6 +283,8 @@ namespace Scorpio.Compiler
                         throw new ParserException("变量后缀不支持此操作符  ", token);
                     }
                 }
+            } else if (member is CodeEval) {
+                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.EVAL, member));
             } else {
                 throw new ParserException("语法不支持起始符号为 " + member.GetType(), peek);
             }
@@ -367,6 +370,9 @@ namespace Scorpio.Compiler
                 case TokenType.LeftBrace:
                     UndoToken();
                     ret = GetTable();
+                    break;
+                case TokenType.Eval:
+                    ret = GetEval();
                     break;
                 case TokenType.Null:
                 case TokenType.Boolean:
@@ -524,6 +530,13 @@ namespace Scorpio.Compiler
                 }
             }
             ReadRightBrace();
+            return ret;
+        }
+        //返回执行一段字符串
+        private CodeEval GetEval()
+        {
+            CodeEval ret = new CodeEval();
+            ret.EvalObject = GetObject();
             return ret;
         }
     }

@@ -43,16 +43,19 @@ namespace Scorpio
         {
             return LoadString("", strBuffer);
         }
-        public ScriptObject LoadString(String strName, String strBuffer)
+        public ScriptObject LoadString(String strBreviary, String strBuffer)
         {
-            string strBreviary = "";
+            return LoadString(strBreviary, strBuffer, null);
+        }
+        internal ScriptObject LoadString(String strBreviary, String strBuffer, ScriptContext context)
+        {
             try {
                 m_StackInfoStack.Clear();
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer);
-                strBreviary = string.IsNullOrEmpty(strName) ? scriptLexer.GetBreviary() : strName;
+                strBreviary = string.IsNullOrEmpty(strBreviary) ? scriptLexer.GetBreviary() : strBreviary;
                 ScriptParser scriptParser = new ScriptParser(this, scriptLexer.GetTokens(), strBreviary);
                 ScriptExecutable scriptExecutable = scriptParser.Parse();
-                return new ScriptContext(this, scriptExecutable, null, Executable_Block.Context).Execute();
+                return new ScriptContext(this, scriptExecutable, context, Executable_Block.Context).Execute();
             } catch (System.Exception e) {
                 throw new ScriptException("load buffer [" + strBreviary + "] is error : " + e.ToString());
             }

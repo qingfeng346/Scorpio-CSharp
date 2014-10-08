@@ -25,6 +25,8 @@ namespace Scorpio.Runtime
         CALL_FUNCTION,
         /// <summary> 递增递减变量 ++或-- </summary>
         CALC,
+        /// <summary> 执行一段字符串 </summary>
+        EVAL,
         /// <summary> 返回值 </summary>
         RET,
         /// <summary> break跳出 for foreach while </summary>

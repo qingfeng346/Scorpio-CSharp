@@ -222,6 +222,7 @@ namespace Scorpio.Runtime
                 case Opcode.MOV: ProcessMov(); break;
                 case Opcode.RET: ProcessRet(); break;
                 case Opcode.CALC: ProcessCalc(); break;
+                case Opcode.EVAL: ProcessEval(); break;
                 case Opcode.CONTINUE: ProcessContinue(); break;
                 case Opcode.BREAK: ProcessBreak(); break;
                 case Opcode.CALL_BLOCK: ProcessCallBlock(); break;
@@ -339,6 +340,10 @@ namespace Scorpio.Runtime
         {
             ResolveOperand(m_scriptInstruction.Operand0);
         }
+        void ProcessEval()
+        {
+            ResolveOperand(m_scriptInstruction.Operand0);
+        }
         void ProcessCallBlock()
         {
             ScriptContext context = (ScriptContext)m_scriptInstruction.Value;
@@ -394,6 +399,8 @@ namespace Scorpio.Runtime
                 return ParseOperate(value as CodeOperator);
             } else if (value is CodeTernary) {
                 return ParseTernary(value as CodeTernary);
+            } else if (value is CodeEval) {
+                return ParseEval(value as CodeEval);
             }
             return ScriptNull.Instance;
         }
@@ -557,6 +564,13 @@ namespace Scorpio.Runtime
             ScriptBoolean b = ResolveOperand(ternary.Allow) as ScriptBoolean;
             if (b == null) throw new ExecutionException("三目运算符 条件必须是一个bool型");
             return b.Value ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
+        }
+        ScriptObject ParseEval(CodeEval eval)
+        {
+            ScriptString obj = ResolveOperand(eval.EvalObject) as ScriptString;
+            if (obj == null)
+                throw new ExecutionException("Eval参数必须是一个字符串");
+            return m_script.LoadString("", obj.Value, this);
         }
     }
 }

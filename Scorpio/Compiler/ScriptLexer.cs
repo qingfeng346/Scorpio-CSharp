@@ -353,6 +353,9 @@ namespace Scorpio.Compiler
                                 case "using":
                                     tokenType = TokenType.Require;
                                     break;
+                                case "eval":
+                                    tokenType = TokenType.Eval;
+                                    break;
                                 case "global":
                                     tokenType = TokenType.Global;
                                     break;
