@@ -525,7 +525,7 @@ namespace Scorpio.Compiler
                 } else if (token.Type == TokenType.Function) {
                     UndoToken();
                     ScriptFunction func = ParseFunctionDeclaration();
-                    if (string.IsNullOrEmpty(func.Name)) throw new ParserException("Table内部函数名称 不能为空", token);
+                    if (Util.IsNullOrEmpty(func.Name)) throw new ParserException("Table内部函数名称 不能为空", token);
                     ret.Functions.Add(func);
                 } else {
                     throw new ParserException("Table开始关键字必须为 变量名称或者function关键字", token);

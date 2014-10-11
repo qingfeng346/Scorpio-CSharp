@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Collections;
+using System.IO;
 using Scorpio.Variable;
 using Scorpio;
 namespace Scorpio
@@ -89,13 +90,13 @@ namespace Scorpio
         }
         public static bool IsEnumObject(object obj)
         {
-            return obj.GetType().IsEnum;
+            return IsEnum(obj.GetType());
         }
         public static object ChangeType(ScriptObject par, Type type)
         {
             if (type == TYPE_OBJECT) {
                 if (par is ScriptNumber) {
-                    return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : ChangeType(par.ObjectValue, type);
+                    return Util.IsEnum(type) ? ToEnum(type, ((ScriptNumber)par).ToInt32()) : ChangeType(par.ObjectValue, type);
                 } else {
                     return par.ObjectValue;
                 }
@@ -103,7 +104,7 @@ namespace Scorpio
                 if (type.IsAssignableFrom(par.GetType())) {
                     return par;
                 } else if (par is ScriptNumber) {
-                    return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : ChangeType(par.ObjectValue, type);
+                    return Util.IsEnum(type) ? ToEnum(type, ((ScriptNumber)par).ToInt32()) : ChangeType(par.ObjectValue, type);
                 } else if (par is ScriptUserdata) {
                     if (Util.IsType(type))
                         return ((ScriptUserdata)par).ValueType;
@@ -148,6 +149,19 @@ namespace Scorpio
             }
             return false;
         }
+        public static String GetFileString(String fileName, Encoding encoding)
+        {
+            FileStream stream = File.OpenRead(fileName);
+            long length = stream.Length;
+            byte[] buffer = new byte[length];
+            stream.Read(buffer, 0, buffer.Length);
+            stream.Close();
+            return encoding.GetString(buffer, 0, buffer.Length);
+        }
+        public static bool IsNullOrEmpty(String str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
         public static object ChangeType(object value, Type conversionType)
         {
             return Convert.ChangeType(value, conversionType);
@@ -164,5 +178,9 @@ namespace Scorpio
         {
             return Convert.ToInt64(value);
         }
+        public static object ToEnum(Type type, int number)
+	    {
+            return Enum.ToObject(type, number);
+	    }
     }
 }

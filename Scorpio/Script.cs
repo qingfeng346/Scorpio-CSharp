@@ -33,17 +33,16 @@ namespace Scorpio
         {
             return LoadFile(strFileName, Encoding.UTF8);
         }
-        public ScriptObject LoadFile(String strFileName, Encoding encoding)
+        public ScriptObject LoadFile(String fileName, string encoding)
+        {
+            return LoadFile(fileName, Encoding.GetEncoding(encoding));
+        }
+        public ScriptObject LoadFile(String fileName, Encoding encoding)
         {
             try {
-                FileStream stream = File.OpenRead(strFileName);
-                long length = stream.Length;
-                byte[] buffer = new byte[length];
-                stream.Read(buffer, 0, buffer.Length);
-                stream.Close();
-                return LoadString(Path.GetFileName(strFileName), encoding.GetString(buffer, 0, buffer.Length));
+                return LoadString(fileName, Util.GetFileString(fileName, encoding));
             } catch (System.Exception e) {
-                throw new ScriptException("load file [" + strFileName + "] is error : " + e.ToString());
+                throw new ScriptException("load file [" + fileName + "] is error : " + e.ToString());
             }
         }
         public ScriptObject LoadString(String strBuffer)
@@ -59,7 +58,7 @@ namespace Scorpio
             try {
                 m_StackInfoStack.Clear();
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer);
-                strBreviary = string.IsNullOrEmpty(strBreviary) ? scriptLexer.GetBreviary() : strBreviary;
+                strBreviary = Util.IsNullOrEmpty(strBreviary) ? scriptLexer.GetBreviary() : strBreviary;
                 ScriptParser scriptParser = new ScriptParser(this, scriptLexer.GetTokens(), strBreviary);
                 ScriptExecutable scriptExecutable = scriptParser.Parse();
                 return new ScriptContext(this, scriptExecutable, context, Executable_Block.Context).Execute();
