@@ -97,7 +97,9 @@ namespace Scorpio.Compiler
                     break;
                 case TokenType.Return:
                     Token peek = PeekToken();
-                    if (peek.Type == TokenType.RightBrace)
+                    if (peek.Type == TokenType.RightBrace || 
+                        peek.Type == TokenType.SemiColon ||
+                        peek.Type == TokenType.Finished)
                         m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(null)));
                     else
                         m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
