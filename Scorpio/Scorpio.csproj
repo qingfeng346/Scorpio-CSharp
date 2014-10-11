@@ -91,13 +91,12 @@
     <Compile Include="ScriptString.cs" />
     <Compile Include="ScriptTable.cs" />
     <Compile Include="ScriptUserdata.cs" />
-    <Compile Include="Util\Util.cs" />
+    <Compile Include="Util.cs" />
     <Compile Include="Variable\ScorpioDelegate.cs" />
     <Compile Include="Variable\ScorpioMethod.cs" />
     <Compile Include="Variable\ScorpioScriptFunction.cs" />
     <Compile Include="Variable\ScriptNumberDouble.cs" />
     <Compile Include="Variable\ScriptNumberLong.cs" />
-    <Compile Include="Variable\ScriptNumberULong.cs" />
     <Compile Include="Variable\ScriptPrimitiveObject.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

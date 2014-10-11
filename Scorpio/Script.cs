@@ -159,8 +159,6 @@ namespace Scorpio
         {
             if (Util.IsLongObject(value))
                 return new ScriptNumberLong(this, (long)value);
-            else if (Util.IsULongObject(value))
-                return new ScriptNumberULong(this, (ulong)value);
             else if (Util.IsDoubleObject(value))
                 return new ScriptNumberDouble(this, (double)value);
             return new ScriptNumberDouble(this, Convert.ToDouble(value));

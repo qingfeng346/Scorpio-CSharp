@@ -331,9 +331,6 @@ namespace Scorpio.Compiler
                         } else if (ch == 'L') {
                             long value = long.Parse(m_strToken);
                             AddToken(TokenType.Number, value);
-                        } else if (ch == 'U') {
-                            ulong value = ulong.Parse(m_strToken);
-                            AddToken(TokenType.Number, value);
                         } else {
                             double value = double.Parse(m_strToken);
                             AddToken(TokenType.Number, value);

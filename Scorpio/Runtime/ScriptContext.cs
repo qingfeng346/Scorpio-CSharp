@@ -65,7 +65,8 @@ namespace Scorpio.Runtime
         }
         private bool SetVariableObject(string name, ScriptObject obj)
         {
-            if (Util.SetObject(m_variableDictionary, name, obj)) {
+            if (m_variableDictionary.ContainsKey(name)) {
+                Util.SetObject(m_variableDictionary, name, obj);
                 return true;
             }
             if (m_parent != null) {

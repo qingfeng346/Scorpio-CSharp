@@ -37,7 +37,7 @@ namespace Scorpio
         }
         public void SetValue_impl(object key, ScriptObject scriptObject)
         {
-            Util.AssignObject(m_listObject, key, scriptObject);
+            Util.SetObject(m_listObject, key, scriptObject);
         }
         public ScriptObject GetValue_impl(object key)
         {
