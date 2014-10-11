@@ -15,13 +15,20 @@ namespace Scorpio
     //脚本类
     public class Script
     {
+        private const string Version = "0.0.1beta";
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
-        private const string GLOBAL_TABLE = "_G";
+        private const string GLOBAL_TABLE = "_G";               //全局table
+        private const string GLOBAL_VERSION = "_VERSION";       //版本号
         private IScriptUserdataFactory m_UserdataFactory = null;                //Userdata工厂
         private ScriptTable m_GlobalTable = new ScriptTable();                  //全局Table
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
+        public Script()
+        {
+            m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
+            m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
+        }
         public ScriptObject LoadFile(String strFileName)
         {
             return LoadFile(strFileName, Encoding.UTF8);
@@ -95,12 +102,10 @@ namespace Scorpio
         }
         public bool HasValue(String key)
         {
-            return (key == GLOBAL_TABLE) || m_GlobalTable.HasValue(key);
+            return m_GlobalTable.HasValue(key);
         }
         public ScriptObject GetValue(string key)
         {
-            if (key == GLOBAL_TABLE)
-                return m_GlobalTable;
             return m_GlobalTable.GetValue(key);
         }
         public void SetObject(string key, object value)

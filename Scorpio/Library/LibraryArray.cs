@@ -12,6 +12,7 @@ namespace Scorpio.Library
             Table.SetValue("count", script.CreateFunction(new count()));
             Table.SetValue("insert", script.CreateFunction(new insert()));
             Table.SetValue("add", script.CreateFunction(new add()));
+            Table.SetValue("clear", script.CreateFunction(new clear()));
             script.SetObjectInternal("array", Table);
         }
         private class count : ScorpioHandle
@@ -37,6 +38,14 @@ namespace Scorpio.Library
                 ScriptObject obj = (ScriptObject)args[1];
                 array.Add(obj);
                 return obj;
+            }
+        }
+        private class clear : ScorpioHandle
+        {
+            public object Call(object[] args)
+            {
+                ((ScriptArray)args[0]).Clear();
+                return null;
             }
         }
     }
