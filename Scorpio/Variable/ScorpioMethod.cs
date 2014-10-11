@@ -37,7 +37,7 @@ namespace Scorpio.Variable
             int length = methods.Length;
             List<Type> parameters = new List<Type>();
             for (int i = 0; i < length;++i ) {
-                var method = methods[i];
+                MethodInfo method = methods[i];
                 if (method.Name.Equals(methodName)) {
                     parameters.Clear();
                     var pars = methods[i].GetParameters();

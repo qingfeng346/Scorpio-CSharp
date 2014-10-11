@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Scorpio;
 namespace Scorpio.CodeDom
 {
     //++或者--标识

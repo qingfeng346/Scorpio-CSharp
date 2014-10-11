@@ -17,7 +17,7 @@ namespace Scorpio
         public abstract bool Compare(TokenType type, CodeOperator oper, ScriptNumber num);
         public int ToInt32()
         {
-            return Convert.ToInt32(ObjectValue);
+            return Util.ToInt32(ObjectValue);
         }
         public override ScriptObject Assign()
         {
@@ -25,15 +25,11 @@ namespace Scorpio
         }
         public virtual double ToDouble()
         {
-            return Convert.ToDouble(ObjectValue);
+            return Util.ToDouble(ObjectValue);
         }
         public virtual long ToLong()
         {
-            return Convert.ToInt64(ObjectValue);
-        }
-        public virtual ulong ToULong()
-        {
-            return Convert.ToUInt64(ObjectValue);
+            return Util.ToInt64(ObjectValue);
         }
         public override string ToString()
         {

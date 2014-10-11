@@ -54,7 +54,6 @@ namespace Scorpio.Library
             script.SetObjectInternal("typeof", script.CreateFunction(new userdatatype()));
             script.SetObjectInternal("tonumber", script.CreateFunction(new tonumber(script)));
             script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
-            script.SetObjectInternal("toulong", script.CreateFunction(new toulong(script)));
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
             script.SetObjectInternal("clone", script.CreateFunction(new clone()));
             script.SetObjectInternal("load_assembly", script.CreateFunction(new load_assembly(script)));
@@ -120,7 +119,7 @@ namespace Scorpio.Library
             {
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptNumber || obj is ScriptString)
-                    return m_script.CreateNumber(Convert.ToDouble(obj.ObjectValue));
+                    return m_script.CreateNumber(Util.ToDouble(obj.ObjectValue));
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Number类型");
             }
         }
@@ -135,23 +134,8 @@ namespace Scorpio.Library
             {
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptNumber || obj is ScriptString)
-                    return m_script.CreateNumber(Convert.ToInt64(obj.ObjectValue));
+                    return m_script.CreateNumber(Util.ToInt64(obj.ObjectValue));
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Long类型");
-            }
-        }
-        private class toulong : ScorpioHandle
-        {
-            private Script m_script;
-            public toulong(Script script)
-            {
-                m_script = script;
-            }
-            public object Call(object[] args)
-            {
-                ScriptObject obj = args[0] as ScriptObject;
-                if (obj is ScriptNumber || obj is ScriptString)
-                    return m_script.CreateNumber(Convert.ToUInt64(obj.ObjectValue));
-                throw new ExecutionException("不能从类型 " + obj.Type + " 转换成ULong类型");
             }
         }
         private class tostring : ScorpioHandle

@@ -61,7 +61,7 @@ namespace Scorpio.Compiler
                 UndoToken();
                 ParseStatement();
             }
-            var ret = m_scriptExecutable;
+            ScriptExecutable ret = m_scriptExecutable;
             ret.EndScriptInstruction();
             EndExecutable();
             return ret;
@@ -132,7 +132,7 @@ namespace Scorpio.Compiler
             if (m_scriptExecutable.Block == Executable_Block.Context)
             {
                 UndoToken();
-                var func = ParseFunctionDeclaration();
+                ScriptFunction func = ParseFunctionDeclaration();
                 m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func)));
             }
         }
@@ -171,7 +171,7 @@ namespace Scorpio.Compiler
                 }
             }
             ReadRightParenthesis();
-            var executable = ParseStatementBlock(Executable_Block.Function);
+            ScriptExecutable executable = ParseStatementBlock(Executable_Block.Function);
             return m_script.CreateFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable, bParams));
         }
         //解析普通代码块 {}

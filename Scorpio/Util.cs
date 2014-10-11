@@ -95,7 +95,7 @@ namespace Scorpio
         {
             if (type == TYPE_OBJECT) {
                 if (par is ScriptNumber) {
-                    return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : Convert.ChangeType(par.ObjectValue, type);
+                    return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : ChangeType(par.ObjectValue, type);
                 } else {
                     return par.ObjectValue;
                 }
@@ -103,7 +103,7 @@ namespace Scorpio
                 if (type.IsAssignableFrom(par.GetType())) {
                     return par;
                 } else if (par is ScriptNumber) {
-                    return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : Convert.ChangeType(par.ObjectValue, type);
+                    return type.IsEnum ? Enum.ToObject(type, ((ScriptNumber)par).ToLong()) : ChangeType(par.ObjectValue, type);
                 } else if (par is ScriptUserdata) {
                     if (Util.IsType(type))
                         return ((ScriptUserdata)par).ValueType;
@@ -147,6 +147,22 @@ namespace Scorpio
                 }
             }
             return false;
+        }
+        public static object ChangeType(object value, Type conversionType)
+        {
+            return Convert.ChangeType(value, conversionType);
+        }
+        public static int ToInt32(object value)
+        {
+            return Convert.ToInt32(value);
+        }
+        public static double ToDouble(object value)
+        {
+            return Convert.ToDouble(value);
+        }
+        public static long ToInt64(object value)
+        {
+            return Convert.ToInt64(value);
         }
     }
 }

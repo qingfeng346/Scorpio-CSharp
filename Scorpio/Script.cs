@@ -39,7 +39,7 @@ namespace Scorpio
                 FileStream stream = File.OpenRead(strFileName);
                 long length = stream.Length;
                 byte[] buffer = new byte[length];
-                stream.Read(buffer, 0, Convert.ToInt32(length));
+                stream.Read(buffer, 0, buffer.Length);
                 stream.Close();
                 return LoadString(Path.GetFileName(strFileName), encoding.GetString(buffer, 0, buffer.Length));
             } catch (System.Exception e) {
@@ -166,7 +166,7 @@ namespace Scorpio
                 return new ScriptNumberLong(this, (long)value);
             else if (Util.IsDoubleObject(value))
                 return new ScriptNumberDouble(this, (double)value);
-            return new ScriptNumberDouble(this, Convert.ToDouble(value));
+            return new ScriptNumberDouble(this, Util.ToDouble(value));
         }
         public ScriptEnum CreateEnum(object value)
         {

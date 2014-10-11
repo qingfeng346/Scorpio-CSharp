@@ -408,7 +408,7 @@ namespace Scorpio.Runtime
         private ScriptObject ResolveOperand(CodeObject value)
         {
             m_script.SetStackInfo(value.StackInfo);
-            var ret = ResolveOperand_impl(value);
+            ScriptObject ret = ResolveOperand_impl(value);
             if (value.Not) {
                 ScriptBoolean b = ret as ScriptBoolean;
                 if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [!] sign");
