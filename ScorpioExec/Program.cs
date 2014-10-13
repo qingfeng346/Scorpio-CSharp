@@ -12,21 +12,40 @@ namespace ScorpioExec
         static void Main(string[] args)
         {
             Script script = new Script();
-            try {
-                if (args.Length >= 1) {
+            Console.WriteLine("开始执行，当前版本:" + Script.Version);
+            script.LoadLibrary();
+            script.PushAssembly(typeof(Program).Assembly);
+            script.PushAssembly(typeof(System.Environment).Assembly);
+            if (args.Length >= 1) {
+                try {
                     double start = Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
-                    script.LoadLibrary();
-                    script.PushAssembly(typeof(Program).Assembly);
-                    script.PushAssembly(typeof(System.Environment).Assembly);
-                    script.SetObject("Environment", typeof(Environment));
                     Console.WriteLine("返回值为:" + script.LoadFile(args[0]));
                     Console.WriteLine("运行时间:" + (Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds - start) + " ms");
+                } catch (System.Exception ex) {
+                    Console.WriteLine(script.GetStackInfo());
+                    Console.WriteLine(ex.ToString());
                 }
-            } catch (System.Exception ex) {
-                Console.WriteLine(script.GetStackInfo());
-                Console.WriteLine(ex.ToString());
+                Console.ReadKey();
+            } else {
+                while (true)
+                {
+                    try {
+                        string str = Console.ReadLine();
+                        if (str == "exit")  { 
+                            break;
+                        } else if (str == "clear") {
+                            Console.Clear();
+                        } else if (str == "version") {
+                            Console.WriteLine(Script.Version);
+                        } else {
+                            script.LoadString(str);
+                        }
+                    } catch (System.Exception ex) {
+                        Console.WriteLine(script.GetStackInfo());
+                        Console.WriteLine(ex.ToString());
+                    }
+                }
             }
-            Console.ReadKey();
         }
     }
 }
