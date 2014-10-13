@@ -30,7 +30,6 @@ namespace Scorpio
     //脚本函数类型
     public class ScriptFunction : ScriptObject
     {
-        public Script Script { get; private set; }                              //所在脚本
         public String Name { get; private set; }                                //函数名字
         public FunstionType FunctionType { get; private set; }                  //函数类型 （是 脚本函数 还是 程序函数）
         public bool IsStatic { get; private set; }                              //是否是静态函数（不是table内部函数）
@@ -43,38 +42,37 @@ namespace Scorpio
         private VariableDictionary m_stackObject = new VariableDictionary();    //函数变量
         public override ObjectType Type { get { return ObjectType.Function; } }
         public ScriptFunction(Script script, ScorpioFunction function) : this(script, function.Method.Name, function) { }
-        public ScriptFunction(Script script, String strName, ScorpioFunction function)
+        public ScriptFunction(Script script, String strName, ScorpioFunction function) : base(script)
         {
             this.m_Function = function;
-            Initialize(script, strName, FunstionType.Function);
+            Initialize(strName, FunstionType.Function);
         }
         public ScriptFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().Name, handle) { }
-        public ScriptFunction(Script script, String strName, ScorpioHandle handle)
+        public ScriptFunction(Script script, String strName, ScorpioHandle handle) : base(script)
         {
             this.m_Handle = handle;
-            Initialize(script, strName, FunstionType.Handle);
+            Initialize(strName, FunstionType.Handle);
         }
         public ScriptFunction(Script script, Delegate dele) : this(script, dele.Method.Name, dele) { }
-        public ScriptFunction(Script script, String strName, Delegate dele)
+        public ScriptFunction(Script script, String strName, Delegate dele) : base(script)
         {
             this.m_Delegate = new ScorpioDelegate(dele);
-            Initialize(script, strName, FunstionType.Delegate);
+            Initialize(strName, FunstionType.Delegate);
         }
         public ScriptFunction(Script script, ScorpioMethod method) : this(script, method.MethodName, method) { }
-        public ScriptFunction(Script script, String strName, ScorpioMethod method)
+        public ScriptFunction(Script script, String strName, ScorpioMethod method) : base(script)
         {
             this.m_Method = method;
-            Initialize(script, strName, FunstionType.Method);
+            Initialize(strName, FunstionType.Method);
         }
-        internal ScriptFunction(Script script, String strName, ScorpioScriptFunction function)
+        internal ScriptFunction(Script script, String strName, ScorpioScriptFunction function) : base(script)
         {
             this.IsStatic = true;
             this.m_ScriptFunction = function;
-            Initialize(script, strName, FunstionType.Script);
+            Initialize(strName, FunstionType.Script);
         }
-        private void Initialize(Script script, String strName, FunstionType funcType)
+        private void Initialize(String strName, FunstionType funcType)
         {
-            Script = script;
             Name = strName;
             FunctionType = funcType;
         }

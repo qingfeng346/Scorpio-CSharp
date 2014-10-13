@@ -38,9 +38,8 @@ namespace Scorpio.Userdata
         private Dictionary<string, Field> m_FieldInfos;                 //所有的变量 以及 get set函数
         private Dictionary<string, ScriptUserdata> m_NestedTypes;       //所有的类中类
         private Dictionary<string, ScriptFunction> m_Functions;         //所有的函数
-        public DefaultScriptUserdataObject(Script script, object value)
+        public DefaultScriptUserdataObject(Script script, object value) : base(script)
         {
-            this.m_Script = script;
             this.Value = value;
             this.ValueType = (Value is Type) ? (Type)Value : Value.GetType();
             m_FieldInfos = new Dictionary<string, Field>();
@@ -52,7 +51,7 @@ namespace Scorpio.Userdata
             {
                 string name = methods[i].Name;
                 if (!m_Functions.ContainsKey(name))
-                    m_Functions.Add(name, m_Script.CreateFunction(new ScorpioMethod(ValueType, name, Value)));
+                    m_Functions.Add(name, Script.CreateFunction(new ScorpioMethod(ValueType, name, Value)));
             }
         }
         private Field GetField(string strName)
@@ -91,7 +90,7 @@ namespace Scorpio.Userdata
         }
         public override ScriptObject Call(ScriptObject[] parameters)
         {
-            return m_Script.CreateObject(m_Constructor.Call(parameters));
+            return Script.CreateObject(m_Constructor.Call(parameters));
         }
         public override ScriptObject GetValue(string strName)
         {
@@ -100,10 +99,10 @@ namespace Scorpio.Userdata
             if (m_NestedTypes.ContainsKey(strName))
                 return m_NestedTypes[strName];
             Field field = GetField(strName);
-            if (field != null) return m_Script.CreateObject(field.GetValue(Value));
+            if (field != null) return Script.CreateObject(field.GetValue(Value));
             Type nestedType = ValueType.GetNestedType(strName, Script.BindingFlag);
             if (nestedType != null) {
-                ScriptUserdata ret = m_Script.CreateUserdata(nestedType);
+                ScriptUserdata ret = Script.CreateUserdata(nestedType);
                 m_NestedTypes.Add(strName, ret);
                 return ret;
             }

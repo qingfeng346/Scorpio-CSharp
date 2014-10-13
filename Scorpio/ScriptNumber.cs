@@ -11,17 +11,13 @@ namespace Scorpio
     public abstract class ScriptNumber : ScriptObject
     {
         public override ObjectType Type { get { return ObjectType.Number; } }
-        protected Script m_Script;
         public abstract ScriptNumber Calc(CALC c);
         public abstract ScriptNumber Negative();
         public abstract bool Compare(TokenType type, CodeOperator oper, ScriptNumber num);
+        protected ScriptNumber(Script script) : base(script) { }
         public int ToInt32()
         {
             return Util.ToInt32(ObjectValue);
-        }
-        public override ScriptObject Assign()
-        {
-            return m_Script.CreateNumber(ObjectValue);
         }
         public virtual double ToDouble()
         {

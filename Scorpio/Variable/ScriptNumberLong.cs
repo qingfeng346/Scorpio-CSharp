@@ -13,9 +13,8 @@ namespace Scorpio.Variable
         public override int BranchType { get { return 1; } }
         public override object ObjectValue { get { return Value; } }
         public long Value { get; private set; }
-        public ScriptNumberLong(Script script, long value)
+        public ScriptNumberLong(Script script, long value) : base(script)
         {
-            m_Script = script;
             Value = value;
         }
         public override ScriptNumber Calc(CALC c)
@@ -29,9 +28,9 @@ namespace Scorpio.Variable
                     --Value;
                     break;
                 case CALC.POST_INCREMENT:
-                    return m_Script.CreateLong(Value++);
+                    return Script.CreateLong(Value++);
                 case CALC.POST_DECREMENT:
-                    return m_Script.CreateLong(Value--);
+                    return Script.CreateLong(Value--);
             }
             return this;
         }
@@ -40,29 +39,33 @@ namespace Scorpio.Variable
             Value = -Value;
             return this;
         }
+        public override ScriptObject Assign()
+        {
+            return Script.CreateLong(Value);
+        }
         public override long ToLong()
         {
             return Value;
         }
         public override ScriptObject Plus(ScriptObject obj)
         {
-            return m_Script.CreateLong(Value + ((ScriptNumber)obj).ToLong());
+            return Script.CreateLong(Value + ((ScriptNumber)obj).ToLong());
         }
         public override ScriptObject Minus(ScriptObject obj)
         {
-            return m_Script.CreateLong(Value - ((ScriptNumber)obj).ToLong());
+            return Script.CreateLong(Value - ((ScriptNumber)obj).ToLong());
         }
         public override ScriptObject Multiply(ScriptObject obj)
         {
-            return m_Script.CreateLong(Value * ((ScriptNumber)obj).ToLong());
+            return Script.CreateLong(Value * ((ScriptNumber)obj).ToLong());
         }
         public override ScriptObject Divide(ScriptObject obj)
         {
-            return m_Script.CreateLong(Value / ((ScriptNumber)obj).ToLong());
+            return Script.CreateLong(Value / ((ScriptNumber)obj).ToLong());
         }
         public override ScriptObject Modulo(ScriptObject obj)
         {
-            return m_Script.CreateLong(Value % ((ScriptNumber)obj).ToLong());
+            return Script.CreateLong(Value % ((ScriptNumber)obj).ToLong());
         }
         public override bool Compare(TokenType type, CodeOperator oper, ScriptNumber num)
         {
@@ -87,7 +90,7 @@ namespace Scorpio.Variable
         }
         public override ScriptObject Clone()
         {
-            return m_Script.CreateLong(Value);
+            return Script.CreateLong(Value);
         }
     }
 }

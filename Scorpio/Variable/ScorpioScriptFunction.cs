@@ -23,7 +23,7 @@ namespace Scorpio.Variable
             this.m_scriptExecutable = scriptExecutable;
             this.m_ParameterCount = listParameters.Count;
             this.m_Params = bParams;
-            this.m_ParamsArray = bParams ? new ScriptArray() : null;
+            this.m_ParamsArray = bParams ? script.CreateArray() : null;
             this.m_Context = new ScriptContext(m_script, m_scriptExecutable, null, Executable_Block.Function);
         }
         public void SetParentContext(ScriptContext context)

@@ -10,7 +10,7 @@ namespace Scorpio
         public override object ObjectValue { get { return m_Object; } }
         public Type EnumType { get; private set; }
         public object m_Object;
-        public ScriptEnum(Script script, object obj)
+        public ScriptEnum(Script script, object obj) : base(script)
         {
             m_Object = obj;
             EnumType = m_Object.GetType();

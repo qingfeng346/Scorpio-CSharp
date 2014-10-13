@@ -37,7 +37,7 @@ namespace Scorpio.Library
                 if (m_TableEnumerator.MoveNext())
                 {
                     KeyValuePair<object, ScriptObject> v = m_TableEnumerator.Current;
-                    ScriptTable table = new ScriptTable();
+                    ScriptTable table = m_Script.CreateTable();
                     table.SetValue("key", m_Script.CreateObject(v.Key));
                     table.SetValue("value", v.Value);
                     return table;

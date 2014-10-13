@@ -6,9 +6,9 @@ namespace Scorpio.Library
 {
     public class LibraryString
     {
-        public static ScriptTable Table = new ScriptTable();
         public static void Load(Script script)
         {
+            ScriptTable Table = script.CreateTable();
             Table.SetValue("format", script.CreateFunction(new format()));
             Table.SetValue("substring", script.CreateFunction(new substring()));
             Table.SetValue("length", script.CreateFunction(new length()));

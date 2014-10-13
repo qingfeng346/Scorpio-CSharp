@@ -6,9 +6,9 @@ namespace Scorpio.Library
 {
     public class LibraryTable
     {
-        public static ScriptTable Table = new ScriptTable();
         public static void Load(Script script)
         {
+            ScriptTable Table = script.CreateTable();
             Table.SetValue("count", script.CreateFunction(new count()));
             script.SetObjectInternal("table", Table);
         }

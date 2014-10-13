@@ -20,15 +20,10 @@ namespace Scorpio
         private const string GLOBAL_TABLE = "_G";               //全局table
         private const string GLOBAL_VERSION = "_VERSION";       //版本号
         private IScriptUserdataFactory m_UserdataFactory = null;                //Userdata工厂
-        private ScriptTable m_GlobalTable = new ScriptTable();                  //全局Table
+        private ScriptTable m_GlobalTable;                                      //全局Table
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
-        public Script()
-        {
-            m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
-            m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
-        }
         public ScriptObject LoadFile(String strFileName)
         {
             return LoadFile(strFileName, Encoding.UTF8);
@@ -179,6 +174,14 @@ namespace Scorpio
         {
             return m_UserdataFactory.create(this, value);
         }
+        internal ScriptArray CreateArray()
+        {
+            return new ScriptArray(this);
+        }
+        internal ScriptTable CreateTable()
+        {
+            return new ScriptTable(this);
+        }
         internal ScriptFunction CreateFunction(string name, ScorpioScriptFunction value)
         {
             return new ScriptFunction(this, name, value);
@@ -202,6 +205,9 @@ namespace Scorpio
         public void LoadLibrary()
         {
             m_UserdataFactory = new DefaultScriptUserdataFactory();
+            m_GlobalTable = CreateTable();
+            m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
+            m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
             LibraryBasis.Load(this);
             LibraryArray.Load(this);
             LibraryString.Load(this);

@@ -11,8 +11,8 @@ namespace Scorpio
     {
         public override object ObjectValue { get { return Value; } }
         public override ObjectType Type { get { return ObjectType.UserData; } }
-        protected Script m_Script;
         public object Value { get; protected set; }
         public Type ValueType { get; protected set; }
+        public ScriptUserdata(Script script) : base(script) { }
     }
 }

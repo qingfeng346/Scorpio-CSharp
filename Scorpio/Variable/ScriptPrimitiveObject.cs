@@ -8,11 +8,11 @@ namespace Scorpio.Variable
     {
         public T Value { get; set; }
         public override object ObjectValue { get { return Value; } }
-        public ScriptPrimitiveObject()
+        public ScriptPrimitiveObject(T value) : base(null)
         {
-            this.Value = default(T);
+            this.Value = value;
         }
-        public ScriptPrimitiveObject(T value)
+        public ScriptPrimitiveObject(Script script, T value) : base(script)
         {
             this.Value = value;
         }

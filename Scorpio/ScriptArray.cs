@@ -8,16 +8,9 @@ namespace Scorpio
     //脚本数组类型
     public class ScriptArray : ScriptObject
     {
-        public List<ScriptObject> m_listObject;
         public override ObjectType Type { get { return ObjectType.Array; } }
-        public ScriptArray()
-        {
-            m_listObject = new List<ScriptObject>();
-        }
-        private ScriptArray(List<ScriptObject> objs)
-        {
-            m_listObject = objs;
-        }
+        public List<ScriptObject> m_listObject = new List<ScriptObject>();
+        public ScriptArray(Script script) : base(script) { }
         public override ScriptObject GetValue(int index)
         {
             if (index < 0 || index >= m_listObject.Count)
@@ -52,11 +45,11 @@ namespace Scorpio
         }
         public override ScriptObject Clone()
         {
-            List<ScriptObject> objs = new List<ScriptObject>();
+            ScriptArray ret = Script.CreateArray();
             for (int i = 0; i < m_listObject.Count; ++i) {
-                objs.Add(m_listObject[i].Clone());
+                ret.m_listObject.Add(m_listObject[i].Clone());
             }
-            return new ScriptArray(objs);
+            return ret;
         }
         public override string ToString() { return "Array"; }
     }

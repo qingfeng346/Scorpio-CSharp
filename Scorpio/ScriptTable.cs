@@ -11,6 +11,7 @@ namespace Scorpio
     {
         public override ObjectType Type { get { return ObjectType.Table; } }
         private TableDictionary m_listObject = new TableDictionary();  //所有的数据(函数和数据都在一个数组)
+        public ScriptTable(Script script) : base(script) { }
         public override void SetValue(int key, ScriptObject value)
         {
             SetValue_impl(key, value);
@@ -57,7 +58,7 @@ namespace Scorpio
         }
         public override ScriptObject Clone()
         {
-            ScriptTable ret = new ScriptTable();
+            ScriptTable ret = Script.CreateTable();
             ScriptObject obj = null;
             ScriptFunction func = null;
             foreach (var pair in m_listObject) {

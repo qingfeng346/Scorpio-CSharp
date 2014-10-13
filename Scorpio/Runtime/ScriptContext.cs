@@ -469,7 +469,7 @@ namespace Scorpio.Runtime
         }
         ScriptArray ParseArray(CodeArray array)
         {
-            ScriptArray ret = new ScriptArray();
+            ScriptArray ret = m_script.CreateArray();
             int num = array.Elements.Count;
             for (int i = 0; i < num; ++i) {
                 ret.Add(ResolveOperand(array.Elements[i]));
@@ -478,7 +478,7 @@ namespace Scorpio.Runtime
         }
         ScriptTable ParseTable(CodeTable table)
         {
-            ScriptTable ret = new ScriptTable();
+            ScriptTable ret = m_script.CreateTable();
             foreach (TableVariable variable in table.Variables) {
                 ret.SetValue(variable.Key, ResolveOperand(variable.Value));
             }
