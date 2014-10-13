@@ -291,7 +291,9 @@ namespace Scorpio.Runtime
             if (beginNumber == null) throw new ExecutionException("forsimple 初始值必须是number");
             ScriptNumber finishedNumber = ResolveOperand(code.Finished) as ScriptNumber;
             if (finishedNumber == null) throw new ExecutionException("forsimple 最大值必须是number");
-            int begin, finished, step;
+            int begin = beginNumber.ToInt32();
+            int finished = finishedNumber.ToInt32();
+            int step;
             if (code.Step != null) {
                 ScriptNumber stepNumber = ResolveOperand(code.Step) as ScriptNumber;
                 if (stepNumber == null) throw new ExecutionException("forsimple Step必须是number");
@@ -299,10 +301,8 @@ namespace Scorpio.Runtime
             } else {
                 step = 1;
             }
-            begin = beginNumber.ToInt32();
-            finished = finishedNumber.ToInt32();
             var variables = code.variables;
-            for (int i=begin; i <= finished; i += step)
+            for (int i = begin; i <= finished; i += step)
             {
                 variables[code.Identifier] = m_script.CreateNumber(i);
                 code.BlockContext.Initialize(this, variables);

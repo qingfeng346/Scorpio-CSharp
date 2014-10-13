@@ -31,9 +31,5 @@ namespace Scorpio
         {
             return Util.ToInt64(ObjectValue);
         }
-        public override string ToString()
-        {
-            return ObjectValue.ToString();
-        }
     }
 }

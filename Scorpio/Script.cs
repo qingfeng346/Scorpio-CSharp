@@ -161,11 +161,15 @@ namespace Scorpio
         }
         public ScriptNumber CreateNumber(object value)
         {
-            if (Util.IsLongObject(value))
-                return new ScriptNumberLong(this, (long)value);
-            else if (Util.IsDoubleObject(value))
-                return new ScriptNumberDouble(this, (double)value);
-            return new ScriptNumberDouble(this, Util.ToDouble(value));
+            return Util.IsLongObject(value) ? CreateLong((long)value) : CreateDouble(Util.ToDouble(value));
+        }
+        public ScriptNumber CreateDouble(double value)
+        {
+            return new ScriptNumberDouble(this, value);
+        }
+        public ScriptNumber CreateLong(long value)
+        {
+            return new ScriptNumberLong(this, value);
         }
         public ScriptEnum CreateEnum(object value)
         {

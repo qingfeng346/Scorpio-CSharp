@@ -118,7 +118,7 @@ namespace Scorpio.Library
             public object Call(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
-                if (obj is ScriptNumber || obj is ScriptString)
+                if (obj is ScriptNumber || obj is ScriptString || obj.IsEnum)
                     return m_script.CreateNumber(Util.ToDouble(obj.ObjectValue));
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Number类型");
             }
@@ -133,7 +133,7 @@ namespace Scorpio.Library
             public object Call(object[] args)
             {
                 ScriptObject obj = args[0] as ScriptObject;
-                if (obj is ScriptNumber || obj is ScriptString)
+                if (obj is ScriptNumber || obj is ScriptString || obj.IsEnum)
                     return m_script.CreateNumber(Util.ToInt64(obj.ObjectValue));
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Long类型");
             }

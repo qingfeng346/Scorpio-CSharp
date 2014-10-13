@@ -29,9 +29,9 @@ namespace Scorpio.Variable
                     --Value;
                     break;
                 case CALC.POST_INCREMENT:
-                    return m_Script.CreateNumber(Value++);
+                    return m_Script.CreateLong(Value++);
                 case CALC.POST_DECREMENT:
-                    return m_Script.CreateNumber(Value--);
+                    return m_Script.CreateLong(Value--);
             }
             return this;
         }
@@ -46,23 +46,23 @@ namespace Scorpio.Variable
         }
         public override ScriptObject Plus(ScriptObject obj)
         {
-            return new ScriptNumberLong(m_Script, Value + ((ScriptNumber)obj).ToLong());
+            return m_Script.CreateLong(Value + ((ScriptNumber)obj).ToLong());
         }
         public override ScriptObject Minus(ScriptObject obj)
         {
-            return new ScriptNumberLong(m_Script, Value - ((ScriptNumber)obj).ToLong());
+            return m_Script.CreateLong(Value - ((ScriptNumber)obj).ToLong());
         }
         public override ScriptObject Multiply(ScriptObject obj)
         {
-            return new ScriptNumberLong(m_Script, Value * ((ScriptNumber)obj).ToLong());
+            return m_Script.CreateLong(Value * ((ScriptNumber)obj).ToLong());
         }
         public override ScriptObject Divide(ScriptObject obj)
         {
-            return new ScriptNumberLong(m_Script, Value / ((ScriptNumber)obj).ToLong());
+            return m_Script.CreateLong(Value / ((ScriptNumber)obj).ToLong());
         }
         public override ScriptObject Modulo(ScriptObject obj)
         {
-            return new ScriptNumberLong(m_Script, Value % ((ScriptNumber)obj).ToLong());
+            return m_Script.CreateLong(Value % ((ScriptNumber)obj).ToLong());
         }
         public override bool Compare(TokenType type, CodeOperator oper, ScriptNumber num)
         {
@@ -87,7 +87,7 @@ namespace Scorpio.Variable
         }
         public override ScriptObject Clone()
         {
-            return new ScriptNumberLong(m_Script, Value);
+            return m_Script.CreateLong(Value);
         }
     }
 }

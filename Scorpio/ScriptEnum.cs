@@ -15,6 +15,5 @@ namespace Scorpio
             m_Object = obj;
             EnumType = m_Object.GetType();
         }
-        public override string ToString() { return m_Object.ToString(); }
     }
 }
