@@ -17,6 +17,8 @@ namespace Scorpio.Runtime
         CALL_IF,
         /// <summary> 执行For语句 </summary>
         CALL_FOR,
+        /// <summary> 执行For语句 </summary>
+        CALL_FORSIMPLE,
         /// <summary> 执行Foreach语句 </summary>
         CALL_FOREACH,
         /// <summary> 执行While语句 </summary>

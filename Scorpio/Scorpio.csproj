@@ -41,6 +41,7 @@
     <Compile Include="CodeDom\CodeEval.cs" />
     <Compile Include="CodeDom\CodeFor.cs" />
     <Compile Include="CodeDom\CodeForeach.cs" />
+    <Compile Include="CodeDom\CodeForSimple.cs" />
     <Compile Include="CodeDom\CodeFunction.cs" />
     <Compile Include="CodeDom\CodeIf.cs" />
     <Compile Include="CodeDom\CodeMember.cs" />

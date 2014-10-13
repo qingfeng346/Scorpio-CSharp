@@ -214,8 +214,40 @@ namespace Scorpio.Compiler
         //解析for语句
         private void ParseFor()
         {
-            CodeFor ret = new CodeFor(m_script);
             ReadLeftParenthesis();
+            int partIndex = m_iNextToken;
+            Token token = ReadToken();
+            if (token.Type == TokenType.Identifier)
+            {
+                Token assign = ReadToken();
+                if (assign.Type == TokenType.Assign)
+                {
+                    CodeObject obj = GetObject();
+                    Token comma = ReadToken();
+                    if (comma.Type == TokenType.Comma)
+                    {
+                        CodeForSimple ret = new CodeForSimple(m_script);
+                        ret.Identifier = (string)token.Lexeme;
+                        ret.Begin = obj;
+                        ret.Finished = GetObject();
+                        if (PeekToken().Type == TokenType.Comma) 
+                        {
+                            ReadToken();
+                            ret.Step = GetObject();
+                        }
+                        ReadRightParenthesis();
+                        ret.SetContextExecutable(ParseStatementBlock(Executable_Block.For));
+                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FORSIMPLE, ret));
+                        return;
+                    }
+                }
+            }
+            m_iNextToken = partIndex;
+            ParseFor_impl();
+        }
+        private void ParseFor_impl()
+        {
+            CodeFor ret = new CodeFor(m_script);
             Token token = ReadToken();
             if (token.Type != TokenType.SemiColon)
             {

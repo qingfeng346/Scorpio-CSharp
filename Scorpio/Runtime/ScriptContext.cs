@@ -230,6 +230,7 @@ namespace Scorpio.Runtime
                 case Opcode.CALL_FUNCTION: ProcessCallFunction(); break;
                 case Opcode.CALL_IF: ProcessCallIf(); break;
                 case Opcode.CALL_FOR: ProcessCallFor(); break;
+                case Opcode.CALL_FORSIMPLE: ProcessCallForSimple(); break;
                 case Opcode.CALL_FOREACH: ProcessCallForeach(); break;
                 case Opcode.CALL_WHILE: ProcessCallWhile(); break;
             }
@@ -281,6 +282,32 @@ namespace Scorpio.Runtime
                 blockContext.Execute();
                 if (blockContext.IsBreak) break;
                 context.Execute(code.LoopExecutable);
+            }
+        }
+        void ProcessCallForSimple()
+        {
+            CodeForSimple code = (CodeForSimple)m_scriptInstruction.Operand0;
+            ScriptNumber beginNumber = ResolveOperand(code.Begin) as ScriptNumber;
+            if (beginNumber == null) throw new ExecutionException("forsimple 初始值必须是number");
+            ScriptNumber finishedNumber = ResolveOperand(code.Finished) as ScriptNumber;
+            if (finishedNumber == null) throw new ExecutionException("forsimple 最大值必须是number");
+            int begin, finished, step;
+            if (code.Step != null) {
+                ScriptNumber stepNumber = ResolveOperand(code.Step) as ScriptNumber;
+                if (stepNumber == null) throw new ExecutionException("forsimple Step必须是number");
+                step = stepNumber.ToInt32();
+            } else {
+                step = 1;
+            }
+            begin = beginNumber.ToInt32();
+            finished = finishedNumber.ToInt32();
+            var variables = code.variables;
+            for (int i=begin; i <= finished; i += step)
+            {
+                variables[code.Identifier] = m_script.CreateNumber(i);
+                code.BlockContext.Initialize(this, variables);
+                code.BlockContext.Execute();
+                if (code.BlockContext.IsBreak) break;
             }
         }
         void ProcessCallForeach()
