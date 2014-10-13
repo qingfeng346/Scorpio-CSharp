@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Scorpio.Compiler;
 using Scorpio.Exception;
-
 namespace Scorpio.CodeDom
 {
     //一个需要解析的Object

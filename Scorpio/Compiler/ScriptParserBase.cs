@@ -26,12 +26,12 @@ namespace Scorpio.Compiler
             return m_listTokens[m_iNextToken];
         }
         /// <summary> 返回上一个Token </summary>
-        private Token LastToken()
-        {
-            if (m_iNextToken <= 0)
-                throw new ScriptException("No more tokens to last.");
-            return m_listTokens[m_iNextToken - 1];
-        }
+        //private Token LastToken()
+        //{
+        //    if (m_iNextToken <= 0)
+        //        throw new ScriptException("No more tokens to last.");
+        //    return m_listTokens[m_iNextToken - 1];
+        //}
         /// <summary> 回滚Token </summary>
         private void UndoToken()
         {
@@ -47,12 +47,12 @@ namespace Scorpio.Compiler
                 throw new ParserException("Comma ',' expected.", token);
         }
         /// <summary> 读取. </summary>
-        private void ReadPeriod()
-        {
-            Token token = ReadToken();
-            if (token.Type != TokenType.Period)
-                throw new ParserException( "Period '.' expected for member variable expression.",token);
-        }
+        //private void ReadPeriod()
+        //{
+        //    Token token = ReadToken();
+        //    if (token.Type != TokenType.Period)
+        //        throw new ParserException( "Period '.' expected for member variable expression.",token);
+        //}
         /// <summary> 读取 未知字符 </summary>
         private String ReadIdentifier()
         {

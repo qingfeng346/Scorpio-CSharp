@@ -10,8 +10,8 @@ namespace Scorpio.CodeDom
         public CodeObject Value;
         public TableVariable(string key, CodeObject value)
         {
-            this.Key = key;
-            this.Value = value;
+            Key = key;
+            Value = value;
         }
     }
     //返回一个table类型 t = { a = "1", b = "2", function hello() { } }
