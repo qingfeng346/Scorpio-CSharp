@@ -41,6 +41,7 @@ namespace CancerDemo
                 m_txtScriptOutput.Text = "";
                 double start = Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
                 script.LoadLibrary();
+                script.PushAssembly(typeof(System.Environment).Assembly);
                 script.SetObject("print", new ScorpioFunction(print));
                 BuildOutPut("返回值为 " + script.LoadString("", textBox1.Text));
                 BuildOutPut("运行时间:" + (Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds - start) + " ms");
