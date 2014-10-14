@@ -14,7 +14,7 @@ namespace Scorpio.Library
         }
         private class count : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 return ((ScriptTable)args[0]).Count();
             }

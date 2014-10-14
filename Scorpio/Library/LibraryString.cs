@@ -21,7 +21,7 @@ namespace Scorpio.Library
         const string DELIM_STR = "{}";
         private class format : ScorpioHandle
         {
-            public object Call(object[] args) {
+            public object Call(ScriptObject[] args) {
                 if (args == null || args.Length == 0) {
                     return null;
                 }
@@ -54,7 +54,8 @@ namespace Scorpio.Library
         }
         private class substring : ScorpioHandle
         {
-            public object Call(object[] args) {
+            public object Call(ScriptObject[] args)
+            {
                 string messagePattern = (args[0] as ScriptString).Value;
                 if (args.Length == 1) return messagePattern;
                 int index = (args[1] as ScriptNumber).ToInt32();
@@ -64,35 +65,35 @@ namespace Scorpio.Library
         }
         private class length : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 return (args[0] as ScriptString).Value.Length;
             }
         }
         private class tolower : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 return (args[0] as ScriptString).Value.ToLowerInvariant();
             }
         }
         private class toupper : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 return (args[0] as ScriptString).Value.ToUpperInvariant();
             }
         }
         private class trim : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 return (args[0] as ScriptString).Value.Trim();
             }
         }
         private class replace : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 string str = (args[0] as ScriptString).Value;
                 string oldValue = (args[1] as ScriptString).Value;

@@ -22,7 +22,7 @@ namespace Scorpio.Library
                 m_Table = m_Script.CreateTable();
                 m_Enumerator = obj.GetIterator();
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 if (m_Enumerator.MoveNext())
                 {
@@ -44,7 +44,7 @@ namespace Scorpio.Library
                 m_Index = 0;
                 m_Enumerator = obj.GetIterator();
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 if (m_Enumerator.MoveNext())
                     return m_Index++;
@@ -60,7 +60,7 @@ namespace Scorpio.Library
                 m_Script = script;
                 m_Enumerator = obj.GetIterator();
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 if (m_Enumerator.MoveNext())
                     return m_Enumerator.Current;
@@ -78,7 +78,7 @@ namespace Scorpio.Library
                 m_Table = m_Script.CreateTable();
                 m_Enumerator = obj.GetIterator();
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 if (m_Enumerator.MoveNext())
                 {
@@ -99,7 +99,7 @@ namespace Scorpio.Library
                 m_Script = script;
                 m_Enumerator = obj.GetIterator();
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 if (m_Enumerator.MoveNext())
                     return m_Enumerator.Current.Key;
@@ -115,7 +115,7 @@ namespace Scorpio.Library
                 m_Script = script;
                 m_Enumerator = obj.GetIterator();
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 if (m_Enumerator.MoveNext())
                     return m_Enumerator.Current.Value;
@@ -134,7 +134,7 @@ namespace Scorpio.Library
                 if (ienumerable == null) throw new ExecutionException("pairs 只支持继承 IEnumerable 的类");
                 m_Enumerator = ienumerable.GetEnumerator();
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 if (m_Enumerator.MoveNext())
                     return m_Enumerator.Current;
@@ -160,7 +160,7 @@ namespace Scorpio.Library
         }
         private class print : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 for (int i = 0; i < args.Length; ++i) {
                     Console.WriteLine(args[i].ToString());
@@ -175,9 +175,9 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                ScriptObject obj = args[0] as ScriptObject;
+                ScriptObject obj = args[0];
                 if (obj is ScriptArray)
                     return m_script.CreateFunction(new ArrayPairs(m_script, (ScriptArray)obj));
                 else if (obj is ScriptTable)
@@ -194,9 +194,9 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                ScriptObject obj = args[0] as ScriptObject;
+                ScriptObject obj = args[0];
                 if (obj is ScriptArray)
                     return m_script.CreateFunction(new ArrayKPairs(m_script, (ScriptArray)obj));
                 else if (obj is ScriptTable)
@@ -211,9 +211,9 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                ScriptObject obj = args[0] as ScriptObject;
+                ScriptObject obj = args[0];
                 if (obj is ScriptArray)
                     return m_script.CreateFunction(new ArrayVPairs(m_script, (ScriptArray)obj));
                 else if (obj is ScriptTable)
@@ -223,21 +223,21 @@ namespace Scorpio.Library
         }
         private class type : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                return ((ScriptObject)args[0]).Type;
+                return args[0].Type;
             }
         }
         private class branchtype : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                return ((ScriptObject)args[0]).BranchType;
+                return args[0].BranchType;
             }
         }
         private class userdatatype : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 return ((ScriptUserdata)args[0]).ValueType;
             }
@@ -249,10 +249,10 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                ScriptObject obj = args[0] as ScriptObject;
-                if (obj is ScriptNumber || obj is ScriptString || obj.IsEnum)
+                ScriptObject obj = args[0];
+                if (obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum)
                     return m_script.CreateNumber(Util.ToDouble(obj.ObjectValue));
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Number类型");
             }
@@ -264,10 +264,10 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                ScriptObject obj = args[0] as ScriptObject;
-                if (obj is ScriptNumber || obj is ScriptString || obj.IsEnum)
+                ScriptObject obj = args[0];
+                if (obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum)
                     return m_script.CreateNumber(Util.ToInt64(obj.ObjectValue));
                 throw new ExecutionException("不能从类型 " + obj.Type + " 转换成Long类型");
             }
@@ -279,18 +279,18 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                ScriptObject obj = args[0] as ScriptObject;
+                ScriptObject obj = args[0];
                 if (obj is ScriptString) return obj;
                 return m_script.CreateString(obj.ToString());
             }
         }
         private class clone : ScorpioHandle
         {
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
-                return ((ScriptObject)args[0]).Clone();
+                return args[0].Clone();
             }
         }
         private class load_assembly : ScorpioHandle
@@ -300,7 +300,7 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 ScriptString str = args[0] as ScriptString;
                 if (str == null) throw new ExecutionException("load_assembly 参数必须是 string");
@@ -315,7 +315,7 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 try {
                     ScriptString str = args[0] as ScriptString;
@@ -332,7 +332,7 @@ namespace Scorpio.Library
             {
                 m_script = script;
             }
-            public object Call(object[] args)
+            public object Call(ScriptObject[] args)
             {
                 ScriptString str = args[0] as ScriptString;
                 if (str == null) throw new ExecutionException("import_type 参数必须是 string");
