@@ -82,6 +82,42 @@ namespace Scorpio.Runtime
                 return m_parent.ContainsVariable(name);
             return false;
         }
+        private int GetArrayMember(CodeMember member)
+        {
+            if (member.Type == MEMBER_TYPE.NUMBER) {
+                return member.MemberNumber;
+            } else if (member.Type == MEMBER_TYPE.OBJECT) {
+                ScriptObject mem = ResolveOperand(member.Member);
+                if (!(mem is ScriptNumber)) throw new ExecutionException("Array Element 错误的类型:" + mem.Type);
+                return ((ScriptNumber)mem).ToInt32();
+            } else {
+                throw new ExecutionException("Array Element 不接受string类型");
+            }
+        }
+        private object GetTableMember(CodeMember member)
+        {
+            if (member.Type == MEMBER_TYPE.NUMBER) {
+                return member.MemberNumberObject;
+            } else if (member.Type == MEMBER_TYPE.STRING) {
+                return member.MemberString;
+            } else {
+                ScriptObject mem = ResolveOperand(member.Member);
+                if (!(mem is ScriptString || mem is ScriptNumber)) throw new ExecutionException("Table Element 错误的类型:" + mem.Type);
+                return mem.ObjectValue;
+            }
+        }
+        private string GetUserdataMember(CodeMember member)
+        {
+            if (member.Type == MEMBER_TYPE.STRING) {
+                return member.MemberString;
+            } else if (member.Type == MEMBER_TYPE.OBJECT) {
+                ScriptObject mem = ResolveOperand(member.Member);
+                if (!(mem is ScriptString)) throw new ExecutionException("Userdata Element 错误的类型:" + mem.Type);
+                return ((ScriptString)mem).Value;
+            } else {
+                throw new ExecutionException("Userdata Element 不接受number类型");
+            }
+        }
         private ScriptObject GetVariable(CodeMember member)
         {
             ScriptObject ret = null;
@@ -91,41 +127,14 @@ namespace Scorpio.Runtime
                 ret = (obj == null ? m_script.GetValue(name) : obj);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
-                if (parent == null || parent is ScriptNull) throw new ExecutionException("GetVariable parent is null");
                 if (parent is ScriptArray) {
-                    if (member.Type == MEMBER_TYPE.NUMBER) {
-                        ret = parent.GetValue(member.MemberNumber);
-                    } else if (member.Type == MEMBER_TYPE.OBJECT) {
-                        ScriptNumber mem = ResolveOperand(member.Member) as ScriptNumber;
-                        if (mem == null) throw new ExecutionException("GetVariable Array Element is must a number");
-                        ret = parent.GetValue(mem.ToInt32());
-                    } else {
-                        throw new ExecutionException("GetVariable Array Element is must a number");
-                    }
+                    ret = parent.GetValue(GetArrayMember(member));
                 } else if (parent is ScriptTable) {
-                    if (member.Type == MEMBER_TYPE.NUMBER) {
-                        return parent.GetValue(member.MemberNumberObject);
-                    } else if (member.Type == MEMBER_TYPE.STRING) {
-                        return parent.GetValue(member.MemberString);
-                    } else if (member.Type == MEMBER_TYPE.OBJECT) {
-                        ScriptObject mem = ResolveOperand(member.Member);
-                        if (!(mem is ScriptString || mem is ScriptNumber)) throw new ExecutionException("GetVariable Table Element is must a string or number");
-                        ret = parent.GetValue(mem.ObjectValue);
-                    }
+                    ret = parent.GetValue(GetTableMember(member));
                 } else if (parent is ScriptUserdata) {
-                    if (member.Type == MEMBER_TYPE.NUMBER) {
-                        return parent.GetValue(member.MemberNumberObject);
-                    } else if (member.Type == MEMBER_TYPE.STRING) {
-                        return parent.GetValue(member.MemberString);
-                    } else if (member.Type == MEMBER_TYPE.OBJECT) {
-                        ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
-                        ret = parent.GetValue(mem.Value);
-                    } else {
-                        throw new ExecutionException("GetVariable Table Element is must a string");
-                    }
+                    ret = parent.GetValue(GetUserdataMember(member));
                 } else {
-                    throw new ExecutionException("GetVariable member parent is not table or array or userdata");
+                    throw new ExecutionException("Member Parent 错误的类型:" + parent.Type);
                 }
             }
             if (ret == null) throw new ExecutionException("GetVariable member is error");
@@ -145,41 +154,14 @@ namespace Scorpio.Runtime
                     m_script.SetObjectInternal(name, variable);
             } else {
                 ScriptObject parent = ResolveOperand(member.Parent);
-                if (parent == null || parent is ScriptNull) throw new ExecutionException("SetVariable parent is null");
                 if (parent is ScriptArray) {
-                    if (member.Type == MEMBER_TYPE.NUMBER) {
-                        parent.SetValue(member.MemberNumber, ResolveOperand(obj));
-                    } else if (member.Type == MEMBER_TYPE.OBJECT) {
-                        ScriptNumber mem = ResolveOperand(member.Member) as ScriptNumber;
-                        if (mem == null) throw new ExecutionException("SetVariable Array Element is must a number");
-                        parent.SetValue(mem.ToInt32(), ResolveOperand(obj));
-                    } else {
-                        throw new ExecutionException("SetVariable Array Element is must a number");
-                    }
+                    parent.SetValue(GetArrayMember(member), ResolveOperand(obj));
                 } else if (parent is ScriptTable) {
-                    if (member.Type == MEMBER_TYPE.NUMBER) {
-                        parent.SetValue(member.MemberNumberObject, ResolveOperand(obj));
-                    } else if (member.Type == MEMBER_TYPE.STRING) {
-                        parent.SetValue(member.MemberString, ResolveOperand(obj));
-                    } else if (member.Type == MEMBER_TYPE.OBJECT) {
-                        ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string or number");
-                        parent.SetValue(mem.Value, ResolveOperand(obj));
-                    }
+                    parent.SetValue(GetTableMember(member), ResolveOperand(obj));
                 } else if (parent is ScriptUserdata) {
-                    if (member.Type == MEMBER_TYPE.NUMBER) {
-                        parent.SetValue(member.MemberNumberObject, ResolveOperand(obj));
-                    } else if (member.Type == MEMBER_TYPE.STRING) {
-                        parent.SetValue(member.MemberString, ResolveOperand(obj));
-                    } else if (member.Type == MEMBER_TYPE.OBJECT) {
-                        ScriptString mem = ResolveOperand(member.Member) as ScriptString;
-                        if (mem == null) throw new ExecutionException("GetVariable Table Element is must a string");
-                        parent.SetValue(mem.Value, ResolveOperand(obj));
-                    } else {
-                        throw new ExecutionException("GetVariable Table Element is must a string");
-                    }
+                    parent.SetValue(GetUserdataMember(member), ResolveOperand(obj));
                 } else {
-                    throw new ExecutionException("SetVariable member parent is not table or array");
+                    throw new ExecutionException("Member Parent 错误的类型:" + parent.Type);
                 }
             }
         }

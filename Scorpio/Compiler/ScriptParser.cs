@@ -123,7 +123,7 @@ namespace Scorpio.Compiler
                 case TokenType.SemiColon:
                     break;
                 default:
-                    throw new ParserException("nonsupport syntax ", token);
+                    throw new ParserException("不支持的语法 ", token);
             }
         }
         //解析函数（全局函数或类函数）
@@ -314,7 +314,7 @@ namespace Scorpio.Compiler
                     } else if (token.Type == TokenType.AssignModulo) {
                         m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, member, new CodeOperator(GetObject(), member, TokenType.Modulo)));
                     } else {
-                        throw new ParserException("变量后缀不支持此操作符  ", token);
+                        throw new ParserException("变量后缀不支持此操作符  ", peek);
                     }
                 }
             } else if (member is CodeEval) {
@@ -415,7 +415,7 @@ namespace Scorpio.Compiler
                     ret = new CodeScriptObject(token.Lexeme);
                     break;
                 default:
-                    throw new ParserException("parse is error ", token);
+                    throw new ParserException("Object起始关键字错误 ", token);
             }
             ret.StackInfo = new StackInfo(m_strBreviary, token.SourceLine);
             ret = GetVariable(ret);
@@ -439,7 +439,7 @@ namespace Scorpio.Compiler
                     }
                 }
             } else if (calc != CALC.NONE) {
-                throw new ParserException("++ 或者 -- 只支持变量的操作");
+                throw new ParserException("++ 或者 -- 只支持变量的操作", token);
             }
             return ret;
         }
@@ -462,7 +462,7 @@ namespace Scorpio.Compiler
                         else if (obj.IsString)
                             ret = new CodeMember(((ScriptString)obj).Value, ret);
                         else
-                            throw new ParserException("获取变量只能是 number或string");
+                            throw new ParserException("获取变量只能是 number或string", m);
                     } else {
                          ret = new CodeMember(member, ret);
                     }

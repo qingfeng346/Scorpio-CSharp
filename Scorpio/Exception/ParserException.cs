@@ -10,7 +10,7 @@ namespace Scorpio.Exception
     {
         public ParserException(String strMessage) : base(strMessage) { }
         public ParserException(String strMessage, Token token)
-            : base(" Line:" + token.SourceLine + "  Column:" + token.SourceChar + "  value[" + token.Lexeme.ToString() + "]    " + strMessage) 
+            : base(" Line:" + token.SourceLine + "  Column:" + token.SourceChar + "  Type:" + token.Type + "  value[" + token.Lexeme.ToString() + "]    " + strMessage) 
         { }
     }
 }

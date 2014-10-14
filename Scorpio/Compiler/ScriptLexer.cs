@@ -8,7 +8,6 @@ namespace Scorpio.Compiler
     /// <summary> 脚本语法解析 </summary>
     public partial class ScriptLexer
     {
-
         private LexState m_lexState;                //当前解析状态
         private String m_strToken = null;           //字符串token
         private int m_iSourceLine;                  //当前解析行数
@@ -409,7 +408,7 @@ namespace Scorpio.Compiler
                             if (tokenType == TokenType.Boolean) {
                                 m_listTokens.Add(new Token(tokenType, m_strToken == "true", m_iSourceLine, m_iSourceChar));
                             } else if (tokenType == TokenType.Null) {
-                                m_listTokens.Add(new Token(tokenType, ScriptNull.Instance, m_iSourceLine, m_iSourceChar));
+                                m_listTokens.Add(new Token(tokenType, null, m_iSourceLine, m_iSourceChar));
                             } else {
                                 m_listTokens.Add(new Token(tokenType, m_strToken, m_iSourceLine, m_iSourceChar));
                             }
