@@ -48,7 +48,7 @@ namespace Scorpio.Library
         public static void Load(Script script)
         {
             script.SetObjectInternal("print", script.CreateFunction(new print()));
-            script.SetObjectInternal("pair", script.CreateFunction(new pair(script)));
+            script.SetObjectInternal("pairs", script.CreateFunction(new pairs(script)));
             script.SetObjectInternal("type", script.CreateFunction(new type()));
             script.SetObjectInternal("branchtype", script.CreateFunction(new branchtype()));
             script.SetObjectInternal("typeof", script.CreateFunction(new userdatatype()));
@@ -60,10 +60,10 @@ namespace Scorpio.Library
             script.SetObjectInternal("load_assembly_safe", script.CreateFunction(new load_assembly_safe(script)));
             script.SetObjectInternal("import_type", script.CreateFunction(new import_type(script)));
         }
-        private class pair : ScorpioHandle
+        private class pairs : ScorpioHandle
         {
             private Script m_script;
-            public pair(Script script)
+            public pairs(Script script)
             {
                 m_script = script;
             }
