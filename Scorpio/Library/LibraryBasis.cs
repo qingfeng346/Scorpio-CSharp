@@ -9,39 +9,135 @@ namespace Scorpio.Library
 {
     public class LibraryBasis
     {
-        private class ArrayPair : ScorpioHandle
+        private class ArrayPairs : ScorpioHandle
         {
-            List<ScriptObject>.Enumerator m_ListEnumerator;
-            public ArrayPair(ScriptObject obj)
+            Script m_Script;
+            List<ScriptObject>.Enumerator m_Enumerator;
+            int m_Index = 0;
+            ScriptTable m_Table;
+            public ArrayPairs(Script script, ScriptArray obj)
             {
-                m_ListEnumerator = ((ScriptArray)obj).GetIterator();
+                m_Script = script;
+                m_Index = 0;
+                m_Table = m_Script.CreateTable();
+                m_Enumerator = obj.GetIterator();
             }
             public object Call(object[] args)
             {
-                if (m_ListEnumerator.MoveNext())
-                    return m_ListEnumerator.Current;
+                if (m_Enumerator.MoveNext())
+                {
+                    m_Table.SetValue("key", m_Script.CreateObject(m_Index++));
+                    m_Table.SetValue("value", m_Enumerator.Current);
+                    return m_Table;
+                }
                 return null;
             }
         }
-        private class TablePair : ScorpioHandle
+        private class ArrayKPairs : ScorpioHandle
         {
             Script m_Script;
-            TableDictionary.Enumerator m_TableEnumerator;
-            public TablePair(Script script, ScriptObject obj)
+            List<ScriptObject>.Enumerator m_Enumerator;
+            int m_Index = 0;
+            public ArrayKPairs(Script script, ScriptArray obj)
             {
                 m_Script = script;
-                m_TableEnumerator = ((ScriptTable)obj).GetIterator();
+                m_Index = 0;
+                m_Enumerator = obj.GetIterator();
             }
             public object Call(object[] args)
             {
-                if (m_TableEnumerator.MoveNext())
+                if (m_Enumerator.MoveNext())
+                    return m_Index++;
+                return null;
+            }
+        }
+        private class ArrayVPairs : ScorpioHandle
+        {
+            Script m_Script;
+            List<ScriptObject>.Enumerator m_Enumerator;
+            public ArrayVPairs(Script script, ScriptArray obj)
+            {
+                m_Script = script;
+                m_Enumerator = obj.GetIterator();
+            }
+            public object Call(object[] args)
+            {
+                if (m_Enumerator.MoveNext())
+                    return m_Enumerator.Current;
+                return null;
+            }
+        }
+        private class TablePairs : ScorpioHandle
+        {
+            Script m_Script;
+            TableDictionary.Enumerator m_Enumerator;
+            ScriptTable m_Table;
+            public TablePairs(Script script, ScriptTable obj)
+            {
+                m_Script = script;
+                m_Table = m_Script.CreateTable();
+                m_Enumerator = obj.GetIterator();
+            }
+            public object Call(object[] args)
+            {
+                if (m_Enumerator.MoveNext())
                 {
-                    KeyValuePair<object, ScriptObject> v = m_TableEnumerator.Current;
-                    ScriptTable table = m_Script.CreateTable();
-                    table.SetValue("key", m_Script.CreateObject(v.Key));
-                    table.SetValue("value", v.Value);
-                    return table;
+                    KeyValuePair<object, ScriptObject> v = m_Enumerator.Current;
+                    m_Table.SetValue("key", m_Script.CreateObject(v.Key));
+                    m_Table.SetValue("value", v.Value);
+                    return m_Table;
                 }
+                return null;
+            }
+        }
+        private class TableKPairs : ScorpioHandle
+        {
+            Script m_Script;
+            TableDictionary.Enumerator m_Enumerator;
+            public TableKPairs(Script script, ScriptTable obj)
+            {
+                m_Script = script;
+                m_Enumerator = obj.GetIterator();
+            }
+            public object Call(object[] args)
+            {
+                if (m_Enumerator.MoveNext())
+                    return m_Enumerator.Current.Key;
+                return null;
+            }
+        }
+        private class TableVPairs : ScorpioHandle
+        {
+            Script m_Script;
+            TableDictionary.Enumerator m_Enumerator;
+            public TableVPairs(Script script, ScriptTable obj)
+            {
+                m_Script = script;
+                m_Enumerator = obj.GetIterator();
+            }
+            public object Call(object[] args)
+            {
+                if (m_Enumerator.MoveNext())
+                    return m_Enumerator.Current.Value;
+                return null;
+            }
+        }
+        private class UserdataPairs : ScorpioHandle
+        {
+            Script m_Script;
+            System.Collections.IEnumerator m_Enumerator;
+            public UserdataPairs(Script script, ScriptUserdata obj)
+            {
+                m_Script = script;
+                object value = obj.Value;
+                System.Collections.IEnumerable ienumerable = value as System.Collections.IEnumerable;
+                if (ienumerable == null) throw new ExecutionException("pairs 只支持继承 IEnumerable 的类");
+                m_Enumerator = ienumerable.GetEnumerator();
+            }
+            public object Call(object[] args)
+            {
+                if (m_Enumerator.MoveNext())
+                    return m_Enumerator.Current;
                 return null;
             }
         }
@@ -49,6 +145,8 @@ namespace Scorpio.Library
         {
             script.SetObjectInternal("print", script.CreateFunction(new print()));
             script.SetObjectInternal("pairs", script.CreateFunction(new pairs(script)));
+            script.SetObjectInternal("kpairs", script.CreateFunction(new kpairs(script)));
+            script.SetObjectInternal("vpairs", script.CreateFunction(new vpairs(script)));
             script.SetObjectInternal("type", script.CreateFunction(new type()));
             script.SetObjectInternal("branchtype", script.CreateFunction(new branchtype()));
             script.SetObjectInternal("typeof", script.CreateFunction(new userdatatype()));
@@ -59,6 +157,16 @@ namespace Scorpio.Library
             script.SetObjectInternal("load_assembly", script.CreateFunction(new load_assembly(script)));
             script.SetObjectInternal("load_assembly_safe", script.CreateFunction(new load_assembly_safe(script)));
             script.SetObjectInternal("import_type", script.CreateFunction(new import_type(script)));
+        }
+        private class print : ScorpioHandle
+        {
+            public object Call(object[] args)
+            {
+                for (int i = 0; i < args.Length; ++i) {
+                    Console.WriteLine(args[i].ToString());
+                }
+                return null;
+            }
         }
         private class pairs : ScorpioHandle
         {
@@ -71,20 +179,46 @@ namespace Scorpio.Library
             {
                 ScriptObject obj = args[0] as ScriptObject;
                 if (obj is ScriptArray)
-                    return m_script.CreateFunction(new ArrayPair(obj));
+                    return m_script.CreateFunction(new ArrayPairs(m_script, (ScriptArray)obj));
                 else if (obj is ScriptTable)
-                    return m_script.CreateFunction(new TablePair(m_script, obj));
+                    return m_script.CreateFunction(new TablePairs(m_script, (ScriptTable)obj));
+                else if (obj is ScriptUserdata)
+                    return m_script.CreateFunction(new UserdataPairs(m_script, (ScriptUserdata)obj));
                 throw new ExecutionException("pair必须用语table或array类型");
             }
         }
-        private class print : ScorpioHandle
+        private class kpairs : ScorpioHandle
         {
+            private Script m_script;
+            public kpairs(Script script)
+            {
+                m_script = script;
+            }
             public object Call(object[] args)
             {
-                for (int i = 0; i < args.Length; ++i) {
-                    Console.WriteLine(args[i].ToString());
-                }
-                return null;
+                ScriptObject obj = args[0] as ScriptObject;
+                if (obj is ScriptArray)
+                    return m_script.CreateFunction(new ArrayKPairs(m_script, (ScriptArray)obj));
+                else if (obj is ScriptTable)
+                    return m_script.CreateFunction(new TableKPairs(m_script, (ScriptTable)obj));
+                throw new ExecutionException("pair必须用语table或array类型");
+            }
+        }
+        private class vpairs : ScorpioHandle
+        {
+            private Script m_script;
+            public vpairs(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(object[] args)
+            {
+                ScriptObject obj = args[0] as ScriptObject;
+                if (obj is ScriptArray)
+                    return m_script.CreateFunction(new ArrayVPairs(m_script, (ScriptArray)obj));
+                else if (obj is ScriptTable)
+                    return m_script.CreateFunction(new TableVPairs(m_script, (ScriptTable)obj));
+                throw new ExecutionException("pair必须用语table或array类型");
             }
         }
         private class type : ScorpioHandle
