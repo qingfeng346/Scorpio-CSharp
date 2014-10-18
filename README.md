@@ -21,7 +21,8 @@
             print(b)  
         }  
         Hello.t = Hello.Test(test)  
-        Hello.t(100,200)  
+        Hello.t(100,200)
+        
 ## v0.0.2beta (2014-10-13) ##
 -----------
 * 修复已知BUG
