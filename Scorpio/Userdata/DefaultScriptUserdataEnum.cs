@@ -7,10 +7,10 @@ namespace Scorpio.Userdata
     public class DefaultScriptUserdataEnum : ScriptUserdata
     {
         private Dictionary<string, ScriptEnum> m_Enums;                 //如果是枚举的话 所有枚举的值
-        public DefaultScriptUserdataEnum(Script script, object value) : base(script)
+        public DefaultScriptUserdataEnum(Script script, Type value) : base(script)
         {
             this.Value = value;
-            this.ValueType = (Value is Type) ? (Type)value : value.GetType();
+            this.ValueType = value;
             m_Enums = new Dictionary<string, ScriptEnum>();
             Array values = Enum.GetValues(ValueType);
             foreach (var v in values) {

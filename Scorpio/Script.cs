@@ -15,6 +15,7 @@ namespace Scorpio
     //脚本类
     public class Script
     {
+        public const string DynamicDelegateName = "__DynamicDelegate__";
         public const string Version = "0.0.1beta";
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         private const string GLOBAL_TABLE = "_G";               //全局table
@@ -132,8 +133,6 @@ namespace Scorpio
                 return CreateFunction((ScorpioFunction)value);
             else if (value is ScorpioHandle)
                 return CreateFunction((ScorpioHandle)value);
-            else if (value is Delegate)
-                return CreateFunction((Delegate)value);
             else if (value is ScorpioMethod)
                 return CreateFunction((ScorpioMethod)value);
             else if (Util.IsBoolObject(value))
@@ -191,10 +190,6 @@ namespace Scorpio
             return new ScriptFunction(this, value);
         }
         public ScriptFunction CreateFunction(ScorpioHandle value)
-        {
-            return new ScriptFunction(this, value);
-        }
-        public ScriptFunction CreateFunction(Delegate value)
         {
             return new ScriptFunction(this, value);
         }

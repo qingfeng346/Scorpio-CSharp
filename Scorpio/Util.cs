@@ -9,8 +9,10 @@ namespace Scorpio
 {
     public static class Util
     {
+        private static readonly Type TYPE_VOID = typeof(void);
         private static readonly Type TYPE_OBJECT = typeof(object);
         private static readonly Type TYPE_TYPE = typeof(Type);
+        private static readonly Type TYPE_DELEGATE = typeof(Delegate);
         private static readonly Type TYPE_BOOL = typeof(bool);
         private static readonly Type TYPE_STRING = typeof(string);
         private static readonly Type TYPE_SBYTE = typeof(sbyte);
@@ -59,6 +61,14 @@ namespace Scorpio
         public static bool IsEnum(Type type)
         {
             return type.IsEnum;
+        }
+        public static bool IsDelegate(Type type)
+        {
+            return TYPE_DELEGATE.IsAssignableFrom(type);
+        }
+        public static bool IsVoid(Type type)
+        {
+            return type == TYPE_VOID;
         }
         public static bool IsType(Type type)
         {

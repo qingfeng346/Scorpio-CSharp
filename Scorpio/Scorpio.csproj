@@ -33,7 +33,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeDom\CodeArray.cs" />
@@ -53,8 +52,6 @@
     <Compile Include="CodeDom\CodeWhile.cs" />
     <Compile Include="CodeDom\Temp\TempCondition.cs" />
     <Compile Include="CodeDom\Temp\TempOperator.cs" />
-    <Compile Include="Collections\ReadOnlyDictionary.cs" />
-    <Compile Include="Collections\ReadOnlyICollection.cs" />
     <Compile Include="Collections\TableDictionary.cs" />
     <Compile Include="Collections\VariableDictionary.cs" />
     <Compile Include="Compiler\ScriptLexer.cs" />
@@ -65,6 +62,8 @@
     <Compile Include="Compiler\TokenType.cs" />
     <Compile Include="Exception\StackInfo.cs" />
     <Compile Include="ScriptEnum.cs" />
+    <Compile Include="Userdata\DefaultScriptUserdataDelegate.cs" />
+    <Compile Include="Userdata\DefaultScriptUserdataDelegateType.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataObject.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataEnum.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataFactory.cs" />
@@ -93,7 +92,6 @@
     <Compile Include="ScriptTable.cs" />
     <Compile Include="ScriptUserdata.cs" />
     <Compile Include="Util.cs" />
-    <Compile Include="Variable\ScorpioDelegate.cs" />
     <Compile Include="Variable\ScorpioMethod.cs" />
     <Compile Include="Variable\ScorpioScriptFunction.cs" />
     <Compile Include="Variable\ScriptNumberDouble.cs" />

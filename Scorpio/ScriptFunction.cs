@@ -22,8 +22,6 @@ namespace Scorpio
         Function,
         //注册的C函数
         Handle,
-        //动态委托
-        Delegate,
         //函数
         Method,
     }
@@ -37,7 +35,6 @@ namespace Scorpio
         private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数
         private ScorpioFunction m_Function;                                     //程序函数指针
         private ScorpioHandle m_Handle;                                         //程序函数执行类
-        private ScorpioDelegate m_Delegate;                                     //程序函数动态委托
         private ScorpioMethod m_Method;                                         //程序函数
         private VariableDictionary m_stackObject = new VariableDictionary();    //函数变量
         public override ObjectType Type { get { return ObjectType.Function; } }
@@ -52,12 +49,6 @@ namespace Scorpio
         {
             this.m_Handle = handle;
             Initialize(strName, FunstionType.Handle);
-        }
-        public ScriptFunction(Script script, Delegate dele) : this(script, dele.Method.Name, dele) { }
-        public ScriptFunction(Script script, String strName, Delegate dele) : base(script)
-        {
-            this.m_Delegate = new ScorpioDelegate(dele);
-            Initialize(strName, FunstionType.Delegate);
         }
         public ScriptFunction(Script script, ScorpioMethod method) : this(script, method.MethodName, method) { }
         public ScriptFunction(Script script, String strName, ScorpioMethod method) : base(script)
@@ -108,8 +99,6 @@ namespace Scorpio
                     return Script.CreateObject(m_Function(parameters));
                 } else if (FunctionType == FunstionType.Handle) {
                     return Script.CreateObject(m_Handle.Call(parameters));
-                } else if (FunctionType == FunstionType.Delegate) {
-                    return Script.CreateObject(m_Delegate.Call(parameters));
                 } else if (FunctionType == FunstionType.Method) {
                     return Script.CreateObject(m_Method.Call(parameters));
                 }

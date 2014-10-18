@@ -8,8 +8,16 @@ namespace Scorpio.Userdata
     {
         public ScriptUserdata create(Script script, object obj)
         {
-            if (obj is Type && ((Type)obj).IsEnum)
-                return new DefaultScriptUserdataEnum(script, obj);
+            Type type = obj as Type;
+            if (type != null)
+            {
+                if (Util.IsEnum(type))
+                    return new DefaultScriptUserdataEnum(script, type);
+                else if (Util.IsDelegate(type))
+                    return new DefaultScriptUserdataDelegateType(script, type);
+            }
+            if (obj is Delegate)
+                return new DefaultScriptUserdataDelegate(script, (Delegate)obj);
             return new DefaultScriptUserdataObject(script, obj);
         }
     }
