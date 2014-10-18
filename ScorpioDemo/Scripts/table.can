@@ -3,6 +3,8 @@ a =
     a = 100,
     b = function ()
     {
+        //不能使用this 这种声明算静态函数
+        print(this == null)
         print("b")
     },
     function c()

@@ -1,12 +1,12 @@
 var arr = [100,200,300,400]
 print(array.count(arr))
-foreach ( p in pair(arr)) 
+foreach ( p in pairs(arr)) 
 {
     print(p)
 }
 var tab = {a = 100, b = 200, c = 300, d = 400}
 print(table.count(tab))
-foreach ( p in pair(tab))
+foreach ( p in pairs(tab))
 {
     print(p.key + " = " + p.value)
 }
