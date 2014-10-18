@@ -52,10 +52,10 @@ namespace CancerDemo
         }
         private object print(object[] Parameters)
         {
-            for (int i = 0; i < Parameters.Length;++i ) {
+            for (int i = 0; i < Parameters.Length; ++i) {
                 ScriptOutPut(Parameters[i].ToString());
             }
-            return 100;
+            return null;
         }
         private void BuildOutPut(string message)
         {
