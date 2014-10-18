@@ -5,6 +5,23 @@
 
 ## ps: 此脚本本来是用作Unity热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 后续正在移植到java
 
+## v0.0.3beta (2014-10-18) ##
+* 增加对Delegate动态委托的支持  
+        示例：  
+        c# :  
+        namespace Scropio { 
+            public class Hello {  
+                public delegate void Test(int a, int b);  
+                public static Test t;
+            }  
+        }  
+        script:  
+        function test(a,b) {   
+            print(a)  
+            print(b)  
+        }  
+        Hello.t = Hello.Test(test)  
+        Hello.t(100,200)  
 ## v0.0.2beta (2014-10-13) ##
 -----------
 * 修复已知BUG
