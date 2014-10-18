@@ -477,7 +477,9 @@ namespace Scorpio.Runtime
             ScriptObject left = ResolveOperand(operate.Left);
             if (type == TokenType.Plus) {
                 ScriptObject right = ResolveOperand(operate.Right);
-                if (left is ScriptString || right is ScriptString || (left is ScriptNumber && right is ScriptNumber)) {
+                if (left is ScriptString || right is ScriptString) {
+                    return m_script.CreateString(left.ToString() + right.ToString());
+                } else if (left is ScriptNumber && right is ScriptNumber){
                     return left.Plus(right);
                 } else {
                     throw new ExecutionException("operate [+] left right is not same type");

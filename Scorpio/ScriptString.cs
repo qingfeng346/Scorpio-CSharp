@@ -14,10 +14,6 @@ namespace Scorpio
         {
             return Script.CreateString(Value);
         }
-        public override ScriptObject Plus(ScriptObject obj)
-        {
-            return Script.CreateString(Value + obj.ToString());
-        }
         public override ScriptObject Clone()
         {
             return Script.CreateString(Value);
