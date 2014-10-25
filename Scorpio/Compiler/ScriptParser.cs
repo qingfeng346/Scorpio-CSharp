@@ -73,11 +73,20 @@ namespace Scorpio.Compiler
             switch (token.Type)
             {
                 case TokenType.Var:
-                    string str = ReadIdentifier();
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, str));
-                    if (PeekToken().Type == TokenType.Assign) {
-                        UndoToken();
-                        ParseStatement();
+                    {
+                        string str = ReadIdentifier();
+                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, str));
+                        Token peek = PeekToken();
+                        if (peek.Type == TokenType.Assign) {
+                            UndoToken();
+                            ParseStatement();
+                        } else if (peek.Type == TokenType.Comma) {
+                            while (PeekToken().Type == TokenType.Comma)
+                            {
+                                ReadToken();
+                                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, ReadIdentifier()));
+                            }
+                        }
                     }
                     break;
                 case TokenType.LeftBrace:
@@ -96,13 +105,15 @@ namespace Scorpio.Compiler
                     ParseWhile();
                     break;
                 case TokenType.Return:
-                    Token peek = PeekToken();
-                    if (peek.Type == TokenType.RightBrace || 
-                        peek.Type == TokenType.SemiColon ||
-                        peek.Type == TokenType.Finished)
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(null)));
-                    else
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
+                    {
+                        Token peek = PeekToken();
+                        if (peek.Type == TokenType.RightBrace ||
+                            peek.Type == TokenType.SemiColon ||
+                            peek.Type == TokenType.Finished)
+                            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(null)));
+                        else
+                            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
+                    }
                     break;
                 case TokenType.Identifier:
                 case TokenType.Increment:
@@ -132,20 +143,17 @@ namespace Scorpio.Compiler
             if (m_scriptExecutable.Block == Executable_Block.Context)
             {
                 UndoToken();
-                ScriptFunction func = ParseFunctionDeclaration();
+                ScriptFunction func = ParseFunctionDeclaration(true);
                 m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func)));
             }
         }
         //解析函数（返回一个函数）
-        private ScriptFunction ParseFunctionDeclaration()
+        private ScriptFunction ParseFunctionDeclaration(bool needName)
         {
             Token token = ReadToken();
             if (token.Type != TokenType.Function)
                 throw new ParserException("Function declaration must start with the 'function' keyword.", token);
-            String strFunctionName = "";
-            Token identifierToken = PeekToken();
-            if (identifierToken.Type == TokenType.Identifier)
-                strFunctionName = ReadIdentifier();
+            String strFunctionName = needName ? ReadIdentifier() : "";
             ReadLeftParenthesis();
             List<String> listParameters = new List<String>();
             bool bParams = false;
@@ -297,28 +305,12 @@ namespace Scorpio.Compiler
             if (member is CodeCallFunction) {
                 m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FUNCTION, member));
             } else if (member is CodeMember) {
-                if (((CodeMember)member).Calc != CALC.NONE) {
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALC, member));
-                } else {
-                    Token token = ReadToken();
-                    if (token.Type == TokenType.Assign) {
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, member, GetObject()));
-                    } else if (token.Type == TokenType.AssignPlus) {
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, member, new CodeOperator(GetObject(), member, TokenType.Plus)));
-                    } else if (token.Type == TokenType.AssignMinus) {
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, member, new CodeOperator(GetObject(), member, TokenType.Minus)));
-                    } else if (token.Type == TokenType.AssignMultiply) {
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, member, new CodeOperator(GetObject(), member, TokenType.Multiply)));
-                    } else if (token.Type == TokenType.AssignDivide) {
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, member, new CodeOperator(GetObject(), member, TokenType.Divide)));
-                    } else if (token.Type == TokenType.AssignModulo) {
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, member, new CodeOperator(GetObject(), member, TokenType.Modulo)));
-                    } else {
-                        throw new ParserException("变量后缀不支持此操作符  ", peek);
-                    }
-                }
-            } else if (member is CodeEval) {
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.EVAL, member));
+                if ((member as CodeMember).Calc != CALC.NONE)
+                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RESOLVE, member));
+                else
+                    throw new ParserException("变量后缀不支持此操作符  " + PeekToken().Type, peek);
+            } else if (member is CodeAssign || member is CodeEval) {
+                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RESOLVE, member));
             } else {
                 throw new ParserException("语法不支持起始符号为 " + member.GetType(), peek);
             }
@@ -342,7 +334,29 @@ namespace Scorpio.Compiler
                 CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator);
                 objectStack.Push(binexp);
             }
-            return objectStack.Pop();
+            CodeObject ret = objectStack.Pop();
+            if (ret is CodeMember)
+            {
+                CodeMember member = ret as CodeMember;
+                if (member.Calc == CALC.NONE)
+                {
+                    Token token = ReadToken();
+                    switch (token.Type)
+                    {
+                        case TokenType.Assign:
+                        case TokenType.AssignPlus:
+                        case TokenType.AssignMinus:
+                        case TokenType.AssignMultiply:
+                        case TokenType.AssignDivide:
+                        case TokenType.AssignModulo:
+                            return new CodeAssign(member, GetObject(), token.Type);
+                        default:
+                            UndoToken();
+                            break;
+                    }
+                }
+            }
+            return ret;
         }
         //解析操作符
         private bool P_Operator(Stack<TempOperator> operateStack, Stack<CodeObject> objectStack)
@@ -391,7 +405,7 @@ namespace Scorpio.Compiler
                     break;
                 case TokenType.Function:
                     UndoToken();
-                    ret = new CodeFunction(ParseFunctionDeclaration());
+                    ret = new CodeFunction(ParseFunctionDeclaration(false));
                     break;
                 case TokenType.LeftPar:
                     ret = GetObject();
@@ -556,9 +570,7 @@ namespace Scorpio.Compiler
                     }
                 } else if (token.Type == TokenType.Function) {
                     UndoToken();
-                    ScriptFunction func = ParseFunctionDeclaration();
-                    if (Util.IsNullOrEmpty(func.Name)) throw new ParserException("Table内部函数名称 不能为空", token);
-                    ret.Functions.Add(func);
+                    ret.Functions.Add(ParseFunctionDeclaration(true));
                 } else {
                     throw new ParserException("Table开始关键字必须为 变量名称或者function关键字", token);
                 }

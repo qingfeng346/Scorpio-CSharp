@@ -48,25 +48,50 @@ namespace Scorpio.Variable
         {
             return Value;
         }
-        public override ScriptObject Plus(ScriptObject obj) 
+        public override ScriptObject Plus(ScriptNumber obj) 
         {
-            return Script.CreateDouble(Value + ((ScriptNumber)obj).ToDouble());
+            return Script.CreateDouble(Value + obj.ToDouble());
         }
-        public override ScriptObject Minus(ScriptObject obj)
+        public override ScriptObject Minus(ScriptNumber obj)
         {
-            return Script.CreateDouble(Value - ((ScriptNumber)obj).ToDouble());
+            return Script.CreateDouble(Value - obj.ToDouble());
         }
-        public override ScriptObject Multiply(ScriptObject obj)
+        public override ScriptObject Multiply(ScriptNumber obj)
         {
-            return Script.CreateDouble(Value * ((ScriptNumber)obj).ToDouble());
+            return Script.CreateDouble(Value * obj.ToDouble());
         }
-        public override ScriptObject Divide(ScriptObject obj)
+        public override ScriptObject Divide(ScriptNumber obj)
         {
-            return Script.CreateDouble(Value / ((ScriptNumber)obj).ToDouble());
+            return Script.CreateDouble(Value / obj.ToDouble());
         }
-        public override ScriptObject Modulo(ScriptObject obj)
+        public override ScriptObject Modulo(ScriptNumber obj)
         {
-            return Script.CreateDouble(Value % ((ScriptNumber)obj).ToDouble());
+            return Script.CreateDouble(Value % obj.ToDouble());
+        }
+        public override ScriptObject AssignPlus(ScriptNumber obj)
+        {
+            Value += obj.ToDouble();
+            return this;
+        }
+        public override ScriptObject AssignMinus(ScriptNumber obj)
+        {
+            Value -= obj.ToDouble();
+            return this;
+        }
+        public override ScriptObject AssignMultiply(ScriptNumber obj)
+        {
+            Value *= obj.ToDouble();
+            return this;
+        }
+        public override ScriptObject AssignDivide(ScriptNumber obj)
+        {
+            Value /= obj.ToDouble();
+            return this;
+        }
+        public override ScriptObject AssignModulo(ScriptNumber obj)
+        {
+            Value %= obj.ToDouble();
+            return this;
         }
         public override bool Compare(TokenType type, CodeOperator oper, ScriptNumber num)
         {

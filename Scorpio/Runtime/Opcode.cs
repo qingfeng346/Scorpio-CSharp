@@ -7,7 +7,7 @@ namespace Scorpio.Runtime
     //指令类型
     public enum Opcode
     {
-        /// <summary> 复制操作 </summary>
+        /// <summary> 赋值操作 </summary>
         MOV,
         /// <summary> 申请一个局部变量 </summary>
         VAR,
@@ -25,10 +25,8 @@ namespace Scorpio.Runtime
         CALL_WHILE,
         /// <summary> 调用一个函数 </summary>
         CALL_FUNCTION,
-        /// <summary> 递增递减变量 ++或-- </summary>
-        CALC,
-        /// <summary> 执行一段字符串 </summary>
-        EVAL,
+        /// <summary> 解析一个变量 </summary>
+        RESOLVE,
         /// <summary> 返回值 </summary>
         RET,
         /// <summary> break跳出 for foreach while </summary>
