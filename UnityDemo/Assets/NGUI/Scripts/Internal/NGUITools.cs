@@ -775,7 +775,7 @@ static public class NGUITools
 
 		if (File.Exists(path))
 		{
-			return File.ReadAllBytes(path);
+			//return File.ReadAllBytes(path);
 		}
 		return null;
 #endif
