@@ -188,7 +188,7 @@ namespace Scorpio
         {
             return Convert.ToInt64(value);
         }
-        public static object ToEnum(Type type, int number)
+        public static object ToEnum(Type type, object number)
 	    {
             return Enum.ToObject(type, number);
 	    }
