@@ -1,6 +1,4 @@
-load_assembly("System")
-load_assembly("UnityEngine")
-load_assembly("Assembly-CSharp")
+
 
 GameObject = import_type("UnityEngine.GameObject")
 Color = import_type("UnityEngine.Color")

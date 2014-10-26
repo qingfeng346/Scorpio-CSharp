@@ -14,6 +14,9 @@ public class Launch : MonoBehaviour {
             Script script = new Script();
             Launch.Script = script;
             script.LoadLibrary();
+            script.PushAssembly(typeof(int).Assembly);
+            script.PushAssembly(typeof(GameObject).Assembly);
+            script.PushAssembly(GetType().Assembly);
             script.SetObject("print", new ScorpioFunction(Print));
             for (int i = 0; i < scripts.Count; ++i)
             {
