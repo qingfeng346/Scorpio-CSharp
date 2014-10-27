@@ -9,20 +9,20 @@
 ## v0.0.3beta (2014-10-18) ##
 * 增加对Delegate动态委托的支持  
         示例：  
-        ** c# :  
-        >namespace Scropio {  
-        >>    public class Hello {  
-        >>>        public delegate void Test(int a, int b);  
-        >>>        public static Test t;  
-        >>    }  
-        >}  
-        ** script:  
-        >function test(a,b) {   
-        >>    print(a)  
-        >>    print(b)  
-        >}  
-        >Hello.t = Hello.Test(test)  
-        >Hello.t(100,200)
+        ###c# :###
+        namespace Scropio {  
+            public class Hello {  
+                public delegate void Test(int a, int b);  
+                public static Test t;  
+            }  
+        }  
+        ###script:###
+        function test(a,b) {   
+            print(a)  
+            print(b)  
+        }  
+        Hello.t = Hello.Test(test)  
+        Hello.t(100,200)
         
 ## v0.0.2beta (2014-10-13) ##
 -----------
