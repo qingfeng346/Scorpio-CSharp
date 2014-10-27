@@ -11,10 +11,10 @@
         示例：  
     * c# :  
         namespace Scropio {  
-            public class Hello {  
-                public delegate void Test(int a, int b);  
-                public static Test t;  
-            }  
+        > public class Hello {  
+        >> public delegate void Test(int a, int b);  
+        >> public static Test t;  
+        > }  
         }  
     * script:  
         function test(a,b) {   
