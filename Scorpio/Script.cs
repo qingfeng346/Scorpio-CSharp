@@ -72,9 +72,12 @@ namespace Scorpio
         {
             for (int i = 0; i < m_Assembly.Count;++i )
             {
-                Type type = m_Assembly[i].GetType(str);
-                if (type != null)
-                    return CreateUserdata(type);
+                Type type = m_Assembly[i].GetType(str, false);
+                if (type != null) return CreateUserdata(type);
+            }
+            {
+                Type type = Type.GetType(str, false);
+                if (type != null) return CreateUserdata(type);
             }
             return ScriptNull.Instance;
         }
@@ -203,6 +206,8 @@ namespace Scorpio
             m_GlobalTable = CreateTable();
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
             m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
+            PushAssembly(typeof(int).Assembly);
+            PushAssembly(GetType().Assembly);
             LibraryBasis.Load(this);
             LibraryArray.Load(this);
             LibraryString.Load(this);
