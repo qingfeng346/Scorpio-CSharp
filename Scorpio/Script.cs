@@ -16,7 +16,7 @@ namespace Scorpio
     public class Script
     {
         public const string DynamicDelegateName = "__DynamicDelegate__";
-        public const string Version = "0.0.3beta";
+        public const string Version = "0.0.4beta";
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         private const string GLOBAL_TABLE = "_G";               //全局table
         private const string GLOBAL_VERSION = "_VERSION";       //版本号
