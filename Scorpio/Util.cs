@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
 using Scorpio.Collections;
 using System.IO;
 using Scorpio.Variable;
@@ -25,6 +26,7 @@ namespace Scorpio
         private static readonly Type TYPE_FLOAT = typeof(float);
         private static readonly Type TYPE_DOUBLE = typeof(double);
         private static readonly Type TYPE_DECIMAL = typeof(decimal);
+        private static readonly Type TYPE_PARAMATTRIBUTE = typeof(ParamArrayAttribute);
 
         public static void SetObject(TableDictionary variables, object key, ScriptObject obj)
         {
@@ -102,6 +104,11 @@ namespace Scorpio
         {
             return IsEnum(obj.GetType());
         }
+        public static bool IsParamArray(ParameterInfo info)
+        {
+            return info.IsDefined(TYPE_PARAMATTRIBUTE, false);
+        }
+
         public static object ChangeType(ScriptObject par, Type type)
         {
             if (type == TYPE_OBJECT) {
