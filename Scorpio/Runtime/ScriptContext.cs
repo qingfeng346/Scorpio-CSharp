@@ -521,8 +521,7 @@ namespace Scorpio.Runtime
                     }
                 } else {
                     ScriptObject right = ResolveOperand(operate.Right);
-                    if (left is ScriptNull || right is ScriptNull)
-                    {
+                    if (left is ScriptNull || right is ScriptNull) {
                         bool ret = false;
                         if (type == TokenType.Equal)
                             ret = (left == right);
@@ -532,17 +531,18 @@ namespace Scorpio.Runtime
                             throw new ExecutionException("nonsupport operate [" + type + "] with null");
                         return ret ? ScriptBoolean.True : ScriptBoolean.False;
                     }
+                    if (type == TokenType.Equal) {
+                        return left.ObjectValue.Equals(right.ObjectValue) ? ScriptBoolean.True : ScriptBoolean.False;
+                    } else if (type == TokenType.NotEqual) {
+                        return !left.ObjectValue.Equals(right.ObjectValue) ? ScriptBoolean.True : ScriptBoolean.False;
+                    }
                     if (left.Type != right.Type)
                         throw new ExecutionException("[operate] left right is not same type");
                     if (left is ScriptString) {
                         string str1 = ((ScriptString)left).Value;
                         string str2 = ((ScriptString)right).Value;
                         bool ret = false;
-                        if (type == TokenType.Equal)
-                            ret = str1 == str2;
-                        else if (type == TokenType.NotEqual)
-                            ret = str1 != str2;
-                        else if (type == TokenType.Greater)
+                        if (type == TokenType.Greater)
                             ret = string.Compare(str1, str2) < 0;
                         else if (type == TokenType.GreaterOrEqual)
                             ret = string.Compare(str1, str2) <= 0;
@@ -555,15 +555,8 @@ namespace Scorpio.Runtime
                         return ret ? ScriptBoolean.True : ScriptBoolean.False;
                     } else if (left is ScriptNumber) {
                         return ((ScriptNumber)left).Compare(type, operate, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
-                    } else if (left is ScriptEnum) {
-                        bool ret = false;
-                        if (type == TokenType.Equal)
-                            ret = (left.ObjectValue == right.ObjectValue);
-                        else if (type == TokenType.NotEqual)
-                            ret = (left.ObjectValue != right.ObjectValue);
-                        else
-                            throw new ExecutionException("nonsupport operate [" + type + "] with enum");
-                        return ret ? ScriptBoolean.True : ScriptBoolean.False;
+                    } else {
+                        throw new ExecutionException("nonsupport operate [" + type + "] with " + left.Type);
                     }
                 }
             }

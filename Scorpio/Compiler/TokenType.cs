@@ -184,6 +184,18 @@ namespace Scorpio.Compiler
         /// </summary>
         In,
         /// <summary>
+        /// switch
+        /// </summary>
+        Switch,
+        /// <summary>
+        /// case
+        /// </summary>
+        Case,
+        /// <summary>
+        /// default
+        /// </summary>
+        Default,
+        /// <summary>
         /// break
         /// </summary>
         Break,

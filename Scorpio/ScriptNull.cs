@@ -11,6 +11,7 @@ namespace Scorpio
         public static ScriptNull Instance { get { if (s_ScriptNull == null) s_ScriptNull = new ScriptNull(); return s_ScriptNull; } }
         public ScriptNull() : base(null) { }
         public override ObjectType Type { get { return ObjectType.Null; } }
+        public override object ObjectValue { get { return null; } }
         public override string ToString() { return "Null"; }
         public override bool Equals(object obj)
         {

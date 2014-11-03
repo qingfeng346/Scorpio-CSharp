@@ -384,6 +384,15 @@ namespace Scorpio.Compiler
                                 case "in":
                                     tokenType = TokenType.In;
                                     break;
+                                case "switch":
+                                    tokenType = TokenType.Switch;
+                                    break;
+                                case "case":
+                                    tokenType = TokenType.Case;
+                                    break;
+                                case "default":
+                                    tokenType = TokenType.Default;
+                                    break;
                                 case "continue":
                                     tokenType = TokenType.Continue;
                                     break;

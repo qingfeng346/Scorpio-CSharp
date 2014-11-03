@@ -106,7 +106,7 @@ namespace Scorpio
         {
             if (type == TYPE_OBJECT) {
                 if (par is ScriptNumber) {
-                    return Util.IsEnum(type) ? ToEnum(type, ((ScriptNumber)par).ToInt32()) : ChangeType(par.ObjectValue, type);
+                    return ChangeType_impl(par.ObjectValue, type);
                 } else {
                     return par.ObjectValue;
                 }
@@ -114,7 +114,9 @@ namespace Scorpio
                 if (type.IsAssignableFrom(par.GetType())) {
                     return par;
                 } else if (par is ScriptNumber) {
-                    return Util.IsEnum(type) ? ToEnum(type, ((ScriptNumber)par).ToInt32()) : ChangeType(par.ObjectValue, type);
+                    return Util.IsEnum(type) ? ToEnum(type, ((ScriptNumber)par).ToLong()) : ChangeType_impl(par.ObjectValue, type);
+                } else if (par is ScriptArray) {
+                    return ChangeType_impl(par as ScriptArray, type);
                 } else if (par is ScriptUserdata) {
                     if (Util.IsType(type))
                         return ((ScriptUserdata)par).ValueType;
@@ -148,6 +150,8 @@ namespace Scorpio
                     return true;
                 } else if (par is ScriptEnum && (par as ScriptEnum).EnumType == type) {
                     return true;
+                } else if (par is ScriptArray && type.IsArray) {
+                    return true;
                 } else if (par is ScriptUserdata) {
                     if (Util.IsType(type))
                         return true;
@@ -172,9 +176,19 @@ namespace Scorpio
         {
             return string.IsNullOrEmpty(str);
         }
-        public static object ChangeType(object value, Type conversionType)
+        public static object ChangeType_impl(object value, Type conversionType)
         {
             return Convert.ChangeType(value, conversionType);
+        }
+        public static object ChangeType_impl(ScriptArray value, Type conversionType)
+        {
+            int count = value.Count();
+            Type elementType = conversionType.GetElementType();
+            Array array = Array.CreateInstance(elementType, count);
+            for (int i = 0; i < count;++i ) {
+                array.SetValue(ChangeType(value.GetValue(i), elementType), i);
+            }
+            return array;
         }
         public static int ToInt32(object value)
         {

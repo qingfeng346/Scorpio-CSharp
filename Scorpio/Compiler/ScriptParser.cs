@@ -193,14 +193,25 @@ namespace Scorpio.Compiler
         {
             CodeIf ret = new CodeIf();
             ret.If = ParseCondition(true, Executable_Block.If);
-            Token token = PeekToken();
-            while (token.Type == TokenType.ElseIf)
+            for (; ; )
             {
-                ReadToken();
-                ret.AddElseIf(ParseCondition(true, Executable_Block.If));
-                token = PeekToken();
+                Token token = ReadToken();
+                if (token.Type == TokenType.ElseIf) {
+                    ret.AddElseIf(ParseCondition(true, Executable_Block.If));
+                } else if (token.Type == TokenType.Else) {
+                    if (PeekToken().Type == TokenType.If) {
+                        ReadToken();
+                        ret.AddElseIf(ParseCondition(true, Executable_Block.If));
+                    } else {
+                        UndoToken();
+                        break;
+                    }
+                } else {
+                    UndoToken();
+                    break;
+                }
             }
-            if (token.Type == TokenType.Else)
+            if (PeekToken().Type == TokenType.Else)
             {
                 ReadToken();
                 ret.Else = ParseCondition(false, Executable_Block.If);
@@ -234,24 +245,28 @@ namespace Scorpio.Compiler
                     Token comma = ReadToken();
                     if (comma.Type == TokenType.Comma)
                     {
-                        CodeForSimple ret = new CodeForSimple(m_script);
-                        ret.Identifier = (string)token.Lexeme;
-                        ret.Begin = obj;
-                        ret.Finished = GetObject();
-                        if (PeekToken().Type == TokenType.Comma) 
-                        {
-                            ReadToken();
-                            ret.Step = GetObject();
-                        }
-                        ReadRightParenthesis();
-                        ret.SetContextExecutable(ParseStatementBlock(Executable_Block.For));
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FORSIMPLE, ret));
+                        ParseFor_Simple((string)token.Lexeme, obj);
                         return;
                     }
                 }
             }
             m_iNextToken = partIndex;
             ParseFor_impl();
+        }
+        private void ParseFor_Simple(string Identifier, CodeObject obj)
+        {
+            CodeForSimple ret = new CodeForSimple(m_script);
+            ret.Identifier = Identifier;
+            ret.Begin = obj;
+            ret.Finished = GetObject();
+            if (PeekToken().Type == TokenType.Comma)
+            {
+                ReadToken();
+                ret.Step = GetObject();
+            }
+            ReadRightParenthesis();
+            ret.SetContextExecutable(ParseStatementBlock(Executable_Block.For));
+            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FORSIMPLE, ret));
         }
         private void ParseFor_impl()
         {
@@ -556,11 +571,10 @@ namespace Scorpio.Compiler
             while (PeekToken().Type != TokenType.RightBrace)
             {
                 Token token = ReadToken();
-                if (token.Type == TokenType.Identifier)
-                {
+                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.Number) {
                     Token next = ReadToken();
                     if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
-                        ret.Variables.Add(new TableVariable((string)token.Lexeme, GetObject()));
+                        ret.Variables.Add(new TableVariable(token.Lexeme, GetObject()));
                         Token peek = PeekToken();
                         if (peek.Type == TokenType.Comma || peek.Type == TokenType.SemiColon) {
                             ReadToken();

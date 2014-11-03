@@ -98,10 +98,6 @@ namespace Scorpio.Variable
             if (val == null) throw new ExecutionException("数字比较 两边的数字类型不一致 请先转换再比较 ");
             switch (type)
             {
-                case TokenType.Equal:
-                    return Value == val.Value;
-                case TokenType.NotEqual:
-                    return Value != val.Value;
                 case TokenType.Greater:
                     return Value > val.Value;
                 case TokenType.GreaterOrEqual:
