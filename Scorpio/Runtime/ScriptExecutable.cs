@@ -27,6 +27,8 @@ namespace Scorpio.Runtime
         Foreach,
         //while语句
         While,
+        //swtich语句
+        Switch,
     }
     //指令执行列表
     public class ScriptExecutable

@@ -216,6 +216,18 @@ namespace Scorpio.Compiler
         /// </summary>
         Function,
         /// <summary>
+        /// try
+        /// </summary>
+        Try,
+        /// <summary>
+        /// catch
+        /// </summary>
+        Catch,
+        /// <summary>
+        /// throw
+        /// </summary>
+        Throw,
+        /// <summary>
         /// bool true false
         /// </summary>
         Boolean,

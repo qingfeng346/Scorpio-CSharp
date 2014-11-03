@@ -104,6 +104,15 @@ namespace Scorpio.Compiler
                 case TokenType.While:
                     ParseWhile();
                     break;
+                case TokenType.Switch:
+                    ParseSwtich();
+                    break;
+                case TokenType.Try:
+                    ParseTry();
+                    break;
+                case TokenType.Throw:
+                    ParseThrow();
+                    break;
                 case TokenType.Return:
                     {
                         Token peek = PeekToken();
@@ -253,6 +262,7 @@ namespace Scorpio.Compiler
             m_iNextToken = partIndex;
             ParseFor_impl();
         }
+        //解析单纯for循环
         private void ParseFor_Simple(string Identifier, CodeObject obj)
         {
             CodeForSimple ret = new CodeForSimple(m_script);
@@ -268,6 +278,7 @@ namespace Scorpio.Compiler
             ret.SetContextExecutable(ParseStatementBlock(Executable_Block.For));
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FORSIMPLE, ret));
         }
+        //解析正规for循环
         private void ParseFor_impl()
         {
             CodeFor ret = new CodeFor(m_script);
@@ -302,7 +313,7 @@ namespace Scorpio.Compiler
             ReadIn();
             ret.LoopObject = GetObject();
             ReadRightParenthesis();
-            ret.Executable = ParseStatementBlock(Executable_Block.Foreach);
+            ret.Context = new ScriptContext(m_script, ParseStatementBlock(Executable_Block.Foreach), null, Executable_Block.Foreach);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FOREACH, ret));
         }
         //解析while（循环语句）
@@ -311,6 +322,72 @@ namespace Scorpio.Compiler
             CodeWhile ret = new CodeWhile();
             ret.While = ParseCondition(true, Executable_Block.While);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_WHILE, ret));
+        }
+        //解析swtich语句
+        private void ParseSwtich()
+        {
+            CodeSwitch ret = new CodeSwitch();
+            ReadLeftParenthesis();
+            ret.Condition = GetObject();
+            ReadRightParenthesis();
+            ReadLeftBrace();
+            for (; ; )
+            {
+                Token token = ReadToken();
+                if (token.Type == TokenType.Case) {
+                    List<object> vals = new List<object>();
+                    ParseCase(vals);
+                    ret.AddCase(new TempCase(m_script, vals, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break), Executable_Block.Switch));
+                } else if (token.Type == TokenType.Default) {
+                    ReadColon();
+                    ret.Default = new TempCase(m_script, null, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break), Executable_Block.Switch);
+                } else if (token.Type != TokenType.SemiColon) {
+                    UndoToken();
+                    break;
+                }
+            }
+            ReadRightBrace();
+            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_SWITCH, ret));
+        }
+        //解析case
+        private void ParseCase(List<object> vals)
+        {
+            Token val = ReadToken();
+            if (val.Type == TokenType.String || val.Type == TokenType.Number)
+                vals.Add(val.Lexeme);
+            else
+                throw new ParserException("case 语句 只支持 string和number类型");
+            ReadColon();
+            if (ReadToken().Type == TokenType.Case) {
+                ParseCase(vals);
+            } else {
+                UndoToken();
+            }
+        }
+        //解析try catch
+        private void ParseTry()
+        {
+            CodeTry ret = new CodeTry();
+            {
+                ScriptExecutable exec = ParseStatementBlock(Executable_Block.Context);
+                ret.TryContext = new ScriptContext(m_script, exec);
+            }
+            {
+                ReadCatch();
+                ReadLeftParenthesis();
+                ret.Identifier = ReadIdentifier();
+                ReadRightParenthesis();
+                ScriptExecutable exec = ParseStatementBlock(Executable_Block.Context);
+                ret.CatchContext = new ScriptContext(m_script, exec);
+            }
+            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_TRY, ret));
+        }
+        //解析throw
+        private void ParseThrow()
+        {
+            CodeThrow ret = new CodeThrow();
+            ret.obj = GetObject();
+            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.THROW, ret));
         }
         //解析表达式
         private void ParseExpression()

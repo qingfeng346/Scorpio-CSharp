@@ -9,6 +9,6 @@ namespace Scorpio.CodeDom
     {
         public string Identifier;
         public CodeObject LoopObject;
-        public ScriptExecutable Executable;
+        public ScriptContext Context;
     }
 }

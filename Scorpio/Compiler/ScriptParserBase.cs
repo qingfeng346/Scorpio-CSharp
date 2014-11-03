@@ -108,7 +108,14 @@ namespace Scorpio.Compiler
         {
             Token token = ReadToken();
             if (token.Type != TokenType.Colon)
-                throw new ParserException("Colon ';' expected.", token);
+                throw new ParserException("Colon ':' expected.", token);
+        }
+        /// <summary> 读取catch </summary>
+        private void ReadCatch()
+        {
+            Token token = ReadToken();
+            if (token.Type != TokenType.Catch)
+                throw new ParserException("Catch 'catch' expected.", token);
         }
     }
 }

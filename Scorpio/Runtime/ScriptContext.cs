@@ -40,8 +40,9 @@ namespace Scorpio.Runtime
             m_parent = parent;
             m_variableDictionary = variable;
         }
-        private void Initialize(string name, ScriptObject obj)
+        private void Initialize(ScriptContext parent, string name, ScriptObject obj)
         {
+            m_parent = parent;
             m_variableDictionary.Clear();
             m_variableDictionary.Add(name, obj);
         }
@@ -213,6 +214,9 @@ namespace Scorpio.Runtime
                 case Opcode.CALL_FORSIMPLE: ProcessCallForSimple(); break;
                 case Opcode.CALL_FOREACH: ProcessCallForeach(); break;
                 case Opcode.CALL_WHILE: ProcessCallWhile(); break;
+                case Opcode.CALL_SWITCH: ProcessCallSwitch(); break;
+                case Opcode.CALL_TRY: ProcessTry(); break;
+                case Opcode.THROW: ProcessThrow(); break;
             }
         }
         private bool SupportReturnValue()
@@ -295,15 +299,14 @@ namespace Scorpio.Runtime
             CodeForeach code = (CodeForeach)m_scriptInstruction.Operand0;
             ScriptObject loop = ResolveOperand(code.LoopObject);
             if (!loop.IsFunction) throw new ExecutionException("foreach函数必须返回一个ScriptFunction");
-            ScriptContext context = new ScriptContext(m_script, code.Executable, this, Executable_Block.Foreach);
             ScriptObject obj;
             for ( ; ; )
             {
                 obj = ((ScriptFunction)loop).Call();
                 if (obj == null || obj is ScriptNull) return;
-                context.Initialize(code.Identifier, obj);
-                context.Execute();
-                if (context.IsBreak) break;
+                code.Context.Initialize(this, code.Identifier, obj);
+                code.Context.Execute();
+                if (code.Context.IsBreak) break;
             }
         }
         void ProcessCallIf()
@@ -340,6 +343,49 @@ namespace Scorpio.Runtime
                 if (!ProcessCondition(condition, Executable_Block.While)) break;
                 if (condition.Context.IsBreak) break;
             }
+        }
+        void ProcessCallSwitch()
+        {
+            CodeSwitch code = (CodeSwitch)m_scriptInstruction.Operand0;
+            ScriptObject obj = ResolveOperand(code.Condition);
+            bool exec = false;
+            foreach (var c in code.Cases)
+            {
+                foreach (var a in c.Allow)
+                {
+                    if (a.Equals(obj.ObjectValue))
+                    {
+                        exec = true;
+                        c.Context.Initialize(this);
+                        c.Context.Execute();
+                        break;
+                    }
+                }
+            }
+            if (exec == false && code.Default != null)
+            {
+                code.Default.Context.Initialize(this);
+                code.Default.Context.Execute();
+            }
+        }
+        void ProcessTry()
+        {
+            CodeTry code = (CodeTry)m_scriptInstruction.Operand0;
+            try {
+                code.TryContext.Initialize(this);
+                code.TryContext.Execute();
+            } catch (InteriorException ex) {
+                code.CatchContext.Initialize(this, code.Identifier, ex.obj);
+                code.CatchContext.Execute();
+            } catch (System.Exception ex) {
+                code.CatchContext.Initialize(this, code.Identifier, m_script.CreateObject(ex));
+                code.CatchContext.Execute();
+            }
+        }
+        void ProcessThrow()
+        {
+            CodeThrow code = (CodeThrow)m_scriptInstruction.Operand0;
+            throw new InteriorException(ResolveOperand(code.obj));
         }
         void ProcessRet()
         {

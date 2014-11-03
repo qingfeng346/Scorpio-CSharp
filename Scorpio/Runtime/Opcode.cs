@@ -23,8 +23,14 @@ namespace Scorpio.Runtime
         CALL_FOREACH,
         /// <summary> 执行While语句 </summary>
         CALL_WHILE,
+        /// <summary> 执行switch语句 </summary>
+        CALL_SWITCH,
+        /// <summary> 执行try catch语句 </summary>
+        CALL_TRY,
         /// <summary> 调用一个函数 </summary>
         CALL_FUNCTION,
+        /// <summary> throw </summary>
+        THROW,
         /// <summary> 解析一个变量 </summary>
         RESOLVE,
         /// <summary> 返回值 </summary>
