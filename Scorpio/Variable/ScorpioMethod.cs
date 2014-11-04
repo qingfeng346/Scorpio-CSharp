@@ -36,45 +36,36 @@ namespace Scorpio.Variable
         {
             m_Object = obj;
             MethodName = methodName;
-            List<FunctionMethod> functionMethod = new List<FunctionMethod>();
+            List<MethodBase> methodBases = new List<MethodBase>();
             MethodInfo[] methods = type.GetMethods(Script.BindingFlag);
-            int length = methods.Length;
-            List<Type> parameters = new List<Type>();
-            bool Params = false;
-            Type ParamType = null;
-            for (int i = 0; i < length;++i ) {
-                MethodInfo method = methods[i];
-                if (method.Name.Equals(methodName)) {
-                    Params = false;
-                    ParamType = null;
-                    parameters.Clear();
-                    var pars = methods[i].GetParameters();
-                    foreach (var par in pars) {
-                        parameters.Add(par.ParameterType);
-                        Params = Util.IsParamArray(par);
-                        if (Params) ParamType = par.ParameterType.GetElementType();
-                    }
-                    functionMethod.Add(new FunctionMethod(method, parameters.ToArray(), ParamType, Params));
-                }
+            foreach (var method in methods) {
+                if (method.Name.Equals(methodName))
+                    methodBases.Add(method);
             }
-            m_Methods = functionMethod.ToArray();
-            m_Count = m_Methods.Length;
+            Initialize(methodBases);
         }
-        public ScorpioMethod(string typeName, ConstructorInfo[] methods)
+        public ScorpioMethod(string typeName, ConstructorInfo[] cons)
         {
+            m_Object = null;
             MethodName = typeName;
+            List<MethodBase> methods = new List<MethodBase>();
+            methods.AddRange(cons);
+            Initialize(methods);
+        }
+        private void Initialize(List<MethodBase> methods)
+        {
             List<FunctionMethod> functionMethod = new List<FunctionMethod>();
-            int length = methods.Length;
-            List<Type> parameters = new List<Type>();
             bool Params = false;
             Type ParamType = null;
-            for (int i = 0; i < length; ++i)
-            {
+            MethodBase method = null;
+            List<Type> parameters = new List<Type>();
+            int length = methods.Count;
+            for (int i = 0; i < length; ++i) {
                 Params = false;
                 ParamType = null;
-                var method = methods[i];
                 parameters.Clear();
-                var pars = methods[i].GetParameters();
+                method = methods[i];
+                var pars = method.GetParameters();
                 foreach (var par in pars) {
                     parameters.Add(par.ParameterType);
                     Params = Util.IsParamArray(par);
@@ -93,8 +84,7 @@ namespace Scorpio.Variable
                 if (parameters.Length == m_Methods[0].ParameterType.Length)
                     methodInfo = m_Methods[0];
             } else {
-                for (int i = 0; i < m_Methods.Length; ++i) {
-                    FunctionMethod method = m_Methods[i];
+                foreach (FunctionMethod method in m_Methods) {
                     if (Util.CanChangeType(parameters, method.ParameterType)) {
                         methodInfo = method;
                         break;
@@ -109,25 +99,24 @@ namespace Scorpio.Variable
                 }
                 return methodInfo.Invoke(m_Object, objs);
             } else {
-                for (int i = 0; i < m_Methods.Length; ++i) {
-                    FunctionMethod method = m_Methods[i];
+                foreach (FunctionMethod method in m_Methods) {
                     int length = method.ParameterType.Length;
                     if (method.Params && parameters.Length >= length - 1) {
                         bool fit = true;
-                        for (int j = 0; j < parameters.Length; ++j) {
-                            if (!Util.CanChangeType(parameters[j], j >= length - 1 ? method.ParamType : method.ParameterType[j])) {
+                        for (int i = 0; i < parameters.Length; ++i) {
+                            if (!Util.CanChangeType(parameters[i], i >= length - 1 ? method.ParamType : method.ParameterType[i])) {
                                 fit = false;
                                 break;
                             }
                         }
                         if (fit) {
                             object[] objs = new object[length];
-                            for (int j = 0; j < length - 1; ++j) {
-                                objs[j] = Util.ChangeType(parameters[j], method.ParameterType[j]);
+                            for (int i = 0; i < length - 1; ++i) {
+                                objs[i] = Util.ChangeType(parameters[i], method.ParameterType[i]);
                             }
                             List<object> param = new List<object>();
-                            for (int j = length - 1; j < parameters.Length; ++j) {
-                                param.Add(Util.ChangeType(parameters[j], method.ParamType));
+                            for (int i = length - 1; i < parameters.Length; ++i) {
+                                param.Add(Util.ChangeType(parameters[i], method.ParamType));
                             }
                             objs[length -1] = param.ToArray();
                             return method.Invoke(m_Object, objs);

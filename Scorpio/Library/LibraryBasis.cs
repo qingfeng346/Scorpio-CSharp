@@ -174,7 +174,7 @@ namespace Scorpio.Library
                     return m_script.CreateFunction(new TablePairs(m_script, (ScriptTable)obj));
                 else if (obj is ScriptUserdata)
                     return m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj));
-                throw new ExecutionException("pair必须用语table或array类型");
+                throw new ExecutionException("pairs必须用语table或array或者继承IEnumerable的userdata 类型");
             }
         }
         private class kpairs : ScorpioHandle
@@ -191,7 +191,7 @@ namespace Scorpio.Library
                     return m_script.CreateFunction(new ArrayKPairs((ScriptArray)obj));
                 else if (obj is ScriptTable)
                     return m_script.CreateFunction(new TableKPairs((ScriptTable)obj));
-                throw new ExecutionException("pair必须用语table或array类型");
+                throw new ExecutionException("kpairs必须用语table或array类型");
             }
         }
         private class vpairs : ScorpioHandle
@@ -208,7 +208,7 @@ namespace Scorpio.Library
                     return m_script.CreateFunction(new ArrayVPairs((ScriptArray)obj));
                 else if (obj is ScriptTable)
                     return m_script.CreateFunction(new TableVPairs((ScriptTable)obj));
-                throw new ExecutionException("pair必须用语table或array类型");
+                throw new ExecutionException("vpairs必须用语table或array类型");
             }
         }
         private class type : ScorpioHandle
