@@ -146,6 +146,7 @@ namespace Scorpio.Library
             script.SetObjectInternal("clone", script.CreateFunction(new clone()));
             script.SetObjectInternal("load_assembly", script.CreateFunction(new load_assembly(script)));
             script.SetObjectInternal("load_assembly_safe", script.CreateFunction(new load_assembly_safe(script)));
+            script.SetObjectInternal("push_assembly", script.CreateFunction(new push_assembly(script)));
             script.SetObjectInternal("import_type", script.CreateFunction(new import_type(script)));
         }
         private class print : ScorpioHandle
@@ -312,6 +313,21 @@ namespace Scorpio.Library
                     if (str == null) throw new ExecutionException("load_assembly 参数必须是 string");
                     m_script.PushAssembly(Assembly.Load(str.Value));
                 } catch (System.Exception ) { }
+                return null;
+            }
+        }
+        private class push_assembly : ScorpioHandle
+        {
+            private Script m_script;
+            public push_assembly(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args)
+            {
+                ScriptUserdata assembly = args[0] as ScriptUserdata;
+                if (assembly == null) throw new ExecutionException("push_assembly 参数必须是 Assembly 类型");
+                m_script.PushAssembly(assembly.ObjectValue as Assembly);
                 return null;
             }
         }
