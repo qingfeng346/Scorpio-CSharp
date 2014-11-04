@@ -1,12 +1,12 @@
 # Scorpio-CSharp #
-* author : 杨林远
+* author : while
 * email : qingfeng346@126.com
-* QQ : 250178206
+* QQ ：250178206
 * QQ群 ：245199668
 
 ## 脚本示例放在  ScorpioDemo/Scripts 目录
 ## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  把 示例代码复制到 Source 输入框 然后点击 Run Script 按钮 即可
-## ps: 此脚本本来是用作Unity热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 后续正在移植到java
+## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 后续正在移植到java
 
 ## v0.0.5beta (2014-11-4) ##
 -----------
