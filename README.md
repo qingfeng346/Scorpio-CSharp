@@ -4,8 +4,20 @@
 * QQ : 250178206
 * QQ群 ：245199668
 
+## 脚本示例放在  ScorpioDemo/Scripts 目录
+## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  把 示例代码复制到 Source 输入框 然后点击 Run Script 按钮 即可
 ## ps: 此脚本本来是用作Unity热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 后续正在移植到java
-## 脚本示例放在  ScorpioDemo/Scripts
+
+## v0.0.5beta (2014-11-4) ##
+-----------
+* 增加table声明语法  支持 Key 用 数字和字符串声明 示例：var a = { 1 = 1, "a" = a, b = b}
+* 增加elseif语法 现支持三种 elseif,elif,else if 都可以当作 else if 语法
+* 修改 不同类型之间 做 ==  != 比较报错的问题  改成  不同类型之间==比较 直接返回false
+* 增加switch语句 只支持 number和string 并且 case 只支持常量 不支持变量
+* 支持try catch 语法 示例： try { trhow "error" } catch (e) { print(e) }
+* 支持脚本调用 c# 变长参数(params) 的函数
+* 增加 switch trycatch import_type 示例
+
 
 ## v0.0.4beta (2014-10-27) ##
 -----------
