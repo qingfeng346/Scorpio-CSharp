@@ -35,12 +35,10 @@ namespace Scorpio.Library
         }
         private class ArrayKPairs : ScorpioHandle
         {
-            Script m_Script;
             List<ScriptObject>.Enumerator m_Enumerator;
             int m_Index = 0;
-            public ArrayKPairs(Script script, ScriptArray obj)
+            public ArrayKPairs(ScriptArray obj)
             {
-                m_Script = script;
                 m_Index = 0;
                 m_Enumerator = obj.GetIterator();
             }
@@ -53,11 +51,9 @@ namespace Scorpio.Library
         }
         private class ArrayVPairs : ScorpioHandle
         {
-            Script m_Script;
             List<ScriptObject>.Enumerator m_Enumerator;
-            public ArrayVPairs(Script script, ScriptArray obj)
+            public ArrayVPairs(ScriptArray obj)
             {
-                m_Script = script;
                 m_Enumerator = obj.GetIterator();
             }
             public object Call(ScriptObject[] args)
@@ -92,11 +88,9 @@ namespace Scorpio.Library
         }
         private class TableKPairs : ScorpioHandle
         {
-            Script m_Script;
             TableDictionary.Enumerator m_Enumerator;
-            public TableKPairs(Script script, ScriptTable obj)
+            public TableKPairs(ScriptTable obj)
             {
-                m_Script = script;
                 m_Enumerator = obj.GetIterator();
             }
             public object Call(ScriptObject[] args)
@@ -108,11 +102,9 @@ namespace Scorpio.Library
         }
         private class TableVPairs : ScorpioHandle
         {
-            Script m_Script;
             TableDictionary.Enumerator m_Enumerator;
-            public TableVPairs(Script script, ScriptTable obj)
+            public TableVPairs(ScriptTable obj)
             {
-                m_Script = script;
                 m_Enumerator = obj.GetIterator();
             }
             public object Call(ScriptObject[] args)
@@ -124,11 +116,9 @@ namespace Scorpio.Library
         }
         private class UserdataPairs : ScorpioHandle
         {
-            Script m_Script;
             System.Collections.IEnumerator m_Enumerator;
-            public UserdataPairs(Script script, ScriptUserdata obj)
+            public UserdataPairs(ScriptUserdata obj)
             {
-                m_Script = script;
                 object value = obj.Value;
                 System.Collections.IEnumerable ienumerable = value as System.Collections.IEnumerable;
                 if (ienumerable == null) throw new ExecutionException("pairs 只支持继承 IEnumerable 的类");
@@ -183,7 +173,7 @@ namespace Scorpio.Library
                 else if (obj is ScriptTable)
                     return m_script.CreateFunction(new TablePairs(m_script, (ScriptTable)obj));
                 else if (obj is ScriptUserdata)
-                    return m_script.CreateFunction(new UserdataPairs(m_script, (ScriptUserdata)obj));
+                    return m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj));
                 throw new ExecutionException("pair必须用语table或array类型");
             }
         }
@@ -198,9 +188,9 @@ namespace Scorpio.Library
             {
                 ScriptObject obj = args[0];
                 if (obj is ScriptArray)
-                    return m_script.CreateFunction(new ArrayKPairs(m_script, (ScriptArray)obj));
+                    return m_script.CreateFunction(new ArrayKPairs((ScriptArray)obj));
                 else if (obj is ScriptTable)
-                    return m_script.CreateFunction(new TableKPairs(m_script, (ScriptTable)obj));
+                    return m_script.CreateFunction(new TableKPairs((ScriptTable)obj));
                 throw new ExecutionException("pair必须用语table或array类型");
             }
         }
@@ -215,9 +205,9 @@ namespace Scorpio.Library
             {
                 ScriptObject obj = args[0];
                 if (obj is ScriptArray)
-                    return m_script.CreateFunction(new ArrayVPairs(m_script, (ScriptArray)obj));
+                    return m_script.CreateFunction(new ArrayVPairs((ScriptArray)obj));
                 else if (obj is ScriptTable)
-                    return m_script.CreateFunction(new TableVPairs(m_script, (ScriptTable)obj));
+                    return m_script.CreateFunction(new TableVPairs((ScriptTable)obj));
                 throw new ExecutionException("pair必须用语table或array类型");
             }
         }
