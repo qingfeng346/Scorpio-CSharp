@@ -1,5 +1,6 @@
 a = 
 {
+    1 = 200,
     a = 100,
     b = function ()
     {
@@ -7,13 +8,21 @@ a =
         print(this == null)
         print("b")
     },
+    //可以使用this 算内部函数
     function c()
     {
         print("this " + this.a)
         print("self " + self.a)
     }
+    //这句话等同于 d = 300
+    "d" = 300,
 }
-a.d = 200
 a.b()
 a.c()
+//数字只能使用 [] 访问
+print(a[1])
+print(a.d)
+a.d = 400
+print(a.d)
+a["d"] = 500
 print(a.d)
