@@ -1,4 +1,4 @@
-//swith Ä¿Ç°Ö§³Ö number ºÍ stringÀàĞÍ ÇÒ²»Ö§³Ö±äÁ¿  Ö»Ö§³Ö³£Á¿
+//swith ç›®å‰æ”¯æŒ number å’Œ stringç±»å‹ ä¸”ä¸æ”¯æŒå˜é‡  åªæ”¯æŒå¸¸é‡
 function sw(a)
 {
     switch (a)

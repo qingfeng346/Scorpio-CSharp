@@ -1,6 +1,6 @@
-//import_type ¿ÉÒÔµ¼ÈëÒ»¸öÀà  ´«ÈëµÄÖµ ±ØĞëÊÇÍêÕûÀàÃû 
-//Ò²¿ÉÒÔÊ¹ÓÃ  push_assembly Ñ¹ÈëÒ»¸ö ³ÌĞò¼¯ »òÕßÊ¹ÓÃ load_assembly ¼ÓÔØÒ»¸ö³ÌĞò¼¯
-//»òÕßÊ¹ÓÃ Script.PushAssembly ÔÚ³ÌĞòÖĞÊÖ¶¯Ñ¹ÈëÒ»¸ö³ÌĞò¼¯
+//import_type å¯ä»¥å¯¼å…¥ä¸€ä¸ªç±»  ä¼ å…¥çš„å€¼ å¿…é¡»æ˜¯å®Œæ•´ç±»å 
+//ä¹Ÿå¯ä»¥ä½¿ç”¨  push_assembly å‹å…¥ä¸€ä¸ª ç¨‹åºé›† æˆ–è€…ä½¿ç”¨ load_assembly åŠ è½½ä¸€ä¸ªç¨‹åºé›†
+//æˆ–è€…ä½¿ç”¨ Script.PushAssembly åœ¨ç¨‹åºä¸­æ‰‹åŠ¨å‹å…¥ä¸€ä¸ªç¨‹åºé›†
 String = import_type("System.String")
 print(String.Format("{0}-{1}-{2}-{3}-{4}-{5}", "0", "1", "2", "3" ,"4", "5"))
 Int32 = import_type("System.Int32")

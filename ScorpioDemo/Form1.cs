@@ -12,26 +12,27 @@ namespace CancerDemo
 {
     public partial class Form1 : Form
     {
-        private readonly string PATH = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/a.sco";
+        private string m_Path = "";
         public Form1()
         {
             InitializeComponent();
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            try {
-                textBox1.Text = File.ReadAllText(PATH);
-            } catch (System.Exception ex) {
-                BuildOutPut("Load is error : " + ex.ToString());
-            }
+            m_Path = Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)) + "/Scripts";
+            LoadFileList();
         }
         private void Form1_Activated(object sender, EventArgs e)
         {
-            //try {
-            //    textBox1.Text = File.ReadAllText(PATH);
-            //} catch (System.Exception ex) {
-            //    BuildOutPut("Load is error : " + ex.ToString());
-            //}
+            LoadFileList();
+        }
+        private void LoadFileList()
+        {
+            listBox1.Items.Clear();
+            string[] files = Directory.GetFiles(m_Path);
+            for (int i = 0; i < files.Length;++i ) {
+                listBox1.Items.Add(Path.GetFileName(files[i]));
+            }
         }
         private void Run_Click(object sender, EventArgs e)
         {
@@ -64,6 +65,11 @@ namespace CancerDemo
         private void ScriptOutPut(string message)
         {
             m_txtScriptOutput.Text += (message + "\r\n");
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            textBox1.Text = File.ReadAllText(m_Path + "/" + listBox1.Text, Encoding.UTF8);
         }
     }
 }

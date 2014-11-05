@@ -1,4 +1,4 @@
-//try catch ¿ÉÒÔÌø¹ýÒ»Ð©²»È·¶¨µÄ´úÂë ÒÔ ±£Ö¤ºóÐøµÄ´úÂëÕý³£Ö´ÐÐ
+//try catch å¯ä»¥è·³è¿‡ä¸€äº›ä¸ç¡®å®šçš„ä»£ç  ä»¥ ä¿è¯åŽç»­çš„ä»£ç æ­£å¸¸æ‰§è¡Œ
 function trycatch(arg,th)
 {
     try
