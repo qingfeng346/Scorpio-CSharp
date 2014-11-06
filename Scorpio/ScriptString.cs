@@ -6,10 +6,15 @@ using Scorpio.Variable;
 namespace Scorpio
 {
     //脚本字符串类型
-    public class ScriptString : ScriptPrimitiveObject<string>
+    public class ScriptString : ScriptObject
     {
         public override ObjectType Type { get { return ObjectType.String; } }
-        public ScriptString(Script script, string value) : base(script, value) { }
+        public override object ObjectValue { get { return Value; } }
+        public string Value { get; set; }
+        public ScriptString(Script script, string value) : base(script)
+        {
+            this.Value = value;
+        }
         public override ScriptObject Assign()
         {
             return Script.CreateString(Value);
