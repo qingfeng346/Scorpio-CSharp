@@ -10,7 +10,7 @@ namespace Scorpio.CodeDom
         public CodeMember member;
         public CodeObject value;
         public TokenType AssignType;
-        public CodeAssign(CodeMember member, CodeObject value, TokenType assignType)
+        public CodeAssign(CodeMember member, CodeObject value, TokenType assignType, string breviary, int line) : base(breviary, line)
         {
             this.member = member;
             this.value = value;

@@ -6,7 +6,7 @@ namespace Scorpio.CodeDom
     //返回一个继承ScriptObject的变量
     public class CodeScriptObject : CodeObject
     {
-        public CodeScriptObject(object obj) { Object = obj; }
-        public object Object { get; private set; }
+        public CodeScriptObject(Script script, object obj) { Object = script.CreateObject(obj); }
+        public ScriptObject Object { get; private set; }
     }
 }

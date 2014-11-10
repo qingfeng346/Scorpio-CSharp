@@ -119,7 +119,7 @@ namespace Scorpio.Compiler
                         if (peek.Type == TokenType.RightBrace ||
                             peek.Type == TokenType.SemiColon ||
                             peek.Type == TokenType.Finished)
-                            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(null)));
+                            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(m_script, null)));
                         else
                             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
                     }
@@ -441,7 +441,7 @@ namespace Scorpio.Compiler
                         case TokenType.AssignMultiply:
                         case TokenType.AssignDivide:
                         case TokenType.AssignModulo:
-                            return new CodeAssign(member, GetObject(), token.Type);
+                            return new CodeAssign(member, GetObject(), token.Type, m_strBreviary, token.SourceLine);
                         default:
                             UndoToken();
                             break;
@@ -518,7 +518,7 @@ namespace Scorpio.Compiler
                 case TokenType.Boolean:
                 case TokenType.Number:
                 case TokenType.String:
-                    ret = new CodeScriptObject(token.Lexeme);
+                    ret = new CodeScriptObject(m_script, token.Lexeme);
                     break;
                 default:
                     throw new ParserException("Object起始关键字错误 ", token);
@@ -562,10 +562,10 @@ namespace Scorpio.Compiler
                     CodeObject member = GetObject();
                     ReadRightBracket();
                     if (member is CodeScriptObject) {
-                        ScriptObject obj = m_script.CreateObject(((CodeScriptObject)member).Object);
-                        if (obj.IsNumber)
+                        ScriptObject obj = ((CodeScriptObject)member).Object;
+                        if (obj is ScriptNumber)
                             ret = new CodeMember((ScriptNumber)obj, ret);
-                        else if (obj.IsString)
+                        else if (obj is ScriptString)
                             ret = new CodeMember(((ScriptString)obj).Value, ret);
                         else
                             throw new ParserException("获取变量只能是 number或string", m);
