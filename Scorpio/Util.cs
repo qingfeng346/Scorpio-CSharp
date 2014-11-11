@@ -27,6 +27,7 @@ namespace Scorpio
         private static readonly Type TYPE_DOUBLE = typeof(double);
         private static readonly Type TYPE_DECIMAL = typeof(decimal);
         private static readonly Type TYPE_PARAMATTRIBUTE = typeof(ParamArrayAttribute);
+        public static readonly Assembly MSCORLIB_ASSEMBLY = TYPE_OBJECT.Assembly;
 
         public static void SetObject(TableDictionary variables, object key, ScriptObject obj)
         {
