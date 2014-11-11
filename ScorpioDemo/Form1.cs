@@ -40,12 +40,12 @@ namespace CancerDemo
             try {
                 m_txtBuildOutput.Text = "";
                 m_txtScriptOutput.Text = "";
-                double start = Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
                 script.LoadLibrary();
-                script.PushAssembly(typeof(System.Environment).Assembly);
+                script.PushAssembly(GetType().Assembly);
+                Stopwatch watch = Stopwatch.StartNew();
                 script.SetObject("print", new ScorpioFunction(print));
                 BuildOutPut("返回值为 " + script.LoadString("", textBox1.Text));
-                BuildOutPut("运行时间:" + (Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds - start) + " ms");
+                BuildOutPut("运行时间:" + watch.ElapsedMilliseconds + " ms");
             } catch (System.Exception ex) {
                 BuildOutPut("堆栈数据为 " + script.GetStackInfo());
                 BuildOutPut(ex.ToString());
@@ -66,7 +66,6 @@ namespace CancerDemo
         {
             m_txtScriptOutput.Text += (message + "\r\n");
         }
-
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             textBox1.Text = File.ReadAllText(m_Path + "/" + listBox1.Text, Encoding.UTF8);
