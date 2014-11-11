@@ -15,12 +15,11 @@ namespace ScorpioExec
             Console.WriteLine("开始执行，当前版本:" + Script.Version);
             script.LoadLibrary();
             script.PushAssembly(typeof(Program).Assembly);
-            script.PushAssembly(typeof(System.Environment).Assembly);
             if (args.Length >= 1) {
                 try {
-                    double start = Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
+                    Stopwatch watch = Stopwatch.StartNew();
                     Console.WriteLine("返回值为:" + script.LoadFile(args[0]));
-                    Console.WriteLine("运行时间:" + (Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds - start) + " ms");
+                    Console.WriteLine("运行时间:" + watch.ElapsedMilliseconds + " ms");
                 } catch (System.Exception ex) {
                     Console.WriteLine(script.GetStackInfo());
                     Console.WriteLine(ex.ToString());
