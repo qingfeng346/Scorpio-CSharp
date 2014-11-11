@@ -6,8 +6,7 @@ UICheckbox = import_type("UICheckbox")
 UISprite = import_type("UISprite")
 UIGrid = import_type("UIGrid")
 Util = import_type("Util")
-ScriptEventListener = import_type("ScriptEventListener")
-
+UIEventListener = import_type("UIEventListener")
 
 colors = [Color.blue, Color.cyan, Color.gray, Color.green, Color.red, Color.white, Color.yellow, Color.magenta]
 window = 
@@ -77,7 +76,7 @@ item =
     {
         this.m_Index = index
         this.m_Image.color = colors[index]
-        ScriptEventListener.Get(this.com).onClick = this.OnClickSelf
+		UIEventListener.Get(this.com.gameObject).onClick = UIEventListener.VoidDelegate(this.OnClickSelf)
     }
     function Show()
     {
