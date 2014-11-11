@@ -46,30 +46,23 @@ namespace Scorpio.Userdata
                 }
                 MethodFactory = new DynamicMethod(Script.DynamicDelegateName, returnType, argTypes.ToArray(), DynamicDelegateType);
                 ILGenerator generator = MethodFactory.GetILGenerator();
-                generator.DeclareLocal(typeof(object[]));
-                generator.DeclareLocal(typeof(object));
-                generator.Emit(OpCodes.Nop);
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldc_I4, argTypes.Count - 1);
                 generator.Emit(OpCodes.Newarr, typeof(object));
-                generator.Emit(OpCodes.Stloc_1);
                 for (int i = 1; i < argTypes.Count; ++i)
                 {
-                    generator.Emit(OpCodes.Ldloc_1);
+                    generator.Emit(OpCodes.Dup);
                     generator.Emit(OpCodes.Ldc_I4, i - 1);
                     generator.Emit(OpCodes.Ldarg, i);
                     generator.Emit(OpCodes.Box, argTypes[i]);
                     generator.Emit(OpCodes.Stelem_Ref);
                 }
-                generator.Emit(OpCodes.Ldloc_1);
                 generator.Emit(OpCodes.Call, DynamicDelegateMethod);
                 if (Util.IsVoid(InvokeMethod.ReturnType)) {
-                    generator.Emit(OpCodes.Nop);
+                    generator.Emit(OpCodes.Pop);
                     generator.Emit(OpCodes.Ret);
                 } else {
                     generator.Emit(OpCodes.Unbox_Any, InvokeMethod.ReturnType);
-                    generator.Emit(OpCodes.Stloc_0);
-                    generator.Emit(OpCodes.Ldloc_0);
                     generator.Emit(OpCodes.Ret);
                 }
             }
