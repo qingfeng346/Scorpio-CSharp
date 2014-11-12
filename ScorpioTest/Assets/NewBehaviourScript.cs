@@ -28,6 +28,8 @@ public class NewBehaviourScript : MonoBehaviour {
 			Script script = new Script();
 			try {
 				script.LoadLibrary();
+                script.PushAssembly(GetType().Assembly);
+                script.PushAssembly(typeof(GameObject).Assembly);
 				script.SetObject("print", script.CreateFunction(print));
 				ScriptObject ret = script.LoadString(text);
                 OutPut("ReturnValue : " + ret);
