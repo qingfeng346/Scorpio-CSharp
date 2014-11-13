@@ -15,11 +15,11 @@ namespace Scorpio
         public abstract ScriptNumber Negative();
         public abstract bool Compare(TokenType type, CodeOperator oper, ScriptNumber num);
         protected ScriptNumber(Script script) : base(script) { }
-        public abstract ScriptObject Plus(ScriptNumber obj);             // +
-        public abstract ScriptObject Minus(ScriptNumber obj);            // -
-        public abstract ScriptObject Multiply(ScriptNumber obj);         // *
-        public abstract ScriptObject Divide(ScriptNumber obj);           // /
-        public abstract ScriptObject Modulo(ScriptNumber obj);           // %
+        public abstract ScriptObject ComputePlus(ScriptNumber obj);             // +
+        public abstract ScriptObject ComputeMinus(ScriptNumber obj);            // -
+        public abstract ScriptObject ComputeMultiply(ScriptNumber obj);         // *
+        public abstract ScriptObject ComputeDivide(ScriptNumber obj);           // /
+        public abstract ScriptObject ComputeModulo(ScriptNumber obj);           // %
 
         public abstract ScriptObject AssignPlus(ScriptNumber obj);             // +=
         public abstract ScriptObject AssignMinus(ScriptNumber obj);            // -=

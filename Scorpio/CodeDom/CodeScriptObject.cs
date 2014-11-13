@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using Scorpio;
 namespace Scorpio.CodeDom
 {
     //返回一个继承ScriptObject的变量

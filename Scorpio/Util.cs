@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
-using Scorpio.Collections;
 using System.IO;
 using Scorpio.Variable;
 using Scorpio;
@@ -29,11 +28,11 @@ namespace Scorpio
         private static readonly Type TYPE_PARAMATTRIBUTE = typeof(ParamArrayAttribute);
         public static readonly Assembly MSCORLIB_ASSEMBLY = TYPE_OBJECT.Assembly;
 
-        public static void SetObject(TableDictionary variables, object key, ScriptObject obj)
+        public static void SetObject(Dictionary<object, ScriptObject> variables, object key, ScriptObject obj)
         {
             variables[key] = obj.Assign();
         }
-        public static void SetObject(VariableDictionary variables, string key, ScriptObject obj)
+        public static void SetObject(Dictionary<string, ScriptObject> variables, string key, ScriptObject obj)
         {
             variables[key] = obj.Assign();
         }

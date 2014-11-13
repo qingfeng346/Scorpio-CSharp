@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+using Scorpio;
 namespace Scorpio.Exception
 {
     public class InteriorException : System.Exception

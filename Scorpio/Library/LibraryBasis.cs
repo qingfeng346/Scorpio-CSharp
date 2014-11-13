@@ -4,7 +4,6 @@ using System.Text;
 using System.Reflection;
 using Scorpio;
 using Scorpio.Exception;
-using Scorpio.Collections;
 namespace Scorpio.Library
 {
     public class LibraryBasis
@@ -66,7 +65,7 @@ namespace Scorpio.Library
         private class TablePairs : ScorpioHandle
         {
             Script m_Script;
-            TableDictionary.Enumerator m_Enumerator;
+            Dictionary<object, ScriptObject>.Enumerator m_Enumerator;
             ScriptTable m_Table;
             public TablePairs(Script script, ScriptTable obj)
             {
@@ -88,7 +87,7 @@ namespace Scorpio.Library
         }
         private class TableKPairs : ScorpioHandle
         {
-            TableDictionary.Enumerator m_Enumerator;
+            Dictionary<object, ScriptObject>.Enumerator m_Enumerator;
             public TableKPairs(ScriptTable obj)
             {
                 m_Enumerator = obj.GetIterator();
@@ -102,7 +101,7 @@ namespace Scorpio.Library
         }
         private class TableVPairs : ScorpioHandle
         {
-            TableDictionary.Enumerator m_Enumerator;
+            Dictionary<object, ScriptObject>.Enumerator m_Enumerator;
             public TableVPairs(ScriptTable obj)
             {
                 m_Enumerator = obj.GetIterator();

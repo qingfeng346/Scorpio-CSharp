@@ -3,14 +3,13 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Scorpio.Collections;
 namespace Scorpio
 {
     //脚本table类型
     public class ScriptTable : ScriptObject
     {
         public override ObjectType Type { get { return ObjectType.Table; } }
-        private TableDictionary m_listObject = new TableDictionary();  //所有的数据(函数和数据都在一个数组)
+        private Dictionary<object, ScriptObject> m_listObject = new Dictionary<object, ScriptObject>();  //所有的数据(函数和数据都在一个数组)
         public ScriptTable(Script script) : base(script) { }
         public override void SetValue(int key, ScriptObject value)
         {
@@ -52,7 +51,7 @@ namespace Scorpio
         {
             return m_listObject.Count;
         }
-        public TableDictionary.Enumerator GetIterator()
+        public Dictionary<object, ScriptObject>.Enumerator GetIterator()
         {
             return m_listObject.GetEnumerator();
         }
@@ -61,7 +60,7 @@ namespace Scorpio
             ScriptTable ret = Script.CreateTable();
             ScriptObject obj = null;
             ScriptFunction func = null;
-            foreach (var pair in m_listObject) {
+            foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
                 obj = pair.Value.Clone();
                 if (obj is ScriptFunction) {
                     func = (ScriptFunction)obj;

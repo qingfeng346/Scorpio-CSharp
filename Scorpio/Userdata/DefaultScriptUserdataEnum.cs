@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Scorpio;
 using Scorpio.Exception;
 namespace Scorpio.Userdata
 {

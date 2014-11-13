@@ -7,7 +7,6 @@ using Scorpio.Compiler;
 using Scorpio.CodeDom;
 using Scorpio.CodeDom.Temp;
 using Scorpio.Exception;
-using Scorpio.Collections;
 namespace Scorpio.Runtime
 {
     //执行命令
@@ -17,7 +16,7 @@ namespace Scorpio.Runtime
         private ScriptContext m_parent;                                                 //父级执行命令
         private ScriptExecutable m_scriptExecutable;                                    //执行命令堆栈
         private ScriptInstruction m_scriptInstruction;                                  //当前执行
-        private VariableDictionary m_variableDictionary = new VariableDictionary();     //当前作用域所有变量
+        private Dictionary<String, ScriptObject> m_variableDictionary = new Dictionary<String, ScriptObject>();     //当前作用域所有变量
         private ScriptObject m_returnObject = null;                                     //返回值
         private Executable_Block m_block;                                               //堆栈类型
         private bool m_Break = false;                                                   //break跳出
@@ -35,7 +34,7 @@ namespace Scorpio.Runtime
         }
         private bool IsBreak { get { return m_Break; } }                 //是否已经Break
         private bool IsOver { get { return m_Break || m_Over; } }        //此逻辑块是否已经执行完成
-        public void Initialize(ScriptContext parent, VariableDictionary variable)
+        public void Initialize(ScriptContext parent, Dictionary<String, ScriptObject> variable)
         {
             m_parent = parent;
             m_variableDictionary = variable;
@@ -349,9 +348,9 @@ namespace Scorpio.Runtime
             CodeSwitch code = (CodeSwitch)m_scriptInstruction.Operand0;
             ScriptObject obj = ResolveOperand(code.Condition);
             bool exec = false;
-            foreach (var c in code.Cases)
+            foreach (TempCase c in code.Cases)
             {
-                foreach (var a in c.Allow)
+                foreach (object a in c.Allow)
                 {
                     if (a.Equals(obj.ObjectValue))
                     {
@@ -505,7 +504,7 @@ namespace Scorpio.Runtime
         {
             ScriptTable ret = m_script.CreateTable();
             foreach (TableVariable variable in table.Variables) {
-                ret.SetValue(variable.Key, ResolveOperand(variable.Value));
+                ret.SetValue(variable.key, ResolveOperand(variable.value));
             }
             foreach (ScriptFunction func in table.Functions) {
                 func.SetTable(ret);
@@ -522,7 +521,7 @@ namespace Scorpio.Runtime
                 if (left is ScriptString || right is ScriptString) {
                     return m_script.CreateString(left.ToString() + right.ToString());
                 } else if (left is ScriptNumber && right is ScriptNumber){
-                    return (left as ScriptNumber).Plus(right as ScriptNumber);
+                    return (left as ScriptNumber).ComputePlus(right as ScriptNumber);
                 } else {
                     throw new ExecutionException("operate [+] left right is not same type");
                 }
@@ -532,13 +531,13 @@ namespace Scorpio.Runtime
                 ScriptNumber rightNumber = ResolveOperand(operate.Right) as ScriptNumber;
                 if (rightNumber == null) throw new ExecutionException("operate [+ - * /] right is not number");
                 if (operate.Operator == TokenType.Minus)
-                    return leftNumber.Minus(rightNumber);
+                    return leftNumber.ComputeMinus(rightNumber);
                 else if (operate.Operator == TokenType.Multiply)
-                    return leftNumber.Multiply(rightNumber);
+                    return leftNumber.ComputeMultiply(rightNumber);
                 else if (operate.Operator == TokenType.Divide)
-                    return leftNumber.Divide(rightNumber);
+                    return leftNumber.ComputeDivide(rightNumber);
                 else if (operate.Operator == TokenType.Modulo)
-                    return leftNumber.Modulo(rightNumber);
+                    return leftNumber.ComputeModulo(rightNumber);
             } else {
                 if (left is ScriptBoolean) {
                     if (type == TokenType.And) {

@@ -6,12 +6,12 @@ namespace Scorpio.CodeDom
 {
     public class TableVariable
     {
-        public object Key;
-        public CodeObject Value;
+        public object key;
+        public CodeObject value;
         public TableVariable(object key, CodeObject value)
         {
-            Key = key;
-            Value = value;
+            this.key = key;
+            this.value = value;
         }
     }
     //返回一个table类型 t = { a = "1", b = "2", function hello() { } }

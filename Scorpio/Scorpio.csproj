@@ -60,8 +60,6 @@
     <Compile Include="CodeDom\Temp\TempCase.cs" />
     <Compile Include="CodeDom\Temp\TempCondition.cs" />
     <Compile Include="CodeDom\Temp\TempOperator.cs" />
-    <Compile Include="Collections\TableDictionary.cs" />
-    <Compile Include="Collections\VariableDictionary.cs" />
     <Compile Include="Compiler\ScriptLexer.cs" />
     <Compile Include="Compiler\ScriptLexerBase.cs" />
     <Compile Include="Compiler\ScriptParser.cs" />

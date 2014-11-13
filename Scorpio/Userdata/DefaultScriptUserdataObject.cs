@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using Scorpio;
 using Scorpio.Variable;
 using Scorpio.Exception;
 namespace Scorpio.Userdata
@@ -9,7 +10,7 @@ namespace Scorpio.Userdata
     //语言数据
     public class DefaultScriptUserdataObject : ScriptUserdata
     {
-        private class Field
+        private class ScriptUserdataField
         {
             public string name;
             public Type fieldType;
@@ -35,14 +36,14 @@ namespace Scorpio.Userdata
             }
         }
         private ScorpioMethod m_Constructor;
-        private Dictionary<string, Field> m_FieldInfos;                 //所有的变量 以及 get set函数
+        private Dictionary<string, ScriptUserdataField> m_FieldInfos;                 //所有的变量 以及 get set函数
         private Dictionary<string, ScriptUserdata> m_NestedTypes;       //所有的类中类
         private Dictionary<string, ScriptFunction> m_Functions;         //所有的函数
         public DefaultScriptUserdataObject(Script script, object value) : base(script)
         {
             this.Value = value;
             this.ValueType = (Value is Type) ? (Type)Value : Value.GetType();
-            m_FieldInfos = new Dictionary<string, Field>();
+            m_FieldInfos = new Dictionary<string, ScriptUserdataField>();
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, ScriptFunction>();
             m_Constructor = new ScorpioMethod(ValueType.ToString(), ValueType.GetConstructors());
@@ -54,11 +55,11 @@ namespace Scorpio.Userdata
                     m_Functions.Add(name, Script.CreateFunction(new ScorpioMethod(ValueType, name, Value)));
             }
         }
-        private Field GetField(string strName)
+        private ScriptUserdataField GetField(string strName)
         {
             if (m_FieldInfos.ContainsKey(strName))
                 return m_FieldInfos[strName];
-            Field field = new Field();
+            ScriptUserdataField field = new ScriptUserdataField();
             field.name = strName;
             FieldInfo info = ValueType.GetField(strName);
             if (info != null)
@@ -98,7 +99,7 @@ namespace Scorpio.Userdata
                 return m_Functions[strName];
             if (m_NestedTypes.ContainsKey(strName))
                 return m_NestedTypes[strName];
-            Field field = GetField(strName);
+            ScriptUserdataField field = GetField(strName);
             if (field != null) return Script.CreateObject(field.GetValue(Value));
             Type nestedType = ValueType.GetNestedType(strName, Script.BindingFlag);
             if (nestedType != null) {
@@ -110,7 +111,7 @@ namespace Scorpio.Userdata
         }
         public override void SetValue(string strName, ScriptObject value)
         {
-            Field field = GetField(strName);
+            ScriptUserdataField field = GetField(strName);
             if (field == null) throw new ScriptException("Type[" + ValueType + "] 变量 [" + strName + "] 不存在");
             field.SetValue(Value, Util.ChangeType(value, field.fieldType));
         }

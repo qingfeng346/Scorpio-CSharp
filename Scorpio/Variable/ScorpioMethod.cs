@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using Scorpio;
 using Scorpio.Exception;
 namespace Scorpio.Variable
 {
@@ -9,22 +10,31 @@ namespace Scorpio.Variable
     {
         private class FunctionMethod
         {
-            public bool Params;
-            public MethodBase Method;
+            private int m_Type;                     //是普通函数还是构造函数
+            private MethodInfo m_Method;            //普通函数对象
+            private ConstructorInfo m_Constructor;  //构造函数对象
             public Type[] ParameterType;
+            public bool Params;
             public Type ParamType;
-            public FunctionMethod(MethodBase Method, Type[] ParameterType, Type ParamType, bool Params)
+            public FunctionMethod(ConstructorInfo Constructor, Type[] ParameterType, Type ParamType, bool Params)
             {
-                this.Method = Method;
+                m_Type = 0;
+                m_Constructor = Constructor;
+                this.ParameterType = ParameterType;
+                this.ParamType = ParamType;
+                this.Params = Params;
+            }
+            public FunctionMethod(MethodInfo Method, Type[] ParameterType, Type ParamType, bool Params)
+            {
+                m_Type = 1;
+                m_Method = Method;
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
                 this.Params = Params;
             }
             public object Invoke(object obj, object[] parameters)
             {
-                if (Method is ConstructorInfo)
-                    return ((ConstructorInfo)Method).Invoke(parameters);
-                return Method.Invoke(obj, parameters);
+                return m_Type == 0 ? m_Constructor.Invoke(parameters) : m_Method.Invoke(obj, parameters);
             }
         }
         private object m_Object;
@@ -38,7 +48,7 @@ namespace Scorpio.Variable
             MethodName = methodName;
             List<MethodBase> methodBases = new List<MethodBase>();
             MethodInfo[] methods = type.GetMethods(Script.BindingFlag);
-            foreach (var method in methods) {
+            foreach (MethodInfo method in methods) {
                 if (method.Name.Equals(methodName))
                     methodBases.Add(method);
             }
@@ -65,13 +75,16 @@ namespace Scorpio.Variable
                 ParamType = null;
                 parameters.Clear();
                 method = methods[i];
-                var pars = method.GetParameters();
-                foreach (var par in pars) {
+                ParameterInfo[] pars = method.GetParameters();
+                foreach (ParameterInfo par in pars) {
                     parameters.Add(par.ParameterType);
                     Params = Util.IsParamArray(par);
                     if (Params) ParamType = par.ParameterType.GetElementType();
                 }
-                functionMethod.Add(new FunctionMethod(method, parameters.ToArray(), ParamType, Params));
+                if (method is MethodInfo)
+                    functionMethod.Add(new FunctionMethod(method as MethodInfo, parameters.ToArray(), ParamType, Params));
+                else
+                    functionMethod.Add(new FunctionMethod(method as ConstructorInfo, parameters.ToArray(), ParamType, Params));
             }
             m_Methods = functionMethod.ToArray();
             m_Count = m_Methods.Length;

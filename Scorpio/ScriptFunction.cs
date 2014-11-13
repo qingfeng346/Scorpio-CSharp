@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Text;
 using Scorpio.Runtime;
 using Scorpio.Variable;
-using Scorpio.Collections;
 namespace Scorpio
 {
     //C#函数指针
@@ -36,7 +35,7 @@ namespace Scorpio
         private ScorpioFunction m_Function;                                     //程序函数指针
         private ScorpioHandle m_Handle;                                         //程序函数执行类
         private ScorpioMethod m_Method;                                         //程序函数
-        private VariableDictionary m_stackObject = new VariableDictionary();    //函数变量
+        private Dictionary<String, ScriptObject> m_stackObject = new Dictionary<String, ScriptObject>();    //函数变量
         public override ObjectType Type { get { return ObjectType.Function; } }
         public ScriptFunction(Script script, ScorpioFunction function) : this(script, function.Method.Name, function) { }
         public ScriptFunction(Script script, String strName, ScorpioFunction function) : base(script)

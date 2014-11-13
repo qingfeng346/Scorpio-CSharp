@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using Scorpio;
 using Scorpio.Runtime;
-using Scorpio.Collections;
 namespace Scorpio.Variable
 {
     internal class ScorpioScriptFunction
@@ -32,8 +32,8 @@ namespace Scorpio.Variable
         }
         public bool Params { get { return m_Params; } }
         public int ParameterCount { get { return m_ParameterCount; } }
-        public ReadOnlyCollection<String> Parameters { get { return m_listParameters.AsReadOnly(); } }
-        public ScriptObject Call(VariableDictionary objs, ScriptObject[] parameters)
+        //public ReadOnlyCollection<String> Parameters { get { return m_listParameters.AsReadOnly(); } }
+        public ScriptObject Call(Dictionary<String, ScriptObject> objs, ScriptObject[] parameters)
         {
             int length = parameters.Length;
             if (m_Params) {
