@@ -5,8 +5,17 @@
 * QQ群 ：245199668
 
 ## 脚本示例放在  ScorpioDemo/Scripts 目录
-## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  把 示例代码复制到 Source 输入框 然后点击 Run Script 按钮 即可
-## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 后续正在移植到java
+## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  左侧选中要测试的脚本 点击 Run Script 按钮 即可
+## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 (现Scorpio-Java已发布 https://github.com/qingfeng346/Scorpio-Java)
+
+## v0.0.6beta (2014-11-14) ##
+-----------
+* 适配Unity3d WebGL (Unity5.0.0b1测试通过 WebGL示例地址 http://yunpan.cn/cAVkfYdGbgFug  提取码 2df5)
+* 修复Unity下Delegate动态委托出错的BUG
+* 修复赋值操作（如 = += -= 等）出错报不出堆栈的问题
+* 优化数字和字符串的执行效率
+* 同步发布Scorpio-Java 地址:https://github.com/qingfeng346/Scorpio-Java
+
 
 ## v0.0.5beta (2014-11-4) ##
 -----------
