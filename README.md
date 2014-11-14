@@ -1,7 +1,5 @@
 # Scorpio-CSharp #
 * author : while
-* email : qingfeng346@126.com
-* QQ ：250178206
 * QQ群 ：245199668
 
 ## 脚本示例放在  ScorpioDemo/Scripts 目录
