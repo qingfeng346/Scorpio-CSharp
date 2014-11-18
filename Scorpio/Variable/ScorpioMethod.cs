@@ -4,6 +4,7 @@ using System.Text;
 using System.Reflection;
 using Scorpio;
 using Scorpio.Exception;
+using System.Diagnostics;
 namespace Scorpio.Variable
 {
     public class ScorpioMethod
@@ -16,6 +17,7 @@ namespace Scorpio.Variable
             public Type[] ParameterType;
             public bool Params;
             public Type ParamType;
+            public object[] Args;
             public FunctionMethod(ConstructorInfo Constructor, Type[] ParameterType, Type ParamType, bool Params)
             {
                 m_Type = 0;
@@ -23,6 +25,7 @@ namespace Scorpio.Variable
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
                 this.Params = Params;
+                this.Args = new object[ParameterType.Length];
             }
             public FunctionMethod(MethodInfo Method, Type[] ParameterType, Type ParamType, bool Params)
             {
@@ -31,39 +34,39 @@ namespace Scorpio.Variable
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
                 this.Params = Params;
+                this.Args = new object[ParameterType.Length];
             }
-            public object Invoke(object obj, object[] parameters)
+            public object Invoke(object obj, Type type)
             {
-                return m_Type == 0 ? m_Constructor.Invoke(parameters) : m_Method.Invoke(obj, parameters);
+                return m_Type == 0 ? m_Constructor.Invoke(Args) : m_Method.Invoke(obj, Args);
             }
         }
-        private object m_Object;
-        private int m_Count;
-        private FunctionMethod[] m_Methods;
-        public string MethodName { get; private set; }
-        public ScorpioMethod(Type type, string methodName) : this(type, methodName, null) { }
-        public ScorpioMethod(Type type, string methodName, object obj)
+        private object m_Object;                        //实例
+        private Type m_Type;                            //所在类型
+        private int m_Count;                            //相同名字函数数量
+        private FunctionMethod[] m_Methods;             //所有函数对象
+        public string MethodName { get; private set; }  //函数名字
+        public ScorpioMethod(Type type, string methodName, object obj, MethodInfo[] methods)
         {
-            m_Object = obj;
-            MethodName = methodName;
             List<MethodBase> methodBases = new List<MethodBase>();
-            MethodInfo[] methods = type.GetMethods(Script.BindingFlag);
             foreach (MethodInfo method in methods) {
                 if (method.Name.Equals(methodName))
                     methodBases.Add(method);
             }
-            Initialize(methodBases);
+            Initialize(type, methodName, obj, methodBases);
         }
-        public ScorpioMethod(string typeName, ConstructorInfo[] cons)
+        /// <summary> 构造函数 </summary>
+        public ScorpioMethod(Type type, string methodName, ConstructorInfo[] cons)
         {
-            m_Object = null;
-            MethodName = typeName;
             List<MethodBase> methods = new List<MethodBase>();
             methods.AddRange(cons);
-            Initialize(methods);
+            Initialize(type, methodName, null, methods);
         }
-        private void Initialize(List<MethodBase> methods)
+        private void Initialize(Type type, string methodName, object obj, List<MethodBase> methods)
         {
+            m_Type = type;
+            m_Object = obj;
+            MethodName = methodName;
             List<FunctionMethod> functionMethod = new List<FunctionMethod>();
             bool Params = false;
             Type ParamType = null;
@@ -105,12 +108,12 @@ namespace Scorpio.Variable
                 }
             }
             if (methodInfo != null) {
+                object[] objs = methodInfo.Args;
                 int length = methodInfo.ParameterType.Length;
-                object[] objs = new object[length];
                 for (int i = 0; i < length; i++) {
                     objs[i] = Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
                 }
-                return methodInfo.Invoke(m_Object, objs);
+                return methodInfo.Invoke(m_Object, m_Type);
             } else {
                 foreach (FunctionMethod method in m_Methods) {
                     int length = method.ParameterType.Length;
@@ -123,7 +126,7 @@ namespace Scorpio.Variable
                             }
                         }
                         if (fit) {
-                            object[] objs = new object[length];
+                            object[] objs = method.Args;
                             for (int i = 0; i < length - 1; ++i) {
                                 objs[i] = Util.ChangeType(parameters[i], method.ParameterType[i]);
                             }
@@ -132,7 +135,7 @@ namespace Scorpio.Variable
                                 param.Add(Util.ChangeType(parameters[i], method.ParamType));
                             }
                             objs[length -1] = param.ToArray();
-                            return method.Invoke(m_Object, objs);
+                            return method.Invoke(m_Object, m_Type);
                         }
                     }
                 }

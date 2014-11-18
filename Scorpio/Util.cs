@@ -112,26 +112,14 @@ namespace Scorpio
         public static object ChangeType(ScriptObject par, Type type)
         {
             if (type == TYPE_OBJECT) {
-                if (par is ScriptNumber) {
-                    return ChangeType_impl(par.ObjectValue, type);
-                } else {
-                    return par.ObjectValue;
-                }
+                return par.ObjectValue;
             } else {
-                if (type.IsAssignableFrom(par.GetType())) {
-                    return par;
-                } else if (par is ScriptNumber) {
-                    return Util.IsEnum(type) ? ToEnum(type, ((ScriptNumber)par).ToLong()) : ChangeType_impl(par.ObjectValue, type);
-                } else if (par is ScriptArray) {
-                    return ChangeType_impl(par as ScriptArray, type);
-                } else if (par is ScriptUserdata) {
-                    if (Util.IsType(type))
-                        return ((ScriptUserdata)par).ValueType;
-                    else
-                        return par.ObjectValue;
-                } else {
+                if (par is ScriptUserdata && Util.IsType(type))
+                    return ((ScriptUserdata)par).ValueType;
+                else if (par is ScriptNumber)
+                    return ChangeType_impl(par.ObjectValue, type);
+                else
                     return par.ObjectValue;
-                }
             }
         }
         public static bool CanChangeType(ScriptObject[] pars, Type[] types)
@@ -151,18 +139,14 @@ namespace Scorpio
             } else {
                 if (par is ScriptString && Util.IsString(type)) {
                     return true;
-                } else if (par is ScriptNumber && (IsNumber(type) || IsEnum(type))) {
+                } else if (par is ScriptNumber && IsNumber(type)) {
                     return true;
                 } else if (par is ScriptBoolean && IsBool(type)) {
                     return true;
                 } else if (par is ScriptEnum && (par as ScriptEnum).EnumType == type) {
                     return true;
-                } else if (par is ScriptArray && type.IsArray) {
-                    return true;
                 } else if (par is ScriptUserdata) {
-                    if (Util.IsType(type))
-                        return true;
-                    else if (type.IsAssignableFrom(((ScriptUserdata)par).ValueType))
+                    if (Util.IsType(type) || type.IsAssignableFrom(((ScriptUserdata)par).ValueType))
                         return true;
                 } else if (type.IsAssignableFrom(par.GetType())) {
                     return true;
@@ -209,9 +193,5 @@ namespace Scorpio
         {
             return Convert.ToInt64(value);
         }
-        public static object ToEnum(Type type, object number)
-	    {
-            return Enum.ToObject(type, number);
-	    }
     }
 }

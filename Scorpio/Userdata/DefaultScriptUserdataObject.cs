@@ -35,8 +35,11 @@ namespace Scorpio.Userdata
                     throw new ScriptException("变量 [" + name + "] 不支持SetValue");
             }
         }
+        private bool m_InitializeConstructor;
+        private bool m_InitializeMethods;
         private ScorpioMethod m_Constructor;
-        private Dictionary<string, ScriptUserdataField> m_FieldInfos;                 //所有的变量 以及 get set函数
+        private MethodInfo[] m_Methods;                                 //所有函数
+        private Dictionary<string, ScriptUserdataField> m_FieldInfos;   //所有的变量 以及 get set函数
         private Dictionary<string, ScriptUserdata> m_NestedTypes;       //所有的类中类
         private Dictionary<string, ScriptFunction> m_Functions;         //所有的函数
         public DefaultScriptUserdataObject(Script script, object value) : base(script)
@@ -46,14 +49,39 @@ namespace Scorpio.Userdata
             m_FieldInfos = new Dictionary<string, ScriptUserdataField>();
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, ScriptFunction>();
-            m_Constructor = new ScorpioMethod(ValueType.ToString(), ValueType.GetConstructors());
-            MethodInfo[] methods = ValueType.GetMethods(Script.BindingFlag);
-            for (int i = 0; i < methods.Length;++i )
+            m_InitializeConstructor = false;
+            m_InitializeMethods = false;
+        }
+        private void InitializeConstructor()
+        {
+            if (m_InitializeConstructor == true) return;
+            m_InitializeConstructor = true;
+            m_Constructor = new ScorpioMethod(ValueType, ValueType.ToString(), ValueType.GetConstructors());
+        }
+        private void InitializeMethods()
+        {
+            if (m_InitializeMethods == true) return;
+            m_InitializeMethods = true;
+            m_Methods = ValueType.GetMethods(Script.BindingFlag);
+        }
+        public override ScriptObject Call(ScriptObject[] parameters)
+        {
+            InitializeConstructor();
+            return Script.CreateObject(m_Constructor.Call(parameters));
+        }
+        private ScriptFunction GetMethod(string strName)
+        {
+            InitializeMethods();
+            for (int i = 0; i < m_Methods.Length; ++i)
             {
-                string name = methods[i].Name;
-                if (!m_Functions.ContainsKey(name))
-                    m_Functions.Add(name, Script.CreateFunction(new ScorpioMethod(ValueType, name, Value)));
+                if (m_Methods[i].Name.Equals(strName))
+                {
+                    ScriptFunction method = Script.CreateFunction(new ScorpioMethod(ValueType, strName, this.Value, m_Methods));
+                    m_Functions.Add(strName, method);
+                    return method;
+                }
             }
+            return null;
         }
         private ScriptUserdataField GetField(string strName)
         {
@@ -89,10 +117,6 @@ namespace Scorpio.Userdata
             }
             return null;
         }
-        public override ScriptObject Call(ScriptObject[] parameters)
-        {
-            return Script.CreateObject(m_Constructor.Call(parameters));
-        }
         public override ScriptObject GetValue(string strName)
         {
             if (m_Functions.ContainsKey(strName))
@@ -100,14 +124,18 @@ namespace Scorpio.Userdata
             if (m_NestedTypes.ContainsKey(strName))
                 return m_NestedTypes[strName];
             ScriptUserdataField field = GetField(strName);
-            if (field != null) return Script.CreateObject(field.GetValue(Value));
+            if (field != null)
+                return Script.CreateObject(field.GetValue(Value));
             Type nestedType = ValueType.GetNestedType(strName, Script.BindingFlag);
             if (nestedType != null) {
                 ScriptUserdata ret = Script.CreateUserdata(nestedType);
                 m_NestedTypes.Add(strName, ret);
                 return ret;
             }
-            throw new ScriptException("Type[" + ValueType.ToString() + "] Variable[" + strName + "] 不存在");
+            ScriptObject func = GetMethod(strName);
+            if (func != null)
+                return func;
+            throw new ScriptException("Type[" + ValueType.ToString() + "] 变量 [" + strName + "] 不存在");
         }
         public override void SetValue(string strName, ScriptObject value)
         {
