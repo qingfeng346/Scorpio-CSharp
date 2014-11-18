@@ -5,6 +5,7 @@ using Scorpio;
 using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
+    /// <summary> 枚举类型 </summary>
     public class DefaultScriptUserdataEnum : ScriptUserdata
     {
         private Dictionary<string, ScriptEnum> m_Enums;                 //如果是枚举的话 所有枚举的值
@@ -24,8 +25,9 @@ namespace Scorpio.Userdata
         }
         public override ScriptObject GetValue(string strName)
         {
-            if (!m_Enums.ContainsKey(strName)) throw new ScriptException("枚举[" + ValueType.ToString() + "] 元素[" + strName + "] 不存在");
-            return m_Enums[strName];
+            if (m_Enums.ContainsKey(strName))
+                return m_Enums[strName];
+            throw new ScriptException("枚举[" + ValueType.ToString() + "] 元素[" + strName + "] 不存在");
         }
     }
 }

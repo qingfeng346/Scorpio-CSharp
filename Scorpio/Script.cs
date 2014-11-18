@@ -23,6 +23,7 @@ namespace Scorpio
         private ScriptTable m_GlobalTable;                                      //全局Table
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
+        private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();    //所有的类集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
         public ScriptObject LoadFile(String strFileName)
         {
@@ -198,6 +199,14 @@ namespace Scorpio
         public ScriptFunction CreateFunction(ScorpioMethod value)
         {
             return new ScriptFunction(this, value);
+        }
+        internal UserdataType GetScorpioType(Type type)
+        {
+            if (m_Types.ContainsKey(type))
+                return m_Types[type];
+            UserdataType scorpioType = new UserdataType(this, type);
+            m_Types.Add(type, scorpioType);
+            return scorpioType;
         }
         public void LoadLibrary()
         {

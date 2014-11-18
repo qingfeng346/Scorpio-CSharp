@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Scorpio.Userdata
 {
+    /// <summary> 动态委托类型实例 </summary>
     public class DefaultScriptUserdataDelegate : ScriptUserdata
     {
         private class FunctionParameter

@@ -99,8 +99,10 @@
     <Compile Include="ScriptTable.cs" />
     <Compile Include="ScriptUserdata.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="Userdata\UserdataMethod.cs" />
     <Compile Include="Variable\ScorpioMethod.cs" />
     <Compile Include="Variable\ScorpioScriptFunction.cs" />
+    <Compile Include="Userdata\UserdataType.cs" />
     <Compile Include="Variable\ScriptNumberDouble.cs" />
     <Compile Include="Variable\ScriptNumberLong.cs" />
   </ItemGroup>

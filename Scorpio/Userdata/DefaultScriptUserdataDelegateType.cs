@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 namespace Scorpio.Userdata
 {
+    /// <summary> 动态委托类型(声明) </summary>
     public class DefaultScriptUserdataDelegateType : ScriptUserdata
     {
         private static readonly MethodInfo DynamicDelegateMethod;
