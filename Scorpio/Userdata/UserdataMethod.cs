@@ -15,7 +15,7 @@ namespace Scorpio.Userdata
         {
             private int m_Type;                     //是普通函数还是构造函数
             private MethodInfo m_Method;            //普通函数对象
-            private FastInvokeHandler m_Handler;    //快速反射委托
+            //private FastInvokeHandler m_Handler;    //快速反射委托
             private ConstructorInfo m_Constructor;  //构造函数对象
             public Type[] ParameterType;            //所有参数类型
             public bool Params;                     //是否是变长参数
@@ -38,17 +38,18 @@ namespace Scorpio.Userdata
                 this.ParamType = ParamType;
                 this.Params = Params;
                 this.Args = new object[ParameterType.Length];
-                try {
-                    m_Handler = FastMethodInvoker.GetMethodInvoker(Method);
-                } catch (System.Exception) { }
+                //try {
+                //    m_Handler = FastMethodInvoker.GetMethodInvoker(Method);
+                //} catch (System.Exception) { }
             }
             public object Invoke(object obj, Type type)
             {
-                if (m_Type == 1) {
-                    return m_Handler != null ? m_Handler(obj, Args) : m_Method.Invoke(obj, Args);
-                } else {
-                    return m_Constructor.Invoke(Args);
-                }
+                return m_Type == 1 ? m_Method.Invoke(obj, Args) : m_Constructor.Invoke(Args);
+                //if (m_Type == 1) {
+                //    return m_Handler != null ? m_Handler(obj, Args) : m_Method.Invoke(obj, Args);
+                //} else {
+                //    return m_Constructor.Invoke(Args);
+                //}
             }
         }
         private Type m_Type;                            //所在类型
