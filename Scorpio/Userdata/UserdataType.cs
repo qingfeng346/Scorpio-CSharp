@@ -11,27 +11,40 @@ namespace Scorpio.Userdata
     {
         private class UserdataField
         {
-            public string name;
-            public Type fieldType;
-            public FieldInfo field;
-            public MethodInfo getMethod;
-            public MethodInfo setMethod;
+            public string Name;
+            public Type FieldType;
+            private FieldInfo m_Field;
+            private MethodInfo m_GetMethod;
+            private MethodInfo m_SetMethod;
+            public UserdataField(FieldInfo info)
+            {
+                m_Field = info;
+                Name = info.Name;
+                FieldType = info.FieldType;
+            }
+            public UserdataField(PropertyInfo info)
+            {
+                m_GetMethod = info.GetGetMethod();
+                m_SetMethod = info.GetSetMethod();
+                Name = info.Name;
+                FieldType = info.PropertyType;
+            }
             public object GetValue(object obj)
             {
-                if (field != null)
-                    return field.GetValue(obj);
-                else if (getMethod != null)
-                    return getMethod.Invoke(obj, null);
-                throw new ScriptException("变量 [" + name + "] 不支持GetValue");
+                if (m_Field != null)
+                    return m_Field.GetValue(obj);
+                else if (m_GetMethod != null)
+                    return m_GetMethod.Invoke(obj, null);
+                throw new ScriptException("变量 [" + Name + "] 不支持GetValue");
             }
             public void SetValue(object obj, object val)
             {
-                if (field != null)
-                    field.SetValue(obj, val);
-                else if (setMethod != null)
-                    setMethod.Invoke(obj, new object[] { val });
+                if (m_Field != null)
+                    m_Field.SetValue(obj, val);
+                else if (m_SetMethod != null)
+                    m_SetMethod.Invoke(obj, new object[] { val });
                 else
-                    throw new ScriptException("变量 [" + name + "] 不支持SetValue");
+                    throw new ScriptException("变量 [" + Name + "] 不支持SetValue");
             }
         }
         private Script m_Script;                                        //脚本系统
@@ -83,24 +96,19 @@ namespace Scorpio.Userdata
         {
             if (m_FieldInfos.ContainsKey(name))
                 return m_FieldInfos[name];
-            UserdataField field = new UserdataField();
-            field.name = name;
             FieldInfo fInfo = m_Type.GetField(name);
             if (fInfo != null)
             {
-                field.field = fInfo;
-                field.fieldType = fInfo.FieldType;
-                m_FieldInfos.Add(name, field);
-                return field;
+                UserdataField info = new UserdataField(fInfo);
+                m_FieldInfos.Add(name, info);
+                return info;
             }
             PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
             if (pInfo != null)
             {
-                field.getMethod = pInfo.GetGetMethod();
-                field.setMethod = pInfo.GetSetMethod();
-                field.fieldType = pInfo.PropertyType;
-                m_FieldInfos.Add(name, field);
-                return field;
+                UserdataField info = new UserdataField(pInfo);
+                m_FieldInfos.Add(name, info);
+                return info;
             }
             return null;
         }
@@ -133,7 +141,7 @@ namespace Scorpio.Userdata
         {
             UserdataField field = GetField(name);
             if (field == null) throw new ScriptException("SetValue Type[" + m_Type + "] 变量 [" + name + "] 不存在");
-            field.SetValue(obj, Util.ChangeType(value, field.fieldType));
+            field.SetValue(obj, Util.ChangeType(value, field.FieldType));
         }
     }
 }
