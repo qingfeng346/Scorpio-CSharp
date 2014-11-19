@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Scorpio;
 using Scorpio.Exception;
 using Scorpio.Variable;
 namespace Scorpio.Userdata
