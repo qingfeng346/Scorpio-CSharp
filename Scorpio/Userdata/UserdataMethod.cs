@@ -4,43 +4,35 @@ using System.Text;
 using System.Reflection;
 using Scorpio;
 using Scorpio.Exception;
-using System.Diagnostics;
 using Scorpio.FastMethod;
+using System.Diagnostics;
 namespace Scorpio.Userdata
 {
     /// <summary> 一个类的同名函数 </summary>
     public class UserdataMethod
     {
-        private abstract class IFunctionMethod
+        private class FunctionMethod
         {
+            private int m_Type;                     //是普通函数还是构造函数
+            private MethodInfo m_Method;            //普通函数对象
+            private FastInvokeHandler m_Handler;    //快速反射委托
+            private ConstructorInfo m_Constructor;  //构造函数对象
             public Type[] ParameterType;            //所有参数类型
             public bool Params;                     //是否是变长参数
             public Type ParamType;                  //变长参数类型
             public object[] Args;                   //参数数组（预创建 可以共用）
-            public abstract object Invoke(object obj, Type type);
-        }
-        private class FunctionConstructor : IFunctionMethod
-        {
-            protected ConstructorInfo m_Constructor;  //构造函数对象
-            public FunctionConstructor(ConstructorInfo Constructor, Type[] ParameterType, Type ParamType, bool Params)
+            public FunctionMethod(ConstructorInfo Constructor, Type[] ParameterType, Type ParamType, bool Params)
             {
+                m_Type = 0;
                 m_Constructor = Constructor;
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
                 this.Params = Params;
                 this.Args = new object[ParameterType.Length];
             }
-            public override object Invoke(object obj, Type type)
-            {
-                return m_Constructor.Invoke(Args);
-            }
-        }
-        private class FunctionMethod : IFunctionMethod
-        {
-            private MethodInfo m_Method;            //普通函数对象
-            private FastInvokeHandler m_Handler;    //快速反射对象
             public FunctionMethod(MethodInfo Method, Type[] ParameterType, Type ParamType, bool Params)
             {
+                m_Type = 1;
                 m_Method = Method;
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
@@ -48,21 +40,26 @@ namespace Scorpio.Userdata
                 this.Args = new object[ParameterType.Length];
                 try {
                     m_Handler = FastMethodInvoker.GetMethodInvoker(Method);
-                } catch (System.Exception ) { }
+                } catch (System.Exception) { }
             }
-            public override object Invoke(object obj, Type type)
+            public object Invoke(object obj, Type type)
             {
-                return m_Handler != null ? m_Handler(obj, Args) : m_Method.Invoke(obj, Args);
+                if (m_Type == 1) {
+                    return m_Handler != null ? m_Handler(obj, Args) : m_Method.Invoke(obj, Args);
+                } else {
+                    return m_Constructor.Invoke(Args);
+                }
             }
         }
         private Type m_Type;                            //所在类型
         private int m_Count;                            //相同名字函数数量
-        private IFunctionMethod[] m_Methods;            //所有函数对象
+        private FunctionMethod[] m_Methods;             //所有函数对象
         public string MethodName { get; private set; }  //函数名字
         public UserdataMethod(Type type, string methodName, MethodInfo[] methods)
         {
             List<MethodBase> methodBases = new List<MethodBase>();
-            foreach (MethodInfo method in methods) {
+            foreach (MethodInfo method in methods)
+            {
                 if (method.Name.Equals(methodName))
                     methodBases.Add(method);
             }
@@ -78,19 +75,21 @@ namespace Scorpio.Userdata
         {
             m_Type = type;
             MethodName = methodName;
-            List<IFunctionMethod> functionMethod = new List<IFunctionMethod>();
+            List<FunctionMethod> functionMethod = new List<FunctionMethod>();
             bool Params = false;
             Type ParamType = null;
             MethodBase method = null;
             List<Type> parameters = new List<Type>();
             int length = methods.Count;
-            for (int i = 0; i < length; ++i) {
+            for (int i = 0; i < length; ++i)
+            {
                 Params = false;
                 ParamType = null;
                 parameters.Clear();
                 method = methods[i];
                 ParameterInfo[] pars = method.GetParameters();
-                foreach (ParameterInfo par in pars) {
+                foreach (ParameterInfo par in pars)
+                {
                     parameters.Add(par.ParameterType);
                     Params = Util.IsParamArray(par);
                     if (Params) ParamType = par.ParameterType.GetElementType();
@@ -98,7 +97,7 @@ namespace Scorpio.Userdata
                 if (method is MethodInfo)
                     functionMethod.Add(new FunctionMethod(method as MethodInfo, parameters.ToArray(), ParamType, Params));
                 else
-                    functionMethod.Add(new FunctionConstructor(method as ConstructorInfo, parameters.ToArray(), ParamType, Params));
+                    functionMethod.Add(new FunctionMethod(method as ConstructorInfo, parameters.ToArray(), ParamType, Params));
             }
             m_Methods = functionMethod.ToArray();
             m_Count = m_Methods.Length;
@@ -106,7 +105,7 @@ namespace Scorpio.Userdata
         public object Call(object obj, ScriptObject[] parameters)
         {
             if (m_Count == 0) throw new ScriptException("找不到函数 [" + MethodName + "]");
-            IFunctionMethod methodInfo = null;
+            FunctionMethod methodInfo = null;
             if (m_Count == 1) {
                 if (parameters.Length == m_Methods[0].ParameterType.Length)
                     methodInfo = m_Methods[0];
@@ -138,14 +137,16 @@ namespace Scorpio.Userdata
                         }
                         if (fit) {
                             object[] objs = method.Args;
-                            for (int i = 0; i < length - 1; ++i) {
+                            for (int i = 0; i < length - 1; ++i)
+                            {
                                 objs[i] = Util.ChangeType(parameters[i], method.ParameterType[i]);
                             }
                             List<object> param = new List<object>();
-                            for (int i = length - 1; i < parameters.Length; ++i) {
+                            for (int i = length - 1; i < parameters.Length; ++i)
+                            {
                                 param.Add(Util.ChangeType(parameters[i], method.ParamType));
                             }
-                            objs[length -1] = param.ToArray();
+                            objs[length - 1] = param.ToArray();
                             return method.Invoke(obj, m_Type);
                         }
                     }
