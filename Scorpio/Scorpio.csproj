@@ -68,6 +68,7 @@
     <Compile Include="Compiler\TokenType.cs" />
     <Compile Include="Exception\InteriorException.cs" />
     <Compile Include="Exception\StackInfo.cs" />
+    <Compile Include="FastMethod\FastMethodInvoker.cs" />
     <Compile Include="ScriptEnum.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataDelegate.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataDelegateType.cs" />

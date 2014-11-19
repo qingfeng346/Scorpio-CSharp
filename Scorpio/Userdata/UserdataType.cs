@@ -85,29 +85,20 @@ namespace Scorpio.Userdata
                 return m_FieldInfos[name];
             UserdataField field = new UserdataField();
             field.name = name;
-            FieldInfo info = m_Type.GetField(name);
-            if (info != null)
+            FieldInfo fInfo = m_Type.GetField(name);
+            if (fInfo != null)
             {
-                field.field = info;
-                field.fieldType = info.FieldType;
+                field.field = fInfo;
+                field.fieldType = fInfo.FieldType;
                 m_FieldInfos.Add(name, field);
                 return field;
             }
-            MethodInfo method = m_Type.GetMethod("get_" + name, Script.BindingFlag);
-            if (method != null)
+            PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
+            if (pInfo != null)
             {
-                field.getMethod = method;
-                field.fieldType = method.ReturnType;
-                field.setMethod = m_Type.GetMethod("set_" + name, Script.BindingFlag);
-                m_FieldInfos.Add(name, field);
-                return field;
-            }
-            method = m_Type.GetMethod("set_" + name, Script.BindingFlag);
-            if (method != null)
-            {
-                field.setMethod = method;
-                field.fieldType = method.GetParameters()[0].ParameterType;
-                field.getMethod = m_Type.GetMethod("get_" + name, Script.BindingFlag);
+                field.getMethod = pInfo.GetGetMethod();
+                field.setMethod = pInfo.GetSetMethod();
+                field.fieldType = pInfo.PropertyType;
                 m_FieldInfos.Add(name, field);
                 return field;
             }
