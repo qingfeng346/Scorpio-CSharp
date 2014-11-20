@@ -5,6 +5,8 @@
 ## 脚本示例放在  ScorpioDemo/Scripts 目录
 ## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  左侧选中要测试的脚本 点击 Run Script 按钮 即可
 ## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 (现Scorpio-Java已发布 https://github.com/qingfeng346/Scorpio-Java)
+## 性能比较用例（C#light,ulua,Scorpio-CSharp比较）（https://github.com/qingfeng346/ScriptTestor）
+
 
 ## v0.0.6beta (2014-11-14) ##
 -----------
