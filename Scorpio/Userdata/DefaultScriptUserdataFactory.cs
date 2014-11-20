@@ -7,8 +7,9 @@ namespace Scorpio.Userdata
     /// <summary> 默认的Userdata工厂类 </summary>
     public class DefaultScriptUserdataFactory : IScriptUserdataFactory
     {
-        private Dictionary<Type, DefaultScriptUserdataEnum> m_Enums = new Dictionary<Type, DefaultScriptUserdataEnum>();
-        private Dictionary<Type, DefaultScriptUserdataDelegateType> m_Delegates = new Dictionary<Type, DefaultScriptUserdataDelegateType>();
+        private Dictionary<Type, DefaultScriptUserdataEnum> m_Enums = new Dictionary<Type, DefaultScriptUserdataEnum>();                        //所有枚举集合
+        private Dictionary<Type, DefaultScriptUserdataDelegateType> m_Delegates = new Dictionary<Type, DefaultScriptUserdataDelegateType>();    //所有委托类型集合
+        private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                                                  //所有的类集合
         private DefaultScriptUserdataEnum GetEnum(Script script, Type type)
         {
             if (m_Enums.ContainsKey(type))
@@ -25,6 +26,14 @@ namespace Scorpio.Userdata
             m_Delegates.Add(type, ret);
             return ret;
         }
+        private UserdataType GetScorpioType(Script script, Type type)
+        {
+            if (m_Types.ContainsKey(type))
+                return m_Types[type];
+            UserdataType scorpioType = new UserdataType(script, type);
+            m_Types.Add(type, scorpioType);
+            return scorpioType;
+        }
         public ScriptUserdata create(Script script, object obj)
         {
             Type type = obj as Type;
@@ -33,10 +42,12 @@ namespace Scorpio.Userdata
                     return GetEnum(script, type);
                 else if (Util.IsDelegate(type))
                     return GetDelegate(script, type);
+                else
+                    return new DefaultScriptUserdataObject(script, obj, GetScorpioType(script, type));
             }
             if (obj is Delegate)
                 return new DefaultScriptUserdataDelegate(script, (Delegate)obj);
-            return new DefaultScriptUserdataObject(script, obj);
+            return new DefaultScriptUserdataObject(script, obj, GetScorpioType(script, obj.GetType()));
         }
     }
 }

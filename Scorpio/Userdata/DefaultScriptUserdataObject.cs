@@ -11,11 +11,11 @@ namespace Scorpio.Userdata
     public class DefaultScriptUserdataObject : ScriptUserdata
     {
         private UserdataType m_Type;
-        public DefaultScriptUserdataObject(Script script, object value) : base(script)
+        public DefaultScriptUserdataObject(Script script, object value, UserdataType type) : base(script)
         {
             this.Value = value;
             this.ValueType = (Value is Type) ? (Type)Value : Value.GetType();
-            m_Type = script.GetScorpioType(ValueType);
+            this.m_Type = type;
         }
         public override ScriptObject Call(ScriptObject[] parameters)
         {
