@@ -19,7 +19,7 @@ namespace Scorpio.Userdata
                 m_Enums[v.ToString()] = script.CreateEnum(v);
             }
         }
-        public override ScriptObject Call(ScriptObject[] parameters)
+        public override object Call(ScriptObject[] parameters)
         {
             throw new ScriptException("枚举类型不支持实例化");
         }

@@ -27,7 +27,7 @@ namespace Scorpio.Userdata
             {
                 if (Util.IsVoid(m_ReturnType))
                     return m_Function.call(args);
-                return Util.ChangeType(m_Function.call(args), m_ReturnType);
+                return Util.ChangeType((ScriptObject)m_Function.call(args), m_ReturnType);
             }
         }
         private class DelegateInfo
@@ -84,9 +84,9 @@ namespace Scorpio.Userdata
             this.ValueType = value;
             this.m_Info = new DelegateInfo(value);
         }
-        public override ScriptObject Call(ScriptObject[] parameters)
+        public override object Call(ScriptObject[] parameters)
         {
-            return Script.CreateObject(m_Info.CreateDelegate(new DynamicDelegate((ScriptFunction)parameters[0], m_Info.GetReturnType())));
+            return m_Info.CreateDelegate(new DynamicDelegate((ScriptFunction)parameters[0], m_Info.GetReturnType()));
         }
     }
 }

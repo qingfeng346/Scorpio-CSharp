@@ -17,9 +17,9 @@ namespace Scorpio.Userdata
             this.ValueType = (Value is Type) ? (Type)Value : Value.GetType();
             this.m_Type = type;
         }
-        public override ScriptObject Call(ScriptObject[] parameters)
+        public override object Call(ScriptObject[] parameters)
         {
-            return Script.CreateObject(m_Type.CreateInstance(parameters));
+            return m_Type.CreateInstance(parameters);
         }
         public override ScriptObject GetValue(string strName)
         {

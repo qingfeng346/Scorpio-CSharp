@@ -36,9 +36,9 @@ namespace Scorpio
         //获取变量
         public virtual ScriptObject GetValue(object key) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(object)"); }
         //调用无参函数
-        public ScriptObject Call() { return Call(NOPARAMETER); }
+        public object Call() { return Call(NOPARAMETER); }
         //调用函数
-        public virtual ScriptObject Call(ScriptObject[] parameters) { throw new ExecutionException("类型[" + Type + "]不支持函数调用"); }
+        public virtual object Call(ScriptObject[] parameters) { throw new ExecutionException("类型[" + Type + "]不支持函数调用"); }
         public virtual ScriptObject Clone() { return this; }                            // 复制一个变量
         public override string ToString() { return ObjectValue.ToString(); }            // ToString
         public ScriptObject(Script script) { Script = script; }                         // 构图函数

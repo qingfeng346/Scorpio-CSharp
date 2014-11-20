@@ -37,7 +37,7 @@ namespace Scorpio.Userdata
             }
             m_ParameterCount = m_Parameters.Count;
         }
-        public override ScriptObject Call(ScriptObject[] parameters)
+        public override object Call(ScriptObject[] parameters)
         {
             FunctionParameter parameter;
             for (int i = 0; i < m_ParameterCount; i++)
@@ -49,7 +49,7 @@ namespace Scorpio.Userdata
                     m_Objects[i] = Util.ChangeType(parameters[i], parameter.ParameterType);
                 }
             }
-            return Script.CreateObject(m_Delegate.DynamicInvoke(m_Objects));
+            return m_Delegate.DynamicInvoke(m_Objects);
         }
     }
 }

@@ -301,7 +301,7 @@ namespace Scorpio.Runtime
             ScriptObject obj;
             for ( ; ; )
             {
-                obj = ((ScriptFunction)loop).Call();
+                obj = m_script.CreateObject(((ScriptFunction)loop).Call());
                 if (obj == null || obj is ScriptNull) return;
                 code.Context.Initialize(this, code.Identifier, obj);
                 code.Context.Execute();
@@ -402,7 +402,7 @@ namespace Scorpio.Runtime
         }
         void ProcessCallFunction()
         {
-            ParseCall((CodeCallFunction)m_scriptInstruction.Operand0);
+            ParseCall((CodeCallFunction)m_scriptInstruction.Operand0, false);
         }
         private void InvokeReturnValue(ScriptObject value)
         {
@@ -438,7 +438,7 @@ namespace Scorpio.Runtime
             } else if (value is CodeFunction) {
                 return ParseFunction((CodeFunction)value);
             } else if (value is CodeCallFunction) {
-                return ParseCall(value as CodeCallFunction);
+                return ParseCall(value as CodeCallFunction, true);
             } else if (value is CodeMember) {
                 return GetVariable(value as CodeMember);
             } else if (value is CodeArray) {
@@ -480,7 +480,7 @@ namespace Scorpio.Runtime
             func.Func.SetParentContext(this);
             return func.Func;
         }
-        ScriptObject ParseCall(CodeCallFunction scriptFunction)
+        ScriptObject ParseCall(CodeCallFunction scriptFunction, bool needRet)
         {
             ScriptObject obj = ResolveOperand(scriptFunction.Member);
             int num = scriptFunction.Parameters.Count;
@@ -489,7 +489,8 @@ namespace Scorpio.Runtime
                 parameters[i] = ResolveOperand(scriptFunction.Parameters[i]);
             }
             m_script.PushStackInfo();
-            return obj.Call(parameters);
+            object ret = obj.Call(parameters);
+            return needRet ? m_script.CreateObject(ret) : null;
         }
         ScriptArray ParseArray(CodeArray array)
         {

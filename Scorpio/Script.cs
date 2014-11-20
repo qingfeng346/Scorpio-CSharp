@@ -113,7 +113,7 @@ namespace Scorpio
         {
             m_GlobalTable.SetValue(key, value);
         }
-        public ScriptObject Call(String strName, params object[] args)
+        public object Call(String strName, params object[] args)
         {
             ScriptObject obj = m_GlobalTable.GetValue(strName);
             if (obj is ScriptNull) throw new ScriptException("找不到变量[" + strName + "]");

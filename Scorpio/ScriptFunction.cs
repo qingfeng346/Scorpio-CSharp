@@ -79,7 +79,7 @@ namespace Scorpio
             if (FunctionType == FunstionType.Script)
                 m_ScriptFunction.SetParentContext(context);
         }
-        public ScriptObject call(params object[] args)
+        public object call(params object[] args)
         {
             int length = args.Length;
             ScriptObject[] parameters = new ScriptObject[length];
@@ -89,17 +89,17 @@ namespace Scorpio
             }
             return Call(parameters);
         }
-        public override ScriptObject Call(ScriptObject[] parameters)
+        public override object Call(ScriptObject[] parameters)
         {
             if (FunctionType == FunstionType.Script) {
                 return m_ScriptFunction.Call(m_stackObject, parameters);
             } else {
                 if (FunctionType == FunstionType.Function) {
-                    return Script.CreateObject(m_Function(parameters));
+                    return m_Function(parameters);
                 } else if (FunctionType == FunstionType.Handle) {
-                    return Script.CreateObject(m_Handle.Call(parameters));
+                    return m_Handle.Call(parameters);
                 } else if (FunctionType == FunstionType.Method) {
-                    return Script.CreateObject(m_Method.Call(parameters));
+                    return m_Method.Call(parameters);
                 }
             }
             return null;
