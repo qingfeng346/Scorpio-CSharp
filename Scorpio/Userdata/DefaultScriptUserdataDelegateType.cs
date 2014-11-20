@@ -14,7 +14,7 @@ namespace Scorpio.Userdata
         {
             DynamicDelegateMethod = DynamicDelegateType.GetMethod("MyFunction");
         }
-        public class DynamicDelegate
+        private class DynamicDelegate
         {
             private Type m_ReturnType;
             private ScriptFunction m_Function;
@@ -76,18 +76,13 @@ namespace Scorpio.Userdata
                 return InvokeMethod.ReturnType;
             }
         }
-        private static Dictionary<Type, DelegateInfo> m_DynamicMethod = new Dictionary<Type, DelegateInfo>();
+        
         private DelegateInfo m_Info;
         public DefaultScriptUserdataDelegateType(Script script, Type value) : base(script)
         {
             this.Value = value;
             this.ValueType = value;
-            if (m_DynamicMethod.ContainsKey(value)) {
-                m_Info = m_DynamicMethod[value];
-            } else {
-                m_Info = new DelegateInfo(value);
-                m_DynamicMethod.Add(value, m_Info);
-            }
+            this.m_Info = new DelegateInfo(value);
         }
         public override ScriptObject Call(ScriptObject[] parameters)
         {

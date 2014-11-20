@@ -7,15 +7,32 @@ namespace Scorpio.Userdata
     /// <summary> 默认的Userdata工厂类 </summary>
     public class DefaultScriptUserdataFactory : IScriptUserdataFactory
     {
+        private Dictionary<Type, DefaultScriptUserdataEnum> m_Enums = new Dictionary<Type, DefaultScriptUserdataEnum>();
+        private Dictionary<Type, DefaultScriptUserdataDelegateType> m_Delegates = new Dictionary<Type, DefaultScriptUserdataDelegateType>();
+        private DefaultScriptUserdataEnum GetEnum(Script script, Type type)
+        {
+            if (m_Enums.ContainsKey(type))
+                return m_Enums[type];
+            DefaultScriptUserdataEnum ret = new DefaultScriptUserdataEnum(script, type);
+            m_Enums.Add(type, ret);
+            return ret;
+        }
+        private DefaultScriptUserdataDelegateType GetDelegate(Script script, Type type)
+        {
+            if (m_Delegates.ContainsKey(type))
+                return m_Delegates[type];
+            DefaultScriptUserdataDelegateType ret = new DefaultScriptUserdataDelegateType(script, type);
+            m_Delegates.Add(type, ret);
+            return ret;
+        }
         public ScriptUserdata create(Script script, object obj)
         {
             Type type = obj as Type;
-            if (type != null)
-            {
+            if (type != null) {
                 if (Util.IsEnum(type))
-                    return new DefaultScriptUserdataEnum(script, type);
+                    return GetEnum(script, type);
                 else if (Util.IsDelegate(type))
-                    return new DefaultScriptUserdataDelegateType(script, type);
+                    return GetDelegate(script, type);
             }
             if (obj is Delegate)
                 return new DefaultScriptUserdataDelegate(script, (Delegate)obj);
