@@ -1,5 +1,5 @@
 # Scorpio-CSharp #
-* author : while
+* author ：while
 * QQ群 ：245199668
 
 ## 脚本示例放在  ScorpioDemo/Scripts 目录
