@@ -7,6 +7,12 @@
 ## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 (现Scorpio-Java已发布 https://github.com/qingfeng346/Scorpio-Java)
 ## 性能比较用例（C#light,ulua,Scorpio-CSharp比较）（https://github.com/qingfeng346/ScriptTestor）
 
+## v0.0.7beta (2014-11-25) ##
+-----------
+* 增加声明泛型类的函数 示例： ListInt 就相当于c#的List<int>
+    * List = import_type("System.Collections.Generic.List`1") 
+      ListInt = generic_type(List, import_type("System.Int32")) 
+* 大幅优化与c#交互效率 具体测试结果请参考 （https://github.com/qingfeng346/ScriptTestor）
 
 ## v0.0.6beta (2014-11-14) ##
 -----------
