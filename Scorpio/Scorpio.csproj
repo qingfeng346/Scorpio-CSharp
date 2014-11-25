@@ -98,7 +98,6 @@
     <Compile Include="ScriptString.cs" />
     <Compile Include="ScriptTable.cs" />
     <Compile Include="ScriptUserdata.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdataObjectType.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Userdata\UserdataMethod.cs" />
     <Compile Include="Variable\ScorpioMethod.cs" />
