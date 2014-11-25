@@ -147,6 +147,7 @@ namespace Scorpio.Library
             script.SetObjectInternal("load_assembly_safe", script.CreateFunction(new load_assembly_safe(script)));
             script.SetObjectInternal("push_assembly", script.CreateFunction(new push_assembly(script)));
             script.SetObjectInternal("import_type", script.CreateFunction(new import_type(script)));
+            script.SetObjectInternal("generic_type", script.CreateFunction(new generic_type(script)));
         }
         private class print : ScorpioHandle
         {
@@ -342,6 +343,27 @@ namespace Scorpio.Library
                 ScriptString str = args[0] as ScriptString;
                 if (str == null) throw new ExecutionException("import_type 参数必须是 string");
                 return m_script.LoadType(str.Value);
+            }
+        }
+        private class generic_type : ScorpioHandle
+        {
+            private Script m_script;
+            public generic_type(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args)
+            {
+                ScriptUserdata userdata = args[0] as ScriptUserdata;
+                if (userdata == null) throw new ExecutionException("generic_type 参数必须是 userdata");
+                Type[] types = new Type[args.Length - 1];
+                for (int i = 1; i < args.Length; ++i)
+                {
+                    ScriptUserdata type = args[i] as ScriptUserdata;
+                    if (userdata == null) throw new ExecutionException("generic_type 参数必须是 userdata");
+                    types[i - 1] = type.ValueType;
+                }
+                return userdata.ValueType.MakeGenericType(types);
             }
         }
     }
