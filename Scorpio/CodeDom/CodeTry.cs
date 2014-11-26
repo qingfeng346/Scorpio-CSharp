@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Scorpio.CodeDom
 {
+    //try catch 语句
     public class CodeTry : CodeObject
     {
         public ScriptContext TryContext;            //try指令执行

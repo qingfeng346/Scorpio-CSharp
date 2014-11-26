@@ -6,6 +6,7 @@ using Scorpio.CodeDom;
 using Scorpio.Runtime;
 namespace Scorpio.CodeDom.Temp
 {
+    /// <summary> switch语句中一个cast条件</summary>
     internal class TempCase
     {
         public List<object> Allow;                  //判断条件

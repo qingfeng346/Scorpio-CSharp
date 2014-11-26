@@ -181,6 +181,14 @@ namespace Scorpio
             }
             return array;
         }
+        public static void Assert(bool b)
+        {
+            Assert(b, "");
+        }
+        public static void Assert(bool b, string message)
+        {
+            if (!b) throw new ExecutionEngineException(message);
+        }
         public static int ToInt32(object value)
         {
             return Convert.ToInt32(value);

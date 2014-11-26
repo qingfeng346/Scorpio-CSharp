@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Scorpio.Exception
 {
+    //堆栈信息
     public class StackInfo
     {
         public string Breviary = "";     // 文件摘要

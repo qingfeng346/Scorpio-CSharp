@@ -122,10 +122,10 @@ namespace Scorpio.Userdata
         /// <summary> 获得一个类变量 </summary>
         public object GetValue(object obj, string name)
         {
-            if (m_Functions.ContainsKey(name)) return new ScorpioMethod(obj, name, m_Functions[name]);
+            if (m_Functions.ContainsKey(name)) return m_Functions[name];
             if (m_NestedTypes.ContainsKey(name)) return m_NestedTypes[name];
             UserdataField field = GetField(name);
-            if (field != null) return m_Script.CreateObject(field.GetValue(obj));
+            if (field != null) return field.GetValue(obj);
             Type nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
             if (nestedType != null)
             {
@@ -134,7 +134,7 @@ namespace Scorpio.Userdata
                 return ret;
             }
             UserdataMethod func = GetMethod(name);
-            if (func != null) return new ScorpioMethod(obj, name, func);
+            if (func != null) return func;
             throw new ScriptException("GetValue Type[" + m_Type.ToString() + "] 变量 [" + name + "] 不存在");
         }
         /// <summary> 设置一个类变量 </summary>

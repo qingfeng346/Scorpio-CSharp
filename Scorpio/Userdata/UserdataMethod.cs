@@ -46,6 +46,7 @@ namespace Scorpio.Userdata
         private int m_Count;                            //相同名字函数数量
         private FunctionMethod[] m_Methods;             //所有函数对象
         public string MethodName { get; private set; }  //函数名字
+        public bool IsStatic { get; private set; }      //是否是静态函数
         public UserdataMethod(Type type, string methodName, MethodInfo[] methods)
         {
             List<MethodBase> methodBases = new List<MethodBase>();
@@ -54,10 +55,12 @@ namespace Scorpio.Userdata
                 if (method.Name.Equals(methodName))
                     methodBases.Add(method);
             }
+            IsStatic = methodBases.Count > 0 ? methodBases[0].IsStatic : false;
             Initialize(type, methodName, methodBases);
         }
         public UserdataMethod(Type type, string methodName, ConstructorInfo[] cons)
         {
+            IsStatic = false;
             List<MethodBase> methods = new List<MethodBase>();
             methods.AddRange(cons);
             Initialize(type, methodName, methods);

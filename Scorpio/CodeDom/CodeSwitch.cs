@@ -5,6 +5,7 @@ using Scorpio;
 using Scorpio.CodeDom.Temp;
 namespace Scorpio.CodeDom
 {
+    //switch语句
     public class CodeSwitch : CodeObject
     {
         internal CodeObject Condition;

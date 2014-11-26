@@ -6,6 +6,7 @@ using Scorpio.CodeDom;
 using Scorpio.Runtime;
 namespace Scorpio.CodeDom.Temp
 {
+    /// <summary> if语句中一个 if语句 </summary>
     internal class TempCondition
     {
         public CodeObject Allow;                        //判断条件

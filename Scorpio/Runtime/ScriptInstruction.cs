@@ -21,9 +21,9 @@ namespace Scorpio.Runtime
             Opcode = opcode;
             Value = value;
         }
-        public Opcode Opcode { get; private set; }
-        public CodeObject Operand0 { get; private set; }
-        public CodeObject Operand1 { get; private set; }
-        public object Value { get; private set; }
+        public Opcode Opcode { get; private set; }          //指令类型
+        public CodeObject Operand0 { get; private set; }    //指令值1
+        public CodeObject Operand1 { get; private set; }    //指令值2
+        public object Value { get; private set; }           //指令值
     }
 }

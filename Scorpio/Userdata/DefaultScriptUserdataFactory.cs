@@ -43,7 +43,7 @@ namespace Scorpio.Userdata
                 else if (Util.IsDelegate(type))
                     return GetDelegate(script, type);
                 else
-                    return new DefaultScriptUserdataObject(script, obj, GetScorpioType(script, type));
+                    return new DefaultScriptUserdataObjectType(script, type, GetScorpioType(script, type));
             }
             if (obj is Delegate)
                 return new DefaultScriptUserdataDelegate(script, (Delegate)obj);

@@ -7,7 +7,6 @@ namespace Scorpio.Runtime
 {
     public enum Executable_Block
     {
-
         None,
         //上下文
         Context,
