@@ -13,8 +13,8 @@ namespace Scorpio.Userdata
         private class FunctionMethod
         {
             private int m_Type;                     //是普通函数还是构造函数
-            private MethodInfo m_Method;            //普通函数对象
-            private ConstructorInfo m_Constructor;  //构造函数对象
+            public ConstructorInfo Constructor;  //构造函数对象
+            public MethodInfo Method;              //普通函数对象
             public Type[] ParameterType;            //所有参数类型
             public bool Params;                     //是否是变长参数
             public Type ParamType;                  //变长参数类型
@@ -22,7 +22,7 @@ namespace Scorpio.Userdata
             public FunctionMethod(ConstructorInfo Constructor, Type[] ParameterType, Type ParamType, bool Params)
             {
                 m_Type = 0;
-                m_Constructor = Constructor;
+                this.Constructor = Constructor;
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
                 this.Params = Params;
@@ -31,7 +31,7 @@ namespace Scorpio.Userdata
             public FunctionMethod(MethodInfo Method, Type[] ParameterType, Type ParamType, bool Params)
             {
                 m_Type = 1;
-                m_Method = Method;
+                this.Method = Method;
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
                 this.Params = Params;
@@ -39,7 +39,7 @@ namespace Scorpio.Userdata
             }
             public object Invoke(object obj, Type type)
             {
-                return m_Type == 1 ? m_Method.Invoke(obj, Args) : m_Constructor.Invoke(Args);
+                return m_Type == 1 ? Method.Invoke(obj, Args) : Constructor.Invoke(Args);
             }
         }
         private Type m_Type;                            //所在类型
@@ -64,6 +64,29 @@ namespace Scorpio.Userdata
             List<MethodBase> methods = new List<MethodBase>();
             methods.AddRange(cons);
             Initialize(type, methodName, methods);
+        }
+        private UserdataMethod(Type type, string methodName, MethodInfo method)
+        {
+            IsStatic = method.IsStatic;
+            Initialize(type, methodName, new List<MethodBase>() { method });
+        }
+        public UserdataMethod MakeGenericMethod(ScriptObject[] parameters)
+        {
+            int length = parameters.Length;
+            Type[] typeArguments = new Type[length];
+            for (int i = 0; i < length; ++i) {
+                Util.Assert(parameters[i] is ScriptUserdata);
+                typeArguments[i] = (parameters[i] as ScriptUserdata).ValueType;
+            }
+            for (int i = 0; i < m_Count; ++i) {
+                if (m_Methods[i].Method.IsGenericMethod) {
+                    //此处代码 因为暂时没找到获取泛型个数的函数 所以只能用此笨方法 见谅见谅
+                    try {
+                        return new UserdataMethod(m_Type, MethodName, m_Methods[i].Method.MakeGenericMethod(typeArguments));
+                    } catch (System.Exception ) { }
+                }
+            }
+            throw new ExecutionException("没有找到合适的泛型函数 " + MethodName);
         }
         private void Initialize(Type type, string methodName, List<MethodBase> methods)
         {
