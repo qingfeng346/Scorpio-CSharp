@@ -41,7 +41,7 @@ namespace Scorpio.Variable
             Util.Assert(parameters[0] is ScriptUserdata);
             if (length > 1) {
                 ScriptObject[] pars = new ScriptObject[parameters.Length - 1];
-                Array.Copy(parameters, pars, pars.Length);
+                Array.Copy(parameters, 1, pars, 0, pars.Length);
                 return Method.Call(parameters[0].ObjectValue, pars);
             } else {
                 return Method.Call(parameters[0].ObjectValue, new ScriptObject[0]);
