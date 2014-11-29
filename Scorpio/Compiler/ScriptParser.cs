@@ -73,21 +73,7 @@ namespace Scorpio.Compiler
             switch (token.Type)
             {
                 case TokenType.Var:
-                    {
-                        string str = ReadIdentifier();
-                        m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, str));
-                        Token peek = PeekToken();
-                        if (peek.Type == TokenType.Assign) {
-                            UndoToken();
-                            ParseStatement();
-                        } else if (peek.Type == TokenType.Comma) {
-                            while (PeekToken().Type == TokenType.Comma)
-                            {
-                                ReadToken();
-                                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, ReadIdentifier()));
-                            }
-                        }
-                    }
+                    ParseVar();
                     break;
                 case TokenType.LeftBrace:
                     ParseBlock();
@@ -190,6 +176,23 @@ namespace Scorpio.Compiler
             ReadRightParenthesis();
             ScriptExecutable executable = ParseStatementBlock(Executable_Block.Function);
             return m_script.CreateFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable, bParams));
+        }
+        //解析Var关键字
+        private void ParseVar()
+        {
+            for (; ; ) {
+                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, ReadIdentifier()));
+                Token peek = PeekToken();
+                if (peek.Type == TokenType.Assign) {
+                    UndoToken();
+                    ParseStatement();
+                }
+                peek = ReadToken();
+                if (peek.Type != TokenType.Comma) {
+                    UndoToken();
+                    break;
+                }
+            }
         }
         //解析普通代码块 {}
         private void ParseBlock()
