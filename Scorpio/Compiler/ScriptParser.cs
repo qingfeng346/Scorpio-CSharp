@@ -100,21 +100,12 @@ namespace Scorpio.Compiler
                     ParseThrow();
                     break;
                 case TokenType.Return:
-                    {
-                        Token peek = PeekToken();
-                        if (peek.Type == TokenType.RightBrace ||
-                            peek.Type == TokenType.SemiColon ||
-                            peek.Type == TokenType.Finished)
-                            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(m_script, null)));
-                        else
-                            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
-                    }
+                    ParseReturn();
                     break;
                 case TokenType.Identifier:
                 case TokenType.Increment:
                 case TokenType.Decrement:
                 case TokenType.Eval:
-                    UndoToken();
                     ParseExpression();
                     break;
                 case TokenType.Break:
@@ -392,9 +383,21 @@ namespace Scorpio.Compiler
             ret.obj = GetObject();
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.THROW, ret));
         }
+        //解析return
+        private void ParseReturn()
+        {
+            Token peek = PeekToken();
+            if (peek.Type == TokenType.RightBrace ||
+                peek.Type == TokenType.SemiColon ||
+                peek.Type == TokenType.Finished)
+                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(m_script, null)));
+            else
+                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
+        }
         //解析表达式
         private void ParseExpression()
         {
+            UndoToken();
             Token peek = PeekToken();
             CodeObject member = GetObject();
             if (member is CodeCallFunction) {
