@@ -54,9 +54,10 @@ namespace Scorpio.Userdata
         private bool m_InitializeMethods;                               //是否初始化过所有函数
         private UserdataMethod m_Constructor;                            //所有构造函数
         private MethodInfo[] m_Methods;                                 //所有函数
-        private Dictionary<string, UserdataField> m_FieldInfos;   //所有的变量 以及 get set函数
+        private Dictionary<string, UserdataField> m_FieldInfos;         //所有的变量 以及 get set函数
         private Dictionary<string, ScriptUserdata> m_NestedTypes;       //所有的类中类
-        private Dictionary<string, UserdataMethod> m_Functions;          //所有的函数
+        private Dictionary<string, UserdataMethod> m_Functions;         //所有的函数
+        private Dictionary<string, ScorpioMethod> m_ScorpioMethods;     //所有的静态函数和类函数（不包含对象函数）
         public UserdataType(Script script, Type type)
         {
             m_Script = script;
@@ -66,6 +67,7 @@ namespace Scorpio.Userdata
             m_FieldInfos = new Dictionary<string, UserdataField>();
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, UserdataMethod>();
+            m_ScorpioMethods = new Dictionary<string, ScorpioMethod>();
         }
         private void InitializeConstructor()
         {
@@ -92,6 +94,19 @@ namespace Scorpio.Userdata
                 }
             }
             return null;
+        }
+        private ScorpioMethod GetMethod(object obj, string name, UserdataMethod method)
+        {
+            if (method.IsStatic) {
+                ScorpioMethod ret = new ScorpioStaticMethod(name, method);
+                m_ScorpioMethods[name] = ret;
+                return ret;
+            } else if (obj == null) {
+                ScorpioMethod ret = new ScorpioTypeMethod(name, method);
+                m_ScorpioMethods[name] = ret;
+                return ret;
+            }
+            return new ScorpioObjectMethod(obj, name, method);
         }
         private UserdataField GetField(string name)
         {
@@ -122,7 +137,8 @@ namespace Scorpio.Userdata
         /// <summary> 获得一个类变量 </summary>
         public object GetValue(object obj, string name)
         {
-            if (m_Functions.ContainsKey(name)) return m_Functions[name];
+            if (m_ScorpioMethods.ContainsKey(name)) return m_ScorpioMethods[name];
+            if (m_Functions.ContainsKey(name)) return GetMethod(obj, name, m_Functions[name]);
             if (m_NestedTypes.ContainsKey(name)) return m_NestedTypes[name];
             UserdataField field = GetField(name);
             if (field != null) return field.GetValue(obj);
@@ -134,7 +150,7 @@ namespace Scorpio.Userdata
                 return ret;
             }
             UserdataMethod func = GetMethod(name);
-            if (func != null) return func;
+            if (func != null) return GetMethod(obj, name, func);
             throw new ScriptException("GetValue Type[" + m_Type.ToString() + "] 变量 [" + name + "] 不存在");
         }
         /// <summary> 设置一个类变量 </summary>

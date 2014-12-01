@@ -20,15 +20,7 @@ namespace Scorpio.Userdata
         }
         public override ScriptObject GetValue(string strName)
         {
-            object ret = m_Type.GetValue(Value, strName);
-            if (ret is UserdataMethod) {
-                UserdataMethod method = ret as UserdataMethod;
-                if (method.IsStatic)
-                    return Script.CreateFunction(new ScorpioStaticMethod(strName, method));
-                else
-                    return Script.CreateFunction(new ScorpioTypeMethod(strName, method));
-            }
-            return Script.CreateObject(ret);
+            return Script.CreateObject(m_Type.GetValue(null, strName));
         }
         public override void SetValue(string strName, ScriptObject value)
         {
