@@ -12,10 +12,6 @@ namespace Scorpio.Compiler
         /// </summary>
         None = 0,
         /// <summary>
-        /// global
-        /// </summary>
-        Global,
-        /// <summary>
         /// var
         /// </summary>
         Var,
@@ -279,10 +275,6 @@ namespace Scorpio.Compiler
         /// null
         /// </summary>
         Null,
-        /// <summary>
-        /// require,include,import,using
-        /// </summary>
-        Require,
         /// <summary>
         /// eval
         /// </summary>

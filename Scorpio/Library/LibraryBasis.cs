@@ -144,6 +144,10 @@ namespace Scorpio.Library
             script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
             script.SetObjectInternal("clone", script.CreateFunction(new clone()));
+            script.SetObjectInternal("require", script.CreateFunction(new require(script)));
+            script.SetObjectInternal("import", script.CreateFunction(new require(script)));
+            script.SetObjectInternal("using", script.CreateFunction(new require(script)));
+
             script.SetObjectInternal("load_assembly", script.CreateFunction(new load_assembly(script)));
             script.SetObjectInternal("load_assembly_safe", script.CreateFunction(new load_assembly_safe(script)));
             script.SetObjectInternal("push_assembly", script.CreateFunction(new push_assembly(script)));
@@ -284,6 +288,20 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 return args[0].Clone();
+            }
+        }
+        private class require : ScorpioHandle
+        {
+            private Script m_script;
+            public require(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args)
+            {
+                ScriptString str = args[0] as ScriptString;
+                Util.Assert(str != null, "require 参数必须是 string");
+                return m_script.LoadFile(m_script.GetValue("searchpath") + "/" + str.Value);
             }
         }
         private class load_assembly : ScorpioHandle

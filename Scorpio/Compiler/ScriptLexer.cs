@@ -380,17 +380,8 @@ namespace Scorpio.Compiler
                             TokenType tokenType;
                             switch (m_strToken)
                             {
-                                case "require":
-                                case "include":
-                                case "import":
-                                case "using":
-                                    tokenType = TokenType.Require;
-                                    break;
                                 case "eval":
                                     tokenType = TokenType.Eval;
-                                    break;
-                                case "global":
-                                    tokenType = TokenType.Global;
                                     break;
                                 case "var":
                                 case "local":

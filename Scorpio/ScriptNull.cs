@@ -12,7 +12,7 @@ namespace Scorpio
         public ScriptNull() : base(null) { }
         public override ObjectType Type { get { return ObjectType.Null; } }
         public override object ObjectValue { get { return null; } }
-        public override string ToString() { return "Null"; }
+        public override string ToString() { return "null"; }
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
