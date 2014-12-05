@@ -522,39 +522,31 @@ namespace Scorpio.Runtime
                 if (left is ScriptString || right is ScriptString) {
                     return m_script.CreateString(left.ToString() + right.ToString());
                 } else if (left is ScriptNumber && right is ScriptNumber){
-                    return (left as ScriptNumber).ComputePlus(right as ScriptNumber);
+                    return (left as ScriptNumber).Compute(TokenType.Plus, right as ScriptNumber);
                 } else {
                     throw new ExecutionException("operate [+] left right is not same type");
                 }
-            } else if (type == TokenType.Minus || type == TokenType.Multiply || type == TokenType.Divide || type == TokenType.Modulo) {
+            } else if (type == TokenType.Minus || type == TokenType.Multiply || type == TokenType.Divide || type == TokenType.Modulo ||
+                type == TokenType.InclusiveOr || type == TokenType.Combine || type == TokenType.XOR || type == TokenType.Shr || type == TokenType.Shi) {
                 ScriptNumber leftNumber = left as ScriptNumber;
-                if (leftNumber == null) throw new ExecutionException("operate [+ - * /] left is not number");
+                if (leftNumber == null) throw new ExecutionException("运算符[左边]必须是number类型");
                 ScriptNumber rightNumber = ResolveOperand(operate.Right) as ScriptNumber;
-                if (rightNumber == null) throw new ExecutionException("operate [+ - * /] right is not number");
-                if (operate.Operator == TokenType.Minus)
-                    return leftNumber.ComputeMinus(rightNumber);
-                else if (operate.Operator == TokenType.Multiply)
-                    return leftNumber.ComputeMultiply(rightNumber);
-                else if (operate.Operator == TokenType.Divide)
-                    return leftNumber.ComputeDivide(rightNumber);
-                else if (operate.Operator == TokenType.Modulo)
-                    return leftNumber.ComputeModulo(rightNumber);
+                if (rightNumber == null) throw new ExecutionException("运算符[右边]必须是number类型");
+                return leftNumber.Compute(type, rightNumber);
             } else {
                 if (left is ScriptBoolean) {
+                    bool b1 = ((ScriptBoolean)left).Value;
                     if (type == TokenType.And) {
-                        bool b1 = ((ScriptBoolean)left).Value;
                         if (b1 == false) return ScriptBoolean.False;
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
                         if (right == null) throw new ExecutionException("operate [&&] right is not a bool");
                         return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
                     } else if (type == TokenType.Or) {
-                        bool b1 = ((ScriptBoolean)left).Value;
                         if (b1 == true) return ScriptBoolean.True;
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
                         if (right == null) throw new ExecutionException("operate [||] right is not a bool");
                         return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
                     } else {
-                        bool b1 = ((ScriptBoolean)left).Value;
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
                         if (right == null) throw new ExecutionException("operate [==] [!=] right is not a bool");
                         bool b2 = right.Value;
@@ -585,22 +577,9 @@ namespace Scorpio.Runtime
                     if (left.Type != right.Type)
                         throw new ExecutionException("[operate] left right is not same type");
                     if (left is ScriptString) {
-                        string str1 = ((ScriptString)left).Value;
-                        string str2 = ((ScriptString)right).Value;
-                        bool ret = false;
-                        if (type == TokenType.Greater)
-                            ret = string.Compare(str1, str2) < 0;
-                        else if (type == TokenType.GreaterOrEqual)
-                            ret = string.Compare(str1, str2) <= 0;
-                        else if (type == TokenType.Less)
-                            ret = string.Compare(str1, str2) > 0;
-                        else if (type == TokenType.LessOrEqual)
-                            ret = string.Compare(str1, str2) >= 0;
-                        else
-                            throw new ExecutionException("nonsupport operate [" + type + "] with string");
-                        return ret ? ScriptBoolean.True : ScriptBoolean.False;
+                        return ((ScriptString)left).Compare(type, (ScriptString)right) ? ScriptBoolean.True : ScriptBoolean.False;
                     } else if (left is ScriptNumber) {
-                        return ((ScriptNumber)left).Compare(type, operate, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
+                        return ((ScriptNumber)left).Compare(type, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
                     } else {
                         throw new ExecutionException("nonsupport operate [" + type + "] with " + left.Type);
                     }
@@ -636,19 +615,7 @@ namespace Scorpio.Runtime
                     ScriptNumber right = ResolveOperand(assign.value) as ScriptNumber;
                     if (right == null)
                         throw new ExecutionException("[+= -=...]值只能为 number类型");
-                    switch (assign.AssignType)
-                    {
-                        case TokenType.AssignPlus:
-                            return num.AssignPlus(right);
-                        case TokenType.AssignMinus:
-                            return num.AssignMinus(right);
-                        case TokenType.AssignMultiply:
-                            return num.AssignMultiply(right);
-                        case TokenType.AssignDivide:
-                            return num.AssignDivide(right);
-                        case TokenType.AssignModulo:
-                            return num.AssignModulo(right);
-                    }
+                    return num.AssignCompute(assign.AssignType, right);
                 }
                 throw new ExecutionException("[+= -=...]左边值只能为number或者string");
             }

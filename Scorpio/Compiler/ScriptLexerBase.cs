@@ -32,10 +32,16 @@ namespace Scorpio.Compiler
             MultiplyOrAssignMultiply,
             /// <summary> % 或者 %= </summary>
             ModuloOrAssignModulo,
-            /// <summary> & 并且 </summary>
-            And,
-            /// <summary> | 或者 </summary>
-            Or,
+            /// <summary> & 或者 &= 或者 && </summary>
+            AndOrCombine,
+            /// <summary> | 或者 |= 或者 || </summary>
+            OrOrInclusiveOr,
+            /// <summary> ^ 或者 ^= </summary>
+            XorOrAssignXor,
+            /// <summary> << 或者 <<= </summary>
+            ShiOrAssignShi,
+            /// <summary> >> 或者 >>= </summary>
+            ShrOrAssignShr,
             /// <summary> ! 非或者不等于 </summary>
             NotOrNotEqual,
             /// <summary> > 大于或者大于等于 </summary>

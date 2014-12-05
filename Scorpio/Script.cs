@@ -97,6 +97,10 @@ namespace Scorpio
             }
             return builder.ToString();
         }
+        public ScriptTable GetGlobalTable()
+        {
+            return m_GlobalTable;
+        }
         public bool HasValue(String key)
         {
             return m_GlobalTable.HasValue(key);

@@ -112,10 +112,10 @@ namespace Scorpio.Compiler
                                 lexState = LexState.AssignOrEqual;
                                 break;
                             case '&':
-                                lexState = LexState.And;
+                                lexState = LexState.AndOrCombine;
                                 break;
                             case '|':
-                                lexState = LexState.Or;
+                                lexState = LexState.OrOrInclusiveOr;
                                 break;
                             case '!':
                                 lexState = LexState.NotOrNotEqual;
@@ -125,6 +125,9 @@ namespace Scorpio.Compiler
                                 break;
                             case '<':
                                 lexState = LexState.LessOrLessEqual;
+                                break;
+                            case '^':
+                                lexState = LexState.XorOrAssignXor;
                                 break;
                             case '@':
                                 lexState = LexState.SimpleStringStart;
@@ -235,31 +238,39 @@ namespace Scorpio.Compiler
                             UndoChar();
                         }
                         break;
-                    case LexState.And:
+                    case LexState.AndOrCombine:
                         if (ch == '&') {
                             AddToken(TokenType.And, "&&");
+                        } else if (ch == '=') {
+                            AddToken(TokenType.AssignCombine, "&=");
                         } else {
-                            ThrowInvalidCharacterException(ch);
+                            AddToken(TokenType.Combine, "&");
+                            UndoChar();
                         }
                         break;
-                    case LexState.Or:
+                    case LexState.OrOrInclusiveOr:
                         if (ch == '|') {
                             AddToken(TokenType.Or, "||");
+                        } else if (ch == '=') {
+                            AddToken(TokenType.AssignInclusiveOr, "|=");
                         } else {
-                            ThrowInvalidCharacterException(ch);
+                            AddToken(TokenType.InclusiveOr, "|");
+                            UndoChar();
                         }
                         break;
-                    case LexState.NotOrNotEqual:
+                    case LexState.XorOrAssignXor:
                         if (ch == '=') {
-                            AddToken(TokenType.NotEqual, "!=");
+                            AddToken(TokenType.AssignXOR, "^=");
                         } else {
-                            AddToken(TokenType.Not, "!");
+                            AddToken(TokenType.XOR, "^");
                             UndoChar();
                         }
                         break;
                     case LexState.GreaterOrGreaterEqual:
                         if (ch == '=') {
                             AddToken(TokenType.GreaterOrEqual, ">=");
+                        } else if (ch == '>') {
+                            lexState = LexState.ShrOrAssignShr;
                         } else {
                             AddToken(TokenType.Greater, ">");
                             UndoChar();
@@ -268,8 +279,34 @@ namespace Scorpio.Compiler
                     case LexState.LessOrLessEqual:
                         if (ch == '=') {
                             AddToken(TokenType.LessOrEqual, "<=");
+                        } else if (ch == '<') {
+                            lexState = LexState.ShiOrAssignShi;
                         } else {
                             AddToken(TokenType.Less, "<");
+                            UndoChar();
+                        }
+                        break;
+                    case LexState.ShrOrAssignShr:
+                        if (ch == '=') {
+                            AddToken(TokenType.AssignShr, ">>=");
+                        } else {
+                            AddToken(TokenType.Shr, ">>");
+                            UndoChar();
+                        }
+                        break;
+                    case LexState.ShiOrAssignShi:
+                        if (ch == '=') {
+                            AddToken(TokenType.AssignShi, "<<=");
+                        } else {
+                            AddToken(TokenType.Shi, "<<");
+                            UndoChar();
+                        }
+                        break;
+                    case LexState.NotOrNotEqual:
+                        if (ch == '=') {
+                            AddToken(TokenType.NotEqual, "!=");
+                        } else {
+                            AddToken(TokenType.Not, "!");
                             UndoChar();
                         }
                         break;

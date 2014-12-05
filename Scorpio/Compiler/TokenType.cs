@@ -104,7 +104,7 @@ namespace Scorpio.Compiler
         /// </summary>
         AssignDivide,
         /// <summary>
-        /// %
+        /// % 模运算
         /// </summary>
         Modulo,
         /// <summary>
@@ -112,21 +112,57 @@ namespace Scorpio.Compiler
         /// </summary>
         AssignModulo,
         /// <summary>
-        /// 
+        /// | 或运算
         /// </summary>
-        Power,
+        InclusiveOr,
         /// <summary>
-        /// !
+        /// |=
         /// </summary>
-        Not,
+        AssignInclusiveOr,
+        /// <summary>
+        /// ||
+        /// </summary>
+        Or,
+        /// <summary>
+        /// & 并运算
+        /// </summary>
+        Combine,
+        /// <summary>
+        /// &=
+        /// </summary>
+        AssignCombine,
         /// <summary>
         /// &&
         /// </summary>
         And,
         /// <summary>
-        /// ||
+        /// ^ 异或
         /// </summary>
-        Or,
+        XOR,
+        /// <summary>
+        /// ^=
+        /// </summary>
+        AssignXOR,
+        /// <summary>
+        /// <<左移
+        /// </summary>
+        Shi,
+        /// <summary>
+        /// <<=
+        /// </summary>
+        AssignShi,
+        /// <summary>
+        /// >> 右移
+        /// </summary>
+        Shr,
+        /// <summary>
+        /// >>=
+        /// </summary>
+        AssignShr,
+        /// <summary>
+        /// !
+        /// </summary>
+        Not,
         /// <summary>
         /// =
         /// </summary>

@@ -48,52 +48,48 @@ namespace Scorpio.Variable
         {
             return m_Value;
         }
-        public override ScriptObject ComputePlus(ScriptNumber obj) 
+        public override ScriptObject Compute(TokenType type, ScriptNumber obj)
         {
-            return Script.CreateDouble(m_Value + obj.ToDouble());
+            switch (type)
+            {
+                case TokenType.Plus:
+                    return Script.CreateDouble(m_Value + obj.ToDouble());
+                case TokenType.Minus:
+                    return Script.CreateDouble(m_Value - obj.ToDouble());
+                case TokenType.Multiply:
+                    return Script.CreateDouble(m_Value * obj.ToDouble());
+                case TokenType.Divide:
+                    return Script.CreateDouble(m_Value / obj.ToDouble());
+                case TokenType.Modulo:
+                    return Script.CreateDouble(m_Value % obj.ToDouble());
+                default:
+                    throw new ExecutionException("Double不支持的运算符 " + type);
+            }
         }
-        public override ScriptObject ComputeMinus(ScriptNumber obj)
+        public override ScriptObject AssignCompute(TokenType type, ScriptNumber obj)
         {
-            return Script.CreateDouble(m_Value - obj.ToDouble());
+            switch (type)
+            {
+                case TokenType.AssignPlus:
+                    m_Value += obj.ToDouble();
+                    return this;
+                case TokenType.AssignMinus:
+                    m_Value -= obj.ToDouble();
+                    return this;
+                case TokenType.AssignMultiply:
+                    m_Value *= obj.ToDouble();
+                    return this;
+                case TokenType.AssignDivide:
+                    m_Value /= obj.ToDouble();
+                    return this;
+                case TokenType.AssignModulo:
+                    m_Value %= obj.ToDouble();
+                    return this;
+                default:
+                    throw new ExecutionException("Double不支持的运算符 " + type);
+            }
         }
-        public override ScriptObject ComputeMultiply(ScriptNumber obj)
-        {
-            return Script.CreateDouble(m_Value * obj.ToDouble());
-        }
-        public override ScriptObject ComputeDivide(ScriptNumber obj)
-        {
-            return Script.CreateDouble(m_Value / obj.ToDouble());
-        }
-        public override ScriptObject ComputeModulo(ScriptNumber obj)
-        {
-            return Script.CreateDouble(m_Value % obj.ToDouble());
-        }
-        public override ScriptObject AssignPlus(ScriptNumber obj)
-        {
-            m_Value += obj.ToDouble();
-            return this;
-        }
-        public override ScriptObject AssignMinus(ScriptNumber obj)
-        {
-            m_Value -= obj.ToDouble();
-            return this;
-        }
-        public override ScriptObject AssignMultiply(ScriptNumber obj)
-        {
-            m_Value *= obj.ToDouble();
-            return this;
-        }
-        public override ScriptObject AssignDivide(ScriptNumber obj)
-        {
-            m_Value /= obj.ToDouble();
-            return this;
-        }
-        public override ScriptObject AssignModulo(ScriptNumber obj)
-        {
-            m_Value %= obj.ToDouble();
-            return this;
-        }
-        public override bool Compare(TokenType type, CodeOperator oper, ScriptNumber num)
+        public override bool Compare(TokenType type, ScriptNumber num)
         {
             ScriptNumberDouble val = num as ScriptNumberDouble;
             if (val == null) throw new ExecutionException("数字比较 两边的数字类型不一致 请先转换再比较 ");
@@ -107,8 +103,9 @@ namespace Scorpio.Variable
                     return m_Value < val.m_Value;
                 case TokenType.LessOrEqual:
                     return m_Value <= val.m_Value;
+                default:
+                    throw new ExecutionException("Number类型 操作符[" + type + "]不支持");
             }
-            return false;
         }
         public override ScriptObject Clone()
         {

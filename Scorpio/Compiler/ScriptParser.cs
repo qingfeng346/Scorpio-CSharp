@@ -447,6 +447,11 @@ namespace Scorpio.Compiler
                         case TokenType.AssignMultiply:
                         case TokenType.AssignDivide:
                         case TokenType.AssignModulo:
+                        case TokenType.AssignCombine:
+                        case TokenType.AssignInclusiveOr:
+                        case TokenType.AssignXOR:
+                        case TokenType.AssignShr:
+                        case TokenType.AssignShi:
                             return new CodeAssign(member, GetObject(), token.Type, m_strBreviary, token.SourceLine);
                         default:
                             UndoToken();
