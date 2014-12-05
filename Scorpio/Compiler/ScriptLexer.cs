@@ -139,6 +139,9 @@ namespace Scorpio.Compiler
                                 if (ch == '_' || char.IsLetter(ch)) {
                                     lexState = LexState.Identifier;
                                     m_strToken = "" + ch;
+                                } else if (ch == '0') {
+                                    lexState = LexState.NumberOrHexNumber;
+                                    m_strToken = "";
                                 } else if (char.IsDigit(ch)) {
                                     lexState = LexState.Number;
                                     m_strToken = "" + ch;
@@ -361,6 +364,15 @@ namespace Scorpio.Compiler
                             ThrowInvalidCharacterException(ch);
                         }
                         break;
+                    case LexState.NumberOrHexNumber:
+                        if (ch == 'x') {
+                            lexState = LexState.HexNumber;
+                        } else {
+                            m_strToken = "0";
+                            lexState = LexState.Number;
+                            UndoChar();
+                        }
+                        break;
                     case LexState.Number:
                         if (char.IsDigit(ch) || ch == '.') {
                             m_strToken += ch;
@@ -369,6 +381,17 @@ namespace Scorpio.Compiler
                             AddToken(TokenType.Number, value);
                         } else {
                             double value = double.Parse(m_strToken);
+                            AddToken(TokenType.Number, value);
+                            UndoChar();
+                        }
+                        break;
+                    case LexState.HexNumber:
+                        if (IsHexDigit(ch)) {
+                            m_strToken += ch;
+                        } else {
+                            if (Util.IsNullOrEmpty(m_strToken))
+                                ThrowInvalidCharacterException(ch);
+                            long value = long.Parse(m_strToken, System.Globalization.NumberStyles.HexNumber);
                             AddToken(TokenType.Number, value);
                             UndoChar();
                         }

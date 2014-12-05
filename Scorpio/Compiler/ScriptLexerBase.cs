@@ -58,8 +58,12 @@ namespace Scorpio.Compiler
             SimpleString,
             /// <summary> 字符串内出现"是引号还是结束符 </summary>
             SimpleStringQuotationMarkOrOver,
-            /// <summary> 数字 </summary>
+            /// <summary> 十进制数字或者十六进制数字 </summary>
+            NumberOrHexNumber,
+            /// <summary> 十进制数字 </summary>
             Number,
+            /// <summary> 十六进制数字 </summary>
+            HexNumber,
             /// <summary> 描述符 </summary>
             Identifier,
         }
@@ -106,5 +110,15 @@ namespace Scorpio.Compiler
             m_listTokens.Add(new Token(type, lexeme, m_iSourceLine, m_iSourceChar));
             lexState = LexState.None;
         }
+        bool IsHexDigit( char c )
+		{
+			if( Char.IsDigit( c ) )
+				return true;
+			if( 'a' <= c && c <= 'f' )
+				return true;
+			if( 'A' <= c && c <= 'F' )
+				return true;
+			return false;
+		}
     }
 }
