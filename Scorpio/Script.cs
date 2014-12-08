@@ -205,7 +205,7 @@ namespace Scorpio
         }
         public void LoadLibrary()
         {
-            m_UserdataFactory = new DefaultScriptUserdataFactory();
+            m_UserdataFactory = new DefaultScriptUserdataFactory(this);
             m_GlobalTable = CreateTable();
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
             m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));

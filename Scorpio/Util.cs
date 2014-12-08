@@ -64,7 +64,7 @@ namespace Scorpio
         {
             return type.IsEnum;
         }
-        public static bool IsDelegate(Type type)
+        public static bool IsDelegateType(Type type)
         {
             return TYPE_DELEGATE.IsAssignableFrom(type);
         }
@@ -144,6 +144,8 @@ namespace Scorpio
                 } else if (par is ScriptBoolean && IsBool(type)) {
                     return true;
                 } else if (par is ScriptEnum && (par as ScriptEnum).EnumType == type) {
+                    return true;
+                } else if (par is ScriptFunction && IsDelegateType(type)) {
                     return true;
                 } else if (par is ScriptUserdata) {
                     if (Util.IsType(type) || type.IsAssignableFrom(((ScriptUserdata)par).ValueType))
