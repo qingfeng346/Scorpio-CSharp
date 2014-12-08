@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.IO;
-using Scorpio.Variable;
 using Scorpio;
+using Scorpio.Variable;
+using Scorpio.Exception;
 namespace Scorpio
 {
     public static class Util
@@ -173,23 +174,13 @@ namespace Scorpio
         {
             return Convert.ChangeType(value, conversionType);
         }
-        public static object ChangeType_impl(ScriptArray value, Type conversionType)
-        {
-            int count = value.Count();
-            Type elementType = conversionType.GetElementType();
-            Array array = Array.CreateInstance(elementType, count);
-            for (int i = 0; i < count;++i ) {
-                array.SetValue(ChangeType(value.GetValue(i), elementType), i);
-            }
-            return array;
-        }
         public static void Assert(bool b)
         {
             Assert(b, "");
         }
         public static void Assert(bool b, string message)
         {
-            if (!b) throw new ExecutionEngineException(message);
+            if (!b) throw new ExecutionException(message);
         }
         public static int ToInt32(object value)
         {

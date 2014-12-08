@@ -20,8 +20,7 @@ namespace Scorpio.Variable
         }
         public override ScriptNumber Calc(CALC c)
         {
-            switch (c)
-            {
+            switch (c) {
                 case CALC.PRE_INCREMENT:
                     ++m_Value;
                     break;
@@ -32,6 +31,8 @@ namespace Scorpio.Variable
                     return Script.CreateDouble(m_Value++);
                 case CALC.POST_DECREMENT:
                     return Script.CreateDouble(m_Value--);
+                default:
+                    return this;
             }
             return this;
         }
