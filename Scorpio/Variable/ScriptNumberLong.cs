@@ -38,8 +38,7 @@ namespace Scorpio.Variable
         }
         public override ScriptNumber Negative()
         {
-            m_Value = -m_Value;
-            return this;
+            return Script.CreateDouble(-m_Value);
         }
         public override ScriptObject Assign()
         {
