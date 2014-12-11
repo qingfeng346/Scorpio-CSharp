@@ -5,10 +5,33 @@ using System.IO;
 using System.Diagnostics;
 using Scorpio;
 using System.Reflection;
+using Microsoft.CSharp;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 namespace ScorpioExec
 {
     public class Program
     {
+        public static Assembly CompilerFile(string path)
+        {
+            CSharpCodeProvider Provider = new CSharpCodeProvider();
+            CompilerParameters Parameters = new CompilerParameters();
+            Parameters.ReferencedAssemblies.Add("System.dll");
+            Parameters.ReferencedAssemblies.Add("Scorpio.dll");
+            Parameters.GenerateExecutable = false;
+            Parameters.GenerateInMemory = true;
+            string aaa = AppDomain.CurrentDomain.BaseDirectory;
+            string[] fileNames = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
+            CompilerResults cr = Provider.CompileAssemblyFromFile(Parameters, fileNames);
+            if (cr.Errors.HasErrors) {
+                string str = "cs文件编译错误: \n";
+                foreach (CompilerError err in cr.Errors) {
+                    str += (err.ToString() + "\n");
+                }
+                throw new Exception(str);
+            }
+            return cr.CompiledAssembly;
+        }
         static void Main(string[] args)
         {
             Script script = new Script();
@@ -26,6 +49,13 @@ namespace ScorpioExec
                     } catch (System.Exception ex) {
                         Console.WriteLine("导入文件[" + file + "]失败 " + ex.ToString());
                     }
+                }
+            }
+            if (Directory.Exists(Environment.CurrentDirectory + "/Program")) {
+                try {
+                    script.PushAssembly(CompilerFile(Environment.CurrentDirectory + "/Program"));
+                } catch (System.Exception ex) {
+                    Console.WriteLine("编译文件失败 " + ex.ToString());
                 }
             }
             if (args.Length >= 1) {
