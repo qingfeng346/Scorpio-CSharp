@@ -25,6 +25,10 @@ namespace Scorpio
             Value += obj.ToString();
             return this;
         }
+        public override ScriptObject GetValue(int key)
+        {
+            return Script.CreateString(Value[key].ToString());
+        }
         public bool Compare(TokenType type, ScriptString str)
         {
             switch (type) 

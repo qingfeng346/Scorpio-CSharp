@@ -16,18 +16,19 @@ namespace Scorpio.CodeDom
     //成员类型
     public enum MEMBER_TYPE
     {
-        STRING,
-        NUMBER,
-        OBJECT,
+        STRING,     //String
+        NUMBER,     //long类型
+        INDEX,      //double类型（自动转成int类型）
+        OBJECT,     //变量类型
     }
     //成员类型  a.b["c"].d[1]
     public class CodeMember : CodeObject
     {
         public CodeObject Parent;
-        public CodeObject Member;
+        public CodeObject MemberObject;
         public string MemberString;
-        public int MemberNumber;
-        public object MemberNumberObject;
+        public int MemberIndex;
+        public object MemberNumber;
         public MEMBER_TYPE Type;
         public CALC Calc;
         public CodeMember(string name) : this (name, null) { }
@@ -40,13 +41,17 @@ namespace Scorpio.CodeDom
         public CodeMember(ScriptNumber mem, CodeObject parent)
         {
             this.Parent = parent;
-            this.MemberNumber = mem.ToInt32();
-            this.MemberNumberObject = mem.ObjectValue;
-            this.Type = MEMBER_TYPE.NUMBER;
+            if (mem.ObjectValue is double) {
+                this.MemberIndex = mem.ToInt32();
+                this.Type = MEMBER_TYPE.INDEX;
+            } else {
+                this.MemberNumber = mem.ObjectValue;
+                this.Type = MEMBER_TYPE.NUMBER;
+            }
         }
         public CodeMember(CodeObject member, CodeObject parent)
         {
-            this.Member = member;
+            this.MemberObject = member;
             this.Parent = parent;
             this.Type = MEMBER_TYPE.OBJECT;
         }

@@ -24,17 +24,36 @@ namespace Scorpio
         private static readonly ScriptObject[] NOPARAMETER = new ScriptObject[0];       // 没有参数
         public virtual ScriptObject Assign() { return this; }                           // 赋值
         //设置变量
-        public virtual void SetValue(int key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(int)"); }
+        public virtual void SetValue(int key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(int)"); }
         //获取变量
-        public virtual ScriptObject GetValue(int key) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(int)"); }
+        public virtual ScriptObject GetValue(int key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(int)"); }
         //设置变量
-        public virtual void SetValue(string key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(string)"); }
+        public virtual void SetValue(string key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(string)"); }
         //获取变量
-        public virtual ScriptObject GetValue(string key) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(string)"); }
+        public virtual ScriptObject GetValue(string key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(string)"); }
         //设置变量
-        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(object)"); }
+        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(object)"); }
         //获取变量
-        public virtual ScriptObject GetValue(object key) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(object)"); }
+        public virtual ScriptObject GetValue(object key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(object)"); }
+
+        public void SetValueInternal(object key, ScriptObject value)
+        {
+            if (key is string)
+                SetValue((string)key, value);
+            else if (key is int)
+                SetValue((int)key, value);
+            else
+                SetValue(key, value);
+        }
+        public ScriptObject GetValueInternal(object key)
+        {
+            if (key is string)
+                return GetValue((string)key);
+            else if (key is int)
+                return GetValue((int)key);
+            else
+                return GetValue(key);
+        }
         //调用无参函数
         public object Call() { return Call(NOPARAMETER); }
         //调用函数
