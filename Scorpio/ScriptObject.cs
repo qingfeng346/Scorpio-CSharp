@@ -40,8 +40,8 @@ namespace Scorpio
         {
             if (key is string)
                 SetValue((string)key, value);
-            else if (key is int)
-                SetValue((int)key, value);
+            else if (key is int || key is double)
+                SetValue(Util.ToInt32(key), value);
             else
                 SetValue(key, value);
         }
@@ -49,8 +49,8 @@ namespace Scorpio
         {
             if (key is string)
                 return GetValue((string)key);
-            else if (key is int)
-                return GetValue((int)key);
+            else if (key is int && key is double)
+                return GetValue(Util.ToInt32(key));
             else
                 return GetValue(key);
         }

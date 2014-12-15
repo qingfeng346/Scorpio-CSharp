@@ -91,8 +91,7 @@ namespace Scorpio.Runtime
             } else if (member.Type == MEMBER_TYPE.NUMBER) {
                 return member.MemberNumber;
             } else {
-                var obj = ResolveOperand(member.MemberObject).ObjectValue ;
-                return obj is double ? Util.ToInt32(obj) : obj;
+                return ResolveOperand(member.MemberObject).ObjectValue ;
             }
         }
         private ScriptObject GetVariable(CodeMember member)
