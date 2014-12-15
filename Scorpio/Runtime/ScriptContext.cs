@@ -74,14 +74,6 @@ namespace Scorpio.Runtime
             }
             return false;
         }
-        private bool ContainsVariable(string name)
-        {
-            if (m_variableDictionary.ContainsKey(name))
-                return true;
-            if (m_parent != null)
-                return m_parent.ContainsVariable(name);
-            return false;
-        }
         private object GetMember(CodeMember member)
         {
             if (member.Type == MEMBER_TYPE.STRING) {
