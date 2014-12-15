@@ -662,7 +662,10 @@ namespace Scorpio.Compiler
                 if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.Number) {
                     Token next = ReadToken();
                     if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
-                        ret.Variables.Add(new TableVariable(token.Lexeme, GetObject()));
+                        if (token.Lexeme is double)
+                            ret.Variables.Add(new TableVariable(Util.ToInt32(token.Lexeme), GetObject()));
+                        else
+                            ret.Variables.Add(new TableVariable(token.Lexeme, GetObject()));
                         Token peek = PeekToken();
                         if (peek.Type == TokenType.Comma || peek.Type == TokenType.SemiColon) {
                             ReadToken();

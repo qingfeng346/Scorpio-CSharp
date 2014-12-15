@@ -11,6 +11,14 @@ namespace Scorpio
         public override ObjectType Type { get { return ObjectType.Table; } }
         private Dictionary<object, ScriptObject> m_listObject = new Dictionary<object, ScriptObject>();  //所有的数据(函数和数据都在一个数组)
         public ScriptTable(Script script) : base(script) { }
+        public override void SetValue(int key, ScriptObject value)
+        {
+            SetValue_impl(key, value);
+        }
+        public override ScriptObject GetValue(int key)
+        {
+            return GetValue_impl(key);
+        }
         public override void SetValue(string key, ScriptObject value)
         {
             SetValue_impl(key, value);
