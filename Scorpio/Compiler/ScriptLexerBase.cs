@@ -52,12 +52,20 @@ namespace Scorpio.Compiler
             String,
             /// <summary> \ 格式符 </summary>
             StringEscape,
+            /// <summary> ' 字符串 单引号开始结束</summary>
+            SingleString,
+            /// <summary> \ 格式符</summary>
+            SingleStringEscape,
             /// <summary> @ 开始字符串 </summary>
             SimpleStringStart,
             /// <summary> @" 不格式化的字符串 类似c# @符号 </summary>
             SimpleString,
             /// <summary> 字符串内出现"是引号还是结束符 </summary>
             SimpleStringQuotationMarkOrOver,
+            /// <summary> @" 不格式化的字符串 类似c# @符号 </summary>
+            SingleSimpleString,
+            /// <summary> 字符串内出现"是引号还是结束符 </summary>
+            SingleSimpleStringQuotationMarkOrOver,
             /// <summary> 十进制数字或者十六进制数字 </summary>
             NumberOrHexNumber,
             /// <summary> 十进制数字 </summary>

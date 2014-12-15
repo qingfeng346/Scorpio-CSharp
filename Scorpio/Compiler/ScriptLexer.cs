@@ -135,6 +135,9 @@ namespace Scorpio.Compiler
                             case '\"':
                                 lexState = LexState.String;
                                 break;
+                            case '\'':
+                                lexState = LexState.SingleString;
+                                break;
                             default:
                                 if (ch == '_' || char.IsLetter(ch)) {
                                     lexState = LexState.Identifier;
@@ -324,9 +327,56 @@ namespace Scorpio.Compiler
                             m_strToken += ch;
                         }
                         break;
+                    case LexState.StringEscape:
+                        if (ch == '\\' || ch == '\"') {
+                            m_strToken += ch;
+                            lexState = LexState.String;
+                        } else if (ch == 't') {
+                            m_strToken += '\t';
+                            lexState = LexState.String;
+                        } else if (ch == 'r') {
+                            m_strToken += '\r';
+                            lexState = LexState.String;
+                        } else if (ch == 'n') {
+                            m_strToken += '\n';
+                            lexState = LexState.String;
+                        } else {
+                            ThrowInvalidCharacterException(ch);
+                        }
+                        break;
+                    case LexState.SingleString:
+                        if (ch == '\'') {
+                            AddToken(TokenType.String, m_strToken);
+                        } else if (ch == '\\') {
+                            lexState = LexState.SingleStringEscape;
+                        } else if (ch == '\r' || ch == '\n') {
+                            ThrowInvalidCharacterException(ch);
+                        } else {
+                            m_strToken += ch;
+                        }
+                        break;
+                    case LexState.SingleStringEscape:
+                        if (ch == '\\' || ch == '\'') {
+                            m_strToken += ch;
+                            lexState = LexState.SingleString;
+                        } else if (ch == 't') {
+                            m_strToken += '\t';
+                            lexState = LexState.SingleString;
+                        } else if (ch == 'r') {
+                            m_strToken += '\r';
+                            lexState = LexState.SingleString;
+                        } else if (ch == 'n') {
+                            m_strToken += '\n';
+                            lexState = LexState.SingleString;
+                        } else {
+                            ThrowInvalidCharacterException(ch);
+                        }
+                        break;
                     case LexState.SimpleStringStart:
                         if (ch == '\"') {
                             lexState = LexState.SimpleString;
+                        } else if (ch == '\'') {
+                            lexState = LexState.SingleSimpleString;
                         } else {
                             ThrowInvalidCharacterException(ch);
                         }
@@ -347,21 +397,20 @@ namespace Scorpio.Compiler
                             UndoChar();
                         }
                         break;
-                    case LexState.StringEscape:
-                        if (ch == '\\' || ch == '\"') {
-                            m_strToken += ch;
-                            lexState = LexState.String;
-                        } else if (ch == 't') {
-                            m_strToken += '\t';
-                            lexState = LexState.String;
-                        } else if (ch == 'r') {
-                            m_strToken += '\r';
-                            lexState = LexState.String;
-                        } else if (ch == 'n') {
-                            m_strToken += '\n';
-                            lexState = LexState.String;
+                    case LexState.SingleSimpleString:
+                        if (ch == '\'') {
+                            lexState = LexState.SingleSimpleStringQuotationMarkOrOver;
                         } else {
-                            ThrowInvalidCharacterException(ch);
+                            m_strToken += ch;
+                        }
+                        break;
+                    case LexState.SingleSimpleStringQuotationMarkOrOver:
+                        if (ch == '\'') {
+                            m_strToken += '\'';
+                            lexState = LexState.SingleSimpleString;
+                        } else {
+                            AddToken(TokenType.String, m_strToken);
+                            UndoChar();
                         }
                         break;
                     case LexState.NumberOrHexNumber:
