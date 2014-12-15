@@ -49,7 +49,7 @@ namespace Scorpio
         {
             if (key is string)
                 return GetValue((string)key);
-            else if (key is int && key is double)
+            else if (key is int || key is double)
                 return GetValue(Util.ToInt32(key));
             else
                 return GetValue(key);

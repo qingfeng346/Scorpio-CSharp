@@ -102,7 +102,7 @@ namespace Scorpio.Runtime
                 ScriptObject obj = GetVariableObject(name);
                 ret = (obj == null ? m_script.GetValue(name) : obj);
             } else {
-                return ResolveOperand(member.Parent).GetValueInternal(GetMember(member));
+                ret = ResolveOperand(member.Parent).GetValueInternal(GetMember(member));
             }
             if (ret == null) throw new ExecutionException("GetVariable member is error");
             if (member.Calc != CALC.NONE) {
