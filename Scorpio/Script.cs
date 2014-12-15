@@ -215,6 +215,7 @@ namespace Scorpio
             LibraryArray.Load(this);
             LibraryString.Load(this);
             LibraryTable.Load(this);
+            LibraryJson.Load(this);
         }
     }
 }

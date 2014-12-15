@@ -13,6 +13,7 @@ namespace Scorpio
         public override ObjectType Type { get { return ObjectType.Null; } }
         public override object ObjectValue { get { return null; } }
         public override string ToString() { return "null"; }
+        public override string ToJson() { return "null"; }
         public override bool Equals(object obj)
         {
             if (obj == null) return false;

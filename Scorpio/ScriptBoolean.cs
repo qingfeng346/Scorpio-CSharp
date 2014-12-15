@@ -25,5 +25,9 @@ namespace Scorpio
         {
             return b ? True : False;
         }
+        public override string ToJson()
+        {
+            return Value ? "true" : "false";
+        }
     }
 }

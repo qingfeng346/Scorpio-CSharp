@@ -63,5 +63,23 @@ namespace Scorpio
             return ret;
         }
         public override string ToString() { return "Table"; }
+        public override string ToJson()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append("{");
+            bool first = true;
+            foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
+                if (first)
+                    first = false;
+                else
+                    builder.Append(",");
+                builder.Append("\"");
+                builder.Append(pair.Key);
+                builder.Append("\":");
+                builder.Append(pair.Value.ToJson());
+            }
+            builder.Append("}");
+            return builder.ToString();
+        }
     }
 }

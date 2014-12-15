@@ -52,5 +52,17 @@ namespace Scorpio
             return ret;
         }
         public override string ToString() { return "Array"; }
+        public override string ToJson()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append("[");
+            for (int i = 0; i < m_listObject.Count;++i )
+            {
+                if (i != 0) builder.Append(",");
+                builder.Append(m_listObject[i].ToJson());
+            }
+            builder.Append("]");
+            return builder.ToString();
+        }
     }
 }
