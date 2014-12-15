@@ -114,5 +114,6 @@ namespace Scorpio
             return ret;
         }
         public override string ToString() { return "Function(" + Name + ")"; }
+        public override string ToJson() { return "\"Function\""; }
     }
 }
