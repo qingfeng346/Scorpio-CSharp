@@ -10,6 +10,7 @@ namespace ScorpioMaker
 {
     class Program
     {
+        private static sbyte LineFlag = sbyte.MaxValue;
         public static void WriteString(BinaryWriter writer, string str)
         {
             if (string.IsNullOrEmpty(str)) {
@@ -29,14 +30,19 @@ namespace ScorpioMaker
         }
         public static byte[] Serialize(List<Token> tokens)
         {
+            if (tokens.Count == 0) throw new Exception("Token数量小于等于0");
+            int sourceLine = 0;
             MemoryStream stream = new MemoryStream();
             BinaryWriter writer = new BinaryWriter(stream);
             writer.Write(tokens.Count);
             for (int i = 0; i < tokens.Count; ++i) {
                 var token = tokens[i];
-                writer.Write((byte)token.Type);
-                writer.Write(token.SourceLine);
-                writer.Write(token.SourceChar);
+                if (sourceLine != token.SourceLine) {
+                    sourceLine = token.SourceLine;
+                    writer.Write(LineFlag);
+                    writer.Write(token.SourceLine);
+                }
+                writer.Write((sbyte)token.Type);
                 switch (token.Type)
                 {
                     case TokenType.Boolean:
@@ -70,11 +76,16 @@ namespace ScorpioMaker
             BinaryReader reader = new BinaryReader(stream);
             List<Token> tokens = new List<Token>();
             int count = reader.ReadInt32();
+            int sourceLine = 0;
             for (int i = 0; i < count;++i )
             {
-                TokenType type = (TokenType)reader.ReadByte();
-                int sourceLine = reader.ReadInt32();
-                int sourceChar = reader.ReadInt32();
+                sbyte flag = reader.ReadSByte();
+                if (flag == LineFlag)
+                {
+                    sourceLine = reader.ReadInt32();
+                    flag = reader.ReadSByte();
+                }
+                TokenType type = (TokenType)flag;
                 object value = null;
                 switch (type)
                 {
@@ -98,20 +109,39 @@ namespace ScorpioMaker
                         value = type.ToString();
                         break;
                 }
-                tokens.Add(new Token(type, value, sourceLine, sourceChar));
+                tokens.Add(new Token(type, value, sourceLine, 0));
             }
             return tokens;
         }
         static void Main(string[] args)
         {
-            try {
-                if (args.Length <= 0) return;
-                string str = File.ReadAllText(args[0]);
-                ScriptLexer lexer = new ScriptLexer(str);
-                File.WriteAllBytes(args[0] + ".ser", Serialize(lexer.GetTokens()));
+            string source = "";
+            string target = "";
+             try {
+                for (int i = 0; i < args.Length; ++i) {
+                    if (args[i] == "-s") {
+                        source = args[i + 1];
+                    } else if (args[i] == "-o") {
+                        target = args[i + 1];
+                    }
+                }
             } catch (System.Exception ex) {
-                Console.WriteLine("error : " + ex.ToString());	
+                Console.WriteLine("参数出错 -s [源文件] -o [输出文件] error : " + ex.ToString());
+                goto exit;
             }
+            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(target)) {
+                 Console.WriteLine("参数出错 -s [源文件] -o [输出文件] ");
+                 goto exit;
+            }
+            source = Path.Combine(Environment.CurrentDirectory, source);
+            target = Path.Combine(Environment.CurrentDirectory, target);
+            try {
+                ScriptLexer lexer = new ScriptLexer(File.ReadAllText(source));
+                File.WriteAllBytes(target, Serialize(lexer.GetTokens()));
+            } catch (System.Exception ex) {
+                Console.WriteLine("解析出错 error : " + ex.ToString());	
+            }
+exit:
             Console.WriteLine("生成完成，请按任意键继续");
             Console.ReadKey();
         }
