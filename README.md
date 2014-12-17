@@ -1,11 +1,41 @@
 # Scorpio-CSharp #
-* author ：while
-* QQ群 ：245199668
+* author : while
+* QQ群 : 245199668
 
 ## 脚本示例放在  ScorpioDemo/Scripts 目录
 ## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  左侧选中要测试的脚本 点击 Run Script 按钮 即可
-## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台 (现Scorpio-Java已发布 https://github.com/qingfeng346/Scorpio-Java)
-## 性能比较用例（C#light,ulua,Scorpio-CSharp比较）(https://github.com/qingfeng346/ScriptTestor)
+## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0  兼容所有c#平台
+## Scorpio-Java(java版的Scorpio脚本) https://github.com/qingfeng346/Scorpio-Java
+## ScorpioMessage(网络协议生成工具) https://github.com/qingfeng346/ScorpioMessage
+## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
+
+## v0.0.8beta (2014-12-17) ##
+-----------
+* 增加16进制表达式 16进制表达式会保存成long型 示例：print(0xffff)
+* 增加位运算(| & ^ >> <<) 位运算只支持long型  示例：var a = 0L print(a |= 1)
+* 增加单引号字符串声明 示例 print('hello world')
+* 增加json库 json.encode  json.decode
+* Script类增加LoadTokens函数
+* 增加require函数 可以加载一个文件 搜索目录为 _G["searchpath"]
+* 增加generic_method函数 可以声明泛型函数 示例：
+    c#:  
+    public class Test {  
+        public static T Func<T>() {  
+            return default(T);  
+        }  
+    }  
+    sco:  
+    var func = generic_method(import_type("Test").Func, import_type("System.Int32"))  
+    print(func())  
+    
+* 发布ScorpioMaker工具 可以把脚本编译成二进制数据
+* 修改table类型Key值 可以为任意变量
+* 修改string类型可以用 []表达式 获取指定位置的字符
+* 修改 解析Array类型 最后一个值加逗号会解析失败的问题
+* 修复 负值常量 多次运行 值会修改的BUG
+* 增加新增功能的示例
+* 发布ScorpioMessage项目 可以热更新网络协议 传送门 https://github.com/qingfeng346/ScorpioMessage
+
 
 ## v0.0.7beta (2014-11-25) ##
 -----------
