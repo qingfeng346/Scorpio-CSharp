@@ -179,11 +179,11 @@ namespace Scorpio
         {
             return m_UserdataFactory.create(this, value);
         }
-        internal ScriptArray CreateArray()
+        public ScriptArray CreateArray()
         {
             return new ScriptArray(this);
         }
-        internal ScriptTable CreateTable()
+        public ScriptTable CreateTable()
         {
             return new ScriptTable(this);
         }
