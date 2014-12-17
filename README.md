@@ -17,7 +17,7 @@
 * 增加json库 json.encode  json.decode
 * Script类增加LoadTokens函数
 * 增加require函数 可以加载一个文件 搜索目录为 _G["searchpath"]
-* 增加generic_method函数 可以声明泛型函数 示例：
+* 增加generic_method函数 可以声明泛型函数 示例：  
     c#:  
     public class Test {  
         public static T Func<T>() {  
@@ -27,7 +27,6 @@
     sco:  
     var func = generic_method(import_type("Test").Func, import_type("System.Int32"))  
     print(func())  
-    
 * 发布ScorpioMaker工具 可以把脚本编译成二进制数据
 * 修改table类型Key值 可以为任意变量
 * 修改string类型可以用 []表达式 获取指定位置的字符
