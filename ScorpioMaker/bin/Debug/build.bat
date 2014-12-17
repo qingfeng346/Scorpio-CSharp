@@ -1,0 +1,1 @@
+ScorpioMaker.exe -s Test.sco -o Test.ser
