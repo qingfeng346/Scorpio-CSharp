@@ -204,8 +204,7 @@ namespace Scorpio.Runtime
             context.Initialize(this);
             context.Execute(code.BeginExecutable);
             ScriptBoolean Condition;
-            for ( ; ; )
-            {
+            for ( ; ; ) {
                 if (code.Condition != null) {
                     Condition = context.ResolveOperand(code.Condition) as ScriptBoolean;
                     if (Condition == null) throw new ExecutionException("for 跳出条件必须是一个bool型");
@@ -275,9 +274,8 @@ namespace Scorpio.Runtime
             if (con == null) return false;
             if (con.Allow != null)
             {
-                ScriptBoolean b = ResolveOperand(con.Allow) as ScriptBoolean;
-                if (b == null) throw new ExecutionException("if 条件必须是一个bool型");
-                if (b.Value == false) return false;
+                object b = ResolveOperand(con.Allow).ObjectValue;
+                if (b == null || b.Equals(false)) return false;
             }
             con.Context.Initialize(this);
             con.Context.Execute();
