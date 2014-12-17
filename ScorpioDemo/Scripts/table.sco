@@ -14,8 +14,10 @@ a =
         print("this " + this.a)
         print("self " + self.a)
     }
-    //这句话等同于 d = 300
+    //等同于 d = 300
     "d" = 300,
+    //等同于 e = 300 
+    'e' = 400,
 }
 a.b()
 a.c()

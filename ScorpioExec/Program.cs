@@ -12,15 +12,18 @@ namespace ScorpioExec
 {
     public class Program
     {
+        public static string CurrentDirectory {
+            get {
+                return AppDomain.CurrentDomain.BaseDirectory;
+            }
+        }
         public static Assembly CompilerFile(string path)
         {
             CSharpCodeProvider Provider = new CSharpCodeProvider();
             CompilerParameters Parameters = new CompilerParameters();
             Parameters.ReferencedAssemblies.Add("System.dll");
-            Parameters.ReferencedAssemblies.Add("Scorpio.dll");
             Parameters.GenerateExecutable = false;
             Parameters.GenerateInMemory = true;
-            string aaa = AppDomain.CurrentDomain.BaseDirectory;
             string[] fileNames = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
             CompilerResults cr = Provider.CompileAssemblyFromFile(Parameters, fileNames);
             if (cr.Errors.HasErrors) {
@@ -38,9 +41,9 @@ namespace ScorpioExec
             Console.WriteLine("开始执行，当前版本:" + Script.Version);
             script.LoadLibrary();
             script.PushAssembly(typeof(Program).Assembly);
-            if (Directory.Exists(Environment.CurrentDirectory + "/Library"))
+            if (Directory.Exists(CurrentDirectory + "/Library"))
             {
-                string[] files = Directory.GetFiles(Environment.CurrentDirectory + "/Library", "*.dll", SearchOption.AllDirectories);
+                string[] files = Directory.GetFiles(CurrentDirectory + "/Library", "*.dll", SearchOption.AllDirectories);
                 foreach (var file in files)
                 {
                     try {
@@ -51,9 +54,9 @@ namespace ScorpioExec
                     }
                 }
             }
-            if (Directory.Exists(Environment.CurrentDirectory + "/Program")) {
+            if (Directory.Exists(CurrentDirectory + "/Program")) {
                 try {
-                    script.PushAssembly(CompilerFile(Environment.CurrentDirectory + "/Program"));
+                    script.PushAssembly(CompilerFile(CurrentDirectory + "/Program"));
                 } catch (System.Exception ex) {
                     Console.WriteLine("编译文件失败 " + ex.ToString());
                 }
