@@ -639,13 +639,15 @@ namespace Scorpio.Compiler
             CodeArray ret = new CodeArray();
             while (token.Type != TokenType.RightBracket)
             {
+                if (PeekToken().Type == TokenType.RightBracket)
+                    break;
                 ret.Elements.Add(GetObject());
                 token = PeekToken();
-                if (token.Type == TokenType.Comma)
+                if (token.Type == TokenType.Comma) {
                     ReadComma();
-                else if (token.Type == TokenType.RightBracket)
+                } else if (token.Type == TokenType.RightBracket) {
                     break;
-                else
+                } else
                     throw new ParserException("Comma ',' or right parenthesis ']' expected in array object.", token);
             }
             ReadRightBracket();
