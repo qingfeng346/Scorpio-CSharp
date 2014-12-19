@@ -34,8 +34,11 @@ namespace Scorpio.Variable
     //类函数
     public class ScorpioTypeMethod : ScorpioMethod
     {
-        public ScorpioTypeMethod(string name, UserdataMethod method)
+        //所在的类
+        private Type m_Type;
+        public ScorpioTypeMethod(string name, UserdataMethod method, Type type)
         {
+            m_Type = type;
             Method = method;
             MethodName = name;
         }
@@ -43,18 +46,20 @@ namespace Scorpio.Variable
         {
             int length = parameters.Length;
             Util.Assert(length > 0, "length > 0");
-            Util.Assert(parameters[0] is ScriptUserdata, "parameters[0] is ScriptUserdata");
             if (length > 1) {
                 ScriptObject[] pars = new ScriptObject[parameters.Length - 1];
                 Array.Copy(parameters, 1, pars, 0, pars.Length);
-                return Method.Call(parameters[0].ObjectValue, pars);
+                if (parameters[0] is ScriptNumber)
+                    return Method.Call(Util.ChangeType_impl(parameters[0].ObjectValue, m_Type), pars);
+                else
+                    return Method.Call(parameters[0].ObjectValue, pars);
             } else {
                 return Method.Call(parameters[0].ObjectValue, new ScriptObject[0]);
             }
         }
         public override ScorpioMethod MakeGenericMethod(ScriptObject[] parameters)
         {
-            return new ScorpioTypeMethod(MethodName, Method.MakeGenericMethod(parameters));
+            return new ScorpioTypeMethod(MethodName, Method.MakeGenericMethod(parameters), m_Type);
         }
     }
     //静态函数

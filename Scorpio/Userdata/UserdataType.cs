@@ -102,7 +102,7 @@ namespace Scorpio.Userdata
                 m_ScorpioMethods[name] = ret;
                 return ret;
             } else if (obj == null) {
-                ScorpioMethod ret = new ScorpioTypeMethod(name, method);
+                ScorpioMethod ret = new ScorpioTypeMethod(name, method, m_Type);
                 m_ScorpioMethods[name] = ret;
                 return ret;
             }
