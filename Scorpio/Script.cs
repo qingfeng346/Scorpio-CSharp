@@ -19,6 +19,7 @@ namespace Scorpio
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         private const string GLOBAL_TABLE = "_G";               //全局table
         private const string GLOBAL_VERSION = "_VERSION";       //版本号
+        private const string GLOBAL_SCRIPT = "_SCRIPT";         //Script对象
         private IScriptUserdataFactory m_UserdataFactory = null;                //Userdata工厂
         private ScriptTable m_GlobalTable;                                      //全局Table
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
@@ -220,6 +221,7 @@ namespace Scorpio
             m_GlobalTable = CreateTable();
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
             m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
+            m_GlobalTable.SetValue(GLOBAL_SCRIPT, CreateObject(this));
             PushAssembly(Util.MSCORLIB_ASSEMBLY);
             PushAssembly(GetType().Assembly);
             LibraryBasis.Load(this);
