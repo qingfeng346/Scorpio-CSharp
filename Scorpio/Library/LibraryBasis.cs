@@ -152,8 +152,8 @@ namespace Scorpio.Library
             script.SetObjectInternal("load_assembly_safe", script.CreateFunction(new load_assembly_safe(script)));
             script.SetObjectInternal("push_assembly", script.CreateFunction(new push_assembly(script)));
             script.SetObjectInternal("import_type", script.CreateFunction(new import_type(script)));
-            script.SetObjectInternal("generic_type", script.CreateFunction(new generic_type(script)));
-            script.SetObjectInternal("generic_method", script.CreateFunction(new generic_method(script)));
+            script.SetObjectInternal("generic_type", script.CreateFunction(new generic_type()));
+            script.SetObjectInternal("generic_method", script.CreateFunction(new generic_method()));
         }
         private class print : ScorpioHandle
         {
@@ -367,11 +367,6 @@ namespace Scorpio.Library
         }
         private class generic_type : ScorpioHandle
         {
-            private Script m_script;
-            public generic_type(Script script)
-            {
-                m_script = script;
-            }
             public object Call(ScriptObject[] args)
             {
                 ScriptUserdata userdata = args[0] as ScriptUserdata;
@@ -388,11 +383,6 @@ namespace Scorpio.Library
         }
         private class generic_method : ScorpioHandle
         {
-            private Script m_script;
-            public generic_method(Script script)
-            {
-                m_script = script;
-            }
             public object Call(ScriptObject[] args)
             {
                 if (args.Length < 2) throw new ExecutionException("generic_method 参数必须大于等于2个");

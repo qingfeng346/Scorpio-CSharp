@@ -533,7 +533,6 @@ namespace Scorpio.Runtime
                     }
                 }
             }
-            throw new ExecutionException("错误的操作符号 " + operate.Operator);
         }
         ScriptObject ParseTernary(CodeTernary ternary)
         {
