@@ -28,15 +28,12 @@ public class ScriptComponent : MonoBehaviour {
         }
         OnStart();
     }
-    private ScriptObject CallFunction(string func)
+    private object CallFunction(string func)
     {
-        try
-        {
+        try {
             ScriptFunction fun = Table.GetValue(func) as ScriptFunction;
             if (fun != null) return fun.Call();
-        }
-        catch (System.Exception ex)
-        {
+        } catch (System.Exception ex) {
             Debug.LogError("Stack : " + Launch.Script.GetStackInfo());
             Debug.LogError("CallFunction " + func + " is error " + ex.ToString());
         }
