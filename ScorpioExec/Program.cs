@@ -12,11 +12,7 @@ namespace ScorpioExec
 {
     public class Program
     {
-        public static string CurrentDirectory {
-            get {
-                return AppDomain.CurrentDomain.BaseDirectory;
-            }
-        }
+        public static string CurrentDirectory { get { return AppDomain.CurrentDomain.BaseDirectory; } }
         public static Assembly CompilerFile(string path)
         {
             CSharpCodeProvider Provider = new CSharpCodeProvider();
