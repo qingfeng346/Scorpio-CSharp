@@ -142,9 +142,8 @@ namespace Scorpio.Userdata
             if (methodInfo != null) {
                 object[] objs = methodInfo.Args;
                 int length = methodInfo.ParameterType.Length;
-                for (int i = 0; i < length; i++) {
-                    objs[i] = Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
-                }
+                for (int i = 0; i < length; i++)
+                    objs[i] = Util.ChangeTypeCheck(parameters[i], methodInfo.ParameterType[i]);
                 return methodInfo.Invoke(obj, m_Type);
             } else {
                 foreach (FunctionMethod method in m_Methods) {
@@ -160,14 +159,10 @@ namespace Scorpio.Userdata
                         if (fit) {
                             object[] objs = method.Args;
                             for (int i = 0; i < length - 1; ++i)
-                            {
                                 objs[i] = Util.ChangeType(parameters[i], method.ParameterType[i]);
-                            }
                             List<object> param = new List<object>();
                             for (int i = length - 1; i < parameters.Length; ++i)
-                            {
                                 param.Add(Util.ChangeType(parameters[i], method.ParamType));
-                            }
                             objs[length - 1] = param.ToArray();
                             return method.Invoke(obj, m_Type);
                         }

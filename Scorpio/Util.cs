@@ -109,7 +109,21 @@ namespace Scorpio
         {
             return info.IsDefined(TYPE_PARAMATTRIBUTE, false);
         }
-
+        public static object ChangeTypeCheck(ScriptObject par, Type type)
+        {
+            if (type == TYPE_OBJECT) {
+                return par.ObjectValue;
+            } else {
+                if (par is ScriptUserdata && Util.IsType(type))
+                    return ((ScriptUserdata)par).ValueType;
+                else if (par is ScriptNumber)
+                    return ChangeType_impl(par.ObjectValue, type);
+                else if (par.ObjectValue.GetType() != type)
+                    throw new ScriptException("不能从源类型转换成 目标类型 源:" + par.ObjectValue.GetType() + " 目标:" + type);
+                else
+                    return par.ObjectValue;
+            }
+        }
         public static object ChangeType(ScriptObject par, Type type)
         {
             if (type == TYPE_OBJECT) {
