@@ -32,7 +32,6 @@ namespace Scorpio.Runtime
             m_block = block;
             m_InstructionCount = m_scriptExecutable != null ? m_scriptExecutable.Count : 0;
         }
-        private bool IsBreak { get { return m_Break; } }                 //是否已经Break
         private bool IsOver { get { return m_Break || m_Over; } }        //此逻辑块是否已经执行完成
         public void Initialize(ScriptContext parent, Dictionary<String, ScriptObject> variable)
         {
@@ -212,7 +211,7 @@ namespace Scorpio.Runtime
                 }
                 blockContext.Initialize(context);
                 blockContext.Execute();
-                if (blockContext.IsBreak) break;
+                if (blockContext.IsOver) break;
                 context.Execute(code.LoopExecutable);
             }
         }
@@ -234,12 +233,11 @@ namespace Scorpio.Runtime
                 step = 1;
             }
             var variables = code.variables;
-            for (int i = begin; i <= finished; i += step)
-            {
+            for (int i = begin; i <= finished; i += step) {
                 variables[code.Identifier] = m_script.CreateNumber(i);
                 code.BlockContext.Initialize(this, variables);
                 code.BlockContext.Execute();
-                if (code.BlockContext.IsBreak) break;
+                if (code.BlockContext.IsOver) break;
             }
         }
         void ProcessCallForeach()
@@ -248,13 +246,12 @@ namespace Scorpio.Runtime
             ScriptObject loop = ResolveOperand(code.LoopObject);
             if (!loop.IsFunction) throw new ExecutionException("foreach函数必须返回一个ScriptFunction");
             ScriptObject obj;
-            for ( ; ; )
-            {
+            for ( ; ; ) {
                 obj = m_script.CreateObject(((ScriptFunction)loop).Call());
                 if (obj == null || obj is ScriptNull) return;
                 code.Context.Initialize(this, code.Identifier, obj);
                 code.Context.Execute();
-                if (code.Context.IsBreak) break;
+                if (code.Context.IsOver) break;
             }
         }
         void ProcessCallIf()
@@ -285,10 +282,9 @@ namespace Scorpio.Runtime
         {
             CodeWhile code = (CodeWhile)m_scriptInstruction.Operand0;
             TempCondition condition = code.While;
-            for ( ; ; )
-            {
+            for ( ; ; ) {
                 if (!ProcessCondition(condition, Executable_Block.While)) break;
-                if (condition.Context.IsBreak) break;
+                if (condition.Context.IsOver) break;
             }
         }
         void ProcessCallSwitch()
