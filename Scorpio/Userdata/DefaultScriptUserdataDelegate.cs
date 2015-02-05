@@ -46,7 +46,7 @@ namespace Scorpio.Userdata
                 if (i >= parameters.Length) {
                     m_Objects[i] = parameter.DefaultValue;
                 } else {
-                    m_Objects[i] = Util.ChangeTypeCheck(parameters[i], parameter.ParameterType);
+                    m_Objects[i] = Util.ChangeType(parameters[i], parameter.ParameterType);
                 }
             }
             return m_Delegate.DynamicInvoke(m_Objects);

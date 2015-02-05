@@ -158,7 +158,7 @@ namespace Scorpio.Userdata
         {
             UserdataField field = GetField(name);
             if (field == null) throw new ScriptException("SetValue Type[" + m_Type + "] 变量 [" + name + "] 不存在");
-            field.SetValue(obj, Util.ChangeTypeCheck(value, field.FieldType));
+            field.SetValue(obj, Util.ChangeType(value, field.FieldType));
         }
     }
 }

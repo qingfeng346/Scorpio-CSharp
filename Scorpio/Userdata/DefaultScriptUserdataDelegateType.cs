@@ -27,7 +27,7 @@ namespace Scorpio.Userdata
             {
                 if (Util.IsVoid(m_ReturnType))
                     return m_Function.call(args);
-                return Util.ChangeTypeCheck((ScriptObject)m_Function.call(args), m_ReturnType);
+                return Util.ChangeType((ScriptObject)m_Function.call(args), m_ReturnType);
             }
         }
 

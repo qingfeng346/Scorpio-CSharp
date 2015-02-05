@@ -143,7 +143,7 @@ namespace Scorpio.Userdata
                 object[] objs = methodInfo.Args;
                 int length = methodInfo.ParameterType.Length;
                 for (int i = 0; i < length; i++)
-                    objs[i] = Util.ChangeTypeCheck(parameters[i], methodInfo.ParameterType[i]);
+                    objs[i] = Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
                 return methodInfo.Invoke(obj, m_Type);
             } else {
                 foreach (FunctionMethod method in m_Methods) {
