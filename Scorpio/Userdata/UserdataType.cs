@@ -161,7 +161,7 @@ namespace Scorpio.Userdata
             try {
                 field.SetValue(obj, Util.ChangeType(value, field.FieldType));
             } catch (System.Exception ) {
-                throw new ScriptException("不能从源类型:" + (value.IsNull ? "null" : value.ObjectValue.GetType().Name) + " 转换成目标类型:" + field.FieldType.Name);
+                throw new ScriptException("不能从源类型:" + (value == null || value.IsNull ? "null" : value.ObjectValue.GetType().Name) + " 转换成目标类型:" + field.FieldType.Name);
             }
         }
     }

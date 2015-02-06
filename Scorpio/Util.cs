@@ -134,27 +134,26 @@ namespace Scorpio
         }
         public static bool CanChangeType(ScriptObject par, Type type)
         {
-            if (type == TYPE_OBJECT || par.IsNull) {
+            if (type == TYPE_OBJECT)
                 return true;
-            } else {
-                if (par is ScriptString && Util.IsString(type)) {
-                    return true;
-                } else if (par is ScriptNumber && IsNumber(type)) {
-                    return true;
-                } else if (par is ScriptBoolean && IsBool(type)) {
-                    return true;
-                } else if (par is ScriptEnum && (par as ScriptEnum).EnumType == type) {
-                    return true;
-                } else if (par is ScriptFunction && IsDelegateType(type)) {
-                    return true;
-                } else if (par is ScriptUserdata) {
-                    if (Util.IsType(type) || type.IsAssignableFrom(((ScriptUserdata)par).ValueType))
-                        return true;
-                } else if (type.IsAssignableFrom(par.GetType())) {
-                    return true;
-                }
-            }
-            return false;
+            else if (IsNumber(type))
+                return par is ScriptNumber;
+            else if (IsBool(type))
+                return par is ScriptBoolean;
+            else if (IsEnum(type))
+                return par is ScriptEnum && ((ScriptEnum)par).EnumType == type;
+            else if (par is ScriptNull)
+                return true;
+            else if (IsString(type))
+                return par is ScriptString;
+            else if (IsDelegateType(type))
+                return par is ScriptFunction;
+            else if (IsType(type))
+                return par is ScriptUserdata;
+            else if (par is ScriptUserdata)
+                return type.IsAssignableFrom(((ScriptUserdata)par).ValueType);
+            else
+                return type.IsAssignableFrom(par.GetType());
         }
         public static String GetFileString(String fileName, Encoding encoding)
         {
