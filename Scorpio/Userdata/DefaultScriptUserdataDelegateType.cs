@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Reflection.Emit;
+using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
     /// <summary> 动态委托类型(声明) </summary>
@@ -27,7 +28,12 @@ namespace Scorpio.Userdata
             {
                 if (Util.IsVoid(m_ReturnType))
                     return m_Function.call(args);
-                return Util.ChangeType((ScriptObject)m_Function.call(args), m_ReturnType);
+                ScriptObject ret = (ScriptObject)m_Function.call(args);
+                try {
+                    return Util.ChangeType(ret, m_ReturnType);
+                } catch (System.Exception) {
+                    throw new ScriptException("委托返回值不能从源类型:" + (ret.IsNull ? "null" : ret.ObjectValue.GetType().Name) + " 转换成目标类型:" + m_ReturnType.Name);
+                }
             }
         }
 

@@ -139,37 +139,39 @@ namespace Scorpio.Userdata
                     }
                 }
             }
-            if (methodInfo != null) {
-                object[] objs = methodInfo.Args;
-                int length = methodInfo.ParameterType.Length;
-                for (int i = 0; i < length; i++)
-                    objs[i] = Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
-                return methodInfo.Invoke(obj, m_Type);
-            } else {
-                foreach (FunctionMethod method in m_Methods) {
-                    int length = method.ParameterType.Length;
-                    if (method.Params && parameters.Length >= length - 1) {
-                        bool fit = true;
-                        for (int i = 0; i < parameters.Length; ++i) {
-                            if (!Util.CanChangeType(parameters[i], i >= length - 1 ? method.ParamType : method.ParameterType[i])) {
-                                fit = false;
-                                break;
+            try {
+                if (methodInfo != null) {
+                    object[] objs = methodInfo.Args;
+                    int length = methodInfo.ParameterType.Length;
+                    for (int i = 0; i < length; i++)
+                        objs[i] = Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
+                    return methodInfo.Invoke(obj, m_Type);
+                } else {
+                    foreach (FunctionMethod method in m_Methods) {
+                        int length = method.ParameterType.Length;
+                        if (method.Params && parameters.Length >= length - 1) {
+                            bool fit = true;
+                            for (int i = 0; i < parameters.Length; ++i) {
+                                if (!Util.CanChangeType(parameters[i], i >= length - 1 ? method.ParamType : method.ParameterType[i])) {
+                                    fit = false;
+                                    break;
+                                }
                             }
-                        }
-                        if (fit) {
-                            object[] objs = method.Args;
-                            for (int i = 0; i < length - 1; ++i)
-                                objs[i] = Util.ChangeType(parameters[i], method.ParameterType[i]);
-                            List<object> param = new List<object>();
-                            for (int i = length - 1; i < parameters.Length; ++i)
-                                param.Add(Util.ChangeType(parameters[i], method.ParamType));
-                            objs[length - 1] = param.ToArray();
-                            return method.Invoke(obj, m_Type);
+                            if (fit) {
+                                object[] objs = method.Args;
+                                for (int i = 0; i < length - 1; ++i)
+                                    objs[i] = Util.ChangeType(parameters[i], method.ParameterType[i]);
+                                List<object> param = new List<object>();
+                                for (int i = length - 1; i < parameters.Length; ++i)
+                                    param.Add(Util.ChangeType(parameters[i], method.ParamType));
+                                objs[length - 1] = param.ToArray();
+                                return method.Invoke(obj, m_Type);
+                            }
                         }
                     }
                 }
-                throw new ScriptException("Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
-            }
+            } catch (System.Exception ) { }
+            throw new ScriptException("Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
         }
     }
 }
