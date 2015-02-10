@@ -1,14 +1,26 @@
 ﻿using UnityEngine;
+using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio;
+using Scorpio.Userdata;
+public class DelegateFactory : DelegateTypeFactory
+{
+    public Delegate CreateDelegate(Type type, ScriptFunction func)
+    {
+        if (type == typeof(UIEventListener.VoidDelegate))
+            return new UIEventListener.VoidDelegate((go) => { func.call(go); });
+        return null;
+    }
+}
 public class Launch : MonoBehaviour {
     public static Script Script;
     public GameObject obj;
 	void Start () {
         try
         {
+            DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());
             List<string> scripts = new List<string>();
             scripts.Add("window");
             Script script = new Script();
