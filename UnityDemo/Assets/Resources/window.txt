@@ -8,7 +8,7 @@ UIGrid = import_type("UIGrid")
 Util = import_type("Util")
 UIEventListener = import_type("UIEventListener")
 
-colors = [Color.blue, Color.cyan, Color.gray, Color.green, Color.red, Color.white, Color.yellow, Color.magenta]
+colors = [Color(1,0,0,1), Color(0,1,0,1), Color(0,0,1,1), Color(1,1,0,1), Color(0,1,1,1), Color(1,0,1,1), Color(1,1,1,1), Color(0.5,0.5,0.5,1)]
 window = 
 {
     m_Item = null,
