@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define SCORPIO_IL2CPP
+using System;
 namespace Scorpio.Userdata
 {
 #if SCORPIO_IL2CPP

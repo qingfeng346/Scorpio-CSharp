@@ -9,6 +9,21 @@
 ## ScorpioConversion(网络协议生成工具) https://github.com/qingfeng346/ScorpioConversion/
 ## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
+## v0.0.9beta (2015-2-11) ##
+-----------
+* 增加调用c#函数 找不到合适函数的错误输出
+* 修复[%]运算解析错误的问题
+* 修复 for while循环 return 后没有跳出循环的BUG
+* 支持Unity IL2CPP (IL2CPP暂不支持 Emit 如需使用 delegate 请把DefaultScriptUserdataDelegateType.cs文件的 //#define SCORPIO_IL2CPP 改为 #define SCORPIO_IL2CPP) 然后自己实现一个DelegateTypeFactory类  示例:  
+  public class DelegateFactory : DelegateTypeFactory  {
+    public Delegate CreateDelegate(Type type, ScriptFunction func) {  
+        if (type == typeof(UIEventListener.VoidDelegate))  
+            return new UIEventListener.VoidDelegate((go) => { func.call(go); });  
+        return null;  
+    }  
+  }  
+  DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());  
+
 ## v0.0.8beta (2014-12-17) ##
 -----------
 * 增加16进制表达式 16进制表达式会保存成long型 示例：print(0xffff)
