@@ -14,6 +14,7 @@
 - [x] Windows Phone 8
 - [x] WebGL(Unity5.0Beta)
 - [ ] Windows Store Apps
+
 ## Scorpio-Java(java版的Scorpio脚本) https://github.com/qingfeng346/Scorpio-Java
 ## ScorpioConversion(网络协议生成工具) https://github.com/qingfeng346/ScorpioConversion/
 ## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
@@ -24,18 +25,16 @@
 * 修复[%]运算解析错误的问题
 * 修复 for while循环 return 后没有跳出循环的BUG
 * 支持Unity IL2CPP (IL2CPP暂不支持 Emit 如需使用 delegate 请把DefaultScriptUserdataDelegateType.cs文件的 //#define SCORPIO_IL2CPP 改为 #define SCORPIO_IL2CPP) 然后自己实现一个DelegateTypeFactory类  示例:  
-    
-    ```c#
-    public class DelegateFactory : DelegateTypeFactory  {
-        public Delegate CreateDelegate(Type type, ScriptFunction func) {  
-            if (type == typeof(UIEventListener.VoidDelegate))  
-                return new UIEventListener.VoidDelegate((go) => { func.call(go); });  
-            return null;  
-        }  
+```c#
+public class DelegateFactory : DelegateTypeFactory  {
+    public Delegate CreateDelegate(Type type, ScriptFunction func) {  
+        if (type == typeof(UIEventListener.VoidDelegate))  
+            return new UIEventListener.VoidDelegate((go) => { func.call(go); });  
+        return null;  
     }  
-    DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());  
-    ```
-    
+}  
+DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());  
+```
 ## v0.0.8beta (2014-12-17) ##
 -----------
 * 增加16进制表达式 16进制表达式会保存成long型 示例：print(0xffff)
@@ -45,15 +44,19 @@
 * Script类增加LoadTokens函数
 * 增加require函数 可以加载一个文件 搜索目录为 _G["searchpath"]
 * 增加generic_method函数 可以声明泛型函数 示例：  
-    c#:  
-    public class Test {  
-        public static T Func<T>() {  
-            return default(T);  
-        }  
+c#:  
+```c#
+public class Test {  
+    public static T Func<T>() {  
+        return default(T);  
     }  
-    sco:  
-    var func = generic_method(import_type("Test").Func, import_type("System.Int32"))  
-    print(func())  
+}  
+```
+sco:  
+```javascript
+var func = generic_method(import_type("Test").Func, import_type("System.Int32"))  
+print(func())  
+```
 * 发布ScorpioMaker工具 可以把脚本编译成二进制数据
 * 修改table类型Key值 可以为任意变量
 * 修改string类型可以用 []表达式 获取指定位置的字符
@@ -61,7 +64,6 @@
 * 修复 负值常量 多次运行 值会修改的BUG
 * 增加新增功能的示例
 * 发布ScorpioMessage项目 可以热更新网络协议 传送门 https://github.com/qingfeng346/ScorpioMessage
-
 
 ## v0.0.7beta (2014-11-25) ##
 -----------
@@ -99,37 +101,43 @@
 -----------
 * 增加对Delegate动态委托的支持  
         示例：  
-    * c# :  
-        namespace Scropio {  
-            public class Hello {  
-                public delegate void Test(int a, int b);  
-                public static Test t;  
-            }  
-        }  
-    * script:  
-        function test(a,b) {   
-            print(a)  
-            print(b)  
-        }  
-        Hello.t = Hello.Test(test)  
-        Hello.t(100,200)
+* c# :  
+```c#
+namespace Scropio {  
+    public class Hello {  
+        public delegate void Test(int a, int b);  
+        public static Test t;  
+    }  
+}  
+```
+* sco:  
+```javascript
+function test(a,b) {   
+    print(a)  
+    print(b)  
+}  
+Hello.t = Hello.Test(test)  
+Hello.t(100,200)
+```
         
 ## v0.0.2beta (2014-10-13) ##
 -----------
 * 修复已知BUG
 * 增加对不定参的支持  
     示例：  
-        function hello(a,...args) { }    
+```javascript
+    function hello(a,...args) { }  
+```
     args会传入一个Array
 * 增加 eval函数 可以动态执行一段代码
 * 删除对ulong类型的支持
 * 增加基础for循环 for(i=begin,finished(包含此值),step)  
     示例：  
-        for (i=0,10000)  
-        {  
-        }  
-        for (i=0,10000,2)  
-        {  
-        }
+```c#
+for (i=0,10000) {  
+}  
+for (i=0,10000,2) {  
+}
+```
 * 统一scriptobject产出函数 方便以后加入对象池
 * 增加Unity例子 (亲测支持pc web android ios wp(需要修改一些基础函数调用,应该不影响功能使用,稍后会发布一个版本支持wp))
