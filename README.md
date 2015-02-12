@@ -56,7 +56,7 @@
 ```javascript
     //sco代码
     var func = generic_method(import_type("Test").Func, import_type("System.Int32"))  
-print(func())  
+    print(func())  
 ```
 * 发布ScorpioMaker工具 可以把脚本编译成二进制数据
 * 修改table类型Key值 可以为任意变量
