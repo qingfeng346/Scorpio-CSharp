@@ -7,7 +7,7 @@
 ## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0 兼容所有c#平台 语法类似 javascript 
 ## Unity3d发布平台支持:
 - [x] WebPlayer
-- [x] PC
+- [x] PC (Windows Mac Linux)
 - [x] IOS(包括IL2CPP)
 - [x] Android
 - [x] BlackBerry
