@@ -26,15 +26,16 @@
 * 修复 for while循环 return 后没有跳出循环的BUG
 * 支持Unity IL2CPP (IL2CPP暂不支持 Emit 如需使用 delegate 请把DefaultScriptUserdataDelegateType.cs文件的 //#define SCORPIO_IL2CPP 改为 #define SCORPIO_IL2CPP) 然后自己实现一个DelegateTypeFactory类  示例:  
 ```c#
-public class DelegateFactory : DelegateTypeFactory  {
-    public Delegate CreateDelegate(Type type, ScriptFunction func) {  
-        if (type == typeof(UIEventListener.VoidDelegate))  
-            return new UIEventListener.VoidDelegate((go) => { func.call(go); });  
-        return null;  
+    public class DelegateFactory : DelegateTypeFactory  {
+        public Delegate CreateDelegate(Type type, ScriptFunction func) {  
+            if (type == typeof(UIEventListener.VoidDelegate))  
+                return new UIEventListener.VoidDelegate((go) => { func.call(go); });  
+            return null;  
+        }  
     }  
-}  
-DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());  
+    DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());  
 ```
+
 ## v0.0.8beta (2014-12-17) ##
 -----------
 * 增加16进制表达式 16进制表达式会保存成long型 示例：print(0xffff)
@@ -43,18 +44,18 @@ DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());
 * 增加json库 json.encode  json.decode
 * Script类增加LoadTokens函数
 * 增加require函数 可以加载一个文件 搜索目录为 _G["searchpath"]
-* 增加generic_method函数 可以声明泛型函数 示例：  
-c#:  
+* 增加generic_method函数 可以声明泛型函数 示例： 
 ```c#
-public class Test {  
-    public static T Func<T>() {  
-        return default(T);  
+    //c#代码
+    public class Test {  
+        public static T Func<T>() {  
+            return default(T);  
+        }  
     }  
-}  
 ```
-sco:  
 ```javascript
-var func = generic_method(import_type("Test").Func, import_type("System.Int32"))  
+    //sco代码
+    var func = generic_method(import_type("Test").Func, import_type("System.Int32"))  
 print(func())  
 ```
 * 发布ScorpioMaker工具 可以把脚本编译成二进制数据
@@ -82,73 +83,77 @@ print(func())
 * 优化数字和字符串的执行效率
 * 同步发布Scorpio-Java 地址:https://github.com/qingfeng346/Scorpio-Java
 
-
 ## v0.0.5beta (2014-11-4) ##
 -----------
 * 增加table声明语法  支持 Key 用 数字和字符串声明 示例：
 ```javascript
-    var a = { 1 = 1, "a" = a, b = b}
+    var a = { 
+        1 = 1, 
+        "a" = a, 
+        b = b
+    }
 ```
 * 增加elseif语法 现支持三种 elseif,elif,else if 都可以当作 else if 语法
 * 修改 不同类型之间 做 ==  != 比较报错的问题  改成  不同类型之间==比较 直接返回false
 * 增加switch语句 只支持 number和string 并且 case 只支持常量 不支持变量
 * 支持try catch 语法 示例： 
 ```javascript
-    try { trhow "error" } catch (e) { print(e) }
+    try { 
+        throw "error" 
+    } catch (e) { 
+        print(e) 
+    }
 ```
 * 支持脚本调用 c# 变长参数(params) 的函数
 * 增加 switch trycatch import_type 示例
-
 
 ## v0.0.4beta (2014-10-27) ##
 -----------
 * 增加赋值操作返回值  示例: 
 ```javascript
-    if ((a = true) == true)        a = 100   if ((a += 100) == 200)
+    if ((a = true) == true)
+    var a = 100
+    if ((a += 100) == 200) { }
 ```
 * 修复对Unity3d Windows Phone 8 版本的兼容问题  （亲测支持wp版本）
 
 ## v0.0.3beta (2014-10-18) ##
 -----------
-* 增加对Delegate动态委托的支持  
-        示例：  
-* c# :  
+* 增加对Delegate动态委托的支持 示例：
 ```c#
-namespace Scropio {  
-    public class Hello {  
-        public delegate void Test(int a, int b);  
-        public static Test t;  
+    //c#代码
+    namespace Scropio {  
+        public class Hello {  
+            public delegate void Test(int a, int b);  
+            public static Test t;  
+        }  
     }  
-}  
 ```
-* sco:  
 ```javascript
-function test(a,b) {   
-    print(a)  
-    print(b)  
-}  
-Hello.t = Hello.Test(test)  
-Hello.t(100,200)
-```
-        
+    //sco代码
+    function test(a,b) {   
+        print(a)  
+        print(b)  
+    }  
+    Hello.t = Hello.Test(test)  
+    Hello.t(100,200)
+``` 
+
 ## v0.0.2beta (2014-10-13) ##
 -----------
 * 修复已知BUG
-* 增加对不定参的支持  
-    示例：  
+* 增加对不定参的支持 示例：(args会传入一个Array)
 ```javascript
     function hello(a,...args) { }  
 ```
-    args会传入一个Array
 * 增加 eval函数 可以动态执行一段代码
 * 删除对ulong类型的支持
-* 增加基础for循环 for(i=begin,finished(包含此值),step)  
-    示例：  
+* 增加基础for循环 for(i=begin,finished(包含此值),step) 示例：  
 ```c#
-for (i=0,10000) {  
-}  
-for (i=0,10000,2) {  
-}
+    for (i=0,10000) {  
+    }  
+    for (i=0,10000,2) {  
+    }
 ```
 * 统一scriptobject产出函数 方便以后加入对象池
 * 增加Unity例子 (亲测支持pc web android ios wp(需要修改一些基础函数调用,应该不影响功能使用,稍后会发布一个版本支持wp))
