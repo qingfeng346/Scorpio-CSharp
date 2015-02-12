@@ -5,7 +5,8 @@
 ## 脚本示例放在 ScorpioDemo/Scripts 目录
 ## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  左侧选中要测试的脚本 点击 Run Script 按钮 即可
 ## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0 兼容所有c#平台 语法类似 javascript 
-## Unity3d发布平台支持 `PC WebPlayer Android IOS(包括IL2CPP) WP8 BlackBerry WebGL(Unity5.0Beta)`
+## Unity3d发布平台支持:
+## PC WebPlayer Android IOS(包括IL2CPP) WP8 BlackBerry WebGL(Unity5.0Beta)
 ## Scorpio-Java(java版的Scorpio脚本) https://github.com/qingfeng346/Scorpio-Java
 ## ScorpioConversion(网络协议生成工具) https://github.com/qingfeng346/ScorpioConversion/
 ## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
@@ -16,16 +17,14 @@
 * 修复[%]运算解析错误的问题
 * 修复 for while循环 return 后没有跳出循环的BUG
 * 支持Unity IL2CPP (IL2CPP暂不支持 Emit 如需使用 delegate 请把DefaultScriptUserdataDelegateType.cs文件的 //#define SCORPIO_IL2CPP 改为 #define SCORPIO_IL2CPP) 然后自己实现一个DelegateTypeFactory类  示例:  
-  ```C#
-  public class DelegateFactory : DelegateTypeFactory  {
-    public Delegate CreateDelegate(Type type, ScriptFunction func) {  
-        if (type == typeof(UIEventListener.VoidDelegate))  
-            return new UIEventListener.VoidDelegate((go) => { func.call(go); });  
-        return null;  
+    public class DelegateFactory : DelegateTypeFactory  {
+        public Delegate CreateDelegate(Type type, ScriptFunction func) {  
+            if (type == typeof(UIEventListener.VoidDelegate))  
+                return new UIEventListener.VoidDelegate((go) => { func.call(go); });  
+            return null;  
+        }  
     }  
-  }  
-  DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());  
-  ```
+    DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());  
 
 ## v0.0.8beta (2014-12-17) ##
 -----------
