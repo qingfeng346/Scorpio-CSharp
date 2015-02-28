@@ -1,5 +1,4 @@
-
-
+//import_type 注册c#类到脚本
 GameObject = import_type("UnityEngine.GameObject")
 Color = import_type("UnityEngine.Color")
 UICheckbox = import_type("UICheckbox")
@@ -8,14 +7,17 @@ UIGrid = import_type("UIGrid")
 Util = import_type("Util")
 UIEventListener = import_type("UIEventListener")
 
+//声明所有的颜色变量  c#类构造函数使用方法  Color(xx,xx,xx,xx) 不用加new关键字
 colors = [Color(1,0,0,1), Color(0,1,0,1), Color(0,0,1,1), Color(1,1,0,1), Color(0,1,1,1), Color(1,0,1,1), Color(1,1,1,1), Color(0.5,0.5,0.5,1)]
+//绑定在windows GameObject上的组件  通过过渡组件类ScriptComponent
 window = 
 {
-    m_Item = null,
-    m_Grid = null,
-    m_Sel = null,
-    m_Sel2 = null,
-    registerFunction = ["Awake"],
+    m_Item = null,          //Item Copy对象
+    m_Grid = null,          //排布Object
+    m_Sel = null,           //当前选中的Item
+    registerFunction = ["Awake"],       //声明使用到的组件回调函数
+    
+    //初始化函数 初始化所有的Item 并设置不同颜色
     function Awake()
     {
         this.m_Grid = Util.FindChild(this.com, "Grid", UIGrid)
@@ -30,13 +32,14 @@ window =
                 Util.AddChild(this.m_Grid, obj)
                 Util.SetActive(obj, true)
                 obj.name = tostring(Util.Range(100,200))
-                var com = clone(item)
+                var com = clone(item)           //clone(脚本系统自带函数)函数表示克隆一个脚本对象
                 Util.AddComponent(obj, com)
                 com.Initialize(i)
             }
         }
         this.m_Grid.Reposition()
     }
+    //点击Item事件
     function OnClick(i)
     {
         if (this.m_Sel == null)
@@ -58,6 +61,7 @@ window =
         }
     }
 }
+//绑定在单个Item上的组件
 item = 
 {
     m_Check = null,
