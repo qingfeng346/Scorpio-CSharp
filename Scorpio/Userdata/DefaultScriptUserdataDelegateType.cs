@@ -1,4 +1,4 @@
-﻿#define SCORPIO_IL2CPP
+﻿//#define SCORPIO_IL2CPP
 using System;
 namespace Scorpio.Userdata
 {
