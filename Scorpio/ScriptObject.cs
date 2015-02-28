@@ -61,6 +61,11 @@ namespace Scorpio
         public virtual ScriptObject Clone() { return this; }                            // 复制一个变量
         public virtual string ToJson() { return ObjectValue.ToString(); }               // ToJson
         public override string ToString() { return ObjectValue.ToString(); }            // ToString
+        public override bool Equals(object obj) {                                       // Equals
+            if (obj == null) return false;
+            if (!(obj is ScriptObject)) return false;
+            return ((ScriptObject)obj).ObjectValue.Equals(ObjectValue);
+        }
         public ScriptObject(Script script) { Script = script; }                         // 构图函数
         public Script Script { get; protected set; }                                    // 所在脚本对象
         public abstract ObjectType Type { get; }                                        // 变量类型

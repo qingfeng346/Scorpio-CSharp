@@ -31,6 +31,14 @@ namespace Scorpio
         {
             m_listObject.Insert(index, obj);
         }
+        public void Remove(ScriptObject obj)
+        {
+            m_listObject.Remove(obj);
+        }
+        public void RemoveAt(int index)
+        {
+            m_listObject.RemoveAt(index);
+        }
         public void Clear()
         {
             m_listObject.Clear();
