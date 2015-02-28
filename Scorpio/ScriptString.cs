@@ -27,8 +27,7 @@ namespace Scorpio
         }
         public override ScriptObject GetValue(object index)
         {
-            if (!(index is double || index is int || index is long))
-                throw new ExecutionException("String GetValue只支持Number类型");
+            if (!(index is double || index is int || index is long)) throw new ExecutionException("String GetValue只支持Number类型");
             return Script.CreateString(Value[Util.ToInt32(index)].ToString());
         }
         public bool Compare(TokenType type, ScriptString str)

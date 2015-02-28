@@ -45,6 +45,18 @@ namespace Scorpio
         {
             m_listObject.RemoveAt(index);
         }
+        public bool Contains(ScriptObject obj)
+        {
+            return m_listObject.Contains(obj);
+        }
+        public int IndexOf(ScriptObject obj)
+        {
+            return m_listObject.IndexOf(obj);
+        }
+        public int LastIndexOf(ScriptObject obj)
+        {
+            return m_listObject.LastIndexOf(obj);
+        }
         public void Clear()
         {
             m_listObject.Clear();
