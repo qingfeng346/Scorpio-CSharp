@@ -10,6 +10,7 @@ namespace Scorpio.Library
         {
             ScriptTable Table = script.CreateTable();
             Table.SetValue("count", script.CreateFunction(new count()));
+            Table.SetValue("clear", script.CreateFunction(new clear()));
             script.SetObjectInternal("table", Table);
         }
         private class count : ScorpioHandle
@@ -17,6 +18,14 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 return ((ScriptTable)args[0]).Count();
+            }
+        }
+        private class clear : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                ((ScriptTable)args[0]).Clear();
+                return null;
             }
         }
     }

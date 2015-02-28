@@ -17,13 +17,15 @@ namespace Scorpio.Userdata
             this.ValueType = value.GetType();
             this.m_Type = type;
         }
-        public override ScriptObject GetValue(string strName)
+        public override ScriptObject GetValue(object key)
         {
-            return Script.CreateObject(m_Type.GetValue(Value, strName));
+            if (!(key is string)) throw new ExecutionException("Object GetValue只支持String类型");
+            return Script.CreateObject(m_Type.GetValue(Value, (string)key));
         }
-        public override void SetValue(string strName, ScriptObject value)
+        public override void SetValue(object key, ScriptObject value)
         {
-            m_Type.SetValue(Value, strName, value);
+            if (!(key is string)) throw new ExecutionException("Object SetValue只支持String类型");
+            m_Type.SetValue(Value, (string)key, value);
         }
     }
 }

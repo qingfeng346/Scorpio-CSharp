@@ -75,12 +75,8 @@ namespace Scorpio.Runtime
         }
         private object GetMember(CodeMember member)
         {
-            if (member.Type == MEMBER_TYPE.STRING) {
-                return member.MemberString;
-            } else if (member.Type == MEMBER_TYPE.INDEX) {
-                return member.MemberIndex;
-            } else if (member.Type == MEMBER_TYPE.NUMBER) {
-                return member.MemberNumber;
+            if (member.Type == MEMBER_TYPE.VALUE) {
+                return member.MemberValue;
             } else {
                 return ResolveOperand(member.MemberObject).ObjectValue ;
             }
@@ -89,11 +85,11 @@ namespace Scorpio.Runtime
         {
             ScriptObject ret = null;
             if (member.Parent == null) {
-                string name = member.MemberString;
+                string name = (string)member.MemberValue;
                 ScriptObject obj = GetVariableObject(name);
                 ret = (obj == null ? m_script.GetValue(name) : obj);
             } else {
-                ret = ResolveOperand(member.Parent).GetValueInternal(GetMember(member));
+                ret = ResolveOperand(member.Parent).GetValue(GetMember(member));
             }
             if (ret == null) throw new ExecutionException("GetVariable member is error");
             if (member.Calc != CALC.NONE) {
@@ -106,11 +102,11 @@ namespace Scorpio.Runtime
         private void SetVariable(CodeMember member, ScriptObject variable)
         {
             if (member.Parent == null) {
-                string name = member.MemberString;
+                string name = (string)member.MemberValue;
                 if (!SetVariableObject(name, variable))
                     m_script.SetObjectInternal(name, variable);
             } else {
-                ResolveOperand(member.Parent).SetValueInternal(GetMember(member), variable);
+                ResolveOperand(member.Parent).SetValue(GetMember(member), variable);
             }
         }
         private void Reset()

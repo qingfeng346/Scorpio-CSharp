@@ -23,37 +23,37 @@ namespace Scorpio
     {
         private static readonly ScriptObject[] NOPARAMETER = new ScriptObject[0];       // 没有参数
         public virtual ScriptObject Assign() { return this; }                           // 赋值
+        ////设置变量
+        //public virtual void SetValue(int key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(int)"); }
+        ////获取变量
+        //public virtual ScriptObject GetValue(int key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(int)"); }
+        ////设置变量
+        //public virtual void SetValue(string key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(string)"); }
+        ////获取变量
+        //public virtual ScriptObject GetValue(string key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(string)"); }
         //设置变量
-        public virtual void SetValue(int key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(int)"); }
+        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量"); }
         //获取变量
-        public virtual ScriptObject GetValue(int key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(int)"); }
-        //设置变量
-        public virtual void SetValue(string key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(string)"); }
-        //获取变量
-        public virtual ScriptObject GetValue(string key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(string)"); }
-        //设置变量
-        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量(object)"); }
-        //获取变量
-        public virtual ScriptObject GetValue(object key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量(object)"); }
+        public virtual ScriptObject GetValue(object key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量"); }
 
-        public void SetValueInternal(object key, ScriptObject value)
-        {
-            if (key is string)
-                SetValue((string)key, value);
-            else if (key is int || key is double)
-                SetValue(Util.ToInt32(key), value);
-            else
-                SetValue(key, value);
-        }
-        public ScriptObject GetValueInternal(object key)
-        {
-            if (key is string)
-                return GetValue((string)key);
-            else if (key is int || key is double)
-                return GetValue(Util.ToInt32(key));
-            else
-                return GetValue(key);
-        }
+        //public void SetValueInternal(object key, ScriptObject value)
+        //{
+        //    if (key is string)
+        //        SetValue((string)key, value);
+        //    else if (key is int || key is double)
+        //        SetValue(Util.ToInt32(key), value);
+        //    else
+        //        SetValue(key, value);
+        //}
+        //public ScriptObject GetValueInternal(object key)
+        //{
+        //    if (key is string)
+        //        return GetValue((string)key);
+        //    else if (key is int || key is double)
+        //        return GetValue(Util.ToInt32(key));
+        //    else
+        //        return GetValue(key);
+        //}
         //调用无参函数
         public object Call() { return Call(NOPARAMETER); }
         //调用函数
@@ -65,6 +65,10 @@ namespace Scorpio
             if (obj == null) return false;
             if (!(obj is ScriptObject)) return false;
             return ((ScriptObject)obj).ObjectValue.Equals(ObjectValue);
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
         public ScriptObject(Script script) { Script = script; }                         // 构图函数
         public Script Script { get; protected set; }                                    // 所在脚本对象

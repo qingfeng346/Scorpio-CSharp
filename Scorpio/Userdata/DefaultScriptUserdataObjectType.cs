@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Scorpio;
 using Scorpio.Variable;
+using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
     /// <summary> 普通Object Type类型 </summary>
@@ -19,13 +20,15 @@ namespace Scorpio.Userdata
         {
             return m_Type.CreateInstance(parameters);
         }
-        public override ScriptObject GetValue(string strName)
+        public override ScriptObject GetValue(object key)
         {
-            return Script.CreateObject(m_Type.GetValue(null, strName));
+            if (!(key is string)) throw new ExecutionException("ObjectType GetValue只支持String类型");
+            return Script.CreateObject(m_Type.GetValue(null, (string)key));
         }
-        public override void SetValue(string strName, ScriptObject value)
+        public override void SetValue(object key, ScriptObject value)
         {
-            m_Type.SetValue(Value, strName, value);
+            if (!(key is string)) throw new ExecutionException("ObjectType SetValue只支持String类型");
+            m_Type.SetValue(null, (string)key, value);
         }
     }
 }

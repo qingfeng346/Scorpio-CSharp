@@ -23,11 +23,14 @@ namespace Scorpio.Userdata
         {
             throw new ScriptException("枚举类型不支持实例化");
         }
-        public override ScriptObject GetValue(string strName)
+        public override ScriptObject GetValue(object key)
         {
-            if (m_Enums.ContainsKey(strName))
-                return m_Enums[strName];
-            throw new ScriptException("枚举[" + ValueType.ToString() + "] 元素[" + strName + "] 不存在");
+            if (!(key is string))
+                throw new ExecutionException("Enum GetValue只支持String类型");
+            string name = (string)key;
+            if (m_Enums.ContainsKey(name))
+                return m_Enums[name];
+            throw new ScriptException("枚举[" + ValueType.ToString() + "] 元素[" + name + "] 不存在");
         }
     }
 }

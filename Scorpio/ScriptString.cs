@@ -25,9 +25,11 @@ namespace Scorpio
             Value += obj.ToString();
             return this;
         }
-        public override ScriptObject GetValue(int key)
+        public override ScriptObject GetValue(object index)
         {
-            return Script.CreateString(Value[key].ToString());
+            if (!(index is double || index is int || index is long))
+                throw new ExecutionException("String GetValue只支持Number类型");
+            return Script.CreateString(Value[Util.ToInt32(index)].ToString());
         }
         public bool Compare(TokenType type, ScriptString str)
         {

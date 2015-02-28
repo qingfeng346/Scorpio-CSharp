@@ -11,17 +11,23 @@ namespace Scorpio
         public override ObjectType Type { get { return ObjectType.Array; } }
         public List<ScriptObject> m_listObject = new List<ScriptObject>();
         public ScriptArray(Script script) : base(script) { }
-        public override ScriptObject GetValue(int index)
+        public override ScriptObject GetValue(object index)
         {
-            if (index < 0 || index >= m_listObject.Count)
-                throw new ExecutionException("index is < 0 or out of count ");
-            return m_listObject[index];
+            if (!(index is double || index is int || index is long))
+                throw new ExecutionException("Array GetValue只支持Number类型");
+            int i = Util.ToInt32(index);
+            if (i < 0 || i >= m_listObject.Count)
+                throw new ExecutionException("Array GetValue索引小于0或者超过最大值");
+            return m_listObject[i];
         }
-        public override void SetValue(int index, ScriptObject obj)
+        public override void SetValue(object index, ScriptObject obj)
         {
-            if (index < 0 || index >= m_listObject.Count)
-                throw new ExecutionException("index is < 0 or out of count ");
-            m_listObject[index] = obj;
+            if (!(index is double || index is int || index is long))
+                throw new ExecutionException("Array SetValue只支持Number类型");
+            int i = Util.ToInt32(index);
+            if (i < 0 || i >= m_listObject.Count)
+                throw new ExecutionException("Array SetValue索引小于0或者超过最大值");
+            m_listObject[i] = obj;
         }
         public void Add(ScriptObject obj)
         {

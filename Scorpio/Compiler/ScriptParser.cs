@@ -574,10 +574,8 @@ namespace Scorpio.Compiler
                     ReadRightBracket();
                     if (member is CodeScriptObject) {
                         ScriptObject obj = ((CodeScriptObject)member).Object;
-                        if (obj is ScriptNumber)
-                            ret = new CodeMember((ScriptNumber)obj, ret);
-                        else if (obj is ScriptString)
-                            ret = new CodeMember(((ScriptString)obj).Value, ret);
+                        if (obj is ScriptNumber || obj is ScriptString)
+                            ret = new CodeMember(obj.ObjectValue, ret);
                         else
                             throw new ParserException("获取变量只能是 number或string", m);
                     } else {
