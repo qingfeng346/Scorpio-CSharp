@@ -15,6 +15,9 @@ namespace Scorpio.Library
             Table.SetValue("remove", script.CreateFunction(new remove()));
             Table.SetValue("removeat", script.CreateFunction(new removeat()));
             Table.SetValue("clear", script.CreateFunction(new clear()));
+            Table.SetValue("contains", script.CreateFunction(new contains()));
+            Table.SetValue("indexof", script.CreateFunction(new indexof()));
+            Table.SetValue("lastindexof", script.CreateFunction(new lastindexof()));
             script.SetObjectInternal("array", Table);
         }
         private class count : ScorpioHandle
@@ -26,35 +29,30 @@ namespace Scorpio.Library
         private class insert : ScorpioHandle
         {
             public object Call(ScriptObject[] args) {
-                ScriptArray array = (ScriptArray)args[0];
-                int index = ((ScriptNumber)args[1]).ToInt32();
-                ScriptObject obj = (ScriptObject)args[2];
-                array.Insert(index, obj);
+                ScriptObject obj = args[2];
+                ((ScriptArray)args[0]).Insert(((ScriptNumber)args[1]).ToInt32(), obj);
                 return obj;
             }
         }
         private class add : ScorpioHandle
         {
             public object Call(ScriptObject[] args) {
-                ScriptArray array = (ScriptArray)args[0];
-                ScriptObject obj = (ScriptObject)args[1];
-                array.Add(obj);
+                ScriptObject obj = args[1];
+                ((ScriptArray)args[0]).Add(obj);
                 return obj;
             }
         }
         private class remove : ScorpioHandle
         {
             public object Call(ScriptObject[] args) {
-                ((ScriptArray)args[0]).Remove((ScriptObject)args[1]);
+                ((ScriptArray)args[0]).Remove(args[1]);
                 return null;
             }
         }
         private class removeat : ScorpioHandle
         {
             public object Call(ScriptObject[] args) {
-                ScriptArray array = (ScriptArray)args[0];
-                int index = ((ScriptNumber)args[1]).ToInt32();
-                array.RemoveAt(index);
+                ((ScriptArray)args[0]).RemoveAt(((ScriptNumber)args[1]).ToInt32());
                 return null;
             }
         }
@@ -65,12 +63,24 @@ namespace Scorpio.Library
                 return null;
             }
         }
-        private class Contains : ScorpioHandle
+        private class contains : ScorpioHandle
         {
             public object Call(ScriptObject[] args) {
-                ScriptArray array = (ScriptArray)args[0];
-                ScriptObject obj = (ScriptObject)args[1];
-                return array.Contains(obj);
+                return ((ScriptArray)args[0]).Contains(args[1]);
+            }
+        }
+        private class indexof : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return ((ScriptArray)args[0]).IndexOf(args[1]);
+            }
+        }
+        private class lastindexof : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return ((ScriptArray)args[0]).LastIndexOf(args[1]);
             }
         }
     }
