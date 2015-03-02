@@ -42,8 +42,7 @@ namespace Scorpio.Library
         {
             public object Call(ScriptObject[] args)
             {
-                ((ScriptTable)args[0]).HasValue(args[1].ObjectValue);
-                return null;
+                return ((ScriptTable)args[0]).HasValue(args[1].ObjectValue);
             }
         }
     }
