@@ -50,16 +50,18 @@ namespace Scorpio.Compiler
         private ScriptExecutable ParseStatementBlock(Executable_Block block, bool readLeftBrace, TokenType finished)
         {
             BeginExecutable(block);
-            if (readLeftBrace) ReadLeftBrace();
-            TokenType tokenType;
-            while (HasMoreTokens())
-            {
-                tokenType = ReadToken().Type;
-                if (tokenType == finished) {
-                    break;
-                }
-                UndoToken();
+            if (readLeftBrace && PeekToken().Type != TokenType.LeftBrace) {
                 ParseStatement();
+            } else {
+                if (readLeftBrace) ReadLeftBrace();
+                TokenType tokenType;
+                while (HasMoreTokens()) {
+                    tokenType = ReadToken().Type;
+                    if (tokenType == finished)
+                        break;
+                    UndoToken();
+                    ParseStatement();
+                }
             }
             ScriptExecutable ret = m_scriptExecutable;
             ret.EndScriptInstruction();
