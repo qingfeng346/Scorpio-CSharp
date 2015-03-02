@@ -18,6 +18,8 @@ namespace Scorpio.Library
             Table.SetValue("contains", script.CreateFunction(new contains()));
             Table.SetValue("indexof", script.CreateFunction(new indexof()));
             Table.SetValue("lastindexof", script.CreateFunction(new lastindexof()));
+            Table.SetValue("first", script.CreateFunction(new first()));
+            Table.SetValue("last", script.CreateFunction(new last()));
             script.SetObjectInternal("array", Table);
         }
         private class count : ScorpioHandle
@@ -81,6 +83,20 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 return ((ScriptArray)args[0]).LastIndexOf(args[1]);
+            }
+        }
+        private class first : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return ((ScriptArray)args[0]).First();
+            }
+        }
+        private class last : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return ((ScriptArray)args[0]).Last();
             }
         }
     }

@@ -65,6 +65,18 @@ namespace Scorpio
         {
             return m_listObject.Count;
         }
+        public ScriptObject First()
+        {
+            if (m_listObject.Count > 0)
+                return m_listObject[0];
+            return ScriptNull.Instance;
+        }
+        public ScriptObject Last()
+        {
+            if (m_listObject.Count > 0)
+                return m_listObject[m_listObject.Count - 1];
+            return ScriptNull.Instance;
+        }
         public List<ScriptObject>.Enumerator GetIterator()
         {
             return m_listObject.GetEnumerator();
