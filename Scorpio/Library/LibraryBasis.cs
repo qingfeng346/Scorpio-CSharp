@@ -138,6 +138,17 @@ namespace Scorpio.Library
             script.SetObjectInternal("kpairs", script.CreateFunction(new kpairs(script)));
             script.SetObjectInternal("vpairs", script.CreateFunction(new vpairs(script)));
             script.SetObjectInternal("type", script.CreateFunction(new type()));
+            script.SetObjectInternal("is_null", script.CreateFunction(new is_null()));
+            script.SetObjectInternal("is_bool", script.CreateFunction(new is_bool()));
+            script.SetObjectInternal("is_number", script.CreateFunction(new is_number()));
+            script.SetObjectInternal("is_double", script.CreateFunction(new is_double()));
+            script.SetObjectInternal("is_long", script.CreateFunction(new is_long()));
+            script.SetObjectInternal("is_string", script.CreateFunction(new is_string()));
+            script.SetObjectInternal("is_function", script.CreateFunction(new is_function()));
+            script.SetObjectInternal("is_array", script.CreateFunction(new is_array()));
+            script.SetObjectInternal("is_table", script.CreateFunction(new is_table()));
+            script.SetObjectInternal("is_enum", script.CreateFunction(new is_enum()));
+            script.SetObjectInternal("is_userdata", script.CreateFunction(new is_userdata()));
             script.SetObjectInternal("branchtype", script.CreateFunction(new branchtype()));
             script.SetObjectInternal("typeof", script.CreateFunction(new userdatatype()));
             script.SetObjectInternal("tonumber", script.CreateFunction(new tonumber(script)));
@@ -222,7 +233,84 @@ namespace Scorpio.Library
         {
             public object Call(ScriptObject[] args)
             {
-                return args[0].Type;
+                return (int)args[0].Type;
+            }
+        }
+        private class is_null : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptNull;
+            }
+        }
+        private class is_bool : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptBoolean;
+            }
+        }
+        private class is_number : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptNumber;
+            }
+        }
+        private class is_double : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptNumberDouble;
+            }
+        }
+        private class is_long : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptNumberLong;
+            }
+        }
+        private class is_string : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptString;
+            }
+        }
+        private class is_function : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptFunction;
+            }
+        }
+        private class is_array : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptArray;
+            }
+        }
+        private class is_table : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptTable;
+            }
+        }
+        private class is_enum : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptEnum;
+            }
+        }
+        private class is_userdata : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptUserdata;
             }
         }
         private class branchtype : ScorpioHandle

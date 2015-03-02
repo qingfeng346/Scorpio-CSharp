@@ -305,6 +305,7 @@ namespace Scorpio.Compiler
         {
             CodeForeach ret = new CodeForeach();
             ReadLeftParenthesis();
+            if (PeekToken().Type == TokenType.Var) ReadToken();
             ret.Identifier = ReadIdentifier();
             ReadIn();
             ret.LoopObject = GetObject();
