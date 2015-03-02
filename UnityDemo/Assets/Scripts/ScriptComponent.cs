@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio;
+//组件过渡类
 public class ScriptComponent : MonoBehaviour {
     const string StringAwake = "Awake";
     const string StringStart = "Start";
