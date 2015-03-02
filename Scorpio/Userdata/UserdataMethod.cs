@@ -129,8 +129,7 @@ namespace Scorpio.Userdata
             if (m_Count == 0) throw new ScriptException("找不到函数 [" + MethodName + "]");
             FunctionMethod methodInfo = null;
             if (m_Count == 1) {
-                if (parameters.Length == m_Methods[0].ParameterType.Length)
-                    methodInfo = m_Methods[0];
+                methodInfo = m_Methods[0];
             } else {
                 foreach (FunctionMethod method in m_Methods) {
                     if (Util.CanChangeType(parameters, method.ParameterType)) {
@@ -140,9 +139,9 @@ namespace Scorpio.Userdata
                 }
             }
             try {
-                if (methodInfo != null) {
-                    object[] objs = methodInfo.Args;
+                if (methodInfo != null && !methodInfo.Params) {
                     int length = methodInfo.ParameterType.Length;
+                    object[] objs = methodInfo.Args;
                     for (int i = 0; i < length; i++)
                         objs[i] = Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
                     return methodInfo.Invoke(obj, m_Type);
@@ -161,10 +160,10 @@ namespace Scorpio.Userdata
                                 object[] objs = method.Args;
                                 for (int i = 0; i < length - 1; ++i)
                                     objs[i] = Util.ChangeType(parameters[i], method.ParameterType[i]);
-                                List<object> param = new List<object>();
+                                Array array = Array.CreateInstance(method.ParamType, parameters.Length - length + 1);
                                 for (int i = length - 1; i < parameters.Length; ++i)
-                                    param.Add(Util.ChangeType(parameters[i], method.ParamType));
-                                objs[length - 1] = param.ToArray();
+                                    array.SetValue(Util.ChangeType(parameters[i], method.ParamType), i - length + 1);
+                                objs[length - 1] = array;
                                 return method.Invoke(obj, m_Type);
                             }
                         }
