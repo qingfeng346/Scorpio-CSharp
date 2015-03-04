@@ -514,7 +514,7 @@ namespace Scorpio.Compiler
                     ret = new CodeFunction(ParseFunctionDeclaration(false));
                     break;
                 case TokenType.LeftPar:
-                    ret = GetObject();
+                    ret = new CodeRegion(GetObject());
                     ReadRightParenthesis();
                     break;
                 case TokenType.LeftBracket:

@@ -371,6 +371,8 @@ namespace Scorpio.Runtime
         {
             if (value is CodeScriptObject) {
                 return ParseScriptObject((CodeScriptObject)value);
+            } else if (value is CodeRegion) {
+                return ParseRegion((CodeRegion)value);
             } else if (value is CodeFunction) {
                 return ParseFunction((CodeFunction)value);
             } else if (value is CodeCallFunction) {
@@ -410,6 +412,10 @@ namespace Scorpio.Runtime
         ScriptObject ParseScriptObject(CodeScriptObject obj)
         {
             return obj.Object;
+        }
+        ScriptObject ParseRegion(CodeRegion region)
+        {
+            return ResolveOperand(region.Context);
         }
         ScriptFunction ParseFunction(CodeFunction func)
         {
