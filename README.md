@@ -19,6 +19,25 @@
 ## ScorpioConversion(网络协议生成工具) https://github.com/qingfeng346/ScorpioConversion/
 ## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
+
+## master版本更新和修改内容 ##
+* array库增加 remove removeat contains indexof lastindexof 函数
+* table库增加 remove containskey clear 函数
+* 全局函数增加 is_null is_bool is_number is_double is_long is_string is_function is_array is_table is_enum is_userdata函数
+* 全局函数type函数 返回值由枚举Scorpio.ObjectType改为int型
+* 增加单句执行语法  例如 
+```c#
+    if (true) { 
+        print("hello world ")
+    }
+    //上面的代码可以写成
+    if (true)
+        print("hello world")
+```
+* 修复调用c#变长参数的函数 某些情况判断错误的问题
+* 修复()内区域变量[!][-]修饰符会失效的BUG 例如 : print((-1)) 会输出 1
+
+
 ## v0.0.9beta (2015-2-11) ##
 -----------
 * 增加调用c#函数 找不到合适函数的错误输出
