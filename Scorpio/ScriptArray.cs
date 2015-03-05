@@ -77,6 +77,14 @@ namespace Scorpio
                 return m_listObject[m_listObject.Count - 1];
             return ScriptNull.Instance;
         }
+        public ScriptObject Pop()
+        {
+            if (m_listObject.Count == 0)
+                throw new ExecutionException("Array Pop 数组长度为0");
+            ScriptObject obj = m_listObject[0];
+            m_listObject.RemoveAt(0);
+            return obj;
+        }
         public List<ScriptObject>.Enumerator GetIterator()
         {
             return m_listObject.GetEnumerator();
