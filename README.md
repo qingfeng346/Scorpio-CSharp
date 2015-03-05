@@ -13,7 +13,6 @@
 - [x] BlackBerry
 - [x] Windows Phone 8
 - [x] WebGL(Unity5.0Beta)
-- [ ] Windows Store Apps
 
 ## Scorpio-Java(java版的Scorpio脚本) https://github.com/qingfeng346/Scorpio-Java
 ## ScorpioConversion(网络协议生成工具) https://github.com/qingfeng346/ScorpioConversion/
