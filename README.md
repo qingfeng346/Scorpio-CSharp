@@ -43,7 +43,7 @@
 * table库增加 remove containskey clear 函数
 * 全局函数增加 is_null is_bool is_number is_double is_long is_string is_function is_array is_table is_enum is_userdata函数
 * 全局函数type函数 返回值由枚举Scorpio.ObjectType改为int型
-* 增加单句执行语法  例如 
+* 增加单句执行语法  例如(修改后):
 ```javascript
     if (true) { 
         print("hello world ")
