@@ -1,11 +1,10 @@
 # Scorpio-CSharp #
 * author : while
 * QQ群 : 245199668
-
-## 脚本示例放在 ScorpioDemo/Scripts 目录
-## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  左侧选中要测试的脚本 点击 Run Script 按钮 即可
-## ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0 兼容所有c#平台 语法类似 javascript 
-## Unity3d发布平台支持:
+脚本示例放在 ScorpioDemo/Scripts 目录  
+直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  左侧选中要测试的脚本 点击 Run Script 按钮 即可  
+ps: 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0 兼容所有c#平台 语法类似 javascript  
+Unity3d发布平台支持:  
 - [x] WebPlayer
 - [x] PC (Windows Mac Linux)
 - [x] IOS(包括IL2CPP)
@@ -13,10 +12,9 @@
 - [x] BlackBerry
 - [x] Windows Phone 8
 - [x] WebGL(Unity5.0Beta)
-
-## Scorpio-Java(java版的Scorpio脚本) https://github.com/qingfeng346/Scorpio-Java
-## ScorpioConversion(网络协议生成工具) https://github.com/qingfeng346/ScorpioConversion/
-## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
+Scorpio-Java(java版的Scorpio脚本) https://github.com/qingfeng346/Scorpio-Java  
+ScorpioConversion(网络协议生成工具) https://github.com/qingfeng346/ScorpioConversion  
+性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor  
 
 
 ## master版本更新和修改内容 ##
