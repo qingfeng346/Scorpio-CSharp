@@ -411,7 +411,7 @@ namespace Scorpio.Runtime
         }
         ScriptObject ParseScriptObject(CodeScriptObject obj)
         {
-            return obj.Object;
+            return obj.Object.Clone();
         }
         ScriptObject ParseRegion(CodeRegion region)
         {
