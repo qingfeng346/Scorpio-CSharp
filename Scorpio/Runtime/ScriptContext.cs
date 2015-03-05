@@ -20,6 +20,7 @@ namespace Scorpio.Runtime
         private ScriptObject m_returnObject = null;                                     //返回值
         private Executable_Block m_block;                                               //堆栈类型
         private bool m_Break = false;                                                   //break跳出
+        private bool m_Continue = false;                                                //continue跳出
         private bool m_Over = false;                                                    //函数是否已经结束
         private int m_InstructionCount = 0;                                             //指令数量
         public ScriptContext(Script script, ScriptExecutable scriptExecutable) : this(script, scriptExecutable, null, Executable_Block.None) { }
@@ -32,7 +33,8 @@ namespace Scorpio.Runtime
             m_block = block;
             m_InstructionCount = m_scriptExecutable != null ? m_scriptExecutable.Count : 0;
         }
-        private bool IsOver { get { return m_Break || m_Over; } }        //此逻辑块是否已经执行完成
+        private bool IsOver { get { return m_Break || m_Over; } }                       //break 或者 return  跳出循环
+        private bool IsExecuted { get { return m_Break || m_Over || m_Continue; } }     //continue break return 当前模块是否执行完成
         public void Initialize(ScriptContext parent, Dictionary<String, ScriptObject> variable)
         {
             m_parent = parent;
@@ -115,11 +117,10 @@ namespace Scorpio.Runtime
         {
             Reset();
             int iInstruction = 0;
-            while (iInstruction < m_InstructionCount)
-            {
+            while (iInstruction < m_InstructionCount) {
                 m_scriptInstruction = m_scriptExecutable[iInstruction++];
                 ExecuteInstruction();
-                if (IsOver) break;
+                if (IsExecuted) break;
             }
             return m_returnObject;
         }
@@ -129,11 +130,10 @@ namespace Scorpio.Runtime
             Reset();
             int iInstruction = 0;
             int iInstructionCount = executable.Count;
-            while (iInstruction < iInstructionCount)
-            {
+            while (iInstruction < iInstructionCount) {
                 m_scriptInstruction = executable[iInstruction++];
                 ExecuteInstruction();
-                if (IsOver) break;
+                if (IsExecuted) break;
             }
             return m_returnObject;
         }
@@ -351,10 +351,10 @@ namespace Scorpio.Runtime
         }
         private void InvokeContinue(CodeObject con)
         {
-            m_Over = true;
+            m_Continue = true;
             if (!SupportContinue()) {
                 if (m_parent == null)
-                    throw new ExecutionException("this block is not support continue");
+                    throw new ExecutionException("当前模块不支持continue语法");
                 m_parent.InvokeContinue(con);
             }
         }
@@ -363,7 +363,7 @@ namespace Scorpio.Runtime
             m_Break = true;
             if (!SupportBreak()) {
                 if (m_parent == null)
-                    throw new ExecutionException("this block is not support break");
+                    throw new ExecutionException("当前模块不支持break语法");
                 m_parent.InvokeBreak(bre);
             }
         }
