@@ -1,6 +1,6 @@
 # Scorpio-CSharp #
 * author : while
-* QQ群 : 245199668
+* QQ群 : 245199668 [加群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 
 ## 脚本示例放在 [ScorpioDemo/Scripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/ScorpioDemo/Scripts) 目录
 ## 直接运行 ScorpioDemo/bin/Debug/ScorpioDemo.exe  左侧选中要测试的脚本 点击 Run Script 按钮 即可
