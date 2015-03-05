@@ -21,12 +21,30 @@
 
 
 ## master版本更新和修改内容 ##
-* array库增加 remove removeat contains indexof lastindexof 函数
+(2015-3-5)
+* array库增加 pop函数
+* 修复循环continue会导致跳出循环的BUG
+* 修复相同常量自运算的问题 例如(修改前):
+```javascript
+    var a = []
+    for (var i=0;i<2;++i)
+        array.add(a, 0)
+    a[0]++
+    for (var i=0;i<array.count(a);++i)
+        print(i + " , " + a[i])
+    /*上面代码会输出
+    0 , 1
+    1 , 1
+    */
+```
+
+(2015-3-4)
+* array库增加 remove removeat contains indexof lastindexof pop函数
 * table库增加 remove containskey clear 函数
 * 全局函数增加 is_null is_bool is_number is_double is_long is_string is_function is_array is_table is_enum is_userdata函数
 * 全局函数type函数 返回值由枚举Scorpio.ObjectType改为int型
 * 增加单句执行语法  例如 
-```c#
+```javascript
     if (true) { 
         print("hello world ")
     }
@@ -35,7 +53,11 @@
         print("hello world")
 ```
 * 修复调用c#变长参数的函数 某些情况判断错误的问题
-* 修复()内区域变量[!][-]修饰符会失效的BUG 例如 : print((-1)) 会输出 1
+* 修复()内区域变量[!][-]修饰符会失效的BUG 例如(修改前): 
+```javascript
+    print((-1)) 
+    //上面代码会输出 1
+```
 
 
 ## v0.0.9beta (2015-2-11) ##
@@ -130,7 +152,7 @@
 -----------
 * 增加赋值操作返回值  示例: 
 ```javascript
-    if ((a = true) == true)
+    if ((a = true) == true) { }
     var a = 100
     if ((a += 100) == 200) { }
 ```
