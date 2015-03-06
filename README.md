@@ -23,6 +23,7 @@
 (2013-3-6)
 * array库增加 safepop 函数(如果array长度小于0默认返回null)
 * Script类增加 ClearStackInfo 函数  
+
 (2015-3-5)
 * array库增加 pop 函数
 * 修复循环continue会导致跳出循环的BUG (多谢[过期,丶守望灬稻田]同学提供反馈)
