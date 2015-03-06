@@ -421,29 +421,24 @@ namespace Scorpio.Compiler
         {
             Stack<TempOperator> operateStack = new Stack<TempOperator>();
             Stack<CodeObject> objectStack = new Stack<CodeObject>();
-            while (true)
-            {
+            while (true) {
                 objectStack.Push(GetOneObject());
                 if (!P_Operator(operateStack, objectStack))
                     break;
             }
-            while (true)
-            {
+            while (true) {
                 if (operateStack.Count <= 0)
                     break;
                 TempOperator oper = operateStack.Pop();
-                CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator);
+                CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator, m_strBreviary, PeekToken().SourceLine);
                 objectStack.Push(binexp);
             }
             CodeObject ret = objectStack.Pop();
-            if (ret is CodeMember)
-            {
+            if (ret is CodeMember) {
                 CodeMember member = ret as CodeMember;
-                if (member.Calc == CALC.NONE)
-                {
+                if (member.Calc == CALC.NONE) {
                     Token token = ReadToken();
-                    switch (token.Type)
-                    {
+                    switch (token.Type) {
                         case TokenType.Assign:
                         case TokenType.AssignPlus:
                         case TokenType.AssignMinus:
@@ -474,7 +469,7 @@ namespace Scorpio.Compiler
                 TempOperator oper = operateStack.Peek();
                 if (oper.Level >= curr.Level) {
                     operateStack.Pop();
-                    CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator);
+                    CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator, m_strBreviary, PeekToken().SourceLine);
                     objectStack.Push(binexp);
                 } else {
                     break;

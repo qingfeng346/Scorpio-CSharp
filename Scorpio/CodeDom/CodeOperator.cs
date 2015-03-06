@@ -10,7 +10,7 @@ namespace Scorpio.CodeDom
         public CodeObject Left;             //左边值
         public CodeObject Right;            //右边值
         public TokenType Operator;          //符号类型
-        public CodeOperator(CodeObject Right, CodeObject Left, TokenType type)
+        public CodeOperator(CodeObject Right, CodeObject Left, TokenType type, string breviary, int line) : base(breviary, line)
         {
             this.Left = Left;
             this.Right = Right;
