@@ -12,16 +12,18 @@ namespace Scorpio.Userdata
     {
         private class FunctionMethod
         {
-            private int m_Type;                     //是普通函数还是构造函数
-            public ConstructorInfo Constructor;  //构造函数对象
-            public MethodInfo Method;              //普通函数对象
-            public Type[] ParameterType;            //所有参数类型
-            public bool Params;                     //是否是变长参数
-            public Type ParamType;                  //变长参数类型
-            public object[] Args;                   //参数数组（预创建 可以共用）
+            private int m_Type;                         //是普通函数还是构造函数 
+            public ConstructorInfo Constructor;         //构造函数对象
+            public MethodInfo Method;                   //普通函数对象
+            public Type[] ParameterType;                //所有参数类型
+            public bool Params;                         //是否是变长参数
+            public Type ParamType;                      //变长参数类型
+            public object[] Args;                       //参数数组（预创建 可以共用）
+            public bool IsValid { get; private set; }   //是否是有效的函数 (模版函数没有声明的时候就是无效的)
             public FunctionMethod(ConstructorInfo Constructor, Type[] ParameterType, Type ParamType, bool Params)
             {
                 m_Type = 0;
+                IsValid = true;
                 this.Constructor = Constructor;
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
@@ -31,6 +33,7 @@ namespace Scorpio.Userdata
             public FunctionMethod(MethodInfo Method, Type[] ParameterType, Type ParamType, bool Params)
             {
                 m_Type = 1;
+                IsValid = !Method.IsGenericMethod || !Method.ContainsGenericParameters;
                 this.Method = Method;
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
@@ -130,9 +133,10 @@ namespace Scorpio.Userdata
             FunctionMethod methodInfo = null;
             if (m_Count == 1) {
                 methodInfo = m_Methods[0];
+                if (!methodInfo.IsValid) throw new ScriptException("Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
             } else {
                 foreach (FunctionMethod method in m_Methods) {
-                    if (Util.CanChangeType(parameters, method.ParameterType)) {
+                    if (method.IsValid && Util.CanChangeType(parameters, method.ParameterType)) {
                         methodInfo = method;
                         break;
                     }
