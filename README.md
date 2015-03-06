@@ -22,8 +22,16 @@
 ## master版本更新和修改内容 ##
 (2013-3-6)
 * array库增加 safepop 函数(如果array长度小于0默认返回null)
-* Script类增加 ClearStackInfo 函数  
-
+* Script类增加 ClearStackInfo 函数
+* 修复相同名字相同参数类型函数泛型和非泛型判断错误的问题 例如(修改前):
+```c#
+class Test {
+    public static void Func<T>(int args) {}
+    public static void Func(int args) {}
+}
+//如果在脚本里面调用 Test.Func(100) 按顺序查找会先找到泛型函数 从而调用Func函数失败
+//注:泛型函数声明在非泛型函数之后不会有问题
+```
 (2015-3-5)
 * array库增加 pop 函数
 * 修复循环continue会导致跳出循环的BUG (多谢[过期,丶守望灬稻田]同学提供反馈)
