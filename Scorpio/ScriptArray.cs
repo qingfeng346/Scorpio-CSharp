@@ -85,6 +85,14 @@ namespace Scorpio
             m_listObject.RemoveAt(0);
             return obj;
         }
+        public ScriptObject SafePop()
+        {
+            if (m_listObject.Count == 0)
+                return ScriptNull.Instance;
+            ScriptObject obj = m_listObject[0];
+            m_listObject.RemoveAt(0);
+            return obj;
+        }
         public List<ScriptObject>.Enumerator GetIterator()
         {
             return m_listObject.GetEnumerator();
