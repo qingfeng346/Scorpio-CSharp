@@ -147,7 +147,7 @@ namespace Scorpio
             else if (IsString(type))
                 return par is ScriptString;
             else if (IsDelegateType(type))
-                return par is ScriptFunction;
+                return par is ScriptUserdata && (par as ScriptUserdata).ValueType == type;
             else if (IsType(type))
                 return par is ScriptUserdata;
             else if (par is ScriptUserdata)
