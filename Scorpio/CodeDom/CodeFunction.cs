@@ -13,5 +13,9 @@ namespace Scorpio.CodeDom
         {
             this.Func = func;
         }
+        public CodeFunction(ScriptFunction func, string breviary, int line) : base(breviary, line)
+        {
+            this.Func = func;
+        }
     }
 }

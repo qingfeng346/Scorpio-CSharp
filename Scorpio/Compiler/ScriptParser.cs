@@ -35,6 +35,10 @@ namespace Scorpio.Compiler
             m_Executables.Pop();
             m_scriptExecutable = (m_Executables.Count > 0) ? m_Executables.Peek() : null;
         }
+        private int GetSourceLine()
+        {
+            return PeekToken().SourceLine;
+        }
         //解析脚本
         public ScriptExecutable Parse()
         {
@@ -128,11 +132,11 @@ namespace Scorpio.Compiler
         //解析函数（全局函数或类函数）
         private void ParseFunction()
         {
-            if (m_scriptExecutable.Block == Executable_Block.Context)
-            {
+            if (m_scriptExecutable.Block == Executable_Block.Context) {
+                Token token = PeekToken();
                 UndoToken();
                 ScriptFunction func = ParseFunctionDeclaration(true);
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func)));
+                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func, m_strBreviary, token.SourceLine)));
             }
         }
         //解析函数（返回一个函数）
@@ -393,7 +397,7 @@ namespace Scorpio.Compiler
             if (peek.Type == TokenType.RightBrace ||
                 peek.Type == TokenType.SemiColon ||
                 peek.Type == TokenType.Finished)
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(m_script, null)));
+                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(m_script, null, m_strBreviary, peek.SourceLine)));
             else
                 m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
         }
@@ -430,7 +434,7 @@ namespace Scorpio.Compiler
                 if (operateStack.Count <= 0)
                     break;
                 TempOperator oper = operateStack.Pop();
-                CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator, m_strBreviary, PeekToken().SourceLine);
+                CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator, m_strBreviary, GetSourceLine());
                 objectStack.Push(binexp);
             }
             CodeObject ret = objectStack.Pop();
@@ -469,7 +473,7 @@ namespace Scorpio.Compiler
                 TempOperator oper = operateStack.Peek();
                 if (oper.Level >= curr.Level) {
                     operateStack.Pop();
-                    CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator, m_strBreviary, PeekToken().SourceLine);
+                    CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator, m_strBreviary, GetSourceLine());
                     objectStack.Push(binexp);
                 } else {
                     break;
@@ -586,6 +590,7 @@ namespace Scorpio.Compiler
                     UndoToken();
                     break;
                 }
+                ret.StackInfo = new StackInfo(m_strBreviary, m.SourceLine);
             }
             return ret;
         }

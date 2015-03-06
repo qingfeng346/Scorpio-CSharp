@@ -6,6 +6,7 @@ namespace Scorpio.CodeDom
     public class CodeScriptObject : CodeObject
     {
         public CodeScriptObject(Script script, object obj) { Object = script.CreateObject(obj); }
+        public CodeScriptObject(Script script, object obj, string breviary, int line) : base(breviary, line) { Object = script.CreateObject(obj); }
         public ScriptObject Object { get; private set; }
     }
 }
