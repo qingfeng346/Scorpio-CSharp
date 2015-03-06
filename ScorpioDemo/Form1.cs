@@ -44,7 +44,7 @@ namespace CancerDemo
                 script.PushAssembly(GetType().Assembly);
                 Stopwatch watch = Stopwatch.StartNew();
                 script.SetObject("print", new ScorpioFunction(print));
-                BuildOutPut("返回值为 " + script.LoadString("", textBox1.Text));
+                BuildOutPut("返回值为 " + script.LoadString(textBox1.Text));
                 BuildOutPut("运行时间:" + watch.ElapsedMilliseconds + " ms");
             } catch (System.Exception ex) {
                 BuildOutPut("堆栈数据为 " + script.GetStackInfo());

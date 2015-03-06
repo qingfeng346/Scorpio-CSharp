@@ -566,7 +566,7 @@ namespace Scorpio.Runtime
             ScriptString obj = ResolveOperand(eval.EvalObject) as ScriptString;
             if (obj == null)
                 throw new ExecutionException("Eval参数必须是一个字符串");
-            return m_script.LoadString("", obj.Value, this);
+            return m_script.LoadString("", obj.Value, this, false);
         }
     }
 }

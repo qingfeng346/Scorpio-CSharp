@@ -20,8 +20,11 @@
 
 
 ## master版本更新和修改内容 ##
+(2013-3-6)
+* array库增加 safepop 函数(如果array长度小于0默认返回null)
+* Script类增加 ClearStackInfo 函数
 (2015-3-5)
-* array库增加 pop函数
+* array库增加 pop 函数
 * 修复循环continue会导致跳出循环的BUG (多谢[过期,丶守望灬稻田]同学提供反馈)
 * 修复相同常量自运算的问题 例如(修改前) (多谢[过期]同学提供反馈):
 ```javascript
@@ -38,7 +41,7 @@
 ```
 
 (2015-3-4)
-* array库增加 remove removeat contains indexof lastindexof pop函数
+* array库增加 remove removeat contains indexof lastindexof 函数
 * table库增加 remove containskey clear 函数
 * 全局函数增加 is_null is_bool is_number is_double is_long is_string is_function is_array is_table is_enum is_userdata函数
 * 全局函数type函数 返回值由枚举Scorpio.ObjectType改为int型

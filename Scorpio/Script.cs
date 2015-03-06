@@ -47,12 +47,12 @@ namespace Scorpio
         }
         public ScriptObject LoadString(String strBreviary, String strBuffer)
         {
-            return LoadString(strBreviary, strBuffer, null);
+            return LoadString(strBreviary, strBuffer, null, true);
         }
-        internal ScriptObject LoadString(String strBreviary, String strBuffer, ScriptContext context)
+        internal ScriptObject LoadString(String strBreviary, String strBuffer, ScriptContext context, bool clearStack)
         {
             try {
-                m_StackInfoStack.Clear();
+                if (clearStack) m_StackInfoStack.Clear();
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer);
                 strBreviary = Util.IsNullOrEmpty(strBreviary) ? scriptLexer.GetBreviary() : strBreviary;
                 ScriptParser scriptParser = new ScriptParser(this, scriptLexer.GetTokens(), strBreviary);
