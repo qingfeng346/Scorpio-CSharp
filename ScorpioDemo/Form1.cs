@@ -10,6 +10,24 @@ using Scorpio;
 using System.IO;
 namespace CancerDemo
 {
+    public delegate void HttpProcessListener(string error, byte[] bytes);
+    public class Test
+    {
+        public static void httpPost(String uri, string body, HttpProcessListener listener)
+        {
+            Console.WriteLine("111111111111111111");
+            //httpPost(uri, body, "utf8", listener);
+        }
+        public static void httpPost(String uri, string body, string encoding, HttpProcessListener listener)
+        {
+            Console.WriteLine("222222222222222222");
+            //httpPost(uri, Encoding.GetEncoding(encoding).GetBytes(body), listener);
+        }
+        public static void httpPost(String uri, byte[] body, HttpProcessListener listener)
+        {
+            Console.WriteLine("33333333333333333333");
+        }
+    }
     public partial class Form1 : Form
     {
         private string m_Path = "";
