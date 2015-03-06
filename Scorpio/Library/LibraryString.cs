@@ -106,7 +106,7 @@ namespace Scorpio.Library
         {
             public object Call(ScriptObject[] args)
             {
-                return Util.IsNullOrEmpty((args[0] as ScriptString).Value);
+                return Util.IsNullOrEmpty(args[0].ObjectValue as string);
             }
         }
     }
