@@ -100,6 +100,10 @@ namespace Scorpio
         {
             m_StackInfoStack.Add(m_StackInfo);
         }
+        public void ClearStackInfo()
+        {
+            m_StackInfoStack.Clear();
+        }
         public string GetStackInfo()
         {
             StringBuilder builder = new StringBuilder();
