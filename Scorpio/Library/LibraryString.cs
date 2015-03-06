@@ -16,6 +16,7 @@ namespace Scorpio.Library
             Table.SetValue("toupper", script.CreateFunction(new toupper()));
             Table.SetValue("trim", script.CreateFunction(new trim()));
             Table.SetValue("replace", script.CreateFunction(new replace()));
+            Table.SetValue("isnullorempty", script.CreateFunction(new isnullorempty()));
             script.SetObjectInternal("string", Table);
         }
         const string DELIM_STR = "{}";
@@ -99,6 +100,13 @@ namespace Scorpio.Library
                 string oldValue = (args[1] as ScriptString).Value;
                 string newValue = (args[2] as ScriptString).Value;
                 return str.Replace(oldValue, newValue);
+            }
+        }
+        private class isnullorempty : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return Util.IsNullOrEmpty((args[0] as ScriptString).Value);
             }
         }
     }
