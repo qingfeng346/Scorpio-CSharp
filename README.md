@@ -23,6 +23,7 @@
 (2013-3-6)
 * array库增加 safepop 函数(如果array长度小于0默认返回null)
 * Script类增加 ClearStackInfo 函数
+* 修复某些语法情况下出错报不出堆栈的问题
 * 修复相同名字相同参数类型函数泛型和非泛型判断错误的问题 例如(修改前):
 ```c#
 class Test {
