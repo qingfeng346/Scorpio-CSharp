@@ -73,7 +73,7 @@ namespace Scorpio.Userdata
         {
             if (m_InitializeConstructor == true) return;
             m_InitializeConstructor = true;
-            m_Constructor = new UserdataMethod(m_Type, m_Type.ToString(), m_Type.GetConstructors());
+            m_Constructor = new UserdataMethod(m_Script, m_Type, m_Type.ToString(), m_Type.GetConstructors());
         }
         private void InitializeMethods()
         {
@@ -84,11 +84,9 @@ namespace Scorpio.Userdata
         private UserdataMethod GetMethod(string name)
         {
             InitializeMethods();
-            for (int i = 0; i < m_Methods.Length; ++i)
-            {
-                if (m_Methods[i].Name.Equals(name))
-                {
-                    UserdataMethod method = new UserdataMethod(m_Type, name, m_Methods);
+            for (int i = 0; i < m_Methods.Length; ++i) {
+                if (m_Methods[i].Name.Equals(name)) {
+                    UserdataMethod method = new UserdataMethod(m_Script, m_Type, name, m_Methods);
                     m_Functions.Add(name, method);
                     return method;
                 }
@@ -159,7 +157,7 @@ namespace Scorpio.Userdata
             UserdataField field = GetField(name);
             if (field == null) throw new ScriptException("SetValue Type[" + m_Type + "] 变量 [" + name + "] 不存在");
             try {
-                field.SetValue(obj, Util.ChangeType(value, field.FieldType));
+                field.SetValue(obj, Util.ChangeType(m_Script, value, field.FieldType));
             } catch (System.Exception ) {
                 throw new ScriptException("不能从源类型:" + (value == null || value.IsNull ? "null" : value.ObjectValue.GetType().Name) + " 转换成目标类型:" + field.FieldType.Name);
             }

@@ -20,6 +20,20 @@
 
 
 ## master版本更新和修改内容 ##
+(2013-3-7)
+* 增加c#委托和脚本function类型无缝切换 例如:
+```c#
+    public delegate void Action();
+    public class Test {
+        public static void Func(Action action);
+    }
+```
+```javascript
+    //修改前代码要写成这样:
+    Test.Func(Action( function() { } ) )
+    //修改后可以去掉Action 程序会自动检测并转换
+    Test.Func(function() {} )
+```
 (2013-3-6)
 * array库增加 safepop 函数(如果array长度小于0默认返回null)
 * string库增加 isnullorempty 函数
@@ -27,10 +41,10 @@
 * 修复某些语法情况下出错报不出堆栈的问题
 * 修复相同名字相同参数类型函数泛型和非泛型判断错误的问题 例如(修改前):
 ```c#
-class Test {
-    public static void Func<T>(int args) {}
-    public static void Func(int args) {}
-}
+    public class Test {
+        public static void Func<T>(int args) {}
+        public static void Func(int args) {}
+    }
 //如果在脚本里面调用 Test.Func(100) 按顺序查找会先找到泛型函数 从而调用Func函数失败
 //注:泛型函数声明在非泛型函数之后不会有问题
 ```

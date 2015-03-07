@@ -45,31 +45,34 @@ namespace Scorpio.Userdata
                 return m_Type == 1 ? Method.Invoke(obj, Args) : Constructor.Invoke(Args);
             }
         }
+        private Script m_Script;                        //所在脚本引擎
         private Type m_Type;                            //所在类型
         private int m_Count;                            //相同名字函数数量
         private FunctionMethod[] m_Methods;             //所有函数对象
         public string MethodName { get; private set; }  //函数名字
         public bool IsStatic { get; private set; }      //是否是静态函数
-        public UserdataMethod(Type type, string methodName, MethodInfo[] methods)
+        public UserdataMethod(Script script, Type type, string methodName, MethodInfo[] methods)
         {
+            m_Script = script;
             List<MethodBase> methodBases = new List<MethodBase>();
-            foreach (MethodInfo method in methods)
-            {
+            foreach (MethodInfo method in methods) {
                 if (method.Name.Equals(methodName))
                     methodBases.Add(method);
             }
             IsStatic = methodBases.Count > 0 ? methodBases[0].IsStatic : false;
             Initialize(type, methodName, methodBases);
         }
-        public UserdataMethod(Type type, string methodName, ConstructorInfo[] cons)
+        public UserdataMethod(Script script, Type type, string methodName, ConstructorInfo[] cons)
         {
+            m_Script = script;
             IsStatic = false;
             List<MethodBase> methods = new List<MethodBase>();
             methods.AddRange(cons);
             Initialize(type, methodName, methods);
         }
-        private UserdataMethod(Type type, string methodName, List<MethodInfo> methods)
+        private UserdataMethod(Script script, Type type, string methodName, List<MethodInfo> methods)
         {
+            m_Script = script;
             IsStatic = methods[0].IsStatic;
             List<MethodBase> methodBases = new List<MethodBase>();
             methodBases.AddRange(methods.ToArray());
@@ -93,7 +96,7 @@ namespace Scorpio.Userdata
                 }
             }
             if (methods.Count > 0)
-                return new UserdataMethod(m_Type, MethodName, methods);
+                return new UserdataMethod(m_Script, m_Type, MethodName, methods);
             throw new ExecutionException("没有找到合适的泛型函数 " + MethodName);
         }
         private void Initialize(Type type, string methodName, List<MethodBase> methods)
@@ -147,7 +150,7 @@ namespace Scorpio.Userdata
                     int length = methodInfo.ParameterType.Length;
                     object[] objs = methodInfo.Args;
                     for (int i = 0; i < length; i++)
-                        objs[i] = Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
+                        objs[i] = Util.ChangeType(m_Script, parameters[i], methodInfo.ParameterType[i]);
                     return methodInfo.Invoke(obj, m_Type);
                 } else {
                     foreach (FunctionMethod method in m_Methods) {
@@ -163,10 +166,10 @@ namespace Scorpio.Userdata
                             if (fit) {
                                 object[] objs = method.Args;
                                 for (int i = 0; i < length - 1; ++i)
-                                    objs[i] = Util.ChangeType(parameters[i], method.ParameterType[i]);
+                                    objs[i] = Util.ChangeType(m_Script, parameters[i], method.ParameterType[i]);
                                 Array array = Array.CreateInstance(method.ParamType, parameters.Length - length + 1);
                                 for (int i = length - 1; i < parameters.Length; ++i)
-                                    array.SetValue(Util.ChangeType(parameters[i], method.ParamType), i - length + 1);
+                                    array.SetValue(Util.ChangeType(m_Script, parameters[i], method.ParamType), i - length + 1);
                                 objs[length - 1] = array;
                                 return method.Invoke(obj, m_Type);
                             }

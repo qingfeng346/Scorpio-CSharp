@@ -109,7 +109,7 @@ namespace Scorpio
         {
             return info.IsDefined(TYPE_PARAMATTRIBUTE, false);
         }
-        public static object ChangeType(ScriptObject par, Type type)
+        public static object ChangeType(Script script, ScriptObject par, Type type)
         {
             if (type == TYPE_OBJECT) {
                 return par.ObjectValue;
@@ -118,7 +118,12 @@ namespace Scorpio
                     return ((ScriptUserdata)par).ValueType;
                 else if (par is ScriptNumber)
                     return ChangeType_impl(par.ObjectValue, type);
-                else
+                else if (Util.IsDelegateType(type)) {
+                    if (par is ScriptFunction)
+                        return script.GetUserdataFactory().GetDelegate(type).Call(new ScriptObject[] { par });
+                    else
+                        return par.ObjectValue;
+                } else
                     return par.ObjectValue;
             }
         }
@@ -147,7 +152,7 @@ namespace Scorpio
             else if (IsString(type))
                 return par is ScriptString;
             else if (IsDelegateType(type))
-                return par is ScriptUserdata && (par as ScriptUserdata).ValueType == type;
+                return (par is ScriptFunction) || (par is ScriptUserdata && (par as ScriptUserdata).ValueType == type);
             else if (IsType(type))
                 return par is ScriptUserdata;
             else if (par is ScriptUserdata)

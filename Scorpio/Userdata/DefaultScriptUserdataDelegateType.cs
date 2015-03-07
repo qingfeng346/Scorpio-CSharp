@@ -38,10 +38,12 @@ namespace Scorpio.Userdata
         }
         private class DynamicDelegate
         {
+            private Script m_Script;
             private Type m_ReturnType;
             private ScriptFunction m_Function;
-            public DynamicDelegate(ScriptFunction function, Type returnType)
+            public DynamicDelegate(Script script, ScriptFunction function, Type returnType)
             {
+                m_Script = script;
                 m_Function = function;
                 m_ReturnType = returnType;
             }
@@ -51,7 +53,7 @@ namespace Scorpio.Userdata
                     return m_Function.call(args);
                 ScriptObject ret = (ScriptObject)m_Function.call(args) ?? ScriptNull.Instance;
                 if (Util.CanChangeType(ret, m_ReturnType))
-                    return Util.ChangeType(ret, m_ReturnType);
+                    return Util.ChangeType(m_Script, ret, m_ReturnType);
                 throw new ScriptException("委托返回值不能从源类型:" + (ret.IsNull ? "null" : ret.ObjectValue.GetType().Name) + " 转换成目标类型:" + m_ReturnType.Name);
             }
         }
@@ -93,7 +95,7 @@ namespace Scorpio.Userdata
         }
         public override object Call(ScriptObject[] parameters)
         {
-            return MethodFactory.CreateDelegate(m_DelegateType, new DynamicDelegate(parameters[0] as ScriptFunction, m_ReturnType));
+            return MethodFactory.CreateDelegate(m_DelegateType, new DynamicDelegate(Script, parameters[0] as ScriptFunction, m_ReturnType));
         }
     }
 #endif

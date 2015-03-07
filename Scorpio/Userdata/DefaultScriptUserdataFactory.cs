@@ -11,7 +11,7 @@ namespace Scorpio.Userdata
         private Dictionary<Type, DefaultScriptUserdataEnum> m_Enums = new Dictionary<Type, DefaultScriptUserdataEnum>();                        //所有枚举集合
         private Dictionary<Type, DefaultScriptUserdataDelegateType> m_Delegates = new Dictionary<Type, DefaultScriptUserdataDelegateType>();    //所有委托类型集合
         private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                                                  //所有的类集合
-        public DefaultScriptUserdataEnum GetEnum(Type type)
+        public ScriptUserdata GetEnum(Type type)
         {
             if (m_Enums.ContainsKey(type))
                 return m_Enums[type];
@@ -19,7 +19,7 @@ namespace Scorpio.Userdata
             m_Enums.Add(type, ret);
             return ret;
         }
-        public DefaultScriptUserdataDelegateType GetDelegate(Type type)
+        public ScriptUserdata GetDelegate(Type type)
         {
             if (m_Delegates.ContainsKey(type))
                 return m_Delegates[type];

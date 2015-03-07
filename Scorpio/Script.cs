@@ -219,6 +219,9 @@ namespace Scorpio
         {
             return new ScriptFunction(this, value);
         }
+        public IScriptUserdataFactory GetUserdataFactory() {
+            return m_UserdataFactory;
+        }
         public void LoadLibrary()
         {
             m_UserdataFactory = new DefaultScriptUserdataFactory(this);
