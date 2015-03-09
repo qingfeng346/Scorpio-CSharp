@@ -341,7 +341,8 @@ namespace Scorpio.Compiler
                             m_strToken += '\n';
                             lexState = LexState.String;
                         } else {
-                            ThrowInvalidCharacterException(ch);
+                            m_strToken += ch;
+                            lexState = LexState.String;
                         }
                         break;
                     case LexState.SingleString:
@@ -369,7 +370,8 @@ namespace Scorpio.Compiler
                             m_strToken += '\n';
                             lexState = LexState.SingleString;
                         } else {
-                            ThrowInvalidCharacterException(ch);
+                            m_strToken += ch;
+                            lexState = LexState.SingleString;
                         }
                         break;
                     case LexState.SimpleStringStart:
