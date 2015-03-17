@@ -1,12 +1,20 @@
-﻿//#define SCORPIO_IL2CPP
+﻿#define SCORPIO_IL2CPP
 using System;
+
+#if !SCORPIO_IL2CPP
+using System.Collections.Generic;
+using System.Text;
+using System.Reflection;
+using System.Reflection.Emit;
+using Scorpio.Exception;
+#endif
+
 namespace Scorpio.Userdata
 {
-#if SCORPIO_IL2CPP
-    public interface DelegateTypeFactory
-    {
+    public interface DelegateTypeFactory {
         Delegate CreateDelegate(Type type, ScriptFunction func);
     }
+#if SCORPIO_IL2CPP
     public class DefaultScriptUserdataDelegateType : ScriptUserdata
     {
         private static DelegateTypeFactory m_Factory = null;
@@ -22,14 +30,10 @@ namespace Scorpio.Userdata
         }
     }
 #else
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Reflection;
-    using System.Reflection.Emit;
-    using Scorpio.Exception;
     /// <summary> 动态委托类型(声明) </summary>
     public class DefaultScriptUserdataDelegateType : ScriptUserdata
     {
+        public static void SetFactory(DelegateTypeFactory factory) {  }
         private static readonly MethodInfo DynamicDelegateMethod;
         private static readonly Type DynamicDelegateType = typeof(DynamicDelegate);
         static DefaultScriptUserdataDelegateType()
