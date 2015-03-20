@@ -1,4 +1,4 @@
-﻿#if !UNITY_TEAM_LICENSE
+﻿#if !UNITY_ENGINE
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
