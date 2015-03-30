@@ -177,7 +177,7 @@ namespace Scorpio.Userdata
                     }
                 }
             } catch (System.Exception e) {
-                throw new ScriptException("Type[" + m_Type.ToString() + "] 调用函数出错 [" + MethodName + "] : " + e.Message);
+                throw new ScriptException("Type[" + m_Type.ToString() + "] 调用函数出错 [" + MethodName + "] : " + e.ToString());
             }
             throw new ScriptException("Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
         }

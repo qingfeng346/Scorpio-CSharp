@@ -96,6 +96,10 @@ namespace Scorpio
         {
             m_StackInfo = info;
         }
+        public StackInfo GetCurrentStackInfo()
+        {
+            return m_StackInfo;
+        }
         internal void PushStackInfo()
         {
             m_StackInfoStack.Add(m_StackInfo);
