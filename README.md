@@ -87,6 +87,11 @@ test.str = "hello world"
     //上面的代码可以写成
     if (true)
         print("hello world")
+	/*注:如果是 没有返回值的return
+		if(true) return
+		请在return后面加上[;]后则会解析失败
+		if(true) return;
+	*/
 ```
 * 修复调用c#变长参数的函数 某些情况判断错误的问题
 * 修复()内区域变量[!][-]修饰符会失效的BUG 例如(修改前)(多谢[he110world]同学提供反馈): 
