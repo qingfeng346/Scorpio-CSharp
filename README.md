@@ -20,7 +20,17 @@
 
 
 ## master版本更新和修改内容 ##
-(2013-3-7)
+(2015-3-31)
+* 增加function类型内部变量 例如:
+```javascript
+function test() { print(str) }
+test.str = "hello world"
+//上述代码会输出 hello world str就相当于 test函数的变量
+test = function() { print(str) }
+test.str = "hello world"
+//上述代码会输出 hello world str就相当于 test函数的变量
+```
+(2015-3-7)
 * 增加c#委托和脚本function类型无缝切换 例如:
 ```c#
     public delegate void Action();
@@ -34,7 +44,7 @@
     //修改后可以去掉Action 程序会自动检测并转换
     Test.Func(function() {} )
 ```
-(2013-3-6)
+(2015-3-6)
 * array库增加 safepop 函数(如果array长度小于0默认返回null)
 * string库增加 isnullorempty 函数
 * Script类增加 ClearStackInfo 函数
