@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using Scorpio.Runtime;
 using Scorpio.Variable;
+using Scorpio.Exception;
 namespace Scorpio
 {
     //C#函数指针
@@ -75,6 +76,17 @@ namespace Scorpio
                 m_stackObject["self"] = table;
             }
         }
+        public override void SetValue(object key, ScriptObject value)
+        {
+            if (!(key is string)) throw new ExecutionException(this.Script, "Function SetValue只支持String类型");
+            m_stackObject[(string)key] = value;
+        }
+        public override ScriptObject GetValue(object key)
+        {
+            if (!(key is string)) throw new ExecutionException(this.Script, "Function GetValue只支持String类型");
+            return m_stackObject[(string)key];
+        }
+
         public void SetParentContext(ScriptContext context)
         {
             if (FunctionType == FunstionType.Script)
