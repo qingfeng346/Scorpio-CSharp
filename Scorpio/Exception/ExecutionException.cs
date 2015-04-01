@@ -7,9 +7,12 @@ namespace Scorpio.Exception
     class ExecutionException : ScriptException
     {
         private string m_Source = "";
-        public ExecutionException(Script script, String strMessage) : base(strMessage) {
-            StackInfo stackInfo = script.GetCurrentStackInfo();
-            if (stackInfo != null) m_Source = stackInfo.Breviary + ":" + stackInfo.Line + ": ";
+        public ExecutionException(Script script, String strMessage) : base(strMessage)
+        {
+            if (script != null) {
+                StackInfo stackInfo = script.GetCurrentStackInfo();
+                if (stackInfo != null) m_Source = stackInfo.Breviary + ":" + stackInfo.Line + ": ";
+            }
         }
         public override string Message { get { return m_Source + base.Message; } }
     }
