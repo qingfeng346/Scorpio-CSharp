@@ -21,6 +21,7 @@
 
 ## master版本更新和修改内容 ##
 (2015-4-1)
+* string库增加indexof lastindexof startswith endswith contains函数
 * 修改运行时发生异常 错误输出会加上 文件行信息 例如:
 ```javascript
 	print(null.a)

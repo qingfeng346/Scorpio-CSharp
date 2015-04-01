@@ -19,6 +19,9 @@ namespace Scorpio.Library
             Table.SetValue("isnullorempty", script.CreateFunction(new isnullorempty()));
             Table.SetValue("indexof", script.CreateFunction(new indexof()));
             Table.SetValue("lastindexof", script.CreateFunction(new lastindexof()));
+            Table.SetValue("startswith", script.CreateFunction(new startswith()));
+            Table.SetValue("endswith", script.CreateFunction(new endswith()));
+            Table.SetValue("contains", script.CreateFunction(new contains()));
             script.SetObjectInternal("string", Table);
         }
         const string DELIM_STR = "{}";
@@ -61,9 +64,10 @@ namespace Scorpio.Library
             {
                 string messagePattern = (args[0] as ScriptString).Value;
                 if (args.Length == 1) return messagePattern;
-                int index = (args[1] as ScriptNumber).ToInt32();
-                int length = (args[2] as ScriptNumber).ToInt32();
-                return messagePattern.Substring(index, length);
+                if (args.Length == 3)
+                    return messagePattern.Substring((args[1] as ScriptNumber).ToInt32(), (args[2] as ScriptNumber).ToInt32());
+                else
+                    return messagePattern.Substring((args[1] as ScriptNumber).ToInt32());
             }
         }
         private class length : ScorpioHandle
@@ -117,9 +121,7 @@ namespace Scorpio.Library
             {
                 string str = (args[0] as ScriptString).Value;
                 string value = (args[1] as ScriptString).Value;
-                if (args.Length == 4)
-                    return str.IndexOf(value, (args[2] as ScriptNumber).ToInt32(), (args[3] as ScriptNumber).ToInt32());
-                else if (args.Length == 3)
+                if (args.Length == 3)
                     return str.IndexOf(value, (args[2] as ScriptNumber).ToInt32());
                 else
                     return str.IndexOf(value);
@@ -131,12 +133,31 @@ namespace Scorpio.Library
             {
                 string str = (args[0] as ScriptString).Value;
                 string value = (args[1] as ScriptString).Value;
-                if (args.Length == 4)
-                    return str.LastIndexOf(value, (args[2] as ScriptNumber).ToInt32(), (args[3] as ScriptNumber).ToInt32());
-                else if (args.Length == 3)
+                if (args.Length == 3)
                     return str.LastIndexOf(value, (args[2] as ScriptNumber).ToInt32());
                 else
                     return str.LastIndexOf(value);
+            }
+        }
+        private class startswith : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return (args[0] as ScriptString).Value.StartsWith((args[1] as ScriptString).Value);
+            }
+        }
+        private class endswith : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return (args[0] as ScriptString).Value.EndsWith((args[1] as ScriptString).Value);
+            }
+        }
+        private class contains : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return (args[0] as ScriptString).Value.Contains((args[1] as ScriptString).Value);
             }
         }
     }
