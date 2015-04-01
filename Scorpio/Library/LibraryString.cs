@@ -18,6 +18,7 @@ namespace Scorpio.Library
             Table.SetValue("replace", script.CreateFunction(new replace()));
             Table.SetValue("isnullorempty", script.CreateFunction(new isnullorempty()));
             Table.SetValue("indexof", script.CreateFunction(new indexof()));
+            Table.SetValue("lastindexof", script.CreateFunction(new lastindexof()));
             script.SetObjectInternal("string", Table);
         }
         const string DELIM_STR = "{}";
@@ -122,6 +123,20 @@ namespace Scorpio.Library
                     return str.IndexOf(value, (args[2] as ScriptNumber).ToInt32());
                 else
                     return str.IndexOf(value);
+            }
+        }
+        private class lastindexof : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                string str = (args[0] as ScriptString).Value;
+                string value = (args[1] as ScriptString).Value;
+                if (args.Length == 4)
+                    return str.LastIndexOf(value, (args[2] as ScriptNumber).ToInt32(), (args[3] as ScriptNumber).ToInt32());
+                else if (args.Length == 3)
+                    return str.LastIndexOf(value, (args[2] as ScriptNumber).ToInt32());
+                else
+                    return str.LastIndexOf(value);
             }
         }
     }
