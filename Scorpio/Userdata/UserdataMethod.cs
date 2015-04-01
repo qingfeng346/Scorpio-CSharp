@@ -83,7 +83,7 @@ namespace Scorpio.Userdata
             int length = parameters.Length;
             Type[] typeArguments = new Type[length];
             for (int i = 0; i < length; ++i) {
-                Util.Assert(parameters[i] is ScriptUserdata, m_Script);
+                Util.Assert(parameters[i] is ScriptUserdata, m_Script, "MakeGenericMethod 参数 " + (i + 1) + " 不是 userdata类型");
                 typeArguments[i] = (parameters[i] as ScriptUserdata).ValueType;
             }
             List<MethodInfo> methods = new List<MethodInfo>();

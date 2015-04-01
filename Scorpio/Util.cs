@@ -177,10 +177,6 @@ namespace Scorpio
         {
             return Convert.ChangeType(value, conversionType);
         }
-        public static void Assert(bool b, Script script)
-        {
-            Assert(b, script, "");
-        }
         public static void Assert(bool b, Script script, string message)
         {
             if (!b) throw new ExecutionException(script, message);
