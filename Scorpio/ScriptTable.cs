@@ -17,7 +17,7 @@ namespace Scorpio
         }
         public override ScriptObject GetValue(object key)
         {
-            return m_listObject.ContainsKey(key) ? m_listObject[key] : ScriptNull.Instance;
+            return m_listObject.ContainsKey(key) ? m_listObject[key] : Script.Null;
         }
         public bool HasValue(object key)
         {

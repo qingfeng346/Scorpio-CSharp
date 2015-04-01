@@ -54,7 +54,7 @@ namespace Scorpio.Runtime
         private void ApplyVariableObject(string name)
         {
             if (!m_variableDictionary.ContainsKey(name))
-                m_variableDictionary.Add(name, ScriptNull.Instance);
+                m_variableDictionary.Add(name, m_script.Null);
         }
         private ScriptObject GetVariableObject(string name)
         {
@@ -392,7 +392,7 @@ namespace Scorpio.Runtime
             } else if (value is CodeEval) {
                 return ParseEval(value as CodeEval);
             }
-            return ScriptNull.Instance;
+            return m_script.Null;
         }
         private ScriptObject ResolveOperand(CodeObject value)
         {
@@ -479,23 +479,23 @@ namespace Scorpio.Runtime
                 if (left is ScriptBoolean) {
                     bool b1 = ((ScriptBoolean)left).Value;
                     if (type == TokenType.And) {
-                        if (b1 == false) return ScriptBoolean.False;
+                        if (b1 == false) return m_script.False;
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
                         if (right == null) throw new ExecutionException(m_script, "operate [&&] right is not a bool");
-                        return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
+                        return right.Value ? m_script.True : m_script.False;
                     } else if (type == TokenType.Or) {
-                        if (b1 == true) return ScriptBoolean.True;
+                        if (b1 == true) return m_script.True;
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
                         if (right == null) throw new ExecutionException(m_script, "operate [||] right is not a bool");
-                        return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
+                        return right.Value ? m_script.True : m_script.False;
                     } else {
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
                         if (right == null) throw new ExecutionException(m_script, "operate [==] [!=] right is not a bool");
                         bool b2 = right.Value;
                         if (type == TokenType.Equal)
-                            return b1 == b2 ? ScriptBoolean.True : ScriptBoolean.False;
+                            return b1 == b2 ? m_script.True : m_script.False;
                         else if (type == TokenType.NotEqual)
-                            return b1 != b2 ? ScriptBoolean.True : ScriptBoolean.False;
+                            return b1 != b2 ? m_script.True : m_script.False;
                         else
                             throw new ExecutionException(m_script, "nonsupport operate [" + type + "]  with bool");
                     }
@@ -509,19 +509,19 @@ namespace Scorpio.Runtime
                             ret = (left != right);
                         else
                             throw new ExecutionException(m_script, "nonsupport operate [" + type + "] with null");
-                        return ret ? ScriptBoolean.True : ScriptBoolean.False;
+                        return ret ? m_script.True : m_script.False;
                     }
                     if (type == TokenType.Equal) {
-                        return left.ObjectValue.Equals(right.ObjectValue) ? ScriptBoolean.True : ScriptBoolean.False;
+                        return left.ObjectValue.Equals(right.ObjectValue) ? m_script.True : m_script.False;
                     } else if (type == TokenType.NotEqual) {
-                        return !left.ObjectValue.Equals(right.ObjectValue) ? ScriptBoolean.True : ScriptBoolean.False;
+                        return !left.ObjectValue.Equals(right.ObjectValue) ? m_script.True : m_script.False;
                     }
                     if (left.Type != right.Type)
                         throw new ExecutionException(m_script, "[operate] left right is not same type");
                     if (left is ScriptString) {
-                        return ((ScriptString)left).Compare(type, (ScriptString)right) ? ScriptBoolean.True : ScriptBoolean.False;
+                        return ((ScriptString)left).Compare(type, (ScriptString)right) ? m_script.True : m_script.False;
                     } else if (left is ScriptNumber) {
-                        return ((ScriptNumber)left).Compare(type, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
+                        return ((ScriptNumber)left).Compare(type, (ScriptNumber)right) ? m_script.True : m_script.False;
                     } else {
                         throw new ExecutionException(m_script, "nonsupport operate [" + type + "] with " + left.Type);
                     }

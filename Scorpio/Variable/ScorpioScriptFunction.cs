@@ -39,7 +39,7 @@ namespace Scorpio.Variable
             if (m_Params) {
                 m_ParamsArray.Clear();
                 for (int i = 0; i < m_ParameterCount - 1; ++i) {
-                    objs[m_ListParameters[i]] = (parameters != null && length > i) ? parameters[i] : ScriptNull.Instance;
+                    objs[m_ListParameters[i]] = (parameters != null && length > i) ? parameters[i] : m_Script.Null;
                 }
                 for (int i = m_ParameterCount - 1; i < length; ++i) {
                     m_ParamsArray.Add(parameters[i]);
@@ -47,7 +47,7 @@ namespace Scorpio.Variable
                 objs[m_ListParameters[m_ParameterCount - 1]] = m_ParamsArray;
             } else {
                 for (int i = 0; i < m_ParameterCount; ++i) {
-                    objs[m_ListParameters[i]] = (parameters != null && length > i) ? parameters[i] : ScriptNull.Instance;
+                    objs[m_ListParameters[i]] = (parameters != null && length > i) ? parameters[i] : m_Script.Null;
                 }
             }
             m_Context.Initialize(m_ParentContext, objs);

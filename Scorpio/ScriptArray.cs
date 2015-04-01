@@ -69,13 +69,13 @@ namespace Scorpio
         {
             if (m_listObject.Count > 0)
                 return m_listObject[0];
-            return ScriptNull.Instance;
+            return Script.Null;
         }
         public ScriptObject Last()
         {
             if (m_listObject.Count > 0)
                 return m_listObject[m_listObject.Count - 1];
-            return ScriptNull.Instance;
+            return Script.Null;
         }
         public ScriptObject Pop()
         {
@@ -88,7 +88,7 @@ namespace Scorpio
         public ScriptObject SafePop()
         {
             if (m_listObject.Count == 0)
-                return ScriptNull.Instance;
+                return Script.Null;
             ScriptObject obj = m_listObject[0];
             m_listObject.RemoveAt(0);
             return obj;

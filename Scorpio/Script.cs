@@ -25,6 +25,19 @@ namespace Scorpio
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
+
+        public ScriptNull Null { get; private set; }                            //null对象
+        public ScriptBoolean True { get; private set; }                         //true对象
+        public ScriptBoolean False { get; private set; }                        //false对象
+        public ScriptBoolean GetBoolean(bool value) {
+            return value ? True : False; 
+        }
+        public Script()
+        {
+            Null = new ScriptNull(this);
+            True = new ScriptBoolean(this, true);
+            False = new ScriptBoolean(this, false);
+        }
         public ScriptObject LoadFile(String strFileName)
         {
             return LoadFile(strFileName, Encoding.UTF8);
@@ -90,7 +103,7 @@ namespace Scorpio
                 Type type = Type.GetType(str, false);
                 if (type != null) return CreateUserdata(type);
             }
-            return ScriptNull.Instance;
+            return Null;
         }
         internal void SetStackInfo(StackInfo info)
         {
@@ -152,7 +165,7 @@ namespace Scorpio
         public ScriptObject CreateObject(object value)
         {
             if (value == null)
-                return ScriptNull.Instance;
+                return Null;
             else if (value is ScriptObject)
                 return (ScriptObject)value;
             else if (value is ScorpioFunction)
@@ -173,7 +186,7 @@ namespace Scorpio
         }
         public ScriptBoolean CreateBool(bool value)
         {
-            return ScriptBoolean.Get(value);
+            return GetBoolean(value);
         }
         public ScriptString CreateString(string value)
         {

@@ -8,22 +8,16 @@ namespace Scorpio
     //脚本bool类型
     public class ScriptBoolean : ScriptObject
     {
-        public static readonly ScriptBoolean True = new ScriptBoolean(true);
-        public static readonly ScriptBoolean False = new ScriptBoolean(false);
         public override ObjectType Type { get { return ObjectType.Boolean; } }
         public override object ObjectValue { get { return Value; } }
-        public bool Value { get; set; }
-        public ScriptBoolean(bool value) : base(null)
+        public bool Value { get; private set; }
+        public ScriptBoolean(Script script, bool value) : base(script)
         {
             this.Value = value;
         }
         public ScriptBoolean Inverse()
         {
-            return Value ? False : True;
-        }
-        public static ScriptBoolean Get(bool b)
-        {
-            return b ? True : False;
+            return Value ? Script.False : Script.True;
         }
         public override string ToJson()
         {
