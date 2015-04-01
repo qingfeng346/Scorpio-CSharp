@@ -82,7 +82,7 @@ namespace Scorpio.Compiler
         char ReadChar()
         {
             if (EndOfSource)
-                throw new LexerException("End of source reached.", m_iSourceLine);
+                throw new LexerException("End of source reached.");
             char ch = m_listSourceLines[m_iSourceLine][m_iSourceChar++];
             if (m_iSourceChar >= m_listSourceLines[m_iSourceLine].Length) {
                 m_iSourceChar = 0;
@@ -93,7 +93,7 @@ namespace Scorpio.Compiler
         void UndoChar()
         {
             if (m_iSourceLine == 0 && m_iSourceChar == 0)
-                throw new LexerException("Cannot undo char beyond start of source.", m_iSourceLine);
+                throw new LexerException("Cannot undo char beyond start of source.");
             --m_iSourceChar;
             if (m_iSourceChar < 0) {
                 --m_iSourceLine;
@@ -107,7 +107,7 @@ namespace Scorpio.Compiler
         }
         void ThrowInvalidCharacterException(char ch)
         {
-            throw new ScriptException("Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar + " [" + m_listSourceLines[m_iSourceLine] + "]");
+            throw new LexerException("Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar + " [" + m_listSourceLines[m_iSourceLine] + "]");
         }
         void AddToken(TokenType type)
         {

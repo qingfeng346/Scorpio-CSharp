@@ -21,16 +21,16 @@ namespace Scorpio.Userdata
         }
         public override object Call(ScriptObject[] parameters)
         {
-            throw new ScriptException("枚举类型不支持实例化");
+            throw new ExecutionException(Script, "枚举类型不支持实例化");
         }
         public override ScriptObject GetValue(object key)
         {
             if (!(key is string))
-                throw new ExecutionException("Enum GetValue只支持String类型");
+                throw new ExecutionException(Script, "Enum GetValue只支持String类型");
             string name = (string)key;
             if (m_Enums.ContainsKey(name))
                 return m_Enums[name];
-            throw new ScriptException("枚举[" + ValueType.ToString() + "] 元素[" + name + "] 不存在");
+            throw new ExecutionException(Script, "枚举[" + ValueType.ToString() + "] 元素[" + name + "] 不存在");
         }
     }
 }

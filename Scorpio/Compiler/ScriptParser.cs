@@ -357,7 +357,7 @@ namespace Scorpio.Compiler
             if (val.Type == TokenType.String || val.Type == TokenType.Number)
                 vals.Add(val.Lexeme);
             else
-                throw new ParserException("case 语句 只支持 string和number类型");
+                throw new ParserException("case 语句 只支持 string和number类型", val);
             ReadColon();
             if (ReadToken().Type == TokenType.Case) {
                 ParseCase(vals);

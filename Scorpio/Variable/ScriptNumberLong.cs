@@ -73,7 +73,7 @@ namespace Scorpio.Variable
                 case TokenType.Shi:
                     return Script.CreateLong(m_Value << obj.ToInt32());
                 default:
-                    throw new ExecutionException("Long不支持的运算符 " + type);
+                    throw new ExecutionException(Script, "Long不支持的运算符 " + type);
             }
         }
         public override ScriptObject AssignCompute(TokenType type, ScriptNumber obj)
@@ -111,13 +111,13 @@ namespace Scorpio.Variable
                     m_Value <<= obj.ToInt32();
                     return this;
                 default:
-                    throw new ExecutionException("Long不支持的运算符 " + type);
+                    throw new ExecutionException(Script, "Long不支持的运算符 " + type);
             }
         }
         public override bool Compare(TokenType type, ScriptNumber num)
         {
             ScriptNumberLong val = num as ScriptNumberLong;
-            if (val == null) throw new ExecutionException("数字比较 两边的数字类型不一致 请先转换再比较 ");
+            if (val == null) throw new ExecutionException(Script, "数字比较 两边的数字类型不一致 请先转换再比较 ");
             switch (type)
             {
                 case TokenType.Greater:
@@ -129,7 +129,7 @@ namespace Scorpio.Variable
                 case TokenType.LessOrEqual:
                     return m_Value <= val.m_Value;
                 default:
-                    throw new ExecutionException("Number类型 操作符[" + type + "]不支持");
+                    throw new ExecutionException(Script, "Number类型 操作符[" + type + "]不支持");
             }
         }
         public override ScriptObject Clone()

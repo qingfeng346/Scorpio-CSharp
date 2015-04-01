@@ -15,21 +15,21 @@ namespace Scorpio.Compiler
         private Token ReadToken()
         {
             if (!HasMoreTokens())
-                throw new ScriptException("Unexpected end of token stream.");
+                throw new LexerException("Unexpected end of token stream.");
             return m_listTokens[m_iNextToken++];
         }
         /// <summary> 返回第一个Token </summary>
         private Token PeekToken()
         {
             if (!HasMoreTokens())
-                throw new ScriptException("Unexpected end of token stream.");
+                throw new LexerException("Unexpected end of token stream.");
             return m_listTokens[m_iNextToken];
         }
         /// <summary> 回滚Token </summary>
         private void UndoToken()
         {
             if (m_iNextToken <= 0)
-                throw new ScriptException("No more tokens to undo.");
+                throw new LexerException("No more tokens to undo.");
             --m_iNextToken;
         }
         /// <summary> 读取, </summary>

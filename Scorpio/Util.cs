@@ -177,13 +177,13 @@ namespace Scorpio
         {
             return Convert.ChangeType(value, conversionType);
         }
-        public static void Assert(bool b)
+        public static void Assert(bool b, Script script)
         {
-            Assert(b, "");
+            Assert(b, script, "");
         }
-        public static void Assert(bool b, string message)
+        public static void Assert(bool b, Script script, string message)
         {
-            if (!b) throw new ExecutionException(message);
+            if (!b) throw new ExecutionException(script, message);
         }
         public static int ToInt32(object value)
         {

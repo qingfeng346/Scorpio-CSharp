@@ -89,10 +89,10 @@ namespace Scorpio.Runtime
             } else {
                 ret = ResolveOperand(member.Parent).GetValue(GetMember(member));
             }
-            if (ret == null) throw new ExecutionException("GetVariable member is error");
+            if (ret == null) throw new ExecutionException(m_script, "GetVariable member is error");
             if (member.Calc != CALC.NONE) {
                 ScriptNumber num = ret as ScriptNumber;
-                if (num == null) throw new ExecutionException("++或者--只能应用于Number类型");
+                if (num == null) throw new ExecutionException(m_script, "++或者--只能应用于Number类型");
                 return num.Calc(member.Calc);
             }
             return ret;
@@ -198,7 +198,7 @@ namespace Scorpio.Runtime
             for ( ; ; ) {
                 if (code.Condition != null) {
                     Condition = context.ResolveOperand(code.Condition) as ScriptBoolean;
-                    if (Condition == null) throw new ExecutionException("for 跳出条件必须是一个bool型");
+                    if (Condition == null) throw new ExecutionException(m_script, "for 跳出条件必须是一个bool型");
                     if (!Condition.Value) break;
                 }
                 blockContext.Initialize(context);
@@ -211,15 +211,15 @@ namespace Scorpio.Runtime
         {
             CodeForSimple code = (CodeForSimple)m_scriptInstruction.Operand0;
             ScriptNumber beginNumber = ResolveOperand(code.Begin) as ScriptNumber;
-            if (beginNumber == null) throw new ExecutionException("forsimple 初始值必须是number");
+            if (beginNumber == null) throw new ExecutionException(m_script, "forsimple 初始值必须是number");
             ScriptNumber finishedNumber = ResolveOperand(code.Finished) as ScriptNumber;
-            if (finishedNumber == null) throw new ExecutionException("forsimple 最大值必须是number");
+            if (finishedNumber == null) throw new ExecutionException(m_script, "forsimple 最大值必须是number");
             int begin = beginNumber.ToInt32();
             int finished = finishedNumber.ToInt32();
             int step;
             if (code.Step != null) {
                 ScriptNumber stepNumber = ResolveOperand(code.Step) as ScriptNumber;
-                if (stepNumber == null) throw new ExecutionException("forsimple Step必须是number");
+                if (stepNumber == null) throw new ExecutionException(m_script, "forsimple Step必须是number");
                 step = stepNumber.ToInt32();
             } else {
                 step = 1;
@@ -236,7 +236,7 @@ namespace Scorpio.Runtime
         {
             CodeForeach code = (CodeForeach)m_scriptInstruction.Operand0;
             ScriptObject loop = ResolveOperand(code.LoopObject);
-            if (!loop.IsFunction) throw new ExecutionException("foreach函数必须返回一个ScriptFunction");
+            if (!loop.IsFunction) throw new ExecutionException(m_script, "foreach函数必须返回一个ScriptFunction");
             ScriptObject obj;
             for ( ; ; ) {
                 obj = m_script.CreateObject(((ScriptFunction)loop).Call());
@@ -354,7 +354,7 @@ namespace Scorpio.Runtime
             m_Continue = true;
             if (!SupportContinue()) {
                 if (m_parent == null)
-                    throw new ExecutionException("当前模块不支持continue语法");
+                    throw new ExecutionException(m_script, "当前模块不支持continue语法");
                 m_parent.InvokeContinue(con);
             }
         }
@@ -363,7 +363,7 @@ namespace Scorpio.Runtime
             m_Break = true;
             if (!SupportBreak()) {
                 if (m_parent == null)
-                    throw new ExecutionException("当前模块不支持break语法");
+                    throw new ExecutionException(m_script, "当前模块不支持break语法");
                 m_parent.InvokeBreak(bre);
             }
         }
@@ -400,11 +400,11 @@ namespace Scorpio.Runtime
             ScriptObject ret = ResolveOperand_impl(value);
             if (value.Not) {
                 ScriptBoolean b = ret as ScriptBoolean;
-                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [!] sign");
+                if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [!] sign");
                 ret = b.Inverse();
             }  else if (value.Negative) {
                 ScriptNumber b = ret as ScriptNumber;
-                if (b == null) throw new ExecutionException("Script Object Type [" + ret.Type + "] is cannot use [-] sign");
+                if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [-] sign");
                 ret = b.Negative();
             }
             return ret;
@@ -466,14 +466,14 @@ namespace Scorpio.Runtime
                 } else if (left is ScriptNumber && right is ScriptNumber){
                     return (left as ScriptNumber).Compute(TokenType.Plus, right as ScriptNumber);
                 } else {
-                    throw new ExecutionException("operate [+] left right is not same type");
+                    throw new ExecutionException(m_script, "operate [+] left right is not same type");
                 }
             } else if (type == TokenType.Minus || type == TokenType.Multiply || type == TokenType.Divide || type == TokenType.Modulo ||
                 type == TokenType.InclusiveOr || type == TokenType.Combine || type == TokenType.XOR || type == TokenType.Shr || type == TokenType.Shi) {
                 ScriptNumber leftNumber = left as ScriptNumber;
-                if (leftNumber == null) throw new ExecutionException("运算符[左边]必须是number类型");
+                if (leftNumber == null) throw new ExecutionException(m_script, "运算符[左边]必须是number类型");
                 ScriptNumber rightNumber = ResolveOperand(operate.Right) as ScriptNumber;
-                if (rightNumber == null) throw new ExecutionException("运算符[右边]必须是number类型");
+                if (rightNumber == null) throw new ExecutionException(m_script, "运算符[右边]必须是number类型");
                 return leftNumber.Compute(type, rightNumber);
             } else {
                 if (left is ScriptBoolean) {
@@ -481,23 +481,23 @@ namespace Scorpio.Runtime
                     if (type == TokenType.And) {
                         if (b1 == false) return ScriptBoolean.False;
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                        if (right == null) throw new ExecutionException("operate [&&] right is not a bool");
+                        if (right == null) throw new ExecutionException(m_script, "operate [&&] right is not a bool");
                         return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
                     } else if (type == TokenType.Or) {
                         if (b1 == true) return ScriptBoolean.True;
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                        if (right == null) throw new ExecutionException("operate [||] right is not a bool");
+                        if (right == null) throw new ExecutionException(m_script, "operate [||] right is not a bool");
                         return right.Value ? ScriptBoolean.True : ScriptBoolean.False;
                     } else {
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                        if (right == null) throw new ExecutionException("operate [==] [!=] right is not a bool");
+                        if (right == null) throw new ExecutionException(m_script, "operate [==] [!=] right is not a bool");
                         bool b2 = right.Value;
                         if (type == TokenType.Equal)
                             return b1 == b2 ? ScriptBoolean.True : ScriptBoolean.False;
                         else if (type == TokenType.NotEqual)
                             return b1 != b2 ? ScriptBoolean.True : ScriptBoolean.False;
                         else
-                            throw new ExecutionException("nonsupport operate [" + type + "]  with bool");
+                            throw new ExecutionException(m_script, "nonsupport operate [" + type + "]  with bool");
                     }
                 } else {
                     ScriptObject right = ResolveOperand(operate.Right);
@@ -508,7 +508,7 @@ namespace Scorpio.Runtime
                         else if (type == TokenType.NotEqual)
                             ret = (left != right);
                         else
-                            throw new ExecutionException("nonsupport operate [" + type + "] with null");
+                            throw new ExecutionException(m_script, "nonsupport operate [" + type + "] with null");
                         return ret ? ScriptBoolean.True : ScriptBoolean.False;
                     }
                     if (type == TokenType.Equal) {
@@ -517,13 +517,13 @@ namespace Scorpio.Runtime
                         return !left.ObjectValue.Equals(right.ObjectValue) ? ScriptBoolean.True : ScriptBoolean.False;
                     }
                     if (left.Type != right.Type)
-                        throw new ExecutionException("[operate] left right is not same type");
+                        throw new ExecutionException(m_script, "[operate] left right is not same type");
                     if (left is ScriptString) {
                         return ((ScriptString)left).Compare(type, (ScriptString)right) ? ScriptBoolean.True : ScriptBoolean.False;
                     } else if (left is ScriptNumber) {
                         return ((ScriptNumber)left).Compare(type, (ScriptNumber)right) ? ScriptBoolean.True : ScriptBoolean.False;
                     } else {
-                        throw new ExecutionException("nonsupport operate [" + type + "] with " + left.Type);
+                        throw new ExecutionException(m_script, "nonsupport operate [" + type + "] with " + left.Type);
                     }
                 }
             }
@@ -531,7 +531,7 @@ namespace Scorpio.Runtime
         ScriptObject ParseTernary(CodeTernary ternary)
         {
             ScriptBoolean b = ResolveOperand(ternary.Allow) as ScriptBoolean;
-            if (b == null) throw new ExecutionException("三目运算符 条件必须是一个bool型");
+            if (b == null) throw new ExecutionException(m_script, "三目运算符 条件必须是一个bool型");
             return b.Value ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
         }
         ScriptObject ParseAssign(CodeAssign assign)
@@ -548,24 +548,23 @@ namespace Scorpio.Runtime
                     if (assign.AssignType == TokenType.AssignPlus)
                         return str.AssignPlus(ResolveOperand(assign.value));
                     else
-                        throw new ExecutionException("string类型只支持[+=]赋值操作");
+                        throw new ExecutionException(m_script, "string类型只支持[+=]赋值操作");
                 }
                 ScriptNumber num = obj as ScriptNumber;
                 if (num != null)
                 {
                     ScriptNumber right = ResolveOperand(assign.value) as ScriptNumber;
                     if (right == null)
-                        throw new ExecutionException("[+= -=...]值只能为 number类型");
+                        throw new ExecutionException(m_script, "[+= -=...]值只能为 number类型");
                     return num.AssignCompute(assign.AssignType, right);
                 }
-                throw new ExecutionException("[+= -=...]左边值只能为number或者string");
+                throw new ExecutionException(m_script, "[+= -=...]左边值只能为number或者string");
             }
         }
         ScriptObject ParseEval(CodeEval eval)
         {
             ScriptString obj = ResolveOperand(eval.EvalObject) as ScriptString;
-            if (obj == null)
-                throw new ExecutionException("Eval参数必须是一个字符串");
+            if (obj == null) throw new ExecutionException(m_script, "Eval参数必须是一个字符串");
             return m_script.LoadString("", obj.Value, this, false);
         }
     }

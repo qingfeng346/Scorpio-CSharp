@@ -27,7 +27,7 @@ namespace Scorpio
         }
         public override ScriptObject GetValue(object index)
         {
-            if (!(index is double || index is int || index is long)) throw new ExecutionException("String GetValue只支持Number类型");
+            if (!(index is double || index is int || index is long)) throw new ExecutionException(Script, "String GetValue只支持Number类型");
             return Script.CreateString(Value[Util.ToInt32(index)].ToString());
         }
         public bool Compare(TokenType type, ScriptString str)
@@ -43,7 +43,7 @@ namespace Scorpio
                 case TokenType.LessOrEqual:
                     return string.Compare(Value, str.Value) >= 0;
                 default:
-                    throw new ExecutionException("String类型 操作符[" + type + "]不支持");
+                    throw new ExecutionException(Script, "String类型 操作符[" + type + "]不支持");
             }
         }
         public override ScriptObject Clone()

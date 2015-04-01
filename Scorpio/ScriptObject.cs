@@ -24,13 +24,13 @@ namespace Scorpio
         private static readonly ScriptObject[] NOPARAMETER = new ScriptObject[0];       // 没有参数
         public virtual ScriptObject Assign() { return this; }                           // 赋值
         //设置变量
-        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException("类型[" + Type + "]不支持设置变量"); }
+        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException(Script, "类型[" + Type + "]不支持设置变量"); }
         //获取变量
-        public virtual ScriptObject GetValue(object key) { throw new ExecutionException("类型[" + Type + "]不支持获取变量"); }
+        public virtual ScriptObject GetValue(object key) { throw new ExecutionException(Script, "类型[" + Type + "]不支持获取变量"); }
         //调用无参函数
         public object Call() { return Call(NOPARAMETER); }
         //调用函数
-        public virtual object Call(ScriptObject[] parameters) { throw new ExecutionException("类型[" + Type + "]不支持函数调用"); }
+        public virtual object Call(ScriptObject[] parameters) { throw new ExecutionException(Script, "类型[" + Type + "]不支持函数调用"); }
         public virtual ScriptObject Clone() { return this; }                            // 复制一个变量
         public virtual string ToJson() { return ObjectValue.ToString(); }               // ToJson
         public override string ToString() { return ObjectValue.ToString(); }            // ToString

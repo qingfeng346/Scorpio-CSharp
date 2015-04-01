@@ -14,19 +14,19 @@ namespace Scorpio
         public override ScriptObject GetValue(object index)
         {
             if (!(index is double || index is int || index is long))
-                throw new ExecutionException("Array GetValue只支持Number类型");
+                throw new ExecutionException(Script, "Array GetValue只支持Number类型");
             int i = Util.ToInt32(index);
             if (i < 0 || i >= m_listObject.Count)
-                throw new ExecutionException("Array GetValue索引小于0或者超过最大值");
+                throw new ExecutionException(Script, "Array GetValue索引小于0或者超过最大值");
             return m_listObject[i];
         }
         public override void SetValue(object index, ScriptObject obj)
         {
             if (!(index is double || index is int || index is long))
-                throw new ExecutionException("Array SetValue只支持Number类型");
+                throw new ExecutionException(Script, "Array SetValue只支持Number类型");
             int i = Util.ToInt32(index);
             if (i < 0 || i >= m_listObject.Count)
-                throw new ExecutionException("Array SetValue索引小于0或者超过最大值");
+                throw new ExecutionException(Script, "Array SetValue索引小于0或者超过最大值");
             m_listObject[i] = obj;
         }
         public void Add(ScriptObject obj)
@@ -80,7 +80,7 @@ namespace Scorpio
         public ScriptObject Pop()
         {
             if (m_listObject.Count == 0)
-                throw new ExecutionException("Array Pop 数组长度为0");
+                throw new ExecutionException(Script, "Array Pop 数组长度为0");
             ScriptObject obj = m_listObject[0];
             m_listObject.RemoveAt(0);
             return obj;

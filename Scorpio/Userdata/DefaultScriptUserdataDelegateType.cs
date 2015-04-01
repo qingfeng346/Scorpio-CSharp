@@ -58,7 +58,7 @@ namespace Scorpio.Userdata
                 ScriptObject ret = (ScriptObject)m_Function.call(args) ?? ScriptNull.Instance;
                 if (Util.CanChangeType(ret, m_ReturnType))
                     return Util.ChangeType(m_Script, ret, m_ReturnType);
-                throw new ScriptException("委托返回值不能从源类型:" + (ret.IsNull ? "null" : ret.ObjectValue.GetType().Name) + " 转换成目标类型:" + m_ReturnType.Name);
+                throw new ExecutionException(m_Script, "委托返回值不能从源类型:" + (ret.IsNull ? "null" : ret.ObjectValue.GetType().Name) + " 转换成目标类型:" + m_ReturnType.Name);
             }
         }
         private Type m_DelegateType;            //委托类型

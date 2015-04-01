@@ -19,12 +19,12 @@ namespace Scorpio.Userdata
         }
         public override ScriptObject GetValue(object key)
         {
-            if (!(key is string)) throw new ExecutionException("Object GetValue只支持String类型");
+            if (!(key is string)) throw new ExecutionException(Script, "Object GetValue只支持String类型");
             return Script.CreateObject(m_Type.GetValue(Value, (string)key));
         }
         public override void SetValue(object key, ScriptObject value)
         {
-            if (!(key is string)) throw new ExecutionException("Object SetValue只支持String类型");
+            if (!(key is string)) throw new ExecutionException(Script, "Object SetValue只支持String类型");
             m_Type.SetValue(Value, (string)key, value);
         }
     }

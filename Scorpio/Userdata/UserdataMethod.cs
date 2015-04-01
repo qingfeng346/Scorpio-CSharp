@@ -83,7 +83,7 @@ namespace Scorpio.Userdata
             int length = parameters.Length;
             Type[] typeArguments = new Type[length];
             for (int i = 0; i < length; ++i) {
-                Util.Assert(parameters[i] is ScriptUserdata);
+                Util.Assert(parameters[i] is ScriptUserdata, m_Script);
                 typeArguments[i] = (parameters[i] as ScriptUserdata).ValueType;
             }
             List<MethodInfo> methods = new List<MethodInfo>();
@@ -97,7 +97,7 @@ namespace Scorpio.Userdata
             }
             if (methods.Count > 0)
                 return new UserdataMethod(m_Script, m_Type, MethodName, methods);
-            throw new ExecutionException("没有找到合适的泛型函数 " + MethodName);
+            throw new ExecutionException(m_Script, "没有找到合适的泛型函数 " + MethodName);
         }
         private void Initialize(Type type, string methodName, List<MethodBase> methods)
         {
@@ -132,11 +132,11 @@ namespace Scorpio.Userdata
         }
         public object Call(object obj, ScriptObject[] parameters)
         {
-            if (m_Count == 0) throw new ScriptException("找不到函数 [" + MethodName + "]");
+            if (m_Count == 0) throw new ExecutionException(m_Script, "找不到函数 [" + MethodName + "]");
             FunctionMethod methodInfo = null;
             if (m_Count == 1) {
                 methodInfo = m_Methods[0];
-                if (!methodInfo.IsValid) throw new ScriptException("Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
+                if (!methodInfo.IsValid) throw new ExecutionException(m_Script, "Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
             } else {
                 foreach (FunctionMethod method in m_Methods) {
                     if (method.IsValid && Util.CanChangeType(parameters, method.ParameterType)) {
@@ -177,9 +177,9 @@ namespace Scorpio.Userdata
                     }
                 }
             } catch (System.Exception e) {
-                throw new ScriptException("Type[" + m_Type.ToString() + "] 调用函数出错 [" + MethodName + "] : " + e.ToString());
+                throw new ExecutionException(m_Script, "Type[" + m_Type.ToString() + "] 调用函数出错 [" + MethodName + "] : " + e.ToString());
             }
-            throw new ScriptException("Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
+            throw new ExecutionException(m_Script, "Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
         }
     }
 }
