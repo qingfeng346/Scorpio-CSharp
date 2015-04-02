@@ -107,12 +107,16 @@ namespace Scorpio
             if (FunctionType == FunstionType.Script) {
                 return m_ScriptFunction.Call(m_stackObject, parameters);
             } else {
-                if (FunctionType == FunstionType.Function) {
-                    return m_Function(parameters);
-                } else if (FunctionType == FunstionType.Handle) {
-                    return m_Handle.Call(parameters);
-                } else if (FunctionType == FunstionType.Method) {
-                    return m_Method.Call(parameters);
+                try {
+                    if (FunctionType == FunstionType.Function) {
+                        return m_Function(parameters);
+                    } else if (FunctionType == FunstionType.Handle) {
+                        return m_Handle.Call(parameters);
+                    } else if (FunctionType == FunstionType.Method) {
+                        return m_Method.Call(parameters);
+                    }
+                } catch (System.Exception ex) {
+                    throw new ExecutionException(Script, "CallFunction " + Name + " is error : " + ex.ToString());
                 }
             }
             return null;
