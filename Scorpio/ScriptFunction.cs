@@ -116,7 +116,7 @@ namespace Scorpio
                         return m_Method.Call(parameters);
                     }
                 } catch (System.Exception ex) {
-                    throw new ExecutionException(Script, "CallFunction " + Name + " is error : " + ex.ToString());
+                    throw new ExecutionException(Script, "CallFunction [" + Name + "] is error : " + ex.ToString());
                 }
             }
             return null;
