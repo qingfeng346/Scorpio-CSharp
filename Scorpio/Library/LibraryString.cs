@@ -28,18 +28,20 @@ namespace Scorpio.Library
         private class format : ScorpioHandle
         {
             public object Call(ScriptObject[] args) {
-                if (args == null || args.Length == 0) {
-                    return null;
-                }
+                if (args == null || args.Length == 0) return null;
                 string messagePattern = (args[0] as ScriptString).Value;
-                if (args.Length == 1)
-                    return messagePattern;
-                int i = 0;
-                int j;
+                if (args.Length == 1) return messagePattern;
                 StringBuilder sbuf = new StringBuilder();
-                int length = args.Length;
                 int L;
-                for (L = 1; L < length; L++) {
+                if (args[1] is ScriptArray) {
+                    L = 0;
+                    args = ((ScriptArray)args[1]).ToArray();
+                } else {
+                    L = 1;
+                }
+                int length = args.Length;
+                int i = 0, j = 0;
+                for (; L < length; L++) {
                     j = messagePattern.IndexOf(DELIM_STR, i);
                     if (j == -1) {
                         if (i == 0) {

@@ -97,6 +97,10 @@ namespace Scorpio
         {
             return m_listObject.GetEnumerator();
         }
+        public ScriptObject[] ToArray()
+        {
+            return m_listObject.ToArray();
+        }
         public override ScriptObject Clone()
         {
             ScriptArray ret = Script.CreateArray();
