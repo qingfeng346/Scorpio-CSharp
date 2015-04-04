@@ -45,7 +45,7 @@ namespace Scorpio
             this.m_Function = function;
             Initialize(strName, FunstionType.Function);
         }
-        public ScriptFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().Name, handle) { }
+        public ScriptFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().FullName, handle) { }
         public ScriptFunction(Script script, String strName, ScorpioHandle handle) : base(script)
         {
             this.m_Handle = handle;
