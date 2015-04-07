@@ -19,7 +19,10 @@
 ## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
 ## master版本已知问题 ##
-* 返回function类型 父区域的值会变化 例如:
+
+## master版本更新和修改内容 ##
+(2015-4-7)
+* 修复返回function类型 父区域的值会变化的BUG 例如:
 ```javascript
 function test(data) { 
 	return function() {
@@ -30,12 +33,15 @@ var b = test(100)
 b()
 test(200)
 b()
-/*上述代码会输出(b的data值会随test函数调用改变)
+/*
+(修改前)上述代码会输出(b的data值会随test函数调用改变)
 100
 200
+(修改后)上述代码会输出(b的data值不会随test函数调用改变)
+100
+100
 */
 ```
-## master版本更新和修改内容 ##
 (2015-4-1)
 * string库增加indexof lastindexof startswith endswith contains函数
 * 修改运行时发生异常 错误输出会加上 文件行信息 例如:

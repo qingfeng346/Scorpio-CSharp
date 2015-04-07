@@ -86,11 +86,15 @@ namespace Scorpio
             if (!(key is string)) throw new ExecutionException(this.Script, "Function GetValue只支持String类型");
             return m_stackObject[(string)key];
         }
-
-        public void SetParentContext(ScriptContext context)
+        public ScriptFunction SetParentVariable(Dictionary<String, ScriptObject> variables)
         {
-            if (FunctionType == FunstionType.Script)
-                m_ScriptFunction.SetParentContext(context);
+            if (FunctionType == FunstionType.Script) {
+                foreach (KeyValuePair<String, ScriptObject> pair in variables) {
+                    if (!m_stackObject.ContainsKey(pair.Key))
+                        m_stackObject.Add(pair.Key, pair.Value.Clone());
+                }
+            }
+            return this;
         }
         public object call(params object[] args)
         {
