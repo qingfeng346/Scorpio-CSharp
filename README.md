@@ -18,7 +18,23 @@
 ## ScorpioConversion(网络协议生成工具) https://github.com/qingfeng346/ScorpioConversion
 ## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
-
+## master版本已知问题 ##
+* 返回function类型 父区域的值会变化 例如:
+```javascript
+function test(data) { 
+	return function() {
+		print(data)
+	}
+}
+var b = test(100)
+b()
+test(200)
+b()
+/*上述代码会输出(b的data值会随test函数调用改变)
+100
+200
+*/
+```
 ## master版本更新和修改内容 ##
 (2015-4-1)
 * string库增加indexof lastindexof startswith endswith contains函数
@@ -33,10 +49,14 @@
 ```javascript
 function test() { print(str) }
 test.str = "hello world"
-//上述代码会输出 hello world str就相当于 test函数的变量
+/*上述代码会输出(str就相当于 test函数的变量)
+hello world 
+*/
 test = function() { print(str) }
 test.str = "hello world"
-//上述代码会输出 hello world str就相当于 test函数的变量
+/*上述代码会输出(str就相当于 test函数的变量)
+hello world 
+*/
 ```
 (2015-3-7)
 * 增加c#委托和脚本function类型无缝切换 例如:
