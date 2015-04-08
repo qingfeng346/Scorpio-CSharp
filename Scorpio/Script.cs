@@ -65,7 +65,7 @@ namespace Scorpio
         internal ScriptObject LoadString(String strBreviary, String strBuffer, ScriptContext context, bool clearStack)
         {
             try {
-                if (string.IsNullOrEmpty(strBuffer)) return Null;
+                if (Util.IsNullOrEmpty(strBuffer)) return Null;
                 if (clearStack) m_StackInfoStack.Clear();
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer);
                 strBreviary = Util.IsNullOrEmpty(strBreviary) ? scriptLexer.GetBreviary() : strBreviary;
