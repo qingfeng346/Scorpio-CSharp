@@ -19,7 +19,7 @@
 ## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
 ## master版本已知问题 ##
-
+* ScorpioMaker工具转换 @"" @'' 字符串带回车的时候 转换会出问题
 ## master版本更新和修改内容 ##
 (2015-4-9)
 * 修改解析文本[回车]判断 由原来的[\r\n]修改为[\n]
