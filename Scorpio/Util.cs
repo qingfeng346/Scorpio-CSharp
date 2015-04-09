@@ -160,13 +160,18 @@ namespace Scorpio
             else
                 return type.IsAssignableFrom(par.GetType());
         }
-        public static String GetFileString(String fileName, Encoding encoding)
+        public static byte[] GetFileBuffer(String fileName)
         {
             FileStream stream = File.OpenRead(fileName);
             long length = stream.Length;
             byte[] buffer = new byte[length];
             stream.Read(buffer, 0, buffer.Length);
             stream.Close();
+            return buffer;
+        }
+        public static String GetFileString(String fileName, Encoding encoding)
+        {
+            byte[] buffer = GetFileBuffer(fileName);
             return encoding.GetString(buffer, 0, buffer.Length);
         }
         public static bool IsNullOrEmpty(String str)

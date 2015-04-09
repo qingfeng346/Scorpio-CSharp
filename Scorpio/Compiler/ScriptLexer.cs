@@ -20,12 +20,11 @@ namespace Scorpio.Compiler
         {
             m_listSourceLines = new List<string>();
             m_listTokens = new List<Token>();
-            String strSource = buffer.Replace("\r\n", "\r");
-            string[] strLines = strSource.Split('\r');
+            string[] strLines = buffer.Split('\n');
             m_strBreviary = strLines.Length > 0 ? strLines[0] : "";
             if (m_strBreviary.Length > BREVIARY_CHAR) m_strBreviary = m_strBreviary.Substring(0, BREVIARY_CHAR);
             foreach (String strLine in strLines)
-                m_listSourceLines.Add(strLine + "\r\n");
+                m_listSourceLines.Add(strLine + '\n');
             m_iSourceLine = 0;
             m_iSourceChar = 0;
             lexState = LexState.None;
