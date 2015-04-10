@@ -14,16 +14,15 @@ namespace Scorpio
             BinaryReader reader = new BinaryReader(stream);
             StringBuilder builder = new StringBuilder();
             int count = reader.ReadInt32();
-            int sourceLine = 1;
             for (int i = 0; i < count; ++i) {
                 sbyte flag = reader.ReadSByte();
                 if (flag == LineFlag) {
                     int line = reader.ReadInt32();
                     flag = reader.ReadSByte();
+                    int sourceLine = builder.ToString().Split('\n').Length;
                     for (int j = sourceLine; j < line; ++j) {
                         builder.Append('\n');
                     }
-                    sourceLine = line;
                 }
                 TokenType type = (TokenType)flag;
                 object value = null;
@@ -33,7 +32,8 @@ namespace Scorpio
                         value = (reader.ReadByte() == 1);
                         break;
                     case TokenType.String:
-                        value = "\"" + ReadString(reader) + "\"";
+                        string text = ReadString(reader);
+                        value = (text.Contains("\n") ? "@\"" : "\"") + text + "\"";
                         break;
                     case TokenType.Identifier:
                         value = ReadString(reader);

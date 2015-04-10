@@ -1,4 +1,4 @@
-var a = "aaaaaaaaaaaaaaaa"
+var a = "\n"
 
 var b = "ffewafawef"
 var c = 0x0010

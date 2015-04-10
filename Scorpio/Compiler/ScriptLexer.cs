@@ -10,6 +10,7 @@ namespace Scorpio.Compiler
     {
         private LexState m_lexState;                //当前解析状态
         private String m_strToken = null;           //字符串token
+        private int m_iCacheLine;                   //解析@字符串的时候记录其实行数
         private int m_iSourceLine;                  //当前解析行数
         private int m_iSourceChar;                  //当前解析字符
         private String m_strBreviary;               //字符串的摘要 取第一行字符串的前20个字符
@@ -375,8 +376,10 @@ namespace Scorpio.Compiler
                         break;
                     case LexState.SimpleStringStart:
                         if (ch == '\"') {
+                            m_iCacheLine = m_iSourceLine;
                             lexState = LexState.SimpleString;
                         } else if (ch == '\'') {
+                            m_iCacheLine = m_iSourceLine;
                             lexState = LexState.SingleSimpleString;
                         } else {
                             ThrowInvalidCharacterException(ch);
@@ -394,7 +397,9 @@ namespace Scorpio.Compiler
                             m_strToken += '\"';
                             lexState = LexState.SimpleString;
                         } else {
-                            AddToken(TokenType.String, m_strToken);
+                            m_listTokens.Add(new Token(TokenType.String, m_strToken, m_iCacheLine, m_iSourceChar));
+                            lexState = LexState.None;
+                            //AddToken(TokenType.String, m_strToken);
                             UndoChar();
                         }
                         break;
@@ -410,7 +415,8 @@ namespace Scorpio.Compiler
                             m_strToken += '\'';
                             lexState = LexState.SingleSimpleString;
                         } else {
-                            AddToken(TokenType.String, m_strToken);
+                            m_listTokens.Add(new Token(TokenType.String, m_strToken, m_iCacheLine, m_iSourceChar));
+                            lexState = LexState.None;
                             UndoChar();
                         }
                         break;
