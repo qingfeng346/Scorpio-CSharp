@@ -12,7 +12,7 @@ using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
     public interface DelegateTypeFactory {
-        Delegate CreateDelegate(Type type, ScriptFunction func);
+        Delegate CreateDelegate(Script script, Type type, ScriptFunction func);
     }
 #if SCORPIO_IL2CPP
     public class DefaultScriptUserdataDelegateType : ScriptUserdata
@@ -26,7 +26,7 @@ namespace Scorpio.Userdata
         }
         public override object Call(ScriptObject[] parameters)
         {
-            return m_Factory != null ? m_Factory.CreateDelegate(ValueType, parameters[0] as ScriptFunction) : null;
+            return m_Factory != null ? m_Factory.CreateDelegate(Script, ValueType, parameters[0] as ScriptFunction) : null;
         }
     }
 #else
