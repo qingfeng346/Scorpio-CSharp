@@ -7,9 +7,8 @@ namespace Scorpio
 {
     public partial class ScorpioMaker
     {
-        public static List<Token> Deserialize(string file)
+        public static List<Token> Deserialize(byte[] data)
         {
-            byte[] data = Util.GetFileBuffer(file);
             MemoryStream stream = new MemoryStream(data);
             BinaryReader reader = new BinaryReader(stream);
             List<Token> tokens = new List<Token>();

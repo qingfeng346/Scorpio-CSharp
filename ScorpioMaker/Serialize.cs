@@ -7,9 +7,9 @@ namespace Scorpio
 {
     public partial class ScorpioMaker
     {
-        public static byte[] Serialize(string file)
+        public static byte[] Serialize(string data)
         {
-            List<Token> tokens = new ScriptLexer(Util.GetFileString(file, Encoding.UTF8)).GetTokens();
+            List<Token> tokens = new ScriptLexer(data).GetTokens();
             if (tokens.Count == 0) throw new System.Exception("Token数量小于等于0");
             int sourceLine = 0;
             MemoryStream stream = new MemoryStream();

@@ -7,9 +7,8 @@ namespace Scorpio
 {
     public partial class ScorpioMaker
     {
-        public static string DeserializeToString(string file)
+        public static string DeserializeToString(byte[] data)
         {
-            byte[] data = Util.GetFileBuffer(file);
             MemoryStream stream = new MemoryStream(data);
             BinaryReader reader = new BinaryReader(stream);
             StringBuilder builder = new StringBuilder();
