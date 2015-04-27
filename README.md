@@ -21,7 +21,12 @@
 
 ## master版本已知问题 ##
 * ScorpioMaker工具转换 "\n\n" 从二进制转回字符串的时候 会当作 回车 处理
-
+* 三目运算符的优先级有问题 例如:
+```javascript
+var a = 2 > 3 ? true : false;
+//上述语法会优先执行[3 ? true : false]所以会报语法错误 所以上述语法就相当于 var a = 2 > (3 ? true : false);
+//可以暂时先写成 (2 > 3) ? true : false
+```
 ## master版本更新和修改内容 ##
 (2015-4-10)
 * ScorpioMaker工具修复 @"" @'' 字符串的支持
