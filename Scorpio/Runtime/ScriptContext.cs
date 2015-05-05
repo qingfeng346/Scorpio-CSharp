@@ -398,8 +398,6 @@ namespace Scorpio.Runtime
                 return ParseTable(value as CodeTable);
             } else if (value is CodeOperator) {
                 return ParseOperate(value as CodeOperator);
-            } else if (value is CodeTernary) {
-                return ParseTernary(value as CodeTernary);
             } else if (value is CodeAssign) {
                 return ParseAssign(value as CodeAssign);
             } else if (value is CodeEval) {
@@ -487,6 +485,12 @@ namespace Scorpio.Runtime
                 ScriptNumber rightNumber = ResolveOperand(operate.Right) as ScriptNumber;
                 if (rightNumber == null) throw new ExecutionException(m_script, "运算符[右边]必须是number类型");
                 return leftNumber.Compute(type, rightNumber);
+            } else if (type == TokenType.QuestionMark) {
+                ScriptBoolean b = left as ScriptBoolean;
+                if (b == null) throw new ExecutionException(m_script, "三目运算符 条件必须是一个[bool]型");
+                CodeOperator value = operate.Right as CodeOperator;
+                if (value == null || value.Operator != TokenType.Colon) throw new ExecutionException(m_script, "三目运算符 格式错误");
+                return b.Value ? ResolveOperand(value.Left) : ResolveOperand(value.Right);
             } else {
                 if (left is ScriptBoolean) {
                     bool b1 = ((ScriptBoolean)left).Value;
@@ -539,12 +543,6 @@ namespace Scorpio.Runtime
                     }
                 }
             }
-        }
-        ScriptObject ParseTernary(CodeTernary ternary)
-        {
-            ScriptBoolean b = ResolveOperand(ternary.Allow) as ScriptBoolean;
-            if (b == null) throw new ExecutionException(m_script, "三目运算符 条件必须是一个bool型");
-            return b.Value ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
         }
         ScriptObject ParseAssign(CodeAssign assign)
         {

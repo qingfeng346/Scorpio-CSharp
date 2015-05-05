@@ -53,7 +53,6 @@
     <Compile Include="CodeDom\CodeScriptObject.cs" />
     <Compile Include="CodeDom\CodeSwitch.cs" />
     <Compile Include="CodeDom\CodeTable.cs" />
-    <Compile Include="CodeDom\CodeTernary.cs" />
     <Compile Include="CodeDom\CodeThrow.cs" />
     <Compile Include="CodeDom\CodeTry.cs" />
     <Compile Include="CodeDom\CodeWhile.cs" />

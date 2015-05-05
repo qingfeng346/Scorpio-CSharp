@@ -7,31 +7,43 @@ namespace Scorpio.CodeDom.Temp
 {
     public class TempOperator
     {
-        //运算符优先级表，
+        const int HighOperate = 6;
+        const int LowOperate = 5;
+        const int Compare = 4;
+        const int BitOperate = 3;
+        const int Logical = 2;
+        const int TernaryValue = 1;
+        const int Ternary = 0;
+        //运算符优先级表 优先级高的 先执行
         private static Dictionary<TokenType, TempOperator> Operators = new Dictionary<TokenType, TempOperator>();
 		static TempOperator()
 		{
-            Operators[TokenType.InclusiveOr] = new TempOperator(TokenType.InclusiveOr, 1);
-            Operators[TokenType.Combine] = new TempOperator(TokenType.Combine, 1);
-            Operators[TokenType.XOR] = new TempOperator(TokenType.XOR, 1);
-            Operators[TokenType.Shi] = new TempOperator(TokenType.Shi, 1);
-            Operators[TokenType.Shr] = new TempOperator(TokenType.Shr, 1);
-            Operators[TokenType.And] = new TempOperator(TokenType.And, 1);
-            Operators[TokenType.Or] = new TempOperator(TokenType.Or, 1);
+            Operators[TokenType.QuestionMark] = new TempOperator(TokenType.QuestionMark, Ternary);
 
-            Operators[TokenType.Equal] = new TempOperator(TokenType.Equal, 2);
-            Operators[TokenType.NotEqual] = new TempOperator(TokenType.NotEqual, 2);
-            Operators[TokenType.Greater] = new TempOperator(TokenType.Greater, 2);
-            Operators[TokenType.GreaterOrEqual] = new TempOperator(TokenType.GreaterOrEqual, 2);
-            Operators[TokenType.Less] = new TempOperator(TokenType.Less, 2);
-            Operators[TokenType.LessOrEqual] = new TempOperator(TokenType.LessOrEqual, 2);
+            Operators[TokenType.Colon] = new TempOperator(TokenType.Colon, TernaryValue);
+            
+            Operators[TokenType.And] = new TempOperator(TokenType.And, Logical);
+            Operators[TokenType.Or] = new TempOperator(TokenType.Or, Logical);
 
-            Operators[TokenType.Plus] = new TempOperator(TokenType.Plus, 3);
-            Operators[TokenType.Minus] = new TempOperator(TokenType.Minus, 3);
+            Operators[TokenType.InclusiveOr] = new TempOperator(TokenType.InclusiveOr, BitOperate);
+            Operators[TokenType.Combine] = new TempOperator(TokenType.Combine, BitOperate);
+            Operators[TokenType.XOR] = new TempOperator(TokenType.XOR, BitOperate);
+            Operators[TokenType.Shi] = new TempOperator(TokenType.Shi, BitOperate);
+            Operators[TokenType.Shr] = new TempOperator(TokenType.Shr, BitOperate);
 
-            Operators[TokenType.Multiply] = new TempOperator(TokenType.Multiply, 4);
-            Operators[TokenType.Divide] = new TempOperator(TokenType.Divide, 4);
-            Operators[TokenType.Modulo] = new TempOperator(TokenType.Modulo, 4);
+            Operators[TokenType.Equal] = new TempOperator(TokenType.Equal, Compare);
+            Operators[TokenType.NotEqual] = new TempOperator(TokenType.NotEqual, Compare);
+            Operators[TokenType.Greater] = new TempOperator(TokenType.Greater, Compare);
+            Operators[TokenType.GreaterOrEqual] = new TempOperator(TokenType.GreaterOrEqual, Compare);
+            Operators[TokenType.Less] = new TempOperator(TokenType.Less, Compare);
+            Operators[TokenType.LessOrEqual] = new TempOperator(TokenType.LessOrEqual, Compare);
+
+            Operators[TokenType.Plus] = new TempOperator(TokenType.Plus, LowOperate);
+            Operators[TokenType.Minus] = new TempOperator(TokenType.Minus, LowOperate);
+
+            Operators[TokenType.Multiply] = new TempOperator(TokenType.Multiply, HighOperate);
+            Operators[TokenType.Divide] = new TempOperator(TokenType.Divide, HighOperate);
+            Operators[TokenType.Modulo] = new TempOperator(TokenType.Modulo, HighOperate);
 		}
         public TokenType Operator;      //符号类型
         public int Level;               //优先级

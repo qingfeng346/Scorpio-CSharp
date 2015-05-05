@@ -4,7 +4,7 @@ using System.Text;
 using Scorpio.Compiler;
 namespace Scorpio.CodeDom
 {
-    //复制变量 = += -= /= *= %=
+    //赋值变量 = += -= /= *= %= |= &= ^= >>= <<=
     public class CodeAssign : CodeObject
     {
         public CodeMember member;

@@ -540,7 +540,6 @@ namespace Scorpio.Compiler
             ret.StackInfo = new StackInfo(m_strBreviary, token.SourceLine);
             ret = GetVariable(ret);
             ret.Not = not;
-            ret = GetTernary(ret);
             ret.Negative = negative;
             if (ret is CodeMember) {
                 if (calc != CALC.NONE) {
@@ -594,21 +593,6 @@ namespace Scorpio.Compiler
                 ret.StackInfo = new StackInfo(m_strBreviary, m.SourceLine);
             }
             return ret;
-        }
-        //返回三元运算符
-        private CodeObject GetTernary(CodeObject parent)
-        {
-            if (PeekToken().Type == TokenType.QuestionMark)
-            {
-                CodeTernary ret = new CodeTernary();
-                ret.Allow = parent;
-                ReadToken();
-                ret.True = GetObject();
-                ReadColon();
-                ret.False = GetObject();
-                return ret;
-            }
-            return parent;
         }
         //返回一个调用函数 Object
         private CodeCallFunction GetFunction(CodeObject member)
