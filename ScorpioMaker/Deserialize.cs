@@ -28,6 +28,7 @@ namespace Scorpio
                         value = (reader.ReadByte() == 1);
                         break;
                     case TokenType.String:
+                    case TokenType.SimpleString:
                         value = ReadString(reader);
                         break;
                     case TokenType.Identifier:

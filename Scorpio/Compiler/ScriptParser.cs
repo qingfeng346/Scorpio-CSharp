@@ -353,11 +353,11 @@ namespace Scorpio.Compiler
         //解析case
         private void ParseCase(List<object> vals)
         {
-            Token val = ReadToken();
-            if (val.Type == TokenType.String || val.Type == TokenType.Number)
-                vals.Add(val.Lexeme);
+            Token token = ReadToken();
+            if (token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number)
+                vals.Add(token.Lexeme);
             else
-                throw new ParserException("case 语句 只支持 string和number类型", val);
+                throw new ParserException("case 语句 只支持 string和number类型", token);
             ReadColon();
             if (ReadToken().Type == TokenType.Case) {
                 ParseCase(vals);
@@ -531,6 +531,7 @@ namespace Scorpio.Compiler
                 case TokenType.Boolean:
                 case TokenType.Number:
                 case TokenType.String:
+                case TokenType.SimpleString:
                     ret = new CodeScriptObject(m_script, token.Lexeme);
                     break;
                 default:
@@ -662,7 +663,7 @@ namespace Scorpio.Compiler
             while (PeekToken().Type != TokenType.RightBrace)
             {
                 Token token = ReadToken();
-                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.Number) {
+                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number) {
                     Token next = ReadToken();
                     if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
                         ret.Variables.Add(new TableVariable(token.Lexeme, GetObject()));

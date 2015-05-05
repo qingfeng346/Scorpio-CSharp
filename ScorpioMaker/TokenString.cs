@@ -31,8 +31,10 @@ namespace Scorpio
                         value = (reader.ReadByte() == 1);
                         break;
                     case TokenType.String:
-                        string text = ReadString(reader);
-                        value = (text.Contains("\n") ? "@\"" : "\"") + text + "\"";
+                        value = "\"" + ReadString(reader).Replace("\n", "\\n") + "\"";
+                        break;
+                    case TokenType.SimpleString:
+                        value = "@\"" + ReadString(reader) + "\"";
                         break;
                     case TokenType.Identifier:
                         value = ReadString(reader);

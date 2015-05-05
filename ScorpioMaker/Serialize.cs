@@ -28,6 +28,7 @@ namespace Scorpio
                         writer.Write((bool)token.Lexeme ? (byte)1 : (byte)0);
                         break;
                     case TokenType.String:
+                    case TokenType.SimpleString:
                         WriteString(writer, (string)token.Lexeme);
                         break;
                     case TokenType.Identifier:

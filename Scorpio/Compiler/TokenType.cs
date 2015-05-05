@@ -272,6 +272,10 @@ namespace Scorpio.Compiler
         /// </summary>
         String,
         /// <summary>
+        /// @"" @'' string
+        /// </summary>
+        SimpleString,
+        /// <summary>
         /// null
         /// </summary>
         Null,

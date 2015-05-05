@@ -397,9 +397,8 @@ namespace Scorpio.Compiler
                             m_strToken += '\"';
                             lexState = LexState.SimpleString;
                         } else {
-                            m_listTokens.Add(new Token(TokenType.String, m_strToken, m_iCacheLine, m_iSourceChar));
+                            m_listTokens.Add(new Token(TokenType.SimpleString, m_strToken, m_iCacheLine, m_iSourceChar));
                             lexState = LexState.None;
-                            //AddToken(TokenType.String, m_strToken);
                             UndoChar();
                         }
                         break;
@@ -415,7 +414,7 @@ namespace Scorpio.Compiler
                             m_strToken += '\'';
                             lexState = LexState.SingleSimpleString;
                         } else {
-                            m_listTokens.Add(new Token(TokenType.String, m_strToken, m_iCacheLine, m_iSourceChar));
+                            m_listTokens.Add(new Token(TokenType.SimpleString, m_strToken, m_iCacheLine, m_iSourceChar));
                             lexState = LexState.None;
                             UndoChar();
                         }
