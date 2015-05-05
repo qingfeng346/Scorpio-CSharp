@@ -20,15 +20,11 @@
 ## 性能比较用例(C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
 ## master版本已知问题 ##
-* 三目运算符的优先级有问题 例如:
-```javascript
-var a = 2 > 3 ? true : false;
-//上述语法会优先执行[3 ? true : false]所以会报语法错误 所以上述语法就相当于 var a = 2 > (3 ? true : false);
-//可以暂时先写成 (2 > 3) ? true : false
-```
+
 ## master版本更新和修改内容 ##
 (2015-5-5)
 * ScorpioMaker工具修复 普通字符串 "\n" 会当作回车处理的问题
+* 修复三目运算符的优先级问题
 (2015-4-10)
 * ScorpioMaker工具修复 @"" @'' 字符串的支持
 

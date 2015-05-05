@@ -460,6 +460,18 @@ namespace Scorpio.Compiler
                             break;
                     }
                 }
+            } else {
+                Token token = ReadToken();
+                if (token.Type == TokenType.QuestionMark) {
+                    CodeTernary ternary = new CodeTernary();
+                    ternary.Allow = ret;
+                    ternary.True = GetObject();
+                    ReadColon();
+                    ternary.False = GetObject();
+                    return ternary;
+                } else {
+                    UndoToken();
+                }
             }
             return ret;
         }

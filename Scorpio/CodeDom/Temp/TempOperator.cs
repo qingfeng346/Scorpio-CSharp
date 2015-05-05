@@ -12,16 +12,10 @@ namespace Scorpio.CodeDom.Temp
         const int Compare = 4;
         const int BitOperate = 3;
         const int Logical = 2;
-        const int TernaryValue = 1;
-        const int Ternary = 0;
         //运算符优先级表 优先级高的 先执行
         private static Dictionary<TokenType, TempOperator> Operators = new Dictionary<TokenType, TempOperator>();
 		static TempOperator()
 		{
-            Operators[TokenType.QuestionMark] = new TempOperator(TokenType.QuestionMark, Ternary);
-
-            Operators[TokenType.Colon] = new TempOperator(TokenType.Colon, TernaryValue);
-            
             Operators[TokenType.And] = new TempOperator(TokenType.And, Logical);
             Operators[TokenType.Or] = new TempOperator(TokenType.Or, Logical);
 
