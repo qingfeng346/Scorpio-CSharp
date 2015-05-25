@@ -45,7 +45,7 @@ namespace Scorpio
                         value = type.ToString();
                         break;
                 }
-                tokens.Add(new Token(type, value, sourceLine, 0));
+                tokens.Add(new Token(type, value, sourceLine - 1, 0));
             }
             return tokens;
         }
