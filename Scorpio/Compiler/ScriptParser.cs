@@ -540,6 +540,8 @@ namespace Scorpio.Compiler
                     ret = GetEval();
                     break;
                 case TokenType.Null:
+                    ret = new CodeScriptObject(m_script, null);
+                    break;
                 case TokenType.Boolean:
                 case TokenType.Number:
                 case TokenType.String:

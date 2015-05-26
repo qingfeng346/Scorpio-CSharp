@@ -37,6 +37,13 @@ namespace Scorpio
             Null = new ScriptNull(this);
             True = new ScriptBoolean(this, true);
             False = new ScriptBoolean(this, false);
+            m_UserdataFactory = new DefaultScriptUserdataFactory(this);
+            m_GlobalTable = CreateTable();
+            m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
+            m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
+            m_GlobalTable.SetValue(GLOBAL_SCRIPT, CreateObject(this));
+            PushAssembly(Util.MSCORLIB_ASSEMBLY);
+            PushAssembly(GetType().Assembly);
         }
         public ScriptObject LoadFile(String strFileName)
         {
@@ -243,13 +250,6 @@ namespace Scorpio
         }
         public void LoadLibrary()
         {
-            m_UserdataFactory = new DefaultScriptUserdataFactory(this);
-            m_GlobalTable = CreateTable();
-            m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
-            m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
-            m_GlobalTable.SetValue(GLOBAL_SCRIPT, CreateObject(this));
-            PushAssembly(Util.MSCORLIB_ASSEMBLY);
-            PushAssembly(GetType().Assembly);
             LibraryBasis.Load(this);
             LibraryArray.Load(this);
             LibraryString.Load(this);
