@@ -156,9 +156,9 @@ hello world
 * 增加调用c#函数 找不到合适函数的错误输出
 * 修复[%]运算解析错误的问题
 * 修复 for while循环 return 后没有跳出循环的BUG
-* 支持Unity IL2CPP (IL2CPP暂不支持 Emit 如需使用 delegate 请把DefaultScriptUserdataDelegateType.cs文件的  
-  //#define SCORPIO_IL2CPP 改为 #define SCORPIO_IL2CPP)  
-  然后自己实现一个DelegateTypeFactory类  示例:
+* 支持Unity IL2CPP (IL2CPP暂不支持 Emit 如需使用 delegate 请把**DefaultScriptUserdataDelegateType.cs**文件的  
+  **//#define SCORPIO_IL2CPP** 改为 **#define SCORPIO_IL2CPP)**  
+  然后自己实现一个**DelegateTypeFactory**类  示例:
 ```c#
     public class DelegateFactory : DelegateTypeFactory  {
         public Delegate CreateDelegate(Type type, ScriptFunction func) {  
