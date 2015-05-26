@@ -10,16 +10,14 @@
 * **网络协议生成工具** ScorpioConversion https://github.com/qingfeng346/ScorpioConversion
 * **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
-## Unity3d发布平台支持:
-- [x] WebPlayer
-- [x] PC (Windows Mac Linux)
-- [x] IOS(包括IL2CPP)
+## Unity3d发布平台支持(亲测):
+- [x] Web Player
+- [x] PC, Mac & Linux Standalone
+- [x] iOS(包括IL2CPP)
 - [x] Android
 - [x] BlackBerry
 - [x] Windows Phone 8
 - [x] WebGL(Unity5.0Beta)
-
-
 
 ## master版本已知问题 ##
 
