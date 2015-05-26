@@ -25,6 +25,7 @@
 (2015-5-26)
 * ScorpioMaker工具修复 Deserialize 函数行数会多一行的问题
 * 修复ScorpioMaker.Deserialize关键字null读取错误的问题
+* 增加toenum函数
 
 (2015-5-5)
 * ScorpioMaker工具修复 普通字符串 "\n" 会当作回车处理的问题
