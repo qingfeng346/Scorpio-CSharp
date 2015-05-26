@@ -76,24 +76,31 @@ namespace Scorpio
                 if (clearStack) m_StackInfoStack.Clear();
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer);
                 strBreviary = Util.IsNullOrEmpty(strBreviary) ? scriptLexer.GetBreviary() : strBreviary;
-                ScriptParser scriptParser = new ScriptParser(this, scriptLexer.GetTokens(), strBreviary);
-                ScriptExecutable scriptExecutable = scriptParser.Parse();
-                return new ScriptContext(this, scriptExecutable, context, Executable_Block.Context).Execute();
+                return Load(strBreviary, scriptLexer.GetTokens(), context);
             } catch (System.Exception e) {
                 throw new ScriptException("load buffer [" + strBreviary + "] is error : " + e.ToString());
             }
+        }
+        public ScriptObject LoadTokens(List<Token> tokens)
+        {
+            return LoadTokens("Undefined", tokens);
         }
         public ScriptObject LoadTokens(String strBreviary, List<Token> tokens)
         {
             try {
                 if (tokens.Count == 0) return Null;
                 m_StackInfoStack.Clear();
-                ScriptParser scriptParser = new ScriptParser(this, tokens, strBreviary);
-                ScriptExecutable scriptExecutable = scriptParser.Parse();
-                return new ScriptContext(this, scriptExecutable, null, Executable_Block.Context).Execute();
+                return Load(strBreviary, tokens, null);
             } catch (System.Exception e) {
                 throw new ScriptException("load tokens [" + strBreviary + "] is error : " + e.ToString());
             }
+        }
+        private ScriptObject Load(String strBreviary, List<Token> tokens, ScriptContext context)
+        {
+            if (tokens.Count == 0) return Null;
+            ScriptParser scriptParser = new ScriptParser(this, tokens, strBreviary);
+            ScriptExecutable scriptExecutable = scriptParser.Parse();
+            return new ScriptContext(this, scriptExecutable, context, Executable_Block.Context).Execute();
         }
         public void PushAssembly(Assembly assembly)
         {

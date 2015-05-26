@@ -155,6 +155,7 @@ namespace Scorpio.Library
             script.SetObjectInternal("typeof", script.CreateFunction(new userdatatype()));
             script.SetObjectInternal("tonumber", script.CreateFunction(new tonumber(script)));
             script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
+            script.SetObjectInternal("toenum", script.CreateFunction(new toenum(script)));
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
             script.SetObjectInternal("clone", script.CreateFunction(new clone()));
             script.SetObjectInternal("require", script.CreateFunction(new require(script)));
@@ -341,7 +342,7 @@ namespace Scorpio.Library
                 ScriptObject obj = args[0];
                 if (obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum)
                     return m_script.CreateNumber(Util.ToDouble(obj.ObjectValue));
-                throw new ExecutionException(m_script, "不能从类型 " + obj.Type + " 转换成Number类型");
+                throw new ExecutionException(m_script, "tonumber 不能从类型 " + obj.Type + " 转换成Number类型");
             }
         }
         private class tolong : ScorpioHandle
@@ -354,9 +355,24 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 ScriptObject obj = args[0];
-                if (obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum)
-                    return m_script.CreateNumber(Util.ToInt64(obj.ObjectValue));
-                throw new ExecutionException(m_script, "不能从类型 " + obj.Type + " 转换成Long类型");
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "tolong 不能从类型 " + obj.Type + " 转换成Long类型");
+                return m_script.CreateNumber(Util.ToInt64(obj.ObjectValue));
+            }
+        }
+        private class toenum : ScorpioHandle
+        {
+            private Script m_script;
+            public toenum(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args)
+            {
+                Util.Assert(args.Length == 2, m_script, "toenum 第一个参数是枚举类 第二个参数必须是number类型");
+                ScriptUserdata obj = args[0] as ScriptUserdata;
+                ScriptNumber number = args[1] as ScriptNumber;
+                Util.Assert(obj != null && number != null, m_script, "toenum 第一个参数是枚举类 第二个参数必须是number类型");
+                return m_script.CreateEnum(Enum.ToObject(obj.ValueType, number.ToInt32()));
             }
         }
         private class tostring : ScorpioHandle
@@ -404,7 +420,7 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 ScriptString str = args[0] as ScriptString;
-                if (str == null) throw new ExecutionException(m_script, "load_assembly 参数必须是 string");
+                Util.Assert(str != null, m_script, "load_assembly 参数必须是 string");
                 m_script.PushAssembly(Assembly.Load(str.Value));
                 return null;
             }
@@ -420,7 +436,7 @@ namespace Scorpio.Library
             {
                 try {
                     ScriptString str = args[0] as ScriptString;
-                    if (str == null) throw new ExecutionException(m_script, "load_assembly 参数必须是 string");
+                    Util.Assert(str != null, m_script, "load_assembly 参数必须是 string");
                     m_script.PushAssembly(Assembly.Load(str.Value));
                 } catch (System.Exception ) { }
                 return null;
@@ -436,7 +452,7 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 ScriptUserdata assembly = args[0] as ScriptUserdata;
-                if (assembly == null) throw new ExecutionException(m_script, "push_assembly 参数必须是 Assembly 类型");
+                Util.Assert(assembly != null, m_script, "push_assembly 参数必须是 Assembly 类型");
                 m_script.PushAssembly(assembly.ObjectValue as Assembly);
                 return null;
             }
@@ -451,7 +467,7 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 ScriptString str = args[0] as ScriptString;
-                if (str == null) throw new ExecutionException(m_script, "import_type 参数必须是 string");
+                Util.Assert(str != null, m_script, "import_type 参数必须是 string");
                 return m_script.LoadType(str.Value);
             }
         }
@@ -465,12 +481,11 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 ScriptUserdata userdata = args[0] as ScriptUserdata;
-                if (userdata == null) throw new ExecutionException(m_script, "generic_type 参数必须是 userdata");
+                Util.Assert(userdata != null, m_script, "generic_type 第1个参数必须是 userdata");
                 Type[] types = new Type[args.Length - 1];
-                for (int i = 1; i < args.Length; ++i)
-                {
+                for (int i = 1; i < args.Length; ++i) {
                     ScriptUserdata type = args[i] as ScriptUserdata;
-                    if (userdata == null) throw new ExecutionException(m_script, "generic_type 参数必须是 userdata");
+                    Util.Assert(type != null, m_script, "generic_type 第" + (i+1) + "参数必须是 userdata");
                     types[i - 1] = type.ValueType;
                 }
                 return userdata.ValueType.MakeGenericType(types);
@@ -485,11 +500,11 @@ namespace Scorpio.Library
             }
             public object Call(ScriptObject[] args)
             {
-                if (args.Length < 2) throw new ExecutionException(m_script, "generic_method 参数必须大于等于2个");
+                Util.Assert(args.Length >= 2, m_script, "generic_method 参数必须大于等于2个");
                 ScriptFunction func = args[0] as ScriptFunction;
-                if (func == null) throw new ExecutionException(m_script, "generic_method 参数必须是 function");
+                Util.Assert(func != null, m_script, "generic_method 第1个参数必须是 function");
                 ScorpioMethod method = func.Method;
-                if (func == null) throw new ExecutionException(m_script, "generic_method 参数必须是 程序函数");
+                Util.Assert(method != null, m_script, "generic_method 第1个参数必须是 程序函数");
                 ScriptObject[] pars = new ScriptObject[args.Length - 1];
                 Array.Copy(args, 1, pars, 0, pars.Length);
                 return method.MakeGenericMethod(pars);
