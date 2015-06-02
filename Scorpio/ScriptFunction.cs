@@ -73,6 +73,7 @@ namespace Scorpio
             if (FunctionType == FunstionType.Script) {
                 IsStatic = false;
                 m_stackObject["this"] = table;
+                m_stackObject["self"] = table;
             }
         }
         public override void SetValue(object key, ScriptObject value)
