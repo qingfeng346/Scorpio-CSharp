@@ -22,6 +22,10 @@
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2015-6-2)
+* 去除self关键字
+* 修复 function(){} 这种类似 lambda 表达式的作用域以及值问题
+
 (2015-5-26)
 * ScorpioMaker工具修复 Deserialize 函数行数会多一行的问题
 * 修复ScorpioMaker.Deserialize关键字null读取错误的问题

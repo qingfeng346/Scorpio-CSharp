@@ -90,7 +90,7 @@ namespace Scorpio
             if (FunctionType == FunstionType.Script) {
                 foreach (KeyValuePair<String, ScriptObject> pair in variables) {
                     if (!m_stackObject.ContainsKey(pair.Key))
-                        m_stackObject.Add(pair.Key, pair.Key.Equals("this") ? pair.Value : pair.Value.Clone());
+                        m_stackObject.Add(pair.Key, pair.Value);
                 }
             }
             return this;
