@@ -51,6 +51,14 @@ namespace Scorpio.Runtime
             m_parent = parent;
             m_variableDictionary.Clear();
         }
+        //初始化所有数据 每次调用 Execute 调用
+        private void Reset()
+        {
+            m_returnObject = null;
+            m_Over = false;
+            m_Break = false;
+            m_Continue = false;
+        }
         private Dictionary<String, ScriptObject> GetContextVariables()
         {
             Dictionary<String, ScriptObject> vars = new Dictionary<String, ScriptObject>();
@@ -119,12 +127,6 @@ namespace Scorpio.Runtime
             } else {
                 ResolveOperand(member.Parent).SetValue(GetMember(member), variable);
             }
-        }
-        private void Reset()
-        {
-            m_returnObject = null;
-            m_Over = false;
-            m_Break = false;
         }
         public ScriptObject Execute()
         {
