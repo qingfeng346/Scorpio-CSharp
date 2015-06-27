@@ -22,6 +22,10 @@
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2015-6-27)
+* ScorpioMaker转成二进制文件 第一个字节写入一个null 用来区别字符串文件
+* Script类LoadFile函数支持直接载入二进制文件
+
 (2015-6-9)
 * 修复 continue 导致跳出循环的BUG
 
