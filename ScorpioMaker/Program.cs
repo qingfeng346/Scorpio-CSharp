@@ -5,7 +5,7 @@ using Scorpio.Compiler;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
-
+using Scorpio.Serialize;
 namespace Scorpio
 {
     class Program
@@ -37,10 +37,11 @@ namespace Scorpio
             if (string.IsNullOrEmpty(source)) target = source + ".sco";
             target = Path.Combine(Environment.CurrentDirectory, target);
             try {
+                byte[] buffer = Util.GetFileBuffer(source);
                 if (type.Equals("1"))
-                    File.WriteAllBytes(target, Encoding.UTF8.GetBytes(ScorpioMaker.DeserializeToString(Util.GetFileBuffer(source))));
+                    File.WriteAllBytes(target, Encoding.UTF8.GetBytes(ScorpioMaker.DeserializeToString(buffer)));
                 else
-                    File.WriteAllBytes(target, ScorpioMaker.Serialize(Util.GetFileString(source, Encoding.UTF8)));
+                    File.WriteAllBytes(target, ScorpioMaker.Serialize(Encoding.UTF8.GetString(buffer, 0, buffer.Length)));
             } catch (System.Exception ex) {
                 Console.WriteLine("转换出错 error : " + ex.ToString());	
             }

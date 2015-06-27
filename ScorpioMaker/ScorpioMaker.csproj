@@ -37,12 +37,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Deserialize.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScorpioMaker.cs" />
-    <Compile Include="Serialize.cs" />
-    <Compile Include="TokenString.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Scorpio\Scorpio.csproj">
