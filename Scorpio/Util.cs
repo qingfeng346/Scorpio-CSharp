@@ -169,10 +169,22 @@ namespace Scorpio
             stream.Close();
             return buffer;
         }
-        public static String GetFileString(String fileName, Encoding encoding)
+        public static void WriteString(BinaryWriter writer, string str)
         {
-            byte[] buffer = GetFileBuffer(fileName);
-            return encoding.GetString(buffer, 0, buffer.Length);
+            if (string.IsNullOrEmpty(str)) {
+                writer.Write((byte)0);
+            } else {
+                writer.Write(Encoding.UTF8.GetBytes(str));
+                writer.Write((byte)0);
+            }
+        }
+        public static string ReadString(BinaryReader reader)
+        {
+            List<byte> sb = new List<byte>();
+            byte ch;
+            while ((ch = reader.ReadByte()) != 0)
+                sb.Add(ch);
+            return Encoding.UTF8.GetString(sb.ToArray());
         }
         public static bool IsNullOrEmpty(String str)
         {

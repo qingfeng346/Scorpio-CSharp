@@ -9,6 +9,7 @@ using Scorpio.Exception;
 using Scorpio.Library;
 using Scorpio.Userdata;
 using Scorpio.Variable;
+using Scorpio.Serialize;
 namespace Scorpio
 {
     //脚本类
@@ -56,7 +57,11 @@ namespace Scorpio
         public ScriptObject LoadFile(String fileName, Encoding encoding)
         {
             try {
-                return LoadString(fileName, Util.GetFileString(fileName, encoding));
+                byte[] buffer = Util.GetFileBuffer(fileName);
+                if (buffer.Length > 0 && buffer[0] == 0)
+                    return LoadTokens(ScorpioMaker.Deserialize(buffer));
+                else
+                    return LoadString(fileName, encoding.GetString(buffer, 0, buffer.Length));
             } catch (System.Exception e) {
                 throw new ScriptException("load file [" + fileName + "] is error : " + e.ToString());
             }

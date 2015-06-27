@@ -71,6 +71,7 @@
     <Compile Include="Exception\StackInfo.cs" />
     <Compile Include="Library\LibraryJson.cs" />
     <Compile Include="ScriptEnum.cs" />
+    <Compile Include="Serialize\ScorpioMaker.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataDelegate.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataDelegateType.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataObject.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Variable\ScriptNumberDouble.cs" />
     <Compile Include="Variable\ScriptNumberLong.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy $(TargetPath) ..\..\..\UnityDemo\Assets\Plugins
