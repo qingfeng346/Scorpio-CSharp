@@ -16,7 +16,7 @@ namespace Scorpio
     public class Script
     {
         public const string DynamicDelegateName = "__DynamicDelegate__";
-        public const string Version = "0.0.9beta";
+        public const string Version = "master";
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         private const string GLOBAL_TABLE = "_G";               //全局table
         private const string GLOBAL_VERSION = "_VERSION";       //版本号
@@ -59,7 +59,7 @@ namespace Scorpio
             try {
                 byte[] buffer = Util.GetFileBuffer(fileName);
                 if (buffer.Length > 0 && buffer[0] == 0)
-                    return LoadTokens(ScorpioMaker.Deserialize(buffer));
+                    return LoadTokens(fileName, ScorpioMaker.Deserialize(buffer));
                 else
                     return LoadString(fileName, encoding.GetString(buffer, 0, buffer.Length));
             } catch (System.Exception e) {
