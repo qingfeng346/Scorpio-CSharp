@@ -116,7 +116,7 @@ namespace Scorpio.Library
         {
             public object Call(ScriptObject[] args)
             {
-                return ((ScriptArray)args[0]).PopFirst();
+                return ((ScriptArray)args[0]).SafePopFirst();
             }
         }
         private class poplast : ScorpioHandle
