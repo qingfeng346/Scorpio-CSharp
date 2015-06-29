@@ -77,7 +77,7 @@ namespace Scorpio
                 return m_listObject[m_listObject.Count - 1];
             return Script.Null;
         }
-        public ScriptObject Pop()
+        public ScriptObject PopFirst()
         {
             if (m_listObject.Count == 0)
                 throw new ExecutionException(Script, "Array Pop 数组长度为0");
@@ -85,7 +85,7 @@ namespace Scorpio
             m_listObject.RemoveAt(0);
             return obj;
         }
-        public ScriptObject SafePop()
+        public ScriptObject SafePopFirst()
         {
             if (m_listObject.Count == 0)
                 return Script.Null;
@@ -93,6 +93,25 @@ namespace Scorpio
             m_listObject.RemoveAt(0);
             return obj;
         }
+        public ScriptObject PopLast()
+        {
+            if (m_listObject.Count == 0)
+                throw new ExecutionException(Script, "Array Pop 数组长度为0");
+            int index = m_listObject.Count - 1;
+            ScriptObject obj = m_listObject[index];
+            m_listObject.RemoveAt(index);
+            return obj;
+        }
+        public ScriptObject SafePopLast()
+        {
+            if (m_listObject.Count == 0)
+                return Script.Null;
+            int index = m_listObject.Count - 1;
+            ScriptObject obj = m_listObject[index];
+            m_listObject.RemoveAt(index);
+            return obj;
+        }
+
         public List<ScriptObject>.Enumerator GetIterator()
         {
             return m_listObject.GetEnumerator();
