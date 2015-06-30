@@ -38,7 +38,9 @@ namespace Scorpio.Runtime
         public void Initialize(ScriptContext parent, Dictionary<String, ScriptObject> variable)
         {
             m_parent = parent;
-            m_variableDictionary = variable;
+            m_variableDictionary.Clear();
+            foreach (var pair in variable)
+                m_variableDictionary[pair.Key] = pair.Value;
         }
         private void Initialize(ScriptContext parent, string name, ScriptObject obj)
         {

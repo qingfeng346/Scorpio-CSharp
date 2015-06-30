@@ -89,9 +89,12 @@ namespace Scorpio
         public ScriptFunction SetParentVariable(Dictionary<String, ScriptObject> variables)
         {
             if (FunctionType == FunstionType.Script) {
+                ScriptObject value = null;
                 foreach (KeyValuePair<String, ScriptObject> pair in variables) {
-                    if (!m_stackObject.ContainsKey(pair.Key))
-                        m_stackObject.Add(pair.Key, pair.Value);
+                    if (!m_stackObject.ContainsKey(pair.Key)) {
+                        value = pair.Value;
+                        m_stackObject.Add(pair.Key, value is ScriptNumber || value is ScriptString ? value.Clone() : pair.Value);
+                    }
                 }
             }
             return this;
