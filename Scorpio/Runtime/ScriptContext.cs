@@ -504,7 +504,7 @@ namespace Scorpio.Runtime
                         return right.Value ? m_script.True : m_script.False;
                     } else {
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                        if (right == null) throw new ExecutionException(m_script, "operate [==] [!=] right is not a bool");
+                        if (right == null) return m_script.False;
                         bool b2 = right.Value;
                         if (type == TokenType.Equal)
                             return b1 == b2 ? m_script.True : m_script.False;
