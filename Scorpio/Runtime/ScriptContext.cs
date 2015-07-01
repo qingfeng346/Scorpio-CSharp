@@ -505,15 +505,15 @@ namespace Scorpio.Runtime
                         if (right == null) throw new ExecutionException(m_script, "operate [||] right is not a bool");
                         return right.Value ? m_script.True : m_script.False;
                     } else {
+                        if (type != TokenType.Equal && type != TokenType.NotEqual)
+                            throw new ExecutionException(m_script, "nonsupport operate [" + type + "]  with bool");
                         ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                        if (right == null) return m_script.False;
+                        if (right == null) return type == TokenType.Equal ? m_script.False : m_script.True;
                         bool b2 = right.Value;
                         if (type == TokenType.Equal)
                             return b1 == b2 ? m_script.True : m_script.False;
-                        else if (type == TokenType.NotEqual)
-                            return b1 != b2 ? m_script.True : m_script.False;
                         else
-                            throw new ExecutionException(m_script, "nonsupport operate [" + type + "]  with bool");
+                            return b1 != b2 ? m_script.True : m_script.False; 
                     }
                 } else {
                     ScriptObject right = ResolveOperand(operate.Right);

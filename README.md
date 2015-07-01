@@ -22,6 +22,10 @@
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2015-7-1)
+* 修复某些特殊情况下 function(){} 这种类似 lambda 表达式的作用域以及值问题
+* 修改bool类型 跟其他不是bool类型相等比较一律返回false
+
 (2015-6-29)
 * array库增加 popfirst safepopfirst poplast safepoplast 函数
 
