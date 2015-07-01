@@ -84,7 +84,8 @@ namespace Scorpio
         public override ScriptObject GetValue(object key)
         {
             if (!(key is string)) throw new ExecutionException(this.Script, "Function GetValue只支持String类型");
-            return m_stackObject[(string)key];
+            string skey = (string)key;
+            return m_stackObject.ContainsKey(skey) ? m_stackObject[skey] : Script.Null;
         }
         public ScriptFunction SetParentVariable(Dictionary<String, ScriptObject> variables)
         {

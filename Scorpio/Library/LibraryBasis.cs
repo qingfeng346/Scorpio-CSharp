@@ -14,21 +14,19 @@ namespace Scorpio.Library
             Script m_Script;
             List<ScriptObject>.Enumerator m_Enumerator;
             int m_Index = 0;
-            ScriptTable m_Table;
             public ArrayPairs(Script script, ScriptArray obj)
             {
                 m_Script = script;
                 m_Index = 0;
-                m_Table = m_Script.CreateTable();
                 m_Enumerator = obj.GetIterator();
             }
             public object Call(ScriptObject[] args)
             {
-                if (m_Enumerator.MoveNext())
-                {
-                    m_Table.SetValue("key", m_Script.CreateObject(m_Index++));
-                    m_Table.SetValue("value", m_Enumerator.Current);
-                    return m_Table;
+                if (m_Enumerator.MoveNext()) {
+                    ScriptTable table = m_Script.CreateTable();
+                    table.SetValue("key", m_Script.CreateObject(m_Index++));
+                    table.SetValue("value", m_Enumerator.Current);
+                    return table;
                 }
                 return null;
             }
@@ -67,21 +65,19 @@ namespace Scorpio.Library
         {
             Script m_Script;
             Dictionary<object, ScriptObject>.Enumerator m_Enumerator;
-            ScriptTable m_Table;
             public TablePairs(Script script, ScriptTable obj)
             {
                 m_Script = script;
-                m_Table = m_Script.CreateTable();
                 m_Enumerator = obj.GetIterator();
             }
             public object Call(ScriptObject[] args)
             {
-                if (m_Enumerator.MoveNext())
-                {
+                if (m_Enumerator.MoveNext()) {
+                    ScriptTable table = m_Script.CreateTable();
                     KeyValuePair<object, ScriptObject> v = m_Enumerator.Current;
-                    m_Table.SetValue("key", m_Script.CreateObject(v.Key));
-                    m_Table.SetValue("value", v.Value);
-                    return m_Table;
+                    table.SetValue("key", m_Script.CreateObject(v.Key));
+                    table.SetValue("value", v.Value);
+                    return table;
                 }
                 return null;
             }
