@@ -94,7 +94,7 @@ namespace Scorpio
                 foreach (KeyValuePair<String, ScriptObject> pair in variables) {
                     if (!m_stackObject.ContainsKey(pair.Key)) {
                         value = pair.Value;
-                        m_stackObject.Add(pair.Key, value is ScriptNumber || value is ScriptString ? value.Clone() : pair.Value);
+                        m_stackObject.Add(pair.Key, value is ScriptNumber || value is ScriptString ? value.Clone() : value);
                     }
                 }
             }
