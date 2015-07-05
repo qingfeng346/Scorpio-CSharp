@@ -147,8 +147,8 @@ namespace Scorpio.Userdata
             if (field == null) throw new ExecutionException(m_Script, "SetValue Type[" + m_Type + "] 变量 [" + name + "] 不存在");
             try {
                 field.SetValue(obj, Util.ChangeType(m_Script, value, field.FieldType));
-            } catch (System.Exception ) {
-                throw new ExecutionException(m_Script, "不能从源类型:" + (value == null || value.IsNull ? "null" : value.ObjectValue.GetType().Name) + " 转换成目标类型:" + field.FieldType.Name);
+            } catch (System.Exception e) {
+                throw new ExecutionException(m_Script, "不能从源类型:" + (value == null || value.IsNull ? "null" : value.ObjectValue.GetType().Name) + " 转换成目标类型:" + field.FieldType.Name + " : " + e.ToString());
             }
         }
     }

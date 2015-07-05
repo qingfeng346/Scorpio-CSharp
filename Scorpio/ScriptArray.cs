@@ -5,7 +5,7 @@ using Scorpio.CodeDom;
 using Scorpio.Exception;
 namespace Scorpio
 {
-    //½Å±¾Êı×éÀàĞÍ
+    //è„šæœ¬æ•°ç»„ç±»å‹
     public class ScriptArray : ScriptObject
     {
         public override ObjectType Type { get { return ObjectType.Array; } }
@@ -14,19 +14,19 @@ namespace Scorpio
         public override ScriptObject GetValue(object index)
         {
             if (!(index is double || index is int || index is long))
-                throw new ExecutionException(Script, "Array GetValueÖ»Ö§³ÖNumberÀàĞÍ");
+                throw new ExecutionException(Script, "Array GetValueåªæ”¯æŒNumberç±»å‹");
             int i = Util.ToInt32(index);
             if (i < 0 || i >= m_listObject.Count)
-                throw new ExecutionException(Script, "Array GetValueË÷ÒıĞ¡ÓÚ0»òÕß³¬¹ı×î´óÖµ");
+                throw new ExecutionException(Script, "Array GetValueç´¢å¼•å°äº0æˆ–è€…è¶…è¿‡æœ€å¤§å€¼");
             return m_listObject[i];
         }
         public override void SetValue(object index, ScriptObject obj)
         {
             if (!(index is double || index is int || index is long))
-                throw new ExecutionException(Script, "Array SetValueÖ»Ö§³ÖNumberÀàĞÍ");
+                throw new ExecutionException(Script, "Array SetValueåªæ”¯æŒNumberç±»å‹");
             int i = Util.ToInt32(index);
             if (i < 0 || i >= m_listObject.Count)
-                throw new ExecutionException(Script, "Array SetValueË÷ÒıĞ¡ÓÚ0»òÕß³¬¹ı×î´óÖµ");
+                throw new ExecutionException(Script, "Array SetValueç´¢å¼•å°äº0æˆ–è€…è¶…è¿‡æœ€å¤§å€¼");
             m_listObject[i] = obj;
         }
         public void Add(ScriptObject obj)
@@ -65,6 +65,11 @@ namespace Scorpio
         {
             return m_listObject.Count;
         }
+		public void Sort(ScriptFunction func) {
+			m_listObject.Sort (new Comparison<ScriptObject>((obj1, obj2) => { 
+				return (int)Util.ChangeType(Script, (ScriptObject)func.Call(new ScriptObject[] { obj1, obj2}), typeof(int)); 
+			}));
+		}
         public ScriptObject First()
         {
             if (m_listObject.Count > 0)
@@ -80,7 +85,7 @@ namespace Scorpio
         public ScriptObject PopFirst()
         {
             if (m_listObject.Count == 0)
-                throw new ExecutionException(Script, "Array Pop Êı×é³¤¶ÈÎª0");
+                throw new ExecutionException(Script, "Array Pop æ•°ç»„é•¿åº¦ä¸º0");
             ScriptObject obj = m_listObject[0];
             m_listObject.RemoveAt(0);
             return obj;
@@ -96,7 +101,7 @@ namespace Scorpio
         public ScriptObject PopLast()
         {
             if (m_listObject.Count == 0)
-                throw new ExecutionException(Script, "Array Pop Êı×é³¤¶ÈÎª0");
+                throw new ExecutionException(Script, "Array Pop æ•°ç»„é•¿åº¦ä¸º0");
             int index = m_listObject.Count - 1;
             ScriptObject obj = m_listObject[index];
             m_listObject.RemoveAt(index);

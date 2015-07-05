@@ -16,6 +16,7 @@ namespace Scorpio.Library
             Table.SetValue("removeat", script.CreateFunction(new removeat()));
             Table.SetValue("clear", script.CreateFunction(new clear()));
             Table.SetValue("contains", script.CreateFunction(new contains()));
+			Table.SetValue("sort", script.CreateFunction(new sort()));
             Table.SetValue("indexof", script.CreateFunction(new indexof()));
             Table.SetValue("lastindexof", script.CreateFunction(new lastindexof()));
             Table.SetValue("first", script.CreateFunction(new first()));
@@ -77,6 +78,13 @@ namespace Scorpio.Library
                 return ((ScriptArray)args[0]).Contains(args[1]);
             }
         }
+		private class sort : ScorpioHandle
+		{
+			public object Call(ScriptObject[] args) {
+				((ScriptArray)args[0]).Sort((ScriptFunction)args[1]);
+				return null;
+			}
+		}
         private class indexof : ScorpioHandle
         {
             public object Call(ScriptObject[] args)
