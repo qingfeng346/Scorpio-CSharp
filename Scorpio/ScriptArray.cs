@@ -66,8 +66,8 @@ namespace Scorpio
             return m_listObject.Count;
         }
 		public void Sort(ScriptFunction func) {
-			m_listObject.Sort (new Comparison<ScriptObject>((obj1, obj2) => { 
-				return (int)Util.ChangeType(Script, (ScriptObject)func.Call(new ScriptObject[] { obj1, obj2}), typeof(int)); 
+			m_listObject.Sort (new Comparison<ScriptObject>((o1, o2) => { 
+				return (int)Util.ChangeType(Script, (ScriptObject)func.Call(new ScriptObject[] { o1, o2}), typeof(int)); 
 			}));
 		}
         public ScriptObject First()
