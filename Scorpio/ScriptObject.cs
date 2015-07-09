@@ -37,8 +37,8 @@ namespace Scorpio
         public override bool Equals(object obj) {                                       // Equals
             if (obj == null) return false;
             if (!(obj is ScriptObject)) return false;
-			if (obj == this) return true;
-            return ((ScriptObject)obj).ObjectValue.Equals(ObjectValue);
+			if (ObjectValue == this) return obj == this;
+			return ObjectValue.Equals(((ScriptObject)obj).ObjectValue);
         }
         public override int GetHashCode() {                                             // GetHashCode
             return base.GetHashCode();
