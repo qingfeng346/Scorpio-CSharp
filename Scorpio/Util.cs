@@ -184,7 +184,8 @@ namespace Scorpio
             byte ch;
             while ((ch = reader.ReadByte()) != 0)
                 sb.Add(ch);
-            return Encoding.UTF8.GetString(sb.ToArray());
+            byte[] buffer = sb.ToArray();
+            return Encoding.UTF8.GetString(buffer, 0, buffer.Length);
         }
         public static bool IsNullOrEmpty(String str)
         {
