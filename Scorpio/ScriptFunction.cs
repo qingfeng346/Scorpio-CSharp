@@ -90,28 +90,21 @@ namespace Scorpio
         public ScriptFunction SetParentVariable(Dictionary<String, ScriptObject> variables)
         {
             if (FunctionType == FunstionType.Script) {
-                ScriptObject value = null;
                 foreach (KeyValuePair<String, ScriptObject> pair in variables) {
-                    if (!m_stackObject.ContainsKey(pair.Key)) {
-                        value = pair.Value;
-                        m_stackObject.Add(pair.Key, value is ScriptNumber || value is ScriptString ? value.Clone() : value);
-                    }
+                    if (!m_stackObject.ContainsKey(pair.Key))
+                        m_stackObject.Add(pair.Key, pair.Value.Assign());
                 }
             }
             return this;
         }
-        public object call(params object[] args)
-        {
+        public object call(params object[] args) {
             int length = args.Length;
             ScriptObject[] parameters = new ScriptObject[length];
             for (int i = 0; i < length; ++i)
-            {
                 parameters[i] = Script.CreateObject(args[i]);
-            }
             return Call(parameters);
         }
-        public override object Call(ScriptObject[] parameters)
-        {
+        public override object Call(ScriptObject[] parameters) {
             if (FunctionType == FunstionType.Script) {
                 return m_ScriptFunction.Call(m_stackObject, parameters);
             } else {

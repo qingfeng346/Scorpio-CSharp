@@ -67,7 +67,9 @@ namespace Scorpio
         }
 		public void Sort(ScriptFunction func) {
 			m_listObject.Sort (new Comparison<ScriptObject>((o1, o2) => { 
-				return (int)Util.ChangeType(Script, (ScriptObject)func.Call(new ScriptObject[] { o1, o2}), typeof(int)); 
+				ScriptNumber ret = func.Call(new ScriptObject[] { o1, o2 }) as ScriptNumber;
+				if (ret == null) throw new ExecutionException(Script, "Sort 返回值 必须是Number类型");
+				return ret.ToInt32();
 			}));
 		}
         public ScriptObject First()

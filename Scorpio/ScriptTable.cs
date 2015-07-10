@@ -31,16 +31,27 @@ namespace Scorpio
         {
             m_listObject.Clear();
         }
-        public void Remove(object key)
-        {
+        public void Remove(object key) {
             m_listObject.Remove(key);
         }
-        public Dictionary<object, ScriptObject>.Enumerator GetIterator()
-        {
+		public ScriptArray GetKeys() {
+			ScriptArray ret = Script.CreateArray ();
+			foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
+				ret.Add(Script.CreateObject(pair.Key));
+			}
+			return ret;
+		}
+		public ScriptArray GetValues() {
+			ScriptArray ret = Script.CreateArray ();
+			foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
+				ret.Add(pair.Value.Assign());
+			}
+			return ret;
+		}
+        public Dictionary<object, ScriptObject>.Enumerator GetIterator() {
             return m_listObject.GetEnumerator();
         }
-        public override ScriptObject Clone()
-        {
+        public override ScriptObject Clone() {
             ScriptTable ret = Script.CreateTable();
             ScriptObject obj = null;
             ScriptFunction func = null;
