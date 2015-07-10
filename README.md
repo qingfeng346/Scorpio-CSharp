@@ -22,6 +22,9 @@
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2015-7-10)
+* table库增加 keys values 函数
+
 (2015-7-7)
 * array库增加 sort 函数
 * 修复table array类型相等比较会报错的BUG
