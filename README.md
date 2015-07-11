@@ -26,7 +26,7 @@ var a = true
 print(a ? "true" : "false")
 //上述语法会解析出错 可以暂时先写成
 //print(a == true ? "true" : false)
-```javascript
+```
 
 ## master版本更新和修改内容 ##
 (2015-7-10)
