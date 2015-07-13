@@ -460,19 +460,16 @@ namespace Scorpio.Compiler
                             break;
                     }
                 }
-            } else {
-                Token token = ReadToken();
-                if (token.Type == TokenType.QuestionMark) {
-                    CodeTernary ternary = new CodeTernary();
-                    ternary.Allow = ret;
-                    ternary.True = GetObject();
-                    ReadColon();
-                    ternary.False = GetObject();
-                    return ternary;
-                } else {
-                    UndoToken();
-                }
             }
+			if (PeekToken ().Type == TokenType.QuestionMark) {
+				ReadToken();
+				CodeTernary ternary = new CodeTernary();
+				ternary.Allow = ret;
+				ternary.True = GetObject();
+				ReadColon();
+				ternary.False = GetObject();
+				return ternary;
+			}
             return ret;
         }
         //解析操作符
