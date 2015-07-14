@@ -20,15 +20,11 @@
 - [x] WebGL(Unity5.0Beta)
 
 ## master版本已知问题 ##
-* 三目运算符判断条件语法有问题 例如
-```javascript
-var a = true
-print(a ? "true" : "false")
-//上述语法会解析出错 可以暂时先写成
-//print(a == true ? "true" : false)
-```
 
 ## master版本更新和修改内容 ##
+(2015-7-14)
+* 修复三目运算符条件判断优先级问题
+
 (2015-7-10)
 * table库增加 keys values 函数
 
