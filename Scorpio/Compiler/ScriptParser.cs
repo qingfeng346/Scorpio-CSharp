@@ -454,7 +454,8 @@ namespace Scorpio.Compiler
                         case TokenType.AssignXOR:
                         case TokenType.AssignShr:
                         case TokenType.AssignShi:
-                            return new CodeAssign(member, GetObject(), token.Type, m_strBreviary, token.SourceLine);
+                            ret = new CodeAssign(member, GetObject(), token.Type, m_strBreviary, token.SourceLine);
+                            break;
                         default:
                             UndoToken();
                             break;
