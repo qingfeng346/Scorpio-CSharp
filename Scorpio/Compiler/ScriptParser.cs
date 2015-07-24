@@ -244,17 +244,16 @@ namespace Scorpio.Compiler
         {
             ReadLeftParenthesis();
             int partIndex = m_iNextToken;
-            Token token = ReadToken();
-            if (token.Type == TokenType.Identifier)
-            {
+
+			if (PeekToken ().Type == TokenType.Var) ReadToken ();
+			Token identifier = ReadToken();
+			if (identifier.Type == TokenType.Identifier) {
                 Token assign = ReadToken();
-                if (assign.Type == TokenType.Assign)
-                {
+                if (assign.Type == TokenType.Assign) {
                     CodeObject obj = GetObject();
                     Token comma = ReadToken();
-                    if (comma.Type == TokenType.Comma)
-                    {
-                        ParseFor_Simple((string)token.Lexeme, obj);
+                    if (comma.Type == TokenType.Comma) {
+						ParseFor_Simple((string)identifier.Lexeme, obj);
                         return;
                     }
                 }
