@@ -244,7 +244,6 @@ namespace Scorpio.Compiler
         {
             ReadLeftParenthesis();
             int partIndex = m_iNextToken;
-
 			if (PeekToken ().Type == TokenType.Var) ReadToken ();
 			Token identifier = ReadToken();
 			if (identifier.Type == TokenType.Identifier) {
