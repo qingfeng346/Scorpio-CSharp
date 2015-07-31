@@ -54,8 +54,13 @@ namespace Scorpio.Serialize
                 }
             }
             byte[] ret = stream.ToArray();
+#if SCORPIO_UWP
+            writer.Dispose();
+            stream.Dispose();
+#else
             writer.Close();
             stream.Close();
+#endif
             return ret;
         }
         public static List<Token> Deserialize(byte[] data)

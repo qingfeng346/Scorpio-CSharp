@@ -43,8 +43,10 @@ namespace Scorpio
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
             m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
             m_GlobalTable.SetValue(GLOBAL_SCRIPT, CreateObject(this));
-            PushAssembly(Util.MSCORLIB_ASSEMBLY);
+#if !SCORPIO_UWP
+            PushAssembly(typeof(object).Assembly);
             PushAssembly(GetType().Assembly);
+#endif
         }
         public ScriptObject LoadFile(String strFileName)
         {
@@ -117,11 +119,11 @@ namespace Scorpio
         {
             for (int i = 0; i < m_Assembly.Count;++i )
             {
-                Type type = m_Assembly[i].GetType(str, false);
+                Type type = m_Assembly[i].GetType(str, false, false);
                 if (type != null) return CreateUserdata(type);
             }
             {
-                Type type = Type.GetType(str, false);
+                Type type = Type.GetType(str, false, false);
                 if (type != null) return CreateUserdata(type);
             }
             return Null;
@@ -189,8 +191,10 @@ namespace Scorpio
                 return Null;
             else if (value is ScriptObject)
                 return (ScriptObject)value;
+#if !SCORPIO_UWP
             else if (value is ScorpioFunction)
                 return CreateFunction((ScorpioFunction)value);
+#endif
             else if (value is ScorpioHandle)
                 return CreateFunction((ScorpioHandle)value);
             else if (value is ScorpioMethod)
@@ -245,10 +249,12 @@ namespace Scorpio
         {
             return new ScriptFunction(this, name, value);
         }
+#if !SCORPIO_UWP
         public ScriptFunction CreateFunction(ScorpioFunction value)
         {
             return new ScriptFunction(this, value);
         }
+#endif
         public ScriptFunction CreateFunction(ScorpioHandle value)
         {
             return new ScriptFunction(this, value);

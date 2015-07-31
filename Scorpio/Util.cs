@@ -27,7 +27,6 @@ namespace Scorpio
         private static readonly Type TYPE_DOUBLE = typeof(double);
         private static readonly Type TYPE_DECIMAL = typeof(decimal);
         private static readonly Type TYPE_PARAMATTRIBUTE = typeof(ParamArrayAttribute);
-        public static readonly Assembly MSCORLIB_ASSEMBLY = TYPE_OBJECT.Assembly;
 
         public static void SetObject(Dictionary<object, ScriptObject> variables, object key, ScriptObject obj)
         {
@@ -61,9 +60,12 @@ namespace Scorpio
                     type == TYPE_FLOAT || type == TYPE_DOUBLE ||
                     type == TYPE_DECIMAL || type == TYPE_LONG);
         }
-        public static bool IsEnum(Type type)
-        {
+        public static bool IsEnum(Type type) {
+#if !SCORPIO_UWP
             return type.IsEnum;
+#else
+            return false;
+#endif
         }
         public static bool IsDelegateType(Type type)
         {
@@ -166,7 +168,11 @@ namespace Scorpio
             long length = stream.Length;
             byte[] buffer = new byte[length];
             stream.Read(buffer, 0, buffer.Length);
+#if SCORPIO_UWP
+            stream.Dispose();
+#else
             stream.Close();
+#endif
             return buffer;
         }
         public static void WriteString(BinaryWriter writer, string str)

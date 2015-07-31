@@ -169,9 +169,11 @@ namespace Scorpio.Library
         {
             public object Call(ScriptObject[] args)
             {
+#if !SCORPIO_UWP
                 for (int i = 0; i < args.Length; ++i) {
                     Console.WriteLine(args[i].ToString());
                 }
+#endif
                 return null;
             }
         }
@@ -417,7 +419,7 @@ namespace Scorpio.Library
             {
                 ScriptString str = args[0] as ScriptString;
                 Util.Assert(str != null, m_script, "load_assembly 参数必须是 string");
-                m_script.PushAssembly(Assembly.Load(str.Value));
+                m_script.PushAssembly(Assembly.Load(new AssemblyName(str.Value)));
                 return null;
             }
         }
@@ -433,7 +435,7 @@ namespace Scorpio.Library
                 try {
                     ScriptString str = args[0] as ScriptString;
                     Util.Assert(str != null, m_script, "load_assembly 参数必须是 string");
-                    m_script.PushAssembly(Assembly.Load(str.Value));
+                    m_script.PushAssembly(Assembly.Load(new AssemblyName(str.Value)));
                 } catch (System.Exception ) { }
                 return null;
             }

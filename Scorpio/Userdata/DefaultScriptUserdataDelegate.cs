@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
     /// <summary> 动态委托类型实例 </summary>
     public class DefaultScriptUserdataDelegate : ScriptUserdata
     {
+#if !SCORPIO_UWP
         private class FunctionParameter
         {
             public Type ParameterType;
@@ -21,8 +22,10 @@ namespace Scorpio.Userdata
         private int m_ParameterCount = 0;
         private List<FunctionParameter> m_Parameters = new List<FunctionParameter>();
         private object[] m_Objects;
+#endif
         public DefaultScriptUserdataDelegate(Script script, Delegate value) : base(script)
         {
+#if !SCORPIO_UWP
             this.m_Delegate = value;
             this.Value = value;
             this.ValueType = value.GetType();
@@ -36,9 +39,11 @@ namespace Scorpio.Userdata
                 m_Parameters.Add(new FunctionParameter(p.ParameterType, p.DefaultValue));
             }
             m_ParameterCount = m_Parameters.Count;
+#endif
         }
         public override object Call(ScriptObject[] parameters)
         {
+#if !SCORPIO_UWP
             FunctionParameter parameter;
             for (int i = 0; i < m_ParameterCount; i++)
             {
@@ -50,6 +55,9 @@ namespace Scorpio.Userdata
                 }
             }
             return m_Delegate.DynamicInvoke(m_Objects);
+#else
+            throw new ExecutionException(Script, "UWP不支持调用Delegate");
+#endif
         }
     }
 }
