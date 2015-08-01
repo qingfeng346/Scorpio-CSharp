@@ -1,6 +1,6 @@
 ﻿using System;
 
-#if !SCORPIO_DYNAMIC_DELEGATE
+#if SCORPIO_DYNAMIC_DELEGATE
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
@@ -13,7 +13,7 @@ namespace Scorpio.Userdata
     public interface DelegateTypeFactory {
         Delegate CreateDelegate(Script script, Type type, ScriptFunction func);
     }
-#if SCORPIO_DYNAMIC_DELEGATE
+#if !SCORPIO_DYNAMIC_DELEGATE
     public class DefaultScriptUserdataDelegateType : ScriptUserdata
     {
         private static DelegateTypeFactory m_Factory = null;

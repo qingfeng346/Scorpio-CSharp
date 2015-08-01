@@ -167,9 +167,12 @@ namespace Scorpio.Library
         }
         private class print : ScorpioHandle
         {
-            public object Call(ScriptObject[] args)
-            {
-#if !SCORPIO_UWP
+            public object Call(ScriptObject[] args) {
+#if SCORPIO_UWP
+                for (int i = 0; i < args.Length; ++i) {
+                    System.Diagnostics.Debug.WriteLine("");
+                }
+#else
                 for (int i = 0; i < args.Length; ++i) {
                     Console.WriteLine(args[i].ToString());
                 }

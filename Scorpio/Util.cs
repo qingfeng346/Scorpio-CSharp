@@ -64,7 +64,13 @@ namespace Scorpio
 #if !SCORPIO_UWP
             return type.IsEnum;
 #else
-            return false;
+//windows 10 没找到判断枚举的函数  所以用了很挫的方式
+            try {
+                Enum.GetValues(type);
+                return true;
+            } catch (System.Exception) {
+                return false;
+            }
 #endif
         }
         public static bool IsDelegateType(Type type)
