@@ -7,10 +7,8 @@ using Scorpio.Variable;
 using Scorpio.Exception;
 namespace Scorpio
 {
-#if !SCORPIO_UWP
     //C#函数指针
     public delegate object ScorpioFunction(ScriptObject[] Parameters);
-#endif
     //C#类执行
     public interface ScorpioHandle {
         object Call(ScriptObject[] Parameters);
@@ -35,9 +33,7 @@ namespace Scorpio
         public bool IsStatic { get; private set; }                              //是否是静态函数（不是table内部函数）
 
         private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数
-#if !SCORPIO_UWP
         private ScorpioFunction m_Function;                                     //程序函数指针
-#endif
         private ScorpioHandle m_Handle;                                         //程序函数执行类
         private ScorpioMethod m_Method;                                         //程序函数
         public ScorpioMethod Method { get { return m_Method; } }                //返回程序函数对象
@@ -45,15 +41,15 @@ namespace Scorpio
         public override ObjectType Type { get { return ObjectType.Function; } }
 #if !SCORPIO_UWP
         public ScriptFunction(Script script, ScorpioFunction function) : this(script, function.Method.Name, function) { }
-        public ScriptFunction(Script script, String strName, ScorpioFunction function) : base(script)
-        {
+#else
+        public ScriptFunction(Script script, ScorpioFunction function) : this(script, "", function) { }
+#endif
+        public ScriptFunction(Script script, String strName, ScorpioFunction function) : base(script) {
             this.m_Function = function;
             Initialize(strName, FunstionType.Function);
         }
-#endif
         public ScriptFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().FullName, handle) { }
-        public ScriptFunction(Script script, String strName, ScorpioHandle handle) : base(script)
-        {
+        public ScriptFunction(Script script, String strName, ScorpioHandle handle) : base(script) {
             this.m_Handle = handle;
             Initialize(strName, FunstionType.Handle);
         }
@@ -117,10 +113,8 @@ namespace Scorpio
                 try {
                     if (FunctionType == FunstionType.Handle){
                         return m_Handle.Call(parameters);
-#if !SCORPIO_UWP
                     } else if (FunctionType == FunstionType.Function) {
                         return m_Function(parameters);
-#endif
                     } else if (FunctionType == FunstionType.Method) {
                         return m_Method.Call(parameters);
                     }
