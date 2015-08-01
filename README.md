@@ -20,7 +20,7 @@
 - [x] WebGL(Unity5.0Beta)
 
 ## 脚本内使用的宏定义说明:
-* SCORPIO_UWP  UWP(Universal Windows Platform)专用 阉割掉的功能 : 不能调用c#类中的 Delegate 函数
+* SCORPIO_UWP  UWP(Universal Windows Platform)专用 阉割掉的功能 : 不能调用c#类中的 Delegate 变量
 * SCORPIO_DYNAMIC_DELEGATE 动态创建Delegate对象 不适用的请自行实现一个集成DelegateTypeFactory的类
 
 ## master版本已知问题 ##
