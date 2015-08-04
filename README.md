@@ -19,6 +19,8 @@
 - [x] Windows Phone 8
 - [x] WebGL(Unity5.0Beta)
 
+## Android 挂机游戏示例 游戏除了一些c#库 还有网络通信 所有游戏逻辑 都是由脚本编写 可以 下载地址 http://fengyuezhu.sinaapp.com/Scorpio.apk
+
 ## 脚本内使用的宏定义说明:
 * **SCORPIO_UWP**  UWP(Universal Windows Platform)专用 阉割掉的功能 : 不能调用c#类中的 Delegate 变量
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承DelegateTypeFactory的类
