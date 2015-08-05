@@ -229,6 +229,10 @@ namespace Scorpio
         {
             return new ScriptNumberLong(this, value);
         }
+        public ScriptNumber CreateInt(int value)
+        {
+            return new ScriptNumberInt(this, value);
+        }
         public ScriptEnum CreateEnum(object value)
         {
             return new ScriptEnum(this, value);
@@ -273,6 +277,7 @@ namespace Scorpio
             LibraryString.Load(this);
             LibraryTable.Load(this);
             LibraryJson.Load(this);
+            LibraryMath.Load(this);
         }
     }
 }

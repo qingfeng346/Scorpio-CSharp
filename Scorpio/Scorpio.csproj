@@ -70,6 +70,7 @@
     <Compile Include="Exception\InteriorException.cs" />
     <Compile Include="Exception\StackInfo.cs" />
     <Compile Include="Library\LibraryJson.cs" />
+    <Compile Include="Library\LibraryMath.cs" />
     <Compile Include="ScriptEnum.cs" />
     <Compile Include="Serialize\ScorpioMaker.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataDelegate.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Variable\ScorpioScriptFunction.cs" />
     <Compile Include="Userdata\UserdataType.cs" />
     <Compile Include="Variable\ScriptNumberDouble.cs" />
+    <Compile Include="Variable\ScriptNumberInt.cs" />
     <Compile Include="Variable\ScriptNumberLong.cs" />
   </ItemGroup>
   <ItemGroup />

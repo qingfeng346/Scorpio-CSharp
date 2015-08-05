@@ -17,7 +17,7 @@ namespace Scorpio
         public abstract bool Compare(TokenType type, ScriptNumber num);                 //两个数值比较 > >= < <=
         public abstract ScriptObject Compute(TokenType type, ScriptNumber obj);         //位运算或者运算符 + - * / % | & ^ >> <<
         public abstract ScriptObject AssignCompute(TokenType type, ScriptNumber obj);   //位运算或者运算符复制运算 += -= *= /= %= |= &= ^= >>= <<=
-        public int ToInt32()
+        public virtual int ToInt32()
         {
             return Util.ToInt32(ObjectValue);
         }

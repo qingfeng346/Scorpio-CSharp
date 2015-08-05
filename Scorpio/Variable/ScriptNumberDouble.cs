@@ -104,7 +104,7 @@ namespace Scorpio.Variable
                 case TokenType.LessOrEqual:
                     return m_Value <= val.m_Value;
                 default:
-                    throw new ExecutionException(Script, "Number类型 操作符[" + type + "]不支持");
+                    throw new ExecutionException(Script, "Double类型 操作符[" + type + "]不支持");
             }
         }
         public override ScriptObject Clone()

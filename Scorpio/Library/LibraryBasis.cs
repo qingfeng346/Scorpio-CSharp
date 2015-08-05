@@ -141,6 +141,7 @@ namespace Scorpio.Library
             script.SetObjectInternal("is_number", script.CreateFunction(new is_number()));
             script.SetObjectInternal("is_double", script.CreateFunction(new is_double()));
             script.SetObjectInternal("is_long", script.CreateFunction(new is_long()));
+            script.SetObjectInternal("is_int", script.CreateFunction(new is_int()));
             script.SetObjectInternal("is_string", script.CreateFunction(new is_string()));
             script.SetObjectInternal("is_function", script.CreateFunction(new is_function()));
             script.SetObjectInternal("is_array", script.CreateFunction(new is_array()));
@@ -151,6 +152,7 @@ namespace Scorpio.Library
             script.SetObjectInternal("typeof", script.CreateFunction(new userdatatype()));
             script.SetObjectInternal("tonumber", script.CreateFunction(new tonumber(script)));
             script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
+            script.SetObjectInternal("toint", script.CreateFunction(new toint(script)));
             script.SetObjectInternal("toenum", script.CreateFunction(new toenum(script)));
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
             script.SetObjectInternal("clone", script.CreateFunction(new clone()));
@@ -275,6 +277,13 @@ namespace Scorpio.Library
                 return args[0] is ScriptNumberLong;
             }
         }
+        private class is_int : ScorpioHandle
+        {
+            public object Call(ScriptObject[] args)
+            {
+                return args[0] is ScriptNumberInt;
+            }
+        }
         private class is_string : ScorpioHandle
         {
             public object Call(ScriptObject[] args)
@@ -341,9 +350,8 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 ScriptObject obj = args[0];
-                if (obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum)
-                    return m_script.CreateNumber(Util.ToDouble(obj.ObjectValue));
-                throw new ExecutionException(m_script, "tonumber 不能从类型 " + obj.Type + " 转换成Number类型");
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "tonumber 不能从类型 " + obj.Type + " 转换成Number类型");
+                return m_script.CreateDouble(Util.ToDouble(obj.ObjectValue));
             }
         }
         private class tolong : ScorpioHandle
@@ -357,7 +365,21 @@ namespace Scorpio.Library
             {
                 ScriptObject obj = args[0];
                 Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "tolong 不能从类型 " + obj.Type + " 转换成Long类型");
-                return m_script.CreateNumber(Util.ToInt64(obj.ObjectValue));
+                return m_script.CreateLong(Util.ToInt64(obj.ObjectValue));
+            }
+        }
+        private class toint : ScorpioHandle
+        {
+            private Script m_script;
+            public toint(Script script)
+            {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args)
+            {
+                ScriptObject obj = args[0];
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "toint 不能从类型 " + obj.Type + " 转换成int类型");
+                return m_script.CreateInt(Util.ToInt32(obj.ObjectValue));
             }
         }
         private class toenum : ScorpioHandle
