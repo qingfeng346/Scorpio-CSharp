@@ -28,6 +28,11 @@
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2015-8-5)
+* 增加ScriptNumberInt类 (可以通用 toint 函数转换成 int 类型 调用一些函数的时候 可以强制执行int类型时使用)
+* 基础库增加 toint is_int 函数
+* 修复 long 类型 在脚本里面使用 [-]执行负值的时候 会转换成double类型的BUG
+
 (2015-8-1)
 * 适配Windows通用平台UWP(Universal Windows Platform)
 
