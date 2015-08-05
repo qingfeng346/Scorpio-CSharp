@@ -101,6 +101,10 @@ namespace Scorpio
         {
             return obj is long;
         }
+        public static bool IsIntObject(object obj)
+        {
+            return obj is int;
+        }
         public static bool IsNumberObject(object obj)
         {
             return (obj is sbyte || obj is byte ||
