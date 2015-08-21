@@ -29,57 +29,72 @@
 
 ## master版本更新和修改内容 ##
 (2015-8-5)
+-----------
 * 增加ScriptNumberInt类 (可以通用 toint 函数转换成 int 类型 调用一些函数的时候 可以强制执行int类型时使用 默认传入int值还是会使用double表示  只有通用toint函数才能生成int类型)
 * 基础库增加 toint is_int 函数
 * 修复 long 类型 在脚本里面使用 [-]执行负值的时候 会转换成double类型的BUG
 
 (2015-8-1)
+-----------
 * 适配Windows通用平台UWP(Universal Windows Platform)
 
 (2015-7-14)
+-----------
 * 修复三目运算符条件判断优先级问题
 
 (2015-7-10)
+-----------
 * table库增加 keys values 函数
 
 (2015-7-7)
+-----------
 * array库增加 sort 函数
 * 修复table array类型相等比较会报错的BUG
 
 (2015-7-1)
+-----------
 * 修复某些特殊情况下 function(){} 这种类似 lambda 表达式的作用域以及值问题
 * 修改bool类型 跟其他不是bool类型相等比较一律返回false
 
 (2015-6-29)
+-----------
 * array库增加 popfirst safepopfirst poplast safepoplast 函数
 
 (2015-6-27)
+-----------
 * ScorpioMaker转成二进制文件 第一个字节写入一个null 用来区别字符串文件
 * Script类LoadFile函数支持直接载入二进制文件
 
 (2015-6-9)
+-----------
 * 修复 continue 导致跳出循环的BUG
 
 (2015-6-2)
+-----------
 * 修复 function(){} 这种类似 lambda 表达式的作用域以及值问题
 
 (2015-5-26)
+-----------
 * ScorpioMaker工具修复 Deserialize 函数行数会多一行的问题
 * 修复ScorpioMaker.Deserialize关键字null读取错误的问题
 * 增加toenum函数
 
 (2015-5-5)
+-----------
 * ScorpioMaker工具修复 普通字符串 "\n" 会当作回车处理的问题
 * 修复三目运算符的优先级问题
 
 (2015-4-10)
+-----------
 * ScorpioMaker工具修复 @"" @'' 字符串的支持
 
 (2015-4-9)
+-----------
 * 修改解析文本[回车]判断 由原来的[\r\n]修改为[\n]
 * 完善ScorpioMaker工具 可以由文本sco文件转换为二进制文件 也可以由二进制文件转换回文本sco文件
 
 (2015-4-7)
+-----------
 * 修复返回function类型 父区域的值会变化的BUG 例如:
 ```javascript
 function test(data) { 
@@ -101,6 +116,7 @@ b()
 */
 ```
 (2015-4-1)
+-----------
 * string库增加indexof lastindexof startswith endswith contains函数
 * 修改运行时发生异常 错误输出会加上 文件行信息 例如:
 ```javascript
@@ -109,6 +125,7 @@ b()
 	//修改后报错会输出 test.sco:1 : 类型[Null]不支持获取变量
 ```
 (2015-3-31)
+-----------
 * 增加function类型内部变量 例如:
 ```javascript
 function test() { print(str) }
@@ -123,6 +140,7 @@ hello world
 */
 ```
 (2015-3-7)
+-----------
 * 增加c#委托和脚本function类型无缝切换 例如:
 ```c#
     public delegate void Action();
@@ -136,7 +154,8 @@ hello world
     //修改后可以去掉Action 程序会自动检测并转换
     Test.Func(function() {} )
 ```
-(2015-3-6)
+## (2015-3-6) ##
+-----------
 * array库增加 safepop 函数(如果array长度小于0默认返回null)
 * string库增加 isnullorempty 函数
 * Script类增加 ClearStackInfo 函数
@@ -150,7 +169,8 @@ hello world
 //如果在脚本里面调用 Test.Func(100) 按顺序查找会先找到泛型函数 从而调用Func函数失败
 //注:泛型函数声明在非泛型函数之后不会有问题
 ```
-(2015-3-5)
+## (2015-3-5) ##
+-----------
 * array库增加 pop 函数
 * 修复循环continue会导致跳出循环的BUG (多谢[**过期**,**丶守望灬稻田**]同学提供反馈)
 * 修复相同常量自运算的问题 例如(修改前) (多谢[**过期**]同学提供反馈):
@@ -193,27 +213,13 @@ hello world
     //上面代码会输出 1
 ```
 
-
 ## v0.0.9beta (2015-2-11) ##
 -----------
 * 增加调用c#函数 找不到合适函数的错误输出
 * 修复[%]运算解析错误的问题
 * 修复 for while循环 return 后没有跳出循环的BUG
-* 支持Unity IL2CPP (IL2CPP暂不支持 Emit 如需使用 delegate 请把**DefaultScriptUserdataDelegateType.cs**文件的  
-  **//#define SCORPIO_IL2CPP** 改为 **#define SCORPIO_IL2CPP)**  
-  然后自己实现一个**DelegateTypeFactory**类  示例:
-```c#
-    public class DelegateFactory : DelegateTypeFactory  {
-        public Delegate CreateDelegate(Type type, ScriptFunction func) {  
-            if (type == typeof(UIEventListener.VoidDelegate))  
-                return new UIEventListener.VoidDelegate((go) => { func.call(go); });  
-            return null;  
-        }  
-    }  
-    DefaultScriptUserdataDelegateType.SetFactory(new DelegateFactory());  
-```
 
-## v0.0.8beta (2014-12-17) ##
+## (2014-12-17) ##
 -----------
 * 增加16进制表达式 16进制表达式会保存成long型 示例：print(0xffff)
 * 增加位运算(| & ^ >> <<) 位运算只支持long型  示例：var a = 0L print(a |= 1)
@@ -243,7 +249,7 @@ hello world
 * 增加新增功能的示例
 * 发布ScorpioMessage项目 可以热更新网络协议 传送门 https://github.com/qingfeng346/ScorpioMessage
 
-## v0.0.7beta (2014-11-25) ##
+## (2014-11-25) ##
 -----------
 * 增加声明泛型类的函数 示例： ListInt 就相当于c#的List<int>
 ```javascript
@@ -252,7 +258,7 @@ hello world
 ```
 * 大幅优化与c#交互效率 具体测试结果请参考 (https://github.com/qingfeng346/ScriptTestor)
 
-## v0.0.6beta (2014-11-14) ##
+## (2014-11-14) ##
 -----------
 * 适配Unity3d WebGL (Unity5.0.0b1测试通过 WebGL示例地址 http://yunpan.cn/cAVkfYdGbgFug  提取码 2df5)
 * 修复Unity下Delegate动态委托出错的BUG
@@ -260,7 +266,7 @@ hello world
 * 优化数字和字符串的执行效率
 * 同步发布Scorpio-Java 地址:https://github.com/qingfeng346/Scorpio-Java
 
-## v0.0.5beta (2014-11-4) ##
+## (2014-11-4) ##
 -----------
 * 增加table声明语法  支持 Key 用 数字和字符串声明 示例：
 ```javascript
@@ -284,7 +290,7 @@ hello world
 * 支持脚本调用 c# 变长参数(params) 的函数
 * 增加 switch trycatch import_type 示例
 
-## v0.0.4beta (2014-10-27) ##
+## (2014-10-27) ##
 -----------
 * 增加赋值操作返回值  示例: 
 ```javascript
@@ -294,7 +300,7 @@ hello world
 ```
 * 修复对Unity3d Windows Phone 8 版本的兼容问题  （亲测支持wp版本）
 
-## v0.0.3beta (2014-10-18) ##
+## (2014-10-18) ##
 -----------
 * 增加对Delegate动态委托的支持 示例：
 ```c#
@@ -316,7 +322,7 @@ hello world
     Hello.t(100,200)
 ``` 
 
-## v0.0.2beta (2014-10-13) ##
+## (2014-10-13) ##
 -----------
 * 修复已知BUG
 * 增加对不定参的支持 示例：(args会传入一个Array)
