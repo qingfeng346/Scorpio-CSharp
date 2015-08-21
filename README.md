@@ -166,7 +166,8 @@ hello world
     1 , 1
     */
 ```
-(2015-3-4)
+## (2015-3-4) ##
+-----------
 * array库增加 remove removeat contains indexof lastindexof 函数
 * table库增加 remove containskey clear 函数
 * 全局函数增加 is_null is_bool is_number is_double is_long is_string is_function is_array is_table is_enum is_userdata函数
