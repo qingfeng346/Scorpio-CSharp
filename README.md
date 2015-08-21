@@ -154,7 +154,7 @@ hello world
     //修改后可以去掉Action 程序会自动检测并转换
     Test.Func(function() {} )
 ```
-## (2015-3-6) ##
+(2015-3-6)
 -----------
 * array库增加 safepop 函数(如果array长度小于0默认返回null)
 * string库增加 isnullorempty 函数
@@ -169,7 +169,7 @@ hello world
 //如果在脚本里面调用 Test.Func(100) 按顺序查找会先找到泛型函数 从而调用Func函数失败
 //注:泛型函数声明在非泛型函数之后不会有问题
 ```
-## (2015-3-5) ##
+(2015-3-5)
 -----------
 * array库增加 pop 函数
 * 修复循环continue会导致跳出循环的BUG (多谢[**过期**,**丶守望灬稻田**]同学提供反馈)
@@ -186,7 +186,7 @@ hello world
     1 , 1
     */
 ```
-## (2015-3-4) ##
+(2015-3-4)
 -----------
 * array库增加 remove removeat contains indexof lastindexof 函数
 * table库增加 remove containskey clear 函数
@@ -213,13 +213,13 @@ hello world
     //上面代码会输出 1
 ```
 
-## v0.0.9beta (2015-2-11) ##
+(2015-2-11)
 -----------
 * 增加调用c#函数 找不到合适函数的错误输出
 * 修复[%]运算解析错误的问题
 * 修复 for while循环 return 后没有跳出循环的BUG
 
-## (2014-12-17) ##
+(2014-12-17)
 -----------
 * 增加16进制表达式 16进制表达式会保存成long型 示例：print(0xffff)
 * 增加位运算(| & ^ >> <<) 位运算只支持long型  示例：var a = 0L print(a |= 1)
@@ -249,7 +249,7 @@ hello world
 * 增加新增功能的示例
 * 发布ScorpioMessage项目 可以热更新网络协议 传送门 https://github.com/qingfeng346/ScorpioMessage
 
-## (2014-11-25) ##
+(2014-11-25)
 -----------
 * 增加声明泛型类的函数 示例： ListInt 就相当于c#的List<int>
 ```javascript
@@ -258,7 +258,7 @@ hello world
 ```
 * 大幅优化与c#交互效率 具体测试结果请参考 (https://github.com/qingfeng346/ScriptTestor)
 
-## (2014-11-14) ##
+(2014-11-14)
 -----------
 * 适配Unity3d WebGL (Unity5.0.0b1测试通过 WebGL示例地址 http://yunpan.cn/cAVkfYdGbgFug  提取码 2df5)
 * 修复Unity下Delegate动态委托出错的BUG
@@ -266,7 +266,7 @@ hello world
 * 优化数字和字符串的执行效率
 * 同步发布Scorpio-Java 地址:https://github.com/qingfeng346/Scorpio-Java
 
-## (2014-11-4) ##
+(2014-11-4)
 -----------
 * 增加table声明语法  支持 Key 用 数字和字符串声明 示例：
 ```javascript
@@ -290,7 +290,7 @@ hello world
 * 支持脚本调用 c# 变长参数(params) 的函数
 * 增加 switch trycatch import_type 示例
 
-## (2014-10-27) ##
+(2014-10-27)
 -----------
 * 增加赋值操作返回值  示例: 
 ```javascript
@@ -300,7 +300,7 @@ hello world
 ```
 * 修复对Unity3d Windows Phone 8 版本的兼容问题  （亲测支持wp版本）
 
-## (2014-10-18) ##
+(2014-10-18)
 -----------
 * 增加对Delegate动态委托的支持 示例：
 ```c#
@@ -322,7 +322,7 @@ hello world
     Hello.t(100,200)
 ``` 
 
-## (2014-10-13) ##
+(2014-10-13)
 -----------
 * 修复已知BUG
 * 增加对不定参的支持 示例：(args会传入一个Array)
