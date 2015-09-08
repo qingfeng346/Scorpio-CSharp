@@ -40,6 +40,12 @@ namespace Scorpio.Variable
         {
             return Script.CreateDouble(-m_Value);
         }
+		public override ScriptNumber Abs ()
+		{
+			if (m_Value >= 0)
+				return Script.CreateDouble(m_Value);
+			return Script.CreateDouble(-m_Value);
+		}
         public override ScriptObject Assign()
         {
             return Script.CreateDouble(m_Value);
