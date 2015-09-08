@@ -4,19 +4,18 @@ using System.Text;
 namespace Scorpio.Library {
     public class LibraryMath {
 		public const float PI = 3.14159274f;
-		public const float Infinity = float.PositiveInfinity;
-		public const float NegativeInfinity = float.NegativeInfinity;
 		public const float Deg2Rad = 0.0174532924f;
 		public const float Rad2Deg = 57.29578f;
 		public const float Epsilon = 1.401298E-45f;
         public static void Load(Script script) {
             ScriptTable Table = script.CreateTable();
-			script.SetObject ("PI", PI);
-			script.SetObject ("Infinity", Infinity);
-			script.SetObject ("NegativeInfinity", NegativeInfinity);
-			script.SetObject ("Deg2Rad", Deg2Rad);
-			script.SetObject ("Rad2Deg", Rad2Deg);
-			script.SetObject ("Epsilon", Epsilon);
+			Table.SetValue("PI", script.CreateNumber(PI));
+			Table.SetValue("Deg2Rad", script.CreateNumber(Deg2Rad));
+			Table.SetValue("Rad2Deg", script.CreateNumber(Rad2Deg));
+			Table.SetValue("Epsilon", script.CreateNumber(Epsilon));
+			Table.SetValue("min", script.CreateFunction(new min()));
+			Table.SetValue("max", script.CreateFunction(new max()));
+			Table.SetValue("abs", script.CreateFunction(new abs()));
             script.SetObjectInternal("math", Table);
         }
 		private class min : ScorpioHandle {
