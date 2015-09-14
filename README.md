@@ -28,6 +28,9 @@
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2015-9-14)
+* 修复 functin 递归调用会导致数据错误的BUG
+
 (2015-8-5)
 -----------
 * 增加ScriptNumberInt类 (可以通用 toint 函数转换成 int 类型 调用一些函数的时候 可以强制执行int类型时使用 默认传入int值还是会使用double表示  只有通用toint函数才能生成int类型)
