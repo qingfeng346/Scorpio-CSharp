@@ -9,14 +9,19 @@ namespace Scorpio.CodeDom.Temp
     /// <summary> if语句中一个 if语句 </summary>
     internal class TempCondition
     {
+        public Script m_Script;
         public CodeObject Allow;                        //判断条件
         public ScriptExecutable Executable;             //指令列表
-        public ScriptContext Context;                   //指令执行
+        public Executable_Block Block;                  //指令域类型
         public TempCondition(Script script, CodeObject allow, ScriptExecutable executable, Executable_Block block)
         {
+            m_Script = script;
             this.Allow = allow;
             this.Executable = executable;
-            this.Context = new ScriptContext(script, executable, null, block);
+            this.Block = block;
+        }
+        public ScriptContext GetContext() {
+            return new ScriptContext(m_Script, this.Executable, null, this.Block);
         }
     }
 }

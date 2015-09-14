@@ -9,6 +9,14 @@ namespace Scorpio.CodeDom
     {
         public string Identifier;
         public CodeObject LoopObject;
-        public ScriptContext Context;
+        public ScriptExecutable BlockExecutable;            //for内容
+        private Script m_Script;                            //脚本引擎
+        public CodeForeach(Script script)
+        {
+            m_Script = script;
+        }
+        public ScriptContext GetBlockContext() {
+            return new ScriptContext(m_Script, BlockExecutable, null, Executable_Block.Foreach);
+        }
     }
 }

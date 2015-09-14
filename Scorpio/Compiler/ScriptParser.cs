@@ -273,7 +273,7 @@ namespace Scorpio.Compiler
                 ret.Step = GetObject();
             }
             ReadRightParenthesis();
-            ret.SetContextExecutable(ParseStatementBlock(Executable_Block.For));
+            ret.BlockExecutable = ParseStatementBlock(Executable_Block.For);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FORSIMPLE, ret));
         }
         //解析正规for循环
@@ -299,20 +299,20 @@ namespace Scorpio.Compiler
                 UndoToken();
                 ret.LoopExecutable = ParseStatementBlock(Executable_Block.ForLoop, false, TokenType.RightPar);
             }
-            ret.SetContextExecutable(ParseStatementBlock(Executable_Block.For));
+            ret.BlockExecutable = ParseStatementBlock(Executable_Block.For);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FOR, ret));
         }
         //解析foreach语句
         private void ParseForeach()
         {
-            CodeForeach ret = new CodeForeach();
+            CodeForeach ret = new CodeForeach(m_script);
             ReadLeftParenthesis();
             if (PeekToken().Type == TokenType.Var) ReadToken();
             ret.Identifier = ReadIdentifier();
             ReadIn();
             ret.LoopObject = GetObject();
             ReadRightParenthesis();
-            ret.Context = new ScriptContext(m_script, ParseStatementBlock(Executable_Block.Foreach), null, Executable_Block.Foreach);
+            ret.BlockExecutable = ParseStatementBlock(Executable_Block.Foreach);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FOREACH, ret));
         }
         //解析while（循环语句）

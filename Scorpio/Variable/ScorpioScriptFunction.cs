@@ -12,7 +12,6 @@ namespace Scorpio.Variable
         private Script m_Script;                            //脚本系统
         private List<String> m_ListParameters;              //参数
         private ScriptExecutable m_ScriptExecutable;        //函数执行命令
-        private ScriptContext m_ParentContext;              //父级上下文
         private int m_ParameterCount;                       //参数个数
         private ScriptArray m_ParamsArray;                  //不定参数组
         private bool m_Params;                              //是否是不定参函数
@@ -26,10 +25,6 @@ namespace Scorpio.Variable
             this.m_ParameterCount = listParameters.Count;
             this.m_Params = bParams;
             this.m_ParamsArray = bParams ? script.CreateArray() : null;
-        }
-        public void SetParentContext(ScriptContext context)
-        {
-            m_ParentContext = context;
         }
         public ScriptObject Call(Dictionary<String, ScriptObject> objs, ScriptObject[] parameters)
         {
@@ -49,7 +44,7 @@ namespace Scorpio.Variable
                 }
             }
             ScriptContext context = new ScriptContext(m_Script, m_ScriptExecutable, null, Executable_Block.Function);
-            context.Initialize(m_ParentContext, objs);
+            context.Initialize(null, objs);
             return context.Execute();
         }
     }
