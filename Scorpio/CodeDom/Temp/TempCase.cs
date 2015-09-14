@@ -11,12 +11,16 @@ namespace Scorpio.CodeDom.Temp
     {
         public List<object> Allow;                  //判断条件
         public ScriptExecutable Executable;         //指令列表
-        public ScriptContext Context;               //指令执行
-        public TempCase(Script script, List<object> allow, ScriptExecutable executable, Executable_Block block)
-        {
+        public Executable_Block Block;
+        private Script m_Script;
+        public TempCase(Script script, List<object> allow, ScriptExecutable executable, Executable_Block block) {
+            m_Script = script;
             this.Allow = allow;
             this.Executable = executable;
-            this.Context = new ScriptContext(script, executable, null, block);
+            this.Block = block;
+        }
+        public ScriptContext GetContext() {
+            return new ScriptContext(m_Script, this.Executable, null, this.Block);
         }
     }
 }

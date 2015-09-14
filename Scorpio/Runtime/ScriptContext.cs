@@ -304,23 +304,21 @@ namespace Scorpio.Runtime
             CodeSwitch code = (CodeSwitch)m_scriptInstruction.Operand0;
             ScriptObject obj = ResolveOperand(code.Condition);
             bool exec = false;
-            foreach (TempCase c in code.Cases)
-            {
-                foreach (object a in c.Allow)
-                {
-                    if (a.Equals(obj.ObjectValue))
-                    {
+            foreach (TempCase c in code.Cases) {
+                foreach (object a in c.Allow) {
+                    if (a.Equals(obj.ObjectValue)) {
                         exec = true;
-                        c.Context.Initialize(this);
-                        c.Context.Execute();
+                        ScriptContext context = c.GetContext();
+                        context.Initialize(this);
+                        context.Execute();
                         break;
                     }
                 }
             }
-            if (exec == false && code.Default != null)
-            {
-                code.Default.Context.Initialize(this);
-                code.Default.Context.Execute();
+            if (exec == false && code.Default != null) {
+                ScriptContext context = code.Default.GetContext();
+                context.Initialize(this);
+                context.Execute();
             }
         }
         void ProcessTry()
