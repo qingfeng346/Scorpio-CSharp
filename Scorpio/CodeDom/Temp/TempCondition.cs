@@ -7,14 +7,12 @@ using Scorpio.Runtime;
 namespace Scorpio.CodeDom.Temp
 {
     /// <summary> if语句中一个 if语句 </summary>
-    internal class TempCondition
-    {
-        public Script m_Script;
-        public CodeObject Allow;                        //判断条件
-        public ScriptExecutable Executable;             //指令列表
-        public Executable_Block Block;                  //指令域类型
-        public TempCondition(Script script, CodeObject allow, ScriptExecutable executable, Executable_Block block)
-        {
+    internal class TempCondition {
+        private Script m_Script;
+        private ScriptExecutable Executable;        //指令列表
+        private Executable_Block Block;             //指令域类型
+        public CodeObject Allow;                    //判断条件
+        public TempCondition(Script script, CodeObject allow, ScriptExecutable executable, Executable_Block block) {
             m_Script = script;
             this.Allow = allow;
             this.Executable = executable;

@@ -6,13 +6,12 @@ using Scorpio.Runtime;
 namespace Scorpio.CodeDom
 {
     //for循环 for (var i=0;i<10;++i) {}
-    public class CodeFor : CodeObject
-    {
+    public class CodeFor : CodeObject {
+        private Script m_Script;                            //脚本引擎
         public ScriptExecutable BeginExecutable;            //开始执行
         public CodeObject Condition;                        //跳出条件
         public ScriptExecutable LoopExecutable;             //循环执行
         public ScriptExecutable BlockExecutable;            //for内容
-        private Script m_Script;                            //脚本引擎
         public CodeFor(Script script) {
             m_Script = script;
         }

@@ -8,10 +8,10 @@ namespace Scorpio.CodeDom
     //try catch 语句
     public class CodeTry : CodeObject
     {
+        private Script m_Script;
         public ScriptExecutable TryExecutable;      //try指令执行
         public ScriptExecutable CatchExecutable;    //catch指令执行
         public string Identifier;                   //异常对象
-        private Script m_Script;
         public CodeTry(Script script) {
             m_Script = script;
         }
