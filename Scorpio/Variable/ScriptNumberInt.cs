@@ -47,6 +47,10 @@ namespace Scorpio.Variable
 				return Script.CreateInt(m_Value);
 			return Script.CreateInt(-m_Value);
 		}
+		public override ScriptNumber Floor ()
+		{
+			return Script.CreateInt (m_Value);
+		}
         public override ScriptObject Assign()
         {
             return Script.CreateInt(m_Value);

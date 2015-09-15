@@ -46,6 +46,10 @@ namespace Scorpio.Variable
 				return Script.CreateDouble(m_Value);
 			return Script.CreateDouble(-m_Value);
 		}
+		public override ScriptNumber Floor ()
+		{
+			return Script.CreateDouble (Math.Floor (m_Value));
+		}
         public override ScriptObject Assign()
         {
             return Script.CreateDouble(m_Value);

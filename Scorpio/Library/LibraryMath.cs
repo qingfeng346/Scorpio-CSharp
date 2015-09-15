@@ -16,6 +16,7 @@ namespace Scorpio.Library {
 			Table.SetValue("min", script.CreateFunction(new min()));
 			Table.SetValue("max", script.CreateFunction(new max()));
 			Table.SetValue("abs", script.CreateFunction(new abs()));
+			Table.SetValue("floor", script.CreateFunction(new floor()));
             script.SetObjectInternal("math", Table);
         }
 		private class min : ScorpioHandle {
@@ -47,6 +48,11 @@ namespace Scorpio.Library {
 		private class abs : ScorpioHandle {
 			public object Call(ScriptObject[] args) {
 				return (args [0] as ScriptNumber).Abs ();
+			}
+		}
+		private class floor : ScorpioHandle {
+			public object Call(ScriptObject[] args) {
+				return (args [0] as ScriptNumber).Floor ();
 			}
 		}
     }
