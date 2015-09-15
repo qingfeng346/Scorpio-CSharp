@@ -325,14 +325,17 @@ namespace Scorpio.Runtime
         {
             CodeTry code = (CodeTry)m_scriptInstruction.Operand0;
             try {
-                code.TryContext.Initialize(this);
-                code.TryContext.Execute();
+                ScriptContext context = code.GetTryContext();
+                context.Initialize(this);
+                context.Execute();
             } catch (InteriorException ex) {
-                code.CatchContext.Initialize(this, code.Identifier, ex.obj);
-                code.CatchContext.Execute();
+                ScriptContext context = code.GetCatchContext();
+                context.Initialize(this, code.Identifier, ex.obj);
+                context.Execute();
             } catch (System.Exception ex) {
-                code.CatchContext.Initialize(this, code.Identifier, m_script.CreateObject(ex));
-                code.CatchContext.Execute();
+                ScriptContext context = code.GetCatchContext();
+                context.Initialize(this, code.Identifier, m_script.CreateObject(ex));
+                context.Execute();
             }
         }
         void ProcessThrow()
@@ -350,7 +353,7 @@ namespace Scorpio.Runtime
         }
         void ProcessCallBlock()
         {
-            ScriptContext context = (ScriptContext)m_scriptInstruction.Value;
+            ScriptContext context = new ScriptContext(m_script, (ScriptExecutable)m_scriptInstruction.Value);
             context.Initialize(this);
             context.Execute();
         }

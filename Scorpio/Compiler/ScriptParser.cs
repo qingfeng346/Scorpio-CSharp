@@ -195,7 +195,7 @@ namespace Scorpio.Compiler
         private void ParseBlock()
         {
             UndoToken();
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_BLOCK, new ScriptContext(m_script, ParseStatementBlock(Executable_Block.Block))));
+            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_BLOCK, ParseStatementBlock(Executable_Block.Block)));
         }
         //解析if(判断语句)
         private void ParseIf()
@@ -366,19 +366,13 @@ namespace Scorpio.Compiler
         //解析try catch
         private void ParseTry()
         {
-            CodeTry ret = new CodeTry();
-            {
-                ScriptExecutable exec = ParseStatementBlock(Executable_Block.Context);
-                ret.TryContext = new ScriptContext(m_script, exec);
-            }
-            {
-                ReadCatch();
-                ReadLeftParenthesis();
-                ret.Identifier = ReadIdentifier();
-                ReadRightParenthesis();
-                ScriptExecutable exec = ParseStatementBlock(Executable_Block.Context);
-                ret.CatchContext = new ScriptContext(m_script, exec);
-            }
+            CodeTry ret = new CodeTry(m_script);
+            ret.TryExecutable = ParseStatementBlock(Executable_Block.Context);
+            ReadCatch();
+            ReadLeftParenthesis();
+            ret.Identifier = ReadIdentifier();
+            ReadRightParenthesis();
+            ret.CatchExecutable = ParseStatementBlock(Executable_Block.Context);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_TRY, ret));
         }
         //解析throw
