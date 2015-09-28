@@ -19,7 +19,9 @@
 - [x] Windows Phone 8
 - [x] WebGL(Unity5.0Beta)
 
-## 第一款Android上线游戏(Just Sweeper)扫雷以及一款挂机游戏Demo http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩
+## 上线游戏下载地址 http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩
+* Just Sweeper  一款扫雷单机游戏 目前已在Google Play上线
+* 挂机游戏Demo  个人业余开发的一款挂机游戏的Demo示例
 
 ## 脚本内使用的宏定义说明:
 * **SCORPIO_UWP**  UWP(Universal Windows Platform)专用 阉割掉的功能 : 不能调用c#类中的 Delegate 变量
