@@ -18,7 +18,7 @@
 - [x] BlackBerry
 - [x] Windows Phone 8
 - [x] WebGL(Unity5.0Beta)
-
+## 第一款Android上线游戏(Just Sweeper)扫雷  http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩
 ## Android 挂机游戏示例 游戏除了一些c#库 所有游戏逻辑 都是由脚本编写 下载地址 http://fengyuezhu.sinaapp.com/Scorpio.apk
 
 ## 脚本内使用的宏定义说明:
