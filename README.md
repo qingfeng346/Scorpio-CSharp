@@ -20,7 +20,7 @@
 - [x] WebGL(Unity5.0Beta)
 
 ## 上线游戏下载地址 http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩
-* Just Sweeper  一款扫雷单机游戏 目前已在Google Play上线
+* Sweet Sweeper 一款扫雷单机游戏 目前已在Google Play (https://play.google.com/store/apps/details?id=com.Toydog.Minesweeper) 上线
 * 挂机游戏Demo  个人业余开发的一款挂机游戏的Demo示例
 
 ## 脚本内使用的宏定义说明:
