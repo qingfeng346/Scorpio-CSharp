@@ -18,8 +18,10 @@
 - [x] BlackBerry
 - [x] Windows Phone 8
 - [x] WebGL(Unity5.0Beta)
+
 ## Unity导入Scorpio-CSharp:
-* 把trunk目录下的 Scorpio 文件夹复制到项目 然后删除 文件夹下的 Properties 文件夹和 Scorpio.csproj 文件即可
+* 第一种方法(建议) : 把trunk目录下的 Scorpio 文件夹复制到项目 然后删除 文件夹下的 Properties 文件夹和 Scorpio.csproj 文件即可
+* 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下
 
 ## 上线游戏下载地址 http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩
 * Sweet Sweeper 一款扫雷单机游戏 目前已在Google Play (https://play.google.com/store/apps/details?id=com.Toydog.Minesweeper) 上线
