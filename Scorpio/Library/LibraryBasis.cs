@@ -172,7 +172,7 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args) {
 #if SCORPIO_UWP
                 for (int i = 0; i < args.Length; ++i) {
-                    System.Diagnostics.Debug.WriteLine("");
+                    System.Diagnostics.Debug.WriteLine(args[i].ToString());
                 }
 #else
                 for (int i = 0; i < args.Length; ++i) {

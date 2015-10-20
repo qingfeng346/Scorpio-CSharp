@@ -119,7 +119,7 @@ namespace Scorpio
         {
             for (int i = 0; i < m_Assembly.Count;++i )
             {
-                Type type = m_Assembly[i].GetType(str, false, false);
+                Type type = m_Assembly[i].GetType(str);
                 if (type != null) return CreateUserdata(type);
             }
             {
