@@ -39,6 +39,7 @@
 
 ## master版本更新和修改内容 ##
 (2015-10-22)
+-----------
 * UWP(Universal Windows Platform) 应用去除Script.LoadFile函数,UWP平台下请自行实现
 
 (2015-9-15)
