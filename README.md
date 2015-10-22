@@ -17,7 +17,8 @@
 - [x] Android
 - [x] BlackBerry
 - [x] Windows Phone 8
-- [x] WebGL(Unity5.0Beta)
+- [x] Windows 10 (Universal Windows Platform)
+- [x] WebGL
 
 ## Unity导入Scorpio-CSharp:
 * 第一种方法(建议) : 把trunk目录下的 Scorpio 文件夹复制到项目 然后删除 文件夹下的 Properties 文件夹和 Scorpio.csproj 文件即可
