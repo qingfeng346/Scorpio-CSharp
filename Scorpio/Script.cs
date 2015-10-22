@@ -48,6 +48,7 @@ namespace Scorpio
             PushAssembly(GetType().Assembly);
 #endif
         }
+#if !SCORPIO_UWP
         public ScriptObject LoadFile(String strFileName)
         {
             return LoadFile(strFileName, Encoding.UTF8);
@@ -68,6 +69,7 @@ namespace Scorpio
                 throw new ScriptException("load file [" + fileName + "] is error : " + e.ToString());
             }
         }
+#endif
         public ScriptObject LoadString(String strBuffer)
         {
             return LoadString("", strBuffer);
