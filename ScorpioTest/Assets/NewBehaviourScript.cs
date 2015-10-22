@@ -2,8 +2,16 @@
 using System.Collections;
 using Scorpio;
 public class NewBehaviourScript : MonoBehaviour {
+	private static string output = "";
+	private class ScriptPrint : ScorpioHandle {
+		public object Call(ScriptObject[] args) {
+			for (int i = 0; i < args.Length; ++i) {
+				output += args[i].ToString() + "\n";
+			}
+			return null;
+		}
+	}
 	private string text = "";
-	private string output = "";
     private int width;
     private int height;
     private int windowHeight;
@@ -18,15 +26,14 @@ public class NewBehaviourScript : MonoBehaviour {
 	{
         text = GUI.TextArea(new Rect(0, 0, width, windowHeight), text);
         PlayerPrefs.SetString("__Text", text);
-        if (GUI.Button(new Rect(0, windowHeight, width, 90), "RunScript (" + Script.Version + ")"))
-        {
+        if (GUI.Button(new Rect(0, windowHeight, width, 90), "RunScript (" + Script.Version + ")")) {
 			output = "";
 			Script script = new Script();
 			try {
 				script.LoadLibrary();
                 script.PushAssembly(GetType().Assembly);
                 script.PushAssembly(typeof(GameObject).Assembly);
-				script.SetObject("print", script.CreateFunction(print));
+				script.SetObject("print", script.CreateFunction(new ScriptPrint()));
 				ScriptObject ret = script.LoadString(text);
                 OutPut("ReturnValue : " + ret);
 			} catch (System.Exception e) {
@@ -36,15 +43,7 @@ public class NewBehaviourScript : MonoBehaviour {
 		}
         GUI.TextArea(new Rect(0, windowHeight + 90, width, windowHeight), output);
 	}
-	private object print(object[] Parameters)
-	{
-		for (int i = 0; i < Parameters.Length; ++i) {
-			output += (Parameters[i].ToString() + "\n");
-		}
-		return null;
-	}
-	private void OutPut(string message)
-	{
+	private void OutPut(string message) {
 		output += (message + "\n");
 	}
 }
