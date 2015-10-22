@@ -28,12 +28,15 @@
 * 挂机游戏Demo  个人业余开发的一款挂机游戏的Demo示例
 
 ## 脚本内使用的宏定义说明:
-* **SCORPIO_UWP**  UWP(Universal Windows Platform)专用 阉割掉的功能 : 不能调用c#类中的 Delegate 变量
+* **SCORPIO_UWP**  UWP(Universal Windows Platform)专用 阉割掉的功能 : 不能调用c#类中的 Delegate 变量，不支持ScorpioFunction函数
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承DelegateTypeFactory的类
 
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2015-10-22)
+* UWP(Universal Windows Platform) 应用去除Script.LoadFile函数,UWP平台下请自行实现
+
 (2015-9-15)
 -----------
 * math库增加 floor 函数
