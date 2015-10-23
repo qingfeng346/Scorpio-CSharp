@@ -25,7 +25,9 @@
 * 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下
 
 ## 上线游戏下载地址 http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩
-* Sweet Sweeper 一款扫雷单机游戏 目前已在Google Play (https://play.google.com/store/apps/details?id=com.Toydog.Minesweeper) 上线
+* Sweet Sweeper 一款扫雷单机游戏 上线地址:
+    * Google Play https://play.google.com/store/apps/details?id=com.Toydog.Minesweeper
+    * AppStore https://itunes.apple.com/us/app/sweet-sweeper/id1049666778?l=zh&ls=1&mt=8
 * 挂机游戏Demo  个人业余开发的一款挂机游戏的Demo示例
 
 ## 脚本内使用的宏定义说明:
