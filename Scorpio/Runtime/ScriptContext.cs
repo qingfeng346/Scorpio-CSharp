@@ -24,8 +24,8 @@ namespace Scorpio.Runtime
         private bool m_Over = false;                                                    //函数是否已经结束
         private int m_InstructionCount = 0;                                             //指令数量
         public ScriptContext(Script script, ScriptExecutable scriptExecutable) : this(script, scriptExecutable, null, Executable_Block.None) { }
-        public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent, Executable_Block block)
-        {
+        public ScriptContext(Script script, ScriptExecutable scriptExecutable, Executable_Block block) : this(script, scriptExecutable, null, block) { }
+        public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent, Executable_Block block) {
             m_script = script;
             m_parent = parent;
             m_scriptExecutable = scriptExecutable;
@@ -60,19 +60,6 @@ namespace Scorpio.Runtime
             m_Over = false;
             m_Break = false;
             m_Continue = false;
-        }
-        private Dictionary<String, ScriptObject> GetContextVariables()
-        {
-            Dictionary<String, ScriptObject> vars = new Dictionary<String, ScriptObject>();
-            ScriptContext context = this;
-            while (context != null) {
-                foreach (KeyValuePair<String, ScriptObject> pair in context.m_variableDictionary) {
-                    if (!vars.ContainsKey(pair.Key))
-                        vars.Add(pair.Key, pair.Value);
-                }
-                context = context.m_parent;
-            }
-            return vars;
         }
         private void ApplyVariableObject(string name)
         {
@@ -440,7 +427,7 @@ namespace Scorpio.Runtime
         }
         ScriptFunction ParseFunction(CodeFunction func)
         {
-            return ((ScriptFunction)func.Func.Clone()).SetParentVariable(GetContextVariables());
+            return ((ScriptFunction)func.Func.Clone()).SetParentContext(this);
         }
         ScriptObject ParseCall(CodeCallFunction scriptFunction, bool needRet)
         {

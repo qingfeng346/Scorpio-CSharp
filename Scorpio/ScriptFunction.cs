@@ -31,11 +31,11 @@ namespace Scorpio
         public String Name { get; private set; }                                //函数名字
         public FunstionType FunctionType { get; private set; }                  //函数类型 （是 脚本函数 还是 程序函数）
         public bool IsStatic { get; private set; }                              //是否是静态函数（不是table内部函数）
-
         private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数
         private ScorpioFunction m_Function;                                     //程序函数指针
         private ScorpioHandle m_Handle;                                         //程序函数执行类
         private ScorpioMethod m_Method;                                         //程序函数
+        private ScriptContext m_ParentContext;                                  //父级堆栈
         public ScorpioMethod Method { get { return m_Method; } }                //返回程序函数对象
         private Dictionary<String, ScriptObject> m_stackObject = new Dictionary<String, ScriptObject>();    //函数变量
         public override ObjectType Type { get { return ObjectType.Function; } }
@@ -69,34 +69,27 @@ namespace Scorpio
         {
             Name = strName;
             FunctionType = funcType;
+            m_ParentContext = null;
         }
-        public void SetTable(ScriptTable table)
-        {
+        public void SetTable(ScriptTable table) {
             if (FunctionType == FunstionType.Script) {
                 IsStatic = false;
                 m_stackObject["this"] = table;
                 m_stackObject["self"] = table;
             }
         }
-        public override void SetValue(object key, ScriptObject value)
-        {
+        public override void SetValue(object key, ScriptObject value) {
             if (!(key is string)) throw new ExecutionException(this.Script, "Function SetValue只支持String类型");
             m_stackObject[(string)key] = value;
         }
-        public override ScriptObject GetValue(object key)
-        {
+        public override ScriptObject GetValue(object key) {
             if (!(key is string)) throw new ExecutionException(this.Script, "Function GetValue只支持String类型");
             string skey = (string)key;
             return m_stackObject.ContainsKey(skey) ? m_stackObject[skey] : Script.Null;
         }
-        public ScriptFunction SetParentVariable(Dictionary<String, ScriptObject> variables)
-        {
-            if (FunctionType == FunstionType.Script) {
-                foreach (KeyValuePair<String, ScriptObject> pair in variables) {
-                    if (!m_stackObject.ContainsKey(pair.Key))
-                        m_stackObject.Add(pair.Key, pair.Value.Assign());
-                }
-            }
+        public ScriptFunction SetParentContext(ScriptContext context) {
+            if (FunctionType == FunstionType.Script)
+                m_ParentContext = context;
             return this;
         }
         public object call(params object[] args) {
@@ -108,7 +101,7 @@ namespace Scorpio
         }
         public override object Call(ScriptObject[] parameters) {
             if (FunctionType == FunstionType.Script) {
-                return m_ScriptFunction.Call(m_stackObject, parameters);
+                return m_ScriptFunction.Call(m_ParentContext, m_stackObject, parameters);
             } else {
                 try {
                     if (FunctionType == FunstionType.Handle){
