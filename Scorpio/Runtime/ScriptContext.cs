@@ -40,7 +40,7 @@ namespace Scorpio.Runtime
             m_parent = parent;
             m_variableDictionary.Clear();
             foreach (var pair in variable)
-                m_variableDictionary[pair.Key] = pair.Value;
+                m_variableDictionary[pair.Key] = pair.Value.Assign();
         }
         private void Initialize(ScriptContext parent, string name, ScriptObject obj)
         {
