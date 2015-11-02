@@ -50,6 +50,14 @@ namespace Scorpio.Variable
 		{
 			return Script.CreateDouble (Math.Floor (m_Value));
 		}
+		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)
+		{
+			if (m_Value < min.ToDouble ())
+				return Script.CreateDouble (min.ToDouble());
+			if (m_Value > max.ToDouble ())
+				return Script.CreateDouble (max.ToDouble ());
+			return Script.CreateDouble (m_Value);
+		}
         public override ScriptObject Assign()
         {
             return Script.CreateDouble(m_Value);

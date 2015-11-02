@@ -16,6 +16,7 @@ namespace Scorpio
         public abstract ScriptNumber Negative();
 		public abstract ScriptNumber Abs();
 		public abstract ScriptNumber Floor();
+		public abstract ScriptNumber Clamp(ScriptNumber min, ScriptNumber max);
         public abstract bool Compare(TokenType type, ScriptNumber num);                 //两个数值比较 > >= < <=
         public abstract ScriptObject Compute(TokenType type, ScriptNumber obj);         //位运算或者运算符 + - * / % | & ^ >> <<
         public abstract ScriptObject AssignCompute(TokenType type, ScriptNumber obj);   //位运算或者运算符复制运算 += -= *= /= %= |= &= ^= >>= <<=

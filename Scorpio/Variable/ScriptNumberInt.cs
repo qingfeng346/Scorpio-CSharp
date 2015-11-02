@@ -51,6 +51,14 @@ namespace Scorpio.Variable
 		{
 			return Script.CreateInt (m_Value);
 		}
+		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)
+		{
+			if (m_Value < min.ToInt32 ())
+				return Script.CreateInt (min.ToInt32());
+			if (m_Value > max.ToInt32 ())
+				return Script.CreateInt (max.ToInt32 ());
+			return Script.CreateInt (m_Value);
+		}
         public override ScriptObject Assign()
         {
             return Script.CreateInt(m_Value);
