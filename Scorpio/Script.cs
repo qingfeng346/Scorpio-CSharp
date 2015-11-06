@@ -193,10 +193,8 @@ namespace Scorpio
                 return Null;
             else if (value is ScriptObject)
                 return (ScriptObject)value;
-#if !SCORPIO_UWP
             else if (value is ScorpioFunction)
                 return CreateFunction((ScorpioFunction)value);
-#endif
             else if (value is ScorpioHandle)
                 return CreateFunction((ScorpioHandle)value);
             else if (value is ScorpioMethod)
@@ -255,12 +253,10 @@ namespace Scorpio
         {
             return new ScriptFunction(this, name, value);
         }
-#if !SCORPIO_UWP
         public ScriptFunction CreateFunction(ScorpioFunction value)
         {
             return new ScriptFunction(this, value);
         }
-#endif
         public ScriptFunction CreateFunction(ScorpioHandle value)
         {
             return new ScriptFunction(this, value);
