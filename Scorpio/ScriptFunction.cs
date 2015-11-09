@@ -39,11 +39,7 @@ namespace Scorpio
         public ScorpioMethod Method { get { return m_Method; } }                //返回程序函数对象
         private Dictionary<String, ScriptObject> m_stackObject = new Dictionary<String, ScriptObject>();    //函数变量
         public override ObjectType Type { get { return ObjectType.Function; } }
-#if !SCORPIO_UWP
-        public ScriptFunction(Script script, ScorpioFunction function) : this(script, function.Method.Name, function) { }
-#else
         public ScriptFunction(Script script, ScorpioFunction function) : this(script, "", function) { }
-#endif
         public ScriptFunction(Script script, String strName, ScorpioFunction function) : base(script) {
             this.m_Function = function;
             Initialize(strName, FunstionType.Function);

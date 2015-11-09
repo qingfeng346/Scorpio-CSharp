@@ -69,6 +69,8 @@
     <Compile Include="Compiler\TokenType.cs" />
     <Compile Include="Exception\InteriorException.cs" />
     <Compile Include="Exception\StackInfo.cs" />
+    <Compile Include="Extensions\DefaultScriptExtensions.cs" />
+    <Compile Include="IScriptExtensions.cs" />
     <Compile Include="Library\LibraryJson.cs" />
     <Compile Include="Library\LibraryMath.cs" />
     <Compile Include="ScriptEnum.cs" />

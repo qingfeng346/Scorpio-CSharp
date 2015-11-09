@@ -8,6 +8,7 @@ using Scorpio.Compiler;
 using Scorpio.Exception;
 using Scorpio.Library;
 using Scorpio.Userdata;
+using Scorpio.Extensions;
 using Scorpio.Variable;
 using Scorpio.Serialize;
 namespace Scorpio
@@ -22,31 +23,27 @@ namespace Scorpio
         private const string GLOBAL_VERSION = "_VERSION";       //版本号
         private const string GLOBAL_SCRIPT = "_SCRIPT";         //Script对象
         private IScriptUserdataFactory m_UserdataFactory = null;                //Userdata工厂
+        private IScriptExtensions m_Extensions = null;                          //一些扩展函数
         private ScriptTable m_GlobalTable;                                      //全局Table
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
-
         public ScriptNull Null { get; private set; }                            //null对象
         public ScriptBoolean True { get; private set; }                         //true对象
         public ScriptBoolean False { get; private set; }                        //false对象
-        public ScriptBoolean GetBoolean(bool value) {
-            return value ? True : False; 
-        }
-        public Script()
-        {
+        public ScriptBoolean GetBoolean(bool value) { return value ? True : False;  }
+        public Script() {
             Null = new ScriptNull(this);
             True = new ScriptBoolean(this, true);
             False = new ScriptBoolean(this, false);
             m_UserdataFactory = new DefaultScriptUserdataFactory(this);
+            m_Extensions = new DefaultScriptExtensions();
             m_GlobalTable = CreateTable();
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
             m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
             m_GlobalTable.SetValue(GLOBAL_SCRIPT, CreateObject(this));
-#if !SCORPIO_UWP
-            PushAssembly(typeof(object).Assembly);
-            PushAssembly(GetType().Assembly);
-#endif
+            PushAssembly(m_Extensions.GetAssembly(typeof(object)));
+            PushAssembly(m_Extensions.GetAssembly(GetType()));
         }
         public ScriptObject LoadFile(String strFileName)
         {
@@ -59,7 +56,7 @@ namespace Scorpio
         public ScriptObject LoadFile(String fileName, Encoding encoding)
         {
             try {
-                byte[] buffer = Util.GetFileBuffer(fileName);
+                byte[] buffer = m_Extensions.GetFileBuffer(fileName);
                 if (buffer.Length > 0 && buffer[0] == 0)
                     return LoadTokens(fileName, ScorpioMaker.Deserialize(buffer));
                 else
@@ -265,6 +262,9 @@ namespace Scorpio
         }
         public IScriptUserdataFactory GetUserdataFactory() {
             return m_UserdataFactory;
+        }
+        public IScriptExtensions GetExtensions() {
+            return m_Extensions;
         }
         public void LoadLibrary()
         {

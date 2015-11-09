@@ -172,16 +172,6 @@ namespace Scorpio
             else
                 return type.IsAssignableFrom(par.GetType());
         }
-        public static byte[] GetFileBuffer(String fileName)
-        {
-            FileStream stream = File.OpenRead(fileName);
-            long length = stream.Length;
-            byte[] buffer = new byte[length];
-            stream.Read(buffer, 0, buffer.Length);
-            stream.Close();
-            stream.Dispose();
-            return buffer;
-        }
         public static void WriteString(BinaryWriter writer, string str)
         {
             if (string.IsNullOrEmpty(str)) {

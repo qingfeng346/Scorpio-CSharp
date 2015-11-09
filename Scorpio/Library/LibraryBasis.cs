@@ -131,7 +131,7 @@ namespace Scorpio.Library
         }
         public static void Load(Script script)
         {
-            script.SetObjectInternal("print", script.CreateFunction(new print()));
+            script.SetObjectInternal("print", script.CreateFunction(new print(script)));
             script.SetObjectInternal("pairs", script.CreateFunction(new pairs(script)));
             script.SetObjectInternal("kpairs", script.CreateFunction(new kpairs(script)));
             script.SetObjectInternal("vpairs", script.CreateFunction(new vpairs(script)));
@@ -169,16 +169,15 @@ namespace Scorpio.Library
         }
         private class print : ScorpioHandle
         {
+            private Script m_script;
+            public print(Script script)
+            {
+                m_script = script;
+            }
             public object Call(ScriptObject[] args) {
-#if SCORPIO_UWP
                 for (int i = 0; i < args.Length; ++i) {
-                    System.Diagnostics.Debug.WriteLine(args[i].ToString());
+                    m_script.GetExtensions().print(args[i].ToString());
                 }
-#else
-                for (int i = 0; i < args.Length; ++i) {
-                    Console.WriteLine(args[i].ToString());
-                }
-#endif
                 return null;
             }
         }
