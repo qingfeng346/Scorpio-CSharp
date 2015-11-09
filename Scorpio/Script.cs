@@ -263,11 +263,16 @@ namespace Scorpio
         public IScriptUserdataFactory GetUserdataFactory() {
             return m_UserdataFactory;
         }
+        public void SetUserdataFactory(IScriptUserdataFactory value) {
+            m_UserdataFactory = value;
+        }
         public IScriptExtensions GetExtensions() {
             return m_Extensions;
         }
-        public void LoadLibrary()
-        {
+        public void SetExtensions(IScriptExtensions value) {
+            m_Extensions = value;
+        }
+        public void LoadLibrary() {
             LibraryBasis.Load(this);
             LibraryArray.Load(this);
             LibraryString.Load(this);

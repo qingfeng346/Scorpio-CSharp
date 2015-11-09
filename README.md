@@ -31,16 +31,17 @@
 * 挂机游戏Demo  个人业余开发的一款挂机游戏的Demo示例
 
 ## 脚本内使用的宏定义说明:
-* **SCORPIO_UWP**  UWP(Universal Windows Platform)专用 阉割掉的功能 : 
-    * 不能脚本调用c#类中的 Delegate 变量
-    * 不支持 ScorpioFunction 类型函数
-    * 不能使用 Script.LoadFile 函数
-    * require函数不可用
-* **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承DelegateTypeFactory的类
+* **SCORPIO_UWP**  UWP(Universal Windows Platform)专用
+* **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类
 
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2015-11-9)
+-----------
+* 实现UWP平台下阉割的功能
+* Script添加IScriptExtensions(扩展函数)对象, 如果遇到某平台下不能使用的函数, 可以自行实现一个继承IScriptExtensions的对象
+
 (2015-11-2)
 -----------
 * math库增加clamp函数
