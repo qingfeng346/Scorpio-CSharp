@@ -37,7 +37,7 @@ namespace Scorpio
             if (string.IsNullOrEmpty(source)) target = source + ".sco";
             target = Path.Combine(Environment.CurrentDirectory, target);
             try {
-                byte[] buffer = Util.GetFileBuffer(source);
+                byte[] buffer = GetFileBuffer(source);
                 if (type.Equals("1"))
                     File.WriteAllBytes(target, Encoding.UTF8.GetBytes(ScorpioMaker.DeserializeToString(buffer)));
                 else
@@ -47,6 +47,16 @@ namespace Scorpio
             }
         exit:
             Console.WriteLine("转换结束");
+        }
+        public static byte[] GetFileBuffer(String fileName)
+        {
+            FileStream stream = File.OpenRead(fileName);
+            long length = stream.Length;
+            byte[] buffer = new byte[length];
+            stream.Read(buffer, 0, buffer.Length);
+            stream.Close();
+            stream.Dispose();
+            return buffer;
         }
     }
 }
