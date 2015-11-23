@@ -28,8 +28,10 @@
 * Sweet Sweeper 一款扫雷单机游戏 上线地址:
     * Google Play https://play.google.com/store/apps/details?id=com.Toydog.Minesweeper
     * AppStore https://itunes.apple.com/us/app/sweet-sweeper/id1049666778?l=zh&ls=1&mt=8
-* 挂机游戏Demo  个人业余开发的一款挂机游戏的Demo示例
-
+* Align Man 是男人就下100层 上线地址:
+	* Android http://www.anzhi.com/soft_2422782.html
+	
+	
 ## 脚本内使用的宏定义说明:
 * **SCORPIO_UWP**  UWP(Universal Windows Platform)专用
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类
