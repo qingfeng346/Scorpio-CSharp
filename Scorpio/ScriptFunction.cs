@@ -28,7 +28,6 @@ namespace Scorpio
     //脚本函数类型
     public class ScriptFunction : ScriptObject
     {
-        public String Name { get; private set; }                                //函数名字
         public FunstionType FunctionType { get; private set; }                  //函数类型 （是 脚本函数 还是 程序函数）
         public bool IsStatic { get; private set; }                              //是否是静态函数（不是table内部函数）
         private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数
@@ -75,11 +74,11 @@ namespace Scorpio
             }
         }
         public override void SetValue(object key, ScriptObject value) {
-            if (!(key is string)) throw new ExecutionException(this.Script, "Function SetValue只支持String类型");
+            if (!(key is string)) throw new ExecutionException(this.Script, "Function SetValue只支持String类型 key = " + key);
             m_stackObject[(string)key] = value;
         }
         public override ScriptObject GetValue(object key) {
-            if (!(key is string)) throw new ExecutionException(this.Script, "Function GetValue只支持String类型");
+            if (!(key is string)) throw new ExecutionException(this.Script, "Function GetValue只支持String类型 key = " + key);
             string skey = (string)key;
             return m_stackObject.ContainsKey(skey) ? m_stackObject[skey] : Script.Null;
         }

@@ -111,6 +111,7 @@ namespace Scorpio.Runtime
         {
             if (member.Parent == null) {
                 string name = (string)member.MemberValue;
+                variable.Name = name;
                 if (!SetVariableObject(name, variable))
                     m_script.SetObjectInternal(name, variable);
             } else {
@@ -195,7 +196,6 @@ namespace Scorpio.Runtime
         {
             CodeFor code = (CodeFor)m_scriptInstruction.Operand0;
             ScriptContext context = code.GetContext();
-            ScriptContext blockContext = code.GetBlockContext();
             context.Initialize(this);
             context.Execute(code.BeginExecutable);
             ScriptBoolean Condition;
@@ -205,7 +205,8 @@ namespace Scorpio.Runtime
                     if (Condition == null) throw new ExecutionException(m_script, "for 跳出条件必须是一个bool型");
                     if (!Condition.Value) break;
                 }
-                blockContext.Initialize(context);
+                ScriptContext blockContext = code.GetBlockContext();
+                blockContext.Initialize(context, context.m_variableDictionary);
                 blockContext.Execute();
                 if (blockContext.IsOver) break;
                 context.Execute(code.LoopExecutable);
@@ -228,9 +229,9 @@ namespace Scorpio.Runtime
             } else {
                 step = 1;
             }
-            ScriptContext context = code.GetBlockContext();
             var variables = new Dictionary<String, ScriptObject>();
             for (int i = begin; i <= finished; i += step) {
+                ScriptContext context = code.GetBlockContext();
                 variables[code.Identifier] = m_script.CreateNumber(i);
                 context.Initialize(this, variables);
                 context.Execute();
@@ -550,16 +551,14 @@ namespace Scorpio.Runtime
             } else {
                 ScriptObject obj = GetVariable(assign.member);
                 ScriptString str = obj as ScriptString;
-                if (str != null)
-                {
+                if (str != null) {
                     if (assign.AssignType == TokenType.AssignPlus)
                         return str.AssignPlus(ResolveOperand(assign.value));
                     else
                         throw new ExecutionException(m_script, "string类型只支持[+=]赋值操作");
                 }
                 ScriptNumber num = obj as ScriptNumber;
-                if (num != null)
-                {
+                if (num != null) {
                     ScriptNumber right = ResolveOperand(assign.value) as ScriptNumber;
                     if (right == null)
                         throw new ExecutionException(m_script, "[+= -=...]值只能为 number类型");
