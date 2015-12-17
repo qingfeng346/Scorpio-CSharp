@@ -18,6 +18,8 @@ namespace Scorpio.Library {
 			Table.SetValue("abs", script.CreateFunction(new abs()));
 			Table.SetValue("floor", script.CreateFunction(new floor()));
 			Table.SetValue("clamp", script.CreateFunction(new clamp()));
+			Table.SetValue("sqrt", script.CreateFunction(new sqrt()));
+			Table.SetValue("pow", script.CreateFunction(new pow()));
             script.SetObjectInternal("math", Table);
         }
 		private class min : ScorpioHandle {
@@ -59,6 +61,16 @@ namespace Scorpio.Library {
 		private class clamp : ScorpioHandle {
 			public object Call(ScriptObject[] args) {
 				return (args [0] as ScriptNumber).Clamp (args [1] as ScriptNumber, args [2] as ScriptNumber);
+			}
+		}
+		private class sqrt : ScorpioHandle {
+			public object Call(ScriptObject[] args) {
+				return (args [0] as ScriptNumber).Sqrt ();
+			}
+		}
+		private class pow : ScorpioHandle {
+			public object Call(ScriptObject[] args) {
+				return (args [0] as ScriptNumber).Pow (args [1] as ScriptNumber);
 			}
 		}
     }

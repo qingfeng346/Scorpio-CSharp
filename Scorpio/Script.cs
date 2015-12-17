@@ -182,6 +182,12 @@ namespace Scorpio
             m_StackInfoStack.Clear();
             return obj.Call(parameters);
         }
+		public object Call(String strName, ScriptObject[] args) {
+			ScriptObject obj = m_GlobalTable.GetValue(strName);
+			if (obj is ScriptNull) throw new ScriptException("找不到变量[" + strName + "]");
+			m_StackInfoStack.Clear();
+			return obj.Call(args);
+		}
         public ScriptObject CreateObject(object value)
         {
             if (value == null)
