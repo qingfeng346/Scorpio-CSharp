@@ -107,7 +107,7 @@ namespace Scorpio.Compiler
         }
         void ThrowInvalidCharacterException(char ch)
         {
-            throw new LexerException("Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar + " [" + m_listSourceLines[m_iSourceLine] + "]");
+            throw new LexerException(m_strBreviary + ":" + (m_iSourceLine + 1) + "  Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar + " [" + m_listSourceLines[m_iSourceLine] + "]");
         }
         void AddToken(TokenType type)
         {

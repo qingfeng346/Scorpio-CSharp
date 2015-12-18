@@ -8,9 +8,9 @@ namespace Scorpio.Serialize
     public class ScorpioMaker
     {
         private static sbyte LineFlag = sbyte.MaxValue;
-        public static byte[] Serialize(string data)
+		public static byte[] Serialize(String breviary, string data)
         {
-            List<Token> tokens = new ScriptLexer(data).GetTokens();
+			List<Token> tokens = new ScriptLexer(data, breviary).GetTokens();
             if (tokens.Count == 0) return new byte[0];
             int sourceLine = 0;
             MemoryStream stream = new MemoryStream();

@@ -17,13 +17,18 @@ namespace Scorpio.Compiler
         private List<String> m_listSourceLines;     //所有行
         private List<Token> m_listTokens;           //解析后所得Token
         private char ch;                            //当前的解析的字符
-        public ScriptLexer(String buffer)
+		public ScriptLexer(String buffer, String strBreviary)
         {
             m_listSourceLines = new List<string>();
             m_listTokens = new List<Token>();
             string[] strLines = buffer.Split('\n');
-            m_strBreviary = strLines.Length > 0 ? strLines[0] : "";
-            if (m_strBreviary.Length > BREVIARY_CHAR) m_strBreviary = m_strBreviary.Substring(0, BREVIARY_CHAR);
+			if (Util.IsNullOrEmpty (strBreviary)) {
+				m_strBreviary = strLines.Length > 0 ? strLines [0] : "";
+				if (m_strBreviary.Length > BREVIARY_CHAR)
+					m_strBreviary = m_strBreviary.Substring (0, BREVIARY_CHAR);
+			} else {
+				m_strBreviary = strBreviary;
+			}
             foreach (String strLine in strLines)
                 m_listSourceLines.Add(strLine + '\n');
             m_iSourceLine = 0;

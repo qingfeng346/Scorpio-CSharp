@@ -78,9 +78,8 @@ namespace Scorpio
             try {
                 if (Util.IsNullOrEmpty(strBuffer)) return Null;
                 if (clearStack) m_StackInfoStack.Clear();
-                ScriptLexer scriptLexer = new ScriptLexer(strBuffer);
-                strBreviary = Util.IsNullOrEmpty(strBreviary) ? scriptLexer.GetBreviary() : strBreviary;
-                return Load(strBreviary, scriptLexer.GetTokens(), context);
+                ScriptLexer scriptLexer = new ScriptLexer(strBuffer, strBreviary);
+				return Load(scriptLexer.GetBreviary(), scriptLexer.GetTokens(), context);
             } catch (System.Exception e) {
                 throw new ScriptException("load buffer [" + strBreviary + "] is error : " + e.ToString());
             }
