@@ -29,7 +29,7 @@
     * Google Play https://play.google.com/store/apps/details?id=com.Toydog.Minesweeper
     * AppStore https://itunes.apple.com/us/app/sweet-sweeper/id1049666778?l=zh&ls=1&mt=8
 * Agile Man 是男人就下100层 上线地址:
-	* Android http://www.eoemarket.com/game/766083.html
+	* Android http://www.anzhi.com/soft_2462148.html
 	
 	
 ## 脚本内使用的宏定义说明:
