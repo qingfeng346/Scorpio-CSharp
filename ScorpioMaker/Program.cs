@@ -41,7 +41,7 @@ namespace Scorpio
                 if (type.Equals("1"))
                     File.WriteAllBytes(target, Encoding.UTF8.GetBytes(ScorpioMaker.DeserializeToString(buffer)));
                 else
-                    File.WriteAllBytes(target, ScorpioMaker.Serialize(Encoding.UTF8.GetString(buffer, 0, buffer.Length)));
+                    File.WriteAllBytes(target, ScorpioMaker.Serialize(source, Encoding.UTF8.GetString(buffer, 0, buffer.Length)));
             } catch (System.Exception ex) {
                 Console.WriteLine("转换出错 error : " + ex.ToString());	
             }
