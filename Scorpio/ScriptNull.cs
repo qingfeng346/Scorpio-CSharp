@@ -19,5 +19,6 @@ namespace Scorpio
             return true;
         }
         public override int GetHashCode() { return 0; }
+        public override bool LogicOperation() { return false; }
     }
 }

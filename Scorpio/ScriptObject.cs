@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Scorpio.CodeDom;
 using Scorpio.Exception;
-
+using Scorpio.Compiler;
 namespace Scorpio
 {
     public enum ObjectType
@@ -21,27 +21,43 @@ namespace Scorpio
     //脚本数据类型
     public abstract class ScriptObject
     {
-        public String Name { get; set; }                                        // Object名字
-        private static readonly ScriptObject[] NOPARAMETER = new ScriptObject[0];       // 没有参数
-        public virtual ScriptObject Assign() { return this; }                           // 赋值
+        // 无参                            
+        private static readonly ScriptObject[] NOPARAMETER = new ScriptObject[0];
+        // Object名字
+        public String Name { get; set; }
+        // 赋值
+        public virtual ScriptObject Assign() { return this; }                           
         //设置变量
-        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException(Script, "类型[" + Type + "]不支持设置变量 name = " + Name + " key = " + key); }
+        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException(Script, "类型[" + Type + "]不支持设置变量 Name:" + Name + " key:" + key); }
         //获取变量
-        public virtual ScriptObject GetValue(object key) { throw new ExecutionException(Script, "类型[" + Type + "]不支持获取变量 name = " + Name + " key = " + key); }
+        public virtual ScriptObject GetValue(object key) { throw new ExecutionException(Script, "类型[" + Type + "]不支持获取变量 Name:" + Name + " key:" + key); }
         //调用无参函数
         public object Call() { return Call(NOPARAMETER); }
         //调用函数
-        public virtual object Call(ScriptObject[] parameters) { throw new ExecutionException(Script, "类型[" + Type + "]不支持函数调用 name = " + Name); }
-        public virtual ScriptObject Clone() { return this; }                            // 复制一个变量
-        public virtual string ToJson() { return ObjectValue.ToString(); }               // ToJson
-        public override string ToString() { return ObjectValue.ToString(); }            // ToString
-        public override bool Equals(object obj) {                                       // Equals
+        public virtual object Call(ScriptObject[] parameters) { throw new ExecutionException(Script, "类型[" + Type + "]不支持函数调用 Name:" + Name); }
+        ////两个数值比较 > >= < <=
+        public virtual bool Compare(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持值比较 Name:" + Name + " type:" + type); }
+        //运算符或者位运算 + - * / % | & ^ >> <<
+        public virtual ScriptObject Compute(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持运算符 Name:" + Name + " type:" + type); }
+        //运算符或者位运算赋值运算 += -= *= /= %= |= &= ^= >>= <<=
+        public virtual ScriptObject AssignCompute(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持赋值运算符 Name:" + Name + " type:" + type); }
+        //逻辑运算符 逻辑运算时 Object 算 true 或者 false
+        public virtual bool LogicOperation() { return true; }
+        // 复制一个变量
+        public virtual ScriptObject Clone() { return this; }
+        // ToJson
+        public virtual string ToJson() { return ObjectValue.ToString(); }
+        // ToString
+        public override string ToString() { return ObjectValue.ToString(); }
+        // Equals
+        public override bool Equals(object obj) {                                       
             if (obj == null) return false;
             if (!(obj is ScriptObject)) return false;
 			if (ObjectValue == this) return obj == this;
 			return ObjectValue.Equals(((ScriptObject)obj).ObjectValue);
         }
-        public override int GetHashCode() {                                             // GetHashCode
+        // GetHashCode
+        public override int GetHashCode() {                                             
             return base.GetHashCode();
         }
         public ScriptObject(Script script) { Script = script; }                         // 构图函数

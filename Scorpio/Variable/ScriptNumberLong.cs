@@ -66,73 +66,7 @@ namespace Scorpio.Variable
         {
             return m_Value;
         }
-        public override ScriptObject Compute(TokenType type, ScriptNumber obj)
-        {
-            switch (type)
-            {
-                case TokenType.Plus:
-                    return Script.CreateLong(m_Value + obj.ToLong());
-                case TokenType.Minus:
-                    return Script.CreateLong(m_Value - obj.ToLong());
-                case TokenType.Multiply:
-                    return Script.CreateLong(m_Value * obj.ToLong());
-                case TokenType.Divide:
-                    return Script.CreateLong(m_Value / obj.ToLong());
-                case TokenType.Modulo:
-                    return Script.CreateLong(m_Value % obj.ToLong());
-                case TokenType.InclusiveOr:
-                    return Script.CreateLong(m_Value | obj.ToLong());
-                case TokenType.Combine:
-                    return Script.CreateLong(m_Value & obj.ToLong());
-                case TokenType.XOR:
-                    return Script.CreateLong(m_Value ^ obj.ToLong());
-                case TokenType.Shr:
-                    return Script.CreateLong(m_Value >> obj.ToInt32());
-                case TokenType.Shi:
-                    return Script.CreateLong(m_Value << obj.ToInt32());
-                default:
-                    throw new ExecutionException(Script, "Long不支持的运算符 " + type);
-            }
-        }
-        public override ScriptObject AssignCompute(TokenType type, ScriptNumber obj)
-        {
-            switch (type)
-            {
-                case TokenType.AssignPlus:
-                    m_Value += obj.ToLong();
-                    return this;
-                case TokenType.AssignMinus:
-                    m_Value -= obj.ToLong();
-                    return this;
-                case TokenType.AssignMultiply:
-                    m_Value *= obj.ToLong();
-                    return this;
-                case TokenType.AssignDivide:
-                    m_Value /= obj.ToLong();
-                    return this;
-                case TokenType.AssignModulo:
-                    m_Value %= obj.ToLong();
-                    return this;
-                case TokenType.AssignInclusiveOr:
-                    m_Value |= obj.ToLong();
-                    return this;
-                case TokenType.AssignCombine:
-                    m_Value &= obj.ToLong();
-                    return this;
-                case TokenType.AssignXOR:
-                    m_Value ^= obj.ToLong();
-                    return this;
-                case TokenType.AssignShr:
-                    m_Value >>= obj.ToInt32();
-                    return this;
-                case TokenType.AssignShi:
-                    m_Value <<= obj.ToInt32();
-                    return this;
-                default:
-                    throw new ExecutionException(Script, "Long不支持的运算符 " + type);
-            }
-        }
-        public override bool Compare(TokenType type, ScriptNumber num)
+        public override bool Compare(TokenType type, ScriptObject num)
         {
             ScriptNumberLong val = num as ScriptNumberLong;
             if (val == null) throw new ExecutionException(Script, "数字比较 两边的数字类型不一致 请先转换再比较 ");
@@ -148,6 +82,76 @@ namespace Scorpio.Variable
                     return m_Value <= val.m_Value;
                 default:
                     throw new ExecutionException(Script, "Long类型 操作符[" + type + "]不支持");
+            }
+        }
+        public override ScriptObject Compute(TokenType type, ScriptObject obj)
+        {
+            ScriptNumber val = obj as ScriptNumber;
+            if (val == null) throw new ExecutionException(Script, "逻辑计算 右边值必须为数字类型");
+            switch (type)
+            {
+                case TokenType.Plus:
+                    return Script.CreateLong(m_Value + val.ToLong());
+                case TokenType.Minus:
+                    return Script.CreateLong(m_Value - val.ToLong());
+                case TokenType.Multiply:
+                    return Script.CreateLong(m_Value * val.ToLong());
+                case TokenType.Divide:
+                    return Script.CreateLong(m_Value / val.ToLong());
+                case TokenType.Modulo:
+                    return Script.CreateLong(m_Value % val.ToLong());
+                case TokenType.InclusiveOr:
+                    return Script.CreateLong(m_Value | val.ToLong());
+                case TokenType.Combine:
+                    return Script.CreateLong(m_Value & val.ToLong());
+                case TokenType.XOR:
+                    return Script.CreateLong(m_Value ^ val.ToLong());
+                case TokenType.Shr:
+                    return Script.CreateLong(m_Value >> val.ToInt32());
+                case TokenType.Shi:
+                    return Script.CreateLong(m_Value << val.ToInt32());
+                default:
+                    throw new ExecutionException(Script, "Long不支持的运算符 " + type);
+            }
+        }
+        public override ScriptObject AssignCompute(TokenType type, ScriptObject obj)
+        {
+            ScriptNumber val = obj as ScriptNumber;
+            if (val == null) throw new ExecutionException(Script, "逻辑计算 右边值必须为数字类型");
+            switch (type)
+            {
+                case TokenType.AssignPlus:
+                    m_Value += val.ToLong();
+                    return this;
+                case TokenType.AssignMinus:
+                    m_Value -= val.ToLong();
+                    return this;
+                case TokenType.AssignMultiply:
+                    m_Value *= val.ToLong();
+                    return this;
+                case TokenType.AssignDivide:
+                    m_Value /= val.ToLong();
+                    return this;
+                case TokenType.AssignModulo:
+                    m_Value %= val.ToLong();
+                    return this;
+                case TokenType.AssignInclusiveOr:
+                    m_Value |= val.ToLong();
+                    return this;
+                case TokenType.AssignCombine:
+                    m_Value &= val.ToLong();
+                    return this;
+                case TokenType.AssignXOR:
+                    m_Value ^= val.ToLong();
+                    return this;
+                case TokenType.AssignShr:
+                    m_Value >>= val.ToInt32();
+                    return this;
+                case TokenType.AssignShi:
+                    m_Value <<= val.ToInt32();
+                    return this;
+                default:
+                    throw new ExecutionException(Script, "Long不支持的运算符 " + type);
             }
         }
         public override ScriptObject Clone()

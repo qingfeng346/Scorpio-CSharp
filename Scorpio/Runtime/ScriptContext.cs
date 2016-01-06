@@ -469,71 +469,22 @@ namespace Scorpio.Runtime
             ScriptObject left = ResolveOperand(operate.Left);
             if (type == TokenType.Plus) {
                 ScriptObject right = ResolveOperand(operate.Right);
-                if (left is ScriptString || right is ScriptString) {
-                    return m_script.CreateString(left.ToString() + right.ToString());
-                } else if (left is ScriptNumber && right is ScriptNumber){
-                    return (left as ScriptNumber).Compute(TokenType.Plus, right as ScriptNumber);
-                } else {
-                    throw new ExecutionException(m_script, "operate [+] left right is not same type");
-                }
-            } else if (type == TokenType.Minus || type == TokenType.Multiply || type == TokenType.Divide || type == TokenType.Modulo ||
-                type == TokenType.InclusiveOr || type == TokenType.Combine || type == TokenType.XOR || type == TokenType.Shr || type == TokenType.Shi) {
-                ScriptNumber leftNumber = left as ScriptNumber;
-                if (leftNumber == null) throw new ExecutionException(m_script, "运算符[左边]必须是number类型");
-                ScriptNumber rightNumber = ResolveOperand(operate.Right) as ScriptNumber;
-                if (rightNumber == null) throw new ExecutionException(m_script, "运算符[右边]必须是number类型");
-                return leftNumber.Compute(type, rightNumber);
+                if (left is ScriptString || right is ScriptString) { return m_script.CreateString(left.ToString() + right.ToString()); }
+                return left.Compute(type, right);
+            } else if (type == TokenType.And) {
+                if (left.LogicOperation() == false) return m_script.False;
+                return m_script.GetBoolean(ResolveOperand(operate.Right).LogicOperation());
+            } else if (type == TokenType.Or) {
+                if (left.LogicOperation() == true) return m_script.True;
+                return m_script.GetBoolean(ResolveOperand(operate.Right).LogicOperation());
+            } else if (type == TokenType.Equal) {
+                return m_script.GetBoolean(left.Equals(ResolveOperand(operate.Right)));
+            } else if (type == TokenType.NotEqual) {
+                return m_script.GetBoolean(!left.Equals(ResolveOperand(operate.Right)));
+            } else if (type == TokenType.Greater || type == TokenType.GreaterOrEqual || type == TokenType.Less || type == TokenType.LessOrEqual) {
+                return m_script.GetBoolean(left.Compare(type, ResolveOperand(operate.Right)));
             } else {
-                if (left is ScriptBoolean) {
-                    bool b1 = ((ScriptBoolean)left).Value;
-                    if (type == TokenType.And) {
-                        if (b1 == false) return m_script.False;
-                        ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                        if (right == null) throw new ExecutionException(m_script, "operate [&&] right is not a bool");
-                        return right.Value ? m_script.True : m_script.False;
-                    } else if (type == TokenType.Or) {
-                        if (b1 == true) return m_script.True;
-                        ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                        if (right == null) throw new ExecutionException(m_script, "operate [||] right is not a bool");
-                        return right.Value ? m_script.True : m_script.False;
-                    } else {
-                        if (type != TokenType.Equal && type != TokenType.NotEqual)
-                            throw new ExecutionException(m_script, "nonsupport operate [" + type + "]  with bool");
-                        ScriptBoolean right = ResolveOperand(operate.Right) as ScriptBoolean;
-                        if (right == null) return type == TokenType.Equal ? m_script.False : m_script.True;
-                        bool b2 = right.Value;
-                        if (type == TokenType.Equal)
-                            return b1 == b2 ? m_script.True : m_script.False;
-                        else
-                            return b1 != b2 ? m_script.True : m_script.False; 
-                    }
-                } else {
-                    ScriptObject right = ResolveOperand(operate.Right);
-                    if (left is ScriptNull || right is ScriptNull) {
-                        bool ret = false;
-                        if (type == TokenType.Equal)
-                            ret = (left == right);
-                        else if (type == TokenType.NotEqual)
-                            ret = (left != right);
-                        else
-                            throw new ExecutionException(m_script, "nonsupport operate [" + type + "] with null");
-                        return ret ? m_script.True : m_script.False;
-                    }
-                    if (type == TokenType.Equal) {
-                        return left.ObjectValue.Equals(right.ObjectValue) ? m_script.True : m_script.False;
-                    } else if (type == TokenType.NotEqual) {
-                        return !left.ObjectValue.Equals(right.ObjectValue) ? m_script.True : m_script.False;
-                    }
-                    if (left.Type != right.Type)
-                        throw new ExecutionException(m_script, "[operate] left right is not same type");
-                    if (left is ScriptString) {
-                        return ((ScriptString)left).Compare(type, (ScriptString)right) ? m_script.True : m_script.False;
-                    } else if (left is ScriptNumber) {
-                        return ((ScriptNumber)left).Compare(type, (ScriptNumber)right) ? m_script.True : m_script.False;
-                    } else {
-                        throw new ExecutionException(m_script, "nonsupport operate [" + type + "] with " + left.Type);
-                    }
-                }
+                return left.Compute(type, ResolveOperand(operate.Right));
             }
         }
         ScriptObject ParseTernary(CodeTernary ternary)
@@ -549,22 +500,7 @@ namespace Scorpio.Runtime
                 SetVariable(assign.member, ret);
                 return ret;
             } else {
-                ScriptObject obj = GetVariable(assign.member);
-                ScriptString str = obj as ScriptString;
-                if (str != null) {
-                    if (assign.AssignType == TokenType.AssignPlus)
-                        return str.AssignPlus(ResolveOperand(assign.value));
-                    else
-                        throw new ExecutionException(m_script, "string类型只支持[+=]赋值操作");
-                }
-                ScriptNumber num = obj as ScriptNumber;
-                if (num != null) {
-                    ScriptNumber right = ResolveOperand(assign.value) as ScriptNumber;
-                    if (right == null)
-                        throw new ExecutionException(m_script, "[+= -=...]值只能为 number类型");
-                    return num.AssignCompute(assign.AssignType, right);
-                }
-                throw new ExecutionException(m_script, "[+= -=...]左边值只能为number或者string");
+                return GetVariable(assign.member).AssignCompute(assign.AssignType, ResolveOperand(assign.value));
             }
         }
         ScriptObject ParseEval(CodeEval eval)

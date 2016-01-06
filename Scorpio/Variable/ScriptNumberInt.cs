@@ -67,73 +67,7 @@ namespace Scorpio.Variable
         {
             return m_Value;
         }
-        public override ScriptObject Compute(TokenType type, ScriptNumber obj)
-        {
-            switch (type)
-            {
-                case TokenType.Plus:
-                    return Script.CreateInt(m_Value + obj.ToInt32());
-                case TokenType.Minus:
-                    return Script.CreateInt(m_Value - obj.ToInt32());
-                case TokenType.Multiply:
-                    return Script.CreateInt(m_Value * obj.ToInt32());
-                case TokenType.Divide:
-                    return Script.CreateInt(m_Value / obj.ToInt32());
-                case TokenType.Modulo:
-                    return Script.CreateInt(m_Value % obj.ToInt32());
-                case TokenType.InclusiveOr:
-                    return Script.CreateInt(m_Value | obj.ToInt32());
-                case TokenType.Combine:
-                    return Script.CreateInt(m_Value & obj.ToInt32());
-                case TokenType.XOR:
-                    return Script.CreateInt(m_Value ^ obj.ToInt32());
-                case TokenType.Shr:
-                    return Script.CreateInt(m_Value >> obj.ToInt32());
-                case TokenType.Shi:
-                    return Script.CreateInt(m_Value << obj.ToInt32());
-                default:
-                    throw new ExecutionException(Script, "Int不支持的运算符 " + type);
-            }
-        }
-        public override ScriptObject AssignCompute(TokenType type, ScriptNumber obj)
-        {
-            switch (type)
-            {
-                case TokenType.AssignPlus:
-                    m_Value += obj.ToInt32();
-                    return this;
-                case TokenType.AssignMinus:
-                    m_Value -= obj.ToInt32();
-                    return this;
-                case TokenType.AssignMultiply:
-                    m_Value *= obj.ToInt32();
-                    return this;
-                case TokenType.AssignDivide:
-                    m_Value /= obj.ToInt32();
-                    return this;
-                case TokenType.AssignModulo:
-                    m_Value %= obj.ToInt32();
-                    return this;
-                case TokenType.AssignInclusiveOr:
-                    m_Value |= obj.ToInt32();
-                    return this;
-                case TokenType.AssignCombine:
-                    m_Value &= obj.ToInt32();
-                    return this;
-                case TokenType.AssignXOR:
-                    m_Value ^= obj.ToInt32();
-                    return this;
-                case TokenType.AssignShr:
-                    m_Value >>= obj.ToInt32();
-                    return this;
-                case TokenType.AssignShi:
-                    m_Value <<= obj.ToInt32();
-                    return this;
-                default:
-                    throw new ExecutionException(Script, "Int不支持的运算符 " + type);
-            }
-        }
-        public override bool Compare(TokenType type, ScriptNumber num)
+        public override bool Compare(TokenType type, ScriptObject num)
         {
             ScriptNumberInt val = num as ScriptNumberInt;
             if (val == null) throw new ExecutionException(Script, "数字比较 两边的数字类型不一致 请先转换再比较 ");
@@ -151,6 +85,77 @@ namespace Scorpio.Variable
                     throw new ExecutionException(Script, "Int类型 操作符[" + type + "]不支持");
             }
         }
+        public override ScriptObject Compute(TokenType type, ScriptObject obj)
+        {
+            ScriptNumber val = obj as ScriptNumber;
+            if (val == null) throw new ExecutionException(Script, "逻辑计算 右边值必须为数字类型");
+            switch (type)
+            {
+                case TokenType.Plus:
+                    return Script.CreateInt(m_Value + val.ToInt32());
+                case TokenType.Minus:
+                    return Script.CreateInt(m_Value - val.ToInt32());
+                case TokenType.Multiply:
+                    return Script.CreateInt(m_Value * val.ToInt32());
+                case TokenType.Divide:
+                    return Script.CreateInt(m_Value / val.ToInt32());
+                case TokenType.Modulo:
+                    return Script.CreateInt(m_Value % val.ToInt32());
+                case TokenType.InclusiveOr:
+                    return Script.CreateInt(m_Value | val.ToInt32());
+                case TokenType.Combine:
+                    return Script.CreateInt(m_Value & val.ToInt32());
+                case TokenType.XOR:
+                    return Script.CreateInt(m_Value ^ val.ToInt32());
+                case TokenType.Shr:
+                    return Script.CreateInt(m_Value >> val.ToInt32());
+                case TokenType.Shi:
+                    return Script.CreateInt(m_Value << val.ToInt32());
+                default:
+                    throw new ExecutionException(Script, "Int不支持的运算符 " + type);
+            }
+        }
+        public override ScriptObject AssignCompute(TokenType type, ScriptObject obj)
+        {
+            ScriptNumber val = obj as ScriptNumber;
+            if (val == null) throw new ExecutionException(Script, "逻辑计算 右边值必须为数字类型");
+            switch (type)
+            {
+                case TokenType.AssignPlus:
+                    m_Value += val.ToInt32();
+                    return this;
+                case TokenType.AssignMinus:
+                    m_Value -= val.ToInt32();
+                    return this;
+                case TokenType.AssignMultiply:
+                    m_Value *= val.ToInt32();
+                    return this;
+                case TokenType.AssignDivide:
+                    m_Value /= val.ToInt32();
+                    return this;
+                case TokenType.AssignModulo:
+                    m_Value %= val.ToInt32();
+                    return this;
+                case TokenType.AssignInclusiveOr:
+                    m_Value |= val.ToInt32();
+                    return this;
+                case TokenType.AssignCombine:
+                    m_Value &= val.ToInt32();
+                    return this;
+                case TokenType.AssignXOR:
+                    m_Value ^= val.ToInt32();
+                    return this;
+                case TokenType.AssignShr:
+                    m_Value >>= val.ToInt32();
+                    return this;
+                case TokenType.AssignShi:
+                    m_Value <<= val.ToInt32();
+                    return this;
+                default:
+                    throw new ExecutionException(Script, "Int不支持的运算符 " + type);
+            }
+        }
+       
         public override ScriptObject Clone()
         {
             return Script.CreateInt(m_Value);
