@@ -49,8 +49,5 @@ namespace Scorpio
         public override string ToJson() {
             return "\"" + Value + "\"";
         }
-        public override string ToString() {
-            return Value;
-        }
     }
 }

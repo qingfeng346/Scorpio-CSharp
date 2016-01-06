@@ -35,7 +35,7 @@ namespace Scorpio
         public object Call() { return Call(NOPARAMETER); }
         //调用函数
         public virtual object Call(ScriptObject[] parameters) { throw new ExecutionException(Script, "类型[" + Type + "]不支持函数调用 Name:" + Name); }
-        ////两个数值比较 > >= < <=
+        //两个数值比较 > >= < <=
         public virtual bool Compare(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持值比较 Name:" + Name + " type:" + type); }
         //运算符或者位运算 + - * / % | & ^ >> <<
         public virtual ScriptObject Compute(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持运算符 Name:" + Name + " type:" + type); }
@@ -53,7 +53,7 @@ namespace Scorpio
         public override bool Equals(object obj) {                                       
             if (obj == null) return false;
             if (!(obj is ScriptObject)) return false;
-			if (ObjectValue == this) return obj == this;
+            if (obj == this) return true;
 			return ObjectValue.Equals(((ScriptObject)obj).ObjectValue);
         }
         // GetHashCode
