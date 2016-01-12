@@ -20,6 +20,13 @@
 - [x] Windows 10 (Universal Windows Platform)
 - [x] WebGL
 
+## 源码目录说明:
+* **Scorpio** 脚本引擎项目,平常使用只需导入此目录即可
+* **ScorpioDemo** Scorpio例子程序
+* **ScorpioExec** 跟lua.exe一样,命令行调用Scorpio脚本
+* **ScorpioMaker** 把Scorpio脚本序列化成二进制文件,把二进制文件反序列化成文本文件
+* **ScorpioTest** Unity内使用Scorpio脚本例子
+
 ## Unity导入Scorpio-CSharp:
 * 第一种方法(建议) : 把trunk目录下的 Scorpio 文件夹复制到项目 然后删除 文件夹下的 Properties 文件夹和 Scorpio.csproj 文件即可
 * 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下
@@ -65,8 +72,6 @@ CTest.Func()				//调用c#的内部函数 CTest是通过 script.SetObject 函数
 	}
 }
 ```
-
-
 
 ## 上线游戏下载地址 http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩
 * Sweet Sweeper 一款扫雷单机游戏 上线地址:
