@@ -4,7 +4,7 @@
 
 **此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0 兼容所有c#平台 语法类似 javascript**
 * **脚本示例** 放在 [ScorpioDemo/Scripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/ScorpioDemo/Scripts) 目录
-* **语法测试** 可以先在此路径体验 http://sina.fengyuezhu.com/demo/ (必须安装UnityWebPlayer)
+* **语法测试** 可以先在此路径体验 http://sina.fengyuezhu.com/demo/WebPlayer.html (必须安装UnityWebPlayer)
 * **语法测试** 直接运行 **ScorpioDemo/bin/Debug/ScorpioDemo.exe**  左侧选中要测试的脚本,点击 **Run Script** 按钮即可
 * **java版的Scorpio脚本** Scorpio-Java https://github.com/qingfeng346/Scorpio-Java
 * **网络协议生成工具** ScorpioConversion https://github.com/qingfeng346/ScorpioConversion
