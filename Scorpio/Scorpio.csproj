@@ -75,8 +75,10 @@
     <Compile Include="Library\LibraryMath.cs" />
     <Compile Include="ScriptEnum.cs" />
     <Compile Include="Serialize\ScorpioMaker.cs" />
+    <Compile Include="Userdata\BridgeEventInfo.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataDelegate.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataDelegateType.cs" />
+    <Compile Include="Userdata\DefaultScriptUserdataEventInfo.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataObject.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataEnum.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataFactory.cs" />
@@ -105,6 +107,7 @@
     <Compile Include="ScriptTable.cs" />
     <Compile Include="ScriptUserdata.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataObjectType.cs" />
+    <Compile Include="Userdata\UserdataField.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Userdata\UserdataMethod.cs" />
     <Compile Include="Variable\ScorpioMethod.cs" />
