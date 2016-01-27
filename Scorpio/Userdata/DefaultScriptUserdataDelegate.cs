@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Scorpio.Compiler;
 using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
@@ -42,6 +43,21 @@ namespace Scorpio.Userdata
                 }
             }
             return m_Delegate.DynamicInvoke(m_Objects);
+        }
+        public override ScriptObject Compute(TokenType type, ScriptObject obj)
+        {
+            switch (type) {
+                case TokenType.Plus:
+                    return Script.CreateObject(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(Script, obj, ValueType)));
+                case TokenType.Minus:
+                    return Script.CreateObject(Delegate.Remove(m_Delegate, (Delegate)Util.ChangeType(Script, obj, ValueType)));
+                default:
+                    throw new ExecutionException(Script, "Delegate 不支持的运算符 " + type);
+            }
+        }
+        public override ScriptObject GetValue(object key) {
+            if (!(key is string) || !key.Equals("Type")) throw new ExecutionException(Script, "EventInfo GetValue只支持 Type 一个变量");
+            return Script.CreateObject(ValueType);
         }
     }
 }

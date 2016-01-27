@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using Scorpio;
@@ -52,6 +53,8 @@ namespace Scorpio.Userdata
             }
             if (obj is Delegate)
                 return new DefaultScriptUserdataDelegate(script, (Delegate)obj);
+            else if (obj is BridgeEventInfo)
+                return new DefaultScriptUserdataEventInfo(script, (BridgeEventInfo)obj);
             return new DefaultScriptUserdataObject(script, obj, GetScorpioType(obj.GetType()));
         }
     }

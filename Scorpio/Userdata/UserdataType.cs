@@ -10,47 +10,6 @@ namespace Scorpio.Userdata
     /// <summary> 保存一个类的所有元素 </summary>
     public class UserdataType
     {
-        private class UserdataField
-        {
-            private Script m_Script;
-            public string Name;
-            public Type FieldType;
-            private FieldInfo m_Field;
-            private MethodInfo m_GetMethod;
-            private MethodInfo m_SetMethod;
-            public UserdataField(Script script, FieldInfo info)
-            {
-                m_Script = script;
-                m_Field = info;
-                Name = info.Name;
-                FieldType = info.FieldType;
-            }
-            public UserdataField(Script script, PropertyInfo info)
-            {
-                m_Script = script;
-                m_GetMethod = info.GetGetMethod();
-                m_SetMethod = info.GetSetMethod();
-                Name = info.Name;
-                FieldType = info.PropertyType;
-            }
-            public object GetValue(object obj)
-            {
-                if (m_Field != null)
-                    return m_Field.GetValue(obj);
-                else if (m_GetMethod != null)
-                    return m_GetMethod.Invoke(obj, null);
-                throw new ExecutionException(m_Script, "变量 [" + Name + "] 不支持GetValue");
-            }
-            public void SetValue(object obj, object val)
-            {
-                if (m_Field != null)
-                    m_Field.SetValue(obj, val);
-                else if (m_SetMethod != null)
-                    m_SetMethod.Invoke(obj, new object[] { val });
-                else
-                    throw new ExecutionException(m_Script, "变量 [" + Name + "] 不支持SetValue");
-            }
-        }
         private Script m_Script;                                        //脚本系统
         private Type m_Type;                                            //类型
         private bool m_InitializeConstructor;                           //是否初始化过所有构造函数
@@ -113,6 +72,8 @@ namespace Scorpio.Userdata
             if (fInfo != null) return m_FieldInfos[name] = new UserdataField(m_Script, fInfo);
             PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
             if (pInfo != null) return m_FieldInfos[name] = new UserdataField(m_Script, pInfo);
+            EventInfo eInfo = m_Type.GetEvent(name);
+            if (eInfo != null) return m_FieldInfos[name] = new UserdataField(m_Script, eInfo);
             return null;
         }
         /// <summary> 创建一个实例 </summary>
@@ -148,7 +109,7 @@ namespace Scorpio.Userdata
             try {
                 field.SetValue(obj, Util.ChangeType(m_Script, value, field.FieldType));
             } catch (System.Exception e) {
-                throw new ExecutionException(m_Script, "不能从源类型:" + (value == null || value.IsNull ? "null" : value.ObjectValue.GetType().Name) + " 转换成目标类型:" + field.FieldType.Name + " : " + e.ToString());
+                throw new ExecutionException(m_Script, "SetValue 出错 源类型:" + (value == null || value.IsNull ? "null" : value.ObjectValue.GetType().Name) + " 目标类型:" + field.FieldType.Name + " : " + e.ToString());
             }
         }
     }
