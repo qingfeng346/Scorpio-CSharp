@@ -91,6 +91,12 @@ CTest.Func()				//调用c#的内部函数 CTest是通过 script.SetObject 函数
 ## master版本已知问题 ##
 
 ## master版本更新和修改内容 ##
+(2016-1-27)
+* string库增加split函数
+* Delegate类型增加 + - 操作
+* event类型增加 += -= 操作
+* Delegate类型和event类型可是用 变量.Type 获取Delegate类型
+
 (2016-1-6)
 -----------
 * 优化运算符,逻辑运算,赋值运算的逻辑
