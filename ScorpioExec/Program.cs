@@ -10,6 +10,16 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 namespace ScorpioExec
 {
+    public delegate void HttpProcessListener(string error, byte[] bytes);
+    public class Test
+    {
+        public static int a = 0;
+        public static event HttpProcessListener listener;
+        public static void Call()
+        {
+            listener("", null);
+        }
+    }
     public class Program
     {
         public static string CurrentDirectory { get { return AppDomain.CurrentDomain.BaseDirectory; } }
