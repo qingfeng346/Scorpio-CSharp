@@ -22,6 +22,7 @@ namespace Scorpio.Library
             Table.SetValue("startswith", script.CreateFunction(new startswith()));
             Table.SetValue("endswith", script.CreateFunction(new endswith()));
             Table.SetValue("contains", script.CreateFunction(new contains()));
+            Table.SetValue("split", script.CreateFunction(new split(script)));
             script.SetObjectInternal("string", Table);
         }
         const string DELIM_STR = "{}";
@@ -160,6 +161,24 @@ namespace Scorpio.Library
             public object Call(ScriptObject[] args)
             {
                 return (args[0] as ScriptString).Value.Contains((args[1] as ScriptString).Value);
+            }
+        }
+        private class split : ScorpioHandle
+        {
+            private Script m_script;
+            public split(Script script) {
+                this.m_script = script;
+            }
+            public object Call(ScriptObject[] args)
+            {
+                string str = (args[0] as ScriptString).Value;
+                string tko = (args[1] as ScriptString).Value;
+                string[] strs = str.Split(tko.ToCharArray());
+                ScriptArray ret = m_script.CreateArray();
+                foreach (string s in strs) {
+                    ret.Add(m_script.CreateString(s));
+                }
+                return ret;
             }
         }
     }
