@@ -74,14 +74,16 @@ CTest.Func()				//调用c#的内部函数 CTest是通过 script.SetObject 函数
 }
 ```
 
-## 上线游戏下载地址 http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩
+## showcase ##
+* 已经上线游戏下载地址 http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩,游戏上线在GooglePlay,国内不能下载的请在网盘下载
 * Sweet Sweeper 一款扫雷单机游戏 上线地址:
     * Google Play https://play.google.com/store/apps/details?id=com.Toydog.Minesweeper
     * AppStore https://itunes.apple.com/us/app/sweet-sweeper/id1049666778?l=zh&ls=1&mt=8
-* Agile Man 是男人就下100层 上线地址:
-	* Android http://www.anzhi.com/soft_2462148.html
 * 地下城扫雷 上线地址:
 	* Google Play https://play.google.com/store/apps/details?id=com.Toydog.DungeonSweeper
+* Agile Man 是男人就下100层 上线地址:
+	* Android http://www.anzhi.com/soft_2462148.html
+
 	
 	
 ## 脚本内使用的宏定义说明:
