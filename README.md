@@ -82,7 +82,8 @@ CTest.Func()				//调用c#的内部函数 CTest是通过 script.SetObject 函数
 * 地下城扫雷 上线地址:
 	* Google Play https://play.google.com/store/apps/details?id=com.Toydog.DungeonSweeper
 * Agile Man 是男人就下100层 上线地址:
-	* Android http://www.anzhi.com/soft_2462148.html
+	* 安智市场 http://www.anzhi.com/soft_2529640.html
+	* Google Play https://play.google.com/store/apps/details?id=com.Toydog.AgileMan
 
 	
 	
