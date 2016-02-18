@@ -84,6 +84,7 @@ CTest.Func()				//调用c#的内部函数 CTest是通过 script.SetObject 函数
 * Agile Man 是男人就下100层 上线地址:
 	* 安智市场 http://www.anzhi.com/soft_2529640.html
 	* Google Play https://play.google.com/store/apps/details?id=com.Toydog.AgileMan
+	* Windows 10 (UWP) https://www.microsoft.com/zh-cn/store/games/agile-man/9nblggh68b51
 
 	
 	
