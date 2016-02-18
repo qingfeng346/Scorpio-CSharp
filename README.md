@@ -92,8 +92,13 @@ CTest.Func()				//调用c#的内部函数 CTest是通过 script.SetObject 函数
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类
 
 ## master版本已知问题 ##
+* UWP平台master配置下generic_method函数会出问题
 
 ## master版本更新和修改内容 ##
+(2016-2-18)
+* 修复UWP平台master配置下枚举类型会出错的BUG
+* IScriptExtensions 改为 保存在 ScriptExtensions 类的 静态变量
+
 (2016-1-27)
 * string库增加split函数
 * Delegate类型增加 + - 操作
