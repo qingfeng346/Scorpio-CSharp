@@ -176,7 +176,7 @@ namespace Scorpio.Library
             }
             public object Call(ScriptObject[] args) {
                 for (int i = 0; i < args.Length; ++i) {
-                    m_script.GetExtensions().print(args[i].ToString());
+                    ScriptExtensions.print(args[i].ToString());
                 }
                 return null;
             }

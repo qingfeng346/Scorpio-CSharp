@@ -14,9 +14,10 @@ namespace Scorpio.Userdata
             this.Value = value;
             this.ValueType = value;
             m_Enums = new Dictionary<string, ScriptEnum>();
-            Array values = Enum.GetValues(ValueType);
-            foreach (var v in values) {
-                m_Enums[v.ToString()] = script.CreateEnum(v);
+            //此处获取枚举列表不能使用 Enum.GetValues 此函数在UWP平台下的master模式会报错
+            string[] names = Enum.GetNames(ValueType);
+            foreach (var name in names) {
+                m_Enums[name] = script.CreateEnum(Enum.Parse(ValueType, name));
             }
         }
         public override object Call(ScriptObject[] parameters)

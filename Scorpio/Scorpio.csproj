@@ -74,6 +74,7 @@
     <Compile Include="Library\LibraryJson.cs" />
     <Compile Include="Library\LibraryMath.cs" />
     <Compile Include="ScriptEnum.cs" />
+    <Compile Include="ScriptExtensions.cs" />
     <Compile Include="Serialize\ScorpioMaker.cs" />
     <Compile Include="Userdata\BridgeEventInfo.cs" />
     <Compile Include="Userdata\DefaultScriptUserdataDelegate.cs" />

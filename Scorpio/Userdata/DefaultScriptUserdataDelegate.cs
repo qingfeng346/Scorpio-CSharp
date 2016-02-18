@@ -22,7 +22,7 @@ namespace Scorpio.Userdata
             this.m_Delegate = value;
             this.Value = value;
             this.ValueType = value.GetType();
-            var method = script.GetExtensions().GetMethodInfo(m_Delegate);
+            var method = ScriptExtensions.GetMethodInfo(m_Delegate);
             var infos = method.GetParameters();
             var dynamicDelegate = method.Name.Equals(Script.DynamicDelegateName);
             int length = dynamicDelegate ? infos.Length - 1 : infos.Length;

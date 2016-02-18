@@ -54,11 +54,11 @@ namespace Scorpio.Serialize
                 }
             }
             byte[] ret = stream.ToArray();
-#if SCORPIO_UWP
             stream.Dispose();
+#if SCORPIO_UWP && !UNITY_EDITOR
+            writer.Dispose();
 #else
             writer.Close();
-            stream.Close();
 #endif
             return ret;
         }

@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using System.Reflection;
 using System.IO;
 using Scorpio;
 using Scorpio.Variable;
@@ -61,17 +61,7 @@ namespace Scorpio
                     type == TYPE_DECIMAL || type == TYPE_LONG);
         }
         public static bool IsEnum(Type type) {
-#if !SCORPIO_UWP
-            return type.IsEnum;
-#else
-//windows 10 没找到判断枚举的函数  所以用了很挫的方式
-            try {
-                Enum.GetValues(type);
-                return true;
-            } catch (System.Exception) {
-                return false;
-            }
-#endif
+            return ScriptExtensions.IsEnum(type);
         }
         public static bool IsDelegateType(Type type)
         {

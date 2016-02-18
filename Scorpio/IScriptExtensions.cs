@@ -10,5 +10,6 @@ namespace Scorpio
         Assembly GetAssembly(Type type);
         MethodInfo GetMethodInfo(Delegate del);
         byte[] GetFileBuffer(string file);
+        bool IsEnum(Type type);
     }
 }
