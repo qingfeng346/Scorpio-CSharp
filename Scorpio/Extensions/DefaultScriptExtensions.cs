@@ -1,11 +1,12 @@
-﻿using System;
+﻿#if SCORPIO_UWP && !UNITY_EDITOR
+#define UWP
+#endif
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-#if SCORPIO_UWP && !UNITY_EDITOR
-#define UWP
-#endif
 
 namespace Scorpio.Extensions
 {
