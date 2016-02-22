@@ -118,7 +118,7 @@ namespace Scorpio.Variable
         public override ScriptObject AssignCompute(TokenType type, ScriptObject obj)
         {
             ScriptNumber val = obj as ScriptNumber;
-            if (val == null) throw new ExecutionException(Script, "逻辑计算 右边值必须为数字类型");
+            if (val == null) throw new ExecutionException(Script, "赋值逻辑计算 右边值必须为数字类型");
             switch (type)
             {
                 case TokenType.AssignPlus:

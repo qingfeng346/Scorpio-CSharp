@@ -14,19 +14,19 @@ namespace Scorpio
         public override ScriptObject GetValue(object index)
         {
             if (!(index is double || index is int || index is long))
-                throw new ExecutionException(Script, "Array GetValue只支持Number类型 name = " + Name + " index = " + index);
+                throw new ExecutionException(Script, "Array GetValue只支持Number类型 index值为:" + index);
             int i = Util.ToInt32(index);
             if (i < 0 || i >= m_listObject.Count)
-                throw new ExecutionException(Script, "Array GetValue索引小于0或者超过最大值 name = " + Name + " index = " + index);
+                throw new ExecutionException(Script, "Array GetValue索引小于0或者超过最大值 index值为:" + index + " count为:" + m_listObject.Count);
             return m_listObject[i];
         }
         public override void SetValue(object index, ScriptObject obj)
         {
             if (!(index is double || index is int || index is long))
-                throw new ExecutionException(Script, "Array SetValue只支持Number类型 name = " + Name + " index = " + index);
+                throw new ExecutionException(Script, "Array SetValue只支持Number类型 index值为:" + index);
             int i = Util.ToInt32(index);
             if (i < 0 || i >= m_listObject.Count)
-                throw new ExecutionException(Script, "Array SetValue索引小于0或者超过最大值 name = " + Name + " index = " + index);
+                throw new ExecutionException(Script, "Array SetValue索引小于0或者超过最大值 index值为:" + index + " count为:" + m_listObject.Count);
             m_listObject[i] = obj;
         }
         public void Add(ScriptObject obj)

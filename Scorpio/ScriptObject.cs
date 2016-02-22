@@ -28,19 +28,19 @@ namespace Scorpio
         // 赋值
         public virtual ScriptObject Assign() { return this; }                           
         //设置变量
-        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException(Script, "类型[" + Type + "]不支持设置变量 Name:" + Name + " key:" + key); }
+        public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException(Script, "类型[" + Type + "]不支持设置变量"); }
         //获取变量
-        public virtual ScriptObject GetValue(object key) { throw new ExecutionException(Script, "类型[" + Type + "]不支持获取变量 Name:" + Name + " key:" + key); }
+        public virtual ScriptObject GetValue(object key) { throw new ExecutionException(Script, "类型[" + Type + "]不支持获取变量"); }
         //调用无参函数
         public object Call() { return Call(NOPARAMETER); }
         //调用函数
-        public virtual object Call(ScriptObject[] parameters) { throw new ExecutionException(Script, "类型[" + Type + "]不支持函数调用 Name:" + Name); }
+        public virtual object Call(ScriptObject[] parameters) { throw new ExecutionException(Script, "类型[" + Type + "]不支持函数调用"); }
         //两个数值比较 > >= < <=
-        public virtual bool Compare(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持值比较 Name:" + Name + " type:" + type); }
+        public virtual bool Compare(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持值比较"); }
         //运算符或者位运算 + - * / % | & ^ >> <<
-        public virtual ScriptObject Compute(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持运算符 Name:" + Name + " type:" + type); }
+        public virtual ScriptObject Compute(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持运算符"); }
         //运算符或者位运算赋值运算 += -= *= /= %= |= &= ^= >>= <<=
-        public virtual ScriptObject AssignCompute(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持赋值运算符 Name:" + Name + " type:" + type); }
+        public virtual ScriptObject AssignCompute(TokenType type, ScriptObject obj) { throw new ExecutionException(Script, "类型[" + Type + "]不支持赋值运算符"); }
         //逻辑运算符 逻辑运算时 Object 算 true 或者 false
         public virtual bool LogicOperation() { return true; }
         // 复制一个变量

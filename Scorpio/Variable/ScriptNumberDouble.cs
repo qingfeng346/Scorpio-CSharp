@@ -69,7 +69,7 @@ namespace Scorpio.Variable
         public override bool Compare(TokenType type, ScriptObject obj)
         {
             ScriptNumberDouble val = obj as ScriptNumberDouble;
-            if (val == null) throw new ExecutionException(Script, "数字比较 两边的数字类型不一致 请先转换再比较 ");
+            if (val == null) throw new ExecutionException(Script, "数字比较 两边的数字类型不一致 请先转换再比较");
             switch (type) {
                 case TokenType.Greater:
                     return m_Value > val.m_Value;
@@ -105,7 +105,7 @@ namespace Scorpio.Variable
         public override ScriptObject AssignCompute(TokenType type, ScriptObject obj)
         {
             ScriptNumber val = obj as ScriptNumber;
-            if (val == null) throw new ExecutionException(Script, "逻辑计算 右边值必须为数字类型");
+            if (val == null) throw new ExecutionException(Script, "赋值逻辑计算 右边值必须为数字类型");
             switch (type) {
                 case TokenType.AssignPlus:
                     m_Value += val.ToDouble();

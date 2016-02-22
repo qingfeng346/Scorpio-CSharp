@@ -74,11 +74,11 @@ namespace Scorpio
             }
         }
         public override void SetValue(object key, ScriptObject value) {
-            if (!(key is string)) throw new ExecutionException(this.Script, "Function SetValue只支持String类型 key = " + key);
+            if (!(key is string)) throw new ExecutionException(this.Script, "Function SetValue只支持String类型 key值为:" + key);
             m_stackObject[(string)key] = value;
         }
         public override ScriptObject GetValue(object key) {
-            if (!(key is string)) throw new ExecutionException(this.Script, "Function GetValue只支持String类型 key = " + key);
+            if (!(key is string)) throw new ExecutionException(this.Script, "Function GetValue只支持String类型 key值为:" + key);
             string skey = (string)key;
             return m_stackObject.ContainsKey(skey) ? m_stackObject[skey] : Script.Null;
         }
