@@ -330,13 +330,12 @@ namespace Scorpio.Compiler
             ret.Condition = GetObject();
             ReadRightParenthesis();
             ReadLeftBrace();
-            for (; ; )
-            {
+            for (; ; ) {
                 Token token = ReadToken();
                 if (token.Type == TokenType.Case) {
-                    List<object> vals = new List<object>();
-                    ParseCase(vals);
-                    ret.AddCase(new TempCase(m_script, vals, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break), Executable_Block.Switch));
+                    List<CodeObject> allow = new List<CodeObject>();
+                    ParseCase(allow);
+                    ret.AddCase(new TempCase(m_script, allow, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break), Executable_Block.Switch));
                 } else if (token.Type == TokenType.Default) {
                     ReadColon();
                     ret.Default = new TempCase(m_script, null, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break), Executable_Block.Switch);
@@ -349,16 +348,12 @@ namespace Scorpio.Compiler
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_SWITCH, ret));
         }
         //解析case
-        private void ParseCase(List<object> vals)
+        private void ParseCase(List<CodeObject> allow)
         {
-            Token token = ReadToken();
-            if (token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number)
-                vals.Add(token.Lexeme);
-            else
-                throw new ParserException("case 语句 只支持 string和number类型", token);
+            allow.Add(GetObject());
             ReadColon();
             if (ReadToken().Type == TokenType.Case) {
-                ParseCase(vals);
+                ParseCase(allow);
             } else {
                 UndoToken();
             }

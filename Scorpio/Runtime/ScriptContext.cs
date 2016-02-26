@@ -291,8 +291,8 @@ namespace Scorpio.Runtime
             ScriptObject obj = ResolveOperand(code.Condition);
             bool exec = false;
             foreach (TempCase c in code.Cases) {
-                foreach (object a in c.Allow) {
-                    if (a.Equals(obj.ObjectValue)) {
+                foreach (CodeObject all in c.Allow) {
+                    if (ResolveOperand(all).Equals(obj)) {
                         exec = true;
                         ScriptContext context = c.GetContext();
                         context.Initialize(this);
@@ -300,6 +300,7 @@ namespace Scorpio.Runtime
                         break;
                     }
                 }
+                if (exec) { break; }
             }
             if (exec == false && code.Default != null) {
                 ScriptContext context = code.Default.GetContext();
