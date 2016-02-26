@@ -2,13 +2,13 @@
 * author : while
 * QQ群 : 245199668 [加群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 * 国内用户如果网比较慢可以在此链接下载 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
+* Sco脚本的Java实现 : https://github.com/qingfeng346/Scorpio-Java
+* 协议,Excel表数据转换工具 : https://github.com/qingfeng346/ScorpioConversion
 
 ## 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0 兼容所有c#平台 语法类似 javascript
 * **脚本示例** 放在 [ScorpioDemo/Scripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/ScorpioDemo/Scripts) 目录
 * **语法测试** 可以先在此路径体验 http://sina.fengyuezhu.com/demo/WebPlayer.html (必须安装UnityWebPlayer)
 * **语法测试** 直接运行 **ScorpioDemo/bin/Debug/ScorpioDemo.exe**  左侧选中要测试的脚本,点击 **Run Script** 按钮即可
-* **java版的Scorpio脚本** Scorpio-Java https://github.com/qingfeng346/Scorpio-Java
-* **网络协议生成工具** ScorpioConversion https://github.com/qingfeng346/ScorpioConversion
 * **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
 ## Unity3d发布平台支持(亲测):
