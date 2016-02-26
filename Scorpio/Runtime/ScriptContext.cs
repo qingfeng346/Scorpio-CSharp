@@ -40,7 +40,7 @@ namespace Scorpio.Runtime
             m_parent = parent;
             m_variableDictionary.Clear();
             foreach (var pair in variable)
-                m_variableDictionary[pair.Key] = pair.Value.Assign();
+                m_variableDictionary[pair.Key] = pair.Value;
         }
         private void Initialize(ScriptContext parent, string name, ScriptObject obj)
         {
@@ -206,7 +206,7 @@ namespace Scorpio.Runtime
                     if (!Condition.Value) break;
                 }
                 ScriptContext blockContext = code.GetBlockContext();
-                blockContext.Initialize(context, context.m_variableDictionary);
+                blockContext.Initialize(context);
                 blockContext.Execute();
                 if (blockContext.IsOver) break;
                 context.Execute(code.LoopExecutable);
@@ -229,11 +229,9 @@ namespace Scorpio.Runtime
             } else {
                 step = 1;
             }
-            var variables = new Dictionary<String, ScriptObject>();
             for (int i = begin; i <= finished; i += step) {
                 ScriptContext context = code.GetBlockContext();
-                variables[code.Identifier] = m_script.CreateNumber(i);
-                context.Initialize(this, variables);
+                context.Initialize(this, code.Identifier, m_script.CreateNumber(i));
                 context.Execute();
                 if (context.IsOver) break;
             }
