@@ -56,7 +56,7 @@ namespace Scorpio.Runtime
         //初始化所有数据 每次调用 Execute 调用
         private void Reset()
         {
-            m_returnObject = null;
+            m_returnObject = m_script.Null;
             m_Over = false;
             m_Break = false;
             m_Continue = false;
