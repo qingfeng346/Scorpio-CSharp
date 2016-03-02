@@ -240,11 +240,13 @@ namespace Scorpio.Runtime
         {
             CodeForeach code = (CodeForeach)m_scriptInstruction.Operand0;
             ScriptObject loop = ResolveOperand(code.LoopObject);
-            if (!loop.IsFunction) throw new ExecutionException(m_script, "foreach函数必须返回一个ScriptFunction");
+            if (!(loop is ScriptFunction)) throw new ExecutionException(m_script, "foreach函数必须返回一个ScriptFunction");
             ScriptObject obj;
+            ScriptContext context;
+            ScriptFunction func = (ScriptFunction)loop;
             for ( ; ; ) {
-                ScriptContext context = code.GetBlockContext();
-                obj = m_script.CreateObject(((ScriptFunction)loop).Call());
+                context = code.GetBlockContext();
+                obj = m_script.CreateObject(func.Call());
                 if (obj == null || obj is ScriptNull) return;
                 context.Initialize(this, code.Identifier, obj);
                 context.Execute();
