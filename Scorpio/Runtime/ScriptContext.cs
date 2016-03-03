@@ -198,12 +198,9 @@ namespace Scorpio.Runtime
             ScriptContext context = code.GetContext();
             context.Initialize(this);
             context.Execute(code.BeginExecutable);
-            ScriptBoolean Condition;
             for ( ; ; ) {
                 if (code.Condition != null) {
-                    Condition = context.ResolveOperand(code.Condition) as ScriptBoolean;
-                    if (Condition == null) throw new ExecutionException(m_script, "for 跳出条件必须是一个bool型");
-                    if (!Condition.Value) break;
+                    if (!context.ResolveOperand(code.Condition).LogicOperation()) break;
                 }
                 ScriptContext blockContext = code.GetBlockContext();
                 blockContext.Initialize(context);
@@ -476,10 +473,10 @@ namespace Scorpio.Runtime
                 if (left is ScriptString || right is ScriptString) { return m_script.CreateString(left.ToString() + right.ToString()); }
                 return left.Compute(type, right);
             } else if (type == TokenType.And) {
-                if (left.LogicOperation() == false) return m_script.False;
+                if (!left.LogicOperation()) return m_script.False;
                 return m_script.GetBoolean(ResolveOperand(operate.Right).LogicOperation());
             } else if (type == TokenType.Or) {
-                if (left.LogicOperation() == true) return m_script.True;
+                if (left.LogicOperation()) return m_script.True;
                 return m_script.GetBoolean(ResolveOperand(operate.Right).LogicOperation());
             } else if (type == TokenType.Equal) {
                 return m_script.GetBoolean(left.Equals(ResolveOperand(operate.Right)));
@@ -493,9 +490,7 @@ namespace Scorpio.Runtime
         }
         ScriptObject ParseTernary(CodeTernary ternary)
         {
-            ScriptBoolean b = ResolveOperand(ternary.Allow) as ScriptBoolean;
-            if (b == null) throw new ExecutionException(m_script, "三目运算符 条件必须是一个bool型");
-            return b.Value ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
+            return ResolveOperand(ternary.Allow).LogicOperation() ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
         }
         ScriptObject ParseAssign(CodeAssign assign)
         {
