@@ -56,7 +56,7 @@ namespace Scorpio.Runtime
         //初始化所有数据 每次调用 Execute 调用
         private void Reset()
         {
-            m_returnObject = m_script.Null;
+            m_returnObject = null;
             m_Over = false;
             m_Break = false;
             m_Continue = false;
@@ -241,14 +241,14 @@ namespace Scorpio.Runtime
             CodeForeach code = (CodeForeach)m_scriptInstruction.Operand0;
             ScriptObject loop = ResolveOperand(code.LoopObject);
             if (!(loop is ScriptFunction)) throw new ExecutionException(m_script, "foreach函数必须返回一个ScriptFunction");
-            ScriptObject obj;
+            object obj;
             ScriptContext context;
             ScriptFunction func = (ScriptFunction)loop;
             for ( ; ; ) {
                 context = code.GetBlockContext();
-                obj = m_script.CreateObject(func.Call());
-                if (obj == null || obj is ScriptNull) return;
-                context.Initialize(this, code.Identifier, obj);
+                obj = func.Call();
+                if (obj == null) return;
+                context.Initialize(this, code.Identifier, m_script.CreateObject(obj));
                 context.Execute();
                 if (context.IsOver) break;
             }
@@ -334,7 +334,10 @@ namespace Scorpio.Runtime
         }
         void ProcessRet()
         {
-            InvokeReturnValue(ResolveOperand(m_scriptInstruction.Operand0));
+            if (m_scriptInstruction.Operand0 == null)
+                InvokeReturnValue(null);
+            else
+                InvokeReturnValue(ResolveOperand(m_scriptInstruction.Operand0));
         }
         void ProcessResolve()
         {

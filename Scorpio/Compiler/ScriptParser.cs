@@ -384,7 +384,7 @@ namespace Scorpio.Compiler
             if (peek.Type == TokenType.RightBrace ||
                 peek.Type == TokenType.SemiColon ||
                 peek.Type == TokenType.Finished)
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, new CodeScriptObject(m_script, null, m_strBreviary, peek.SourceLine)));
+                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, null));
             else
                 m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
         }
