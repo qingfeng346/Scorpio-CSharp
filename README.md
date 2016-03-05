@@ -32,45 +32,45 @@
 * 第一种方法(建议) : 把trunk目录下的 Scorpio 文件夹复制到项目 然后删除 文件夹下的 Properties 文件夹和 Scorpio.csproj 文件即可
 * 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下
 
-## Scorpio脚本Hello World函数:
+## Scorpio脚本Hello World函数 (c#控制台项目):
 ```c#
-using UnityEngine;
-using System.Collections;
+using System;
 using Scorpio;
-namespace MySpace {
+namespace HelloWorld {
 	public class Test {
 		private int a = 100;
 		public Test(int a) {
 			this.a = a;
 		}
 		public void Func() {
-			Debug.Log("Func " + a);
+			Console.WriteLine("Func " + a);
 		}
 		public static void StaticFunc() {
-			Debug.Log("StaticFunc");
+			Console.WriteLine("StaticFunc");
+		}
+	}
+	class MainClass {
+		public static void Main (string[] args)
+		{
+			Script script = new Script();       //new一个Script对象
+			script.LoadLibrary();                               //加载所有Scorpio的库，源码在Library目录下
+			script.PushAssembly(typeof(MainClass).Assembly);            //添加当前程序的程序集
+			script.SetObject("CTest", script.CreateObject(new Test(300)));  //SetObject可以设置一个c#对象到脚本里
+			//LoadString 解析一段字符串,LoadString传入的参数就是热更新的文本文件内容
+			script.LoadString(@"
+print(""hello world"")
+");
+			//Scorpio脚本调用c#函数
+			script.LoadString(@"
+MyTest = import_type(""HelloWorld.Test"")      //import_type 要写入类的全路径 要加上命名空间 否则找不到此类,然后赋值给 MyTest 对象
+MyTest.StaticFunc()         //调用c#类的静态函数
+var t = MyTest(200)         //new 一个Test对象, 括号里面是构造函数的参数
+t.Func()                    //调用c#的内部函数
+CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetObject 函数设置
+");
 		}
 	}
 }
-public class NewBehaviourScript : MonoBehaviour {
-	Script script = new Script();		//new一个Script对象
-	void Awake() {
-		script.LoadLibrary();								//加载所有Scorpio的库，源码在Library目录下
-		script.PushAssembly(GetType().Assembly);			//添加当前程序的程序集
-		script.PushAssembly(typeof(GameObject).Assembly);	//添加UnityEngine的程序集 (如果不调用此函数, 在调用import_type函数时会找不到 UnityEngine程序集里面的类)
-		script.SetObject("CTest", script.CreateObject(new MySpace.Test(300)));	//SetObject可以设置一个c#对象到脚本里
-		//LoadString 解析一段字符串,LoadString传入的参数就是热更新的文本文件内容
-		script.LoadString(@"
-print(""hello world"")
-");
-		//Scorpio脚本调用c#函数
-		script.LoadString(@"
-MyTest = import_type(""MySpace.Test"")		//import_type 要写入类的全路径 要加上命名空间 否则找不到此类,然后赋值给 MyTest 对象
-MyTest.StaticFunc()			//调用c#类的静态函数
-var t = MyTest(200)			//new 一个Test对象, 括号里面是构造函数的参数
-t.Func()					//调用c#的内部函数
-CTest.Func()				//调用c#的内部函数 CTest是通过 script.SetObject 函数设置
-");
-	}
 }
 ```
 
