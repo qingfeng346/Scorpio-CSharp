@@ -87,13 +87,6 @@ namespace Scorpio
                 m_ParentContext = context;
             return this;
         }
-        public object call(params object[] args) {
-            int length = args.Length;
-            ScriptObject[] parameters = new ScriptObject[length];
-            for (int i = 0; i < length; ++i)
-                parameters[i] = Script.CreateObject(args[i]);
-            return Call(parameters);
-        }
         public override object Call(ScriptObject[] parameters) {
             if (FunctionType == FunstionType.Script) {
                 return m_ScriptFunction.Call(m_ParentContext, m_stackObject, parameters);

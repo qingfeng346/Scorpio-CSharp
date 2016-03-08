@@ -31,6 +31,13 @@ namespace Scorpio
         public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException(Script, "类型[" + Type + "]不支持设置变量"); }
         //获取变量
         public virtual ScriptObject GetValue(object key) { throw new ExecutionException(Script, "类型[" + Type + "]不支持获取变量"); }
+        public object call(params object[] args)
+        {
+            int length = args.Length;
+            ScriptObject[] parameters = new ScriptObject[length];
+            for (int i = 0; i < length; ++i) parameters[i] = Script.CreateObject(args[i]);
+            return Call(parameters);
+        }
         //调用无参函数
         public object Call() { return Call(NOPARAMETER); }
         //调用函数
