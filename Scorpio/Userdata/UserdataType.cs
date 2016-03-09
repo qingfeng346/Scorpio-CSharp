@@ -83,6 +83,7 @@ namespace Scorpio.Userdata
             InitializeConstructor();
             return m_Constructor.Call(null, parameters);
         }
+        /// <summary> 获得运算符重载的函数 </summary>
         public UserdataMethod GetComputeMethod(TokenType type)
         {
             switch (type)
