@@ -5,6 +5,7 @@ using System.Text;
 using Scorpio;
 using Scorpio.Exception;
 using Scorpio.Variable;
+using Scorpio.Compiler;
 namespace Scorpio.Userdata
 {
     /// <summary> 保存一个类的所有元素 </summary>
@@ -81,6 +82,17 @@ namespace Scorpio.Userdata
         {
             InitializeConstructor();
             return m_Constructor.Call(null, parameters);
+        }
+        public UserdataMethod GetComputeMethod(TokenType type)
+        {
+            switch (type)
+            {
+                case TokenType.Plus: return GetMethod("op_Addition");
+                case TokenType.Minus: return GetMethod("op_Subtraction");
+                case TokenType.Multiply: return GetMethod("op_Multiply");
+                case TokenType.Divide: return GetMethod("op_Division");
+                default: return null;
+            }
         }
         /// <summary> 获得一个类变量 </summary>
         public object GetValue(object obj, string name)

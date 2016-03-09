@@ -5,6 +5,8 @@ using System.Reflection;
 using Scorpio;
 using Scorpio.Variable;
 using Scorpio.Exception;
+using Scorpio.Compiler;
+
 namespace Scorpio.Userdata
 {
     /// <summary> 普通Object类型 </summary>
@@ -26,6 +28,12 @@ namespace Scorpio.Userdata
         {
             if (!(key is string)) throw new ExecutionException(Script, "Object SetValue只支持String类型");
             m_Type.SetValue(Value, (string)key, value);
+        }
+        public override ScriptObject Compute(TokenType type, ScriptObject obj)
+        {
+            UserdataMethod method = m_Type.GetComputeMethod(type);
+            if (method == null) throw new ExecutionException(Script, "找不到运算符重载 " + type);
+            return Script.CreateObject (method.Call(null, new ScriptObject[] { this, obj }));
         }
     }
 }

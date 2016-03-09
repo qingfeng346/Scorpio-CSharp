@@ -10,14 +10,81 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 namespace ScorpioExec
 {
-    public delegate void HttpProcessListener(string error, byte[] bytes);
-    public class Test
+    public class Vector3
     {
-        public static int a = 0;
-        public static event HttpProcessListener listener;
-        public static void Call()
+        //
+        // Fields
+        //
+        public float z;
+
+        public float y;
+
+        public float x;
+
+        //
+        // Constructors
+        //
+        public Vector3(float x, float y)
         {
-            listener("", null);
+            this.x = x;
+            this.y = y;
+            this.z = 0f;
+        }
+
+        public Vector3(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+        public override bool Equals(object other)
+        {
+            if (!(other is Vector3))
+            {
+                return false;
+            }
+            Vector3 vector = (Vector3)other;
+            return this.x.Equals(vector.x) && this.y.Equals(vector.y) && this.z.Equals(vector.z);
+        }
+        public override string ToString()
+        {
+            return string.Format("({0:F1}, {1:F1}, {2:F1})", new object[]
+            {
+                this.x,
+                this.y,
+                this.z
+            });
+        }
+        //
+        // Operators
+        //
+        public static Vector3 operator +(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+        }
+
+        public static Vector3 operator /(Vector3 a, float d)
+        {
+            return new Vector3(a.x / d, a.y / d, a.z / d);
+        }
+        public static Vector3 operator *(Vector3 a, float d)
+        {
+            return new Vector3(a.x * d, a.y * d, a.z * d);
+        }
+
+        public static Vector3 operator *(float d, Vector3 a)
+        {
+            return new Vector3(a.x * d, a.y * d, a.z * d);
+        }
+
+        public static Vector3 operator -(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+        }
+
+        public static Vector3 operator -(Vector3 a)
+        {
+            return new Vector3(-a.x, -a.y, -a.z);
         }
     }
     public class Program
