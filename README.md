@@ -96,6 +96,10 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 * UWP平台master配置下generic_method函数会出问题
 
 ## master版本更新和修改内容 ##
+(2016-3-9)
+-----------
+* c#类重载运算符,可以在脚本里直接使用 + - * / 
+
 (2016-2-26)
 -----------
 * switch 语法 支持 case 变量 , case 暂时不支持return语法 只支持break
