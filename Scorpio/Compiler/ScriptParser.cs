@@ -10,7 +10,7 @@ using Scorpio.Variable;
 namespace Scorpio.Compiler
 {
     //上下文解析
-    internal partial class ScriptParser
+    public partial class ScriptParser
     {
         private Script m_script;                                                        //脚本类
         private string m_strBreviary;                                                   //当前解析的脚本摘要
