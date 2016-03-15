@@ -76,13 +76,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="a.ico" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Scorpio\Scorpio.csproj">
       <Project>{9c3cc405-c995-40da-8f74-3b2a9ee84a62}</Project>
       <Name>Scorpio</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="a.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
