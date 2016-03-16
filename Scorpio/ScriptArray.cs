@@ -131,7 +131,11 @@ namespace Scorpio
         {
             ScriptArray ret = Script.CreateArray();
             for (int i = 0; i < m_listObject.Count; ++i) {
-                ret.m_listObject.Add(m_listObject[i].Clone());
+                if (m_listObject[i] == this) {
+                    ret.m_listObject.Add(ret);
+                } else {
+                    ret.m_listObject.Add(m_listObject[i].Clone());
+                }
             }
             return ret;
         }

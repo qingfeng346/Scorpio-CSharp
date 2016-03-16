@@ -59,12 +59,16 @@ namespace Scorpio
             ScriptObject obj = null;
             ScriptFunction func = null;
             foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
-                obj = pair.Value.Clone();
-                if (obj is ScriptFunction) {
-                    func = (ScriptFunction)obj;
-                    if (!func.IsStatic) func.SetTable(ret);
+                if (pair.Value == this) {
+                    ret.m_listObject[pair.Key] = ret;
+                } else {
+                    obj = pair.Value.Clone();
+                    if (obj is ScriptFunction) {
+                        func = (ScriptFunction)obj;
+                        if (!func.IsStatic) func.SetTable(ret);
+                    }
+                    ret.m_listObject[pair.Key] = obj;
                 }
-                ret.m_listObject[pair.Key] = obj;
             }
             return ret;
         }
