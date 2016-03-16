@@ -39,6 +39,9 @@ namespace Scorpio.Extensions
             return type.IsEnum;
 #endif
         }
+        public bool FileExist(string file) {
+            return !string.IsNullOrEmpty(file) && File.Exists(file);
+        }
         public byte[] GetFileBuffer(string file) {
             FileStream stream = File.OpenRead(file);
             long length = stream.Length;

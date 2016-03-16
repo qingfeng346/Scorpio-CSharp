@@ -424,7 +424,7 @@ namespace Scorpio.Library
             {
                 ScriptString str = args[0] as ScriptString;
                 Util.Assert(str != null, m_script, "require 参数必须是 string");
-                return m_script.LoadFile(m_script.GetValue("searchpath") + "/" + str.Value);
+                return m_script.LoadSearchPathFile(str.Value);
             }
         }
         private class load_assembly : ScorpioHandle

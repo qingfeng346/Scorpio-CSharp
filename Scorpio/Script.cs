@@ -26,6 +26,7 @@ namespace Scorpio
         private ScriptTable m_GlobalTable;                                      //全局Table
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
+        private List<String> m_SearchPath = new List<String>();                 //request所有文件的路径集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
         public ScriptNull Null { get; private set; }                            //null对象
         public ScriptBoolean True { get; private set; }                         //true对象
@@ -47,20 +48,29 @@ namespace Scorpio
         {
             return LoadFile(strFileName, Encoding.UTF8);
         }
-        public ScriptObject LoadFile(String fileName, string encoding)
-        {
-            return LoadFile(fileName, Encoding.GetEncoding(encoding));
-        }
         public ScriptObject LoadFile(String fileName, Encoding encoding)
         {
+            return LoadBuffer(fileName, ScriptExtensions.GetFileBuffer(fileName), encoding);
+        }
+        public ScriptObject LoadBuffer(byte[] buffer)
+        {
+            return LoadBuffer("Undefined", buffer, Encoding.UTF8);
+        }
+        public ScriptObject LoadBuffer(String strBreviary, byte[] buffer)
+        {
+            return LoadBuffer(strBreviary, buffer, Encoding.UTF8);
+        }
+        public ScriptObject LoadBuffer(String strBreviary, byte[] buffer, Encoding encoding)
+        {
+            if (buffer == null || buffer.Length == 0) { return null; }
             try {
-                byte[] buffer = ScriptExtensions.GetFileBuffer(fileName);
-                if (buffer.Length > 0 && buffer[0] == 0)
-                    return LoadTokens(fileName, ScorpioMaker.Deserialize(buffer));
-                else
-                    return LoadString(fileName, encoding.GetString(buffer, 0, buffer.Length));
+                if (buffer[0] == 0) {
+                    return LoadTokens(strBreviary, ScorpioMaker.Deserialize(buffer));
+                } else {
+                    return LoadString(strBreviary, encoding.GetString(buffer, 0, buffer.Length));
+                }
             } catch (System.Exception e) {
-                throw new ScriptException("load file [" + fileName + "] is error : " + e.ToString());
+                throw new ScriptException("load buffer [" + strBreviary + "] is error : " + e.ToString());
             }
         }
         public ScriptObject LoadString(String strBuffer)
@@ -102,6 +112,21 @@ namespace Scorpio
             ScriptParser scriptParser = new ScriptParser(this, tokens, strBreviary);
             ScriptExecutable scriptExecutable = scriptParser.Parse();
             return new ScriptContext(this, scriptExecutable, context, Executable_Block.Context).Execute();
+        }
+        public void PushSearchPath(string path)
+        {
+            if (!m_SearchPath.Contains(path))
+                m_SearchPath.Add(path);
+        }
+        public ScriptObject LoadSearchPathFile(String fileName)
+        {
+            for (int i = 0; i < m_SearchPath.Count; ++i)
+            {
+                string file = m_SearchPath[i] + "/" + fileName;
+                if (ScriptExtensions.FileExist(file))
+                    return LoadFile(file);
+            }
+            throw new ExecutionException(this, "require 找不到文件 : " + fileName);
         }
         public void PushAssembly(Assembly assembly)
         {

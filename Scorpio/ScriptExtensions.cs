@@ -21,14 +21,17 @@ namespace Scorpio
         public static Assembly GetAssembly(Type type) {
             return m_Extensions.GetAssembly(type);
         }
-        public static byte[] GetFileBuffer(string file) {
-            return m_Extensions.GetFileBuffer(file);
-        }
         public static MethodInfo GetMethodInfo(Delegate del) {
             return m_Extensions.GetMethodInfo(del);
         }
         public static bool IsEnum(Type type) {
             return m_Extensions.IsEnum(type);
+        }
+        public static bool FileExist(string file) {
+            return m_Extensions.FileExist(file);
+        }
+        public static byte[] GetFileBuffer(string file) {
+            return m_Extensions.GetFileBuffer(file);
         }
     }
 }

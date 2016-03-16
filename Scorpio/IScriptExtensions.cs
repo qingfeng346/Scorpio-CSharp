@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Scorpio
 {
@@ -9,7 +7,9 @@ namespace Scorpio
         void print(string str);
         Assembly GetAssembly(Type type);
         MethodInfo GetMethodInfo(Delegate del);
-        byte[] GetFileBuffer(string file);
+        
         bool IsEnum(Type type);
+        bool FileExist(string file);
+        byte[] GetFileBuffer(string file);
     }
 }
