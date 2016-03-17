@@ -125,5 +125,17 @@ namespace Scorpio.Userdata
                 throw new ExecutionException(m_Script, "SetValue 出错 源类型:" + (value == null || value.IsNull ? "null" : value.ObjectValue.GetType().Name) + " 目标类型:" + field.FieldType.Name + " : " + e.ToString());
             }
         }
+        public ScriptUserdata MakeGenericType(Type[] parameters)
+        {
+            Type[] types = m_Type.GetGenericArguments();
+            if (types.Length != parameters.Length)
+                throw new ExecutionException(m_Script, m_Type + " 泛型类个数错误 需要:" + types.Length + " 传入:" + parameters.Length);
+            int length = types.Length;
+            for (int i = 0;i < length; ++i) {
+                if (!types[i].IsAssignableFrom(parameters[i]))
+                    throw new ExecutionException(m_Script, m_Type + "泛型类第" + (i+1) + "个参数失败 需要:" + types[i] + " 传入:" + parameters[i]);
+            }
+            return m_Script.CreateUserdata(m_Type.MakeGenericType(parameters));
+        }
     }
 }

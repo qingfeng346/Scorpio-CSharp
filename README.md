@@ -30,7 +30,7 @@
 
 ## Unity导入Scorpio-CSharp:
 * 第一种方法(建议) : 把trunk目录下的 Scorpio 文件夹复制到项目 然后删除 文件夹下的 Properties 文件夹和 Scorpio.csproj 文件即可
-* 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下
+* 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下 (ps:源码的项目文件自带SCORPIO_DYNAMIC_DELEGATE编译符号,请删除后编译)
 
 ## Scorpio脚本Hello World函数 (c#控制台项目):
 ```c#
@@ -93,7 +93,7 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类
 
 ## master版本已知问题 ##
-* UWP平台master配置下generic_method函数会出问题
+* UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 
 ## master版本更新和修改内容 ##
 (2016-3-9)

@@ -10,7 +10,7 @@ namespace Scorpio.Variable
         public UserdataMethod Method { get; protected set; }        //函数引用
         public string MethodName { get; protected set; }            //函数名字
         public abstract object Call(ScriptObject[] parameters);     //调用函数
-        public abstract ScorpioMethod MakeGenericMethod(ScriptObject[] parameters); //声明泛型函数
+        public abstract ScorpioMethod MakeGenericMethod(Type[] parameters); //声明泛型函数
     }
     //实例函数
     public class ScorpioObjectMethod : ScorpioMethod
@@ -26,7 +26,7 @@ namespace Scorpio.Variable
         {
             return Method.Call(m_Object, parameters);
         }
-        public override ScorpioMethod MakeGenericMethod(ScriptObject[] parameters)
+        public override ScorpioMethod MakeGenericMethod(Type[] parameters)
         {
             return new ScorpioObjectMethod(m_Object, MethodName, Method.MakeGenericMethod(parameters));
         }
@@ -59,7 +59,7 @@ namespace Scorpio.Variable
                 return Method.Call(parameters[0].ObjectValue, new ScriptObject[0]);
             }
         }
-        public override ScorpioMethod MakeGenericMethod(ScriptObject[] parameters)
+        public override ScorpioMethod MakeGenericMethod(Type[] parameters)
         {
             return new ScorpioTypeMethod(m_script, MethodName, Method.MakeGenericMethod(parameters), m_Type);
         }
@@ -76,7 +76,7 @@ namespace Scorpio.Variable
         {
             return Method.Call(null, parameters);
         }
-        public override ScorpioMethod MakeGenericMethod(ScriptObject[] parameters)
+        public override ScorpioMethod MakeGenericMethod(Type[] parameters)
         {
             return new ScorpioStaticMethod(MethodName, Method.MakeGenericMethod(parameters));
         }

@@ -505,7 +505,7 @@ namespace Scorpio.Library
                     Util.Assert(type != null, m_script, "generic_type 第" + (i+1) + "参数必须是 userdata");
                     types[i - 1] = type.ValueType;
                 }
-                return userdata.ValueType.MakeGenericType(types);
+                return m_script.GetUserdataFactory().GetScorpioType(userdata.ValueType).MakeGenericType(types);
             }
         }
         private class generic_method : ScorpioHandle
@@ -517,14 +517,17 @@ namespace Scorpio.Library
             }
             public object Call(ScriptObject[] args)
             {
-                Util.Assert(args.Length >= 2, m_script, "generic_method 参数必须大于等于2个");
                 ScriptFunction func = args[0] as ScriptFunction;
                 Util.Assert(func != null, m_script, "generic_method 第1个参数必须是 function");
                 ScorpioMethod method = func.Method;
                 Util.Assert(method != null, m_script, "generic_method 第1个参数必须是 程序函数");
-                ScriptObject[] pars = new ScriptObject[args.Length - 1];
-                Array.Copy(args, 1, pars, 0, pars.Length);
-                return method.MakeGenericMethod(pars);
+                Type[] types = new Type[args.Length - 1];
+                for (int i = 1; i < args.Length; ++i) {
+                    ScriptUserdata type = args[i] as ScriptUserdata;
+                    Util.Assert(type != null, m_script, "generic_method 第" + (i + 1) + "参数必须是 userdata");
+                    types[i - 1] = type.ValueType;
+                }
+                return method.MakeGenericMethod(types);
             }
         }
     }

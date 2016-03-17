@@ -78,27 +78,6 @@ namespace Scorpio.Userdata
             methodBases.AddRange(methods.ToArray());
             Initialize(type, methodName, methodBases);
         }
-        public UserdataMethod MakeGenericMethod(ScriptObject[] parameters)
-        {
-            int length = parameters.Length;
-            Type[] typeArguments = new Type[length];
-            for (int i = 0; i < length; ++i) {
-                Util.Assert(parameters[i] is ScriptUserdata, m_Script, "MakeGenericMethod 参数 " + (i + 1) + " 不是 userdata类型");
-                typeArguments[i] = (parameters[i] as ScriptUserdata).ValueType;
-            }
-            List<MethodInfo> methods = new List<MethodInfo>();
-            for (int i = 0; i < m_Count; ++i) {
-                if (m_Methods[i].Method.IsGenericMethod) {
-                    //此处代码 因为暂时没找到获取泛型个数的函数 所以只能用此笨方法 见谅见谅
-                    try {
-                        methods.Add(m_Methods[i].Method.MakeGenericMethod(typeArguments));
-                    } catch (System.Exception ) { }
-                }
-            }
-            if (methods.Count > 0)
-                return new UserdataMethod(m_Script, m_Type, MethodName, methods);
-            throw new ExecutionException(m_Script, "没有找到合适的泛型函数 " + MethodName);
-        }
         private void Initialize(Type type, string methodName, List<MethodBase> methods)
         {
             m_Type = type;
@@ -180,6 +159,32 @@ namespace Scorpio.Userdata
                 throw new ExecutionException(m_Script, "Type[" + m_Type.ToString() + "] 调用函数出错 [" + MethodName + "] : " + e.ToString());
             }
             throw new ExecutionException(m_Script, "Type[" + m_Type.ToString() + "] 找不到合适的函数 [" + MethodName + "]");
+        }
+        public UserdataMethod MakeGenericMethod(Type[] parameters)
+        {
+            List<MethodInfo> methods = new List<MethodInfo>();
+            for (int i = 0; i < m_Count; ++i) {
+                if (m_Methods[i].Method.IsGenericMethod) {
+                    Type[] types = m_Methods[i].Method.GetGenericArguments();
+                    if (types.Length == parameters.Length) {
+                        bool accord = true;
+                        int length = types.Length;
+                        for (int j = 0; j < length; ++j) {
+                            if (!types[j].IsAssignableFrom(parameters[j])) {
+                                accord = false;
+                                break;
+                            }
+                        }
+                        if (accord) {
+                            methods.Add(m_Methods[i].Method.MakeGenericMethod(parameters));
+                            break;
+                        }
+                    }
+                }
+            }
+            if (methods.Count > 0)
+                return new UserdataMethod(m_Script, m_Type, MethodName, methods);
+            throw new ExecutionException(m_Script, "没有找到合适的泛型函数 " + MethodName);
         }
     }
 }
