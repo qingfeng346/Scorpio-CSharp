@@ -1,10 +1,10 @@
-﻿using System;
+﻿#if SCORPIO_UWP && !UNITY_EDITOR
+#define UWP
+#endif
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
-using Scorpio;
 using Scorpio.Exception;
-using System.Diagnostics;
 namespace Scorpio.Userdata
 {
     /// <summary> 一个类的同名函数 </summary>
@@ -18,9 +18,10 @@ namespace Scorpio.Userdata
             public Type[] ParameterType;                //所有参数类型
             public bool Params;                         //是否是变长参数
             public Type ParamType;                      //变长参数类型
+            public string ParameterTypes;               //传递参数的类型
             public object[] Args;                       //参数数组（预创建 可以共用）
             public bool IsValid { get; private set; }   //是否是有效的函数 (模版函数没有声明的时候就是无效的)
-            public FunctionMethod(ConstructorInfo Constructor, Type[] ParameterType, Type ParamType, bool Params)
+            public FunctionMethod(ConstructorInfo Constructor, Type[] ParameterType, Type ParamType, bool Params, string ParameterTypes)
             {
                 m_Type = 0;
                 IsValid = true;
@@ -28,9 +29,10 @@ namespace Scorpio.Userdata
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
                 this.Params = Params;
+                this.ParameterTypes = ParameterTypes;
                 this.Args = new object[ParameterType.Length];
             }
-            public FunctionMethod(MethodInfo Method, Type[] ParameterType, Type ParamType, bool Params)
+            public FunctionMethod(MethodInfo Method, Type[] ParameterType, Type ParamType, bool Params, string ParameterTypes)
             {
                 m_Type = 1;
                 IsValid = !Method.IsGenericMethod || !Method.ContainsGenericParameters;
@@ -38,6 +40,7 @@ namespace Scorpio.Userdata
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
                 this.Params = Params;
+                this.ParameterTypes = ParameterTypes;
                 this.Args = new object[ParameterType.Length];
             }
             public object Invoke(object obj, Type type)
@@ -85,26 +88,27 @@ namespace Scorpio.Userdata
             List<FunctionMethod> functionMethod = new List<FunctionMethod>();
             bool Params = false;
             Type ParamType = null;
+            string ParameterTypes = null;
             MethodBase method = null;
             List<Type> parameters = new List<Type>();
             int length = methods.Count;
-            for (int i = 0; i < length; ++i)
-            {
+            for (int i = 0; i < length; ++i) {
                 Params = false;
                 ParamType = null;
+                ParameterTypes = "";
                 parameters.Clear();
                 method = methods[i];
                 ParameterInfo[] pars = method.GetParameters();
-                foreach (ParameterInfo par in pars)
-                {
+                foreach (ParameterInfo par in pars) {
+                    ParameterTypes += (par.ParameterType.FullName + "+");
                     parameters.Add(par.ParameterType);
                     Params = Util.IsParamArray(par);
                     if (Params) ParamType = par.ParameterType.GetElementType();
                 }
                 if (method is MethodInfo)
-                    functionMethod.Add(new FunctionMethod(method as MethodInfo, parameters.ToArray(), ParamType, Params));
+                    functionMethod.Add(new FunctionMethod(method as MethodInfo, parameters.ToArray(), ParamType, Params, ParameterTypes));
                 else
-                    functionMethod.Add(new FunctionMethod(method as ConstructorInfo, parameters.ToArray(), ParamType, Params));
+                    functionMethod.Add(new FunctionMethod(method as ConstructorInfo, parameters.ToArray(), ParamType, Params, ParameterTypes));
             }
             m_Methods = functionMethod.ToArray();
             m_Count = m_Methods.Length;
@@ -170,10 +174,17 @@ namespace Scorpio.Userdata
                         bool accord = true;
                         int length = types.Length;
                         for (int j = 0; j < length; ++j) {
-                            if (!types[j].IsAssignableFrom(parameters[j])) {
+#if UWP
+                            if (!types[j].GetTypeInfo().BaseType.IsAssignableFrom(parameters[j])) {
                                 accord = false;
                                 break;
                             }
+#else
+                            if (!types[j].BaseType.IsAssignableFrom(parameters[j])) {
+                                accord = false;
+                                break;
+                            }
+#endif
                         }
                         if (accord) {
                             methods.Add(m_Methods[i].Method.MakeGenericMethod(parameters));

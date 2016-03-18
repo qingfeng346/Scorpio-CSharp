@@ -9,6 +9,7 @@ namespace Scorpio.Userdata
     /// <summary> 普通Object Type类型 </summary>
     public class DefaultScriptUserdataObjectType : ScriptUserdata
     {
+        protected UserdataType m_UserdataType;
         public DefaultScriptUserdataObjectType(Script script, Type value, UserdataType type) : base(script)
         {
             this.Value = value;

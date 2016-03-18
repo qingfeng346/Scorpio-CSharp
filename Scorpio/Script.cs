@@ -27,6 +27,7 @@ namespace Scorpio
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private List<String> m_SearchPath = new List<String>();                 //request所有文件的路径集合
+        private Dictionary<Type, IScorpioFastReflectClass> m_FastReflectClass = new Dictionary<Type, IScorpioFastReflectClass>();
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
         public ScriptNull Null { get; private set; }                            //null对象
         public ScriptBoolean True { get; private set; }                         //true对象
@@ -146,6 +147,15 @@ namespace Scorpio
                 if (type != null) return CreateUserdata(type);
             }
             return Null;
+        }
+        public void PushFastReflectClass(Type type, IScorpioFastReflectClass value) {
+            m_FastReflectClass[type] = value;
+        }
+        public bool ContainsFastReflectClass(Type type) {
+            return m_FastReflectClass.ContainsKey(type);
+        }
+        public IScorpioFastReflectClass GetFastReflectClass(Type type) {
+            return m_FastReflectClass[type];
         }
         internal void SetStackInfo(StackInfo info)
         {
