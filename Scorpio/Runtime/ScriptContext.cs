@@ -221,6 +221,7 @@ namespace Scorpio.Runtime
             int begin = beginNumber.ToInt32();
             int finished = finishedNumber.ToInt32();
             int step;
+            ScriptContext context;
             if (code.Step != null) {
                 ScriptNumber stepNumber = ResolveOperand(code.Step) as ScriptNumber;
                 if (stepNumber == null) throw new ExecutionException(m_script, "forsimple Step必须是number");
@@ -229,7 +230,7 @@ namespace Scorpio.Runtime
                 step = 1;
             }
             for (int i = begin; i <= finished; i += step) {
-                ScriptContext context = code.GetBlockContext();
+                context = code.GetBlockContext();
                 context.Initialize(this, code.Identifier, m_script.CreateNumber(i));
                 context.Execute();
                 if (context.IsOver) break;
@@ -257,7 +258,7 @@ namespace Scorpio.Runtime
             CodeIf code = (CodeIf)m_scriptInstruction.Operand0;
             if (ProcessCondition(code.If, code.If.GetContext(), Executable_Block.If))
                 return;
-            int length = code.ElseIf.Count;
+            int length = code.ElseIfCount;
             for (int i = 0; i < length; ++i) {
                 if (ProcessCondition(code.ElseIf[i], code.ElseIf[i].GetContext(), Executable_Block.If))
                     return;
@@ -436,7 +437,7 @@ namespace Scorpio.Runtime
         ScriptObject ParseCall(CodeCallFunction scriptFunction, bool needRet)
         {
             ScriptObject obj = ResolveOperand(scriptFunction.Member);
-            int num = scriptFunction.Parameters.Count;
+            int num = scriptFunction.ParametersCount;
             ScriptObject[] parameters = new ScriptObject[num];
             for (int i = 0; i < num; ++i) {
                 parameters[i] = ResolveOperand(scriptFunction.Parameters[i]);
@@ -470,23 +471,27 @@ namespace Scorpio.Runtime
         {
             TokenType type = operate.Operator;
             ScriptObject left = ResolveOperand(operate.Left);
-            if (type == TokenType.Plus) {
+            switch (type) {
+            case TokenType.Plus:
                 ScriptObject right = ResolveOperand(operate.Right);
                 if (left is ScriptString || right is ScriptString) { return m_script.CreateString(left.ToString() + right.ToString()); }
                 return left.Compute(type, right);
-            } else if (type == TokenType.And) {
+            case TokenType.And:
                 if (!left.LogicOperation()) return m_script.False;
                 return m_script.GetBoolean(ResolveOperand(operate.Right).LogicOperation());
-            } else if (type == TokenType.Or) {
+            case TokenType.Or:
                 if (left.LogicOperation()) return m_script.True;
                 return m_script.GetBoolean(ResolveOperand(operate.Right).LogicOperation());
-            } else if (type == TokenType.Equal) {
+            case TokenType.Equal:
                 return m_script.GetBoolean(left.Equals(ResolveOperand(operate.Right)));
-            } else if (type == TokenType.NotEqual) {
+            case TokenType.NotEqual:
                 return m_script.GetBoolean(!left.Equals(ResolveOperand(operate.Right)));
-            } else if (type == TokenType.Greater || type == TokenType.GreaterOrEqual || type == TokenType.Less || type == TokenType.LessOrEqual) {
+            case TokenType.Greater:
+            case TokenType.GreaterOrEqual:
+            case TokenType.Less:
+            case TokenType.LessOrEqual:
                 return m_script.GetBoolean(left.Compare(type, ResolveOperand(operate.Right)));
-            } else {
+            default:
                 return left.Compute(type, ResolveOperand(operate.Right));
             }
         }

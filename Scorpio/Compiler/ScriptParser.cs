@@ -202,15 +202,16 @@ namespace Scorpio.Compiler
         {
             CodeIf ret = new CodeIf();
             ret.If = ParseCondition(true, Executable_Block.If);
+            List<TempCondition> ElseIf = new List<TempCondition>();
             for (; ; )
             {
                 Token token = ReadToken();
                 if (token.Type == TokenType.ElseIf) {
-                    ret.AddElseIf(ParseCondition(true, Executable_Block.If));
+                    ElseIf.Add(ParseCondition(true, Executable_Block.If));
                 } else if (token.Type == TokenType.Else) {
                     if (PeekToken().Type == TokenType.If) {
                         ReadToken();
-                        ret.AddElseIf(ParseCondition(true, Executable_Block.If));
+                        ElseIf.Add(ParseCondition(true, Executable_Block.If));
                     } else {
                         UndoToken();
                         break;
@@ -225,6 +226,7 @@ namespace Scorpio.Compiler
                 ReadToken();
                 ret.Else = ParseCondition(false, Executable_Block.If);
             }
+            ret.Init(ElseIf);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_IF, ret));
         }
         //解析判断内容
@@ -596,7 +598,6 @@ namespace Scorpio.Compiler
         //返回一个调用函数 Object
         private CodeCallFunction GetFunction(CodeObject member)
         {
-            CodeCallFunction ret = new CodeCallFunction();
             ReadLeftParenthesis();
             List<CodeObject> pars = new List<CodeObject>();
             Token token = PeekToken();
@@ -612,9 +613,7 @@ namespace Scorpio.Compiler
                     throw new ParserException("Comma ',' or right parenthesis ')' expected in function declararion.", token);
             }
             ReadRightParenthesis();
-            ret.Member = member;
-            ret.Parameters = pars;
-            return ret;
+            return new CodeCallFunction(member, pars);
         }
         //返回数组
         private CodeArray GetArray()

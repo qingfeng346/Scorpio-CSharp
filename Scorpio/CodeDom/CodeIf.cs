@@ -10,10 +10,11 @@ namespace Scorpio.CodeDom
     {
         internal TempCondition If;
         internal TempCondition Else;
-        internal List<TempCondition> ElseIf = new List<TempCondition>();
-        internal void AddElseIf(TempCondition con)
-        {
-            ElseIf.Add(con);
+        internal TempCondition[] ElseIf;
+        internal int ElseIfCount;
+        internal void Init(List<TempCondition> ElseIf) {
+            this.ElseIf = ElseIf.ToArray();
+            this.ElseIfCount = ElseIf.Count;
         }
     }
 }
