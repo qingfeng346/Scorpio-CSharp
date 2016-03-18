@@ -31,7 +31,7 @@ namespace Scorpio.Variable
             return new ScorpioObjectMethod(m_Object, MethodName, Method.MakeGenericMethod(parameters));
         }
     }
-    //类函数
+    //类函数 c#类 类函数  直接获取类成员函数引用 然后调用时第一个参数传入实例 后面传参数
     public class ScorpioTypeMethod : ScorpioMethod
     {
         private Script m_script;
@@ -64,7 +64,7 @@ namespace Scorpio.Variable
             return new ScorpioTypeMethod(m_script, MethodName, Method.MakeGenericMethod(parameters), m_Type);
         }
     }
-    //静态函数
+    //静态函数 c#类静态函数
     public class ScorpioStaticMethod : ScorpioMethod
     {
         public ScorpioStaticMethod(string name, UserdataMethod method)
