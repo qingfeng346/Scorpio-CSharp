@@ -94,7 +94,8 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 
 ## master版本已知问题 ##
 * UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
-
+* UWP平台master配置下generic_type函数也会出问题
+ 
 ## master版本更新和修改内容 ##
 (2016-3-9)
 -----------
