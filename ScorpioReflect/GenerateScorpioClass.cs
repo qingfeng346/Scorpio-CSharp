@@ -6,7 +6,7 @@ public class GenerateScorpioClass
 {
     public const string ClassTemplate = @"using System;
 namespace __namespace {
-    public class __class : Scorpio.Userdata.IScorpioReflectClass {
+    public class __class : Scorpio.Userdata.IScorpioFastReflectClass {
         public object GetValue(object obj, string name) {
 __getvalue_content
             throw new Exception(""__fullname 找不到变量 : "" + name);
@@ -19,7 +19,7 @@ __setvalue_content
 __methods_content
 }";
     public const string MethodTemplate = @"
-    public class __name : Scorpio.Userdata.IScorpioReflectMethod {
+    public class __name : Scorpio.Userdata.IScorpioFastReflectMethod {
         private static __name _instance;
         public static __name GetInstance() { 
             if (_instance == null)

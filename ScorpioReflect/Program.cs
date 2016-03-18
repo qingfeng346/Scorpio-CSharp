@@ -8,7 +8,7 @@ namespace ScorpioReflect
 {
     public class Test
     {
-        private int wwwww;
+        public int wwwww;
         public int a;
         public int b;
         public int GetA()
