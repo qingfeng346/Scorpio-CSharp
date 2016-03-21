@@ -70,6 +70,7 @@ __execute
     private Type m_Type;
     private string m_ScorpioClassName;
     private string m_FullName;
+	private string m_Namespace;
     private FieldInfo[] m_Fields;
     private PropertyInfo[] m_InatancePropertys;
     private PropertyInfo[] m_StaticPropertys;
@@ -82,10 +83,17 @@ __execute
         m_ScorpioClassName = "ScorpioClass_" + m_Type.Namespace + "_" + m_Type.Name;
 		m_ScorpioClassName = m_ScorpioClassName.Replace(".", "_");
         m_FullName = m_Type.FullName;
+		m_Namespace = string.IsNullOrEmpty(m_Type.Namespace) ? "ScorpioDefault" : m_Type.Namespace;
         m_Fields = m_Type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
         m_InatancePropertys = m_Type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
         m_StaticPropertys = m_Type.GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-        var methods = m_Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+		MethodInfo[] methods = null;
+		//IsAbstract和IsSealed同时为true的话为static class, 不是静态类不会同时有这两个属性
+		if (type.IsAbstract && type.IsSealed) {
+			methods = m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+		} else {
+			methods = m_Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+		}
         List<MethodInfo> ms = new List<MethodInfo>();
         foreach (var method in methods) {
 			string name = method.Name;
@@ -111,7 +119,7 @@ __execute
         str = str.Replace("__setvalue_content", GenerateSetValue());
         str = str.Replace("__constructor_content", GenerateConstructor());
         str = str.Replace("__methods_content", GenerateMethod());
-        str = str.Replace("__namespace", m_Type.Namespace);
+		str = str.Replace("__namespace", m_Namespace);
         str = str.Replace("__class", m_ScorpioClassName);
         str = str.Replace("__fullname", m_FullName);
         return str;
@@ -156,21 +164,21 @@ __execute
         foreach (var field in m_Fields) {
             if (first) { first = false; } else { builder.AppendLine(); }
             if (field.IsStatic) {
-                builder.AppendFormat(fieldStr, field.Name, m_FullName, field.FieldType.FullName);
+                builder.AppendFormat(fieldStr, field.Name, m_FullName, GetFullName(field.FieldType));
             } else {
-                builder.AppendFormat(fieldStr, field.Name, "((" + m_FullName + ")obj)", field.FieldType.FullName);
+				builder.AppendFormat(fieldStr, field.Name, "((" + m_FullName + ")obj)", GetFullName(field.FieldType));
             }
         }
         foreach (var property in m_InatancePropertys) {
             if (property.CanWrite) {
                 if (first) { first = false; } else { builder.AppendLine(); }
-                builder.AppendFormat(fieldStr, property.Name, "((" + m_FullName + ")obj)", property.PropertyType.FullName);
+				builder.AppendFormat(fieldStr, property.Name, "((" + m_FullName + ")obj)", GetFullName(property.PropertyType));
             }
         }
         foreach (var property in m_StaticPropertys) {
             if (property.CanWrite) {
                 if (first) { first = false; } else { builder.AppendLine(); }
-                builder.AppendFormat(fieldStr, property.Name, m_FullName, property.PropertyType.FullName);
+				builder.AppendFormat(fieldStr, property.Name, m_FullName, GetFullName(property.PropertyType));
             }
         }
         return builder.ToString();
