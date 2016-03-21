@@ -92,7 +92,7 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类
 
 ## c#去反射类使用 ##
-* 把**ScorpioReflect**项目中的**GenerateScorpioClass.cs**文件复制到项目工程,放到Editor即可,此类只用作生成中间代码,后期不会使用,示例
+* 把**ScorpioReflect**项目中的**GenerateScorpioClass.cs**文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例:
 ```c#
 //就拿UnityEngine.GameObject类为例
 //先生成中间代码
