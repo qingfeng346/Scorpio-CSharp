@@ -87,10 +87,26 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 	* Windows 10 (UWP) https://www.microsoft.com/zh-cn/store/games/agile-man/9nblggh68b51
 
 	
-	
 ## 脚本内使用的宏定义说明:
 * **SCORPIO_UWP**  UWP(Universal Windows Platform)专用
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类
+
+## c#去反射类使用 ##
+* 把**ScorpioReflect**项目中的**GenerateScorpioClass.cs**文件复制到项目工程,放到Editor即可,此类只用作生成中间代码,示例
+```c#
+//就拿UnityEngine.GameObject类为例
+//先生成中间代码
+//使用GenerateScorpioClass生成代码,ScorpioClassName变量是中间类名称,Generate()返回生成后的代码
+//下面两句代码是生成UnityEngine.GameObject的中间类到工程目录
+var gen = new GenerateScorpioClass(typeof(UnityEngine.GameObject));
+System.IO.File.WriteAllText(Application.dataPath + "/Scripts/ScorpioClass/" + gen.ScorpioClassName + ".cs", gen.Generate());
+
+
+//然后调用Script类的PushFastReflectClass函数把typeof(UnityEngine.GameObject)和生成后的类ScorpioClass_UnityEngine_GameObject关联上
+Script script = new Script();
+script.LoadLibrary();
+script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script));
+```
 
 ## 注意事项 ##
 * 脚本内所有c#变量(除了int,string等基础类型)均为引用,struct变量也一样
@@ -101,10 +117,15 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 * c#类的变量不能类似 += -= *= /= 等赋值计算操作(只有event可以使用 += -=) 请使用 变量 = 变量 + XXX
 * SCORPIO_DYNAMIC_DELEGATE 宏定义好像只能android和windows(exe)平台可用,其它平台请勿用
 * IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
+* 去反射机制生成的静态类代码会报错(暂时未找到判断是否是静态类的方法),请手动删除一下 ToString GetHashCode 等实例函数
 * UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 * UWP平台master配置下generic_type函数也会出问题
  
 ## master版本更新和修改内容 ##
+(2016-3-21)
+-----------
+* 增加c#类去反射机制
+
 (2016-3-9)
 -----------
 * c#类重载运算符,可以在脚本里直接使用 + - * / 
