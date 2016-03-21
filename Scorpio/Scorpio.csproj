@@ -110,7 +110,7 @@
     <Compile Include="Userdata\DefaultScriptUserdataObjectType.cs" />
     <Compile Include="Userdata\IScorpioFastReflectClass.cs" />
     <Compile Include="Userdata\IScorpioFastReflectMethod.cs" />
-    <Compile Include="Userdata\UserdataField.cs" />
+    <Compile Include="Userdata\UserdataVariable.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Userdata\UserdataMethod.cs" />
     <Compile Include="Variable\ScorpioMethod.cs" />
