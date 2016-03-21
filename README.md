@@ -118,7 +118,6 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 * c#类的变量不能类似 += -= *= /= 等赋值计算操作(只有event可以使用 += -=) 请使用 变量 = 变量 + XXX
 * SCORPIO_DYNAMIC_DELEGATE 宏定义好像只能android和windows(exe)平台可用,其它平台请勿用
 * IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
-* 去反射机制生成的静态类代码会报错(暂时未找到判断是否是静态类的方法),请手动删除一下 ToString GetHashCode 等实例函数
 * UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 * UWP平台master配置下generic_type函数也会出问题
  
