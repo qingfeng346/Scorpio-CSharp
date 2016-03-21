@@ -132,12 +132,10 @@ namespace Scorpio.Compiler
         //解析函数（全局函数或类函数）
         private void ParseFunction()
         {
-            if (m_scriptExecutable.Block == Executable_Block.Context) {
-                Token token = PeekToken();
-                UndoToken();
-                ScriptFunction func = ParseFunctionDeclaration(true);
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func, m_strBreviary, token.SourceLine)));
-            }
+            Token token = PeekToken();
+            UndoToken();
+            ScriptFunction func = ParseFunctionDeclaration(true);
+            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func, m_strBreviary, token.SourceLine)));
         }
         //解析函数（返回一个函数）
         private ScriptFunction ParseFunctionDeclaration(bool needName)
