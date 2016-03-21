@@ -176,16 +176,27 @@ namespace Scorpio.Compiler
         private void ParseVar()
         {
             for (; ; ) {
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, ReadIdentifier()));
                 Token peek = PeekToken();
-                if (peek.Type == TokenType.Assign) {
-                    UndoToken();
-                    ParseStatement();
+                if (peek.Type == TokenType.Function) {
+                    ScriptFunction func = ParseFunctionDeclaration(true);
+                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, func.Name));
+                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func, m_strBreviary, peek.SourceLine)));
+                } else {
+                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, ReadIdentifier()));
+                    peek = PeekToken();
+                    if (peek.Type == TokenType.Assign) {
+                        UndoToken();
+                        ParseStatement();
+                    }
                 }
                 peek = ReadToken();
                 if (peek.Type != TokenType.Comma) {
                     UndoToken();
                     break;
+                }
+                peek = PeekToken();
+                if (peek.Type == TokenType.Var) {
+                    ReadToken();
                 }
             }
         }
