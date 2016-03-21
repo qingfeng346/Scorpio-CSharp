@@ -24,7 +24,7 @@ namespace __namespace {
 __getvalue_content
             throw new Exception(""__fullname 找不到变量 : "" + name);
         }
-        public void SetValue(object obj, string name, object value) {
+        public void SetValue(object obj, string name, ScriptObject value) {
 __setvalue_content
             throw new Exception(""__fullname 找不到变量 : "" + name);
         }
@@ -150,7 +150,7 @@ __execute
         return builder.ToString();
     }
     private string GenerateSetValue() {
-        string fieldStr = @"            if (name == ""{0}"") {{ {1}.{0} = ({2})value; return; }}";
+		string fieldStr = @"            if (name == ""{0}"") {{ {1}.{0} = ({2})(Util.ChangeType(m_Script, value, typeof({2}))); return; }}";
         StringBuilder builder = new StringBuilder();
         bool first = true;
         foreach (var field in m_Fields) {
