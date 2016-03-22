@@ -438,7 +438,8 @@ namespace Scorpio.Runtime
             int num = scriptFunction.ParametersCount;
             ScriptObject[] parameters = new ScriptObject[num];
             for (int i = 0; i < num; ++i) {
-                parameters[i] = ResolveOperand(scriptFunction.Parameters[i]);
+                //此处要调用Assign 如果传入number string等基础类型  在函数内自运算的话 会影响 传入的值
+                parameters[i] = ResolveOperand(scriptFunction.Parameters[i]).Assign();
             }
             m_script.PushStackInfo();
             object ret = obj.Call(parameters);
