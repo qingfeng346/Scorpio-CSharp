@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Scorpio;
-namespace Scorpio.CodeDom
+﻿namespace Scorpio.CodeDom
 {
     //++或者--标识
     public enum CALC

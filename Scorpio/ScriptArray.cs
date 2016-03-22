@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Scorpio.CodeDom;
 using Scorpio.Exception;
 namespace Scorpio
 {

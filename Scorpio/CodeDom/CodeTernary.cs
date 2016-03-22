@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Scorpio.CodeDom
 {
+    //三目运算符 true ? xxx : xxx
     public class CodeTernary : CodeObject
     {
         public CodeObject Allow; //判断条件

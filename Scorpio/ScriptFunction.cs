@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using Scorpio.Runtime;
 using Scorpio.Variable;
 using Scorpio.Exception;
@@ -14,20 +12,20 @@ namespace Scorpio
         object Call(ScriptObject[] Parameters);
     }
     /// <summary> 函数类型 </summary>
-    public enum FunstionType
-    {
-        //脚本函数
-        Script,
-        //注册的C函数
-        Function,
-        //注册的C函数
-        Handle,
-        //函数
-        Method,
-    }
+
     //脚本函数类型
     public class ScriptFunction : ScriptObject
     {
+        public enum FunstionType {
+            //脚本函数
+            Script,
+            //注册的C函数
+            Function,
+            //注册的C函数
+            Handle,
+            //函数
+            Method,
+        }
         public FunstionType FunctionType { get; private set; }                  //函数类型 （是 脚本函数 还是 程序函数）
         public bool IsStatic { get; private set; }                              //是否是静态函数（不是table内部函数）
         private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数

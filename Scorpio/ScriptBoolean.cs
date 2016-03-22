@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Scorpio.Variable;
-
-namespace Scorpio
+﻿namespace Scorpio
 {
     //脚本bool类型
     public class ScriptBoolean : ScriptObject

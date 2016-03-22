@@ -1,8 +1,5 @@
-﻿using Scorpio.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using Scorpio;
+using Scorpio.Runtime;
 namespace Scorpio.CodeDom
 {
     //try catch 语句

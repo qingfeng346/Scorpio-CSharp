@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Scorpio;
-using Scorpio.CodeDom;
+﻿using Scorpio.CodeDom;
 namespace Scorpio.Runtime
 {
     //一条指令

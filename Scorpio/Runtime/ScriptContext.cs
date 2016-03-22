@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Scorpio;
-using Scorpio.Runtime;
 using Scorpio.Compiler;
 using Scorpio.CodeDom;
 using Scorpio.CodeDom.Temp;
@@ -39,7 +37,7 @@ namespace Scorpio.Runtime
         {
             m_parent = parent;
             m_variableDictionary.Clear();
-            foreach (var pair in variable)
+            foreach (KeyValuePair<String, ScriptObject> pair in variable)
                 m_variableDictionary[pair.Key] = pair.Value;
         }
         private void Initialize(ScriptContext parent, string name, ScriptObject obj)
@@ -458,7 +456,7 @@ namespace Scorpio.Runtime
         ScriptTable ParseTable(CodeTable table)
         {
             ScriptTable ret = m_script.CreateTable();
-            foreach (TableVariable variable in table.Variables) {
+            foreach (CodeTable.TableVariable variable in table.Variables) {
                 ret.SetValue(variable.key, ResolveOperand(variable.value));
             }
             foreach (ScriptFunction func in table.Functions) {

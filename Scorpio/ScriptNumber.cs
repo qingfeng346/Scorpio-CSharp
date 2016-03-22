@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Scorpio.CodeDom;
-using Scorpio.Variable;
-using Scorpio.Compiler;
-using Scorpio.Exception;
 namespace Scorpio
 {
     //脚本数字类型

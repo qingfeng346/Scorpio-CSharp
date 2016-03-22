@@ -73,6 +73,7 @@
     <Compile Include="IScriptExtensions.cs" />
     <Compile Include="Library\LibraryJson.cs" />
     <Compile Include="Library\LibraryMath.cs" />
+    <Compile Include="Runtime\Executable_Block.cs" />
     <Compile Include="ScriptEnum.cs" />
     <Compile Include="ScriptExtensions.cs" />
     <Compile Include="Serialize\ScorpioMaker.cs" />

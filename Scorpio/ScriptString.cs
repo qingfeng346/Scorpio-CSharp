@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Scorpio.Variable;
-using Scorpio.Compiler;
+﻿using Scorpio.Compiler;
 using Scorpio.Exception;
 namespace Scorpio
 {

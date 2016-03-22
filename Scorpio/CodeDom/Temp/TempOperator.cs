@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Scorpio.Compiler;
-using Scorpio.CodeDom;
 namespace Scorpio.CodeDom.Temp
 {
     public class TempOperator

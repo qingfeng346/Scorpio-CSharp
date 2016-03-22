@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Scorpio;
 namespace Scorpio.Library {
     public class LibraryMath {
 		public const float PI = 3.14159274f;

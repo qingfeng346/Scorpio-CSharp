@@ -4,9 +4,8 @@
 
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
+using Scorpio;
 
 namespace Scorpio.Extensions
 {
@@ -40,7 +39,7 @@ namespace Scorpio.Extensions
 #endif
         }
         public bool FileExist(string file) {
-            return !string.IsNullOrEmpty(file) && File.Exists(file);
+            return !Util.IsNullOrEmpty(file) && File.Exists(file);
         }
         public byte[] GetFileBuffer(string file) {
             FileStream stream = File.OpenRead(file);

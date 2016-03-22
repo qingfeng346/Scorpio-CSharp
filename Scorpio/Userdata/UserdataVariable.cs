@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Scorpio;
 using Scorpio.Exception;
 namespace Scorpio.Userdata
 {

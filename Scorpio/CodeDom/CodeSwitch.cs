@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Scorpio;
+﻿using System.Collections.Generic;
 using Scorpio.CodeDom.Temp;
 namespace Scorpio.CodeDom
 {

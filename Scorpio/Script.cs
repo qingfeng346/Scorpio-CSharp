@@ -8,7 +8,6 @@ using Scorpio.Compiler;
 using Scorpio.Exception;
 using Scorpio.Library;
 using Scorpio.Userdata;
-using Scorpio.Extensions;
 using Scorpio.Variable;
 using Scorpio.Serialize;
 namespace Scorpio
