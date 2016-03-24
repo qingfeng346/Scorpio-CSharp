@@ -122,6 +122,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 * UWP平台master配置下generic_type函数也会出问题
  
 ## master版本更新和修改内容 ##
+(2016-3-24)
+-----------
+* 优化脚本执行性能,大约提升 10%-15%
+
 (2016-3-21)
 -----------
 * 增加c#类去反射机制
