@@ -27,7 +27,7 @@ namespace Scorpio.Compiler
         }
         public void BeginExecutable(Executable_Block block)
         {
-            m_scriptExecutable = new ScriptExecutable(m_script, block);
+            m_scriptExecutable = new ScriptExecutable();
             m_Executables.Push(m_scriptExecutable);
         }
         public void EndExecutable()
@@ -242,13 +242,12 @@ namespace Scorpio.Compiler
         private TempCondition ParseCondition(bool condition, Executable_Block block)
         {
             CodeObject con = null;
-            if (condition)
-            {
+            if (condition) {
                 ReadLeftParenthesis();
                 con = GetObject();
                 ReadRightParenthesis();
             }
-            return new TempCondition(m_script, con, ParseStatementBlock(block), block);
+            return new TempCondition(con, ParseStatementBlock(block), block);
         }
         //解析for语句
         private void ParseFor()
@@ -274,7 +273,7 @@ namespace Scorpio.Compiler
         //解析单纯for循环
         private void ParseFor_Simple(string Identifier, CodeObject obj)
         {
-            CodeForSimple ret = new CodeForSimple(m_script);
+            CodeForSimple ret = new CodeForSimple();
             ret.Identifier = Identifier;
             ret.Begin = obj;
             ret.Finished = GetObject();
@@ -290,7 +289,7 @@ namespace Scorpio.Compiler
         //解析正规for循环
         private void ParseFor_impl()
         {
-            CodeFor ret = new CodeFor(m_script);
+            CodeFor ret = new CodeFor();
             Token token = ReadToken();
             if (token.Type != TokenType.SemiColon)
             {
@@ -316,7 +315,7 @@ namespace Scorpio.Compiler
         //解析foreach语句
         private void ParseForeach()
         {
-            CodeForeach ret = new CodeForeach(m_script);
+            CodeForeach ret = new CodeForeach();
             ReadLeftParenthesis();
             if (PeekToken().Type == TokenType.Var) ReadToken();
             ret.Identifier = ReadIdentifier();
@@ -341,21 +340,23 @@ namespace Scorpio.Compiler
             ret.Condition = GetObject();
             ReadRightParenthesis();
             ReadLeftBrace();
+            List<TempCase> Cases = new List<TempCase>();
             for (; ; ) {
                 Token token = ReadToken();
                 if (token.Type == TokenType.Case) {
                     List<CodeObject> allow = new List<CodeObject>();
                     ParseCase(allow);
-                    ret.AddCase(new TempCase(m_script, allow, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break), Executable_Block.Switch));
+                    Cases.Add(new TempCase(m_script, allow, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break)));
                 } else if (token.Type == TokenType.Default) {
                     ReadColon();
-                    ret.Default = new TempCase(m_script, null, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break), Executable_Block.Switch);
+                    ret.Default = new TempCase(m_script, null, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break));
                 } else if (token.Type != TokenType.SemiColon) {
                     UndoToken();
                     break;
                 }
             }
             ReadRightBrace();
+            ret.SetCases(Cases);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_SWITCH, ret));
         }
         //解析case
@@ -372,7 +373,7 @@ namespace Scorpio.Compiler
         //解析try catch
         private void ParseTry()
         {
-            CodeTry ret = new CodeTry(m_script);
+            CodeTry ret = new CodeTry();
             ret.TryExecutable = ParseStatementBlock(Executable_Block.Context);
             ReadCatch();
             ReadLeftParenthesis();
@@ -634,7 +635,7 @@ namespace Scorpio.Compiler
             {
                 if (PeekToken().Type == TokenType.RightBracket)
                     break;
-                ret.Elements.Add(GetObject());
+                ret._Elements.Add(GetObject());
                 token = PeekToken();
                 if (token.Type == TokenType.Comma) {
                     ReadComma();
@@ -644,6 +645,7 @@ namespace Scorpio.Compiler
                     throw new ParserException("Comma ',' or right parenthesis ']' expected in array object.", token);
             }
             ReadRightBracket();
+            ret.Init();
             return ret;
         }
         //返回Table数据
@@ -651,13 +653,12 @@ namespace Scorpio.Compiler
         {
             CodeTable ret = new CodeTable();
             ReadLeftBrace();
-            while (PeekToken().Type != TokenType.RightBrace)
-            {
+            while (PeekToken().Type != TokenType.RightBrace) {
                 Token token = ReadToken();
                 if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number) {
                     Token next = ReadToken();
                     if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
-                        ret.Variables.Add(new CodeTable.TableVariable(token.Lexeme, GetObject()));
+                        ret._Variables.Add(new CodeTable.TableVariable(token.Lexeme, GetObject()));
                         Token peek = PeekToken();
                         if (peek.Type == TokenType.Comma || peek.Type == TokenType.SemiColon) {
                             ReadToken();
@@ -667,12 +668,13 @@ namespace Scorpio.Compiler
                     }
                 } else if (token.Type == TokenType.Function) {
                     UndoToken();
-                    ret.Functions.Add(ParseFunctionDeclaration(true));
+                    ret._Functions.Add(ParseFunctionDeclaration(true));
                 } else {
                     throw new ParserException("Table开始关键字必须为[变量名称]或者[function]关键字", token);
                 }
             }
             ReadRightBrace();
+            ret.Init();
             return ret;
         }
         //返回执行一段字符串

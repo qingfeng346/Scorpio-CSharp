@@ -10,26 +10,29 @@ namespace Scorpio.Runtime
     //执行命令
     public class ScriptContext
     {
-        private Script m_script;                                                        //脚本类
-        private ScriptContext m_parent;                                                 //父级执行命令
-        private ScriptExecutable m_scriptExecutable;                                    //执行命令堆栈
-        private ScriptInstruction m_scriptInstruction;                                  //当前执行
-        private Dictionary<String, ScriptObject> m_variableDictionary = new Dictionary<String, ScriptObject>();     //当前作用域所有变量
-        private ScriptObject m_returnObject = null;                                     //返回值
-        private Executable_Block m_block;                                               //堆栈类型
-        private bool m_Break = false;                                                   //break跳出
-        private bool m_Continue = false;                                                //continue跳出
-        private bool m_Over = false;                                                    //函数是否已经结束
-        private int m_InstructionCount = 0;                                             //指令数量
+        private Script m_script;                                            //脚本类
+        private ScriptContext m_parent;                                     //父级执行命令
+        private ScriptInstruction[] m_scriptInstructions;                   //指令集
+        private ScriptInstruction m_scriptInstruction;                      //当前执行的指令
+        private int m_InstructionCount;                                     //指令数量
+        private Executable_Block m_block;                                   //指令集类型
+        private Dictionary<String, ScriptObject> m_variableDictionary;      //当前作用域所有变量
+        private ScriptObject m_returnObject = null;                         //返回值
+        private bool m_Break = false;                                       //break跳出
+        private bool m_Continue = false;                                    //continue跳出
+        private bool m_Over = false;                                        //函数是否已经结束
+        
         public ScriptContext(Script script, ScriptExecutable scriptExecutable) : this(script, scriptExecutable, null, Executable_Block.None) { }
         public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent) : this(script, scriptExecutable, parent, Executable_Block.None) { }
         public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent, Executable_Block block) {
             m_script = script;
             m_parent = parent;
-            m_scriptExecutable = scriptExecutable;
-            m_variableDictionary.Clear();
             m_block = block;
-            m_InstructionCount = m_scriptExecutable != null ? m_scriptExecutable.Count : 0;
+            m_variableDictionary = new Dictionary<String, ScriptObject>();
+            if (scriptExecutable != null) {
+                m_scriptInstructions = scriptExecutable.ScriptInstructions;
+                m_InstructionCount = m_scriptInstructions.Length;
+            }
         }
         private bool IsOver { get { return m_Break || m_Over; } }                       //break 或者 return  跳出循环
         private bool IsExecuted { get { return m_Break || m_Over || m_Continue; } }     //continue break return 当前模块是否执行完成
@@ -40,10 +43,8 @@ namespace Scorpio.Runtime
             foreach (KeyValuePair<String, ScriptObject> pair in variable)
                 m_variableDictionary[pair.Key] = pair.Value;
         }
-        private void Initialize(ScriptContext parent, string name, ScriptObject obj)
+        private void Initialize(string name, ScriptObject obj)
         {
-            m_parent = parent;
-            m_variableDictionary.Clear();
             m_variableDictionary.Add(name, obj);
         }
         private void Initialize(ScriptContext parent)
@@ -123,7 +124,7 @@ namespace Scorpio.Runtime
             Reset();
             int iInstruction = 0;
             while (iInstruction < m_InstructionCount) {
-                m_scriptInstruction = m_scriptExecutable[iInstruction++];
+                m_scriptInstruction = m_scriptInstructions[iInstruction++];
                 ExecuteInstruction();
                 if (IsExecuted) break;
             }
@@ -133,10 +134,11 @@ namespace Scorpio.Runtime
         {
             if (executable == null) return null;
             Reset();
+            ScriptInstruction[] scriptInstructions = executable.ScriptInstructions;
             int iInstruction = 0;
-            int iInstructionCount = executable.Count;
+            int iInstructionCount = scriptInstructions.Length ;
             while (iInstruction < iInstructionCount) {
-                m_scriptInstruction = executable[iInstruction++];
+                m_scriptInstruction = scriptInstructions[iInstruction++];
                 ExecuteInstruction();
                 if (IsExecuted) break;
             }
@@ -195,15 +197,13 @@ namespace Scorpio.Runtime
         void ProcessCallFor()
         {
             CodeFor code = (CodeFor)m_scriptInstruction.Operand0;
-            ScriptContext context = code.GetContext();
-            context.Initialize(this);
+            ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.For);
             context.Execute(code.BeginExecutable);
             for ( ; ; ) {
                 if (code.Condition != null) {
                     if (!context.ResolveOperand(code.Condition).LogicOperation()) break;
                 }
-                ScriptContext blockContext = code.GetBlockContext();
-                blockContext.Initialize(context);
+                ScriptContext blockContext = new ScriptContext(m_script, code.BlockExecutable, context, Executable_Block.For);
                 blockContext.Execute();
                 if (blockContext.IsOver) break;
                 context.Execute(code.LoopExecutable);
@@ -219,7 +219,6 @@ namespace Scorpio.Runtime
             int begin = beginNumber.ToInt32();
             int finished = finishedNumber.ToInt32();
             int step;
-            ScriptContext context;
             if (code.Step != null) {
                 ScriptNumber stepNumber = ResolveOperand(code.Step) as ScriptNumber;
                 if (stepNumber == null) throw new ExecutionException(m_script, "forsimple Step必须是number");
@@ -227,9 +226,10 @@ namespace Scorpio.Runtime
             } else {
                 step = 1;
             }
+            ScriptContext context;
             for (int i = begin; i <= finished; i += step) {
-                context = code.GetBlockContext();
-                context.Initialize(this, code.Identifier, m_script.CreateNumber(i));
+                context = new ScriptContext(m_script, code.BlockExecutable, this, Executable_Block.For);
+                context.Initialize(code.Identifier, m_script.CreateNumber(i));
                 context.Execute();
                 if (context.IsOver) break;
             }
@@ -240,49 +240,55 @@ namespace Scorpio.Runtime
             ScriptObject loop = ResolveOperand(code.LoopObject);
             if (!(loop is ScriptFunction)) throw new ExecutionException(m_script, "foreach函数必须返回一个ScriptFunction");
             object obj;
-            ScriptContext context;
             ScriptFunction func = (ScriptFunction)loop;
+            ScriptContext context;
             for ( ; ; ) {
-                context = code.GetBlockContext();
                 obj = func.Call();
                 if (obj == null) return;
-                context.Initialize(this, code.Identifier, m_script.CreateObject(obj));
+                context = new ScriptContext(m_script, code.BlockExecutable, this, Executable_Block.Foreach);
+                context.Initialize(code.Identifier, m_script.CreateObject(obj));
                 context.Execute();
                 if (context.IsOver) break;
             }
         }
-        void ProcessCallIf()
-        {
+        void ProcessCallIf() {
             CodeIf code = (CodeIf)m_scriptInstruction.Operand0;
-            if (ProcessCondition(code.If, code.If.GetContext(), Executable_Block.If))
+            if (ProcessAllow(code.If)) {
+                ProcessCondition(code.If);
                 return;
-            int length = code.ElseIfCount;
-            for (int i = 0; i < length; ++i) {
-                if (ProcessCondition(code.ElseIf[i], code.ElseIf[i].GetContext(), Executable_Block.If))
+            }
+            foreach (var ElseIf in code.ElseIf) {
+                if (ProcessAllow(ElseIf)) {
+                    ProcessCondition(ElseIf);
                     return;
+                }
             }
-            if (code.Else != null)
-                ProcessCondition(code.Else, code.Else.GetContext(), Executable_Block.If);
+            if (code.Else != null && ProcessAllow(code.Else)) {
+                ProcessCondition(code.Else);
+            }
         }
-        bool ProcessCondition(TempCondition con, ScriptContext context, Executable_Block block)
-        {
-            if (con == null) return false;
-            if (con.Allow != null) {
-                object b = ResolveOperand(con.Allow).ObjectValue;
-                if (b == null || b.Equals(false)) return false;
+        bool ProcessAllow(TempCondition con) {
+            if (con.Allow != null && !ResolveOperand(con.Allow).LogicOperation()) {
+                return false;
             }
-            context.Initialize(this);
-            context.Execute();
             return true;
         }
-        void ProcessCallWhile()
-        {
+        void ProcessCondition(TempCondition condition) {
+            new ScriptContext(m_script, condition.Executable, this, condition.Block).Execute();
+        }
+        void ProcessCallWhile() {
             CodeWhile code = (CodeWhile)m_scriptInstruction.Operand0;
             TempCondition condition = code.While;
+            ScriptContext context;
             for ( ; ; ) {
-                ScriptContext context = condition.GetContext();
-                if (!ProcessCondition(condition, context, Executable_Block.While)) break;
-                if (context.IsOver) break;
+                if (!ProcessAllow(condition)) {
+                    break;
+                }
+                context = new ScriptContext(m_script, condition.Executable, this, Executable_Block.While);
+                context.Execute();
+                if (context.IsOver) {
+                    break;
+                }
             }
         }
         void ProcessCallSwitch()
@@ -290,45 +296,38 @@ namespace Scorpio.Runtime
             CodeSwitch code = (CodeSwitch)m_scriptInstruction.Operand0;
             ScriptObject obj = ResolveOperand(code.Condition);
             bool exec = false;
-            foreach (TempCase c in code.Cases) {
-                foreach (CodeObject all in c.Allow) {
-                    if (ResolveOperand(all).Equals(obj)) {
+            foreach (TempCase Case in code.Cases) {
+                foreach (CodeObject allow in Case.Allow) {
+                    if (ResolveOperand(allow).Equals(obj)) {
                         exec = true;
-                        ScriptContext context = c.GetContext();
-                        context.Initialize(this);
-                        context.Execute();
+                        new ScriptContext(m_script, Case.Executable, this, Executable_Block.Switch).Execute();
                         break;
                     }
                 }
                 if (exec) { break; }
             }
             if (exec == false && code.Default != null) {
-                ScriptContext context = code.Default.GetContext();
-                context.Initialize(this);
-                context.Execute();
+                new ScriptContext(m_script, code.Default.Executable, this, Executable_Block.Switch).Execute();
             }
         }
         void ProcessTry()
         {
             CodeTry code = (CodeTry)m_scriptInstruction.Operand0;
             try {
-                ScriptContext context = code.GetTryContext();
-                context.Initialize(this);
-                context.Execute();
+                new ScriptContext(m_script, code.TryExecutable, this).Execute();
             } catch (InteriorException ex) {
-                ScriptContext context = code.GetCatchContext();
-                context.Initialize(this, code.Identifier, ex.obj);
+                ScriptContext context = new ScriptContext(m_script, code.CatchExecutable, this);
+                context.Initialize(code.Identifier, ex.obj);
                 context.Execute();
             } catch (System.Exception ex) {
-                ScriptContext context = code.GetCatchContext();
-                context.Initialize(this, code.Identifier, m_script.CreateObject(ex));
+                ScriptContext context = new ScriptContext(m_script, code.CatchExecutable, this);
+                context.Initialize(code.Identifier, m_script.CreateObject(ex));
                 context.Execute();
             }
         }
         void ProcessThrow()
         {
-            CodeThrow code = (CodeThrow)m_scriptInstruction.Operand0;
-            throw new InteriorException(ResolveOperand(code.obj));
+            throw new InteriorException(ResolveOperand(((CodeThrow)m_scriptInstruction.Operand0).obj));
         }
         void ProcessRet()
         {
@@ -449,9 +448,8 @@ namespace Scorpio.Runtime
         ScriptArray ParseArray(CodeArray array)
         {
             ScriptArray ret = m_script.CreateArray();
-            int num = array.Elements.Count;
-            for (int i = 0; i < num; ++i) {
-                ret.Add(ResolveOperand(array.Elements[i]));
+            foreach (var ele in array.Elements) {
+                ret.Add(ResolveOperand(ele));
             }
             return ret;
         }

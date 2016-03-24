@@ -10,13 +10,13 @@ namespace Scorpio.Variable
     internal class ScorpioScriptFunction
     {
         private Script m_Script;                            //脚本系统
-        private List<String> m_ListParameters;              //参数
+        private String[] m_ListParameters;                  //参数
         private ScriptExecutable m_ScriptExecutable;        //函数执行命令
         private int m_ParameterCount;                       //参数个数
         private bool m_Params;                              //是否是不定参函数
         public ScorpioScriptFunction(Script script, List<String> listParameters, ScriptExecutable scriptExecutable, bool bParams) {
             this.m_Script = script;
-            this.m_ListParameters = new List<string>(listParameters);
+            this.m_ListParameters = listParameters.ToArray();
             this.m_ScriptExecutable = scriptExecutable;
             this.m_ParameterCount = listParameters.Count;
             this.m_Params = bParams;

@@ -13,7 +13,13 @@ namespace Scorpio.CodeDom
                 this.value = value;
             }
         }
-        public List<TableVariable> Variables = new List<TableVariable>();
-        public List<ScriptFunction> Functions = new List<ScriptFunction>();
+        public List<TableVariable> _Variables = new List<TableVariable>();
+        public List<ScriptFunction> _Functions = new List<ScriptFunction>();
+        public TableVariable[] Variables;
+        public ScriptFunction[] Functions;
+        public void Init() {
+            Variables = _Variables.ToArray();
+            Functions = _Functions.ToArray();
+        }
     }
 }
