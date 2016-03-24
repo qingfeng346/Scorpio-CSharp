@@ -204,7 +204,7 @@ namespace Scorpio.Compiler
         private void ParseBlock()
         {
             UndoToken();
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_BLOCK, ParseStatementBlock(Executable_Block.Block)));
+            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_BLOCK, new CodeCallBlock(ParseStatementBlock(Executable_Block.Block))));
         }
         //解析if(判断语句)
         private void ParseIf()

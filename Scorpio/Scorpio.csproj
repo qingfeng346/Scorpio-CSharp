@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="CodeDom\CodeArray.cs" />
     <Compile Include="CodeDom\CodeAssign.cs" />
+    <Compile Include="CodeDom\CodeCallBlock.cs" />
     <Compile Include="CodeDom\CodeCallFunction.cs" />
     <Compile Include="CodeDom\CodeEval.cs" />
     <Compile Include="CodeDom\CodeFor.cs" />

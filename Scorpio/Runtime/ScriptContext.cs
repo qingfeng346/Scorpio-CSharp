@@ -22,7 +22,7 @@ namespace Scorpio.Runtime
         private bool m_Over = false;                                                    //函数是否已经结束
         private int m_InstructionCount = 0;                                             //指令数量
         public ScriptContext(Script script, ScriptExecutable scriptExecutable) : this(script, scriptExecutable, null, Executable_Block.None) { }
-        public ScriptContext(Script script, ScriptExecutable scriptExecutable, Executable_Block block) : this(script, scriptExecutable, null, block) { }
+        public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent) : this(script, scriptExecutable, parent, Executable_Block.None) { }
         public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent, Executable_Block block) {
             m_script = script;
             m_parent = parent;
@@ -343,9 +343,7 @@ namespace Scorpio.Runtime
         }
         void ProcessCallBlock()
         {
-            ScriptContext context = new ScriptContext(m_script, (ScriptExecutable)m_scriptInstruction.Value);
-            context.Initialize(this);
-            context.Execute();
+            ParseCallBlock((CodeCallBlock)m_scriptInstruction.Operand0);
         }
         void ProcessCallFunction()
         {
@@ -431,6 +429,9 @@ namespace Scorpio.Runtime
         ScriptFunction ParseFunction(CodeFunction func)
         {
             return ((ScriptFunction)func.Func.Clone()).SetParentContext(this);
+        }
+        void ParseCallBlock(CodeCallBlock block) {
+            new ScriptContext(m_script, block.Executable, this).Execute();
         }
         ScriptObject ParseCall(CodeCallFunction scriptFunction, bool needRet)
         {
