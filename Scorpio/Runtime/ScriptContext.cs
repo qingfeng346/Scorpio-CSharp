@@ -8,6 +8,8 @@ using Scorpio.Exception;
 namespace Scorpio.Runtime
 {
     //执行命令
+    //注意事项:
+    //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public class ScriptContext
     {
         private Script m_script;                                            //脚本类
@@ -88,6 +90,14 @@ namespace Scorpio.Runtime
                 ret = (obj == null ? m_script.GetValue(name) : obj);
             } else {
                 ret = ResolveOperand(member.Parent);
+                /*此处设置一下堆栈位置 否则 函数返回值取值出错会报错位置 例如  
+                    function Get() { 
+                        return null 
+                    } 
+                    Get().a
+                    
+                上述代码报错会报道 return null 那一行 但实际出错 是 .a 的时候 下面这句话就是把堆栈设置回 .a 那一行
+                */
                 m_script.SetStackInfo(member.StackInfo);
                 ret = ret.GetValue(GetMember(member));
             }
