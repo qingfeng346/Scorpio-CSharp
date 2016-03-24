@@ -37,8 +37,8 @@ namespace Scorpio.Variable
                     objs[m_ListParameters[i]] = (parameters != null && length > i) ? parameters[i] : m_Script.Null;
                 }
             }
-            ScriptContext context = new ScriptContext(m_Script, m_ScriptExecutable, null, Executable_Block.Function);
-            context.Initialize(parentContext, objs);
+            ScriptContext context = new ScriptContext(m_Script, m_ScriptExecutable, parentContext, Executable_Block.Function);
+            context.Initialize(objs);
             return context.Execute();
         }
     }

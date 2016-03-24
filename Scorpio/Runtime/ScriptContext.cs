@@ -36,21 +36,12 @@ namespace Scorpio.Runtime
         }
         private bool IsOver { get { return m_Break || m_Over; } }                       //break 或者 return  跳出循环
         private bool IsExecuted { get { return m_Break || m_Over || m_Continue; } }     //continue break return 当前模块是否执行完成
-        public void Initialize(ScriptContext parent, Dictionary<String, ScriptObject> variable)
-        {
-            m_parent = parent;
-            m_variableDictionary.Clear();
+        public void Initialize(Dictionary<String, ScriptObject> variable) {
             foreach (KeyValuePair<String, ScriptObject> pair in variable)
                 m_variableDictionary[pair.Key] = pair.Value;
         }
-        private void Initialize(string name, ScriptObject obj)
-        {
+        private void Initialize(string name, ScriptObject obj) {
             m_variableDictionary.Add(name, obj);
-        }
-        private void Initialize(ScriptContext parent)
-        {
-            m_parent = parent;
-            m_variableDictionary.Clear();
         }
         //初始化所有数据 每次调用 Execute 调用
         private void Reset()
