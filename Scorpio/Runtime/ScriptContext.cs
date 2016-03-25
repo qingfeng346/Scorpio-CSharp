@@ -420,7 +420,9 @@ namespace Scorpio.Runtime
         }
         ScriptObject ParseScriptObject(CodeScriptObject obj)
         {
-            return obj.Object.Clone();
+            //此处原先使用Clone 是因为 number 和 string 有自运算的操作 会影响常量 但是现在设置变量会调用Assign() 基础类型会自动复制一次 所以去掉clone
+            return obj.Object;
+            //return obj.Object.Clone();
         }
         ScriptObject ParseRegion(CodeRegion region)
         {
@@ -475,6 +477,16 @@ namespace Scorpio.Runtime
                 ScriptObject right = ResolveOperand(operate.Right);
                 if (left is ScriptString || right is ScriptString) { return m_script.CreateString(left.ToString() + right.ToString()); }
                 return left.Compute(type, right);
+            case TokenType.Minus:
+            case TokenType.Multiply:
+            case TokenType.Divide:
+            case TokenType.Modulo:
+            case TokenType.InclusiveOr:
+            case TokenType.Combine:
+            case TokenType.XOR:
+            case TokenType.Shr:
+            case TokenType.Shi:
+                return left.Compute(type, ResolveOperand(operate.Right));
             case TokenType.And:
                 if (!left.LogicOperation()) return m_script.False;
                 return m_script.GetBoolean(ResolveOperand(operate.Right).LogicOperation());
@@ -491,7 +503,7 @@ namespace Scorpio.Runtime
             case TokenType.LessOrEqual:
                 return m_script.GetBoolean(left.Compare(type, ResolveOperand(operate.Right)));
             default:
-                return left.Compute(type, ResolveOperand(operate.Right));
+                throw new ExecutionException(m_script, "不支持的运算符 " + type);
             }
         }
         ScriptObject ParseTernary(CodeTernary ternary)
