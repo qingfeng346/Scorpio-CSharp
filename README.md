@@ -11,6 +11,18 @@
 * **语法测试** 直接运行 **ScorpioDemo/bin/Debug/ScorpioDemo.exe**  左侧选中要测试的脚本,点击 **Run Script** 按钮即可
 * **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
+## 注意事项 ##
+* 脚本内所有c#变量(除了int,string等基础类型)均为引用,struct变量也一样
+* c#重载[]运算符后脚本里不能直接使用[],请使用 get_Item 函数
+* c#数组对象获取元素不能直接使用[],请使用 GetValue 函数
+* 同类中静态函数和实例函数不要重名,否则会调用失败 例如 static void Test(object a); void Test(object a, object b); 两个函数不一定会当静态还是实例函数处理
+* 同类中重载的函数相同参数不要是继承关系,否则可能调用失败,例如 void Test(object a); void Test(string a); 两个Test函数都可以传入string,但是调用时不一定会调用哪一个
+* c#类的变量不能类似 += -= *= /= 等赋值计算操作(只有event可以使用 += -=) 请使用 变量 = 变量 + XXX
+* SCORPIO_DYNAMIC_DELEGATE 宏定义好像只能android和windows(exe)平台可用,其它平台请勿用
+* IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
+* UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
+* UWP平台master配置下generic_type函数也会出问题
+
 ## Unity3d发布平台支持(亲测):
 - [x] Web Player
 - [x] PC, Mac & Linux Standalone
@@ -20,6 +32,8 @@
 - [x] Windows Phone 8
 - [x] Windows 10 (Universal Windows Platform)
 - [x] WebGL
+- [ ] 其他平台未测试,如果测试通过可以@我
+
 
 ## 源码目录说明:
 * **Scorpio** 脚本引擎项目,平常使用只需导入此目录即可
@@ -27,6 +41,8 @@
 * **ScorpioExec** 跟lua.exe一样,命令行调用Scorpio脚本
 * **ScorpioMaker** 把Scorpio脚本序列化成二进制文件,把二进制文件反序列化成文本文件
 * **ScorpioTest** Unity内使用Scorpio脚本例子
+* **ScorpioLibrary** ScorpioExec脚本使用的第三方库,可以直接运行一个脚本然后当作类似python一样的脚本去处理一些简单的任务
+* **ScorpioReflect** Scorpio脚本去反射机制的实现
 
 ## Unity导入Scorpio-CSharp:
 * 第一种方法(建议) : 把trunk目录下的 Scorpio 文件夹复制到项目 然后删除 文件夹下的 Properties 文件夹和 Scorpio.csproj 文件即可
@@ -108,18 +124,6 @@ Script script = new Script();
 script.LoadLibrary();
 script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script));
 ```
-
-## 注意事项 ##
-* 脚本内所有c#变量(除了int,string等基础类型)均为引用,struct变量也一样
-* c#重载[]运算符后脚本里不能直接使用[],请使用 get_Item 函数
-* c#数组对象获取元素不能直接使用[],请使用 GetValue 函数
-* 同类中静态函数和实例函数不要重名,否则会调用失败 例如 static void Test(object a); void Test(object a, object b); 两个函数不一定会当静态还是实例函数处理
-* 同类中重载的函数相同参数不要是继承关系,否则可能调用失败,例如 void Test(object a); void Test(string a); 两个Test函数都可以传入string,但是调用时不一定会调用哪一个
-* c#类的变量不能类似 += -= *= /= 等赋值计算操作(只有event可以使用 += -=) 请使用 变量 = 变量 + XXX
-* SCORPIO_DYNAMIC_DELEGATE 宏定义好像只能android和windows(exe)平台可用,其它平台请勿用
-* IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
-* UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
-* UWP平台master配置下generic_type函数也会出问题
  
 ## master版本更新和修改内容 ##
 (2016-3-24)
