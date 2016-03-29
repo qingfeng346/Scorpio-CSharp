@@ -1,5 +1,4 @@
-﻿using Scorpio;
-using Scorpio.Runtime;
+﻿using Scorpio.Runtime;
 namespace Scorpio.CodeDom
 {
     //foreach 循环  foreach ( element in pairs(table)) { }

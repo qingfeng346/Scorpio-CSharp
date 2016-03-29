@@ -259,7 +259,7 @@ namespace Scorpio.Runtime
                 ProcessCondition(code.If);
                 return;
             }
-            foreach (var ElseIf in code.ElseIf) {
+            foreach (TempCondition ElseIf in code.ElseIf) {
                 if (ProcessAllow(ElseIf)) {
                     ProcessCondition(ElseIf);
                     return;
@@ -452,7 +452,7 @@ namespace Scorpio.Runtime
         ScriptArray ParseArray(CodeArray array)
         {
             ScriptArray ret = m_script.CreateArray();
-            foreach (var ele in array.Elements) {
+            foreach (CodeObject ele in array.Elements) {
                 ret.Add(ResolveOperand(ele));
             }
             return ret;

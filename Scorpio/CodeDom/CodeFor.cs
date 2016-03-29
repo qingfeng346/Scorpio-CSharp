@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Scorpio;
-using Scorpio.Runtime;
+﻿using Scorpio.Runtime;
 namespace Scorpio.CodeDom
 {
     //for循环 for (var i=0;i<10;++i) {}

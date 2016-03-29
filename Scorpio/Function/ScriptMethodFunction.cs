@@ -1,4 +1,5 @@
 ﻿using System;
+using Scorpio;
 using Scorpio.Variable;
 using Scorpio.Exception;
 namespace Scorpio.Function {

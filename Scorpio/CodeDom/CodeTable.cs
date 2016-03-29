@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Scorpio;
 using Scorpio.Function;
 namespace Scorpio.CodeDom
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Scorpio;
 using Scorpio.Runtime;
 using Scorpio.Variable;
 using Scorpio.Exception;

@@ -1,5 +1,4 @@
-﻿using Scorpio;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 namespace Scorpio.Runtime {
     //指令执行列表
     public class ScriptExecutable

@@ -1,6 +1,6 @@
 ﻿using System;
+using Scorpio;
 using Scorpio.Exception;
-
 namespace Scorpio.Function {
     public class ScriptHandleFunction : ScriptFunction {
         private ScorpioHandle m_Handle;                                         //程序函数执行类

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Scorpio.Runtime;
-using Scorpio.Variable;
-using Scorpio.Exception;
 namespace Scorpio
 {
     //C#函数指针
