@@ -56,7 +56,7 @@ namespace CancerDemo
                 BuildOutPut(ex.ToString());
             }
         }
-        private object print(object[] Parameters)
+        private object print(Script script, object[] Parameters)
         {
             for (int i = 0; i < Parameters.Length; ++i) {
                 ScriptOutPut(Parameters[i].ToString());
