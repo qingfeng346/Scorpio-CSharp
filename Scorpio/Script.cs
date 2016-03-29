@@ -10,6 +10,7 @@ using Scorpio.Library;
 using Scorpio.Userdata;
 using Scorpio.Variable;
 using Scorpio.Serialize;
+using Scorpio.Function;
 namespace Scorpio
 {
     //脚本类
@@ -281,21 +282,21 @@ namespace Scorpio
         {
             return new ScriptTable(this);
         }
-        internal ScriptFunction CreateFunction(string name, ScorpioScriptFunction value)
+        internal ScriptScriptFunction CreateFunction(string name, ScorpioScriptFunction value)
         {
-            return new ScriptFunction(this, name, value);
+            return new ScriptScriptFunction(this, name, value);
         }
         public ScriptFunction CreateFunction(ScorpioFunction value)
         {
-            return new ScriptFunction(this, value);
+            return new ScriptDelegateFunction(this, value);
         }
         public ScriptFunction CreateFunction(ScorpioHandle value)
         {
-            return new ScriptFunction(this, value);
+            return new ScriptHandleFunction(this, value);
         }
         public ScriptFunction CreateFunction(ScorpioMethod value)
         {
-            return new ScriptFunction(this, value);
+            return new ScriptMethodFunction(this, value);
         }
         public IScriptUserdataFactory GetUserdataFactory() {
             return m_UserdataFactory;

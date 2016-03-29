@@ -71,6 +71,10 @@
     <Compile Include="Exception\InteriorException.cs" />
     <Compile Include="Exception\StackInfo.cs" />
     <Compile Include="Extensions\DefaultScriptExtensions.cs" />
+    <Compile Include="Function\ScriptDelegateFunction.cs" />
+    <Compile Include="Function\ScriptHandleFunction.cs" />
+    <Compile Include="Function\ScriptMethodFunction.cs" />
+    <Compile Include="Function\ScriptScriptFunction.cs" />
     <Compile Include="IScriptExtensions.cs" />
     <Compile Include="Library\LibraryJson.cs" />
     <Compile Include="Library\LibraryMath.cs" />

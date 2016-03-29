@@ -7,6 +7,7 @@ using Scorpio.Runtime;
 using Scorpio.CodeDom;
 using Scorpio.CodeDom.Temp;
 using Scorpio.Variable;
+using Scorpio.Function;
 namespace Scorpio.Compiler
 {
     //上下文解析
@@ -134,11 +135,11 @@ namespace Scorpio.Compiler
         {
             Token token = PeekToken();
             UndoToken();
-            ScriptFunction func = ParseFunctionDeclaration(true);
+            ScriptScriptFunction func = ParseFunctionDeclaration(true);
             m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func, m_strBreviary, token.SourceLine)));
         }
         //解析函数（返回一个函数）
-        private ScriptFunction ParseFunctionDeclaration(bool needName)
+        private ScriptScriptFunction ParseFunctionDeclaration(bool needName)
         {
             Token token = ReadToken();
             if (token.Type != TokenType.Function)
@@ -178,7 +179,7 @@ namespace Scorpio.Compiler
             for (; ; ) {
                 Token peek = PeekToken();
                 if (peek.Type == TokenType.Function) {
-                    ScriptFunction func = ParseFunctionDeclaration(true);
+                    ScriptScriptFunction func = ParseFunctionDeclaration(true);
                     m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, func.Name));
                     m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func, m_strBreviary, peek.SourceLine)));
                 } else {

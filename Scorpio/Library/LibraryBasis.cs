@@ -5,6 +5,7 @@ using System.Reflection;
 using Scorpio;
 using Scorpio.Exception;
 using Scorpio.Variable;
+using Scorpio.Function;
 namespace Scorpio.Library
 {
     public class LibraryBasis
@@ -517,10 +518,9 @@ namespace Scorpio.Library
             }
             public object Call(ScriptObject[] args)
             {
-                ScriptFunction func = args[0] as ScriptFunction;
+                ScriptMethodFunction func = args[0] as ScriptMethodFunction;
                 Util.Assert(func != null, m_script, "generic_method 第1个参数必须是 function");
                 ScorpioMethod method = func.Method;
-                Util.Assert(method != null, m_script, "generic_method 第1个参数必须是 程序函数");
                 Type[] types = new Type[args.Length - 1];
                 for (int i = 1; i < args.Length; ++i) {
                     ScriptUserdata type = args[i] as ScriptUserdata;

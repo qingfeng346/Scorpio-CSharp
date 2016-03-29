@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Scorpio.Function;
 namespace Scorpio
 {
     //脚本table类型
@@ -57,14 +58,14 @@ namespace Scorpio
         public override ScriptObject Clone() {
             ScriptTable ret = Script.CreateTable();
             ScriptObject obj = null;
-            ScriptFunction func = null;
+            ScriptScriptFunction func = null;
             foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
                 if (pair.Value == this) {
                     ret.m_listObject[pair.Key] = ret;
                 } else {
                     obj = pair.Value.Clone();
-                    if (obj is ScriptFunction) {
-                        func = (ScriptFunction)obj;
+                    if (obj is ScriptScriptFunction) {
+                        func = (ScriptScriptFunction)obj;
                         if (!func.IsStatic) func.SetTable(ret);
                     }
                     ret.m_listObject[pair.Key] = obj;

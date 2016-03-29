@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Scorpio;
+using Scorpio.Function;
 namespace Scorpio.CodeDom
 {
     //返回一个table类型 t = { a = "1", b = "2", function hello() { } }
@@ -14,9 +15,9 @@ namespace Scorpio.CodeDom
             }
         }
         public List<TableVariable> _Variables = new List<TableVariable>();
-        public List<ScriptFunction> _Functions = new List<ScriptFunction>();
+        public List<ScriptScriptFunction> _Functions = new List<ScriptScriptFunction>();
         public TableVariable[] Variables;
-        public ScriptFunction[] Functions;
+        public ScriptScriptFunction[] Functions;
         public void Init() {
             Variables = _Variables.ToArray();
             Functions = _Functions.ToArray();

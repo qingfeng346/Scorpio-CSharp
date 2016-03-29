@@ -5,6 +5,7 @@ using Scorpio.Compiler;
 using Scorpio.CodeDom;
 using Scorpio.CodeDom.Temp;
 using Scorpio.Exception;
+using Scorpio.Function;
 namespace Scorpio.Runtime
 {
     //执行命令
@@ -430,7 +431,7 @@ namespace Scorpio.Runtime
         }
         ScriptFunction ParseFunction(CodeFunction func)
         {
-            return ((ScriptFunction)func.Func.Clone()).SetParentContext(this);
+            return func.Func.Create().SetParentContext(this);
         }
         void ParseCallBlock(CodeCallBlock block) {
             new ScriptContext(m_script, block.Executable, this).Execute();
@@ -462,7 +463,7 @@ namespace Scorpio.Runtime
             foreach (CodeTable.TableVariable variable in table.Variables) {
                 ret.SetValue(variable.key, ResolveOperand(variable.value));
             }
-            foreach (ScriptFunction func in table.Functions) {
+            foreach (ScriptScriptFunction func in table.Functions) {
                 func.SetTable(ret);
                 ret.SetValue(func.Name, func);
             }
