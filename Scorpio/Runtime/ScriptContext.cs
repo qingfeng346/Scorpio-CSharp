@@ -89,6 +89,7 @@ namespace Scorpio.Runtime
                 string name = (string)member.MemberValue;
                 ScriptObject obj = GetVariableObject(name);
                 ret = (obj == null ? m_script.GetValue(name) : obj);
+                ret.Name = name;
             } else {
                 ret = ResolveOperand(member.Parent);
                 /*此处设置一下堆栈位置 否则 函数返回值取值出错会报错位置 例如  
@@ -114,7 +115,6 @@ namespace Scorpio.Runtime
         {
             if (member.Parent == null) {
                 string name = (string)member.MemberValue;
-                variable.Name = name;
                 if (!SetVariableObject(name, variable))
                     m_script.SetObjectInternal(name, variable);
             } else {
