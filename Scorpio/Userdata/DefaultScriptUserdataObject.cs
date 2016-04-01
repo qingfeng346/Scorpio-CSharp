@@ -31,9 +31,9 @@ namespace Scorpio.Userdata
         }
         public override ScriptObject Compute(TokenType type, ScriptObject obj)
         {
-            UserdataMethod method = m_UserdataType.GetComputeMethod(type);
+            ScorpioMethod method = m_UserdataType.GetComputeMethod(type);
             if (method == null) throw new ExecutionException(Script, "找不到运算符重载 " + type);
-            return Script.CreateObject (method.Call(null, new ScriptObject[] { this, obj }));
+            return Script.CreateObject (method.Call(new ScriptObject[] { this, obj }));
         }
     }
 }

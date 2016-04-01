@@ -40,7 +40,7 @@ namespace Scorpio.Userdata
         /// <summary> 创建一个实例 </summary>
         public abstract object CreateInstance(ScriptObject[] parameters);
         /// <summary> 获得运算符重载的函数 </summary>
-        public abstract UserdataMethod GetComputeMethod(TokenType type);
+        public abstract ScorpioMethod GetComputeMethod(TokenType type);
         /// <summary> 获得一个类变量 </summary>
         public abstract object GetValue(object obj, string name);
         /// <summary> 设置一个类变量 </summary>
@@ -110,12 +110,12 @@ namespace Scorpio.Userdata
             return m_Constructor.Call(null, parameters);
         }
         /// <summary> 获得运算符重载的函数 </summary>
-        public override UserdataMethod GetComputeMethod(TokenType type) {
+        public override ScorpioMethod GetComputeMethod(TokenType type) {
             switch (type) {
-            case TokenType.Plus: return GetMethod("op_Addition");
-            case TokenType.Minus: return GetMethod("op_Subtraction");
-            case TokenType.Multiply: return GetMethod("op_Multiply");
-            case TokenType.Divide: return GetMethod("op_Division");
+            case TokenType.Plus: return GetValue(null, "op_Addition") as ScorpioMethod;
+            case TokenType.Minus: return GetValue(null, "op_Subtraction") as ScorpioMethod;
+            case TokenType.Multiply: return GetValue(null, "op_Multiply") as ScorpioMethod;
+            case TokenType.Divide: return GetValue(null, "op_Division") as ScorpioMethod;
             default: return null;
             }
         }
@@ -158,12 +158,12 @@ namespace Scorpio.Userdata
             return m_Constructor.Call(null, parameters);
         }
 
-        public override UserdataMethod GetComputeMethod(TokenType type) {
+        public override ScorpioMethod GetComputeMethod(TokenType type) {
             switch (type) {
-            case TokenType.Plus: return m_Value.GetValue(null, "op_Addition") as UserdataMethod;
-            case TokenType.Minus: return m_Value.GetValue(null, "op_Subtraction") as UserdataMethod;
-            case TokenType.Multiply: return m_Value.GetValue(null, "op_Multiply") as UserdataMethod;
-            case TokenType.Divide: return m_Value.GetValue(null, "op_Division") as UserdataMethod;
+            case TokenType.Plus: return m_Value.GetValue(null, "op_Addition") as ScorpioMethod;
+            case TokenType.Minus: return m_Value.GetValue(null, "op_Subtraction") as ScorpioMethod;
+            case TokenType.Multiply: return m_Value.GetValue(null, "op_Multiply") as ScorpioMethod;
+            case TokenType.Divide: return m_Value.GetValue(null, "op_Division") as ScorpioMethod;
             default: return null;
             }
         }
