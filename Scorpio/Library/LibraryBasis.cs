@@ -13,7 +13,7 @@ namespace Scorpio.Library
         private class ArrayPairs : ScorpioHandle
         {
             Script m_Script;
-            List<ScriptObject>.Enumerator m_Enumerator;
+            ScriptArray.Enumerator m_Enumerator;
             int m_Index = 0;
             public ArrayPairs(Script script, ScriptArray obj)
             {
@@ -34,7 +34,7 @@ namespace Scorpio.Library
         }
         private class ArrayKPairs : ScorpioHandle
         {
-            List<ScriptObject>.Enumerator m_Enumerator;
+            ScriptArray.Enumerator m_Enumerator;
             int m_Index = 0;
             public ArrayKPairs(ScriptArray obj)
             {
@@ -50,7 +50,7 @@ namespace Scorpio.Library
         }
         private class ArrayVPairs : ScorpioHandle
         {
-            List<ScriptObject>.Enumerator m_Enumerator;
+            ScriptArray.Enumerator m_Enumerator;
             public ArrayVPairs(ScriptArray obj)
             {
                 m_Enumerator = obj.GetIterator();

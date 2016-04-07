@@ -14,9 +14,9 @@ namespace Scorpio
         public override string ToJson() { return "null"; }
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (!(obj is ScriptNull)) return false;
-            return true;
+            if (obj == null) return true;
+            if (obj is ScriptNull) return true;
+            return false;
         }
         public override int GetHashCode() { return 0; }
         public override bool LogicOperation() { return false; }

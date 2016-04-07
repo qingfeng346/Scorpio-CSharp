@@ -14,12 +14,10 @@ namespace Scorpio
         public ScriptTable(Script script) : base(script) { }
         public override void SetValue(object key, ScriptObject value)
         {
-			if (key == null) return;
             Util.SetObject(m_listObject, key, value);
         }
         public override ScriptObject GetValue(object key)
         {
-			if (key == null) return Script.Null;
             return m_listObject.ContainsKey(key) ? m_listObject[key] : Script.Null;
         }
         public bool HasValue(object key)

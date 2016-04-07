@@ -14,6 +14,7 @@ namespace Scorpio.Library
             Table.SetValue("add", script.CreateFunction(new add()));
             Table.SetValue("remove", script.CreateFunction(new remove()));
             Table.SetValue("removeat", script.CreateFunction(new removeat()));
+            Table.SetValue("resize", script.CreateFunction(new resize()));
             Table.SetValue("clear", script.CreateFunction(new clear()));
             Table.SetValue("contains", script.CreateFunction(new contains()));
 			Table.SetValue("sort", script.CreateFunction(new sort()));
@@ -62,6 +63,12 @@ namespace Scorpio.Library
         {
             public object Call(ScriptObject[] args) {
                 ((ScriptArray)args[0]).RemoveAt(((ScriptNumber)args[1]).ToInt32());
+                return null;
+            }
+        }
+        private class resize: ScorpioHandle {
+            public object Call(ScriptObject[] args) {
+                ((ScriptArray)args[0]).Resize(((ScriptNumber)args[1]).ToInt32());
                 return null;
             }
         }
