@@ -20,7 +20,7 @@ namespace Scorpio
                 return ret.ToInt32();
             }
         }
-        public struct Enumerator : IDisposable, System.Collections.IEnumerator {
+        public struct Enumerator : System.Collections.IEnumerator {
             private ScriptArray list;
             private int index;
             private ScriptObject current;
@@ -29,10 +29,9 @@ namespace Scorpio
                 this.index = 0;
                 this.current = null;
             }
-            public void Dispose() { }
             public bool MoveNext() {
                 if (index < list.m_size) {
-                    current = list.m_listObject[index] ?? list.Script.Null;
+                    current = list.m_listObject[index] ?? list.m_null;
                     index++;
                     return true;
                 }
@@ -47,14 +46,15 @@ namespace Scorpio
         }
 
 
-
-        private static readonly ScriptObject[] _emptyArray = new ScriptObject[0];
         public override ObjectType Type { get { return ObjectType.Array; } }
+        private static readonly ScriptObject[] _emptyArray = new ScriptObject[0];
         private ScriptObject[] m_listObject;
         private int m_size;
+        private ScriptObject m_null;
         public ScriptArray(Script script) : base(script) {
             m_listObject = _emptyArray;
             m_size = 0;
+            m_null = script.Null;
         }
         public override ScriptObject GetValue(object index)
         {
@@ -63,8 +63,8 @@ namespace Scorpio
                 if (i < 0)
                     throw new ExecutionException(Script, "Array GetValue索引小于0 index值为:" + index);
                 if (i >= m_size)
-                    return Script.Null;
-                return m_listObject[i] ?? Script.Null;
+                    return m_null;
+                return m_listObject[i] ?? m_null;
             } else if (index is string && index.Equals("length")){
                 return Script.CreateNumber(m_size);
             }
@@ -198,13 +198,13 @@ namespace Scorpio
         {
             if (m_size > 0)
                 return m_listObject[0];
-            return Script.Null;
+            return m_null;
         }
         public ScriptObject Last()
         {
             if (m_size > 0)
                 return m_listObject[m_size - 1];
-            return Script.Null;
+            return m_null;
         }
         public ScriptObject PopFirst()
         {
@@ -217,7 +217,7 @@ namespace Scorpio
         public ScriptObject SafePopFirst()
         {
             if (m_size == 0)
-                return Script.Null;
+                return m_null;
             ScriptObject obj = m_listObject[0];
             RemoveAt(0);
             return obj;
@@ -234,7 +234,7 @@ namespace Scorpio
         public ScriptObject SafePopLast()
         {
             if (m_size == 0)
-                return Script.Null;
+                return m_null;
             int index = m_size - 1;
             ScriptObject obj = m_listObject[index];
             RemoveAt(index);
@@ -260,7 +260,7 @@ namespace Scorpio
                 if (m_listObject[i] == this) {
                     ret.m_listObject[i] = ret;
                 } else if (m_listObject[i] == null) {
-                    ret.m_listObject[i] = Script.Null;
+                    ret.m_listObject[i] = m_null;
                 } else {
                     ret.m_listObject[i] = m_listObject[i].Clone();
                 }
@@ -275,7 +275,7 @@ namespace Scorpio
             for (int i = 0; i < m_size; ++i) {
                 if (i != 0) builder.Append(",");
                 if (m_listObject[i] == null) {
-                    builder.Append(Script.Null.ToJson());
+                    builder.Append(m_null.ToJson());
                 } else {
                     builder.Append(m_listObject[i].ToJson());
                 }
