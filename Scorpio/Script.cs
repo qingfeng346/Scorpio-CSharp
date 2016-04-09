@@ -27,6 +27,7 @@ namespace Scorpio
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private List<String> m_SearchPath = new List<String>();                 //request所有文件的路径集合
+        private List<String> m_Defines = new List<String>();                    //所有Define
         private Dictionary<Type, IScorpioFastReflectClass> m_FastReflectClass = new Dictionary<Type, IScorpioFastReflectClass>();
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
         public ScriptNull Null { get; private set; }                            //null对象
@@ -121,13 +122,19 @@ namespace Scorpio
         }
         public ScriptObject LoadSearchPathFile(String fileName)
         {
-            for (int i = 0; i < m_SearchPath.Count; ++i)
-            {
+            for (int i = 0; i < m_SearchPath.Count; ++i) {
                 string file = m_SearchPath[i] + "/" + fileName;
                 if (ScriptExtensions.FileExist(file))
                     return LoadFile(file);
             }
             throw new ExecutionException(this, "require 找不到文件 : " + fileName);
+        }
+        public void PushDefine(string define) {
+            if (!m_Defines.Contains(define))
+                m_Defines.Add(define);
+        }
+        public bool ContainDefine(string define) {
+            return m_Defines.Contains(define);
         }
         public void PushAssembly(Assembly assembly)
         {

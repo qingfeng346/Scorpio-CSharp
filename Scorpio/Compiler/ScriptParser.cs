@@ -13,12 +13,45 @@ namespace Scorpio.Compiler
     //上下文解析
     public partial class ScriptParser
     {
+        private enum DefineType {
+            None,       //没有进入#if
+            Already,    //已经进入条件了
+            Being,      //还没找到合适的 正在处理
+            Break,      //跳过
+        }
+        private class DefineState {
+            public DefineType State;
+            public DefineState(DefineType state) {
+                this.State = state;
+            }
+        }
+        private class DefineObject {
+            public bool Not;
+        }
+        private class DefineString : DefineObject {
+            public string Define;
+            public DefineString(string define) {
+                this.Define = define;
+            }
+        }
+        private class DefineOperate : DefineObject {
+            public DefineObject Left;       //左边值
+            public DefineObject Right;      //右边值
+            public bool and;                //是否是并且操作
+            public DefineOperate(DefineObject left, DefineObject right, bool and) {
+                this.Left = left;
+                this.Right = right;
+                this.and = and;
+            }
+        }
         private Script m_script;                                                        //脚本类
         private string m_strBreviary;                                                   //当前解析的脚本摘要
         private int m_iNextToken;                                                       //当前读到token
         private List<Token> m_listTokens;                                               //token列表
         private Stack<ScriptExecutable> m_Executables = new Stack<ScriptExecutable>();  //指令栈
         private ScriptExecutable m_scriptExecutable;                                    //当前指令栈
+        private Stack<DefineState> m_Defines = new Stack<DefineState>();                //define状态
+        private DefineState m_define;                                                   //define当前状态
         public ScriptParser(Script script, List<Token> listTokens, string strBreviary)
         {
             m_script = script;
@@ -28,7 +61,7 @@ namespace Scorpio.Compiler
         }
         public void BeginExecutable(Executable_Block block)
         {
-            m_scriptExecutable = new ScriptExecutable();
+            m_scriptExecutable = new ScriptExecutable(block);
             m_Executables.Push(m_scriptExecutable);
         }
         public void EndExecutable()
@@ -109,6 +142,9 @@ namespace Scorpio.Compiler
                 case TokenType.Return:
                     ParseReturn();
                     break;
+                case TokenType.Sharp:
+                    ParseSharp();
+                    break;
                 case TokenType.Identifier:
                 case TokenType.Increment:
                 case TokenType.Decrement:
@@ -144,32 +180,38 @@ namespace Scorpio.Compiler
             Token token = ReadToken();
             if (token.Type != TokenType.Function)
                 throw new ParserException("Function declaration must start with the 'function' keyword.", token);
-            String strFunctionName = needName ? ReadIdentifier() : "";
-            ReadLeftParenthesis();
+            String strFunctionName = needName ? ReadIdentifier() : (PeekToken().Type == TokenType.Identifier ? ReadIdentifier() : "");
             List<String> listParameters = new List<String>();
             bool bParams = false;
-            if (PeekToken().Type != TokenType.RightPar) {
-                while (true) {
-                    token = ReadToken();
-                    if (token.Type == TokenType.Params) {
+            Token peek = ReadToken();
+            if (peek.Type == TokenType.LeftPar) {
+                if (PeekToken().Type != TokenType.RightPar) {
+                    while (true) {
                         token = ReadToken();
-                        bParams = true;
+                        if (token.Type == TokenType.Params) {
+                            token = ReadToken();
+                            bParams = true;
+                        }
+                        if (token.Type != TokenType.Identifier) {
+                            throw new ParserException("Unexpected token '" + token.Lexeme + "' in function declaration.", token);
+                        }
+                        String strParameterName = token.Lexeme.ToString();
+                        listParameters.Add(strParameterName);
+                        token = PeekToken();
+                        if (token.Type == TokenType.Comma && !bParams)
+                            ReadComma();
+                        else if (token.Type == TokenType.RightPar)
+                            break;
+                        else
+                            throw new ParserException("Comma ',' or right parenthesis ')' expected in function declararion.", token);
                     }
-                    if (token.Type != TokenType.Identifier) {
-                        throw new ParserException("Unexpected token '" + token.Lexeme + "' in function declaration.", token);
-                    }
-                    String strParameterName = token.Lexeme.ToString();
-                    listParameters.Add(strParameterName);
-                    token = PeekToken();
-                    if (token.Type == TokenType.Comma && !bParams)
-                        ReadComma();
-                    else if (token.Type == TokenType.RightPar)
-                        break;
-                    else
-                        throw new ParserException("Comma ',' or right parenthesis ')' expected in function declararion.", token);
                 }
+                ReadRightParenthesis();
+                peek = ReadToken();
             }
-            ReadRightParenthesis();
+            if (peek.Type == TokenType.LeftBrace) {
+                UndoToken();
+            }
             ScriptExecutable executable = ParseStatementBlock(Executable_Block.Function);
             return m_script.CreateFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable, bParams));
         }
@@ -401,6 +443,165 @@ namespace Scorpio.Compiler
             else
                 m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
         }
+        //解析 #
+        private void ParseSharp() {
+            Token token = ReadToken();
+            if (token.Type == TokenType.Define) {
+                if (m_scriptExecutable.m_Block != Executable_Block.Context)
+                    throw new ParserException("#define只能使用在上下文", token);
+                m_script.PushDefine(ReadIdentifier());
+            } else if (token.Type == TokenType.If) {
+                if (m_define == null) {
+                    if (IsDefine()) {
+                        m_define = new DefineState(DefineType.Already);
+                    } else {
+                        m_define = new DefineState(DefineType.Being);
+                        PopSharp();
+                    }
+                } else if (m_define.State == DefineType.Already) {
+                    if (IsDefine()) {
+                        m_Defines.Push(m_define);
+                        m_define = new DefineState(DefineType.Already);
+                    } else {
+                        m_Defines.Push(m_define);
+                        m_define = new DefineState(DefineType.Being);
+                        PopSharp();
+                    }
+                } else if (m_define.State == DefineType.Being) {
+                    m_Defines.Push(m_define);
+                    m_define = new DefineState(DefineType.Break);
+                    PopSharp();
+                }
+            } else if (token.Type == TokenType.Ifndef) {
+                if (m_define == null) {
+                    if (!IsDefine()) {
+                        m_define = new DefineState(DefineType.Already);
+                    } else {
+                        m_define = new DefineState(DefineType.Being);
+                        PopSharp();
+                    }
+                } else if (m_define.State == DefineType.Already) {
+                    if (!IsDefine()) {
+                        m_Defines.Push(m_define);
+                        m_define = new DefineState(DefineType.Already);
+                    } else {
+                        m_Defines.Push(m_define);
+                        m_define = new DefineState(DefineType.Being);
+                        PopSharp();
+                    }
+                } else if (m_define.State == DefineType.Being) {
+                    m_Defines.Push(m_define);
+                    m_define = new DefineState(DefineType.Break);
+                    PopSharp();
+                }
+            } else if (token.Type == TokenType.ElseIf) {
+                if (m_define == null) {
+                    throw new ParserException("未找到#if或#ifndef", token);
+                } else if (m_define.State == DefineType.Already || m_define.State == DefineType.Break) {
+                    PopSharp();
+                } else if (IsDefine()) {
+                    m_define.State = DefineType.Already;
+                } else {
+                    m_define.State = DefineType.Being;
+                    PopSharp();
+                }
+            } else if (token.Type == TokenType.Else) {
+                if (m_define == null) {
+                    throw new ParserException("未找到#if或#ifndef", token);
+                } else if (m_define.State == DefineType.Already || m_define.State == DefineType.Break) {
+                    PopSharp();
+                } else {
+                    m_define.State = DefineType.Already;
+                }
+            } else if (token.Type == TokenType.Endif) {
+                if (m_define == null) {
+                    throw new ParserException("未找到#if或#ifndef", token);
+                } else if (m_Defines.Count > 0) {
+                    m_define = m_Defines.Pop();
+                } else {
+                    m_define = null;
+                }
+            } else {
+                throw new ParserException("#后缀不支持" + token.Type, token);
+            }
+        }
+        private bool IsDefine() {
+            return IsDefine_impl(ReadDefine());
+        }
+        private bool IsDefine_impl(DefineObject define) {
+            bool ret = false;
+            if (define is DefineString) {
+                ret = m_script.ContainDefine(((DefineString)define).Define);
+            } else {
+                DefineOperate oper = (DefineOperate)define;
+                bool left = IsDefine_impl(oper.Left);
+                if (left && !oper.and) {
+                    ret = true;
+                } else if (!left && oper.and) {
+                    ret = false;
+                } else if (oper.and) {
+                    ret = left && IsDefine_impl(oper.Right);
+                } else {
+                    ret = left || IsDefine_impl(oper.Right);
+                }
+            }
+            if (define.Not) { ret = !ret; }
+            return ret;
+        }
+        private DefineObject ReadDefine() {
+            Stack<bool> operateStack = new Stack<bool>();
+            Stack<DefineObject> objectStack = new Stack<DefineObject>();
+            while (true) {
+                objectStack.Push(GetOneDefine());
+                if (!OperatorDefine(operateStack, objectStack))
+                    break;
+            }
+            while (operateStack.Count > 0) {
+                objectStack.Push(new DefineOperate(objectStack.Pop(), objectStack.Pop(), operateStack.Pop()));
+            }
+            return objectStack.Pop();
+        }
+        private bool OperatorDefine(Stack<bool> operateStack, Stack<DefineObject> objectStack) {
+            Token peek = PeekToken();
+            if (peek.Type != TokenType.And && peek.Type != TokenType.Or) { return false; }
+            ReadToken();
+            while (operateStack.Count > 0) {
+                objectStack.Push(new DefineOperate(objectStack.Pop(), objectStack.Pop(), operateStack.Pop()));
+            }
+            operateStack.Push(peek.Type == TokenType.And);
+            return true;
+        }
+        private DefineObject GetOneDefine() {
+            Token token = ReadToken();
+            bool not = false;
+            if (token.Type == TokenType.Not) {
+                not = true;
+                token = ReadToken();
+            }
+            if (token.Type == TokenType.LeftPar) {
+                var ret = ReadDefine();
+                ReadRightParenthesis();
+                ret.Not = not;
+                return ret;
+            } else if (token.Type == TokenType.Identifier) {
+                return new DefineString(token.Lexeme.ToString()) { Not = not };
+            } else {
+                throw new ParserException("宏定义判断只支持 字符串", token);
+            }
+        }
+        //跳过未解析宏定义 
+        private void PopSharp() {
+            for (;;) {
+                if (ReadToken().Type == TokenType.Sharp) {
+                    if (PeekToken().Type == TokenType.Define) {
+                        ReadToken();
+                    } else {
+                        break;
+                    }
+                }
+            }
+            ParseSharp();
+        }
         //解析表达式
         private void ParseExpression()
         {
@@ -430,12 +631,8 @@ namespace Scorpio.Compiler
                 if (!P_Operator(operateStack, objectStack))
                     break;
             }
-            while (true) {
-                if (operateStack.Count <= 0)
-                    break;
-                TempOperator oper = operateStack.Pop();
-                CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator, m_strBreviary, GetSourceLine());
-                objectStack.Push(binexp);
+            while (operateStack.Count > 0) {
+                objectStack.Push(new CodeOperator(objectStack.Pop(), objectStack.Pop(), operateStack.Pop().Operator, m_strBreviary, GetSourceLine()));
             }
             CodeObject ret = objectStack.Pop();
             if (ret is CodeMember) {
@@ -480,11 +677,8 @@ namespace Scorpio.Compiler
             if (curr == null) return false;
             ReadToken();
             while (operateStack.Count > 0) {
-                TempOperator oper = operateStack.Peek();
-                if (oper.Level >= curr.Level) {
-                    operateStack.Pop();
-                    CodeOperator binexp = new CodeOperator(objectStack.Pop(), objectStack.Pop(), oper.Operator, m_strBreviary, GetSourceLine());
-                    objectStack.Push(binexp);
+                if (operateStack.Peek().Level >= curr.Level) {
+                    objectStack.Push(new CodeOperator(objectStack.Pop(), objectStack.Pop(), operateStack.Pop().Operator, m_strBreviary, GetSourceLine()));
                 } else {
                     break;
                 }

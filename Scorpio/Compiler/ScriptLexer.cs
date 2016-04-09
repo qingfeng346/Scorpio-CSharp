@@ -95,6 +95,9 @@ namespace Scorpio.Compiler
                             case '?':
                                 AddToken(TokenType.QuestionMark);
                                 break;
+                            case '#':
+                                AddToken(TokenType.Sharp);
+                                break;
                             case '.':
                                 lexState = LexState.PeriodOrParams;
                                 break;
@@ -521,6 +524,15 @@ namespace Scorpio.Compiler
                                     break;
                                 case "return":
                                     tokenType = TokenType.Return;
+                                    break;
+                                case "define":
+                                    tokenType = TokenType.Define;
+                                    break;
+                                case "ifndef":
+                                    tokenType = TokenType.Ifndef;
+                                    break;
+                                case "endif":
+                                    tokenType = TokenType.Endif;
                                     break;
                                 case "null":
                                 case "nil":

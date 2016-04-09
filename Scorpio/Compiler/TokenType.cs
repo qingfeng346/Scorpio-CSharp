@@ -60,6 +60,10 @@ namespace Scorpio.Compiler
         /// </summary>
         QuestionMark,
         /// <summary>
+        /// #
+        /// </summary>
+        Sharp,
+        /// <summary>
         /// +
         /// </summary>
         Plus,
@@ -204,6 +208,14 @@ namespace Scorpio.Compiler
         /// </summary>
         ElseIf,
         /// <summary>
+        /// ifndef
+        /// </summary>
+        Ifndef,
+        /// <summary>
+        /// endif
+        /// </summary>
+        Endif,
+        /// <summary>
         /// for
         /// </summary>
         For,
@@ -259,6 +271,10 @@ namespace Scorpio.Compiler
         /// throw
         /// </summary>
         Throw,
+        /// <summary>
+        /// define
+        /// </summary>
+        Define,
         /// <summary>
         /// bool true false
         /// </summary>
