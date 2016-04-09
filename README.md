@@ -128,7 +128,7 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ## master版本更新和修改内容 ##
 (2016-4-9)
 -----------
-* 增加宏定义判断,用法同c# 支持关键字 **#define #if #ifndef #elseif #elif #endif** ,**#elseif**和**#elif**功能一样, 支持嵌套宏定义 例如
+* 增加宏定义判断,用法同c# 支持关键字 **#define #if #ifndef #elseif #elif #endif** ,**#elseif**和**#elif**功能一样, 支持嵌套宏定义 示例:
 ```javascript
 #define TEST
 #if TEST
@@ -145,7 +145,7 @@ print("3")
 
 (2016-4-7)
 -----------
-* 优化脚本array类型操作,例如 
+* 优化脚本array类型操作,示例 
 ```javascript
 var a = []
 a[10] = 10
