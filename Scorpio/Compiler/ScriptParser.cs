@@ -471,6 +471,10 @@ namespace Scorpio.Compiler
                     m_Defines.Push(m_define);
                     m_define = new DefineState(DefineType.Break);
                     PopSharp();
+                } else if (m_define.State == DefineType.Break) {
+                    m_Defines.Push(m_define);
+                    m_define = new DefineState(DefineType.Break);
+                    PopSharp();
                 }
             } else if (token.Type == TokenType.Ifndef) {
                 if (m_define == null) {
@@ -498,6 +502,7 @@ namespace Scorpio.Compiler
                 if (m_define == null) {
                     throw new ParserException("未找到#if或#ifndef", token);
                 } else if (m_define.State == DefineType.Already || m_define.State == DefineType.Break) {
+                    m_define.State = DefineType.Break;
                     PopSharp();
                 } else if (IsDefine()) {
                     m_define.State = DefineType.Already;
@@ -509,6 +514,7 @@ namespace Scorpio.Compiler
                 if (m_define == null) {
                     throw new ParserException("未找到#if或#ifndef", token);
                 } else if (m_define.State == DefineType.Already || m_define.State == DefineType.Break) {
+                    m_define.State = DefineType.Break;
                     PopSharp();
                 } else {
                     m_define.State = DefineType.Already;
@@ -518,6 +524,8 @@ namespace Scorpio.Compiler
                     throw new ParserException("未找到#if或#ifndef", token);
                 } else if (m_Defines.Count > 0) {
                     m_define = m_Defines.Pop();
+                    if (m_define.State == DefineType.Break)
+                        PopSharp();
                 } else {
                     m_define = null;
                 }
