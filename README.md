@@ -126,6 +126,23 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-4-9)
+-----------
+* 增加宏定义判断,用法同c# 支持关键字 #define #if #ifndef #elseif #elif #endif , 支持嵌套宏定义 例如
+```javascript
+#define TEST
+#if TEST
+print("1")
+#elseif TEST1
+print("2")
+#else
+print("3")
+#endif
+```
+* 增加函数 push_search 增加一个 require 的目录
+* 增加函数 push_define 增加一个宏定义
+	* 注:此函数是运行时添加 #define 函数是编译时增加
+
 (2016-4-7)
 -----------
 * 优化脚本array类型操作,例如 
