@@ -130,16 +130,24 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 -----------
 * 增加宏定义判断,用法同c#
 	* 支持关键字 **#define #if #ifndef #elseif #elif #endif**
-	* **#elseif**和**#elif**功能一样 
-	* 暂时不支持嵌套宏定义 稍后更新
+	* **#elseif**和**#elif**功能一样
 ```javascript
 #define TEST
 #if TEST
-print("1")
-#elseif TEST1
-print("2")
-#else
-print("3")
+	print("1")
+	#if TEST1
+		print("6")
+	#endif
+	print("2")
+#elseif TEST2
+	print("3")
+	#if TEST
+		print("4")
+		#if TEST
+			print("6")
+		#endif
+	#endif
+	print("5")
 #endif
 ```
 * 增加函数 push_search 增加一个 require 的目录
