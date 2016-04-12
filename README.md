@@ -126,6 +126,28 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-4-12)
+-----------
+* table 支持 + += 操作,用此操作可以实现伪继承 示例:
+```javascript
+var base = {
+	value1 = 100,
+	function hello1() { print("hello1 " + this.value1) }
+	function hello2() { print("default hello2") }
+}
+var a = base + {
+	value2 = 200,
+	function hello2() { print("hello2 " + this.value2) }
+}
+var b = base + {
+}
+a.value1 = 300
+a.hello1()		//输出 hello1 300
+a.hello2()		//输出 hello2 200
+b.hello1()		//输出 hello1 100
+b.hello2()		//输出 default hello2
+//用 + += 可以实现伪继承 相加的数据都是clone的,所以相互的数据不会共享
+```
 (2016-4-9)
 -----------
 * 增加宏定义判断,用法同c#
