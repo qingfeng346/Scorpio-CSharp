@@ -142,7 +142,7 @@ namespace Scorpio.Userdata {
             m_Type = type;
             MethodName = methodName;
             List<FunctionBase> functionMethod = new List<FunctionBase>();
-            foreach (var method in methods) {
+            foreach (ScorpioMethodInfo method in methods) {
                 functionMethod.Add(new FunctionFastMethod(fastMethod, method.ParameterType, method.ParamType, method.Params, method.ParameterTypes));
             }
             m_Methods = functionMethod.ToArray();
