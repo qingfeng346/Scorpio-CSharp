@@ -22,6 +22,7 @@
 * IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
 * UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 * UWP平台master配置下generic_type函数也会出问题
+* 去反射功能不能用于模板函数
 
 ## Unity3d发布平台支持(亲测):
 - [x] Web Player
@@ -108,7 +109,7 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类
 
 ## c#去反射类使用 ##
-* 把**ScorpioReflect**项目中的**GenerateScorpioClass.cs**文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例: 
+* 把**ScorpioReflect**项目中的**GenerateScorpioClass**开头的几个cs文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例: 
 
 ```c#
 //就拿UnityEngine.GameObject类为例
