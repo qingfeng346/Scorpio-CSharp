@@ -129,7 +129,7 @@ namespace Scorpio.Serialize
                 switch (type)
                 {
                     case TokenType.Boolean:
-                        value = (reader.ReadSByte() == 1);
+                        value = (reader.ReadSByte() == 1) ? "true" : "false";
                         break;
                     case TokenType.String:
                         value = "\"" + Util.ReadString(reader).Replace("\n", "\\n") + "\"";
@@ -158,8 +158,6 @@ namespace Scorpio.Serialize
         {
             switch (type)
             {
-                case TokenType.Var: return "var";
-
                 case TokenType.LeftBrace: return "{";
                 case TokenType.RightBrace: return "}";
                 case TokenType.LeftBracket: return "[";
@@ -172,6 +170,7 @@ namespace Scorpio.Serialize
                 case TokenType.Colon: return ":";
                 case TokenType.SemiColon: return ";";
                 case TokenType.QuestionMark: return "?";
+                case TokenType.Sharp: return "#";
 
                 case TokenType.Plus: return "+";
                 case TokenType.Increment: return "++";
@@ -206,26 +205,30 @@ namespace Scorpio.Serialize
                 case TokenType.Less: return "<";
                 case TokenType.LessOrEqual: return "<=";
 
-                case TokenType.Params: return "...";
+                case TokenType.Eval: return "eval";
+                case TokenType.Var: return "var";
+                case TokenType.Function: return "function";
                 case TokenType.If: return "if";
-                case TokenType.Else: return "else";
                 case TokenType.ElseIf: return "elif";
+                case TokenType.Else: return "else";
+                case TokenType.While: return "while";
                 case TokenType.For: return "for";
                 case TokenType.Foreach: return "foreach";
                 case TokenType.In: return "in";
                 case TokenType.Switch: return "switch";
                 case TokenType.Case: return "case";
                 case TokenType.Default: return "default";
-                case TokenType.Break: return "break";
-                case TokenType.Continue: return "continue";
-                case TokenType.Return: return "return";
-                case TokenType.While: return "while";
-                case TokenType.Function: return "function";
                 case TokenType.Try: return "try";
                 case TokenType.Catch: return "catch";
                 case TokenType.Throw: return "throw";
+                case TokenType.Continue: return "continue";
+                case TokenType.Break: return "break";
+                case TokenType.Return: return "return";
+                case TokenType.Define: return "define";
+                case TokenType.Ifndef: return "ifndef";
+                case TokenType.Endif: return "endif";
                 case TokenType.Null: return "null";
-                case TokenType.Eval: return "eval";
+                case TokenType.Params: return "...";
             }
             return "";
         }
