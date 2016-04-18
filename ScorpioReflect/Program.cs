@@ -12,6 +12,9 @@ namespace ScorpioReflect
         public Test(int a ) {
 
         }
+        public Test(params object[] args) {
+
+        }
         public int a;
         public int b;
         public int GetA() { return a; }
@@ -23,6 +26,9 @@ namespace ScorpioReflect
 
         }
         public void TestTemp<T>(T a) {
+
+        }
+        public void aaaa(List<int> b ) {
 
         }
         public void TestTemp(int a) {
@@ -54,43 +60,43 @@ namespace ScorpioReflect
     {
         static void Main(string[] args)
         {
-//            Thread.Sleep(1000);
-//            {
-//                try {
-//                    Script script = new Script();
-//                    script.LoadLibrary();
-//                    script.PushFastReflectClass(typeof(Test), new ScorpioClass_ScorpioReflect_Test(script));
-//                    script.SetObject("Test", script.CreateObject(new Test(100)));
-//                    var time = Environment.TickCount;
-//                    for (int i = 0; i < 1000000; ++i) {
-//                        script.LoadString(@"
-//Test.Func()
-//");
-//                    }
-//                    Console.WriteLine(Environment.TickCount - time);
-//                } catch (System.Exception ex) {
-//                    Console.WriteLine(ex.ToString());
-//                }
+            //            Thread.Sleep(1000);
+            //            {
+            //                try {
+            //                    Script script = new Script();
+            //                    script.LoadLibrary();
+            //                    script.PushFastReflectClass(typeof(Test), new ScorpioClass_ScorpioReflect_Test(script));
+            //                    script.SetObject("Test", script.CreateObject(new Test(100)));
+            //                    var time = Environment.TickCount;
+            //                    for (int i = 0; i < 1000000; ++i) {
+            //                        script.LoadString(@"
+            //Test.Func()
+            //");
+            //                    }
+            //                    Console.WriteLine(Environment.TickCount - time);
+            //                } catch (System.Exception ex) {
+            //                    Console.WriteLine(ex.ToString());
+            //                }
 
-//            }
-//            {
-//                Script script = new Script();
-//                script.LoadLibrary();
-//                script.SetObject("Test", script.CreateObject(new Test(100)));
-//                var time = Environment.TickCount;
-//                for (int i=0;i<1000000;++i)
-//                {
-//                    script.LoadString(@"
-//Test.Func()
-//");
-//                }
+            //            }
+            //            {
+            //                Script script = new Script();
+            //                script.LoadLibrary();
+            //                script.SetObject("Test", script.CreateObject(new Test(100)));
+            //                var time = Environment.TickCount;
+            //                for (int i=0;i<1000000;++i)
+            //                {
+            //                    script.LoadString(@"
+            //Test.Func()
+            //");
+            //                }
 
-//                Console.WriteLine(Environment.TickCount - time);
-//            }
-//            Console.ReadKey();
-            //var g = new GenerateScorpioClass(typeof(Test));
-            //var str = g.Generate();
-            //File.WriteAllText(@"C:\Users\qingf\Desktop\ConsoleApplication1\ConsoleApplication1\" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
+            //                Console.WriteLine(Environment.TickCount - time);
+            //            }
+            //            Console.ReadKey();
+            var g = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(Test));
+            var str = g.Generate();
+            File.WriteAllText(@"C:\Users\qingf\Desktop\ConsoleApplication1\ConsoleApplication1\" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
         }
     }
 }

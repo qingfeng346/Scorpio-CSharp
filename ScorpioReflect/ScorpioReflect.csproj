@@ -38,6 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GenerateScorpioClass.cs" />
+    <Compile Include="GenerateScorpioClassBase.cs" />
+    <Compile Include="GenerateScorpioClassMethod.cs" />
+    <Compile Include="GenerateScorpioClassValue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
