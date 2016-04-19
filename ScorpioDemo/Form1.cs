@@ -73,7 +73,9 @@ namespace CancerDemo
         }
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            textBox1.Text = File.ReadAllText(m_Path + "/" + listBox1.Text, Encoding.UTF8);
+            if (!string.IsNullOrEmpty(listBox1.Text)) {
+                textBox1.Text = File.ReadAllText(m_Path + "/" + listBox1.Text, Encoding.UTF8);
+            }
         }
     }
 }

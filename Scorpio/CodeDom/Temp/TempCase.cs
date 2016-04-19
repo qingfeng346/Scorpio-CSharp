@@ -9,7 +9,7 @@ namespace Scorpio.CodeDom.Temp
         public ScriptExecutable Executable;        //指令列表
         public CodeObject[] Allow;             //判断条件
         public TempCase(Script script, List<CodeObject> allow, ScriptExecutable executable) {
-            this.Allow = allow.ToArray();
+            this.Allow = allow != null ? allow.ToArray() : new CodeObject[0];
             this.Executable = executable;
         }
     }
