@@ -7,3 +7,7 @@ Int32 = import_type("System.Int32")
 print(Int32.MaxValue)
 var int = Int32
 print(int.MaxValue)
+
+//调用import_type是要传入类的全名
+Math = import_type("System.Math")
+print(Math.Abs(-100))
