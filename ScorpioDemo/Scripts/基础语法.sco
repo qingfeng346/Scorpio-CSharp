@@ -39,3 +39,7 @@ print(a == 100)
 if (null || 100 || "") {
 	print("null")
 }
+//申请一个数组
+var arr = [100,200,300]
+//申请一个table
+var tab = {a = 100, b = 200}
