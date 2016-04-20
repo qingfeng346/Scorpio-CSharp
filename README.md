@@ -30,7 +30,8 @@
 * UWP平台master配置下generic_type函数也会出问题
 
 ## 使用去反射功能注意事项 ##
-* 去反射功能不能用于模板函数
+* 不能调用模板函数
+* 不能调用含有ref和out参数的函数
 
 ## Unity3d发布平台支持(亲测):
 - [x] Web Player
@@ -151,6 +152,14 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-4-20)
+-----------
+* 优化去反射工具生成代码
+	* 所有函数信息直接生成代码,不会运行时获取反射,il2cpp下获取反射函数会获取不全
+	* 可以使用反射函数名调用运算符重载
+	* 可是使用反射函数名操作property和event
+	* GenerateScorpioClass 增加 AddExclude 函数,可以在生成时去除不想生成的函数
+
 (2016-4-12)
 -----------
 * table 支持 + += 操作,用此操作可以实现伪继承 示例:
