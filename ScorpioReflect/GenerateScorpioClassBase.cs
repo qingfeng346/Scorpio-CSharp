@@ -58,8 +58,7 @@ __execute
             if (_instance == null) {
                 _instance = new ScorpioStaticMethod(""__methodname"", _method);
             }
-            return _instance;
-";
+            return _instance;";
         public const string InstanceMethodTemplate = @"
             if (obj == null) {
                 if (_instance == null) {
@@ -67,8 +66,7 @@ __execute
                 }
                 return _instance;
             }
-            return new ScorpioObjectMethod(obj, ""__methodname"", _method);
-";
+            return new ScorpioObjectMethod(obj, ""__methodname"", _method);";
         //获得最后生成的类的名字 把+和.都换成_
         public string GetClassName(Type type) {
             var fullName = type.FullName;
@@ -138,14 +136,20 @@ __execute
             return parameterTypes;
         }
         private string GetScorpioMethodCall(MethodBase method) {
-            var call = "(";
+            var call = "";
             var pars = method.GetParameters();
             for (int i = 0; i < pars.Length; ++i) {
                 if (i != 0) { call += ","; }
                 call += "(" + GetFullName(pars[i].ParameterType) + ")args[" + i + "]";
             }
-            call += ")";
+            call += "";
             return call;
+        }
+        private string GetScorpioMethodArgs(ParameterInfo[] pars, int index) {
+            return "(" + GetFullName(pars[index].ParameterType) + ")args[" + index + "]";
+        }
+        private string GetScorpioVariable(bool IsStatic, string name) {
+            return (IsStatic ? m_FullName : "((" + m_FullName + ")obj)") + "." + name;
         }
         private string GetAllMethod(MethodBase[] methods) {
             StringBuilder builder = new StringBuilder();

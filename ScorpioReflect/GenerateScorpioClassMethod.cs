@@ -4,6 +4,18 @@ using System.Text;
 
 namespace Scorpio.ScorpioReflect {
     public partial class GenerateScorpioClass {
+        private static Dictionary<string, string> Operators = new Dictionary<string, string>() {
+            {"op_Addition", "+"},
+            {"op_Subtraction", "-"},
+            {"op_Multiply", "*"},
+            {"op_Division", "/"},
+            {"op_Modulus", "%"},
+            {"op_BitwiseOr", "|"},
+            {"op_BitwiseAnd", "&"},
+            {"op_ExclusiveOr", "^"},
+            {"op_GreaterThan", ">"},
+            {"op_LessThan", "<"},
+        };
         private string GenerateConstructor() {
             var Constructors = m_Type.GetConstructors();
             StringBuilder builder = new StringBuilder();
@@ -12,7 +24,7 @@ namespace Scorpio.ScorpioReflect {
                 if (first) { first = false; } else { builder.AppendLine(); }
                 string parameterTypes = GetScorpioMethodParameterTypes(constructor);
                 string call = GetScorpioMethodCall(constructor);
-                builder.AppendFormat("		    if (type == \"{0}\") return new __fullname{1};", parameterTypes, call);
+                builder.AppendFormat("		    if (type == \"{0}\") return new __fullname({1});", parameterTypes, call);
             }
             string str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(Constructors));
@@ -35,6 +47,41 @@ namespace Scorpio.ScorpioReflect {
             }
             return builder.ToString();
         }
+        //运算符重载函数 + - * / [] 等
+        private string GetSpeciaMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
+            if (!method.IsSpecialName) { return ""; }
+            string name = method.Name;
+            if (Operators.ContainsKey(name)) {
+                return string.Format("return {0} {1} {2};", GetScorpioMethodArgs(pars, 0), Operators[name], GetScorpioMethodArgs(pars, 1));
+            }
+            if (name == "get_Item") {
+                return string.Format("return {0}[{1}];", variable, GetScorpioMethodArgs(pars, 0));
+            } else if (name == "set_Item") {
+                return string.Format("{0}[{1}] = {2}; return null;", variable, GetScorpioMethodArgs(pars, 0), GetScorpioMethodArgs(pars, 1));
+            }
+            return "";
+        }
+        private string GetEventMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
+            foreach (var @event in m_Events) {
+                if (@event.GetAddMethod() == method) {
+                    return string.Format("{0}.{1} += {2}; return null;", variable, @event.Name, GetScorpioMethodArgs(pars, 0));
+                } else if (@event.GetRemoveMethod() == method) {
+                    return string.Format("{0}.{1} -= {2}; return null;", variable, @event.Name, GetScorpioMethodArgs(pars, 0));
+                }
+            }
+            return "";
+        }
+        private string GetPropertyMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
+            foreach (var property in m_Propertys)
+            {
+                if (property.GetGetMethod() == method) {
+                    return string.Format("return {0}.{1};", variable, property.Name);
+                } else if (property.GetSetMethod() == method) {
+                    return string.Format("{0}.{1} = {2};", variable, property.Name, GetScorpioMethodArgs(pars, 0));
+                }
+            }
+            return "";
+        }
         private string GenerateMethodExecute(string name) {
             bool isStatic = false;
             List<MethodInfo> methods = new List<MethodInfo>();
@@ -49,22 +96,23 @@ namespace Scorpio.ScorpioReflect {
             foreach (var method in methods) {
                 if (first) { first = false; } else { builder.AppendLine(); }
                 string parameterTypes = GetScorpioMethodParameterTypes(method);
-                string call = (method.IsStatic ? m_FullName : "((" + m_FullName + ")obj)");
-                call += "." + name + GetScorpioMethodCall(method);
-                var pars = method.GetParameters();
+                string parameterCall = GetScorpioMethodCall(method);
+                string variable = (method.IsStatic ? m_FullName : "((" + m_FullName + ")obj)");
+                ParameterInfo[] pars = method.GetParameters();
+                string execute = GetSpeciaMethodExecute(method, variable, pars);
+                if (!string.IsNullOrEmpty(execute)) { goto finish; }
+                execute = GetEventMethodExecute(method, variable, pars);
+                if (!string.IsNullOrEmpty(execute)) { goto finish; }
+                execute = GetPropertyMethodExecute(method, variable, pars);
+                if (!string.IsNullOrEmpty(execute)) { goto finish; }
+                string call = variable + "." + name + "(" + parameterCall + ")";
                 if (method.ReturnType == typeof(void)) {
-                    builder.AppendFormat("            if (type == \"{0}\") {{ {1}; return null; }}", parameterTypes, call);
-                } else if (name == "op_Addition") {
-                    builder.AppendFormat("            if (type == \"{0}\") return {1} + {2};", parameterTypes, "(" + GetFullName(pars[0].ParameterType) + ")args[0]", "(" + GetFullName(pars[1].ParameterType) + ")args[1]");
-                } else if (name == "op_Subtraction") {
-                    builder.AppendFormat("            if (type == \"{0}\") return {1} - {2};", parameterTypes, "(" + GetFullName(pars[0].ParameterType) + ")args[0]", "(" + GetFullName(pars[1].ParameterType) + ")args[1]");
-                } else if (name == "op_Multiply") {
-                    builder.AppendFormat("            if (type == \"{0}\") return {1} * {2};", parameterTypes, "(" + GetFullName(pars[0].ParameterType) + ")args[0]", "(" + GetFullName(pars[1].ParameterType) + ")args[1]");
-                } else if (name == "op_Division") {
-                    builder.AppendFormat("            if (type == \"{0}\") return {1} / {2};", parameterTypes, "(" + GetFullName(pars[0].ParameterType) + ")args[0]", "(" + GetFullName(pars[1].ParameterType) + ")args[1]");
+                    execute = string.Format("{0}; return null;", call);
                 } else {
-                    builder.AppendFormat("            if (type == \"{0}\") return {1};", parameterTypes, call);
+                    execute = string.Format("return {0};", call);
                 }
+finish:
+                builder.AppendFormat("            if (type == \"{0}\") {{ {1} }}", parameterTypes, execute);
             }
             string str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(methods.ToArray()));

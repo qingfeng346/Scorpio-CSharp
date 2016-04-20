@@ -15,10 +15,17 @@ namespace ScorpioReflect
         public Test(params object[] args) {
 
         }
+        public event Action<int> testEvent;
         public int a;
         public int b;
         public int GetA() { return a; }
         public void Func() { }
+        public int get_Item(int a) {
+            return 100;
+        }
+        public int op_Addition(int a, int b) {
+            return 100;
+        }
         public void TestParam1(string a, int b, params object[] args) {
 
         }
@@ -95,6 +102,7 @@ namespace ScorpioReflect
             //            }
             //            Console.ReadKey();
             var g = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(Test));
+            //g.AddExclude("aaaa");
             var str = g.Generate();
             File.WriteAllText(@"C:\Users\qingf\Desktop\ConsoleApplication1\ConsoleApplication1\" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
         }
