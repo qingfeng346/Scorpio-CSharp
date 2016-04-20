@@ -15,6 +15,8 @@ namespace Scorpio.ScorpioReflect {
             {"op_ExclusiveOr", "^"},
             {"op_GreaterThan", ">"},
             {"op_LessThan", "<"},
+            {"op_Equality", "=="},
+            {"op_Inequality", "!="},
         };
         private string GenerateConstructor() {
             var Constructors = m_Type.GetConstructors();

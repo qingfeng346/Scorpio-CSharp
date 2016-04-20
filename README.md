@@ -15,13 +15,21 @@
 * 脚本内所有c#变量(除了int,string等基础类型)均为引用,struct变量也一样
 * c#重载[]运算符后脚本里不能直接使用[],请使用 get_Item 函数
 * c#数组对象获取元素不能直接使用[],请使用 GetValue 函数
+* c#中event对象+= -=操作可以使用函数 add_[event变量名] remove_[event变量名] 代替
 * 同类中静态函数和实例函数不要重名,否则会调用失败 例如 static void Test(object a); void Test(object a, object b); 两个函数不一定会当静态还是实例函数处理
 * 同类中重载的函数相同参数不要是继承关系,否则可能调用失败,例如 void Test(object a); void Test(string a); 两个Test函数都可以传入string,但是调用时不一定会调用哪一个
 * c#类的变量不能类似 += -= *= /= 等赋值计算操作(只有event可以使用 += -=) 请使用 变量 = 变量 + XXX
 * SCORPIO_DYNAMIC_DELEGATE 宏定义好像只能android和windows(exe)平台可用,其它平台请勿用
+* 不能使用SCORPIO_DYNAMIC_DELEGATE 要实现一个继承 DelegateTypeFactory 的类实现 Delegate CreateDelegate(Script script, Type type, ScriptFunction func) 函数 例如
+	* UnityAction 委托类型 if (type == typeof(UnityAction)) return new UnityAction (() => { func.call (); });
+	* Application.LogCallback 委托类型 if (type == typeof(Application.LogCallback)) return new Application.LogCallback((arg1, arg2, arg3) => { func.call(arg1, arg2, arg3); });
+	* Comparison<Transform> List排序带返回值 if (type == typeof(Comparison<Transform>))	return new Comparison<Transform>((arg1, arg2) => { return Util.ToInt32(((ScriptObject)func.call(arg1, arg2)).ObjectValue); });
+	* 自己使用到的委托类型要全部添加上
 * IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
 * UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 * UWP平台master配置下generic_type函数也会出问题
+
+## 使用去反射功能注意事项 ##
 * 去反射功能不能用于模板函数
 
 ## Unity3d发布平台支持(亲测):
@@ -34,6 +42,22 @@
 - [x] Windows 10 (Universal Windows Platform)
 - [x] WebGL
 - [ ] 其他平台未测试,如果测试通过可以@我
+
+## 反射调用运算符重载函数
+*	+    op_Addition
+*	-    op_Subtraction
+*	*    op_Multiply
+*	/    op_Division
+*	%    op_Modulus
+*	|    op_BitwiseOr
+*	&    op_BitwiseAnd
+*	^    op_ExclusiveOr
+*	>    op_GreaterThan
+*	<    op_LessThan
+*	==   op_Equality
+*	!=   op_Inequality
+*	[]   get_Item(获取变量)
+*	[]   set_Item(设置变量)
 
 
 ## 源码目录说明:

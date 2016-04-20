@@ -83,7 +83,7 @@ namespace Scorpio.ScorpioReflect {
 			m_Methods.Clear();
 			foreach (var method in methods) {
 				string name = method.Name;
-				if (name == "op_Equality" || name == "op_Inequality" || name == "op_Implicit")
+				if (method.IsSpecialName && name == "op_Implicit")
 					continue;
 				bool RetvalOrOut = false;
 				var pars = method.GetParameters();

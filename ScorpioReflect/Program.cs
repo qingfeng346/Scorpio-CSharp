@@ -62,6 +62,12 @@ namespace ScorpioReflect
         public static Test operator + (Test a, int b) {
             return a;
         }
+        public static bool operator ==(Test a, Test b) {
+            return true;
+        }
+        public static bool operator !=(Test a, Test b) {
+            return false;
+        }
     }
     class Program
     {
@@ -104,7 +110,7 @@ namespace ScorpioReflect
             var g = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(Test));
             //g.AddExclude("aaaa");
             var str = g.Generate();
-            File.WriteAllText(@"C:\Users\qingf\Desktop\ConsoleApplication1\ConsoleApplication1\" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
+            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
         }
     }
 }
