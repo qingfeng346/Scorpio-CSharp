@@ -43,7 +43,7 @@ namespace Scorpio
             return Script.CreateString(Value);
         }
         public override string ToJson() {
-            return "\"" + Value + "\"";
+            return "\"" + Value.Replace("\"", "\\\"") + "\"";
         }
     }
 }
