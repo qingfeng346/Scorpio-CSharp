@@ -15,6 +15,9 @@
         public override string ToJson() {
             return Value ? "true" : "false";
         }
+        public override string ToString() {
+            return Value ? "true" : "false";
+        }
         public ScriptBoolean Inverse()
         {
             return Value ? Script.False : Script.True;

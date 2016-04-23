@@ -21,13 +21,13 @@ namespace Scorpio
             if (val == null) throw new ExecutionException(Script, "字符串比较 右边必须为字符串类型");
             switch (type) {
                 case TokenType.Greater:
-                    return string.Compare(Value, val.Value) < 0;
-                case TokenType.GreaterOrEqual:
-                    return string.Compare(Value, val.Value) <= 0;
-                case TokenType.Less:
                     return string.Compare(Value, val.Value) > 0;
-                case TokenType.LessOrEqual:
+                case TokenType.GreaterOrEqual:
                     return string.Compare(Value, val.Value) >= 0;
+                case TokenType.Less:
+                    return string.Compare(Value, val.Value) < 0;
+                case TokenType.LessOrEqual:
+                    return string.Compare(Value, val.Value) <= 0;
                 default:
                     throw new ExecutionException(Script, "String类型 操作符[" + type + "]不支持");
             }
