@@ -1,1 +1,3 @@
-ScorpioMaker.exe -t 1 -s Test.ser -o Test.sco1
+set file=%1%
+set out=%2%
+ScorpioMaker.exe -t 1 -s %file% -o %out%
