@@ -20,11 +20,23 @@
 * 同类中重载的函数相同参数不要是继承关系,否则可能调用失败,例如 void Test(object a); void Test(string a); 两个Test函数都可以传入string,但是调用时不一定会调用哪一个
 * c#类的变量不能类似 += -= *= /= 等赋值计算操作(只有event可以使用 += -=) 请使用 变量 = 变量 + XXX
 * SCORPIO_DYNAMIC_DELEGATE 宏定义好像只能android和windows(exe)平台可用,其它平台请勿用
-* 不能使用SCORPIO_DYNAMIC_DELEGATE 要实现一个继承 DelegateTypeFactory 的类实现 Delegate CreateDelegate(Script script, Type type, ScriptFunction func) 函数 例如
-	* UnityAction 委托类型 if (type == typeof(UnityAction)) return new UnityAction (() => { func.call (); });
-	* Application.LogCallback 委托类型 if (type == typeof(Application.LogCallback)) return new Application.LogCallback((arg1, arg2, arg3) => { func.call(arg1, arg2, arg3); });
-	* Comparison<Transform> List排序带返回值 if (type == typeof(Comparison<Transform>))	return new Comparison<Transform>((arg1, arg2) => { return Util.ToInt32(((ScriptObject)func.call(arg1, arg2)).ObjectValue); });
-	* 自己使用到的委托类型要全部添加上
+* 不能使用SCORPIO_DYNAMIC_DELEGATE 要实现一个继承 DelegateTypeFactory 的类,然后调用DefaultScriptUserdataDelegateType.SetFactory函数设置一下 例如:
+```c#
+public class MyDelegateFactory : DelegateTypeFactory {
+	public Delegate CreateDelegate(Script script, Type type, ScriptFunction func) {
+		if (type == typeof(UnityAction))						//UnityAction委托类型
+			return new UnityAction (() => { func.call (); });
+		else if (type == typeof(Application.LogCallback)) 		//Application.LogCallback 委托类型
+			return new Application.LogCallback((arg1, arg2, arg3) => { func.call(arg1, arg2, arg3); });
+		else if (type == typeof(Comparison<Transform>))			//Comparison<Transform> List排序委托类型, 带返回值
+			return new Comparison<Transform>((arg1, arg2) => { return Util.ToInt32(((ScriptObject)func.call(arg1, arg2)).ObjectValue); });
+		//自己可能用到的委托类型请自行添加
+		Debug.Log ("Delegate Type is not found : " + type + "  func : " + func);
+        return null;
+	}
+}
+///然后实现完以后 调用 DefaultScriptUserdataDelegateType.SetFactory(new MyDelegateFactory()); 设置一下
+```
 * IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
 * UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 * UWP平台master配置下generic_type函数也会出问题
