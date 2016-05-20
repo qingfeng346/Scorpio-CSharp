@@ -164,6 +164,13 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-5-20)
+-----------
+* 增加func库(只对脚本函数有效)
+	* func.count() 返回函数参数个数
+	* func.isparams() 返回函数是否是不定参函数
+	* func.isstatic() 返回函数是否是静态函数(不是table内部函数)
+	* func.getparams() 返回函数参数名字数组
 (2016-4-20)
 -----------
 * 优化去反射工具生成代码
