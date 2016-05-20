@@ -62,6 +62,7 @@ namespace ScorpioExec
                     Stopwatch watch = Stopwatch.StartNew();
                     script.PushSearchPath(CurrentDirectory);
                     script.PushSearchPath(Path.GetDirectoryName(args[0]));
+                    script.SetObject("__PATH__", Path.GetDirectoryName(args[0]));
                     LibraryIO.Load(script);
                     Console.WriteLine("返回值为:" + script.LoadFile(args[0]));
                     Console.WriteLine("运行时间:" + watch.ElapsedMilliseconds + " ms");
