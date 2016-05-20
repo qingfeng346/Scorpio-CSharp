@@ -32,7 +32,7 @@ namespace Scorpio
                 obj = pair.Value.Clone();
                 if (obj is ScriptScriptFunction) {
                     func = (ScriptScriptFunction)obj;
-                    if (!func.IsStatic) func.SetTable(this);
+                    if (!func.IsStaticFunction) func.SetTable(this);
                 }
                 m_listObject[pair.Key] = obj;
             }
@@ -49,7 +49,7 @@ namespace Scorpio
                 obj = pair.Value.Clone();
                 if (obj is ScriptScriptFunction) {
                     func = (ScriptScriptFunction)obj;
-                    if (!func.IsStatic) func.SetTable(ret);
+                    if (!func.IsStaticFunction) func.SetTable(ret);
                 }
                 ret.m_listObject[pair.Key] = obj;
             }
@@ -57,7 +57,7 @@ namespace Scorpio
                 obj = pair.Value.Clone();
                 if (obj is ScriptScriptFunction) {
                     func = (ScriptScriptFunction)obj;
-                    if (!func.IsStatic) func.SetTable(ret);
+                    if (!func.IsStaticFunction) func.SetTable(ret);
                 }
                 ret.m_listObject[pair.Key] = obj;
             }
@@ -107,7 +107,7 @@ namespace Scorpio
                     obj = pair.Value.Clone();
                     if (obj is ScriptScriptFunction) {
                         func = (ScriptScriptFunction)obj;
-                        if (!func.IsStatic) func.SetTable(ret);
+                        if (!func.IsStaticFunction) func.SetTable(ret);
                     }
                     ret.m_listObject[pair.Key] = obj;
                 }

@@ -318,6 +318,7 @@ namespace Scorpio
             LibraryTable.Load(this);
             LibraryJson.Load(this);
             LibraryMath.Load(this);
+            LibraryFunc.Load(this);
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using Scorpio;
 namespace Scorpio.Library
 {
-    public class LibraryJson
-    {
+    public class LibraryJson {
         public static void Load(Script script)
         {
             ScriptTable Table = script.CreateTable();

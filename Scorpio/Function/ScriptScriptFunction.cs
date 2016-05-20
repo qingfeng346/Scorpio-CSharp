@@ -9,12 +9,16 @@ namespace Scorpio.Function {
         private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数
         private ScriptContext m_ParentContext;                                  //父级堆栈
         private Dictionary<String, ScriptObject> m_stackObject = new Dictionary<String, ScriptObject>();    //函数变量
-        public bool IsStatic { get; private set; }                              //是否是静态函数(不是table内部函数)
+        public bool IsStaticFunction { get; private set; }                              //是否是静态函数(不是table内部函数)
         internal ScriptScriptFunction(Script script, String name, ScorpioScriptFunction function) : base(script, name)
         {
-            this.IsStatic = true;
+            this.IsStaticFunction = true;
             this.m_ScriptFunction = function;
         }
+        public override int GetParamCount() { return m_ScriptFunction.GetParameterCount(); }
+        public override bool IsParams() { return m_ScriptFunction.IsParams(); }
+        public override bool IsStatic() { return IsStaticFunction; }
+        public override ScriptArray GetParams() { return m_ScriptFunction.GetParameters(); }
         public override void SetValue(object key, ScriptObject value) {
             if (!(key is string)) throw new ExecutionException(this.Script, "Function SetValue只支持String类型 key值为:" + key);
             m_stackObject[(string)key] = value;
@@ -25,7 +29,7 @@ namespace Scorpio.Function {
             return m_stackObject.ContainsKey(skey) ? m_stackObject[skey] : Script.Null;
         }
         public void SetTable(ScriptTable table) {
-            IsStatic = false;
+            IsStaticFunction = false;
             m_stackObject["this"] = table;
             m_stackObject["self"] = table;
         }
@@ -35,7 +39,7 @@ namespace Scorpio.Function {
         }
         public ScriptScriptFunction Create() {
             ScriptScriptFunction ret = new ScriptScriptFunction(Script, Name, m_ScriptFunction);
-            ret.IsStatic = IsStatic;
+            ret.IsStaticFunction = IsStaticFunction;
             return ret;
         }
         public override object Call(ScriptObject[] parameters) {

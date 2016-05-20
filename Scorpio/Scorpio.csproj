@@ -76,6 +76,7 @@
     <Compile Include="Function\ScriptMethodFunction.cs" />
     <Compile Include="Function\ScriptScriptFunction.cs" />
     <Compile Include="IScriptExtensions.cs" />
+    <Compile Include="Library\LibraryFunc.cs" />
     <Compile Include="Library\LibraryJson.cs" />
     <Compile Include="Library\LibraryMath.cs" />
     <Compile Include="Runtime\Executable_Block.cs" />

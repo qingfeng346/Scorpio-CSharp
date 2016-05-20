@@ -14,6 +14,15 @@ namespace Scorpio.Variable
         private ScriptExecutable m_ScriptExecutable;        //函数执行命令
         private int m_ParameterCount;                       //参数个数
         private bool m_Params;                              //是否是不定参函数
+        public int GetParameterCount() { return m_ParameterCount; }
+        public bool IsParams() { return m_Params; }
+        public ScriptArray GetParameters() {
+            ScriptArray ret = m_Script.CreateArray();
+            foreach (String par in m_ListParameters) {
+                ret.Add(m_Script.CreateString(par));
+            }
+            return ret;
+        }
         public ScorpioScriptFunction(Script script, List<String> listParameters, ScriptExecutable scriptExecutable, bool bParams) {
             this.m_Script = script;
             this.m_ListParameters = listParameters.ToArray();
