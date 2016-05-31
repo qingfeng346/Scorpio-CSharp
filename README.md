@@ -166,6 +166,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ## master版本更新和修改内容 ##
 (2016-5-31)
 -----------
+* 提升脚本执行性能 5% - 10%
+
+(2016-5-31)
+-----------
 * 类型null支持当作table的key值
 * 类型bool可以直接传入类型当作table的key值,修改前只可以传入变量
 ```javascript
