@@ -21,11 +21,11 @@ namespace Scorpio.Userdata
         public DefaultScriptUserdataDelegateType(Script script, Type value) : base(script)
         {
             this.m_Value = value;
-            this.ValueType = value;
+            this.m_ValueType = value;
         }
         public override object Call(ScriptObject[] parameters)
         {
-            return m_Factory != null ? m_Factory.CreateDelegate(Script, ValueType, parameters[0] as ScriptFunction) : null;
+            return m_Factory != null ? m_Factory.CreateDelegate(m_Script, m_ValueType, parameters[0] as ScriptFunction) : null;
         }
     }
 #else
