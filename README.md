@@ -164,6 +164,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-5-31)
+-----------
+* 类型null支持当作table类型的key值
+
 (2016-5-20)
 -----------
 * 增加func库(只对脚本函数有效)
