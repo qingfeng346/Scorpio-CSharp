@@ -166,7 +166,20 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ## master版本更新和修改内容 ##
 (2016-5-31)
 -----------
-* 类型null支持当作table类型的key值
+* 类型null支持当作table的key值
+* 类型bool可以直接传入类型当作table的key值,修改前只可以传入变量
+```javascript
+var a = {
+    true = 100,
+    null = 100,
+}
+print(a[true])
+print(a[null])
+a[true] = 200
+a[null] = 200
+print(a[true])
+print(a[null])
+```
 
 (2016-5-20)
 -----------

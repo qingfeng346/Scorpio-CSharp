@@ -854,7 +854,8 @@ namespace Scorpio.Compiler
             ReadLeftBrace();
             while (PeekToken().Type != TokenType.RightBrace) {
                 Token token = ReadToken();
-                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number || token.Type == TokenType.Null) {
+                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number || 
+                    token.Type == TokenType.Boolean || token.Type == TokenType.Null) {
                     Token next = ReadToken();
                     if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
                         if (token.Type == TokenType.Null) {
