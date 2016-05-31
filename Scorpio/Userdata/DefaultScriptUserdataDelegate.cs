@@ -21,7 +21,7 @@ namespace Scorpio.Userdata
         public DefaultScriptUserdataDelegate(Script script, Delegate value) : base(script) {
             this.m_Delegate = value;
             this.m_Value = value;
-            this.ValueType = value.GetType();
+            this.m_ValueType = value.GetType();
             var method = ScriptExtensions.GetMethodInfo(m_Delegate);
             var infos = method.GetParameters();
             var dynamicDelegate = method.Name.Equals(Script.DynamicDelegateName);
@@ -39,7 +39,7 @@ namespace Scorpio.Userdata
                 if (i >= parameters.Length) {
                     m_Objects[i] = parameter.DefaultValue;
                 } else {
-                    m_Objects[i] = Util.ChangeType(Script, parameters[i], parameter.ParameterType);
+                    m_Objects[i] = Util.ChangeType(m_Script, parameters[i], parameter.ParameterType);
                 }
             }
             return m_Delegate.DynamicInvoke(m_Objects);
@@ -48,16 +48,16 @@ namespace Scorpio.Userdata
         {
             switch (type) {
                 case TokenType.Plus:
-                    return Script.CreateObject(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(Script, obj, ValueType)));
+                    return m_Script.CreateObject(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(m_Script, obj, ValueType)));
                 case TokenType.Minus:
-                    return Script.CreateObject(Delegate.Remove(m_Delegate, (Delegate)Util.ChangeType(Script, obj, ValueType)));
+                    return m_Script.CreateObject(Delegate.Remove(m_Delegate, (Delegate)Util.ChangeType(m_Script, obj, ValueType)));
                 default:
-                    throw new ExecutionException(Script, "Delegate 不支持的运算符 " + type);
+                    throw new ExecutionException(m_Script, "Delegate 不支持的运算符 " + type);
             }
         }
         public override ScriptObject GetValue(object key) {
-            if (!(key is string) || !key.Equals("Type")) throw new ExecutionException(Script, "EventInfo GetValue只支持 Type 一个变量");
-            return Script.CreateObject(ValueType);
+            if (!(key is string) || !key.Equals("Type")) throw new ExecutionException(m_Script, "EventInfo GetValue只支持 Type 一个变量");
+            return m_Script.CreateObject(ValueType);
         }
     }
 }

@@ -3,25 +3,26 @@
     //脚本bool类型
     public class ScriptBoolean : ScriptObject
     {
+        private bool m_Value;
         public ScriptBoolean(Script script, bool value) : base(script) {
-            this.Value = value;
+            this.m_Value = value;
         }
-        public bool Value { get; private set; }
+        public bool Value { get { return m_Value; } }
         public override ObjectType Type { get { return ObjectType.Boolean; } }
-        public override object ObjectValue { get { return Value; } }
-        public override object KeyValue { get { return Value; } }
+        public override object ObjectValue { get { return m_Value; } }
+        public override object KeyValue { get { return m_Value; } }
         public override bool LogicOperation() {
-            return Value;
+            return m_Value;
         }
         public override string ToJson() {
-            return Value ? "true" : "false";
+            return m_Value ? "true" : "false";
         }
         public override string ToString() {
-            return Value ? "true" : "false";
+            return m_Value ? "true" : "false";
         }
         public ScriptBoolean Inverse()
         {
-            return Value ? Script.False : Script.True;
+            return m_Value ? m_Script.False : m_Script.True;
         }
     }
 }

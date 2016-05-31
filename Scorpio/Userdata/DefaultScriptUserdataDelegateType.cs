@@ -66,7 +66,7 @@ namespace Scorpio.Userdata
         public DefaultScriptUserdataDelegateType(Script script, Type value) : base(script)
         {
             this.m_Value = value;
-            this.ValueType = value;
+            this.m_ValueType = value;
             var InvokeMethod = value.GetMethod("Invoke");
             m_DelegateType = value;
             m_ReturnType = InvokeMethod.ReturnType;
@@ -98,7 +98,7 @@ namespace Scorpio.Userdata
         }
         public override object Call(ScriptObject[] parameters)
         {
-            return MethodFactory.CreateDelegate(m_DelegateType, new DynamicDelegate(Script, parameters[0] as ScriptFunction, m_ReturnType));
+            return MethodFactory.CreateDelegate(m_DelegateType, new DynamicDelegate(m_Script, parameters[0] as ScriptFunction, m_ReturnType));
         }
     }
 #endif

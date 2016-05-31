@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+using Scorpio;
 namespace Scorpio.Userdata {
     public interface IScorpioFastReflectClass {
         FastReflectUserdataMethod GetConstructor();

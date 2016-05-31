@@ -61,28 +61,28 @@ namespace Scorpio
             if (index is double || index is int || index is long) {
                 int i = Util.ToInt32(index);
                 if (i < 0)
-                    throw new ExecutionException(Script, "Array GetValue索引小于0 index值为:" + index);
+                    throw new ExecutionException(m_Script, "Array GetValue索引小于0 index值为:" + index);
                 if (i >= m_size)
                     return m_null;
                 return m_listObject[i] ?? m_null;
             } else if (index is string && index.Equals("length")){
-                return Script.CreateNumber(m_size);
+                return m_Script.CreateNumber(m_size);
             }
-            throw new ExecutionException(Script, "Array SetValue只支持Number类型 index值为:" + index);
+            throw new ExecutionException(m_Script, "Array SetValue只支持Number类型 index值为:" + index);
         }
         public override void SetValue(object index, ScriptObject obj)
         {
             if (index is double || index is int || index is long) {
                 int i = Util.ToInt32(index);
                 if (i < 0)
-                    throw new ExecutionException(Script, "Array SetValue索引小于0 index值为:" + index);
+                    throw new ExecutionException(m_Script, "Array SetValue索引小于0 index值为:" + index);
                 if (i >= m_size) {
                     EnsureCapacity(i + 1);
                     m_size = i + 1;
                 }
                 m_listObject[i] = obj;
             } else {
-                throw new ExecutionException(Script, "Array SetValue只支持Number类型 index值为:" + index);
+                throw new ExecutionException(m_Script, "Array SetValue只支持Number类型 index值为:" + index);
             }
         }
         void SetCapacity(int value) {
@@ -173,7 +173,7 @@ namespace Scorpio
         }
         public void Resize(int length) {
             if (length < 0)
-                throw new ExecutionException(Script, "Resize长度小于0 length:" + length);
+                throw new ExecutionException(m_Script, "Resize长度小于0 length:" + length);
             if (length > m_size) {
                 EnsureCapacity(length);
                 m_size = length;
@@ -192,7 +192,7 @@ namespace Scorpio
             return m_size;
         }
 		public void Sort(ScriptFunction func) {
-            Array.Sort<ScriptObject>(m_listObject, 0, m_size, new Comparer(Script, func));
+            Array.Sort<ScriptObject>(m_listObject, 0, m_size, new Comparer(m_Script, func));
         }
         public ScriptObject First()
         {
@@ -209,7 +209,7 @@ namespace Scorpio
         public ScriptObject PopFirst()
         {
             if (m_size == 0)
-                throw new ExecutionException(Script, "Array Pop 数组长度为0");
+                throw new ExecutionException(m_Script, "Array Pop 数组长度为0");
             ScriptObject obj = m_listObject[0];
             RemoveAt(0);
             return obj;
@@ -225,7 +225,7 @@ namespace Scorpio
         public ScriptObject PopLast()
         {
             if (m_size == 0)
-                throw new ExecutionException(Script, "Array Pop 数组长度为0");
+                throw new ExecutionException(m_Script, "Array Pop 数组长度为0");
             int index = m_size - 1;
             ScriptObject obj = m_listObject[index];
             RemoveAt(index);
@@ -253,7 +253,7 @@ namespace Scorpio
         }
         public override ScriptObject Clone()
         {
-            ScriptArray ret = Script.CreateArray();
+            ScriptArray ret = m_Script.CreateArray();
             ret.m_listObject = new ScriptObject[m_size];
             ret.m_size = m_size;
             for (int i = 0; i < m_size; ++i) {

@@ -10,9 +10,9 @@ namespace Scorpio.Function {
         }
         public override object Call(ScriptObject[] parameters) {
             try {
-                return m_Function(Script, parameters);
+                return m_Function(m_Script, parameters);
             } catch (System.Exception ex) {
-                throw new ExecutionException(Script, "CallFunction [" + Name + "] is error : " + ex.ToString());
+                throw new ExecutionException(m_Script, "CallFunction [" + Name + "] is error : " + ex.ToString());
             }
         }
     }

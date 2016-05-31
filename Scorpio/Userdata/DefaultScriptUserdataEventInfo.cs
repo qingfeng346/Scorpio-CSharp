@@ -16,19 +16,19 @@ namespace Scorpio.Userdata
         public override ScriptObject AssignCompute(TokenType type, ScriptObject obj) {
             switch (type) {
                 case TokenType.AssignPlus:
-                    m_EventInfo.AddEventHandler(m_Target, (Delegate)Util.ChangeType(Script, obj, m_HandlerType));
-                    return Script.Null;
+                    m_EventInfo.AddEventHandler(m_Target, (Delegate)Util.ChangeType(m_Script, obj, m_HandlerType));
+                    return m_Script.Null;
                 case TokenType.AssignMinus:
-                    m_EventInfo.RemoveEventHandler(m_Target, (Delegate)Util.ChangeType(Script, obj, m_HandlerType));
-                    return Script.Null;
+                    m_EventInfo.RemoveEventHandler(m_Target, (Delegate)Util.ChangeType(m_Script, obj, m_HandlerType));
+                    return m_Script.Null;
                 default:
-                    throw new ExecutionException(Script, "event 不支持的运算符 " + type);
+                    throw new ExecutionException(m_Script, "event 不支持的运算符 " + type);
             }
         }
         public override ScriptObject GetValue(object key)
         {
-            if (!(key is string) || !key.Equals("Type")) throw new ExecutionException(Script, "EventInfo GetValue只支持 Type 一个变量");
-            return Script.CreateObject(m_HandlerType);
+            if (!(key is string) || !key.Equals("Type")) throw new ExecutionException(m_Script, "EventInfo GetValue只支持 Type 一个变量");
+            return m_Script.CreateObject(m_HandlerType);
         }
     }
 }

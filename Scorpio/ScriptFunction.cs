@@ -17,7 +17,7 @@ namespace Scorpio
         public virtual int GetParamCount() { return 0; }
         public virtual bool IsParams() { return false; }
         public virtual bool IsStatic() { return false; }
-        public virtual ScriptArray GetParams() { return Script.CreateArray(); }
+        public virtual ScriptArray GetParams() { return m_Script.CreateArray(); }
         public override string ToString() { return "Function(" + Name + ")"; }
         public override string ToJson() { return "\"Function\""; }
     }

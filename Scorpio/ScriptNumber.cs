@@ -13,10 +13,10 @@ namespace Scorpio
 		public abstract ScriptNumber Floor();											//取数的整数
 		public abstract ScriptNumber Clamp(ScriptNumber min, ScriptNumber max);			//取值的区间
 		public ScriptNumber Sqrt () {													//取平方根
-			return Script.CreateDouble (Math.Sqrt (ToDouble()));
+			return m_Script.CreateDouble (Math.Sqrt (ToDouble()));
 		}
 		public ScriptNumber Pow (ScriptNumber value) {									//取几次方
-			return Script.CreateDouble (Math.Pow (ToDouble(), value.ToDouble()));
+			return m_Script.CreateDouble (Math.Pow (ToDouble(), value.ToDouble()));
 		}
         public virtual int ToInt32() { return Util.ToInt32(ObjectValue); }
         public virtual double ToDouble() { return Util.ToDouble(ObjectValue); }

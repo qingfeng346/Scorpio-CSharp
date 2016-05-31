@@ -30,14 +30,17 @@ namespace Scorpio
         private List<String> m_Defines = new List<String>();                    //所有Define
         private Dictionary<Type, IScorpioFastReflectClass> m_FastReflectClass = new Dictionary<Type, IScorpioFastReflectClass>();
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
-        public ScriptNull Null { get; private set; }                            //null对象
-        public ScriptBoolean True { get; private set; }                         //true对象
-        public ScriptBoolean False { get; private set; }                        //false对象
+        private ScriptNull m_Null;                                              //null对象
+        private ScriptBoolean m_True;                                           //true对象
+        private ScriptBoolean m_False;                                          //false对象
+        public ScriptNull Null { get { return m_Null; } }                       //null对象
+        public ScriptBoolean True { get { return m_True; } }                    //true对象
+        public ScriptBoolean False { get { return m_False; } }                  //false对象
         public ScriptBoolean GetBoolean(bool value) { return value ? True : False;  }
         public Script() {
-            Null = new ScriptNull(this);
-            True = new ScriptBoolean(this, true);
-            False = new ScriptBoolean(this, false);
+            m_Null = new ScriptNull(this);
+            m_True = new ScriptBoolean(this, true);
+            m_False = new ScriptBoolean(this, false);
             m_UserdataFactory = new DefaultScriptUserdataFactory(this);
             m_GlobalTable = CreateTable();
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
@@ -86,7 +89,7 @@ namespace Scorpio
         internal ScriptObject LoadString(String strBreviary, String strBuffer, ScriptContext context, bool clearStack)
         {
             try {
-                if (Util.IsNullOrEmpty(strBuffer)) return Null;
+                if (Util.IsNullOrEmpty(strBuffer)) return m_Null;
                 if (clearStack) m_StackInfoStack.Clear();
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer, strBreviary);
 				return Load(scriptLexer.GetBreviary(), scriptLexer.GetTokens(), context);
@@ -101,7 +104,7 @@ namespace Scorpio
         public ScriptObject LoadTokens(String strBreviary, List<Token> tokens)
         {
             try {
-                if (tokens.Count == 0) return Null;
+                if (tokens.Count == 0) return m_Null;
                 m_StackInfoStack.Clear();
                 return Load(strBreviary, tokens, null);
             } catch (System.Exception e) {
@@ -110,7 +113,7 @@ namespace Scorpio
         }
         private ScriptObject Load(String strBreviary, List<Token> tokens, ScriptContext context)
         {
-            if (tokens.Count == 0) return Null;
+            if (tokens.Count == 0) return m_Null;
             ScriptParser scriptParser = new ScriptParser(this, tokens, strBreviary);
             ScriptExecutable scriptExecutable = scriptParser.Parse();
             return new ScriptContext(this, scriptExecutable, context, Executable_Block.Context).Execute();
@@ -153,7 +156,7 @@ namespace Scorpio
                 Type type = Type.GetType(str, false, false);
                 if (type != null) return CreateUserdata(type);
             }
-            return Null;
+            return m_Null;
         }
         public void PushFastReflectClass(Type type, IScorpioFastReflectClass value) {
             m_FastReflectClass[type] = value;
@@ -230,7 +233,7 @@ namespace Scorpio
         public ScriptObject CreateObject(object value)
         {
             if (value == null)
-                return Null;
+                return m_Null;
             else if (value is ScriptObject)
                 return (ScriptObject)value;
             else if (value is ScorpioFunction)

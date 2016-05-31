@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Scorpio;
 using Scorpio.Exception;
 namespace Scorpio.Userdata {
     public class ScorpioMethodInfo {
@@ -30,7 +31,7 @@ namespace Scorpio.Userdata {
             public Type ParamType;                      //变长参数类型
             public string ParameterTypes;               //传递参数的类型
             public object[] Args;                       //参数数组（预创建 可以共用）
-            public bool IsValid { get; protected set; }   //是否是有效的函数 (模版函数没有声明的时候就是无效的)
+            public bool IsValid;                        //是否是有效的函数 (模版函数没有声明的时候就是无效的)
             public FunctionBase(Type[] ParameterType, Type ParamType, bool Params, string ParameterTypes) {
                 this.ParameterType = ParameterType;
                 this.ParamType = ParamType;
@@ -45,7 +46,7 @@ namespace Scorpio.Userdata {
             public FunctionMethod(MethodInfo Method, Type[] ParameterType, Type ParamType, bool Params, string ParameterTypes) : 
                 base(ParameterType, ParamType, Params, ParameterTypes) {
                 this.Method = Method;
-                IsValid = !Method.IsGenericMethod || !Method.ContainsGenericParameters;
+                this.IsValid = !Method.IsGenericMethod || !Method.ContainsGenericParameters;
             }
             public override object Invoke(object obj, Type type) {
                 return Method.Invoke(obj, Args);
@@ -77,12 +78,14 @@ namespace Scorpio.Userdata {
         private Type m_Type;                            //所在类型
         private int m_Count;                            //相同名字函数数量
         private FunctionBase[] m_Methods;               //所有函数对象
-        public string MethodName { get; private set; }  //函数名字
-        public bool IsStatic { get; private set; }      //是否是静态函数
+        private string m_MethodName;                    //函数名字
+        private bool m_IsStatic;                        //是否是静态函数
+        public string MethodName { get { return m_MethodName; } }
+        public bool IsStatic { get { return m_IsStatic; } }
         public UserdataMethod() { }
         private UserdataMethod(Script script, Type type, string methodName, List<MethodInfo> methods) {
             m_Script = script;
-            IsStatic = methods[0].IsStatic;
+            m_IsStatic = methods[0].IsStatic;
             List<MethodBase> methodBases = new List<MethodBase>();
             methodBases.AddRange(methods.ToArray());
             Initialize_impl(type, methodName, methodBases);
@@ -94,12 +97,12 @@ namespace Scorpio.Userdata {
                 if (method.Name.Equals(methodName))
                     methodBases.Add(method);
             }
-            IsStatic = methodBases.Count > 0 ? methodBases[0].IsStatic : false;
+            m_IsStatic = methodBases.Count > 0 ? methodBases[0].IsStatic : false;
             Initialize_impl(type, methodName, methodBases);
         }
         protected void Initialize(Script script, Type type, string methodName, ConstructorInfo[] cons) {
             m_Script = script;
-            IsStatic = false;
+            m_IsStatic = false;
             List<MethodBase> methods = new List<MethodBase>();
             methods.AddRange(cons);
             Initialize_impl(type, methodName, methods);
@@ -107,7 +110,7 @@ namespace Scorpio.Userdata {
         private void Initialize_impl(Type type, string methodName, List<MethodBase> methods)
         {
             m_Type = type;
-            MethodName = methodName;
+            m_MethodName = methodName;
             List<FunctionBase> functionMethod = new List<FunctionBase>();
             bool Params = false;
             Type ParamType = null;
@@ -138,9 +141,9 @@ namespace Scorpio.Userdata {
         }
         protected void Initialize(bool isStatic, Script script, Type type, string methodName, ScorpioMethodInfo[] methods, IScorpioFastReflectMethod fastMethod) {
             m_Script = script;
-            IsStatic = isStatic;
+            m_IsStatic = isStatic;
             m_Type = type;
-            MethodName = methodName;
+            m_MethodName = methodName;
             List<FunctionBase> functionMethod = new List<FunctionBase>();
             foreach (ScorpioMethodInfo method in methods) {
                 functionMethod.Add(new FunctionFastMethod(fastMethod, method.ParameterType, method.ParamType, method.Params, method.ParameterTypes));
