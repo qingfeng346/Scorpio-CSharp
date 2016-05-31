@@ -12,6 +12,7 @@ namespace Scorpio.Variable
         public override ObjectType Type { get { return ObjectType.Number; } }
         public override int BranchType { get { return 1; } }
         public override object ObjectValue { get { return m_Value; } }
+        public override object KeyValue { get { return m_Value; } }
         public long Value { get { return m_Value; } }
         public long m_Value;
         public ScriptNumberLong(Script script, long value) : base(script)

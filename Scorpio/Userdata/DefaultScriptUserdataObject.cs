@@ -15,19 +15,19 @@ namespace Scorpio.Userdata
         protected UserdataType m_UserdataType;
         public DefaultScriptUserdataObject(Script script, object value, UserdataType type) : base(script)
         {
-            this.Value = value;
+            this.m_Value = value;
             this.ValueType = value.GetType();
             this.m_UserdataType = type;
         }
         public override ScriptObject GetValue(object key)
         {
             if (!(key is string)) throw new ExecutionException(Script, "Object GetValue只支持String类型");
-            return Script.CreateObject(m_UserdataType.GetValue(Value, (string)key));
+            return Script.CreateObject(m_UserdataType.GetValue(m_Value, (string)key));
         }
         public override void SetValue(object key, ScriptObject value)
         {
             if (!(key is string)) throw new ExecutionException(Script, "Object SetValue只支持String类型");
-            m_UserdataType.SetValue(Value, (string)key, value);
+            m_UserdataType.SetValue(m_Value, (string)key, value);
         }
         public override ScriptObject Compute(TokenType type, ScriptObject obj)
         {

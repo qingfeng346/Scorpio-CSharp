@@ -20,7 +20,7 @@ namespace Scorpio.Userdata
         private object[] m_Objects;
         public DefaultScriptUserdataDelegate(Script script, Delegate value) : base(script) {
             this.m_Delegate = value;
-            this.Value = value;
+            this.m_Value = value;
             this.ValueType = value.GetType();
             var method = ScriptExtensions.GetMethodInfo(m_Delegate);
             var infos = method.GetParameters();

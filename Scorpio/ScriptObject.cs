@@ -64,11 +64,12 @@ namespace Scorpio
         public override int GetHashCode() {                                             
             return base.GetHashCode();
         }
-        public ScriptObject(Script script) { Script = script; }                         // 构图函数
+        public ScriptObject(Script script) { Script = script; }                       // 构图函数
         public Script Script { get; protected set; }                                    // 所在脚本对象
         public abstract ObjectType Type { get; }                                        // 变量类型
         public virtual int BranchType { get { return 0; } }                             // 分支类型
         public virtual object ObjectValue { get { return this; } }                      // 变量值
+        public virtual object KeyValue { get { return this; } }                         // 作为key值
         public bool IsPrimitive { get { return IsBoolean || IsNumber || IsString; } }
         public bool IsNull { get { return (Type == ObjectType.Null); } }
         public bool IsBoolean { get { return (Type == ObjectType.Boolean); } }

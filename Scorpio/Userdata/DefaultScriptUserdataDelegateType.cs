@@ -20,7 +20,7 @@ namespace Scorpio.Userdata
         public static void SetFactory(DelegateTypeFactory factory) { m_Factory = factory; }
         public DefaultScriptUserdataDelegateType(Script script, Type value) : base(script)
         {
-            this.Value = value;
+            this.m_Value = value;
             this.ValueType = value;
         }
         public override object Call(ScriptObject[] parameters)
@@ -65,7 +65,7 @@ namespace Scorpio.Userdata
         private DynamicMethod MethodFactory;    //动态函数
         public DefaultScriptUserdataDelegateType(Script script, Type value) : base(script)
         {
-            this.Value = value;
+            this.m_Value = value;
             this.ValueType = value;
             var InvokeMethod = value.GetMethod("Invoke");
             m_DelegateType = value;

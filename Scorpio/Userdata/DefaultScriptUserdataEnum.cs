@@ -11,7 +11,7 @@ namespace Scorpio.Userdata
         private Dictionary<string, ScriptEnum> m_Enums;                 //如果是枚举的话 所有枚举的值
         public DefaultScriptUserdataEnum(Script script, Type value) : base(script)
         {
-            this.Value = value;
+            this.m_Value = value;
             this.ValueType = value;
             m_Enums = new Dictionary<string, ScriptEnum>();
             //此处获取枚举列表不能使用 Enum.GetValues 此函数在UWP平台下的master模式会报错

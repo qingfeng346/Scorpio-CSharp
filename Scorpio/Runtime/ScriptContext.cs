@@ -80,7 +80,7 @@ namespace Scorpio.Runtime
         }
         private object GetMember(CodeMember member)
         {
-            return member.Type == MEMBER_TYPE.VALUE ? member.MemberValue : ResolveOperand(member.MemberObject).ObjectValue;
+            return member.Type == MEMBER_TYPE.VALUE ? member.MemberValue : ResolveOperand(member.MemberObject).KeyValue;
         }
         private ScriptObject GetVariable(CodeMember member)
         {

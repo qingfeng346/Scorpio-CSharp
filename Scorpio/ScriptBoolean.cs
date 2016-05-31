@@ -9,6 +9,7 @@
         public bool Value { get; private set; }
         public override ObjectType Type { get { return ObjectType.Boolean; } }
         public override object ObjectValue { get { return Value; } }
+        public override object KeyValue { get { return Value; } }
         public override bool LogicOperation() {
             return Value;
         }

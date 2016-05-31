@@ -789,13 +789,9 @@ namespace Scorpio.Compiler
                     CodeObject member = GetObject();
                     ReadRightBracket();
                     if (member is CodeScriptObject) {
-                        ScriptObject obj = ((CodeScriptObject)member).Object;
-                        if (obj is ScriptNumber || obj is ScriptString)
-                            ret = new CodeMember(obj.ObjectValue, ret);
-                        else
-                            throw new ParserException("获取变量只能是 number或string", m);
+                        ret = new CodeMember(((CodeScriptObject)member).Object.KeyValue, ret);
                     } else {
-                         ret = new CodeMember(member, ret);
+                        ret = new CodeMember(member, ret);
                     }
                 } else if (m.Type == TokenType.LeftPar) {
                     UndoToken();
@@ -858,10 +854,14 @@ namespace Scorpio.Compiler
             ReadLeftBrace();
             while (PeekToken().Type != TokenType.RightBrace) {
                 Token token = ReadToken();
-                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number) {
+                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number || token.Type == TokenType.Null) {
                     Token next = ReadToken();
                     if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
-                        ret._Variables.Add(new CodeTable.TableVariable(token.Lexeme, GetObject()));
+                        if (token.Type == TokenType.Null) {
+                            ret._Variables.Add(new CodeTable.TableVariable(m_script.Null.KeyValue, GetObject()));
+                        } else {
+                            ret._Variables.Add(new CodeTable.TableVariable(token.Lexeme, GetObject()));
+                        }
                         Token peek = PeekToken();
                         if (peek.Type == TokenType.Comma || peek.Type == TokenType.SemiColon) {
                             ReadToken();
