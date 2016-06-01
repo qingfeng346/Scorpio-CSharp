@@ -65,8 +65,8 @@ namespace Scorpio
             return base.GetHashCode();
         }
         protected Script m_Script;
-        public ScriptObject(Script script) { m_Script = script; }                     // 构图函数
-        public Script GetScript { get { return m_Script; } }                            // 所在脚本对象
+        public ScriptObject(Script script) { m_Script = script; }                      // 构图函数
+        public Script Script { get { return m_Script; } }                               // 所在脚本对象
         public abstract ObjectType Type { get; }                                        // 变量类型
         public virtual int BranchType { get { return 0; } }                             // 分支类型
         public virtual object ObjectValue { get { return this; } }                      // 变量值
