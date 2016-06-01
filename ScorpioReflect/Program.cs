@@ -62,12 +62,6 @@ namespace ScorpioReflect
         public static Test operator + (Test a, int b) {
             return a;
         }
-        public static bool operator ==(Test a, Test b) {
-            return true;
-        }
-        public static bool operator !=(Test a, Test b) {
-            return false;
-        }
     }
     class Program
     {

@@ -41,7 +41,7 @@ namespace Scorpio.ScorpioReflect {
             StringBuilder builder = new StringBuilder();
             List<string> methods = new List<string>();
             foreach (var method in m_Methods) {
-                if (m_PropertyEventMethods.Contains(method)) { continue; }
+                if (m_ClassFilter != null && !m_ClassFilter.Check(method, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
                 string name = method.Name;
                 if (methods.Contains(name)) { continue; }
                 methods.Add(name);

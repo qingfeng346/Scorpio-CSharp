@@ -12,25 +12,21 @@ namespace Scorpio.ScorpioReflect {
             bool first = true;
             //所有类变量
             foreach (var field in m_Fields) {
+                if (m_ClassFilter != null && !m_ClassFilter.Check(field, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; } 
                 if (first) { first = false; } else { builder.AppendLine(); }
                 builder.AppendFormat(fieldStr, field.Name, GetScorpioVariable(field.IsStatic, field.Name));
             }
-            //实例属性
-            foreach (var property in m_InatancePropertys) {
+            //所有属性
+            foreach (var property in m_Propertys) {
+                if (m_ClassFilter != null && !m_ClassFilter.Check(property, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
                 if (property.CanRead && property.GetGetMethod(false) != null) {
                     if (first) { first = false; } else { builder.AppendLine(); }
-                    builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(false, property.Name));
+                    builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(property.GetGetMethod(false).IsStatic, property.Name));
                 }
             }
-            //静态属性
-            foreach (var property in m_StaticPropertys) {
-                if (property.CanRead && property.GetGetMethod(false) != null) {
-                    if (first) { first = false; } else { builder.AppendLine(); }
-                    builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(true, property.Name));
-                }
-            }
-            //所有的函数 排除event和属性函数
+            //所有的函数
             foreach (var method in m_Methods) {
+                if (m_ClassFilter != null && !m_ClassFilter.Check(method, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
                 if (first) { first = false; } else { builder.AppendLine(); }
                 builder.AppendFormat(methodStr, method.Name, m_ScorpioClassName + "_" + method.Name);
             }
@@ -43,21 +39,16 @@ namespace Scorpio.ScorpioReflect {
             bool first = true;
             //类变量
             foreach (var field in m_Fields) {
+                if (m_ClassFilter != null && !m_ClassFilter.Check(field, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
                 if (first) { first = false; } else { builder.AppendLine(); }
                 builder.AppendFormat(fieldStr, field.Name, GetScorpioVariable(field.IsStatic, field.Name), GetFullName(field.FieldType));
             }
-            //实例属性
-            foreach (var property in m_InatancePropertys) {
-                if (property.CanWrite && property.GetSetMethod(false) != null) {
+            //所有属性
+            foreach (var property in m_Propertys) {
+                if (m_ClassFilter != null && !m_ClassFilter.Check(property, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
+                if (property.CanRead && property.GetSetMethod(false) != null) {
                     if (first) { first = false; } else { builder.AppendLine(); }
-                    builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(false, property.Name), GetFullName(property.PropertyType));
-                }
-            }
-            //静态属性
-            foreach (var property in m_StaticPropertys) {
-                if (property.CanWrite && property.GetSetMethod(false) != null) {
-                    if (first) { first = false; } else { builder.AppendLine(); }
-                    builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(true, property.Name), GetFullName(property.PropertyType));
+                    builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(property.GetSetMethod(false).IsStatic, property.Name), GetFullName(property.PropertyType));
                 }
             }
             return builder.ToString();
