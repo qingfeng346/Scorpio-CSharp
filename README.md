@@ -164,6 +164,11 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-6-1)
+-----------
+* 去反射类过滤不生成的函数改为 实现一个继承自 Scorpio.ScorpioReflect.ClassFilter 的类, 然后调用 GenerateScorpioClass 的 SetClassFilter 设置
+* 去反射生成的变量,属性,事件,函数加入名字排序,不会导致每次生成有可能导致文件发生改变,也方便查找
+
 (2016-5-31)
 -----------
 * 提升脚本执行性能 5% - 10%
