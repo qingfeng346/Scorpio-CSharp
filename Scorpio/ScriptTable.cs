@@ -16,7 +16,7 @@ namespace Scorpio
         public ScriptTable(Script script) : base(script) { }
         public override void SetValue(object key, ScriptObject value)
         {
-            Util.SetObject(m_listObject, key, value);
+            m_listObject[key] = value.Assign();
         }
         public override ScriptObject GetValue(object key)
         {

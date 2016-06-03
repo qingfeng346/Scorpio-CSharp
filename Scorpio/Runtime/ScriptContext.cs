@@ -6,6 +6,7 @@ using Scorpio.CodeDom;
 using Scorpio.CodeDom.Temp;
 using Scorpio.Exception;
 using Scorpio.Function;
+using Scorpio.Variable;
 namespace Scorpio.Runtime
 {
     //执行命令
@@ -70,7 +71,7 @@ namespace Scorpio.Runtime
         private bool SetVariableObject(string name, ScriptObject obj)
         {
             if (m_variableDictionary.ContainsKey(name)) {
-                Util.SetObject(m_variableDictionary, name, obj);
+                m_variableDictionary[name] = obj.Assign();
                 return true;
             }
             if (m_parent != null) {
@@ -231,7 +232,7 @@ namespace Scorpio.Runtime
             ScriptContext context;
             for (int i = begin; i <= finished; i += step) {
                 context = new ScriptContext(m_script, code.BlockExecutable, this, Executable_Block.For);
-                context.Initialize(code.Identifier, m_script.CreateNumber(i));
+                context.Initialize(code.Identifier, new ScriptNumberDouble(m_script, Convert.ToDouble(i)));
                 context.Execute();
                 if (context.IsOver) break;
             }
@@ -476,7 +477,9 @@ namespace Scorpio.Runtime
             switch (type) {
             case TokenType.Plus:
                 ScriptObject right = ResolveOperand(operate.Right);
-                if (left is ScriptString || right is ScriptString) { return m_script.CreateString(left.ToString() + right.ToString()); }
+                if (left is ScriptString || right is ScriptString) {
+                    return new ScriptString(m_script, left.ToString() + right.ToString());
+                }
                 return left.Compute(type, right);
             case TokenType.Minus:
             case TokenType.Multiply:

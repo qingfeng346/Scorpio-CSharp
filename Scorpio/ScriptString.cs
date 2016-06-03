@@ -13,10 +13,10 @@ namespace Scorpio
         public override ObjectType Type { get { return ObjectType.String; } }
         public override object ObjectValue { get { return m_Value; } }
         public override object KeyValue { get { return m_Value; } }
-        public override ScriptObject Assign() { return m_Script.CreateString(m_Value); }
+        public override ScriptObject Assign() { return new ScriptString(m_Script, m_Value); }
         public override ScriptObject GetValue(object index) {
             if (!(index is double || index is int || index is long)) throw new ExecutionException(m_Script, "String GetValue只支持Number类型");
-            return m_Script.CreateString(m_Value[Util.ToInt32(index)].ToString());
+            return new ScriptString(m_Script, m_Value[Util.ToInt32(index)].ToString());
         }
         public override bool Compare(TokenType type, ScriptObject obj) {
             ScriptString val = obj as ScriptString;
@@ -42,7 +42,7 @@ namespace Scorpio
             throw new ExecutionException(m_Script, "String类型 操作符[" + type + "]不支持");
         }
         public override ScriptObject Clone() {
-            return m_Script.CreateString(m_Value);
+            return new ScriptString(m_Script, m_Value);
         }
         public override string ToJson() {
             return "\"" + m_Value.Replace("\"", "\\\"") + "\"";
