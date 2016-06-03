@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Scorpio</RootNamespace>
     <AssemblyName>Scorpio</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProductVersion>12.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -70,12 +70,10 @@
     <Compile Include="Compiler\TokenType.cs" />
     <Compile Include="Exception\InteriorException.cs" />
     <Compile Include="Exception\StackInfo.cs" />
-    <Compile Include="Extensions\DefaultScriptExtensions.cs" />
     <Compile Include="Function\ScriptDelegateFunction.cs" />
     <Compile Include="Function\ScriptHandleFunction.cs" />
     <Compile Include="Function\ScriptMethodFunction.cs" />
     <Compile Include="Function\ScriptScriptFunction.cs" />
-    <Compile Include="IScriptExtensions.cs" />
     <Compile Include="Library\LibraryFunc.cs" />
     <Compile Include="Library\LibraryJson.cs" />
     <Compile Include="Library\LibraryMath.cs" />
@@ -83,18 +81,15 @@
     <Compile Include="ScriptEnum.cs" />
     <Compile Include="ScriptExtensions.cs" />
     <Compile Include="Serialize\ScorpioMaker.cs" />
-    <Compile Include="Userdata\BridgeEventInfo.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdataDelegate.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdataDelegateType.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdataEventInfo.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdataObject.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdataEnum.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdataFactory.cs" />
+    <Compile Include="Userdata\ScriptUserdataDelegate.cs" />
+    <Compile Include="Userdata\ScriptUserdataDelegateType.cs" />
+    <Compile Include="Userdata\ScriptUserdataEventInfo.cs" />
+    <Compile Include="Userdata\ScriptUserdataObject.cs" />
+    <Compile Include="Userdata\ScriptUserdataEnum.cs" />
     <Compile Include="Exception\ExecutionException.cs" />
     <Compile Include="Exception\LexerException.cs" />
     <Compile Include="Exception\ParserException.cs" />
     <Compile Include="Exception\ScriptException.cs" />
-    <Compile Include="IScriptUserdataFactory.cs" />
     <Compile Include="Library\LibraryArray.cs" />
     <Compile Include="Library\LibraryBasis.cs" />
     <Compile Include="Library\LibraryString.cs" />
@@ -114,7 +109,7 @@
     <Compile Include="ScriptString.cs" />
     <Compile Include="ScriptTable.cs" />
     <Compile Include="ScriptUserdata.cs" />
-    <Compile Include="Userdata\DefaultScriptUserdataObjectType.cs" />
+    <Compile Include="Userdata\ScriptUserdataObjectType.cs" />
     <Compile Include="Userdata\IScorpioFastReflectClass.cs" />
     <Compile Include="Userdata\IScorpioFastReflectMethod.cs" />
     <Compile Include="Userdata\UserdataVariable.cs" />

@@ -6,10 +6,10 @@ using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
     /// <summary> 枚举类型 </summary>
-    public class DefaultScriptUserdataEnum : ScriptUserdata
+    public class ScriptUserdataEnum : ScriptUserdata
     {
         private Dictionary<string, ScriptEnum> m_Enums;                 //如果是枚举的话 所有枚举的值
-        public DefaultScriptUserdataEnum(Script script, Type value) : base(script)
+        public ScriptUserdataEnum(Script script, Type value) : base(script)
         {
             this.m_Value = value;
             this.m_ValueType = value;
@@ -17,7 +17,7 @@ namespace Scorpio.Userdata
             //此处获取枚举列表不能使用 Enum.GetValues 此函数在UWP平台下的master模式会报错
             string[] names = Enum.GetNames(ValueType);
             foreach (var name in names) {
-                m_Enums[name] = script.CreateEnum(Enum.Parse(ValueType, name));
+                m_Enums[name] = new ScriptEnum(m_Script, Enum.Parse(ValueType, name));
             }
         }
         public override object Call(ScriptObject[] parameters)

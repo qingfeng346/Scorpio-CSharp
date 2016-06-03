@@ -14,11 +14,11 @@ namespace Scorpio.Userdata
         Delegate CreateDelegate(Script script, Type type, ScriptFunction func);
     }
 #if !SCORPIO_DYNAMIC_DELEGATE
-    public class DefaultScriptUserdataDelegateType : ScriptUserdata
+    public class ScriptUserdataDelegateType : ScriptUserdata
     {
         private static DelegateTypeFactory m_Factory = null;
         public static void SetFactory(DelegateTypeFactory factory) { m_Factory = factory; }
-        public DefaultScriptUserdataDelegateType(Script script, Type value) : base(script)
+        public ScriptUserdataDelegateType(Script script, Type value) : base(script)
         {
             this.m_Value = value;
             this.m_ValueType = value;
@@ -30,12 +30,12 @@ namespace Scorpio.Userdata
     }
 #else
     /// <summary> 动态委托类型(声明) </summary>
-    public class DefaultScriptUserdataDelegateType : ScriptUserdata
+    public class ScriptUserdataDelegateType : ScriptUserdata
     {
         public static void SetFactory(DelegateTypeFactory factory) {  }
         private static readonly MethodInfo DynamicDelegateMethod;
         private static readonly Type DynamicDelegateType = typeof(DynamicDelegate);
-        static DefaultScriptUserdataDelegateType()
+        static ScriptUserdataDelegateType()
         {
             DynamicDelegateMethod = DynamicDelegateType.GetMethod("MyFunction");
         }
@@ -63,7 +63,7 @@ namespace Scorpio.Userdata
         private Type m_DelegateType;            //委托类型
         private Type m_ReturnType;              //返回值类型
         private DynamicMethod MethodFactory;    //动态函数
-        public DefaultScriptUserdataDelegateType(Script script, Type value) : base(script)
+        public ScriptUserdataDelegateType(Script script, Type value) : base(script)
         {
             this.m_Value = value;
             this.m_ValueType = value;

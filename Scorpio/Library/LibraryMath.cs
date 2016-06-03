@@ -7,10 +7,10 @@ namespace Scorpio.Library {
 		public const float Epsilon = 1.401298E-45f;
         public static void Load(Script script) {
             ScriptTable Table = script.CreateTable();
-			Table.SetValue("PI", script.CreateNumber(PI));
-			Table.SetValue("Deg2Rad", script.CreateNumber(Deg2Rad));
-			Table.SetValue("Rad2Deg", script.CreateNumber(Rad2Deg));
-			Table.SetValue("Epsilon", script.CreateNumber(Epsilon));
+			Table.SetValue("PI", script.CreateDouble(PI));
+			Table.SetValue("Deg2Rad", script.CreateDouble(Deg2Rad));
+			Table.SetValue("Rad2Deg", script.CreateDouble(Rad2Deg));
+			Table.SetValue("Epsilon", script.CreateDouble(Epsilon));
 			Table.SetValue("min", script.CreateFunction(new min()));
 			Table.SetValue("max", script.CreateFunction(new max()));
 			Table.SetValue("abs", script.CreateFunction(new abs()));

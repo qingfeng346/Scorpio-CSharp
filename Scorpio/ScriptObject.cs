@@ -21,7 +21,7 @@ namespace Scorpio
         // 无参                            
         private static readonly ScriptObject[] NOPARAMETER = new ScriptObject[0];
         // Object名字
-        public String Name { get; set; }
+        public String Name;
         // 赋值
         public virtual ScriptObject Assign() { return this; }                           
         //设置变量

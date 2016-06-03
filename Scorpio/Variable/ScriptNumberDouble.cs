@@ -54,10 +54,10 @@ namespace Scorpio.Variable
 		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)
 		{
 			if (m_Value < min.ToDouble ())
-				return m_Script.CreateDouble (min.ToDouble());
+				return new ScriptNumberDouble(m_Script, min.ToDouble());
 			if (m_Value > max.ToDouble ())
-				return m_Script.CreateDouble (max.ToDouble ());
-			return m_Script.CreateDouble (m_Value);
+				return new ScriptNumberDouble(m_Script, max.ToDouble());
+			return new ScriptNumberDouble(m_Script, m_Value);
 		}
         public override double ToDouble()
         {

@@ -22,13 +22,15 @@ namespace Scorpio
         private const string GLOBAL_TABLE = "_G";               //全局table
         private const string GLOBAL_VERSION = "_VERSION";       //版本号
         private const string GLOBAL_SCRIPT = "_SCRIPT";         //Script对象
-        private IScriptUserdataFactory m_UserdataFactory = null;                //Userdata工厂
         private ScriptTable m_GlobalTable;                                      //全局Table
         private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private List<String> m_SearchPath = new List<String>();                 //request所有文件的路径集合
         private List<String> m_Defines = new List<String>();                    //所有Define
-        private Dictionary<Type, IScorpioFastReflectClass> m_FastReflectClass = new Dictionary<Type, IScorpioFastReflectClass>();
+        private Dictionary<Type, IScorpioFastReflectClass> m_FastReflectClass = new Dictionary<Type, IScorpioFastReflectClass>();               //快速反射集合
+        private Dictionary<Type, ScriptUserdataEnum> m_Enums = new Dictionary<Type, ScriptUserdataEnum>();                        //所有枚举集合
+        private Dictionary<Type, ScriptUserdataDelegateType> m_Delegates = new Dictionary<Type, ScriptUserdataDelegateType>();    //所有委托类型集合
+        private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                                                  //所有的类集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
         private ScriptNull m_Null;                                              //null对象
         private ScriptBoolean m_True;                                           //true对象
@@ -41,13 +43,21 @@ namespace Scorpio
             m_Null = new ScriptNull(this);
             m_True = new ScriptBoolean(this, true);
             m_False = new ScriptBoolean(this, false);
-            m_UserdataFactory = new DefaultScriptUserdataFactory(this);
             m_GlobalTable = CreateTable();
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
             m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
             m_GlobalTable.SetValue(GLOBAL_SCRIPT, CreateObject(this));
-            PushAssembly(ScriptExtensions.GetAssembly(typeof(object)));
-            PushAssembly(ScriptExtensions.GetAssembly(GetType()));
+            PushAssembly(typeof(object).GetTypeInfo().Assembly);
+            PushAssembly(GetType().GetTypeInfo().Assembly);
+        }
+        public void LoadLibrary() {
+            LibraryBasis.Load(this);
+            LibraryArray.Load(this);
+            LibraryString.Load(this);
+            LibraryTable.Load(this);
+            LibraryJson.Load(this);
+            LibraryMath.Load(this);
+            LibraryFunc.Load(this);
         }
         public ScriptObject LoadFile(String strFileName)
         {
@@ -55,7 +65,12 @@ namespace Scorpio
         }
         public ScriptObject LoadFile(String fileName, Encoding encoding)
         {
-            return LoadBuffer(fileName, ScriptExtensions.GetFileBuffer(fileName), encoding);
+            using (FileStream stream = File.OpenRead(fileName)) {
+                long length = stream.Length;
+                byte[] buffer = new byte[length];
+                stream.Read(buffer, 0, buffer.Length);
+                return LoadBuffer(fileName, buffer, encoding);
+            }
         }
         public ScriptObject LoadBuffer(byte[] buffer)
         {
@@ -127,7 +142,7 @@ namespace Scorpio
         {
             for (int i = 0; i < m_SearchPath.Count; ++i) {
                 string file = m_SearchPath[i] + "/" + fileName;
-                if (ScriptExtensions.FileExist(file))
+                if (File.Exists(file))
                     return LoadFile(file);
             }
             throw new ExecutionException(this, "require 找不到文件 : " + fileName);
@@ -234,55 +249,33 @@ namespace Scorpio
         {
             if (value == null)
                 return m_Null;
+            else if (value is bool)
+                return GetBoolean((bool)value);
+            else if (value is string)
+                return new ScriptString(this, (string)value);
+            else if (value is long)
+                return new ScriptNumberLong(this, (long)value);
+            else if (value is sbyte || value is byte || value is short || value is ushort || value is int || value is uint || value is float || value is double || value is decimal)
+                return new ScriptNumberDouble(this, Convert.ToDouble(value));
             else if (value is ScriptObject)
                 return (ScriptObject)value;
             else if (value is ScorpioFunction)
-                return CreateFunction((ScorpioFunction)value);
+                return new ScriptDelegateFunction(this, (ScorpioFunction)value);
             else if (value is ScorpioHandle)
-                return CreateFunction((ScorpioHandle)value);
+                return new ScriptHandleFunction(this, (ScorpioHandle)value);
             else if (value is ScorpioMethod)
-                return CreateFunction((ScorpioMethod)value);
-            else if (Util.IsBoolObject(value))
-                return CreateBool((bool)value);
-            else if (Util.IsStringObject(value))
-                return CreateString((string)value);
-            else if (Util.IsNumberObject(value))
-                return CreateNumber(value);
-            else if (Util.IsEnumObject(value))
-                return CreateEnum(value);
+                return new ScriptMethodFunction(this, (ScorpioMethod)value);
+            else if (value.GetType().GetTypeInfo().IsEnum)
+                return new ScriptEnum(this, value);
             return CreateUserdata(value);
-        }
-        public ScriptBoolean CreateBool(bool value)
-        {
-            return GetBoolean(value);
         }
         public ScriptString CreateString(string value)
         {
             return new ScriptString(this, value);
         }
-        public ScriptNumber CreateNumber(object value)
-        {
-            return Util.IsLongObject(value) ? CreateLong((long)value) : CreateDouble(Util.ToDouble(value));
-        }
         public ScriptNumber CreateDouble(double value)
         {
             return new ScriptNumberDouble(this, value);
-        }
-        public ScriptNumber CreateLong(long value)
-        {
-            return new ScriptNumberLong(this, value);
-        }
-        public ScriptNumber CreateInt(int value)
-        {
-            return new ScriptNumberInt(this, value);
-        }
-        public ScriptEnum CreateEnum(object value)
-        {
-            return new ScriptEnum(this, value);
-        }
-        public ScriptUserdata CreateUserdata(object value)
-        {
-            return m_UserdataFactory.create(this, value);
         }
         public ScriptArray CreateArray()
         {
@@ -292,36 +285,51 @@ namespace Scorpio
         {
             return new ScriptTable(this);
         }
-        internal ScriptScriptFunction CreateFunction(string name, ScorpioScriptFunction value)
-        {
-            return new ScriptScriptFunction(this, name, value);
-        }
-        public ScriptFunction CreateFunction(ScorpioFunction value)
-        {
-            return new ScriptDelegateFunction(this, value);
+        public ScriptUserdata CreateUserdata(object obj) {
+            Type type = obj as Type;
+            if (type != null) {
+                if (type.GetTypeInfo().IsEnum)
+                    return GetEnum(type);
+                else if (Util.IsDelegateType(type))
+                    return GetDelegate(type);
+                else
+                    return new ScriptUserdataObjectType(this, type, GetScorpioType(type));
+            }
+            if (obj is Delegate)
+                return new ScriptUserdataDelegate(this, (Delegate)obj);
+            else if (obj is BridgeEventInfo)
+                return new ScriptUserdataEventInfo(this, (BridgeEventInfo)obj);
+            return new ScriptUserdataObject(this, obj, GetScorpioType(obj.GetType()));
         }
         public ScriptFunction CreateFunction(ScorpioHandle value)
         {
             return new ScriptHandleFunction(this, value);
         }
-        public ScriptFunction CreateFunction(ScorpioMethod value)
-        {
-            return new ScriptMethodFunction(this, value);
+        public ScriptUserdata GetEnum(Type type) {
+            if (m_Enums.ContainsKey(type))
+                return m_Enums[type];
+            ScriptUserdataEnum ret = new ScriptUserdataEnum(this, type);
+            m_Enums.Add(type, ret);
+            return ret;
         }
-        public IScriptUserdataFactory GetUserdataFactory() {
-            return m_UserdataFactory;
+        public ScriptUserdata GetDelegate(Type type) {
+            if (m_Delegates.ContainsKey(type))
+                return m_Delegates[type];
+            ScriptUserdataDelegateType ret = new ScriptUserdataDelegateType(this, type);
+            m_Delegates.Add(type, ret);
+            return ret;
         }
-        public void SetUserdataFactory(IScriptUserdataFactory value) {
-            m_UserdataFactory = value;
-        }
-        public void LoadLibrary() {
-            LibraryBasis.Load(this);
-            LibraryArray.Load(this);
-            LibraryString.Load(this);
-            LibraryTable.Load(this);
-            LibraryJson.Load(this);
-            LibraryMath.Load(this);
-            LibraryFunc.Load(this);
+        public UserdataType GetScorpioType(Type type) {
+            if (m_Types.ContainsKey(type))
+                return m_Types[type];
+            UserdataType scorpioType = null;
+            if (ContainsFastReflectClass(type)) {
+                scorpioType = new FastReflectUserdataType(this, type, GetFastReflectClass(type));
+            } else {
+                scorpioType = new ReflectUserdataType(this, type);
+            }
+            m_Types.Add(type, scorpioType);
+            return scorpioType;
         }
     }
 }

@@ -213,7 +213,7 @@ namespace Scorpio.Compiler
                 UndoToken();
             }
             ScriptExecutable executable = ParseStatementBlock(Executable_Block.Function);
-            return m_script.CreateFunction(strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable, bParams));
+            return new ScriptScriptFunction(m_script, strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable, bParams));
         }
         //解析Var关键字
         private void ParseVar()

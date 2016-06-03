@@ -362,7 +362,7 @@ namespace Scorpio.Library
             {
                 ScriptObject obj = args[0];
                 Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "tolong 不能从类型 " + obj.Type + " 转换成Long类型");
-                return m_script.CreateLong(Util.ToInt64(obj.ObjectValue));
+                return new ScriptNumberLong(m_script, Util.ToInt64(obj.ObjectValue));
             }
         }
         private class toint : ScorpioHandle
@@ -392,7 +392,7 @@ namespace Scorpio.Library
                 ScriptUserdata obj = args[0] as ScriptUserdata;
                 ScriptNumber number = args[1] as ScriptNumber;
                 Util.Assert(obj != null && number != null, m_script, "toenum 第一个参数是枚举类 第二个参数必须是number类型");
-                return m_script.CreateEnum(Enum.ToObject(obj.ValueType, number.ToInt32()));
+                return new ScriptEnum(m_script, Enum.ToObject(obj.ValueType, number.ToInt32()));
             }
         }
         private class tostring : ScorpioHandle
@@ -532,7 +532,7 @@ namespace Scorpio.Library
                     Util.Assert(type != null, m_script, "generic_type 第" + (i+1) + "参数必须是 userdata");
                     types[i - 1] = type.ValueType;
                 }
-                return m_script.GetUserdataFactory().GetScorpioType(userdata.ValueType).MakeGenericType(types);
+                return m_script.GetScorpioType(userdata.ValueType).MakeGenericType(types);
             }
         }
         private class generic_method : ScorpioHandle

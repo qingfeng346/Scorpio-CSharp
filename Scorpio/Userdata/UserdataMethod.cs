@@ -1,7 +1,4 @@
-﻿#if SCORPIO_UWP && !UNITY_EDITOR
-#define UWP
-#endif
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Scorpio;
@@ -213,17 +210,10 @@ namespace Scorpio.Userdata {
                             bool accord = true;
                             int length = types.Length;
                             for (int j = 0; j < length; ++j) {
-#if UWP
-                            if (!types[j].GetTypeInfo().BaseType.IsAssignableFrom(parameters[j])) {
-                                accord = false;
-                                break;
-                            }
-#else
-                                if (!types[j].BaseType.IsAssignableFrom(parameters[j])) {
+                                if (!types[j].GetTypeInfo().BaseType.GetTypeInfo().IsAssignableFrom(parameters[j])) {
                                     accord = false;
                                     break;
                                 }
-#endif
                             }
                             if (accord) {
                                 methods.Add(method.Method.MakeGenericMethod(parameters));

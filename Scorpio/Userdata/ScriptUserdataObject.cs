@@ -10,10 +10,10 @@ using Scorpio.Compiler;
 namespace Scorpio.Userdata
 {
     /// <summary> 普通Object类型 </summary>
-    public class DefaultScriptUserdataObject : ScriptUserdata
+    public class ScriptUserdataObject : ScriptUserdata
     {
         protected UserdataType m_UserdataType;
-        public DefaultScriptUserdataObject(Script script, object value, UserdataType type) : base(script)
+        public ScriptUserdataObject(Script script, object value, UserdataType type) : base(script)
         {
             this.m_Value = value;
             this.m_ValueType = value.GetType();
@@ -21,13 +21,15 @@ namespace Scorpio.Userdata
         }
         public override ScriptObject GetValue(object key)
         {
-            if (!(key is string)) throw new ExecutionException(m_Script, "Object GetValue只支持String类型");
-            return m_Script.CreateObject(m_UserdataType.GetValue(m_Value, (string)key));
+            string name = key as string;
+            if (name == null) throw new ExecutionException(m_Script, "Object GetValue只支持String类型");
+            return m_Script.CreateObject(m_UserdataType.GetValue(m_Value, name));
         }
         public override void SetValue(object key, ScriptObject value)
         {
-            if (!(key is string)) throw new ExecutionException(m_Script, "Object SetValue只支持String类型");
-            m_UserdataType.SetValue(m_Value, (string)key, value);
+            string name = key as string;
+            if (name == null) throw new ExecutionException(m_Script, "Object SetValue只支持String类型");
+            m_UserdataType.SetValue(m_Value, name, value);
         }
         public override ScriptObject Compute(TokenType type, ScriptObject obj)
         {

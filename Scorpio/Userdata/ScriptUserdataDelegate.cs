@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Compiler;
@@ -6,7 +7,7 @@ using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
     /// <summary> 动态委托类型实例 </summary>
-    public class DefaultScriptUserdataDelegate : ScriptUserdata {
+    public class ScriptUserdataDelegate : ScriptUserdata {
         private class FunctionParameter {
             public Type ParameterType;
             public object DefaultValue;
@@ -18,11 +19,11 @@ namespace Scorpio.Userdata
         private Delegate m_Delegate;
         private List<FunctionParameter> m_Parameters = new List<FunctionParameter>();
         private object[] m_Objects;
-        public DefaultScriptUserdataDelegate(Script script, Delegate value) : base(script) {
+        public ScriptUserdataDelegate(Script script, Delegate value) : base(script) {
             this.m_Delegate = value;
             this.m_Value = value;
             this.m_ValueType = value.GetType();
-            var method = ScriptExtensions.GetMethodInfo(m_Delegate);
+            var method = m_Delegate.GetMethodInfo();
             var infos = method.GetParameters();
             var dynamicDelegate = method.Name.Equals(Script.DynamicDelegateName);
             int length = dynamicDelegate ? infos.Length - 1 : infos.Length;

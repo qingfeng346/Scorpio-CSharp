@@ -53,11 +53,13 @@ namespace Scorpio.Variable
 		}
 		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)
 		{
-			if (m_Value < min.ToLong ())
-				return m_Script.CreateLong (min.ToLong());
-			if (m_Value > max.ToLong ())
-				return m_Script.CreateLong (max.ToLong ());
-			return m_Script.CreateLong (m_Value);
+            long val = min.ToLong();
+			if (m_Value < val)
+				return new ScriptNumberLong(m_Script, val);
+            val = max.ToLong();
+			if (m_Value > val)
+				return new ScriptNumberLong(m_Script, val);
+			return new ScriptNumberLong(m_Script, m_Value);
 		}
         public override ScriptObject Assign()
         {

@@ -1,7 +1,4 @@
-﻿#if SCORPIO_UWP && !UNITY_EDITOR
-#define UWP
-#endif
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -22,18 +19,13 @@ namespace Scorpio.Userdata
         }
         /// <summary> 初始化泛型类 </summary>
         public ScriptUserdata MakeGenericType(Type[] parameters) {
-            Type[] types = m_Type.GetGenericArguments();
+            Type[] types = m_Type.GetTypeInfo().GetGenericArguments();
             if (types.Length != parameters.Length)
                 throw new ExecutionException(m_Script, m_Type + " 泛型类个数错误 需要:" + types.Length + " 传入:" + parameters.Length);
             int length = types.Length;
             for (int i = 0; i < length; ++i) {
-#if UWP
-                if (!types[i].GetTypeInfo().BaseType.IsAssignableFrom(parameters[i]))
+                if (!types[i].GetTypeInfo().BaseType.GetTypeInfo().IsAssignableFrom(parameters[i]))
                     throw new ExecutionException(m_Script, m_Type + "泛型类第" + (i + 1) + "个参数失败 需要:" + types[i].GetTypeInfo().BaseType + " 传入:" + parameters[i]);
-#else
-                if (!types[i].BaseType.IsAssignableFrom(parameters[i]))
-                    throw new ExecutionException(m_Script, m_Type + "泛型类第" + (i + 1) + "个参数失败 需要:" + types[i].BaseType + " 传入:" + parameters[i]);
-#endif
             }
             return m_Script.CreateUserdata(m_Type.MakeGenericType(parameters));
         }
@@ -67,12 +59,12 @@ namespace Scorpio.Userdata
 		private void InitializeConstructor() {
 			if (m_InitializeConstructor == true) return;
 			m_InitializeConstructor = true;
-			m_Constructor = new ReflectUserdataMethod(m_Script, m_Type, m_Type.ToString(), m_Type.GetConstructors());
+			m_Constructor = new ReflectUserdataMethod(m_Script, m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors());
 		}
 		private void InitializeMethods() {
 			if (m_InitializeMethods == true) return;
 			m_InitializeMethods = true;
-			m_Methods = m_Type.GetMethods(Script.BindingFlag);
+			m_Methods = m_Type.GetTypeInfo().GetMethods(Script.BindingFlag);
 		}
         private UserdataMethod GetMethod(string name) {
 			InitializeMethods();
@@ -96,11 +88,11 @@ namespace Scorpio.Userdata
         private UserdataVariable GetVariable(string name) {
             if (m_Variables.ContainsKey(name))
                 return m_Variables[name];
-            FieldInfo fInfo = m_Type.GetField(name);
+            FieldInfo fInfo = m_Type.GetTypeInfo().GetField(name);
             if (fInfo != null) return m_Variables[name] = new UserdataField(m_Script, fInfo);
-            PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
+            PropertyInfo pInfo = m_Type.GetTypeInfo().GetProperty(name, Script.BindingFlag);
             if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Script, pInfo);
-            EventInfo eInfo = m_Type.GetEvent(name);
+            EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name);
             if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);
             return null;
         }
@@ -126,7 +118,7 @@ namespace Scorpio.Userdata
             if (m_NestedTypes.ContainsKey(name)) return m_NestedTypes[name];
             UserdataVariable variable = GetVariable(name);
             if (variable != null) return variable.GetValue(obj);
-            Type nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
+            Type nestedType = m_Type.GetTypeInfo().GetNestedType(name, Script.BindingFlag);
             if (nestedType != null) {
                 ScriptUserdata ret = m_Script.CreateUserdata(nestedType);
                 m_NestedTypes.Add(name, ret);

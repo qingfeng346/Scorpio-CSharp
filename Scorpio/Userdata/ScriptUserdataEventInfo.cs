@@ -4,11 +4,19 @@ using Scorpio.Compiler;
 using Scorpio.Exception;
 namespace Scorpio.Userdata
 {
-    public class DefaultScriptUserdataEventInfo : ScriptUserdata {
+    public class BridgeEventInfo {
+        public object target;
+        public EventInfo eventInfo;
+        public BridgeEventInfo(object target, EventInfo eventInfo) {
+            this.target = target;
+            this.eventInfo = eventInfo;
+        }
+    }
+    public class ScriptUserdataEventInfo : ScriptUserdata {
         private object m_Target;
         private EventInfo m_EventInfo;
         private Type m_HandlerType;
-        public DefaultScriptUserdataEventInfo(Script script, BridgeEventInfo value) : base(script) {
+        public ScriptUserdataEventInfo(Script script, BridgeEventInfo value) : base(script) {
             m_Target = value.target;
             m_EventInfo = value.eventInfo;
             m_HandlerType = m_EventInfo.EventHandlerType;
