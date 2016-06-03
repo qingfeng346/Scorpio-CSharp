@@ -29,9 +29,9 @@ namespace Scorpio.Variable
                     --m_Value;
                     break;
                 case CALC.POST_INCREMENT:
-                    return m_Script.CreateDouble(m_Value++);
+                    return new ScriptNumberDouble(m_Script, m_Value++);
                 case CALC.POST_DECREMENT:
-                    return m_Script.CreateDouble(m_Value--);
+                    return new ScriptNumberDouble(m_Script, m_Value--);
                 default:
                     return this;
             }
@@ -39,17 +39,17 @@ namespace Scorpio.Variable
         }
         public override ScriptNumber Negative()
         {
-            return m_Script.CreateDouble(-m_Value);
+            return new ScriptNumberDouble(m_Script, -m_Value);
         }
 		public override ScriptNumber Abs ()
 		{
 			if (m_Value >= 0)
-				return m_Script.CreateDouble(m_Value);
-			return m_Script.CreateDouble(-m_Value);
+                return new ScriptNumberDouble(m_Script, m_Value);
+            return new ScriptNumberDouble(m_Script, -m_Value);
 		}
 		public override ScriptNumber Floor ()
 		{
-			return m_Script.CreateDouble (Math.Floor (m_Value));
+			return new ScriptNumberDouble(m_Script, Math.Floor(m_Value));
 		}
 		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)
 		{
@@ -59,10 +59,6 @@ namespace Scorpio.Variable
 				return m_Script.CreateDouble (max.ToDouble ());
 			return m_Script.CreateDouble (m_Value);
 		}
-        public override ScriptObject Assign()
-        {
-            return m_Script.CreateDouble(m_Value);
-        }
         public override double ToDouble()
         {
             return m_Value;
@@ -90,15 +86,15 @@ namespace Scorpio.Variable
             if (val == null) throw new ExecutionException(m_Script, "逻辑计算 右边值必须为数字类型");
             switch (type) {
                 case TokenType.Plus:
-                    return m_Script.CreateDouble(m_Value + val.ToDouble());
+                    return new ScriptNumberDouble(m_Script, m_Value + val.ToDouble());
                 case TokenType.Minus:
-                    return m_Script.CreateDouble(m_Value - val.ToDouble());
+                    return new ScriptNumberDouble(m_Script, m_Value - val.ToDouble());
                 case TokenType.Multiply:
-                    return m_Script.CreateDouble(m_Value * val.ToDouble());
+                    return new ScriptNumberDouble(m_Script, m_Value * val.ToDouble());
                 case TokenType.Divide:
-                    return m_Script.CreateDouble(m_Value / val.ToDouble());
+                    return new ScriptNumberDouble(m_Script, m_Value / val.ToDouble());
                 case TokenType.Modulo:
-                    return m_Script.CreateDouble(m_Value % val.ToDouble());
+                    return new ScriptNumberDouble(m_Script, m_Value % val.ToDouble());
                 default:
                     throw new ExecutionException(m_Script, "Double不支持的运算符 " + type);
             }
@@ -127,9 +123,11 @@ namespace Scorpio.Variable
                     throw new ExecutionException(m_Script, "Double不支持的运算符 " + type);
             }
         }
-        public override ScriptObject Clone()
-        {
-            return m_Script.CreateDouble(m_Value);
+        public override ScriptObject Assign() {
+            return new ScriptNumberDouble(m_Script, m_Value);
+        }
+        public override ScriptObject Clone() {
+            return new ScriptNumberDouble(m_Script, m_Value);
         }
     }
 }

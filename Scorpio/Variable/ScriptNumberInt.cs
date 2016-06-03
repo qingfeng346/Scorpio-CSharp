@@ -30,9 +30,9 @@ namespace Scorpio.Variable
                     --m_Value;
                     break;
                 case CALC.POST_INCREMENT:
-                    return m_Script.CreateLong(m_Value++);
+                    return new ScriptNumberInt(m_Script, m_Value++);
                 case CALC.POST_DECREMENT:
-                    return m_Script.CreateLong(m_Value--);
+                    return new ScriptNumberInt(m_Script, m_Value--);
                 default:
                     return this;
             }
@@ -40,29 +40,29 @@ namespace Scorpio.Variable
         }
         public override ScriptNumber Negative()
         {
-            return m_Script.CreateInt(-m_Value);
+            return new ScriptNumberInt(m_Script, -m_Value);
         }
 		public override ScriptNumber Abs ()
 		{
 			if (m_Value >= 0)
-				return m_Script.CreateInt(m_Value);
-			return m_Script.CreateInt(-m_Value);
+				return new ScriptNumberInt(m_Script, m_Value);
+			return new ScriptNumberInt(m_Script, -m_Value);
 		}
 		public override ScriptNumber Floor ()
 		{
-			return m_Script.CreateInt (m_Value);
+			return new ScriptNumberInt(m_Script, m_Value);
 		}
 		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)
 		{
 			if (m_Value < min.ToInt32 ())
-				return m_Script.CreateInt (min.ToInt32());
+				return new ScriptNumberInt(m_Script, min.ToInt32());
 			if (m_Value > max.ToInt32 ())
-				return m_Script.CreateInt (max.ToInt32 ());
-			return m_Script.CreateInt (m_Value);
+				return new ScriptNumberInt(m_Script, max.ToInt32());
+			return new ScriptNumberInt(m_Script, m_Value);
 		}
         public override ScriptObject Assign()
         {
-            return m_Script.CreateInt(m_Value);
+            return new ScriptNumberInt(m_Script, m_Value);
         }
         public override int ToInt32()
         {
@@ -93,25 +93,25 @@ namespace Scorpio.Variable
             switch (type)
             {
                 case TokenType.Plus:
-                    return m_Script.CreateInt(m_Value + val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value + val.ToInt32());
                 case TokenType.Minus:
-                    return m_Script.CreateInt(m_Value - val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value - val.ToInt32());
                 case TokenType.Multiply:
-                    return m_Script.CreateInt(m_Value * val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value * val.ToInt32());
                 case TokenType.Divide:
-                    return m_Script.CreateInt(m_Value / val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value / val.ToInt32());
                 case TokenType.Modulo:
-                    return m_Script.CreateInt(m_Value % val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value % val.ToInt32());
                 case TokenType.InclusiveOr:
-                    return m_Script.CreateInt(m_Value | val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value | val.ToInt32());
                 case TokenType.Combine:
-                    return m_Script.CreateInt(m_Value & val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value & val.ToInt32());
                 case TokenType.XOR:
-                    return m_Script.CreateInt(m_Value ^ val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value ^ val.ToInt32());
                 case TokenType.Shr:
-                    return m_Script.CreateInt(m_Value >> val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value >> val.ToInt32());
                 case TokenType.Shi:
-                    return m_Script.CreateInt(m_Value << val.ToInt32());
+                    return new ScriptNumberInt(m_Script, m_Value << val.ToInt32());
                 default:
                     throw new ExecutionException(m_Script, "Int不支持的运算符 " + type);
             }
@@ -159,7 +159,7 @@ namespace Scorpio.Variable
        
         public override ScriptObject Clone()
         {
-            return m_Script.CreateInt(m_Value);
+            return new ScriptNumberInt(m_Script, m_Value);
         }
     }
 }

@@ -29,9 +29,9 @@ namespace Scorpio.Variable
                     --m_Value;
                     break;
                 case CALC.POST_INCREMENT:
-                    return m_Script.CreateLong(m_Value++);
+                    return new ScriptNumberLong(m_Script, m_Value++);
                 case CALC.POST_DECREMENT:
-                    return m_Script.CreateLong(m_Value--);
+                    return new ScriptNumberLong(m_Script, m_Value--);
                 default:
                     return this;
             }
@@ -39,17 +39,17 @@ namespace Scorpio.Variable
         }
         public override ScriptNumber Negative()
         {
-            return m_Script.CreateLong(-m_Value);
+            return new ScriptNumberLong(m_Script, -m_Value);
         }
 		public override ScriptNumber Abs ()
 		{
 			if (m_Value >= 0)
-				return m_Script.CreateLong(m_Value);
-			return m_Script.CreateLong(-m_Value);
+				return new ScriptNumberLong(m_Script, m_Value);
+			return new ScriptNumberLong(m_Script, -m_Value);
 		}
 		public override ScriptNumber Floor ()
 		{
-			return m_Script.CreateLong (m_Value);
+			return new ScriptNumberLong(m_Script, m_Value);
 		}
 		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)
 		{
@@ -61,7 +61,7 @@ namespace Scorpio.Variable
 		}
         public override ScriptObject Assign()
         {
-            return m_Script.CreateLong(m_Value);
+            return new ScriptNumberLong(m_Script, m_Value);
         }
         public override long ToLong()
         {
@@ -92,25 +92,25 @@ namespace Scorpio.Variable
             switch (type)
             {
                 case TokenType.Plus:
-                    return m_Script.CreateLong(m_Value + val.ToLong());
+                    return new ScriptNumberLong(m_Script, m_Value + val.ToLong());
                 case TokenType.Minus:
-                    return m_Script.CreateLong(m_Value - val.ToLong());
+                    return new ScriptNumberLong(m_Script, m_Value - val.ToLong());
                 case TokenType.Multiply:
-                    return m_Script.CreateLong(m_Value * val.ToLong());
+                    return new ScriptNumberLong(m_Script, m_Value * val.ToLong());
                 case TokenType.Divide:
-                    return m_Script.CreateLong(m_Value / val.ToLong());
+                    return new ScriptNumberLong(m_Script, m_Value / val.ToLong());
                 case TokenType.Modulo:
-                    return m_Script.CreateLong(m_Value % val.ToLong());
+                    return new ScriptNumberLong(m_Script, m_Value % val.ToLong());
                 case TokenType.InclusiveOr:
-                    return m_Script.CreateLong(m_Value | val.ToLong());
+                    return new ScriptNumberLong(m_Script, m_Value | val.ToLong());
                 case TokenType.Combine:
-                    return m_Script.CreateLong(m_Value & val.ToLong());
+                    return new ScriptNumberLong(m_Script, m_Value & val.ToLong());
                 case TokenType.XOR:
-                    return m_Script.CreateLong(m_Value ^ val.ToLong());
+                    return new ScriptNumberLong(m_Script, m_Value ^ val.ToLong());
                 case TokenType.Shr:
-                    return m_Script.CreateLong(m_Value >> val.ToInt32());
+                    return new ScriptNumberLong(m_Script, m_Value >> val.ToInt32());
                 case TokenType.Shi:
-                    return m_Script.CreateLong(m_Value << val.ToInt32());
+                    return new ScriptNumberLong(m_Script, m_Value << val.ToInt32());
                 default:
                     throw new ExecutionException(m_Script, "Long不支持的运算符 " + type);
             }
@@ -157,7 +157,7 @@ namespace Scorpio.Variable
         }
         public override ScriptObject Clone()
         {
-            return m_Script.CreateLong(m_Value);
+            return new ScriptNumberLong(m_Script, m_Value);
         }
     }
 }
