@@ -230,9 +230,9 @@ namespace Scorpio.Runtime
                 step = 1;
             }
             ScriptContext context;
-            for (int i = begin; i <= finished; i += step) {
+            for (double i = begin; i <= finished; i += step) {
                 context = new ScriptContext(m_script, code.BlockExecutable, this, Executable_Block.For);
-                context.Initialize(code.Identifier, new ScriptNumberDouble(m_script, Convert.ToDouble(i)));
+                context.Initialize(code.Identifier, new ScriptNumberDouble(m_script, i));
                 context.Execute();
                 if (context.IsOver) break;
             }

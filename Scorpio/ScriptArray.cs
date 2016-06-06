@@ -66,7 +66,7 @@ namespace Scorpio
                     return m_null;
                 return m_listObject[i] ?? m_null;
             } else if (index is string && index.Equals("length")){
-                return m_Script.CreateDouble(m_size);
+                return m_Script.CreateDouble(Util.ToDouble(m_size));
             }
             throw new ExecutionException(m_Script, "Array SetValue只支持Number类型 index值为:" + index);
         }
