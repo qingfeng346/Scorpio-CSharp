@@ -376,7 +376,7 @@ namespace Scorpio.Library
             {
                 ScriptObject obj = args[0];
                 Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "toint 不能从类型 " + obj.Type + " 转换成int类型");
-                return new ScriptNumberInt(m_script, Convert.ToInt32(obj.ObjectValue));
+                return new ScriptNumberInt(m_script, Util.ToInt32(obj.ObjectValue));
             }
         }
         private class toenum : ScorpioHandle

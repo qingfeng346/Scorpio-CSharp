@@ -28,22 +28,6 @@ namespace Scorpio
         private static readonly Type TYPE_DECIMAL = typeof(decimal);
         private static readonly Type TYPE_PARAMATTRIBUTE = typeof(ParamArrayAttribute);
 
-        public static bool IsBool(Type type)
-        {
-            return type == TYPE_BOOL;
-        }
-        public static bool IsString(Type type)
-        {
-            return type == TYPE_STRING;
-        }
-        public static bool IsNumber(Type type)
-        {
-            return (type == TYPE_SBYTE || type == TYPE_BYTE ||
-                    type == TYPE_SHORT || type == TYPE_USHORT ||
-                    type == TYPE_INT || type == TYPE_UINT ||
-                    type == TYPE_FLOAT || type == TYPE_DOUBLE ||
-                    type == TYPE_DECIMAL || type == TYPE_LONG);
-        }
         public static bool IsDelegateType(Type type)
         {
             return TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type);
@@ -51,14 +35,6 @@ namespace Scorpio
         public static bool IsVoid(Type type)
         {
             return type == TYPE_VOID;
-        }
-        public static bool IsType(Type type)
-        {
-            return type == TYPE_TYPE;
-        }
-        public static bool IsLongObject(object obj)
-        {
-            return obj is long;
         }
         public static bool IsParamArray(ParameterInfo info)
         {
