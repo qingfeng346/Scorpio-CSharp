@@ -249,7 +249,7 @@ namespace Scorpio
             if (value == null)
                 return m_Null;
             else if (value is bool)
-                return CreateBoolean((bool)value);
+                return CreateBool((bool)value);
             else if (value is string)
                 return new ScriptString(this, (string)value);
             else if (value is long)
@@ -268,7 +268,7 @@ namespace Scorpio
                 return new ScriptEnum(this, value);
             return CreateUserdata(value);
         }
-        public ScriptBoolean CreateBoolean(bool value) {
+        public ScriptBoolean CreateBool(bool value) {
             return value ? True : False;
         }
         public ScriptString CreateString(string value)

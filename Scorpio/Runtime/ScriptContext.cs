@@ -493,19 +493,19 @@ namespace Scorpio.Runtime
                 return left.Compute(type, ResolveOperand(operate.Right));
             case TokenType.And:
                 if (!left.LogicOperation()) return m_script.False;
-                return m_script.CreateBoolean(ResolveOperand(operate.Right).LogicOperation());
+                return m_script.CreateBool(ResolveOperand(operate.Right).LogicOperation());
             case TokenType.Or:
                 if (left.LogicOperation()) return m_script.True;
-                return m_script.CreateBoolean(ResolveOperand(operate.Right).LogicOperation());
+                return m_script.CreateBool(ResolveOperand(operate.Right).LogicOperation());
             case TokenType.Equal:
-                return m_script.CreateBoolean(left.Equals(ResolveOperand(operate.Right)));
+                return m_script.CreateBool(left.Equals(ResolveOperand(operate.Right)));
             case TokenType.NotEqual:
-                return m_script.CreateBoolean(!left.Equals(ResolveOperand(operate.Right)));
+                return m_script.CreateBool(!left.Equals(ResolveOperand(operate.Right)));
             case TokenType.Greater:
             case TokenType.GreaterOrEqual:
             case TokenType.Less:
             case TokenType.LessOrEqual:
-                return m_script.CreateBoolean(left.Compare(type, ResolveOperand(operate.Right)));
+                return m_script.CreateBool(left.Compare(type, ResolveOperand(operate.Right)));
             default:
                 throw new ExecutionException(m_script, "不支持的运算符 " + type);
             }
