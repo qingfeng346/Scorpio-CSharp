@@ -5,11 +5,15 @@
 * 网络协议,Excel表数据转换工具 : https://github.com/qingfeng346/ScorpioConversion
 * 国内用户如果网比较慢可以在此链接下载 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
 
-## 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现 基于.net2.0 兼容所有c#平台 语法类似 javascript
+## 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现,最低支持.net3.5,兼容.net3.5以上所有平台,语法类似 javascript
 * **脚本示例** 放在 [ScorpioDemo/Scripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/ScorpioDemo/Scripts) 目录
 * **语法测试** 可以先在此路径体验 http://sina.fengyuezhu.com/demo/WebPlayer.html (必须安装UnityWebPlayer)
 * **语法测试** 直接运行 **ScorpioDemo/bin/Debug/ScorpioDemo.exe**  左侧选中要测试的脚本,点击 **Run Script** 按钮即可
 * **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
+
+## 项目宏定义说明:
+* **SCORPIO_NET_CORE** .net4.5平台以后使用(UWP平台、dotnet core)
+* **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android和windows(exe)平台可用
 
 ## 注意事项 ##
 * 脚本内所有c#变量(除了int,string等基础类型)均为引用,struct变量也一样
@@ -19,8 +23,10 @@
 * 同类中静态函数和实例函数不要重名,否则会调用失败 例如 static void Test(object a); void Test(object a, object b); 两个函数不一定会当静态还是实例函数处理
 * 同类中重载的函数相同参数不要是继承关系,否则可能调用失败,例如 void Test(object a); void Test(string a); 两个Test函数都可以传入string,但是调用时不一定会调用哪一个
 * c#类的变量不能类似 += -= *= /= 等赋值计算操作(只有event可以使用 += -=) 请使用 变量 = 变量 + XXX
-* SCORPIO_DYNAMIC_DELEGATE 宏定义好像只能android和windows(exe)平台可用,其它平台请勿用
-* 不能使用SCORPIO_DYNAMIC_DELEGATE 要实现一个继承 DelegateTypeFactory 的类,然后调用DefaultScriptUserdataDelegateType.SetFactory函数设置一下 例如:
+* IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
+* UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
+* UWP平台master配置下generic_type函数也会出问题
+* 不能使用 SCORPIO_DYNAMIC_DELEGATE 的平台,要实现一个继承 DelegateTypeFactory 的类,然后调用ScriptUserdataDelegateType.SetFactory函数设置一下 例如:
 ```c#
 public class MyDelegateFactory : DelegateTypeFactory {
 	public Delegate CreateDelegate(Script script, Type type, ScriptFunction func) {
@@ -35,11 +41,8 @@ public class MyDelegateFactory : DelegateTypeFactory {
         return null;
 	}
 }
-///然后实现完以后 调用 DefaultScriptUserdataDelegateType.SetFactory(new MyDelegateFactory()); 设置一下
+///然后实现完以后 调用 ScriptUserdataDelegateType.SetFactory(new MyDelegateFactory()); 设置一下
 ```
-* IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
-* UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
-* UWP平台master配置下generic_type函数也会出问题
 
 ## 使用去反射功能注意事项 ##
 * 不能调用模板函数
@@ -52,9 +55,10 @@ public class MyDelegateFactory : DelegateTypeFactory {
 - [x] Android
 - [x] BlackBerry
 - [x] Windows Phone 8
-- [x] Windows 10 (Universal Windows Platform)
+- [x] Windows 10 (Universal Windows Platform) (请添加 SCORPIO_NET_CORE 宏定义)
 - [x] WebGL
-- [ ] 其他平台未测试,如果测试通过可以@我
+- [x] Tizen
+- [ ] 理论上可以支持所有平台
 
 ## 反射调用运算符重载函数
 *	+    op_Addition
@@ -140,11 +144,6 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 	* Google Play https://play.google.com/store/apps/details?id=com.Toydog.AgileMan
 	* Windows 10 (UWP) https://www.microsoft.com/zh-cn/store/games/agile-man/9nblggh68b51
 
-	
-## 脚本内使用的宏定义说明:
-* **SCORPIO_UWP**  UWP(Universal Windows Platform)专用
-* **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类
-
 ## c#去反射类使用 ##
 * 把**ScorpioReflect**项目中的**GenerateScorpioClass**开头的几个cs文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例: 
 
@@ -164,6 +163,12 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-6-6)
+-----------
+* 修改源码代码最低支持.net3.5,之前的.net版本不再兼容
+* 支持 .net core (当前的.net core版本宏定义有问题,如果要使用请先删除ScriptExtensions.cs文件)
+* 优化脚本执行性能
+
 (2016-6-1)
 -----------
 * 去反射类过滤不生成的函数改为 实现一个继承自 Scorpio.ScorpioReflect.ClassFilter 的类, 然后调用 GenerateScorpioClass 的 SetClassFilter 设置
