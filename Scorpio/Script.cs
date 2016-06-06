@@ -38,7 +38,6 @@ namespace Scorpio
         public ScriptNull Null { get { return m_Null; } }                       //null对象
         public ScriptBoolean True { get { return m_True; } }                    //true对象
         public ScriptBoolean False { get { return m_False; } }                  //false对象
-        public ScriptBoolean GetBoolean(bool value) { return value ? True : False;  }
         public Script() {
             m_Null = new ScriptNull(this);
             m_True = new ScriptBoolean(this, true);
@@ -250,7 +249,7 @@ namespace Scorpio
             if (value == null)
                 return m_Null;
             else if (value is bool)
-                return GetBoolean((bool)value);
+                return CreateBoolean((bool)value);
             else if (value is string)
                 return new ScriptString(this, (string)value);
             else if (value is long)
@@ -268,6 +267,9 @@ namespace Scorpio
             else if (value.GetType().GetTypeInfo().IsEnum)
                 return new ScriptEnum(this, value);
             return CreateUserdata(value);
+        }
+        public ScriptBoolean CreateBoolean(bool value) {
+            return value ? True : False;
         }
         public ScriptString CreateString(string value)
         {
