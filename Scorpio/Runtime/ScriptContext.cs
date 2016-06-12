@@ -183,7 +183,7 @@ namespace Scorpio.Runtime
         }
         void ProcessVar()
         {
-            ApplyVariableObject((string)m_scriptInstruction.Value);
+            ApplyVariableObject(m_scriptInstruction.Value);
         }
         void ProcessMov()
         {
