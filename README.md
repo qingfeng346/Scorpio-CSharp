@@ -166,8 +166,9 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 (2016-6-6)
 -----------
 * 修改源码代码最低支持.net3.5,之前的.net版本不再兼容
-* 支持 .net core (当前的.net core版本宏定义有问题,如果要使用请先删除ScriptExtensions.cs文件)
+* 支持 .net core
 * 优化脚本执行性能
+* UWP平台宏定义改为 SCORPIO_NET_CORE
 
 (2016-6-1)
 -----------
