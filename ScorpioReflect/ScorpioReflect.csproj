@@ -41,6 +41,7 @@
     <Compile Include="GenerateScorpioClass\GenerateScorpioClassBase.cs" />
     <Compile Include="GenerateScorpioClass\GenerateScorpioClassMethod.cs" />
     <Compile Include="GenerateScorpioClass\GenerateScorpioClassValue.cs" />
+    <Compile Include="GenerateScorpioDelegate\GenerateScorpioDelegate.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

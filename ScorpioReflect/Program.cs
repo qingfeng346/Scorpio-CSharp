@@ -65,6 +65,12 @@ namespace ScorpioReflect
     }
     class Program
     {
+        public delegate bool TestDelegate1(string error, byte[] bytes, string url);
+        public delegate int TestDelegate2(string error, string key, string value);
+        public delegate object TestDelegate3(string error, string key, string value);
+        public delegate double TestDelegate4(string error, string key, string value);
+        public delegate string TestDelegate5(string error, string key, string value);
+        public delegate Test TestDelegate6(string error, string key, string value);
         static void Main(string[] args)
         {
             //            Thread.Sleep(1000);
@@ -101,10 +107,20 @@ namespace ScorpioReflect
             //                Console.WriteLine(Environment.TickCount - time);
             //            }
             //            Console.ReadKey();
-            var g = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(Test));
+            //var g = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(Test));
             //g.AddExclude("aaaa");
-            var str = g.Generate();
-            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
+            //var str = g.Generate();
+            //File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
+            var g = new Scorpio.ScorpioReflect.GenerateScorpioDelegate();
+            g.AddType(typeof(Action<bool>));
+            g.AddType(typeof(Action<int>));
+            g.AddType(typeof(TestDelegate1));
+            g.AddType(typeof(TestDelegate2));
+            g.AddType(typeof(TestDelegate3));
+            g.AddType(typeof(TestDelegate4));
+            g.AddType(typeof(TestDelegate5));
+            g.AddType(typeof(TestDelegate6));
+            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ClassName + ".cs", g.Generate(), Encoding.UTF8);
         }
     }
 }
