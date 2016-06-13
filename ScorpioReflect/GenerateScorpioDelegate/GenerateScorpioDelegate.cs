@@ -3,6 +3,11 @@ using System.Text;
 using System.Collections.Generic;
 namespace Scorpio.ScorpioReflect {
     public partial class GenerateScorpioDelegate {
+        struct ComparerType : IComparer<Type> {
+            public int Compare(Type x, Type y) {
+                return x.FullName.CompareTo(y.FullName);
+            }
+        }
         private static readonly Type TYPE_DELEGATE = typeof(Delegate);
         private const string Template = @"using System;
 using Scorpio;
@@ -22,7 +27,8 @@ __CreateDelegate
         public string ClassName = "ScorpioDelegateFactory";
         private List<Type> m_Delegates = new List<Type>();
         public void AddType(Type type) {
-            m_Delegates.Add(type);
+            if (!m_Delegates.Contains(type))
+                m_Delegates.Add(type);
         }
         private string GetFullName(Type type) {
             var fullName = type.FullName;
@@ -43,6 +49,7 @@ __CreateDelegate
             return fullName;
         }
         public string Generate() {
+            m_Delegates.Sort(new ComparerType());
             string str = Template;
             str = str.Replace("__Namespace", string.IsNullOrEmpty(Namespace) ? "ScorpioDelegate" : Namespace);
             str = str.Replace("__ClassName", string.IsNullOrEmpty(ClassName) ? "ScorpioDelegateFactory" : ClassName);
