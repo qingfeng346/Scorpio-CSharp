@@ -62,21 +62,19 @@ __CreateDelegate
             foreach (var type in m_Delegates) {
                 if (!TYPE_DELEGATE.IsAssignableFrom(type)) { continue; }
                 if (first) { first = false; } else { builder.AppendLine(); }
-                builder.AppendLine("            if (type == typeof(__Name)".Replace("__Name", GetFullName(type)));
+                builder.AppendLine("            if (type == typeof(__Name))".Replace("__Name", GetFullName(type)));
                 builder.Append("                return new __Name(".Replace("__Name", GetFullName(type)));
                 var InvokeMethod = type.GetMethod("Invoke");
                 var parameters = InvokeMethod.GetParameters();
                 string pars = "";
-                bool firstPar = true;
-                foreach (var parameter in parameters)
-                {
-                    if (firstPar) { firstPar = false; } else { pars += ","; }
-                    pars += parameter.Name;
-                }
+				for (int i = 0;i < parameters.Length; ++i) {
+					if (i != 0) { pars += ","; }
+					pars += ("arg" + i);
+				}
                 builder.Append("(" + pars + ") => { ");
                 var returnType = InvokeMethod.ReturnType;
                 if (returnType == typeof(void)) {
-                    builder.Append("func.call(" + pars + "); ");
+                    builder.Append("func.call(" + pars + ");");
                 } else if (returnType == typeof(bool)) {
                     builder.Append("return script.CreateObject(func.call(" + pars + ")).LogicOperation();");
                 } else if (returnType == typeof(string)) {
