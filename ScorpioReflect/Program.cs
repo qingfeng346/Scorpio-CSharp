@@ -71,6 +71,7 @@ namespace ScorpioReflect
         public delegate double TestDelegate4(string error, string key, string value);
         public delegate string TestDelegate5(string error, string key, string value);
         public delegate Test TestDelegate6(string error, string key, string value);
+        public delegate ScriptNumber TestDelegate7(string error, string key, string value);
         static void Main(string[] args)
         {
             //            Thread.Sleep(1000);
@@ -120,6 +121,7 @@ namespace ScorpioReflect
             g.AddType(typeof(TestDelegate4));
             g.AddType(typeof(TestDelegate5));
             g.AddType(typeof(TestDelegate6));
+            g.AddType(typeof(TestDelegate7));
             File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ClassName + ".cs", g.Generate(), Encoding.UTF8);
         }
     }

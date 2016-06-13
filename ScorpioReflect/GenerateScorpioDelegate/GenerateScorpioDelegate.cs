@@ -9,6 +9,9 @@ using Scorpio;
 using Scorpio.Userdata;
 namespace __Namespace {
     public class __ClassName : DelegateTypeFactory {
+        public static void Initialize() {
+            ScriptUserdataDelegateType.SetFactory(new __ClassName());
+        }
         public Delegate CreateDelegate(Script script, Type type, ScriptFunction func) {
 __CreateDelegate
             throw new Exception(""Delegate Type is not found : "" + type + ""  func : "" + func);
@@ -68,9 +71,25 @@ __CreateDelegate
                 if (returnType == typeof(void)) {
                     builder.Append("func.call(" + pars + "); ");
                 } else if (returnType == typeof(bool)) {
-                    builder.Append("return ((ScriptObject)func.call(" + pars + ")).LogicOperation(); ");
+                    builder.Append("return script.CreateObject(func.call(" + pars + ")).LogicOperation();");
+                } else if (returnType == typeof(string)) {
+                    builder.Append("return script.CreateObject(func.call(" + pars + ")).ToString();");
+                } else if (returnType == typeof(sbyte) || returnType == typeof(byte) ||
+                            returnType == typeof(short) || returnType == typeof(ushort) ||
+                            returnType == typeof(int) || returnType == typeof(uint) ||
+                            returnType == typeof(long) || returnType == typeof(ulong) ||
+                            returnType == typeof(float) || returnType == typeof(double) || returnType == typeof(decimal)) {
+                    string str = "return (__Type)Convert.ChangeType(script.CreateObject(func.call(" + pars + ")).ObjectValue, typeof(__Type));";
+                    str = str.Replace("__Type", GetFullName(returnType));
+                    builder.Append(str);
+                } else if (typeof(ScriptObject).IsAssignableFrom(returnType)) {
+                    builder.Append("return script.CreateObject(func.call(" + pars + "));");
+                } else {
+                    string str = "return (__Type)script.CreateObject(func.call(" + pars + ")).ObjectValue;";
+                    str = str.Replace("__Type", GetFullName(returnType));
+                    builder.Append(str);
                 }
-                builder.Append("});");
+                builder.Append(" });");
             }
             return builder.ToString();
         }
