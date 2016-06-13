@@ -43,6 +43,34 @@ public class MyDelegateFactory : DelegateTypeFactory {
 }
 ///然后实现完以后 调用 ScriptUserdataDelegateType.SetFactory(new MyDelegateFactory()); 设置一下
 ```
+* 也可以使用**ScorpioReflect**项目中的**GenerateScorpioDelegate**类可以自动生成一个 DelegateTypeFactory 类
+```c#
+var generate = new Scorpio.ScorpioReflect.GenerateScorpioDelegate();
+generate.AddType(typeof(Action<bool>));     //使用AddType 添加所有需要用到的 Delegate , 模板函数 要单独添加
+generate.AddType(typeof(Action<int>));
+System.IO.File.WriteAllText(Application.dataPath + "/Scripts/ScorpioDelegate/" + gen.ClassName + ".cs", gen.Generate());        //调用Generate函数生成内容
+
+/***********下面是生成文件示例***********************
+using System;
+using Scorpio;
+using Scorpio.Userdata;
+namespace ScorpioDelegate {
+    public class ScorpioDelegateFactory : DelegateTypeFactory {
+        public static void Initialize() {
+            ScriptUserdataDelegateType.SetFactory(new ScorpioDelegateFactory());
+        }
+        public Delegate CreateDelegate(Script script, Type type, ScriptFunction func) {
+            if (type == typeof(System.Action<System.Boolean>))
+                return new System.Action<System.Boolean>((arg0) => { func.call(arg0); });
+            if (type == typeof(System.Action<System.Int32>))
+                return new System.Action<System.Int32>((arg0) => { func.call(arg0); });
+            throw new Exception("Delegate Type is not found : " + type + "  func : " + func);
+        }
+    }
+}
+生成文件后 调用 Initialize 函数即可
+*/
+```
 
 ## 使用去反射功能注意事项 ##
 * 不能调用模板函数
@@ -145,7 +173,7 @@ CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetO
 	* Windows 10 (UWP) https://www.microsoft.com/zh-cn/store/games/agile-man/9nblggh68b51
 
 ## c#去反射类使用 ##
-* 把**ScorpioReflect**项目中的**GenerateScorpioClass**开头的几个cs文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例: 
+* 把**ScorpioReflect**项目中的**GenerateScorpioClass**文件夹下的所有cs文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例: 
 
 ```c#
 //就拿UnityEngine.GameObject类为例
@@ -163,6 +191,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-6-13)
+-----------
+* **ScorpioReflect**项目增加**GenerateScorpioDelegate**类，可以自动生成**DelegateTypeFactory**类,具体方法请查看**注意事项**
+
 (2016-6-6)
 -----------
 * 修改源码代码最低支持.net3.5,之前的.net版本不再兼容
