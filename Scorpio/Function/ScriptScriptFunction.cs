@@ -21,11 +21,11 @@ namespace Scorpio.Function {
         public override bool IsStatic() { return m_IsStaticFunction; }
         public override ScriptArray GetParams() { return m_ScriptFunction.GetParameters(); }
         public override void SetValue(object key, ScriptObject value) {
-            if (!(key is string)) throw new ExecutionException(this.m_Script, "Function SetValue只支持String类型 key值为:" + key);
+            if (!(key is string)) throw new ExecutionException(this.m_Script, this, "Function SetValue只支持String类型 key值为:" + key);
             m_stackObject[(string)key] = value;
         }
         public override ScriptObject GetValue(object key) {
-            if (!(key is string)) throw new ExecutionException(this.m_Script, "Function GetValue只支持String类型 key值为:" + key);
+            if (!(key is string)) throw new ExecutionException(this.m_Script, this, "Function GetValue只支持String类型 key值为:" + key);
             string skey = (string)key;
             return m_stackObject.ContainsKey(skey) ? m_stackObject[skey] : m_Script.Null;
         }

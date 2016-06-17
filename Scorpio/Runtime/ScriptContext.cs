@@ -92,7 +92,7 @@ namespace Scorpio.Runtime
                 ret = (obj == null ? m_script.GetValue(name) : obj);
                 ret.Name = name;
             } else {
-                ret = ResolveOperand(member.Parent);
+                ScriptObject parent = ResolveOperand(member.Parent);
                 /*此处设置一下堆栈位置 否则 函数返回值取值出错会报错位置 例如  
                     function Get() { 
                         return null 
@@ -102,7 +102,15 @@ namespace Scorpio.Runtime
                 上述代码报错会报道 return null 那一行 但实际出错 是 .a 的时候 下面这句话就是把堆栈设置回 .a 那一行
                 */
                 m_script.SetStackInfo(member.StackInfo);
-                ret = ret.GetValue(GetMember(member));
+                if (member.Type == MEMBER_TYPE.VALUE) {
+                    object name = member.MemberValue;
+                    ret = parent.GetValue(name);
+                    ret.Name = parent.Name + "." + name.ToString();
+                } else {
+                    object name = ResolveOperand(member.MemberObject).KeyValue;
+                    ret = parent.GetValue(name);
+                    ret.Name = parent.Name + "." + name.ToString();
+                }
             }
             if (ret == null) throw new ExecutionException(m_script, "GetVariable member is error");
             if (member.Calc != CALC.NONE) {
@@ -410,9 +418,7 @@ namespace Scorpio.Runtime
             m_script.SetStackInfo(value.StackInfo);
             ScriptObject ret = ResolveOperand_impl(value);
             if (value.Not) {
-                ScriptBoolean b = ret as ScriptBoolean;
-                if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [!] sign");
-                ret = b.Inverse();
+                ret = m_script.CreateBool(!ret.LogicOperation());
             }  else if (value.Negative) {
                 ScriptNumber b = ret as ScriptNumber;
                 if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [-] sign");

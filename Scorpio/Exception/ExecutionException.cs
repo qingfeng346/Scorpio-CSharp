@@ -13,6 +13,12 @@ namespace Scorpio.Exception
                 if (stackInfo != null) m_Source = stackInfo.Breviary + ":" + stackInfo.Line + ": ";
             }
         }
+        public ExecutionException(Script script, ScriptObject obj, String strMessage) : base(strMessage) {
+            if (script != null) {
+                StackInfo stackInfo = script.GetCurrentStackInfo();
+                if (stackInfo != null) m_Source = stackInfo.Breviary + ":" + stackInfo.Line + "[" + obj.Name + "]:";
+            }
+        }
         public override string Message { get { return m_Source + base.Message; } }
     }
 }

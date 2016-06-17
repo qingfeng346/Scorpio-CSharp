@@ -783,13 +783,21 @@ namespace Scorpio.Compiler
             for ( ; ; ) {
                 Token m = ReadToken();
                 if (m.Type == TokenType.Period) {
-                    string identifier = ReadIdentifier();
-                    ret = new CodeMember(identifier, ret);
+                    ret = new CodeMember(ReadIdentifier(), ret);
                 } else if (m.Type == TokenType.LeftBracket) {
                     CodeObject member = GetObject();
                     ReadRightBracket();
                     if (member is CodeScriptObject) {
-                        ret = new CodeMember(((CodeScriptObject)member).Object.KeyValue, ret);
+                        ScriptObject obj = ((CodeScriptObject)member).Object;
+                        if (member.Not) {
+                            ret = new CodeMember(!obj.LogicOperation(), ret);
+                        } else if (member.Negative) {
+                            ScriptNumber num = obj as ScriptNumber;
+                            if (num == null) throw new ParserException("Script Object Type [" + obj.Type + "] is cannot use [-] sign", m);
+                            ret = new CodeMember(num.Negative().KeyValue, ret);
+                        } else {
+                            ret = new CodeMember(obj.KeyValue, ret);
+                        }
                     } else {
                         ret = new CodeMember(member, ret);
                     }

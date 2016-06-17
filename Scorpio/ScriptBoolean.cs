@@ -20,9 +20,5 @@
         public override string ToString() {
             return m_Value ? "true" : "false";
         }
-        public ScriptBoolean Inverse()
-        {
-            return m_Value ? m_Script.False : m_Script.True;
-        }
     }
 }

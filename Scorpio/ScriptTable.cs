@@ -25,7 +25,7 @@ namespace Scorpio
         public override ScriptObject AssignCompute(TokenType type, ScriptObject value) {
             if (type != TokenType.AssignPlus) { return base.AssignCompute(type, value); }
             ScriptTable table = value as ScriptTable;
-            if (table == null) throw new ExecutionException(m_Script, "table [+=] 操作只支持两个table " + value.Type);
+            if (table == null) throw new ExecutionException(m_Script, this, "table [+=] 操作只限两个[table]之间,传入数据类型:" + value.Type);
             ScriptObject obj = null;
             ScriptScriptFunction func = null;
             foreach (KeyValuePair<object, ScriptObject> pair in table.m_listObject) {
@@ -41,7 +41,7 @@ namespace Scorpio
         public override ScriptObject Compute(TokenType type, ScriptObject value) {
             if (type != TokenType.Plus) { return base.Compute(type, value); }
             ScriptTable table = value as ScriptTable;
-            if (table == null) throw new ExecutionException(m_Script, "table [+] 操作只支持两个table " + value.Type);
+            if (table == null) throw new ExecutionException(m_Script, this, "table [+] 操作只限两个[table]之间,传入数据类型:" + value.Type);
             ScriptTable ret = m_Script.CreateTable();
             ScriptObject obj = null;
             ScriptScriptFunction func = null;

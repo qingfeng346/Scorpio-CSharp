@@ -200,7 +200,7 @@ namespace Scorpio
         public string GetStackInfo()
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("Source [ " + m_StackInfo.Breviary + "] Line [" + m_StackInfo.Line + "]");
+            builder.AppendLine("Source [" + m_StackInfo.Breviary + "] Line [" + m_StackInfo.Line + "]");
             for (int i = m_StackInfoStack.Count - 1; i >= 0;--i ) {
                 builder.AppendLine("        Source [" + m_StackInfoStack[i].Breviary + "] Line [" + m_StackInfoStack[i].Line + "]");
             }
