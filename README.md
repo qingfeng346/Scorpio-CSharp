@@ -191,6 +191,12 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-6-17)
+-----------
+* 增加报错字段名输出
+    * 修改前错误输出格式 : 文件名:行数:错误信息
+    * 修改后错误输出格式 : 文件名:行数[字段名]:错误信息
+
 (2016-6-13)
 -----------
 * **ScorpioReflect**项目增加**GenerateScorpioDelegate**类，可以自动生成**DelegateTypeFactory**类,具体方法请查看**注意事项**
