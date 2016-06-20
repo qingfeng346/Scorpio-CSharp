@@ -191,6 +191,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-6-20)
+-----------
+* 优化堆栈输出内容
+
 (2016-6-17)
 -----------
 * 增加报错字段名输出
