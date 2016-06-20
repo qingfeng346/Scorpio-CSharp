@@ -194,7 +194,8 @@ namespace Scorpio
             m_StackInfoStack.Push(m_StackInfo);
         }
         internal void PopStackInfo() {
-            m_StackInfoStack.Pop();
+            if (m_StackInfoStack.Count > 0)
+                m_StackInfoStack.Pop();
         }
         public void ClearStackInfo()
         {
