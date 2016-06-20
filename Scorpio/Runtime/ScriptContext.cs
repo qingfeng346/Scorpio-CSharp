@@ -454,6 +454,7 @@ namespace Scorpio.Runtime
             }
             m_script.PushStackInfo();
             object ret = obj.Call(parameters);
+            m_script.PopStackInfo();
             return needRet ? m_script.CreateObject(ret) : null;
         }
         ScriptArray ParseArray(CodeArray array)

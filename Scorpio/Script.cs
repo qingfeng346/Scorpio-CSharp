@@ -23,7 +23,7 @@ namespace Scorpio
         private const string GLOBAL_VERSION = "_VERSION";       //版本号
         private const string GLOBAL_SCRIPT = "_SCRIPT";         //Script对象
         private ScriptTable m_GlobalTable;                                      //全局Table
-        private List<StackInfo> m_StackInfoStack = new List<StackInfo>();       //堆栈数据
+        private Stack<StackInfo> m_StackInfoStack = new Stack<StackInfo>();     //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
         private List<String> m_SearchPath = new List<String>();                 //request所有文件的路径集合
         private List<String> m_Defines = new List<String>();                    //所有Define
@@ -191,7 +191,10 @@ namespace Scorpio
         }
         internal void PushStackInfo()
         {
-            m_StackInfoStack.Add(m_StackInfo);
+            m_StackInfoStack.Push(m_StackInfo);
+        }
+        internal void PopStackInfo() {
+            m_StackInfoStack.Pop();
         }
         public void ClearStackInfo()
         {
@@ -201,8 +204,8 @@ namespace Scorpio
         {
             StringBuilder builder = new StringBuilder();
             builder.AppendLine("Source [" + m_StackInfo.Breviary + "] Line [" + m_StackInfo.Line + "]");
-            for (int i = m_StackInfoStack.Count - 1; i >= 0;--i ) {
-                builder.AppendLine("        Source [" + m_StackInfoStack[i].Breviary + "] Line [" + m_StackInfoStack[i].Line + "]");
+            foreach (StackInfo info in m_StackInfoStack) {
+                builder.AppendLine("        Source [" + info.Breviary + "] Line [" + info.Line + "]");
             }
             return builder.ToString();
         }
