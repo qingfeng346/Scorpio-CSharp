@@ -40,6 +40,7 @@ namespace Scorpio.ScorpioReflect {
             //类变量
             foreach (var field in m_Fields) {
                 if (m_ClassFilter != null && !m_ClassFilter.Check(field, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
+                if (field.IsInitOnly /*readonly 属性*/ || field.IsLiteral /*const 属性*/) { continue; }
                 if (first) { first = false; } else { builder.AppendLine(); }
                 builder.AppendFormat(fieldStr, field.Name, GetScorpioVariable(field.IsStatic, field.Name), GetFullName(field.FieldType));
             }
