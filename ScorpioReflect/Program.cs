@@ -15,7 +15,6 @@ namespace ScorpioReflect
         public Test(params object[] args) {
 
         }
-        public event Action<int> testEvent;
         public int a;
         public int b;
         public int GetA() { return a; }
