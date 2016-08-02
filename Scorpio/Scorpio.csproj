@@ -118,9 +118,16 @@
     <Compile Include="Variable\ScorpioMethod.cs" />
     <Compile Include="Variable\ScorpioScriptFunction.cs" />
     <Compile Include="Userdata\UserdataType.cs" />
+    <Compile Include="Variable\ScriptNumberByte.cs" />
     <Compile Include="Variable\ScriptNumberDouble.cs" />
+    <Compile Include="Variable\ScriptNumberFloat.cs" />
     <Compile Include="Variable\ScriptNumberInt.cs" />
     <Compile Include="Variable\ScriptNumberLong.cs" />
+    <Compile Include="Variable\ScriptNumberSByte.cs" />
+    <Compile Include="Variable\ScriptNumberShort.cs" />
+    <Compile Include="Variable\ScriptNumberUInt.cs" />
+    <Compile Include="Variable\ScriptNumberULong.cs" />
+    <Compile Include="Variable\ScriptNumberUShort.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

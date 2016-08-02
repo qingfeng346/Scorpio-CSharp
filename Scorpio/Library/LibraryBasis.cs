@@ -152,8 +152,15 @@ namespace Scorpio.Library
             script.SetObjectInternal("branchtype", script.CreateFunction(new branchtype()));
             script.SetObjectInternal("typeof", script.CreateFunction(new userdatatype()));
             script.SetObjectInternal("tonumber", script.CreateFunction(new tonumber(script)));
-            script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
+            script.SetObjectInternal("tosbyte", script.CreateFunction(new tosbyte(script)));
+            script.SetObjectInternal("tobyte", script.CreateFunction(new tobyte(script)));
+            script.SetObjectInternal("toshort", script.CreateFunction(new toshort(script)));
+            script.SetObjectInternal("toushort", script.CreateFunction(new toushort(script)));
             script.SetObjectInternal("toint", script.CreateFunction(new toint(script)));
+            script.SetObjectInternal("touint", script.CreateFunction(new touint(script)));
+            script.SetObjectInternal("tolong", script.CreateFunction(new tolong(script)));
+            script.SetObjectInternal("toulong", script.CreateFunction(new toulong(script)));
+            script.SetObjectInternal("tofloat", script.CreateFunction(new tofloat(script)));
             script.SetObjectInternal("toenum", script.CreateFunction(new toenum(script)));
             script.SetObjectInternal("tostring", script.CreateFunction(new tostring(script)));
             script.SetObjectInternal("clone", script.CreateFunction(new clone()));
@@ -337,46 +344,114 @@ namespace Scorpio.Library
                 return ((ScriptUserdata)args[0]).ValueType;
             }
         }
-        private class tonumber : ScorpioHandle
-        {
+        private class tonumber : ScorpioHandle {
             private Script m_script;
-            public tonumber(Script script)
-            {
+            public tonumber(Script script) {
                 m_script = script;
             }
-            public object Call(ScriptObject[] args)
-            {
+            public object Call(ScriptObject[] args) {
                 ScriptObject obj = args[0];
                 Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "tonumber 不能从类型 " + obj.Type + " 转换成Number类型");
-                return m_script.CreateDouble(Util.ToDouble(obj.ObjectValue));
+                return new ScriptNumberDouble(m_script, Convert.ToDouble(obj.ObjectValue));
             }
         }
-        private class tolong : ScorpioHandle
-        {
+        private class tosbyte : ScorpioHandle {
             private Script m_script;
-            public tolong(Script script)
-            {
+            public tosbyte(Script script) {
                 m_script = script;
             }
-            public object Call(ScriptObject[] args)
-            {
+            public object Call(ScriptObject[] args) {
                 ScriptObject obj = args[0];
-                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "tolong 不能从类型 " + obj.Type + " 转换成Long类型");
-                return new ScriptNumberLong(m_script, Util.ToInt64(obj.ObjectValue));
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberSByte(m_script, Convert.ToSByte(obj.ObjectValue));
             }
         }
-        private class toint : ScorpioHandle
-        {
+        private class tobyte : ScorpioHandle {
             private Script m_script;
-            public toint(Script script)
-            {
+            public tobyte(Script script) {
                 m_script = script;
             }
-            public object Call(ScriptObject[] args)
-            {
+            public object Call(ScriptObject[] args) {
                 ScriptObject obj = args[0];
-                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "toint 不能从类型 " + obj.Type + " 转换成int类型");
-                return new ScriptNumberInt(m_script, Util.ToInt32(obj.ObjectValue));
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberByte(m_script, Convert.ToByte(obj.ObjectValue));
+            }
+        }
+        private class toshort : ScorpioHandle {
+            private Script m_script;
+            public toshort(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                ScriptObject obj = args[0];
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberShort(m_script, Convert.ToInt16(obj.ObjectValue));
+            }
+        }
+        private class toushort : ScorpioHandle {
+            private Script m_script;
+            public toushort(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                ScriptObject obj = args[0];
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberUShort(m_script, Convert.ToUInt16(obj.ObjectValue));
+            }
+        }
+        private class toint : ScorpioHandle {
+            private Script m_script;
+            public toint(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                ScriptObject obj = args[0];
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberInt(m_script, Convert.ToInt32(obj.ObjectValue));
+            }
+        }
+        private class touint : ScorpioHandle {
+            private Script m_script;
+            public touint(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                ScriptObject obj = args[0];
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberUInt(m_script, Convert.ToUInt32(obj.ObjectValue));
+            }
+        }
+        private class tolong : ScorpioHandle {
+            private Script m_script;
+            public tolong(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                ScriptObject obj = args[0];
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberLong(m_script, Convert.ToInt64(obj.ObjectValue));
+            }
+        }
+        private class toulong : ScorpioHandle {
+            private Script m_script;
+            public toulong(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                ScriptObject obj = args[0];
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberULong(m_script, Convert.ToUInt64(obj.ObjectValue));
+            }
+        }
+        private class tofloat : ScorpioHandle {
+            private Script m_script;
+            public tofloat(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                ScriptObject obj = args[0];
+                Util.Assert(obj is ScriptNumber || obj is ScriptString || obj is ScriptEnum, m_script, "传入类型错误 " + obj.Type);
+                return new ScriptNumberFloat(m_script, Convert.ToSingle(obj.ObjectValue));
             }
         }
         private class toenum : ScorpioHandle
