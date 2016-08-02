@@ -12,7 +12,7 @@
 * **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
 ## 项目宏定义说明:
-* **SCORPIO_NET_CORE** .net4.5平台以后使用(UWP平台、dotnet core)
+* **SCORPIO_NET_CORE** .net4.5平台以后使用(UWP平台 , dotnet core)
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android和windows(exe)平台可用
 
 ## 注意事项 ##
@@ -191,6 +191,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-8-2)
+-----------
+* 增加 tosbyte tobyte toshort toushort touint toulong tofloat 函数, 可以传入制定类型的数字参数
+
 (2016-6-20)
 -----------
 * 优化堆栈输出内容
