@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Scorpio;
 using Scorpio.CodeDom;
 using Scorpio.Compiler;
@@ -9,9 +7,9 @@ namespace Scorpio.Variable
 {
     public class ScriptNumberDouble : ScriptNumber
     {
-        public double m_Value;
+        private double m_Value;
         public override ObjectType Type { get { return ObjectType.Number; } }
-        public override int BranchType { get { return 0; } }
+        public override int BranchType { get { return NumberType.TypeDouble; } }
         public override object ObjectValue { get { return m_Value; } }
         public override object KeyValue { get { return m_Value; } }
         public double Value { get { return m_Value; } }
