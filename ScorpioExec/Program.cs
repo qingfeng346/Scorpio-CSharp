@@ -57,14 +57,14 @@ namespace ScorpioExec
             Console.WriteLine("the current version : " + Script.Version);
             script.LoadLibrary();
             script.PushAssembly(typeof(Program).Assembly);
-            LoadLibrary(CurrentDirectory + "/Library");
-            LoadFiles(CurrentDirectory + "/Program");
+            LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
+            LoadFiles(Path.Combine(CurrentDirectory, "cs"));
             if (args.Length >= 1) {
                 try {
-                    string file = args[0];
+                    string file = Path.GetFullPath(args[0]);
                     string path = Path.GetDirectoryName(file);
-                    LoadLibrary(path + "/Library");
-                    LoadFiles(path + "/Program");
+                    LoadLibrary(Path.Combine(path, "dll"));
+                    LoadFiles(Path.Combine(path, "cs"));
                     Stopwatch watch = Stopwatch.StartNew();
                     script.PushSearchPath(CurrentDirectory);
                     script.PushSearchPath(path);
