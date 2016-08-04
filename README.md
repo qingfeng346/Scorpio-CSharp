@@ -191,6 +191,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-8-4)
+-----------
+* ScorpioExec 项目的生成改为 sco.exe ， 把 ScorpioExec\bin\Debug 加入环境变量可以使用 [sco 文件路径] 命令直接运行一个脚本文件
+
 (2016-8-2)
 -----------
 * 增加 tosbyte tobyte toshort toushort touint toulong tofloat 函数, 可以传入制定类型的数字参数
