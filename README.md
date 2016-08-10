@@ -16,6 +16,7 @@
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android和windows(exe)平台可用
 
 ## 注意事项 ##
+* 如果要使用Script.LoadFile函数，文件编码要改成  utf8 without bom ， 否则bom三个字节会解析失败
 * 脚本内所有c#变量(除了int,string等基础类型)均为引用,struct变量也一样
 * c#重载[]运算符后脚本里不能直接使用[],请使用 get_Item 函数
 * c#数组对象获取元素不能直接使用[],请使用 GetValue 函数
