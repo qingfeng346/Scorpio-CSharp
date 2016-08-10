@@ -1,7 +1,11 @@
 var base = {
     value1 = 100,
-    function hello1() { print("hello1 " + this.value1) }
-    function hello2() { print("default hello2") }
+    function hello1() { 
+		print("hello1 " + this.value1) 
+	}
+    function hello2() { 
+		print("default hello2") 
+	}
 }
 var a = base + {
     value2 = 200,
