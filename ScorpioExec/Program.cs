@@ -12,8 +12,9 @@ namespace ScorpioExec
 {
     public class Program
     {
-        public static string CurrentDirectory { get { return AppDomain.CurrentDomain.BaseDirectory; } }
+        private static Script script;
         public static Assembly CompilerFile(string path) {
+#if !SCORPIO_NET_CORE
             CSharpCodeProvider Provider = new CSharpCodeProvider();
             CompilerParameters Parameters = new CompilerParameters();
             Parameters.ReferencedAssemblies.Add("System.dll");
@@ -29,9 +30,12 @@ namespace ScorpioExec
                 throw new Exception(str);
             }
             return cr.CompiledAssembly;
+#else
+            return null;
+#endif
         }
-        private static Script script;
         private static void LoadLibrary(string path) {
+#if !SCORPIO_NET_CORE
             if (!Directory.Exists(path)) { return; }
             string[] files = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
             foreach (var file in files) {
@@ -42,6 +46,7 @@ namespace ScorpioExec
                     Console.WriteLine("load dll file [" + file + "] fail : " + ex.ToString());
                 }
             }
+#endif
         }
         private static void LoadFiles(string path) {
             if (!Directory.Exists(path)) { return; }
@@ -56,7 +61,12 @@ namespace ScorpioExec
             script = new Script();
             Console.WriteLine("the current version : " + Script.Version);
             script.LoadLibrary();
-            script.PushAssembly(typeof(Program).Assembly);
+            script.PushAssembly(typeof(Program).GetTypeInfo().Assembly);
+#if !SCORPIO_NET_CORE
+            string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#else
+            string CurrentDirectory = "";
+#endif
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
             LoadFiles(Path.Combine(CurrentDirectory, "cs"));
             if (args.Length >= 1) {
