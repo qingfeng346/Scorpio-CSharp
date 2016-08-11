@@ -193,6 +193,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-8-11)
+-----------
+* **Scorpio ScorpioExec ScorpioLibrary** 三个项目增加**dotnet core**项目文件(请自行调用**dotnet restore**)
+
 (2016-8-4)
 -----------
 * ScorpioExec 项目的生成改为 sco.exe ， 把 ScorpioExec\bin\Debug 加入环境变量可以使用 [sco 文件路径] 命令直接运行一个脚本文件
