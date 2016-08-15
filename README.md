@@ -259,6 +259,7 @@ print(a[null])
 	* func.isparams() 返回函数是否是不定参函数
 	* func.isstatic() 返回函数是否是静态函数(不是table内部函数)
 	* func.getparams() 返回函数参数名字数组
+    
 (2016-4-20)
 -----------
 * 优化去反射工具生成代码
