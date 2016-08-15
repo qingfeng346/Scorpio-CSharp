@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace CancerDemo
+namespace ScorpioDemo
 {
     static class Program
     {

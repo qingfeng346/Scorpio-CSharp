@@ -1,4 +1,4 @@
-﻿namespace CancerDemo
+﻿namespace ScorpioDemo
 {
     partial class Form1
     {

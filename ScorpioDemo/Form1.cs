@@ -8,13 +8,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Scorpio;
 using System.IO;
-namespace CancerDemo
-{
-    public delegate void HttpProcessListener(string error, byte[] bytes);
-    public class Test
-    {
-        public HttpProcessListener listener;
-    }
+namespace ScorpioDemo {
     public partial class Form1 : Form
     {
         private string m_Path = "";
