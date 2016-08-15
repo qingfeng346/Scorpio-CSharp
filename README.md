@@ -193,9 +193,9 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
-(2016-8-11)
+(2016-8-15)
 -----------
-* **Scorpio ScorpioExec ScorpioLibrary** 三个项目增加**dotnet core**项目文件(请自行调用**dotnet restore**)
+* 支持c#函数默认参数
 
 (2016-8-4)
 -----------
