@@ -58,16 +58,6 @@ namespace Scorpio
                     return par.ObjectValue;
             }
         }
-        public static bool CanChangeType(ScriptObject[] pars, Type[] types)
-        {
-            if (pars.Length != types.Length) 
-                return false;
-            for (int i = 0; i < pars.Length;++i ) {
-                if (!CanChangeType(pars[i], types[i]))
-                    return false;
-            }
-            return true;
-        }
         public static bool CanChangeType(ScriptObject par, Type type)
         {
             if (type == TYPE_OBJECT)
