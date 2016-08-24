@@ -125,40 +125,64 @@ namespace ScorpioDelegate {
 using System;
 using Scorpio;
 namespace HelloWorld {
-	public class Test {
-		private int a = 100;
-		public Test(int a) {
-			this.a = a;
-		}
-		public void Func() {
-			Console.WriteLine("Func " + a);
-		}
-		public static void StaticFunc() {
-			Console.WriteLine("StaticFunc");
-		}
-	}
-	class MainClass {
-		public static void Main (string[] args)
-		{
-			Script script = new Script();       //new一个Script对象
-			script.LoadLibrary();                               //加载所有Scorpio的库，源码在Library目录下
-			script.PushAssembly(typeof(MainClass).Assembly);            //添加当前程序的程序集
-			script.SetObject("CTest", script.CreateObject(new Test(300)));  //SetObject可以设置一个c#对象到脚本里
-			//LoadString 解析一段字符串,LoadString传入的参数就是热更新的文本文件内容
-			script.LoadString(@"
+    public delegate void TestDelegate1(int a, int b);
+    public class Test {
+        public static TestDelegate1 dele;
+        private int a = 100;
+        public Test(int a) {
+            this.a = a;
+        }
+        public void Func() {
+            Console.WriteLine("Func " + a);
+        }
+        public static void StaticFunc() {
+            Console.WriteLine("StaticFunc");
+        }
+        public static void Call() {
+            if (dele != null) dele(100, 200);
+        }
+    }
+    public enum TestEnum {
+        Test1,
+        Test2,
+        Test3,
+    }
+    public class MyDelegateFactory : Scorpio.Userdata.DelegateTypeFactory {
+        public Delegate CreateDelegate(Script script, Type type, ScriptFunction func) {
+            if (type == typeof(TestDelegate1))                        //UnityAction委托类型
+                return new TestDelegate1((arg1, arg2) => { func.call(arg1, arg2); });
+            //自己可能用到的委托类型请自行添加
+            return null;
+        }
+    }
+    class MainClass {
+        public static void Main(string[] args) {
+            Scorpio.Userdata.ScriptUserdataDelegateType.SetFactory(new MyDelegateFactory());        //设置委托生成器
+            Script script = new Script();                           //new一个Script对象
+            script.LoadLibrary();                                   //加载所有Scorpio的库，源码在Library目录下
+            script.PushAssembly(typeof(MainClass).Assembly);            //添加当前程序的程序集
+            script.SetObject("CTest", script.CreateObject(new Test(300)));  //SetObject可以设置一个c#对象到脚本里
+                                                                            //LoadString 解析一段字符串,LoadString传入的参数就是热更新的文本文件内容
+            script.LoadString(@"
 print(""hello world"")
 ");
-			//Scorpio脚本调用c#函数
-			script.LoadString(@"
-MyTest = import_type(""HelloWorld.Test"")      //import_type 要写入类的全路径 要加上命名空间 否则找不到此类,然后赋值给 MyTest 对象
-MyTest.StaticFunc()         //调用c#类的静态函数
-var t = MyTest(200)         //new 一个Test对象, 括号里面是构造函数的参数
-t.Func()                    //调用c#的内部函数
-CTest.Func()                //调用c#的内部函数 CTest是通过 script.SetObject 函数设置
-");
-		}
-	}
+            //Scorpio脚本调用c#函数
+            script.LoadString(@"
+MyTest = import_type('HelloWorld.Test')             //import_type 要写入类的全路径 要加上命名空间 否则找不到此类,然后赋值给 MyTest 对象
+MyTest.StaticFunc()                                 //调用c#类的静态函数
+var t = MyTest(200)                                 //new 一个Test对象, 括号里面是构造函数的参数
+t.Func()                                            //调用c#的内部函数
+CTest.Func()                                        //调用c#的内部函数 CTest是通过 script.SetObject 函数设置
+MyTest.dele = function(a, b) {                      //设置委托类型
+    print(a + '   ' + b)
 }
+MyTest.Call()
+TestEnum = import_type('HelloWorld.TestEnum')       //引入枚举
+print(TestEnum.Test1)                               //直接使用枚举
+");
+            Console.ReadKey();
+        }
+    }
 }
 ```
 
