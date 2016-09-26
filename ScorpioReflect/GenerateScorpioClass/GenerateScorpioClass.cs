@@ -44,7 +44,7 @@ namespace Scorpio.ScorpioReflect {
         public GenerateScorpioClass(Type type) {
             m_Type = type;
             m_ScorpioClassName = "ScorpioClass_" + GetClassName(type);
-            m_FullName = GetFullName(m_Type);
+            m_FullName = ScorpioReflectUtil.GetFullName(m_Type);
             m_Fields.AddRange(m_Type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
             m_Fields.Sort(new ComparerFieldInfo());
             m_Events.AddRange(m_Type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));

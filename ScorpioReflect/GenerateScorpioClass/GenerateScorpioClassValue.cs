@@ -42,14 +42,14 @@ namespace Scorpio.ScorpioReflect {
                 if (m_ClassFilter != null && !m_ClassFilter.Check(field, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
                 if (field.IsInitOnly /*readonly 属性*/ || field.IsLiteral /*const 属性*/) { continue; }
                 if (first) { first = false; } else { builder.AppendLine(); }
-                builder.AppendFormat(fieldStr, field.Name, GetScorpioVariable(field.IsStatic, field.Name), GetFullName(field.FieldType));
+                builder.AppendFormat(fieldStr, field.Name, GetScorpioVariable(field.IsStatic, field.Name), ScorpioReflectUtil.GetFullName(field.FieldType));
             }
             //所有属性
             foreach (var property in m_Propertys) {
                 if (m_ClassFilter != null && !m_ClassFilter.Check(property, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
                 if (property.CanRead && property.GetSetMethod(false) != null) {
                     if (first) { first = false; } else { builder.AppendLine(); }
-                    builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(property.GetSetMethod(false).IsStatic, property.Name), GetFullName(property.PropertyType));
+                    builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(property.GetSetMethod(false).IsStatic, property.Name), ScorpioReflectUtil.GetFullName(property.PropertyType));
                 }
             }
             return builder.ToString();

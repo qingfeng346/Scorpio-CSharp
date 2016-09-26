@@ -110,20 +110,30 @@ namespace ScorpioReflect
             //                Console.WriteLine(Environment.TickCount - time);
             //            }
             //            Console.ReadKey();
-            var g = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(Test));
-            var str = g.Generate();
-            File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
-            //var g = new Scorpio.ScorpioReflect.GenerateScorpioDelegate();
-            //g.AddType(typeof(Action<bool>));
-            //g.AddType(typeof(Action<int>));
-            //g.AddType(typeof(TestDelegate1));
-            //g.AddType(typeof(TestDelegate2));
-            //g.AddType(typeof(TestDelegate3));
-            //g.AddType(typeof(TestDelegate4));
-            //g.AddType(typeof(TestDelegate5));
-            //g.AddType(typeof(TestDelegate6));
-            //g.AddType(typeof(TestDelegate7));
-            //File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ClassName + ".cs", g.Generate(), Encoding.UTF8);
+            {
+                var g = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(Test));
+                var str = g.Generate();
+                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ScorpioClassName + ".cs", str, Encoding.UTF8);
+            }
+            {
+                var g = new Scorpio.ScorpioReflect.GenerateScorpioDelegate();
+                g.AddType(typeof(Action<bool>));
+                g.AddType(typeof(Action<int>));
+                g.AddType(typeof(TestDelegate1));
+                g.AddType(typeof(TestDelegate2));
+                g.AddType(typeof(TestDelegate3));
+                g.AddType(typeof(TestDelegate4));
+                g.AddType(typeof(TestDelegate5));
+                g.AddType(typeof(TestDelegate6));
+                g.AddType(typeof(TestDelegate7));
+                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ClassName + ".cs", g.Generate(), Encoding.UTF8);
+            }
+            {
+                var g = new Scorpio.ScorpioReflect.GenerateScorpioType();
+                g.AddType(typeof(List<int>));
+                g.AddType(typeof(Script));
+                File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ClassName + ".cs", g.Generate(), Encoding.UTF8);
+            }
         }
     }
 }

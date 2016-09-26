@@ -85,25 +85,6 @@ __execute
             fullName = fullName.Replace(".", "_");
             return fullName;
         }
-        //获得一个类的完整名字 模板类名字要计算一下
-        private string GetFullName(Type type) {
-            var fullName = type.FullName;
-            if (type.IsGenericType) {
-                var index = fullName.IndexOf("`");
-                fullName = fullName.Substring(0, index);
-                fullName += "<";
-                var types = type.GetGenericArguments();
-                bool first = true;
-                foreach (var t in types) {
-                    if (first == false) { fullName += ","; } else { first = false; }
-                    fullName += GetFullName(t);
-                }
-                fullName += ">";
-            } else {
-                fullName = fullName.Replace("+", ".");
-            }
-            return fullName;
-        }
         //根据MethodInfo生成一个ScorpioMethodInfo对象
         private string GetScorpioMethod(MethodBase method) {
             if (!method.IsGenericMethod || !method.ContainsGenericParameters) {
@@ -116,10 +97,10 @@ __execute
                 bool first = true;
                 foreach (var par in pars) {
                     if (first) { first = false; } else { parameterType += ","; }
-                    parameterType += "typeof(" + GetFullName(par.ParameterType) + ")";
+                    parameterType += "typeof(" + ScorpioReflectUtil.GetFullName(par.ParameterType) + ")";
                     if (Util.IsParamArray(par)) {
                         param = "true";
-                        paramType = "typeof(" + GetFullName(par.ParameterType.GetElementType()) + ")";
+                        paramType = "typeof(" + ScorpioReflectUtil.GetFullName(par.ParameterType.GetElementType()) + ")";
                     }
                 }
                 parameterType += "}";
@@ -131,7 +112,7 @@ __execute
             string parameterTypes = "";
             var pars = method.GetParameters();
             foreach (var par in pars) {
-                parameterTypes += GetFullName(par.ParameterType) + "+";
+                parameterTypes += ScorpioReflectUtil.GetFullName(par.ParameterType) + "+";
             }
             return parameterTypes;
         }
@@ -140,13 +121,13 @@ __execute
             var pars = method.GetParameters();
             for (int i = 0; i < pars.Length; ++i) {
                 if (i != 0) { call += ","; }
-                call += "(" + GetFullName(pars[i].ParameterType) + ")args[" + i + "]";
+                call += "(" + ScorpioReflectUtil.GetFullName(pars[i].ParameterType) + ")args[" + i + "]";
             }
             call += "";
             return call;
         }
         private string GetScorpioMethodArgs(ParameterInfo[] pars, int index) {
-            return "(" + GetFullName(pars[index].ParameterType) + ")args[" + index + "]";
+            return "(" + ScorpioReflectUtil.GetFullName(pars[index].ParameterType) + ")args[" + index + "]";
         }
         private string GetScorpioVariable(bool IsStatic, string name) {
             return (IsStatic ? m_FullName : "((" + m_FullName + ")obj)") + "." + name;
