@@ -25,9 +25,10 @@
 * 同类中静态函数和实例函数不要重名,否则会调用失败 例如 static void Test(object a); void Test(object a, object b); 两个函数不一定会当静态还是实例函数处理
 * 同类中重载的函数相同参数不要是继承关系,否则可能调用失败,例如 void Test(object a); void Test(string a); 两个Test函数都可以传入string,但是调用时不一定会调用哪一个
 * c#类的变量不能类似 += -= *= /= 等赋值计算操作(只有event可以使用 += -=) 请使用 变量 = 变量 + XXX
+* 如果要使用c#扩展函数,请调用一次 import_extension("实现扩展函数的类的全路径") , 注意：这个函数一定要在调用扩展函数之前调用,否则会找不到
 * IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
-* UWP平台master配置下generic_method函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
-* UWP平台master配置下generic_type函数也会出问题
+* UWP平台master配置下 generic_method 函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
+* UWP平台master配置下 generic_type 函数也会出问题
 * 不能使用 SCORPIO_DYNAMIC_DELEGATE 的平台,要实现一个继承 DelegateTypeFactory 的类,然后调用ScriptUserdataDelegateType.SetFactory函数设置一下 例如:
 ```c#
 public class MyDelegateFactory : DelegateTypeFactory {
@@ -217,6 +218,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-10-20)
+-----------
+* 增加支持c#的扩展函数方法 具体方法请查看注意事项
+
 (2016-8-15)
 -----------
 * 支持c#函数默认参数
