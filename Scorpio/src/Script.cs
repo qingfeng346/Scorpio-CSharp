@@ -159,18 +159,17 @@ namespace Scorpio
             if (!m_Assembly.Contains(assembly))
                 m_Assembly.Add(assembly);
         }
-        public ScriptObject LoadType(string str)
-        {
-            for (int i = 0; i < m_Assembly.Count;++i )
-            {
+        public Type GetType(string str) {
+            for (int i = 0; i < m_Assembly.Count; ++i) {
                 Type type = m_Assembly[i].GetType(str);
-                if (type != null) return CreateUserdata(type);
+                if (type != null) return type;
             }
-            {
-                Type type = Type.GetType(str, false, false);
-                if (type != null) return CreateUserdata(type);
-            }
-            return m_Null;
+            return Type.GetType(str, false, false);
+        }
+        public ScriptObject LoadType(string str) {
+            Type type = GetType(str);
+            if (type == null) return m_Null;
+            return CreateUserdata(type);
         }
         public void PushFastReflectClass(Type type, IScorpioFastReflectClass value) {
             m_FastReflectClass[type] = value;
@@ -307,8 +306,20 @@ namespace Scorpio
                 return new ScriptUserdataEventInfo(this, (BridgeEventInfo)obj);
             return new ScriptUserdataObject(this, obj, GetScorpioType(obj.GetType()));
         }
-        public ScriptFunction CreateFunction(ScorpioHandle value)
-        {
+        public void LoadExtension(string type) {
+            LoadExtension(GetType(type));
+        }
+        public void LoadExtension(Type type) {
+            if (type == null) return;
+            if (!Util.IsExtensionType(type)) return;
+            var methods = type.GetMethods(BindingFlag);
+            foreach (var method in methods) {
+                if (Util.IsExtensionMethod(method)) {
+                    GetScorpioType(method.GetParameters()[0].ParameterType).AddExtensionMethod(method);
+                }
+            }
+        }
+        public ScriptFunction CreateFunction(ScorpioHandle value) {
             return new ScriptHandleFunction(this, value);
         }
         public ScriptUserdata GetEnum(Type type) {

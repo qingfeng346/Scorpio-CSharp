@@ -80,6 +80,22 @@ namespace Scorpio.Userdata {
                 return Method.Invoke(obj, Args);
             }
         }
+        //扩展函数
+        private class ExtensionMethod : FunctionBase {
+            public MethodInfo Method;                   //普通函数对象
+            private object[] FinishArgs;
+            public ExtensionMethod(MethodInfo Method, Type[] ParameterType, object[] DefaultParameter, Type ParamType, bool Params, string ParameterTypes) : 
+                base(ParameterType, DefaultParameter, ParamType, Params, ParameterTypes) {
+                this.FinishArgs = new object[Args.Length + 1];
+                this.Method = Method;
+                this.IsGeneric = Method.IsGenericMethod && Method.ContainsGenericParameters;
+            }
+            public override object Invoke(object obj, Type type) {
+                FinishArgs[0] = obj;
+                Array.Copy(Args, 0, FinishArgs, 1, Args.Length);
+                return Method.Invoke(null, FinishArgs);
+            }
+        }
         //去反射函数
         private class FunctionFastMethod : FunctionBase {
             public IScorpioFastReflectMethod Method;
@@ -110,14 +126,14 @@ namespace Scorpio.Userdata {
             methodBases.AddRange(methods.ToArray());
             Initialize_impl(type, methodName, methodBases);
         }
-        protected void Initialize(Script script, Type type, string methodName, MethodInfo[] methods) {
+        protected void Initialize(Script script, Type type, string methodName, List<MethodInfo> methods) {
             m_Script = script;
             List<MethodBase> methodBases = new List<MethodBase>();
             foreach (MethodInfo method in methods) {
                 if (method.Name.Equals(methodName))
                     methodBases.Add(method);
             }
-            m_IsStatic = methodBases.Count > 0 ? methodBases[0].IsStatic : false;
+            m_IsStatic = methodBases.Count == 0 ? false : (Util.IsExtensionMethod(methodBases[0]) ? false : methodBases[0].IsStatic);
             Initialize_impl(type, methodName, methodBases);
         }
         protected void Initialize(Script script, Type type, string methodName, ConstructorInfo[] cons) {
@@ -133,12 +149,12 @@ namespace Scorpio.Userdata {
             m_MethodName = methodName;
             List<FunctionBase> functionMethod = new List<FunctionBase>();
             List<FunctionBase> genericMethods = new List<FunctionBase>();
-            bool Params = false;                        //是否是不定参函数
-            Type ParamType = null;                      //不定参类型
-            ParameterInfo[] Parameters;
-            List<Type> parameterTypes = new List<Type>();
-            List<object> defaultParameter = new List<object>();
-            int length = methods.Count;
+            bool Params = false;                                    //是否是不定参函数
+            Type ParamType = null;                                  //不定参类型
+            ParameterInfo[] Parameters;                             //所有参数
+            List<Type> parameterTypes = new List<Type>();           //参数类型
+            List<object> defaultParameter = new List<object>();     //默认参数
+            int length = methods.Count;                             //总数量
             MethodBase method = null;
             FunctionBase functionBase;
             for (int i = 0; i < length; ++i) {
@@ -148,16 +164,27 @@ namespace Scorpio.Userdata {
                 parameterTypes.Clear();
                 defaultParameter.Clear();
                 Parameters = method.GetParameters();
-                foreach (ParameterInfo par in Parameters) {
-                    parameterTypes.Add(par.ParameterType);
-                    if (par.DefaultValue != DBNull.Value) { defaultParameter.Add(par.DefaultValue); }
-                    Params = Util.IsParamArray(par);
-                    if (Params) ParamType = par.ParameterType.GetElementType();
+                if (Util.IsExtensionMethod(method)) {
+                    for (int j = 1; j < Parameters.Length; ++j) {
+                        var par = Parameters[j];
+                        parameterTypes.Add(par.ParameterType);
+                        if (par.DefaultValue != DBNull.Value) { defaultParameter.Add(par.DefaultValue); }
+                        Params = Util.IsParamArray(par);
+                        if (Params) ParamType = par.ParameterType.GetElementType();
+                    }
+                    functionBase = new ExtensionMethod(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), ParamType, Params, "");
+                } else {
+                    foreach (ParameterInfo par in Parameters) {
+                        parameterTypes.Add(par.ParameterType);
+                        if (par.DefaultValue != DBNull.Value) { defaultParameter.Add(par.DefaultValue); }
+                        Params = Util.IsParamArray(par);
+                        if (Params) ParamType = par.ParameterType.GetElementType();
+                    }
+                    if (method is MethodInfo)
+                        functionBase = new FunctionMethod(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), ParamType, Params, "");
+                    else
+                        functionBase = new FunctionConstructor(method as ConstructorInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), ParamType, Params, "");
                 }
-                if (method is MethodInfo)
-                    functionBase = new FunctionMethod(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), ParamType, Params, "");
-                else
-                    functionBase = new FunctionConstructor(method as ConstructorInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), ParamType, Params, "");
                 if (functionBase.IsGeneric)
                     genericMethods.Add(functionBase);
                 else
@@ -298,7 +325,7 @@ namespace Scorpio.Userdata {
         }
     }
     public class ReflectUserdataMethod : UserdataMethod {
-        public ReflectUserdataMethod(Script script, Type type, string methodName, MethodInfo[] methods) {
+        public ReflectUserdataMethod(Script script, Type type, string methodName, List<MethodInfo> methods) {
             this.Initialize(script, type, methodName, methods);
         }
         public ReflectUserdataMethod(Script script, Type type, string methodName, ConstructorInfo[] cons) {

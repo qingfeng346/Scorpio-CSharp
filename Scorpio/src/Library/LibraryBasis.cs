@@ -174,6 +174,7 @@ namespace Scorpio.Library
             script.SetObjectInternal("load_assembly_safe", script.CreateFunction(new load_assembly_safe(script)));
             script.SetObjectInternal("push_assembly", script.CreateFunction(new push_assembly(script)));
             script.SetObjectInternal("import_type", script.CreateFunction(new import_type(script)));
+            script.SetObjectInternal("import_extension", script.CreateFunction(new import_extension(script)));
             script.SetObjectInternal("generic_type", script.CreateFunction(new generic_type(script)));
             script.SetObjectInternal("generic_method", script.CreateFunction(new generic_method(script)));
         }
@@ -588,6 +589,22 @@ namespace Scorpio.Library
                 ScriptString str = args[0] as ScriptString;
                 Util.Assert(str != null, m_script, "import_type 参数必须是 string");
                 return m_script.LoadType(str.Value);
+            }
+        }
+        private class import_extension : ScorpioHandle {
+            private Script m_script;
+            public import_extension(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                if (args[0] is ScriptUserdata) {
+                    m_script.LoadExtension((args[0] as ScriptUserdata).ValueType);
+                } else if (args[0] is ScriptString) {
+                    m_script.LoadExtension((args[0] as ScriptString).Value);
+                } else {
+                    Util.Assert(false, m_script, "import_extension 参数必须是 userdata 或者 string");
+                }
+                return null;
             }
         }
         private class generic_type : ScorpioHandle

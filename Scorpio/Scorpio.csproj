@@ -18,7 +18,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>True</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;SCORPIO_DYNAMIC_DELEGATE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>

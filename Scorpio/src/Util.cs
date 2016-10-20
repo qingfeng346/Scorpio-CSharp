@@ -6,6 +6,7 @@ using System.IO;
 using Scorpio;
 using Scorpio.Variable;
 using Scorpio.Exception;
+using System.Runtime.CompilerServices;
 namespace Scorpio
 {
     public static class Util
@@ -27,18 +28,22 @@ namespace Scorpio
         private static readonly Type TYPE_DOUBLE = typeof(double);
         private static readonly Type TYPE_DECIMAL = typeof(decimal);
         private static readonly Type TYPE_PARAMATTRIBUTE = typeof(ParamArrayAttribute);
+        private static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof(ExtensionAttribute);
 
-        public static bool IsDelegateType(Type type)
-        {
+        public static bool IsDelegateType(Type type) {
             return TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type);
         }
-        public static bool IsVoid(Type type)
-        {
+        public static bool IsVoid(Type type) {
             return type == TYPE_VOID;
         }
-        public static bool IsParamArray(ParameterInfo info)
-        {
+        public static bool IsParamArray(ParameterInfo info) {
             return info.IsDefined(TYPE_PARAMATTRIBUTE, false);
+        }
+        public static bool IsExtensionType(Type type) {
+            return type.IsDefined(TYPE_EXTENSIONATTRIBUTE, false);
+        }
+        public static bool IsExtensionMethod(MemberInfo method) {
+            return method.IsDefined(TYPE_EXTENSIONATTRIBUTE, false);
         }
         public static object ChangeType(Script script, ScriptObject par, Type type)
         {
