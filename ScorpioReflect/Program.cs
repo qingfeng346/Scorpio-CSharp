@@ -65,6 +65,13 @@ namespace ScorpioReflect
             return a;
         }
     }
+    public class TestTemp<T1,T2> {
+        public class Test<T8,T9> {
+            public class Test1<T10,T12> {
+
+            }
+        }
+    }
     class Program
     {
         public delegate bool TestDelegate1(string error, byte[] bytes, string url);
@@ -132,7 +139,18 @@ namespace ScorpioReflect
                 var g = new Scorpio.ScorpioReflect.GenerateScorpioType();
                 g.AddType(typeof(List<int>));
                 g.AddType(typeof(Script));
+                g.AddType(typeof(TestTemp<short, int>.Test<byte, long>));
                 File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + g.ClassName + ".cs", g.Generate(), Encoding.UTF8);
+                //StringBuilder builder = new StringBuilder();
+                //Type[] types = new Type[] {
+                //    typeof(TestTemp<sbyte,byte>.Test<short,ushort>.Test1<int,uint>),
+                //};
+                //foreach (var type in types) {
+                //    builder.AppendLine(ScorpioReflectUtil.GetFullName(type));
+                //    builder.AppendLine(type.FullName);
+                //    builder.AppendLine();
+                //}
+                //File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/a.cs", builder.ToString());
             }
         }
     }
