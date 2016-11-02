@@ -46,8 +46,9 @@ namespace Scorpio
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
             m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
             m_GlobalTable.SetValue(GLOBAL_SCRIPT, CreateObject(this));
-            PushAssembly(typeof(object).GetTypeInfo().Assembly);
-            PushAssembly(GetType().GetTypeInfo().Assembly);
+            PushAssembly(typeof(object).GetTypeInfo().Assembly);                        //mscorlib.dll
+            PushAssembly(typeof(System.Net.Sockets.Socket).GetTypeInfo().Assembly);     //System.dll
+            PushAssembly(GetType().GetTypeInfo().Assembly);                             //当前所在的程序集
         }
         public void LoadLibrary() {
             LibraryBasis.Load(this);
