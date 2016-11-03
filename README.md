@@ -4,6 +4,11 @@
 * Sco脚本的Java实现 : https://github.com/qingfeng346/Scorpio-Java
 * 网络协议,Excel表数据转换工具 : https://github.com/qingfeng346/ScorpioConversion
 * 国内用户如果网比较慢可以在此链接下载 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
+* 教程地址 http://sco.fengyuezhu.com/readme.html
+* 教程地址 http://sco.fengyuezhu.com/readme.html
+* 教程地址 http://sco.fengyuezhu.com/readme.html
+* 重要的事说三遍
+
 
 ## 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现,最低支持.net3.5,兼容.net3.5以上所有平台,语法类似 javascript
 * **脚本示例** 放在 [ScorpioDemo/Scripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/ScorpioDemo/Scripts) 目录
