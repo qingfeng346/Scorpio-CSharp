@@ -6,8 +6,11 @@
 * 国内用户如果网比较慢可以在此链接下载 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
 
 
-## 教程地址 http://sco.fengyuezhu.com/readme.html   教程地址 http://sco.fengyuezhu.com/readme.html   教程地址 http://sco.fengyuezhu.com/readme.html
-## 重要的事说三遍！！！
+
+## 教程地址 http://sco.fengyuezhu.com/readme.html
+## 教程地址 http://sco.fengyuezhu.com/readme.html
+## 教程地址 http://sco.fengyuezhu.com/readme.html
+## 重要的事说三遍！！！！！！
 
 
 
