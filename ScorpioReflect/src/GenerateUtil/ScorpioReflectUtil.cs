@@ -12,6 +12,8 @@ public class ScorpioReflectUtil {
     //获得一个类的完整名字 模板类名字要计算一下
     public static string GetFullName(Type type, Type[] args) {
         var fullName = type.FullName;
+        if (string.IsNullOrEmpty(fullName))
+            return "";
         fullName = fullName.Replace("+", ".");
         if (type.IsGenericType) {
             if (!type.IsNested) {
