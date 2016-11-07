@@ -7,9 +7,9 @@
 
 
 
-## 教程地址 http://sco.fengyuezhu.com/readme.html
-## 教程地址 http://sco.fengyuezhu.com/readme.html
-## 教程地址 http://sco.fengyuezhu.com/readme.html
+## 教程地址 http://sco.fengyuezhu.com/readme/
+## 教程地址 http://sco.fengyuezhu.com/readme/
+## 教程地址 http://sco.fengyuezhu.com/readme/
 ## 重要的事说三遍！！！！！！
 
 
