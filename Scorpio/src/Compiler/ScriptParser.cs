@@ -875,6 +875,12 @@ namespace Scorpio.Compiler
                         if (peek.Type == TokenType.Comma || peek.Type == TokenType.SemiColon) {
                             ReadToken();
                         }
+                    } else if (next.Type == TokenType.Comma || next.Type == TokenType.SemiColon) {
+                        if (token.Type == TokenType.Null) {
+                            ret._Variables.Add(new CodeTable.TableVariable(m_script.Null.KeyValue, new CodeScriptObject(m_script, null)));
+                        } else {
+                            ret._Variables.Add(new CodeTable.TableVariable(token.Lexeme, new CodeScriptObject(m_script, null)));
+                        }
                     } else {
                         throw new ParserException("Table变量赋值符号为[=]或者[:]", token);
                     }
