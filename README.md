@@ -228,6 +228,16 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-11-25)
+-----------
+* 申请table变量可以不赋值,默认为null
+```javascript
+var t = {
+    a,      //修改前此处会报解析错误，修改后a会默认为null，相当于 a = null,
+}
+
+```
+
 (2016-10-20)
 -----------
 * 增加支持c#的扩展函数方法 具体方法请查看注意事项
