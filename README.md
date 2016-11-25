@@ -235,7 +235,6 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 var t = {
     a,      //修改前此处会报解析错误，修改后a会默认为null，相当于 a = null,
 }
-
 ```
 
 (2016-10-20)
