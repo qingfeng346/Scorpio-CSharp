@@ -10,7 +10,7 @@
 ## 脚本教程 http://www.fengyuezhu.com/readme/
 ## Unity示例 源码 http://git.oschina.net/qingfeng346/SocrpioUnitySample
 ## Unity示例 WebGL体验地址 http://www.fengyuezhu.com/unitysample/
-## Unity语法 WebGL体验地址 http://www.fengyuezhu.com/scriptconsole/
+## Scorpio-CSharp语法 WebGL体验地址 http://www.fengyuezhu.com/scriptconsole/
 
 
 
