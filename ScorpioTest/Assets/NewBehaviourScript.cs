@@ -11,7 +11,7 @@ public class NewBehaviourScript : MonoBehaviour {
 			return null;
 		}
 	}
-	private string text = "print (\"hello world\")";
+	private string text;
     private int width;
     private int height;
     private int windowHeight;
@@ -20,7 +20,7 @@ public class NewBehaviourScript : MonoBehaviour {
         width = Screen.width;
         height = Screen.height;
         windowHeight = height / 2 - 30;
-        text = PlayerPrefs.GetString("__Text", "");
+        text = PlayerPrefs.GetString("__Text", "print (\"hello world\")");
 		Application.RegisterLogCallbackThreaded (OnLogCallback);
     }
 	void OnGUI()
