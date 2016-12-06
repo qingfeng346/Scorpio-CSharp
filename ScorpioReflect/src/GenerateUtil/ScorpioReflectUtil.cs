@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 public class ScorpioReflectUtil {
     struct ComparerType : IComparer<Type> {
@@ -52,5 +53,14 @@ public class ScorpioReflectUtil {
     public static void SortType(List<Type> types) {
         types.Sort(new ComparerType());
     }
-
+    //是否是带有 ref 和 out 关键字参数的函数
+    public static bool IsRetvalOrOut(MethodInfo method) {
+        var pars = method.GetParameters();
+        foreach (var par in pars) {
+            if (par.IsRetval || par.IsOut) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

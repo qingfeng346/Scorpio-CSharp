@@ -6,10 +6,10 @@ using Scorpio;
 namespace Scorpio.ScorpioReflect {
     //过滤不生成的变量 函数 属性 和 事件 
     public interface ClassFilter {
-        bool Check(FieldInfo fieldInfo, List<FieldInfo> fieldInfos, List<EventInfo> eventInfos, List<PropertyInfo> propertyInfos, List<MethodInfo> methodInfos);
-        bool Check(EventInfo eventInfo, List<FieldInfo> fieldInfos, List<EventInfo> eventInfos, List<PropertyInfo> propertyInfos, List<MethodInfo> methodInfos);
-        bool Check(PropertyInfo propertyInfo, List<FieldInfo> fieldInfos, List<EventInfo> eventInfos, List<PropertyInfo> propertyInfos, List<MethodInfo> methodInfos);
-        bool Check(MethodInfo methodInfo, List<FieldInfo> fieldInfos, List<EventInfo> eventInfos, List<PropertyInfo> propertyInfos, List<MethodInfo> methodInfos);
+        bool Check(Type type, FieldInfo fieldInfo);
+        bool Check(Type type, EventInfo eventInfo);
+        bool Check(Type type, PropertyInfo propertyInfo);
+        bool Check(Type type, MethodInfo methodInfo);
     }
     public partial class GenerateScorpioClass {
         struct ComparerFieldInfo : IComparer<FieldInfo> {
@@ -36,50 +36,73 @@ namespace Scorpio.ScorpioReflect {
         private string m_ScorpioClassName;          					            //最终生成的类的名字
         private string m_FullName;                  					            //类的全名
         private ClassFilter m_ClassFilter;                                          //生成类过滤
-        private List<FieldInfo> m_Fields = new List<FieldInfo>();                   //所有公共变量
-        private List<EventInfo> m_Events = new List<EventInfo>();                   //所有的事件
-        private List<PropertyInfo> m_Propertys = new List<PropertyInfo>();          //所有的属性
-        private List<MethodInfo> m_Methods = new List<MethodInfo>();             	//所有函数
+        private List<FieldInfo> m_Fields = new List<FieldInfo>();                   //过滤的公共变量
+        private List<FieldInfo> m_AllFields = new List<FieldInfo>();                //所有公共变量
+        private List<EventInfo> m_Events = new List<EventInfo>();                   //过滤的事件
+        private List<EventInfo> m_AllEvents = new List<EventInfo>();                //所有的事件
+        private List<PropertyInfo> m_Propertys = new List<PropertyInfo>();          //过滤的属性
+        private List<PropertyInfo> m_AllPropertys = new List<PropertyInfo>();       //所有的属性
+        private List<MethodInfo> m_Methods = new List<MethodInfo>();             	//过滤的函数
+        private List<MethodInfo> m_AllMethods = new List<MethodInfo>();             //所有的函数
         public string ScorpioClassName { get { return m_ScorpioClassName; } }
         public GenerateScorpioClass(Type type) {
             m_Type = type;
             m_ScorpioClassName = "ScorpioClass_" + GetClassName(type);
             m_FullName = ScorpioReflectUtil.GetFullName(m_Type);
-            m_Fields.AddRange(m_Type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
-            m_Fields.Sort(new ComparerFieldInfo());
-            m_Events.AddRange(m_Type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
-            m_Events.Sort(new ComparerEventInfo());
-            m_Propertys.AddRange(m_Type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
-            m_Propertys.Sort(new ComparerPropertyInfo());
-            MethodInfo[] methods = null;
-            //IsAbstract和IsSealed同时为true的话为static class, 不是静态类不会同时有这两个属性
-            if (m_Type.IsAbstract && m_Type.IsSealed) {
-                methods = m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-            } else {
-                methods = m_Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-            }
+            m_AllFields.AddRange(m_Type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
+            m_AllEvents.AddRange(m_Type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
+            m_AllPropertys.AddRange(m_Type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
+            var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
             foreach (var method in methods) {
                 string name = method.Name;
                 //屏蔽掉 =重载函数 IsSpecialName 表示为特殊函数 运算符重载 这个值会为true
                 if (method.IsSpecialName && name == "op_Implicit") { continue; }
-                bool RetvalOrOut = false;
-                var pars = method.GetParameters();
-                foreach (var par in pars) {
-                    if (par.IsRetval || par.IsOut) {
-                        RetvalOrOut = true;
-                        break;
-                    }
-                }
+                //屏蔽掉 模版函数
+                if (method.IsGenericMethod) { continue; }
                 //屏蔽掉 带有 ref 和 out 关键字参数的函数
-                if (RetvalOrOut) { continue; }
-                m_Methods.Add(method);
+                if (ScorpioReflectUtil.IsRetvalOrOut(method)) { continue; }
+                m_AllMethods.Add(method);
             }
-            m_Methods.Sort(new ComparerMethodInfo());
         }
         public void SetClassFilter(ClassFilter classFilter) {
             m_ClassFilter = classFilter;
         }
+        void Init() {
+            {
+                m_Fields.Clear();
+                foreach (var field in m_AllFields) {
+                    if (m_ClassFilter != null && !m_ClassFilter.Check(m_Type, field)) { continue; }
+                    m_Fields.Add(field);
+                }
+                m_Fields.Sort(new ComparerFieldInfo());
+            }
+            {
+                m_Events.Clear();
+                foreach (var eve in m_AllEvents) {
+                    if (m_ClassFilter != null && !m_ClassFilter.Check(m_Type, eve)) { continue; }
+                    m_Events.Add(eve);
+                }
+                m_Events.Sort(new ComparerEventInfo());
+            }
+            {
+                m_Propertys.Clear();
+                foreach (var property in m_AllPropertys) {
+                    if (m_ClassFilter != null && !m_ClassFilter.Check(m_Type, property)) { continue; }
+                    m_Propertys.Add(property);
+                }
+                m_Propertys.Sort(new ComparerPropertyInfo());
+            }
+            {
+                m_Methods.Clear();
+                foreach (var method in m_AllMethods) {
+                    if (m_ClassFilter != null && !m_ClassFilter.Check(m_Type, method)) { continue; }
+                    m_Methods.Add(method);
+                }
+                m_Methods.Sort(new ComparerMethodInfo());
+            }
+        }
         public string Generate() {
+            Init();
             string str = ClassTemplate;
             str = str.Replace("__getvalue_content", GenerateGetValue());
             str = str.Replace("__setvalue_content", GenerateSetValue());

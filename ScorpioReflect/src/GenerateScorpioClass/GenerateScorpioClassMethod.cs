@@ -41,7 +41,6 @@ namespace Scorpio.ScorpioReflect {
             StringBuilder builder = new StringBuilder();
             List<string> methods = new List<string>();
             foreach (var method in m_Methods) {
-                if (m_ClassFilter != null && !m_ClassFilter.Check(method, m_Fields, m_Events, m_Propertys, m_Methods)) { continue; }
                 string name = method.Name;
                 if (methods.Contains(name)) { continue; }
                 methods.Add(name);
@@ -64,17 +63,17 @@ namespace Scorpio.ScorpioReflect {
             return "";
         }
         private string GetEventMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
-            foreach (var @event in m_Events) {
-                if (@event.GetAddMethod() == method) {
-                    return string.Format("{0}.{1} += {2}; return null;", variable, @event.Name, GetScorpioMethodArgs(pars, 0));
-                } else if (@event.GetRemoveMethod() == method) {
-                    return string.Format("{0}.{1} -= {2}; return null;", variable, @event.Name, GetScorpioMethodArgs(pars, 0));
+            foreach (var eve in m_AllEvents) {
+                if (eve.GetAddMethod() == method) {
+                    return string.Format("{0}.{1} += {2}; return null;", variable, eve.Name, GetScorpioMethodArgs(pars, 0));
+                } else if (eve.GetRemoveMethod() == method) {
+                    return string.Format("{0}.{1} -= {2}; return null;", variable, eve.Name, GetScorpioMethodArgs(pars, 0));
                 }
             }
             return "";
         }
         private string GetPropertyMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
-            foreach (var property in m_Propertys)
+            foreach (var property in m_AllPropertys)
             {
                 if (property.GetGetMethod() == method) {
                     return string.Format("return {0}.{1};", variable, property.Name);
@@ -88,7 +87,7 @@ namespace Scorpio.ScorpioReflect {
             bool isStatic = false;
             List<MethodInfo> methods = new List<MethodInfo>();
             foreach (var method in m_Methods) {
-                if (method.Name == name && !method.IsGenericMethod) {
+                if (method.Name == name) {
                     methods.Add(method);
                     isStatic = method.IsStatic;
                 }
