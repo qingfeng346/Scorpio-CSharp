@@ -6,10 +6,10 @@ using Scorpio;
 namespace Scorpio.ScorpioReflect {
     //过滤不生成的变量 函数 属性 和 事件 
     public interface ClassFilter {
-        bool Check(Type type, FieldInfo fieldInfo);
-        bool Check(Type type, EventInfo eventInfo);
-        bool Check(Type type, PropertyInfo propertyInfo);
-        bool Check(Type type, MethodInfo methodInfo);
+        bool Check(GenerateScorpioClass generate, Type type, FieldInfo fieldInfo);
+        bool Check(GenerateScorpioClass generate, Type type, EventInfo eventInfo);
+        bool Check(GenerateScorpioClass generate, Type type, PropertyInfo propertyInfo);
+        bool Check(GenerateScorpioClass generate, Type type, MethodInfo methodInfo);
     }
     public partial class GenerateScorpioClass {
         struct ComparerFieldInfo : IComparer<FieldInfo> {
@@ -44,6 +44,10 @@ namespace Scorpio.ScorpioReflect {
         private List<PropertyInfo> m_AllPropertys = new List<PropertyInfo>();       //所有的属性
         private List<MethodInfo> m_Methods = new List<MethodInfo>();             	//过滤的函数
         private List<MethodInfo> m_AllMethods = new List<MethodInfo>();             //所有的函数
+        public List<FieldInfo> AllFields { get { return m_AllFields; } }
+        public List<EventInfo> AllEvents { get { return m_AllEvents; } }
+        public List<PropertyInfo> AllPropertys { get { return m_AllPropertys; } }
+        public List<MethodInfo> AllMethods { get { return m_AllMethods; } }
         public string ScorpioClassName { get { return m_ScorpioClassName; } }
         public GenerateScorpioClass(Type type) {
             m_Type = type;
@@ -71,7 +75,7 @@ namespace Scorpio.ScorpioReflect {
             {
                 m_Fields.Clear();
                 foreach (var field in m_AllFields) {
-                    if (m_ClassFilter != null && !m_ClassFilter.Check(m_Type, field)) { continue; }
+                    if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, field)) { continue; }
                     m_Fields.Add(field);
                 }
                 m_Fields.Sort(new ComparerFieldInfo());
@@ -79,7 +83,7 @@ namespace Scorpio.ScorpioReflect {
             {
                 m_Events.Clear();
                 foreach (var eve in m_AllEvents) {
-                    if (m_ClassFilter != null && !m_ClassFilter.Check(m_Type, eve)) { continue; }
+                    if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, eve)) { continue; }
                     m_Events.Add(eve);
                 }
                 m_Events.Sort(new ComparerEventInfo());
@@ -87,7 +91,7 @@ namespace Scorpio.ScorpioReflect {
             {
                 m_Propertys.Clear();
                 foreach (var property in m_AllPropertys) {
-                    if (m_ClassFilter != null && !m_ClassFilter.Check(m_Type, property)) { continue; }
+                    if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, property)) { continue; }
                     m_Propertys.Add(property);
                 }
                 m_Propertys.Sort(new ComparerPropertyInfo());
@@ -95,7 +99,7 @@ namespace Scorpio.ScorpioReflect {
             {
                 m_Methods.Clear();
                 foreach (var method in m_AllMethods) {
-                    if (m_ClassFilter != null && !m_ClassFilter.Check(m_Type, method)) { continue; }
+                    if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, method)) { continue; }
                     m_Methods.Add(method);
                 }
                 m_Methods.Sort(new ComparerMethodInfo());
