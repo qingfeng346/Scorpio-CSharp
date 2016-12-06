@@ -226,6 +226,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-12-06)
+-----------
+* 修复生成去反射工具某些情况下过滤条件判断错误的问题
+
 (2016-11-25)
 -----------
 * 申请table变量可以不赋值,默认为null
