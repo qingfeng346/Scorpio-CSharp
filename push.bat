@@ -1,1 +1,0 @@
-git subtree push --prefix=Scorpio/src https://github.com/qingfeng346/Scorpio-CSharp.git scorpiosrc
