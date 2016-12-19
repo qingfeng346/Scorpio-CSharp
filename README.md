@@ -195,18 +195,6 @@ print(TestEnum.Test1)                               //直接使用枚举
 }
 ```
 
-## showcase ##
-* 已经上线游戏下载地址 http://pan.baidu.com/s/1sjQiCGH 欢迎下载试玩,游戏上线在GooglePlay,国内不能下载的请在网盘下载
-* Sweet Sweeper 一款扫雷单机游戏 上线地址:
-    * Google Play https://play.google.com/store/apps/details?id=com.Toydog.Minesweeper
-    * AppStore https://itunes.apple.com/us/app/sweet-sweeper/id1049666778?l=zh&ls=1&mt=8
-* 地下城扫雷 上线地址:
-	* Google Play https://play.google.com/store/apps/details?id=com.Toydog.DungeonSweeper
-* Agile Man 是男人就下100层 上线地址:
-	* 安智市场 http://www.anzhi.com/soft_2529640.html
-	* Google Play https://play.google.com/store/apps/details?id=com.Toydog.AgileMan
-	* Windows 10 (UWP) https://www.microsoft.com/zh-cn/store/games/agile-man/9nblggh68b51
-
 ## c#去反射类使用 ##
 * 把**ScorpioReflect**项目中的**GenerateScorpioClass**文件夹下的所有cs文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例: 
 
