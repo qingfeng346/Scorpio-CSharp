@@ -214,6 +214,16 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-12-27)
+-----------
+* 修改 **if** 间接写法最后加 **;** 会导致后面的 **else** 和 **else if** 解析错误的问题 (感谢 **小卒 北京** 同学的反馈)
+```javascript
+if (true)
+    return;             //修改前此行就解析出错
+else
+    print("false")
+```
+
 (2016-12-06)
 -----------
 * 修复生成去反射工具某些情况下过滤条件判断错误的问题
