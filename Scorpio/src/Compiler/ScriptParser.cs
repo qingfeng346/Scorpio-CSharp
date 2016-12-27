@@ -90,6 +90,7 @@ namespace Scorpio.Compiler
             BeginExecutable(block);
             if (readLeftBrace && PeekToken().Type != TokenType.LeftBrace) {
                 ParseStatement();
+                if (PeekToken().Type == TokenType.SemiColon) ReadToken();
             } else {
                 if (readLeftBrace) ReadLeftBrace();
                 TokenType tokenType;
