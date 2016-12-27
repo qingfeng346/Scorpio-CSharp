@@ -17,8 +17,7 @@ namespace Scorpio.Compiler
         private List<String> m_listSourceLines;     //所有行
         private List<Token> m_listTokens;           //解析后所得Token
         private char ch;                            //当前的解析的字符
-		public ScriptLexer(String buffer, String strBreviary)
-        {
+		public ScriptLexer(String buffer, String strBreviary) {
             m_listSourceLines = new List<string>();
             m_listTokens = new List<Token>();
             string[] strLines = buffer.Split('\n');
@@ -36,27 +35,40 @@ namespace Scorpio.Compiler
             lexState = LexState.None;
         }
         /// <summary> 获得整段字符串的摘要 </summary>
-        public String GetBreviary()
-        {
+        public String GetBreviary() {
             return m_strBreviary;
         }
+        private bool IsIdentifier(char ch) {
+#if SCORPIO_CN_VAR
+            if (ch >= ' ' && ch <= '/')
+                return false;
+            if (ch >= ':' && ch <= '@')
+                return false;
+            if (ch >= '[' && ch <= '^')
+                return false;
+            if (ch >= '{' && ch <= '~')
+                return false;
+            if (ch == '`')
+                return false;
+            return true;
+
+#else
+            return (ch == '_' || char.IsLetterOrDigit(ch));
+#endif
+        }
         /// <summary> 解析字符串 </summary>
-        public List<Token> GetTokens()
-        {
+        public List<Token> GetTokens() {
             m_iSourceLine = 0;
             m_iSourceChar = 0;
             lexState = LexState.None;
             m_listTokens.Clear();
-            while (!EndOfSource)
-            {
-                if (EndOfLine)
-                {
+            while (!EndOfSource) {
+                if (EndOfLine) {
                     IgnoreLine();
                     continue;
                 }
                 ch = ReadChar();
-                switch (lexState)
-                {
+                switch (lexState) {
                     case LexState.None:
                         switch (ch)
                         {
@@ -147,14 +159,14 @@ namespace Scorpio.Compiler
                                 lexState = LexState.SingleString;
                                 break;
                             default:
-                                if (ch == '_' || char.IsLetter(ch)) {
-                                    lexState = LexState.Identifier;
-                                    m_strToken = "" + ch;
-                                } else if (ch == '0') {
+                                if (ch == '0') {
                                     lexState = LexState.NumberOrHexNumber;
                                     m_strToken = "";
                                 } else if (char.IsDigit(ch)) {
                                     lexState = LexState.Number;
+                                    m_strToken = "" + ch;
+                                } else if (IsIdentifier(ch)) {
+                                    lexState = LexState.Identifier;
                                     m_strToken = "" + ch;
                                 } else {
                                     ThrowInvalidCharacterException(ch);
@@ -460,7 +472,7 @@ namespace Scorpio.Compiler
                         }
                         break;
                     case LexState.Identifier:
-                        if (ch == '_' || char.IsLetterOrDigit(ch)) {
+                        if (IsIdentifier(ch)) {
                             m_strToken += ch;
                         } else {
                             TokenType tokenType;

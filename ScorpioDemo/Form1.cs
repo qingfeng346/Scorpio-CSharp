@@ -11,19 +11,14 @@ using System.IO;
 using System.Reflection;
 namespace ScorpioDemo {
     public class TestClass {
-        public int a = 100;
-        public void Test1() {
-            Console.WriteLine("test1");
+        public static void Test1(ScriptTable table) {
+            var itor = table.GetIterator();
+            while (itor.MoveNext()) {
+                var cur = itor.Current;
+                Console.WriteLine("key : " + cur.Key);
+                Console.WriteLine("value 类型 : " + cur.Value.Type);
+            }
         }
-    }
-    public static class TestEx {
-        public static void Test3() {
-
-        }
-        public static void Test2(this TestClass t) {
-            Console.WriteLine("test2 " + t.a);
-        }
-
     }
     public partial class Form1 : Form
     {
@@ -34,31 +29,6 @@ namespace ScorpioDemo {
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            TestClass c = new TestClass();
-            //c.Test2();
-            Console.WriteLine(typeof(TestClass).IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false));
-            {
-                MethodInfo method = typeof(TestClass).GetMethod("Test2", BindingFlags.Static | BindingFlags.Public);
-                Console.WriteLine(method == null ? "null" : method.ToString());
-            }
-            {
-                MethodInfo[] methods = typeof(TestClass).GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-                foreach (var method in methods) {
-                    Console.WriteLine(method.ToString());
-                }
-            }
-            Console.WriteLine("=================================");
-            {
-                Console.WriteLine(typeof(TestEx).IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false));
-                MethodInfo[] methods = typeof(TestEx).GetMethods(Script.BindingFlag);
-                foreach (var method in methods) {
-                    if (method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false)) {
-                        method.Invoke(null, new object[] { c });
-                    }
-                    //Console.WriteLine(method.ToString() + "  " + method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false));
-                }
-            }
-            
             m_Path = Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)) + "/Scripts";
             LoadFileList();
         }

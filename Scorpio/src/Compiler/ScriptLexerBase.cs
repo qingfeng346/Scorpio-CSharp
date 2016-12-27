@@ -120,7 +120,7 @@ namespace Scorpio.Compiler
         }
         bool IsHexDigit( char c )
 		{
-			if( Char.IsDigit( c ) )
+			if( char.IsDigit( c ) )
 				return true;
 			if( 'a' <= c && c <= 'f' )
 				return true;
