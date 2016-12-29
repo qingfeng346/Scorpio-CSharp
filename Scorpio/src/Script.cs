@@ -214,13 +214,17 @@ namespace Scorpio
         {
             return m_GlobalTable;
         }
-        public bool HasValue(String key)
+        public bool HasValue(string key)
         {
             return m_GlobalTable.HasValue(key);
         }
         public ScriptObject GetValue(string key)
         {
             return m_GlobalTable.GetValue(key);
+        }
+        public void SetValue(string key, object value) 
+        {
+            m_GlobalTable.SetValue(key, CreateObject(value));
         }
         public void SetObject(string key, object value)
         {
