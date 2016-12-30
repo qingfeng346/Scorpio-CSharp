@@ -79,6 +79,9 @@ namespace Scorpio.Runtime
             }
             return false;
         }
+        private void SetVariableForce(string name, ScriptObject obj) {
+            m_variableDictionary[name] = obj.Assign();
+        }
         private object GetMember(CodeMember member)
         {
             return member.Type == MEMBER_TYPE.VALUE ? member.MemberValue : ResolveOperand(member.MemberObject).KeyValue;
@@ -467,13 +470,17 @@ namespace Scorpio.Runtime
         }
         ScriptTable ParseTable(CodeTable table)
         {
+            ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.None);
             ScriptTable ret = m_script.CreateTable();
-            foreach (CodeTable.TableVariable variable in table.Variables) {
-                ret.SetValue(variable.key, ResolveOperand(variable.value));
-            }
             foreach (ScriptScriptFunction func in table.Functions) {
                 func.SetTable(ret);
                 ret.SetValue(func.Name, func);
+                context.SetVariableForce(func.Name, func);
+            }
+            foreach (CodeTable.TableVariable variable in table.Variables) {
+                ScriptObject value = context.ResolveOperand(variable.value);
+                ret.SetValue(variable.key, value);
+                context.SetVariableForce(variable.key.ToString(), value);
             }
             return ret;
         }
