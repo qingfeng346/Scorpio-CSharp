@@ -222,7 +222,7 @@ a = {
     a1 = 100,
     a2 = a1 + 100,
     a3 = func1(),
-    function func1() {      //函数可以最先申请
+    function func1() {      //函数优先初始化
         return 100
     }
 }
