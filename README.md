@@ -214,6 +214,19 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2016-12-30)
+-----------
+* 初始化**table**时，后申请的变量可以使用先申请的变量，例如
+```javascript
+a = {
+    a1 = 100,
+    a2 = a1 + 100,
+    a3 = func1(),
+    function func1() {      //函数可以最先申请
+        return 100
+    }
+}
+```
 (2016-12-27)
 -----------
 * 修改 **if** 间接写法最后加 **;** 会导致后面的 **else** 和 **else if** 解析错误的问题 (感谢 **小卒 北京** 同学的反馈)
