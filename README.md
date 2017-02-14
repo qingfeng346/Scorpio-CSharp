@@ -214,6 +214,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2017-02-14)
+-----------
+* 增加**long**和**int**类型的**[~]取反操作**,多谢**[福灵心至]**同学的建议
+
 (2016-12-30)
 -----------
 * 初始化**table**时，后申请的变量可以使用先申请的变量，例如
