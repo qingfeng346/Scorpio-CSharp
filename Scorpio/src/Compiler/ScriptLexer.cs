@@ -110,6 +110,9 @@ namespace Scorpio.Compiler
                             case '#':
                                 AddToken(TokenType.Sharp);
                                 break;
+                            case '~':
+                                AddToken(TokenType.Negative);
+                                break;
                             case '.':
                                 lexState = LexState.PeriodOrParams;
                                 break;

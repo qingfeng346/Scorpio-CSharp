@@ -8,11 +8,11 @@ namespace Scorpio.CodeDom
     public class CodeObject
     {
         public bool Not;                // ! 标识（非xxx）
-        public bool Negative;           // - 标识（负数）
+        public bool Minus;              // - 标识（负数）
+        public bool Negative;           // ~ 标识（取反操作）
         public StackInfo StackInfo;     // 堆栈数据
         public CodeObject() { }
-        public CodeObject(string breviary, int line)
-        {
+        public CodeObject(string breviary, int line) {
             StackInfo = new StackInfo(breviary, line);
         }
     }

@@ -35,7 +35,7 @@ namespace Scorpio.Variable
             }
             return this;
         }
-        public override ScriptNumber Negative()
+        public override ScriptNumber Minus()
         {
             return new ScriptNumberDouble(m_Script, -m_Value);
         }

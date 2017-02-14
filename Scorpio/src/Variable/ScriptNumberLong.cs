@@ -35,18 +35,18 @@ namespace Scorpio.Variable
             }
             return this;
         }
-        public override ScriptNumber Negative()
-        {
+        public override ScriptNumber Minus() {
             return new ScriptNumberLong(m_Script, -m_Value);
         }
-		public override ScriptNumber Abs ()
-		{
+        public override ScriptNumber Negative() {
+            return new ScriptNumberLong(m_Script, ~m_Value);
+        }
+        public override ScriptNumber Abs () {
 			if (m_Value >= 0)
 				return new ScriptNumberLong(m_Script, m_Value);
 			return new ScriptNumberLong(m_Script, -m_Value);
 		}
-		public override ScriptNumber Floor ()
-		{
+		public override ScriptNumber Floor () {
 			return new ScriptNumberLong(m_Script, m_Value);
 		}
 		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)

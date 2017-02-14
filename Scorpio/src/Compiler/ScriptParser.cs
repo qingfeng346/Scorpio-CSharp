@@ -701,15 +701,22 @@ namespace Scorpio.Compiler
             CodeObject ret = null;
             Token token = ReadToken();
             bool not = false;
+            bool minus = false;
             bool negative = false;
             CALC calc = CALC.NONE;
-            if (token.Type == TokenType.Not) {
-                not = true;
+            while (true) {
+                if (token.Type == TokenType.Not) {
+                    not = true;
+                } else if (token.Type == TokenType.Minus) {
+                    minus = true;
+                } else if (token.Type == TokenType.Negative) {
+                    negative = true;
+                } else {
+                    break;
+                }
                 token = ReadToken();
-            } else if (token.Type == TokenType.Minus) {
-                negative = true;
-                token = ReadToken();
-            } else if (token.Type == TokenType.Increment) {
+            }
+            if (token.Type == TokenType.Increment) {
                 calc = CALC.PRE_INCREMENT;
                 token = ReadToken();
             } else if (token.Type == TokenType.Decrement) {
@@ -755,6 +762,7 @@ namespace Scorpio.Compiler
             ret.StackInfo = new StackInfo(m_strBreviary, token.SourceLine);
             ret = GetVariable(ret);
             ret.Not = not;
+            ret.Minus = minus;
             ret.Negative = negative;
             if (ret is CodeMember) {
                 if (calc != CALC.NONE) {
@@ -792,9 +800,13 @@ namespace Scorpio.Compiler
                         ScriptObject obj = ((CodeScriptObject)member).Object;
                         if (member.Not) {
                             ret = new CodeMember(!obj.LogicOperation(), ret);
-                        } else if (member.Negative) {
+                        } else if (member.Minus) {
                             ScriptNumber num = obj as ScriptNumber;
                             if (num == null) throw new ParserException("Script Object Type [" + obj.Type + "] is cannot use [-] sign", m);
+                            ret = new CodeMember(num.Minus().KeyValue, ret);
+                        } else if (member.Negative) {
+                            ScriptNumber num = obj as ScriptNumber;
+                            if (num == null) throw new ParserException("Script Object Type [" + obj.Type + "] is cannot use [~] sign", m);
                             ret = new CodeMember(num.Negative().KeyValue, ret);
                         } else {
                             ret = new CodeMember(obj.KeyValue, ret);

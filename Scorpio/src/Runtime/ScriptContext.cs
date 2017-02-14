@@ -422,9 +422,13 @@ namespace Scorpio.Runtime
             ScriptObject ret = ResolveOperand_impl(value);
             if (value.Not) {
                 ret = m_script.CreateBool(!ret.LogicOperation());
-            }  else if (value.Negative) {
+            }  else if (value.Minus) {
                 ScriptNumber b = ret as ScriptNumber;
                 if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [-] sign");
+                ret = b.Minus();
+            } else if (value.Negative) {
+                ScriptNumber b = ret as ScriptNumber;
+                if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [~] sign");
                 ret = b.Negative();
             }
             return ret;

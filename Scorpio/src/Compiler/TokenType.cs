@@ -143,6 +143,10 @@ namespace Scorpio.Compiler
         /// ^=
         /// </summary>
         AssignXOR,
+        /// <summary> 
+        /// ~ 取反操作
+        /// </summary>
+        Negative,
         /// <summary>
         /// <<左移
         /// </summary>

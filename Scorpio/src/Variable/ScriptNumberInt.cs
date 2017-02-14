@@ -36,30 +36,28 @@ namespace Scorpio.Variable
             }
             return this;
         }
-        public override ScriptNumber Negative()
-        {
+        public override ScriptNumber Minus() {
             return new ScriptNumberInt(m_Script, -m_Value);
         }
-		public override ScriptNumber Abs ()
-		{
+        public override ScriptNumber Negative() {
+            return new ScriptNumberInt(m_Script, ~m_Value);
+        }
+        public override ScriptNumber Abs () {
 			if (m_Value >= 0)
 				return new ScriptNumberInt(m_Script, m_Value);
 			return new ScriptNumberInt(m_Script, -m_Value);
 		}
-		public override ScriptNumber Floor ()
-		{
+		public override ScriptNumber Floor () {
 			return new ScriptNumberInt(m_Script, m_Value);
 		}
-		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max)
-		{
+		public override ScriptNumber Clamp (ScriptNumber min, ScriptNumber max) {
 			if (m_Value < min.ToInt32 ())
 				return new ScriptNumberInt(m_Script, min.ToInt32());
 			if (m_Value > max.ToInt32 ())
 				return new ScriptNumberInt(m_Script, max.ToInt32());
 			return new ScriptNumberInt(m_Script, m_Value);
 		}
-        public override ScriptObject Assign()
-        {
+        public override ScriptObject Assign() {
             return new ScriptNumberInt(m_Script, m_Value);
         }
         public override int ToInt32()
