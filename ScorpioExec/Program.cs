@@ -59,7 +59,6 @@ namespace ScorpioExec
         }
         static void Main(string[] args) {
             script = new Script();
-            Console.WriteLine("the current version : " + Script.Version);
             script.LoadLibrary();
             script.PushAssembly(typeof(Program).GetTypeInfo().Assembly);
 #if !SCORPIO_NET_CORE
@@ -67,6 +66,8 @@ namespace ScorpioExec
 #else
             string CurrentDirectory = "";
 #endif
+            Console.WriteLine("the current version : " + Script.Version);
+            Console.WriteLine("app path is : " + CurrentDirectory);
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
             LoadFiles(Path.Combine(CurrentDirectory, "cs"));
             if (args.Length >= 1) {

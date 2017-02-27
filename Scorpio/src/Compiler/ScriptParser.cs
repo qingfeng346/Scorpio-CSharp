@@ -875,6 +875,9 @@ namespace Scorpio.Compiler
             ReadLeftBrace();
             while (PeekToken().Type != TokenType.RightBrace) {
                 Token token = ReadToken();
+                if (token.Type == TokenType.Comma || token.Type == TokenType.SemiColon) {
+                    continue;
+                }
                 if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number || 
                     token.Type == TokenType.Boolean || token.Type == TokenType.Null) {
                     Token next = ReadToken();
@@ -883,10 +886,6 @@ namespace Scorpio.Compiler
                             ret._Variables.Add(new CodeTable.TableVariable(m_script.Null.KeyValue, GetObject()));
                         } else {
                             ret._Variables.Add(new CodeTable.TableVariable(token.Lexeme, GetObject()));
-                        }
-                        Token peek = PeekToken();
-                        if (peek.Type == TokenType.Comma || peek.Type == TokenType.SemiColon) {
-                            ReadToken();
                         }
                     } else if (next.Type == TokenType.Comma || next.Type == TokenType.SemiColon) {
                         if (token.Type == TokenType.Null) {
