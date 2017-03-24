@@ -100,15 +100,15 @@ namespace ScorpioDelegate {
 - [ ] 理论上可以支持所有平台
 
 ## 反射调用运算符重载函数
-*	+    op_Addition
-*	-    op_Subtraction
-*	*    op_Multiply
+*	\+    op_Addition
+*	\-    op_Subtraction
+*	\*    op_Multiply
 *	/    op_Division
 *	%    op_Modulus
 *	|    op_BitwiseOr
 *	&    op_BitwiseAnd
 *	^    op_ExclusiveOr
-*	>    op_GreaterThan
+*	\>    op_GreaterThan
 *	<    op_LessThan
 *	==   op_Equality
 *	!=   op_Inequality
@@ -214,13 +214,17 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2017-03-24)
+-----------
+* string库增加join函数
+
 (2017-02-14)
 -----------
-* 增加**long**和**int**类型的**[~]取反操作**,多谢**[福灵心至]**同学的建议
+* 增加 **long** 和 **int** 类型的 **[~]取反操作** ,多谢 **[福灵心至]** 同学的建议
 
 (2016-12-30)
 -----------
-* 初始化**table**时，后申请的变量可以使用先申请的变量，例如
+* 初始化 **table** 时，后申请的变量可以使用先申请的变量，例如
 ```javascript
 a = {
     a1 = 100,
