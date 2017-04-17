@@ -25,7 +25,7 @@
 
 ## 注意事项 ##
 * 如果要使用 **Script.LoadFile** 函数，文件编码要改成 **utf8 without bom (无签名的utf8格式)**, 否则bom三个字节会解析失败
-* 使用 **import_type import_extension ** 前要确认是否已经添加该类的程序集(Assembly),例如要使用 **UnityEngine.dll**中的**UnityEngine.GameObject**类,要先再c#中调用 **script.PushAssembly(typeof(GameObject).GetTypeInfo().Assembly)** 压入程序集,然后**UnityEngine.dll**中的类就都可以使用了,也就是**每个dll文件的程序集**都要添加一次
+* 使用 **import_type import_extension**  前要确认是否已经添加该类的程序集(Assembly),例如要使用 **UnityEngine.dll** 中的 **UnityEngine.GameObject** 类,要先再c#中调用 **script.PushAssembly(typeof(GameObject).GetTypeInfo().Assembly)** 压入程序集,然后**UnityEngine.dll** 中的类就都可以使用了,也就是 **每个dll文件的程序集** 都要添加一次
 * 脚本内所有c#变量(除了int,string等基础类型)**均为引用**,struct变量也一样
 * c#重载[]运算符后脚本里不能直接使用[],请使用 **get_Item set_Item** 函数
 * c#数组对象获取元素不能直接使用[],请使用 **GetValue SetValue** 函数, 具体参数可以参考 **Array** 类的 **GetValue SetValue** 函数
