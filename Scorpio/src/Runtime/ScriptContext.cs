@@ -468,7 +468,7 @@ namespace Scorpio.Runtime
         {
             ScriptArray ret = m_script.CreateArray();
             foreach (CodeObject ele in array.Elements) {
-                ret.Add(ResolveOperand(ele));
+                ret.Add(ResolveOperand(ele).Assign());
             }
             return ret;
         }
