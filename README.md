@@ -214,6 +214,16 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2017-04-20)
+-----------
+* 修复array初始化时会传入对象引用的问题，例如
+```javascript
+var num = 0
+var arr = [num]     //修改前传入的num是引用，num本身改变会应用arr[0]的值
+num += 1
+print(arr[0])       //修改前会输出1，修改后会输出0
+```
+
 (2017-03-24)
 -----------
 * string库增加join函数
