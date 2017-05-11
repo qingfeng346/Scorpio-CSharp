@@ -214,6 +214,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2017-05-11)
+-----------
+* 修复去反射生成工具，过滤器不能过滤 property( get,set ) 函数的bug
+
 (2017-04-20)
 -----------
 * 修复array初始化时会传入对象引用的问题，例如
