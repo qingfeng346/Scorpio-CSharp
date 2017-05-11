@@ -100,6 +100,7 @@ namespace Scorpio.ScorpioReflect {
                 string parameterCall = GetScorpioMethodCall(method);
                 string variable = (method.IsStatic ? m_FullName : "((" + m_FullName + ")obj)");
                 ParameterInfo[] pars = method.GetParameters();
+                //运算符重载函数 + - * / [] 等
                 string execute = GetSpeciaMethodExecute(method, variable, pars);
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
                 execute = GetEventMethodExecute(method, variable, pars);

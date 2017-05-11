@@ -100,7 +100,26 @@ namespace Scorpio.ScorpioReflect {
                 m_Methods.Clear();
                 foreach (var method in m_AllMethods) {
                     if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, method)) { continue; }
-                    m_Methods.Add(method);
+                    bool check = true;
+                    foreach (var property in m_AllPropertys) {
+                        if (property.GetGetMethod() == method || property.GetSetMethod() == method) {
+                            if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, property)) {
+                                check = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (check) {
+                        foreach (var eve in m_AllEvents) {
+                            if (eve.GetAddMethod() == method || eve.GetRemoveMethod() == method) {
+                                if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, eve)) {
+                                    check = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (check) m_Methods.Add(method);
                 }
                 m_Methods.Sort(new ComparerMethodInfo());
             }
