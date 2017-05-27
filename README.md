@@ -214,6 +214,12 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
  
 ## master版本更新和修改内容 ##
+(2017-05-27)
+-----------
+* **string**库添加**char2ascii**函数
+* **string**库添加**ascii2char**函数
+* **print**支持直接输出**array**和**table**变量
+
 (2017-05-11)
 -----------
 * 修复去反射生成工具，过滤器不能过滤 property( get,set ) 函数的bug

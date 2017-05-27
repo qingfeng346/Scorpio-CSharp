@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Scorpio;
-namespace Scorpio.Library
-{
-    public class LibraryString
-    {
-        public static void Load(Script script)
-        {
+namespace Scorpio.Library {
+    public class LibraryString {
+        public static void Load(Script script) {
             ScriptTable Table = script.CreateTable();
             Table.SetValue("format", script.CreateFunction(new format()));
             Table.SetValue("substring", script.CreateFunction(new substring()));
@@ -25,11 +22,12 @@ namespace Scorpio.Library
             Table.SetValue("split", script.CreateFunction(new split(script)));
             Table.SetValue("join", script.CreateFunction(new join()));
             Table.SetValue("at", script.CreateFunction(new at()));
+            Table.SetValue("char2ascii", script.CreateFunction(new char2ascii(script)));
+            Table.SetValue("ascii2char", script.CreateFunction(new ascii2char()));
             script.SetObjectInternal("string", Table);
         }
         const string DELIM_STR = "{}";
-        private class format : ScorpioHandle
-        {
+        private class format : ScorpioHandle {
             public object Call(ScriptObject[] args) {
                 if (args == null || args.Length == 0) return null;
                 string messagePattern = (args[0] as ScriptString).Value;
@@ -63,10 +61,8 @@ namespace Scorpio.Library
                 return sbuf.ToString();
             }
         }
-        private class substring : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class substring : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 string messagePattern = (args[0] as ScriptString).Value;
                 if (args.Length == 1) return messagePattern;
                 if (args.Length == 3)
@@ -75,55 +71,41 @@ namespace Scorpio.Library
                     return messagePattern.Substring((args[1] as ScriptNumber).ToInt32());
             }
         }
-        private class length : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class length : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 return (args[0] as ScriptString).Value.Length;
             }
         }
-        private class tolower : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class tolower : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 return (args[0] as ScriptString).Value.ToLowerInvariant();
             }
         }
-        private class toupper : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class toupper : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 return (args[0] as ScriptString).Value.ToUpperInvariant();
             }
         }
-        private class trim : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class trim : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 return (args[0] as ScriptString).Value.Trim();
             }
         }
-        private class replace : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class replace : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 string str = (args[0] as ScriptString).Value;
                 string oldValue = (args[1] as ScriptString).Value;
                 string newValue = (args[2] as ScriptString).Value;
                 return str.Replace(oldValue, newValue);
             }
         }
-        private class isnullorempty : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class isnullorempty : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 return Util.IsNullOrEmpty(args[0].ObjectValue as string);
             }
         }
-        private class indexof : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class indexof : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 string str = (args[0] as ScriptString).Value;
                 string value = (args[1] as ScriptString).Value;
                 if (args.Length == 3)
@@ -132,10 +114,8 @@ namespace Scorpio.Library
                     return str.IndexOf(value);
             }
         }
-        private class lastindexof : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class lastindexof : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 string str = (args[0] as ScriptString).Value;
                 string value = (args[1] as ScriptString).Value;
                 if (args.Length == 3)
@@ -144,35 +124,27 @@ namespace Scorpio.Library
                     return str.LastIndexOf(value);
             }
         }
-        private class startswith : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class startswith : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 return (args[0] as ScriptString).Value.StartsWith((args[1] as ScriptString).Value);
             }
         }
-        private class endswith : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class endswith : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 return (args[0] as ScriptString).Value.EndsWith((args[1] as ScriptString).Value);
             }
         }
-        private class contains : ScorpioHandle
-        {
-            public object Call(ScriptObject[] args)
-            {
+        private class contains : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
                 return (args[0] as ScriptString).Value.Contains((args[1] as ScriptString).Value);
             }
         }
-        private class split : ScorpioHandle
-        {
+        private class split : ScorpioHandle {
             private Script m_script;
             public split(Script script) {
                 this.m_script = script;
             }
-            public object Call(ScriptObject[] args)
-            {
+            public object Call(ScriptObject[] args) {
                 string str = (args[0] as ScriptString).Value;
                 string tko = (args[1] as ScriptString).Value;
                 string[] strs = str.Split(tko.ToCharArray());
@@ -184,27 +156,58 @@ namespace Scorpio.Library
             }
         }
         private class join : ScorpioHandle {
-            public join() {
-            }
             public object Call(ScriptObject[] args) {
                 string separator = (args[0] as ScriptString).Value;
                 ScriptArray value = (args[1] as ScriptArray);
                 var count = value.Count();
                 string[] values = new string[count];
-                for (int i = 0;i < count; ++i) {
+                for (int i = 0; i < count; ++i) {
                     values[i] = value.GetValue(i).ToString();
                 }
                 return string.Join(separator, values);
             }
         }
         private class at : ScorpioHandle {
-            public at() {
-            }
-            public object Call(ScriptObject[] args)
-            {
+            public object Call(ScriptObject[] args) {
                 string str = (args[0] as ScriptString).Value;
                 int index = (args[1] as ScriptNumber).ToInt32();
                 return Convert.ToInt32(str[index]);
+            }
+        }
+        private class char2ascii : ScorpioHandle {
+            private Script m_script;
+            public char2ascii(Script script) {
+                this.m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                string str = (args[0] as ScriptString).Value;
+                int length = str.Length;
+                if (length == 0) {
+                    return null;
+                } else if (length == 1) {
+                    return Convert.ToInt32(str[0]);
+                } else {
+                    ScriptArray array = m_script.CreateArray();
+                    for (int i = 0; i < length; ++i) {
+                        array.Add(m_script.CreateObject(Convert.ToInt32(str[i])));
+                    }
+                    return array;
+                }
+            }
+        }
+        private class ascii2char : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
+                ScriptNumber num = args[0] as ScriptNumber;
+                if (num != null) {
+                    return new string(new char[] { Convert.ToChar(num.ToInt32()) });
+                } else {
+                    ScriptArray array = args[0] as ScriptArray;
+                    char[] chars = new char[array.Count()];
+                    for (int i = 0;i<array.Count();++i) {
+                        chars[i] = Convert.ToChar((array.GetValue(i) as ScriptNumber).ToInt32());
+                    }
+                    return new string(chars);
+                }
             }
         }
     }
