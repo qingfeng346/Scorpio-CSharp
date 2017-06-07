@@ -38,7 +38,8 @@
 * UWP平台master配置下 **generic_method** 函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 * UWP平台master配置下 **generic_type** 函数也会出问题
 * 不能使用 SCORPIO_DYNAMIC_DELEGATE 的平台,要实现一个继承 DelegateTypeFactory 的类,然后调用ScriptUserdataDelegateType.SetFactory函数设置一下 例如:
-```c#
+
+```csharp
 public class MyDelegateFactory : DelegateTypeFactory {
 	public Delegate CreateDelegate(Script script, Type type, ScriptFunction func) {
 		if (type == typeof(UnityAction))						//UnityAction委托类型
@@ -54,8 +55,9 @@ public class MyDelegateFactory : DelegateTypeFactory {
 }
 ///然后实现完以后 调用 ScriptUserdataDelegateType.SetFactory(new MyDelegateFactory()); 设置一下
 ```
-* 也可以使用**ScorpioReflect**项目中的**GenerateScorpioDelegate**类可以自动生成一个 DelegateTypeFactory 类
-```c#
+* 也可以使用**ScorpioReflect**项目中的**GenerateScorpioDelegate**类可以自动生成一个 DelegateTypeFactory 类  
+
+```csharp
 var generate = new Scorpio.ScorpioReflect.GenerateScorpioDelegate();
 generate.AddType(typeof(Action<bool>));     //使用AddType 添加所有需要用到的 Delegate , 模板函数 要单独添加
 generate.AddType(typeof(Action<int>));
@@ -130,7 +132,7 @@ namespace ScorpioDelegate {
 * 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下 (ps:源码的项目文件自带SCORPIO_DYNAMIC_DELEGATE编译符号,请删除后编译)
 
 ## Scorpio脚本Hello World函数 (c#控制台项目):
-```c#
+```csharp
 using System;
 using Scorpio;
 namespace HelloWorld {
@@ -198,7 +200,7 @@ print(TestEnum.Test1)                               //直接使用枚举
 ## c#去反射类使用 ##
 * 把**ScorpioReflect**项目中的**GenerateScorpioClass**文件夹下的所有cs文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例: 
 
-```c#
+```csharp
 //就拿UnityEngine.GameObject类为例
 //先生成中间代码
 //使用GenerateScorpioClass生成代码,ScorpioClassName变量是中间类名称,Generate()返回生成后的代码
@@ -226,7 +228,8 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 
 (2017-04-20)
 -----------
-* 修复array初始化时会传入对象引用的问题，例如
+* 修复array初始化时会传入对象引用的问题，例如  
+
 ```javascript
 var num = 0
 var arr = [num]     //修改前传入的num是引用，num本身改变会应用arr[0]的值
@@ -245,6 +248,7 @@ print(arr[0])       //修改前会输出1，修改后会输出0
 (2016-12-30)
 -----------
 * 初始化 **table** 时，后申请的变量可以使用先申请的变量，例如
+
 ```javascript
 a = {
     a1 = 100,
@@ -258,6 +262,7 @@ a = {
 (2016-12-27)
 -----------
 * 修改 **if** 简洁写法最后加 **;** 会导致后面的 **else** 和 **else if** 解析错误的问题 (感谢 **[小卒 北京]** 同学的反馈)
+
 ```javascript
 if (true)
     return;             //修改前此行就解析出错
@@ -272,6 +277,7 @@ else
 (2016-11-25)
 -----------
 * 申请table变量可以不赋值,默认为null
+
 ```javascript
 var t = {
     a,      //修改前此处会报解析错误，修改后a会默认为null，相当于 a = null,
@@ -328,6 +334,7 @@ var t = {
 -----------
 * 类型null支持当作table的key值
 * 类型bool可以直接传入类型当作table的key值,修改前只可以传入变量
+
 ```javascript
 var a = {
     true = 100,
@@ -360,6 +367,7 @@ print(a[null])
 (2016-4-12)
 -----------
 * table 支持 + += 操作,用此操作可以实现伪继承 示例:
+
 ```javascript
 var base = {
 	value1 = 100,
@@ -384,6 +392,7 @@ b.hello2()		//输出 default hello2
 * 增加宏定义判断,用法同c#
 	* 支持关键字 **#define #if #ifndef #elseif #elif #endif**
 	* **#elseif**和**#elif**功能一样
+
 ```javascript
 #define TEST
 #if TEST
@@ -410,6 +419,7 @@ b.hello2()		//输出 default hello2
 (2016-4-7)
 -----------
 * 优化脚本array类型操作,示例 
+
 ```javascript
 var a = []
 a[10] = 10
@@ -566,6 +576,7 @@ var c = a[20]
 (2015-4-7)
 -----------
 * 修复返回function类型 父区域的值会变化的BUG 例如:
+
 ```javascript
 function test(data) { 
 	return function() {
@@ -589,6 +600,7 @@ b()
 -----------
 * string库增加indexof lastindexof startswith endswith contains函数
 * 修改运行时发生异常 错误输出会加上 文件行信息 例如:
+
 ```javascript
 	print(null.a)
 	//修改前报错会输出 类型[Null]不支持获取变量
@@ -597,6 +609,7 @@ b()
 (2015-3-31)
 -----------
 * 增加function类型内部变量 例如:
+
 ```javascript
 function test() { print(str) }
 test.str = "hello world"
@@ -612,12 +625,14 @@ hello world
 (2015-3-7)
 -----------
 * 增加c#委托和脚本function类型无缝切换 例如:
-```c#
+
+```csharp
     public delegate void Action();
     public class Test {
         public static void Func(Action action);
     }
 ```
+
 ```javascript
     //修改前代码要写成这样:
     Test.Func(Action( function() { } ) )
@@ -631,7 +646,8 @@ hello world
 * Script类增加 ClearStackInfo 函数
 * 修复某些语法情况下出错报不出堆栈的问题
 * 修复相同名字相同参数类型函数泛型和非泛型判断错误的问题 例如(修改前):
-```c#
+
+```csharp
     public class Test {
         public static void Func<T>(int args) {}
         public static void Func(int args) {}
@@ -644,6 +660,7 @@ hello world
 * array库增加 pop 函数
 * 修复循环continue会导致跳出循环的BUG (多谢[**过期**,**丶守望灬稻田**]同学提供反馈)
 * 修复相同常量自运算的问题 例如(修改前) (多谢[**过期**]同学提供反馈):
+
 ```javascript
     var a = []
     for (var i=0;i<2;++i)
@@ -663,6 +680,7 @@ hello world
 * 全局函数增加 is_null is_bool is_number is_double is_long is_string is_function is_array is_table is_enum is_userdata函数
 * 全局函数type函数 返回值由枚举Scorpio.ObjectType改为int型
 * 增加单句执行语法  例如(修改后):
+
 ```javascript
     if (true) { 
         print("hello world ")
@@ -678,6 +696,7 @@ hello world
 ```
 * 修复调用c#变长参数的函数 某些情况判断错误的问题
 * 修复()内区域变量[!][-]修饰符会失效的BUG 例如(修改前)(多谢[**he110world**]同学提供反馈): 
+
 ```javascript
     print((-1)) 
     //上面代码会输出 1
@@ -698,7 +717,8 @@ hello world
 * Script类增加LoadTokens函数
 * 增加require函数 可以加载一个文件 搜索目录为 _G["searchpath"]
 * 增加generic_method函数 可以声明泛型函数 示例： 
-```c#
+
+```csharp
     //c#代码
     public class Test {  
         public static T Func<T>() {  
@@ -706,6 +726,7 @@ hello world
         }  
     }  
 ```
+
 ```javascript
     //sco代码
     var func = generic_method(import_type("Test").Func, import_type("System.Int32"))  
@@ -722,6 +743,7 @@ hello world
 (2014-11-25)
 -----------
 * 增加声明泛型类的函数 示例： ListInt 就相当于c#的List<int>
+
 ```javascript
     List = import_type("System.Collections.Generic.List`1")  
     ListInt = generic_type(List, import_type("System.Int32"))   
@@ -739,6 +761,7 @@ hello world
 (2014-11-4)
 -----------
 * 增加table声明语法  支持 Key 用 数字和字符串声明 示例：
+
 ```javascript
     var a = { 
         1 = 1, 
@@ -750,6 +773,7 @@ hello world
 * 修改 不同类型之间 做 ==  != 比较报错的问题  改成  不同类型之间==比较 直接返回false
 * 增加switch语句 只支持 number和string 并且 case 只支持常量 不支持变量
 * 支持try catch 语法 示例： 
+
 ```javascript
     try { 
         throw "error" 
@@ -763,6 +787,7 @@ hello world
 (2014-10-27)
 -----------
 * 增加赋值操作返回值  示例: 
+
 ```javascript
     if ((a = true) == true) { }
     var a = 100
@@ -773,7 +798,8 @@ hello world
 (2014-10-18)
 -----------
 * 增加对Delegate动态委托的支持 示例：
-```c#
+
+```csharp
     //c#代码
     namespace Scropio {  
         public class Hello {  
@@ -782,6 +808,7 @@ hello world
         }  
     }  
 ```
+
 ```javascript
     //sco代码
     function test(a,b) {   
@@ -796,13 +823,15 @@ hello world
 -----------
 * 修复已知BUG
 * 增加对不定参的支持 示例：(args会传入一个Array)
+
 ```javascript
     function hello(a,...args) { }  
 ```
 * 增加 eval函数 可以动态执行一段代码
 * 删除对ulong类型的支持
 * 增加基础for循环 for(i=begin,finished(包含此值),step) 示例：  
-```c#
+
+```csharp
     for (i=0,10000) {  
     }  
     for (i=0,10000,2) {  
