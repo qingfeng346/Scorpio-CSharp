@@ -127,7 +127,7 @@ namespace ScorpioDelegate {
 * **ScorpioReflect** Scorpio脚本去反射机制的实现
 
 ## Unity导入Scorpio-CSharp:
-* 第一种方法(建议) : 把trunk目录下的 Scorpio 文件夹复制到项目 然后删除 文件夹下的 Properties 文件夹和 Scorpio.csproj 文件即可
+* 第一种方法(建议) : 把 [Scorpio/src](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/Scorpio/src) 整个文件夹复制到项目即可
 * 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下 (ps:源码的项目文件自带SCORPIO_DYNAMIC_DELEGATE编译符号,请删除后编译)
 
 ## Scorpio脚本Hello World函数 (c#控制台项目):
