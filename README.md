@@ -214,7 +214,11 @@ Script script = new Script();
 script.LoadLibrary();
 script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script));
 ```
- 
+
+## 语法测试(请使用支持 WebGL 的浏览器) ##
+
+<iframe src="http://www.fengyuezhu.com/project/Scorpio-CSharp/scriptconsole/index.html" frameborder='0'  width="970px" height="630px"></iframe>
+
 ## master版本更新和修改内容 ##
 (2017-05-27)
 -----------
