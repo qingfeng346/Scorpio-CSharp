@@ -22,6 +22,31 @@
 * **SCORPIO_NET_CORE** .net4.5平台以后使用(UWP平台 , dotnet core)
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android和windows(exe)平台可用
 
+## 源码目录说明
+* Script 文件是脚本的引擎对象
+* Util 文件是一些常用的函数集合
+* ScriptXXX 所有Script开头的类都是脚本内保存的对象
+    * ScriptObject 所有脚本类都继承自此类
+    * ScriptNull 空类型 null
+    * ScriptBoolean bool 类型
+    * ScriptNumber 数字类型 衍生出 ScriptNumberDouble，ScriptNumberInt，ScriptNumberLong 三个类
+    * ScriptString 字符串类型
+    * ScriptFunction 函数类型
+    * ScriptArray 数组([])类型，相当于c#的List< ScriptObject >
+    * ScriptTable table类型，相当于c#的Dictionary<object,ScriptObject>
+    * ScriptEnum 处理所有c#内的枚举
+    * ScriptUserdata 处理所有c#内的对象，衍生出所有Userdata目录下的类
+* 子文件夹
+    * CodeDom 此目录下全部都是解析脚本后生成的中间代码
+    * Compiler 此目录下是脚本解释器
+    * Exception 脚本引擎抛出的已知异常，例如解析失败，未支持语法等
+    * Function 所有的函数类型，脚本函数，扩展函数等
+    * Library 脚本内使用的库的源码，例如**json**,**array**,**table**,**string**,**math**库等，方便使用，初始化脚本时请调用 LoadLibrary 函数后方可使用
+    * Runtime 此目录是运行 CodeDom 目录下的所有中间代码
+    * Serialize 序列化字节码使用，把文本文件解析成二进制数据以及把二进制数据反序列化成文本文件
+    * Userdata   此目录是根据c#代码内object的类型分别处理的代码，例如DefaultScriptUserdataDelegate是处理Delegate类型的对象，DefaultScriptUserdataObject是处理普通的c#对象，DefaultScriptUserdataEnum是处理枚举对象等
+    * Variable 脚本内对象的差异化处理，例如ScriptNumberDouble，ScriptNumberInt，ScriptNumberLong三个类都是处理number类型，但是不同类型的处理方式不同
+
 ## 注意事项 ##
 * 如果要使用 **Script.LoadFile** 函数，文件编码要改成 **utf8 without bom (无签名的utf8格式)**, 否则bom三个字节会解析失败
 * 使用 **import_type import_extension**  前要确认是否已经添加该类的程序集(Assembly),例如要使用 **UnityEngine.dll** 中的 **UnityEngine.GameObject** 类,要先再c#中调用 **script.PushAssembly(typeof(GameObject).GetTypeInfo().Assembly)** 压入程序集,然后**UnityEngine.dll** 中的类就都可以使用了,也就是 **每个dll文件的程序集** 都要添加一次
