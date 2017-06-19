@@ -71,7 +71,7 @@ namespace Scorpio
         public virtual int BranchType { get { return 0; } }                             // 分支类型
         public virtual object ObjectValue { get { return this; } }                      // 变量值
         public virtual object KeyValue { get { return this; } }                         // 作为key值
-        public bool IsPrimitive { get { return IsBoolean || IsNumber || IsString; } }
+        public bool IsPrimitive { get { return IsNull || IsBoolean || IsNumber || IsString; } }         //是否是基础数据
         public bool IsNull { get { return (Type == ObjectType.Null); } }
         public bool IsBoolean { get { return (Type == ObjectType.Boolean); } }
         public bool IsNumber { get { return (Type == ObjectType.Number); } }

@@ -240,6 +240,27 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
 
 ## master版本更新和修改内容 ##
+(2017-06-19)
+-----------
+* table的function变量全部支持this关键字，例如
+
+```javascript
+tab = {
+    a : 100,
+    b : function() {
+        //此处可以使用this
+        print(this.a)
+    }
+    function d () {
+        print(this.a)
+    }
+}
+tab.c = function() {
+    //此处可以使用this
+    print(this.a)
+}
+```
+
 (2017-05-27)
 -----------
 * **string**库添加**char2ascii**函数
