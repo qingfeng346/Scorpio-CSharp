@@ -240,6 +240,26 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
 
 ## master版本更新和修改内容 ##
+(2017-06-21)
+-----------
+* 添加userdata库，只有一个 rename 函数，可以重命名 c# 函数名称，例如：
+```javascript
+ListType = import_type("System.Collections.Generic.List`1")
+StringType = import_type("System.String")
+ListString = generic_type( ListType ,  StringType)      //载入List<String>
+var lt = ListString();                                  //创建一个对象
+//rename 函数第一个参数可以传入c# 类对象，也可以传入 实例对象
+//rename 函数只需调用一次，所有实例类就都可以使用
+userdata.rename(lt, "Add", "testAdd1")                  //重命名Add函数为testAdd1，Add还可以继续使用
+userdata.rename(ListString, "Add", "testAdd2")          //重命名Add函数为testAdd2，
+userdata.rename(ListString, "Capacity", "testCapacity")
+lt.testAdd1("111")
+lt.testAdd2("222")
+print(lt.testCapacity)
+lt.testCapacity = 15000
+print(lt.testCapacity)
+```
+
 (2017-06-20)
 -----------
 * 提升调用c#函数性能
