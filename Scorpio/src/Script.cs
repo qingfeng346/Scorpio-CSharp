@@ -57,6 +57,7 @@ namespace Scorpio {
             LibraryJson.Load(this);
             LibraryMath.Load(this);
             LibraryFunc.Load(this);
+            LibraryUserdata.Load(this);
         }
         public ScriptObject LoadFile(String strFileName) {
             return LoadFile(strFileName, Encoding.UTF8);

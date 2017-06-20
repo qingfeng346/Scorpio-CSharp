@@ -13,6 +13,7 @@ namespace Scorpio.Userdata
     {
         protected Script m_Script;                                        //脚本系统
         protected Type m_Type;                                            //类型
+        protected Dictionary<string, string> m_Rename = new Dictionary<string, string>();       //
         public UserdataType(Script script, Type type) {
             m_Script = script;
             m_Type = type;
@@ -28,6 +29,9 @@ namespace Scorpio.Userdata
                     throw new ExecutionException(m_Script, m_Type + "泛型类第" + (i + 1) + "个参数失败 需要:" + types[i].GetTypeInfo().BaseType + " 传入:" + parameters[i]);
             }
             return m_Script.CreateUserdata(m_Type.MakeGenericType(parameters));
+        }
+        public void Rename(string name1, string name2) {
+            m_Rename[name2] = name1;
         }
         public abstract void AddExtensionMethod(MethodInfo method);
         /// <summary> 创建一个实例 </summary>
@@ -127,6 +131,7 @@ namespace Scorpio.Userdata
         }
         /// <summary> 获得一个类变量 </summary>
         public override object GetValue(object obj, string name) {
+            if (m_Rename.ContainsKey(name)) { return GetValue(obj, m_Rename[name]); }
             if (m_Functions.ContainsKey(name)) return m_Functions[name];
             if (m_NestedTypes.ContainsKey(name)) return m_NestedTypes[name];
             UserdataVariable variable = GetVariable(name);

@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Scorpio;
 using Scorpio.Exception;
-namespace Scorpio.Userdata
-{
+namespace Scorpio.Userdata {
     /// <summary> 枚举类型 </summary>
-    public class ScriptUserdataEnum : ScriptUserdata
-    {
+    public class ScriptUserdataEnum : ScriptUserdata {
         private Dictionary<string, ScriptEnum> m_Enums;                 //如果是枚举的话 所有枚举的值
-        public ScriptUserdataEnum(Script script, Type value) : base(script)
-        {
+        public ScriptUserdataEnum(Script script, Type value) : base(script) {
             this.m_Value = value;
             this.m_ValueType = value;
             m_Enums = new Dictionary<string, ScriptEnum>();
@@ -20,12 +17,10 @@ namespace Scorpio.Userdata
                 m_Enums[name] = new ScriptEnum(m_Script, Enum.Parse(ValueType, name));
             }
         }
-        public override object Call(ScriptObject[] parameters)
-        {
+        public override object Call(ScriptObject[] parameters) {
             throw new ExecutionException(m_Script, "枚举类型不支持实例化");
         }
-        public override ScriptObject GetValue(object key)
-        {
+        public override ScriptObject GetValue(object key) {
             if (!(key is string))
                 throw new ExecutionException(m_Script, "Enum GetValue只支持String类型");
             string name = (string)key;

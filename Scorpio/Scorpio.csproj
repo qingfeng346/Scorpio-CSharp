@@ -81,6 +81,7 @@
     <Compile Include="src\Function\ScriptScriptFunction.cs" />
     <Compile Include="src\Library\LibraryArray.cs" />
     <Compile Include="src\Library\LibraryBasis.cs" />
+    <Compile Include="src\Library\LibraryUserdata.cs" />
     <Compile Include="src\Library\LibraryFunc.cs" />
     <Compile Include="src\Library\LibraryJson.cs" />
     <Compile Include="src\Library\LibraryMath.cs" />

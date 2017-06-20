@@ -1,9 +1,7 @@
 ﻿using System;
-namespace Scorpio
-{
+namespace Scorpio {
     //语言数据
-    public abstract class ScriptUserdata : ScriptObject
-    {
+    public abstract class ScriptUserdata : ScriptObject {
         protected object m_Value;
         protected Type m_ValueType;
         public override object ObjectValue { get { return m_Value; } }
