@@ -42,7 +42,8 @@ namespace Scorpio.Userdata
         public override void SetValue(object obj, object val) {
             if (m_Property.CanWrite)
                 m_Property.SetValue(obj, val, null);
-            throw new ExecutionException(m_Script, "Property [" + Name + "] 不支持SetValue");
+            else
+                throw new ExecutionException(m_Script, "Property [" + Name + "] 不支持SetValue");
         }
     }
     public class UserdataEvent : UserdataVariable {

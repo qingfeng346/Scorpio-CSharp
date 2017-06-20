@@ -71,21 +71,21 @@ namespace Scorpio.Userdata
 			InitializeMethods();
             foreach (var method in m_Methods) {
                 if (method.Name.Equals(name)) {
-                    UserdataMethod userdataMethod = new ReflectUserdataMethod(m_Script, m_Type, name, m_Methods);
-                    m_Functions.Add(name, userdataMethod);
-                    return userdataMethod;
+                    ReflectUserdataMethod ret = new ReflectUserdataMethod(m_Script, m_Type, name, m_Methods);
+                    m_Functions.Add(name, ret);
+                    return ret;
                 }
             }
             return null;
         }
-        private ScorpioMethod GetMethod(object obj, string name, UserdataMethod method) {
-            if (method.IsStatic) {
-                return m_ScorpioMethods[name] = new ScorpioStaticMethod(name, method);
-            } else if (obj == null) {
-                return m_ScorpioMethods[name] = new ScorpioTypeMethod(m_Script, name, method, m_Type);
-            }
-            return new ScorpioObjectMethod(obj, name, method);
-        }
+        //private ScorpioMethod GetMethod(object obj, string name, UserdataMethod method) {
+        //    if (method.IsStatic) {
+        //        return m_ScorpioMethods[name] = new ScorpioStaticMethod(name, method);
+        //    } else if (obj == null) {
+        //        return m_ScorpioMethods[name] = new ScorpioTypeMethod(m_Script, name, method, m_Type);
+        //    }
+        //    return new ScorpioObjectMethod(obj, name, method);
+        //}
         private UserdataVariable GetVariable(string name) {
             if (m_Variables.ContainsKey(name))
                 return m_Variables[name];
@@ -95,6 +95,15 @@ namespace Scorpio.Userdata
             if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Script, pInfo);
             EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name);
             if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);
+            return null;
+        }
+        private ScriptUserdata GetNestedType(string name) {
+            Type nestedType = m_Type.GetTypeInfo().GetNestedType(name, Script.BindingFlag);
+            if (nestedType != null) {
+                ScriptUserdata ret = m_Script.CreateUserdata(nestedType);
+                m_NestedTypes.Add(name, ret);
+                return ret;
+            }
             return null;
         }
         public override void AddExtensionMethod(MethodInfo method) {
@@ -118,19 +127,14 @@ namespace Scorpio.Userdata
         }
         /// <summary> 获得一个类变量 </summary>
         public override object GetValue(object obj, string name) {
-            if (m_ScorpioMethods.ContainsKey(name)) return m_ScorpioMethods[name];
-            if (m_Functions.ContainsKey(name)) return GetMethod(obj, name, m_Functions[name]);
+            if (m_Functions.ContainsKey(name)) return m_Functions[name];
             if (m_NestedTypes.ContainsKey(name)) return m_NestedTypes[name];
             UserdataVariable variable = GetVariable(name);
             if (variable != null) return variable.GetValue(obj);
-            Type nestedType = m_Type.GetTypeInfo().GetNestedType(name, Script.BindingFlag);
-            if (nestedType != null) {
-                ScriptUserdata ret = m_Script.CreateUserdata(nestedType);
-                m_NestedTypes.Add(name, ret);
-                return ret;
-            }
+            ScriptUserdata nestedType = GetNestedType(name);
+            if (nestedType != null) return nestedType;
             UserdataMethod func = GetMethod(name);
-            if (func != null) return GetMethod(obj, name, func);
+            if (func != null) return func;
             throw new ExecutionException(m_Script, "GetValue Type[" + m_Type.ToString() + "] 变量 [" + name + "] 不存在");
         }
         /// <summary> 设置一个类变量 </summary>

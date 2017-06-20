@@ -6,23 +6,19 @@ using System.Text;
 using Scorpio.Function;
 using Scorpio.Compiler;
 using Scorpio.Exception;
-namespace Scorpio
-{
+namespace Scorpio {
     //脚本table类型
-    public class ScriptTable : ScriptObject
-    {
+    public class ScriptTable : ScriptObject {
         public override ObjectType Type { get { return ObjectType.Table; } }
         private Dictionary<object, ScriptObject> m_listObject = new Dictionary<object, ScriptObject>();  //所有的数据(函数和数据都在一个数组)
         public ScriptTable(Script script) : base(script) { }
-        public override void SetValue(object key, ScriptObject value)
-        {
+        public override void SetValue(object key, ScriptObject value) {
             if (value is ScriptScriptFunction) {
                 (value as ScriptScriptFunction).SetTable(this);
             }
             m_listObject[key] = value.Assign();
         }
-        public override ScriptObject GetValue(object key)
-        {
+        public override ScriptObject GetValue(object key) {
             return m_listObject.ContainsKey(key) ? m_listObject[key] : m_Script.Null;
         }
         public override ScriptObject AssignCompute(TokenType type, ScriptObject value) {
@@ -66,36 +62,33 @@ namespace Scorpio
             }
             return ret;
         }
-        public bool HasValue(object key)
-        {
-			if (key == null) return false;
+        public bool HasValue(object key) {
+            if (key == null) return false;
             return m_listObject.ContainsKey(key);
         }
-        public int Count()
-        {
+        public int Count() {
             return m_listObject.Count;
         }
-        public void Clear()
-        {
+        public void Clear() {
             m_listObject.Clear();
         }
         public void Remove(object key) {
             m_listObject.Remove(key);
         }
-		public ScriptArray GetKeys() {
-			ScriptArray ret = m_Script.CreateArray ();
-			foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
-				ret.Add(m_Script.CreateObject(pair.Key));
-			}
-			return ret;
-		}
-		public ScriptArray GetValues() {
-			ScriptArray ret = m_Script.CreateArray ();
-			foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
-				ret.Add(pair.Value.Assign());
-			}
-			return ret;
-		}
+        public ScriptArray GetKeys() {
+            ScriptArray ret = m_Script.CreateArray();
+            foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
+                ret.Add(m_Script.CreateObject(pair.Key));
+            }
+            return ret;
+        }
+        public ScriptArray GetValues() {
+            ScriptArray ret = m_Script.CreateArray();
+            foreach (KeyValuePair<object, ScriptObject> pair in m_listObject) {
+                ret.Add(pair.Value.Assign());
+            }
+            return ret;
+        }
         public Dictionary<object, ScriptObject>.Enumerator GetIterator() {
             return m_listObject.GetEnumerator();
         }
@@ -118,8 +111,7 @@ namespace Scorpio
             return ret;
         }
         public override string ToString() { return "Table"; }
-        public override string ToJson()
-        {
+        public override string ToJson() {
             StringBuilder builder = new StringBuilder();
             builder.Append("{");
             bool first = true;
