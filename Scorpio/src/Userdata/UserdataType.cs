@@ -144,6 +144,10 @@ namespace Scorpio.Userdata
         }
         /// <summary> 设置一个类变量 </summary>
         public override void SetValue(object obj, string name, ScriptObject value) {
+            if (m_Rename.ContainsKey(name)) {
+                SetValue(obj, m_Rename[name], value);
+                return;
+            }
             UserdataVariable variable = GetVariable(name);
             if (variable == null) throw new ExecutionException(m_Script, "SetValue Type[" + m_Type + "] 变量 [" + name + "] 不存在");
             try {
@@ -177,10 +181,15 @@ namespace Scorpio.Userdata
         }
 
         public override object GetValue(object obj, string name) {
+            if (m_Rename.ContainsKey(name)) { return GetValue(obj, m_Rename[name]); }
             return m_Value.GetValue(obj, name);
         }
 
         public override void SetValue(object obj, string name, ScriptObject value) {
+            if (m_Rename.ContainsKey(name)) {
+                SetValue(obj, m_Rename[name], value);
+                return;
+            }
             m_Value.SetValue(obj, name, value);
         }
     }
