@@ -240,6 +240,11 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
 
 ## master版本更新和修改内容 ##
+(2017-06-20)
+-----------
+* 提升调用c#函数性能
+* 修复一个调用c#函数BUG
+
 (2017-06-19)
 -----------
 * table的function变量全部支持this关键字，例如
