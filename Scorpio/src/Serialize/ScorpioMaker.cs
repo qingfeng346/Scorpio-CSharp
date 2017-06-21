@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Scorpio.Compiler;
-namespace Scorpio.Serialize
-{
-    public class ScorpioMaker
-    {
+namespace Scorpio.Serialize {
+    public class ScorpioMaker {
         private static sbyte LineFlag = sbyte.MaxValue;
-		public static byte[] Serialize(String breviary, string data) {
-			List<Token> tokens = new ScriptLexer(data, breviary).GetTokens();
+        public static byte[] Serialize(String breviary, string data) {
+            List<Token> tokens = new ScriptLexer(data, breviary).GetTokens();
             if (tokens.Count == 0) return new byte[0];
             int sourceLine = 0;
             byte[] ret = null;
@@ -52,8 +50,7 @@ namespace Scorpio.Serialize
             }
             return ret;
         }
-        public static List<Token> Deserialize(byte[] data)
-        {
+        public static List<Token> Deserialize(byte[] data) {
             List<Token> tokens = new List<Token>();
             using (MemoryStream stream = new MemoryStream(data)) {
                 using (BinaryReader reader = new BinaryReader(stream)) {
@@ -95,8 +92,7 @@ namespace Scorpio.Serialize
             }
             return tokens;
         }
-        public static string DeserializeToString(byte[] data)
-        {
+        public static string DeserializeToString(byte[] data) {
             StringBuilder builder = new StringBuilder();
             using (MemoryStream stream = new MemoryStream(data)) {
                 using (BinaryReader reader = new BinaryReader(stream)) {
@@ -142,83 +138,82 @@ namespace Scorpio.Serialize
             }
             return builder.ToString();
         }
-        private static string GetTokenString(TokenType type)
-        {
-            switch (type)
-            {
-                case TokenType.LeftBrace: return "{";
-                case TokenType.RightBrace: return "}";
-                case TokenType.LeftBracket: return "[";
-                case TokenType.RightBracket: return "]";
-                case TokenType.LeftPar: return "(";
-                case TokenType.RightPar: return ")";
+        private static string GetTokenString(TokenType type) {
+            switch (type) {
+            case TokenType.LeftBrace: return "{";
+            case TokenType.RightBrace: return "}";
+            case TokenType.LeftBracket: return "[";
+            case TokenType.RightBracket: return "]";
+            case TokenType.LeftPar: return "(";
+            case TokenType.RightPar: return ")";
 
-                case TokenType.Period: return ".";
-                case TokenType.Comma: return ",";
-                case TokenType.Colon: return ":";
-                case TokenType.SemiColon: return ";";
-                case TokenType.QuestionMark: return "?";
-                case TokenType.Sharp: return "#";
+            case TokenType.Period: return ".";
+            case TokenType.Comma: return ",";
+            case TokenType.Colon: return ":";
+            case TokenType.SemiColon: return ";";
+            case TokenType.QuestionMark: return "?";
+            case TokenType.Sharp: return "#";
 
-                case TokenType.Plus: return "+";
-                case TokenType.Increment: return "++";
-                case TokenType.AssignPlus: return "+=";
-                case TokenType.Minus: return "-";
-                case TokenType.Decrement: return "--";
-                case TokenType.AssignMinus: return "-=";
-                case TokenType.Multiply: return "*";
-                case TokenType.AssignMultiply: return "*=";
-                case TokenType.Divide: return "/";
-                case TokenType.AssignDivide: return "/=";
-                case TokenType.Modulo: return "%";
-                case TokenType.AssignModulo: return "%=";
-                case TokenType.InclusiveOr: return "|";
-                case TokenType.AssignInclusiveOr: return "|=";
-                case TokenType.Or: return "||";
-                case TokenType.Combine: return "&";
-                case TokenType.AssignCombine: return "&=";
-                case TokenType.And: return "&&";
-                case TokenType.XOR: return "^";
-                case TokenType.AssignXOR: return "^=";
-                case TokenType.Shi: return "<<";
-                case TokenType.AssignShi: return "<<=";
-                case TokenType.Shr: return ">>";
-                case TokenType.AssignShr: return ">>=";
-                case TokenType.Not: return "!";
-                case TokenType.Assign: return "=";
-                case TokenType.Equal: return "==";
-                case TokenType.NotEqual: return "!=";
-                case TokenType.Greater: return ">";
-                case TokenType.GreaterOrEqual: return ">=";
-                case TokenType.Less: return "<";
-                case TokenType.LessOrEqual: return "<=";
+            case TokenType.Plus: return "+";
+            case TokenType.Increment: return "++";
+            case TokenType.AssignPlus: return "+=";
+            case TokenType.Minus: return "-";
+            case TokenType.Decrement: return "--";
+            case TokenType.AssignMinus: return "-=";
+            case TokenType.Multiply: return "*";
+            case TokenType.AssignMultiply: return "*=";
+            case TokenType.Divide: return "/";
+            case TokenType.AssignDivide: return "/=";
+            case TokenType.Modulo: return "%";
+            case TokenType.AssignModulo: return "%=";
+            case TokenType.InclusiveOr: return "|";
+            case TokenType.AssignInclusiveOr: return "|=";
+            case TokenType.Or: return "||";
+            case TokenType.Combine: return "&";
+            case TokenType.AssignCombine: return "&=";
+            case TokenType.And: return "&&";
+            case TokenType.XOR: return "^";
+            case TokenType.Negative: return "~";
+            case TokenType.AssignXOR: return "^=";
+            case TokenType.Shi: return "<<";
+            case TokenType.AssignShi: return "<<=";
+            case TokenType.Shr: return ">>";
+            case TokenType.AssignShr: return ">>=";
+            case TokenType.Not: return "!";
+            case TokenType.Assign: return "=";
+            case TokenType.Equal: return "==";
+            case TokenType.NotEqual: return "!=";
+            case TokenType.Greater: return ">";
+            case TokenType.GreaterOrEqual: return ">=";
+            case TokenType.Less: return "<";
+            case TokenType.LessOrEqual: return "<=";
 
-                case TokenType.Eval: return "eval";
-                case TokenType.Var: return "var";
-                case TokenType.Function: return "function";
-                case TokenType.If: return "if";
-                case TokenType.ElseIf: return "elif";
-                case TokenType.Else: return "else";
-                case TokenType.While: return "while";
-                case TokenType.For: return "for";
-                case TokenType.Foreach: return "foreach";
-                case TokenType.In: return "in";
-                case TokenType.Switch: return "switch";
-                case TokenType.Case: return "case";
-                case TokenType.Default: return "default";
-                case TokenType.Try: return "try";
-                case TokenType.Catch: return "catch";
-                case TokenType.Throw: return "throw";
-                case TokenType.Continue: return "continue";
-                case TokenType.Break: return "break";
-                case TokenType.Return: return "return";
-                case TokenType.Define: return "define";
-                case TokenType.Ifndef: return "ifndef";
-                case TokenType.Endif: return "endif";
-                case TokenType.Null: return "null";
-                case TokenType.Params: return "...";
+            case TokenType.Eval: return "eval";
+            case TokenType.Var: return "var";
+            case TokenType.Function: return "function";
+            case TokenType.If: return "if";
+            case TokenType.ElseIf: return "elif";
+            case TokenType.Else: return "else";
+            case TokenType.While: return "while";
+            case TokenType.For: return "for";
+            case TokenType.Foreach: return "foreach";
+            case TokenType.In: return "in";
+            case TokenType.Switch: return "switch";
+            case TokenType.Case: return "case";
+            case TokenType.Default: return "default";
+            case TokenType.Try: return "try";
+            case TokenType.Catch: return "catch";
+            case TokenType.Throw: return "throw";
+            case TokenType.Continue: return "continue";
+            case TokenType.Break: return "break";
+            case TokenType.Return: return "return";
+            case TokenType.Define: return "define";
+            case TokenType.Ifndef: return "ifndef";
+            case TokenType.Endif: return "endif";
+            case TokenType.Null: return "null";
+            case TokenType.Params: return "...";
+            default: return "";
             }
-            return "";
         }
     }
 }
