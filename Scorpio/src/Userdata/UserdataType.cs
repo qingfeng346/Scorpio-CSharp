@@ -33,15 +33,25 @@ namespace Scorpio.Userdata
         public void Rename(string name1, string name2) {
             m_Rename[name2] = name1;
         }
+        public object GetValue(object obj, string name) {
+            return m_Rename.ContainsKey(name) ? GetValue_impl(obj, m_Rename[name]) : GetValue_impl(obj, name);
+        }
+        public void SetValue(object obj, string name, ScriptObject value) {
+            if (m_Rename.ContainsKey(name)) {
+                SetValue_impl(obj, m_Rename[name], value);
+            } else {
+                SetValue_impl(obj, name, value);
+            }
+        }
         public abstract void AddExtensionMethod(MethodInfo method);
         /// <summary> 创建一个实例 </summary>
         public abstract object CreateInstance(ScriptObject[] parameters);
         /// <summary> 获得运算符重载的函数 </summary>
         public abstract ScorpioMethod GetComputeMethod(TokenType type);
         /// <summary> 获得一个类变量 </summary>
-        public abstract object GetValue(object obj, string name);
+        public abstract object GetValue_impl(object obj, string name);
         /// <summary> 设置一个类变量 </summary>
-        public abstract void SetValue(object obj, string name, ScriptObject value);
+        public abstract void SetValue_impl(object obj, string name, ScriptObject value);
     }
     public class ReflectUserdataType : UserdataType {
 		private bool m_InitializeConstructor;                           //是否初始化过所有构造函数
@@ -82,14 +92,6 @@ namespace Scorpio.Userdata
             }
             return null;
         }
-        //private ScorpioMethod GetMethod(object obj, string name, UserdataMethod method) {
-        //    if (method.IsStatic) {
-        //        return m_ScorpioMethods[name] = new ScorpioStaticMethod(name, method);
-        //    } else if (obj == null) {
-        //        return m_ScorpioMethods[name] = new ScorpioTypeMethod(m_Script, name, method, m_Type);
-        //    }
-        //    return new ScorpioObjectMethod(obj, name, method);
-        //}
         private UserdataVariable GetVariable(string name) {
             if (m_Variables.ContainsKey(name))
                 return m_Variables[name];
@@ -130,8 +132,7 @@ namespace Scorpio.Userdata
             }
         }
         /// <summary> 获得一个类变量 </summary>
-        public override object GetValue(object obj, string name) {
-            if (m_Rename.ContainsKey(name)) { return GetValue(obj, m_Rename[name]); }
+        public override object GetValue_impl(object obj, string name) {
             if (m_Functions.ContainsKey(name)) return m_Functions[name];
             if (m_NestedTypes.ContainsKey(name)) return m_NestedTypes[name];
             UserdataVariable variable = GetVariable(name);
@@ -143,11 +144,7 @@ namespace Scorpio.Userdata
             throw new ExecutionException(m_Script, "GetValue Type[" + m_Type.ToString() + "] 变量 [" + name + "] 不存在");
         }
         /// <summary> 设置一个类变量 </summary>
-        public override void SetValue(object obj, string name, ScriptObject value) {
-            if (m_Rename.ContainsKey(name)) {
-                SetValue(obj, m_Rename[name], value);
-                return;
-            }
+        public override void SetValue_impl(object obj, string name, ScriptObject value) {
             UserdataVariable variable = GetVariable(name);
             if (variable == null) throw new ExecutionException(m_Script, "SetValue Type[" + m_Type + "] 变量 [" + name + "] 不存在");
             try {
@@ -180,16 +177,11 @@ namespace Scorpio.Userdata
             }
         }
 
-        public override object GetValue(object obj, string name) {
-            if (m_Rename.ContainsKey(name)) { return GetValue(obj, m_Rename[name]); }
+        public override object GetValue_impl(object obj, string name) {
             return m_Value.GetValue(obj, name);
         }
 
-        public override void SetValue(object obj, string name, ScriptObject value) {
-            if (m_Rename.ContainsKey(name)) {
-                SetValue(obj, m_Rename[name], value);
-                return;
-            }
+        public override void SetValue_impl(object obj, string name, ScriptObject value) {
             m_Value.SetValue(obj, name, value);
         }
     }
