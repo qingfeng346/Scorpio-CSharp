@@ -160,7 +160,7 @@ namespace Scorpio.Runtime
         }
         private void ExecuteInstruction()
         {
-            switch (m_scriptInstruction.Opcode)
+            switch (m_scriptInstruction.opcode)
             {
                 case Opcode.VAR: ProcessVar(); break;
                 case Opcode.MOV: ProcessMov(); break;
@@ -194,23 +194,23 @@ namespace Scorpio.Runtime
         }
         void ProcessVar()
         {
-            ApplyVariableObject(m_scriptInstruction.Value);
+            ApplyVariableObject(m_scriptInstruction.opvalue);
         }
         void ProcessMov()
         {
-            SetVariable(m_scriptInstruction.Operand0 as CodeMember, ResolveOperand(m_scriptInstruction.Operand1));
+            SetVariable(m_scriptInstruction.operand0 as CodeMember, ResolveOperand(m_scriptInstruction.operand1));
         }
         void ProcessContinue()
         {
-            InvokeContinue(m_scriptInstruction.Operand0);
+            InvokeContinue(m_scriptInstruction.operand0);
         }
         void ProcessBreak()
         {
-            InvokeBreak(m_scriptInstruction.Operand0);
+            InvokeBreak(m_scriptInstruction.operand0);
         }
         void ProcessCallFor()
         {
-            CodeFor code = (CodeFor)m_scriptInstruction.Operand0;
+            CodeFor code = (CodeFor)m_scriptInstruction.operand0;
             ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.For);
             context.Execute(code.BeginExecutable);
             for ( ; ; ) {
@@ -225,7 +225,7 @@ namespace Scorpio.Runtime
         }
         void ProcessCallForSimple()
         {
-            CodeForSimple code = (CodeForSimple)m_scriptInstruction.Operand0;
+            CodeForSimple code = (CodeForSimple)m_scriptInstruction.operand0;
             ScriptNumber beginNumber = ResolveOperand(code.Begin) as ScriptNumber;
             if (beginNumber == null) throw new ExecutionException(m_script, "forsimple 初始值必须是number");
             ScriptNumber finishedNumber = ResolveOperand(code.Finished) as ScriptNumber;
@@ -250,7 +250,7 @@ namespace Scorpio.Runtime
         }
         void ProcessCallForeach()
         {
-            CodeForeach code = (CodeForeach)m_scriptInstruction.Operand0;
+            CodeForeach code = (CodeForeach)m_scriptInstruction.operand0;
             ScriptObject loop = ResolveOperand(code.LoopObject);
             if (!(loop is ScriptFunction)) throw new ExecutionException(m_script, "foreach函数必须返回一个ScriptFunction");
             object obj;
@@ -266,7 +266,7 @@ namespace Scorpio.Runtime
             }
         }
         void ProcessCallIf() {
-            CodeIf code = (CodeIf)m_scriptInstruction.Operand0;
+            CodeIf code = (CodeIf)m_scriptInstruction.operand0;
             if (ProcessAllow(code.If)) {
                 ProcessCondition(code.If);
                 return;
@@ -291,7 +291,7 @@ namespace Scorpio.Runtime
             new ScriptContext(m_script, condition.Executable, this, condition.Block).Execute();
         }
         void ProcessCallWhile() {
-            CodeWhile code = (CodeWhile)m_scriptInstruction.Operand0;
+            CodeWhile code = (CodeWhile)m_scriptInstruction.operand0;
             TempCondition condition = code.While;
             ScriptContext context;
             for ( ; ; ) {
@@ -307,7 +307,7 @@ namespace Scorpio.Runtime
         }
         void ProcessCallSwitch()
         {
-            CodeSwitch code = (CodeSwitch)m_scriptInstruction.Operand0;
+            CodeSwitch code = (CodeSwitch)m_scriptInstruction.operand0;
             ScriptObject obj = ResolveOperand(code.Condition);
             bool exec = false;
             foreach (TempCase Case in code.Cases) {
@@ -326,7 +326,7 @@ namespace Scorpio.Runtime
         }
         void ProcessTry()
         {
-            CodeTry code = (CodeTry)m_scriptInstruction.Operand0;
+            CodeTry code = (CodeTry)m_scriptInstruction.operand0;
             try {
                 new ScriptContext(m_script, code.TryExecutable, this).Execute();
             } catch (InteriorException ex) {
@@ -341,26 +341,26 @@ namespace Scorpio.Runtime
         }
         void ProcessThrow()
         {
-            throw new InteriorException(ResolveOperand(((CodeThrow)m_scriptInstruction.Operand0).obj));
+            throw new InteriorException(ResolveOperand(((CodeThrow)m_scriptInstruction.operand0).obj));
         }
         void ProcessRet()
         {
-            if (m_scriptInstruction.Operand0 == null)
+            if (m_scriptInstruction.operand0 == null)
                 InvokeReturnValue(null);
             else
-                InvokeReturnValue(ResolveOperand(m_scriptInstruction.Operand0));
+                InvokeReturnValue(ResolveOperand(m_scriptInstruction.operand0));
         }
         void ProcessResolve()
         {
-            ResolveOperand(m_scriptInstruction.Operand0);
+            ResolveOperand(m_scriptInstruction.operand0);
         }
         void ProcessCallBlock()
         {
-            ParseCallBlock((CodeCallBlock)m_scriptInstruction.Operand0);
+            ParseCallBlock((CodeCallBlock)m_scriptInstruction.operand0);
         }
         void ProcessCallFunction()
         {
-            ParseCall((CodeCallFunction)m_scriptInstruction.Operand0, false);
+            ParseCall((CodeCallFunction)m_scriptInstruction.operand0, false);
         }
         private void InvokeReturnValue(ScriptObject value)
         {

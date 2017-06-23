@@ -39,22 +39,7 @@ namespace Scorpio.Compiler
             return m_strBreviary;
         }
         private bool IsIdentifier(char ch) {
-#if SCORPIO_CN_VAR
-            if (ch >= ' ' && ch <= '/')
-                return false;
-            if (ch >= ':' && ch <= '@')
-                return false;
-            if (ch >= '[' && ch <= '^')
-                return false;
-            if (ch >= '{' && ch <= '~')
-                return false;
-            if (ch == '`')
-                return false;
-            return true;
-
-#else
             return (ch == '_' || char.IsLetterOrDigit(ch));
-#endif
         }
         /// <summary> 解析字符串 </summary>
         public List<Token> GetTokens() {

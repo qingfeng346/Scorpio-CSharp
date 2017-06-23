@@ -7,10 +7,8 @@ using Scorpio;
 using Scorpio.Variable;
 using Scorpio.Exception;
 using System.Runtime.CompilerServices;
-namespace Scorpio
-{
-    public static class Util
-    {
+namespace Scorpio {
+    public static class Util {
         private static readonly Type TYPE_VOID = typeof(void);
         private static readonly Type TYPE_OBJECT = typeof(object);
         private static readonly Type TYPE_TYPE = typeof(Type);
@@ -45,8 +43,7 @@ namespace Scorpio
         public static bool IsExtensionMethod(MemberInfo method) {
             return method.IsDefined(TYPE_EXTENSIONATTRIBUTE, false);
         }
-        public static object ChangeType(Script script, ScriptObject par, Type type)
-        {
+        public static object ChangeType(Script script, ScriptObject par, Type type) {
             if (type == TYPE_OBJECT) {
                 return par.ObjectValue;
             } else {
@@ -63,8 +60,7 @@ namespace Scorpio
                     return par.ObjectValue;
             }
         }
-        public static bool CanChangeType(ScriptObject par, Type type)
-        {
+        public static bool CanChangeType(ScriptObject par, Type type) {
             if (type == TYPE_OBJECT)
                 return true;
             else if (type == TYPE_SBYTE || type == TYPE_BYTE || type == TYPE_SHORT || type == TYPE_USHORT || type == TYPE_INT || type == TYPE_UINT ||
@@ -87,8 +83,10 @@ namespace Scorpio
             else
                 return type.GetTypeInfo().IsAssignableFrom(par.GetType());
         }
-        public static void WriteString(BinaryWriter writer, string str)
-        {
+        public static void Assert(bool b, Script script, string message) {
+            if (!b) throw new ExecutionException(script, message);
+        }
+        public static void WriteString(BinaryWriter writer, string str) {
             if (string.IsNullOrEmpty(str)) {
                 writer.Write((byte)0);
             } else {
@@ -96,8 +94,7 @@ namespace Scorpio
                 writer.Write((byte)0);
             }
         }
-        public static string ReadString(BinaryReader reader)
-        {
+        public static string ReadString(BinaryReader reader) {
             List<byte> sb = new List<byte>();
             byte ch;
             while ((ch = reader.ReadByte()) != 0)
@@ -105,29 +102,56 @@ namespace Scorpio
             byte[] buffer = sb.ToArray();
             return Encoding.UTF8.GetString(buffer, 0, buffer.Length);
         }
-        public static bool IsNullOrEmpty(String str)
-        {
-            return string.IsNullOrEmpty(str);
+        public static bool IsNullOrEmpty(String value) {
+            return value == null || value.Length == 0;
         }
-        public static object ChangeType_impl(object value, Type conversionType)
-        {
+        public static string Join(String separator, String[] stringarray) {
+            int startindex = 0;
+            int count = stringarray.Length;
+            String result = "";
+            for (int index = startindex; index < count; index++) {
+                if (index > startindex)
+                    result += separator;
+                result += stringarray[index];
+            }
+            return result;
+        }
+        public static object ChangeType_impl(object value, Type conversionType) {
             return Convert.ChangeType(value, conversionType);
         }
-        public static void Assert(bool b, Script script, string message)
-        {
-            if (!b) throw new ExecutionException(script, message);
+        public static object ToEnum(Type type, int value) {
+            return Enum.ToObject(type, value);
         }
-        public static int ToInt32(object value)
-        {
+        public static sbyte ToSByte(object value) {
+            return Convert.ToSByte(value);
+        }
+        public static byte ToByte(object value) {
+            return Convert.ToByte(value);
+        }
+        public static Int16 ToInt16(object value) {
+            return Convert.ToInt16(value);
+        }
+        public static UInt16 ToUInt16(object value) {
+            return Convert.ToUInt16(value);
+        }
+        public static Int32 ToInt32(object value) {
             return Convert.ToInt32(value);
         }
-        public static double ToDouble(object value)
-        {
-            return Convert.ToDouble(value);
+        public static UInt32 ToUInt32(object value) {
+            return Convert.ToUInt32(value);
         }
-        public static long ToInt64(object value)
-        {
+        public static Int64 ToInt64(object value) {
             return Convert.ToInt64(value);
         }
+        public static UInt64 ToUInt64(object value) {
+            return Convert.ToUInt64(value);
+        }
+        public static float ToSingle(object value) {
+            return Convert.ToSingle(value);
+        }
+        public static double ToDouble(object value) {
+            return Convert.ToDouble(value);
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace Scorpio.Variable {
+﻿using Scorpio;
+namespace Scorpio.Variable {
     public class ScriptNumberUShort : ScriptNumber {
         private ushort m_Value;
         public override ObjectType Type { get { return ObjectType.Number; } }

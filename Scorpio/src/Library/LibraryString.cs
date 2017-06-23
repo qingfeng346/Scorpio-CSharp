@@ -78,12 +78,12 @@ namespace Scorpio.Library {
         }
         private class tolower : ScorpioHandle {
             public object Call(ScriptObject[] args) {
-                return (args[0] as ScriptString).Value.ToLowerInvariant();
+                return (args[0] as ScriptString).Value.ToLower();
             }
         }
         private class toupper : ScorpioHandle {
             public object Call(ScriptObject[] args) {
-                return (args[0] as ScriptString).Value.ToUpperInvariant();
+                return (args[0] as ScriptString).Value.ToUpper();
             }
         }
         private class trim : ScorpioHandle {
@@ -161,17 +161,15 @@ namespace Scorpio.Library {
                 ScriptArray value = (args[1] as ScriptArray);
                 var count = value.Count();
                 string[] values = new string[count];
-                for (int i = 0; i < count; ++i) {
-                    values[i] = value.GetValue(i).ToString();
-                }
-                return string.Join(separator, values);
+                for (int i = 0; i < count; ++i) { values[i] = value.GetValue(i).ToString(); }
+                return Util.Join(separator, values);
             }
         }
         private class at : ScorpioHandle {
             public object Call(ScriptObject[] args) {
                 string str = (args[0] as ScriptString).Value;
                 int index = (args[1] as ScriptNumber).ToInt32();
-                return Convert.ToInt32(str[index]);
+                return (int)str[index];
             }
         }
         private class char2ascii : ScorpioHandle {
@@ -185,11 +183,11 @@ namespace Scorpio.Library {
                 if (length == 0) {
                     return null;
                 } else if (length == 1) {
-                    return Convert.ToInt32(str[0]);
+                    return (int)str[0];
                 } else {
                     ScriptArray array = m_script.CreateArray();
                     for (int i = 0; i < length; ++i) {
-                        array.Add(m_script.CreateObject(Convert.ToInt32(str[i])));
+                        array.Add(m_script.CreateObject((int)str[i]));
                     }
                     return array;
                 }
@@ -199,12 +197,12 @@ namespace Scorpio.Library {
             public object Call(ScriptObject[] args) {
                 ScriptNumber num = args[0] as ScriptNumber;
                 if (num != null) {
-                    return new string(new char[] { Convert.ToChar(num.ToInt32()) });
+                    return new string(new char[] { (char)num.ToInt32() });
                 } else {
                     ScriptArray array = args[0] as ScriptArray;
                     char[] chars = new char[array.Count()];
                     for (int i = 0;i<array.Count();++i) {
-                        chars[i] = Convert.ToChar((array.GetValue(i) as ScriptNumber).ToInt32());
+                        chars[i] = (char)((array.GetValue(i) as ScriptNumber).ToInt32());
                     }
                     return new string(chars);
                 }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Scorpio;
 namespace Scorpio.Variable {
     public class ScriptNumberSByte : ScriptNumber {
         private sbyte m_Value;

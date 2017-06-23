@@ -17,9 +17,10 @@ namespace Scorpio {
         public const string DynamicDelegateName = "__DynamicDelegate__";
         public const string Version = "master";
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
-        private const string GLOBAL_TABLE = "_G";               //全局table
-        private const string GLOBAL_VERSION = "_VERSION";       //版本号
-        private const string GLOBAL_SCRIPT = "_SCRIPT";         //Script对象
+        private const string GLOBAL_TABLE = "_G";                   //全局table
+        private const string GLOBAL_VERSION = "_VERSION";           //版本号
+        private const string GLOBAL_SCRIPT = "_SCRIPT";             //Script对象
+        private static readonly Encoding UTF8 = Encoding.UTF8;      //默认编码格式
         private ScriptTable m_GlobalTable;                                      //全局Table
         private Stack<StackInfo> m_StackInfoStack = new Stack<StackInfo>();     //堆栈数据
         private List<Assembly> m_Assembly = new List<Assembly>();               //所有代码集合
@@ -60,7 +61,7 @@ namespace Scorpio {
             LibraryUserdata.Load(this);
         }
         public ScriptObject LoadFile(String strFileName) {
-            return LoadFile(strFileName, Encoding.UTF8);
+            return LoadFile(strFileName, UTF8);
         }
         public ScriptObject LoadFile(String fileName, Encoding encoding) {
             using (FileStream stream = File.OpenRead(fileName)) {
@@ -71,10 +72,10 @@ namespace Scorpio {
             }
         }
         public ScriptObject LoadBuffer(byte[] buffer) {
-            return LoadBuffer("Undefined", buffer, Encoding.UTF8);
+            return LoadBuffer("Undefined", buffer, UTF8);
         }
         public ScriptObject LoadBuffer(String strBreviary, byte[] buffer) {
-            return LoadBuffer(strBreviary, buffer, Encoding.UTF8);
+            return LoadBuffer(strBreviary, buffer, UTF8);
         }
         public ScriptObject LoadBuffer(String strBreviary, byte[] buffer, Encoding encoding) {
             if (buffer == null || buffer.Length == 0) { return null; }
@@ -236,7 +237,7 @@ namespace Scorpio {
             else if (value is long)
                 return new ScriptNumberLong(this, (long)value);
             else if (value is sbyte || value is byte || value is short || value is ushort || value is int || value is uint || value is float || value is double || value is decimal)
-                return new ScriptNumberDouble(this, Convert.ToDouble(value));
+                return new ScriptNumberDouble(this, Util.ToDouble(value));
             else if (value is ScriptObject)
                 return (ScriptObject)value;
             else if (value is ScorpioFunction)

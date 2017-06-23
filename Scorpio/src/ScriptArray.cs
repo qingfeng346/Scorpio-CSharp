@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Exception;
-namespace Scorpio
-{
+namespace Scorpio {
     //脚本数组类型
-    public class ScriptArray : ScriptObject
-    {
+    public class ScriptArray : ScriptObject {
         public struct Comparer : IComparer<ScriptObject> {
             Script script;
             ScriptFunction func;
@@ -56,8 +54,7 @@ namespace Scorpio
             m_size = 0;
             m_null = script.Null;
         }
-        public override ScriptObject GetValue(object index)
-        {
+        public override ScriptObject GetValue(object index) {
             if (index is double || index is int || index is long) {
                 int i = Util.ToInt32(index);
                 if (i < 0)
@@ -65,13 +62,12 @@ namespace Scorpio
                 if (i >= m_size)
                     return m_null;
                 return m_listObject[i] ?? m_null;
-            } else if (index is string && index.Equals("length")){
+            } else if (index is string && index.Equals("length")) {
                 return m_Script.CreateDouble(Util.ToDouble(m_size));
             }
             throw new ExecutionException(m_Script, this, "Array GetValue只支持Number类型 index值为:" + index);
         }
-        public override void SetValue(object index, ScriptObject obj)
-        {
+        public override void SetValue(object index, ScriptObject obj) {
             if (index is double || index is int || index is long) {
                 int i = Util.ToInt32(index);
                 if (i < 0)
@@ -108,16 +104,14 @@ namespace Scorpio
                 SetCapacity(num);
             }
         }
-        public void Add(ScriptObject obj)
-        {
+        public void Add(ScriptObject obj) {
             if (m_size == m_listObject.Length) {
                 EnsureCapacity(m_size + 1);
             }
             m_listObject[m_size] = obj;
             m_size++;
         }
-        public void Insert(int index, ScriptObject obj)
-        {
+        public void Insert(int index, ScriptObject obj) {
             if (m_size == m_listObject.Length) {
                 EnsureCapacity(m_size + 1);
             }
@@ -127,8 +121,7 @@ namespace Scorpio
             m_listObject[index] = obj;
             m_size++;
         }
-        public bool Remove(ScriptObject obj)
-        {
+        public bool Remove(ScriptObject obj) {
             int num = IndexOf(obj);
             if (num >= 0) {
                 RemoveAt(num);
@@ -136,25 +129,22 @@ namespace Scorpio
             }
             return false;
         }
-        public void RemoveAt(int index)
-        {
+        public void RemoveAt(int index) {
             m_size--;
             if (index < m_size) {
                 Array.Copy(m_listObject, index + 1, m_listObject, index, m_size - index);
             }
             m_listObject[m_size] = null;
         }
-        public bool Contains(ScriptObject obj)
-        {
-            for (int i = 0;i < m_size; ++i) {
+        public bool Contains(ScriptObject obj) {
+            for (int i = 0; i < m_size; ++i) {
                 if (obj.Equals(m_listObject[i])) {
                     return true;
                 }
             }
             return false;
         }
-        public int IndexOf(ScriptObject obj)
-        {
+        public int IndexOf(ScriptObject obj) {
             for (int i = 0; i < m_size; ++i) {
                 if (obj.Equals(m_listObject[i])) {
                     return i;
@@ -162,8 +152,7 @@ namespace Scorpio
             }
             return -1;
         }
-        public int LastIndexOf(ScriptObject obj)
-        {
+        public int LastIndexOf(ScriptObject obj) {
             for (int i = m_size - 1; i >= 0; --i) {
                 if (obj.Equals(m_listObject[i])) {
                     return i;
@@ -191,39 +180,34 @@ namespace Scorpio
         public int Count() {
             return m_size;
         }
-		public void Sort(ScriptFunction func) {
+        public void Sort(ScriptFunction func) {
             Array.Sort<ScriptObject>(m_listObject, 0, m_size, new Comparer(m_Script, func));
         }
-        public ScriptObject First()
-        {
+        public ScriptObject First() {
             if (m_size > 0)
                 return m_listObject[0];
             return m_null;
         }
-        public ScriptObject Last()
-        {
+        public ScriptObject Last() {
             if (m_size > 0)
                 return m_listObject[m_size - 1];
             return m_null;
         }
-        public ScriptObject PopFirst()
-        {
+        public ScriptObject PopFirst() {
             if (m_size == 0)
                 throw new ExecutionException(m_Script, this, "Array Pop 数组长度为0");
             ScriptObject obj = m_listObject[0];
             RemoveAt(0);
             return obj;
         }
-        public ScriptObject SafePopFirst()
-        {
+        public ScriptObject SafePopFirst() {
             if (m_size == 0)
                 return m_null;
             ScriptObject obj = m_listObject[0];
             RemoveAt(0);
             return obj;
         }
-        public ScriptObject PopLast()
-        {
+        public ScriptObject PopLast() {
             if (m_size == 0)
                 throw new ExecutionException(m_Script, this, "Array Pop 数组长度为0");
             int index = m_size - 1;
@@ -231,8 +215,7 @@ namespace Scorpio
             RemoveAt(index);
             return obj;
         }
-        public ScriptObject SafePopLast()
-        {
+        public ScriptObject SafePopLast() {
             if (m_size == 0)
                 return m_null;
             int index = m_size - 1;
@@ -241,18 +224,15 @@ namespace Scorpio
             return obj;
         }
 
-        public Enumerator GetIterator()
-        {
+        public Enumerator GetIterator() {
             return new Enumerator(this);
         }
-        public ScriptObject[] ToArray()
-        {
+        public ScriptObject[] ToArray() {
             ScriptObject[] array = new ScriptObject[m_size];
             Array.Copy(m_listObject, 0, array, 0, m_size);
             return array;
         }
-        public override ScriptObject Clone()
-        {
+        public override ScriptObject Clone() {
             ScriptArray ret = m_Script.CreateArray();
             ret.m_listObject = new ScriptObject[m_size];
             ret.m_size = m_size;
@@ -268,8 +248,7 @@ namespace Scorpio
             return ret;
         }
         public override string ToString() { return "Array"; }
-        public override string ToJson()
-        {
+        public override string ToJson() {
             StringBuilder builder = new StringBuilder();
             builder.Append("[");
             for (int i = 0; i < m_size; ++i) {
