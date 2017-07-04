@@ -13,9 +13,6 @@ namespace Scorpio {
         private Dictionary<object, ScriptObject> m_listObject = new Dictionary<object, ScriptObject>();  //所有的数据(函数和数据都在一个数组)
         public ScriptTable(Script script) : base(script) { }
         public override void SetValue(object key, ScriptObject value) {
-            if (value is ScriptScriptFunction) {
-                ((ScriptScriptFunction)value).SetTable(this);
-            }
             m_listObject[key] = value.Assign();
         }
         public override ScriptObject GetValue(object key) {

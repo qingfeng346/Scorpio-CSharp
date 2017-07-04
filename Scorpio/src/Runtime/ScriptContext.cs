@@ -477,11 +477,15 @@ namespace Scorpio.Runtime
             ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.None);
             ScriptTable ret = m_script.CreateTable();
             foreach (ScriptScriptFunction func in table.Functions) {
+                func.SetTable(ret);
                 ret.SetValue(func.Name, func);
                 context.SetVariableForce(func.Name, func);
             }
             foreach (CodeTable.TableVariable variable in table.Variables) {
                 ScriptObject value = context.ResolveOperand(variable.value);
+                if (value is ScriptScriptFunction) {
+                    ((ScriptScriptFunction)value).SetTable(ret);
+                }
                 ret.SetValue(variable.key, value);
                 context.SetVariableForce(variable.key.ToString(), value);
             }
