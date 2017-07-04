@@ -240,9 +240,14 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
 
 ## master版本更新和修改内容 ##
+(2017-07-04)
+-----------
+* 修复一个table function 中 赋值 this 的 bug
+
 (2017-06-21)
 -----------
 * 添加userdata库，只有一个 rename 函数，可以重命名 c# 函数名称，例如：
+
 ```javascript
 ListType = import_type("System.Collections.Generic.List`1")
 StringType = import_type("System.String")
@@ -259,9 +264,6 @@ print(lt.testCapacity)
 lt.testCapacity = 15000
 print(lt.testCapacity)
 ```
-(2017-07-04)
------------
-* 修复一个table function 中 赋值 this 的 bug
 
 (2017-06-20)
 -----------
