@@ -282,11 +282,12 @@ tab = {
         print(this.a)
     }
     function d () {
+        //此处可以使用this
         print(this.a)
     }
 }
 tab.c = function() {
-    //此处可以使用this
+    //此处不可以使用 this ，只有在table内部声明才可以使用this
     print(this.a)
 }
 ```
