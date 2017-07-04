@@ -259,6 +259,9 @@ print(lt.testCapacity)
 lt.testCapacity = 15000
 print(lt.testCapacity)
 ```
+(2017-07-04)
+-----------
+* 修复一个table function 中 赋值 this 的 bug
 
 (2017-06-20)
 -----------
