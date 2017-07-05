@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using Scorpio.Compiler;
-namespace Scorpio.CodeDom.Temp
-{
-    public class TempOperator
-    {
+namespace Scorpio.CodeDom.Temp {
+    public class TempOperator {
         const int HighOperate = 6;
         const int LowOperate = 5;
         const int Compare = 4;
@@ -11,8 +9,7 @@ namespace Scorpio.CodeDom.Temp
         const int Logical = 2;
         //运算符优先级表 优先级高的 先执行
         private static Dictionary<TokenType, TempOperator> Operators = new Dictionary<TokenType, TempOperator>();
-		static TempOperator()
-		{
+        static TempOperator() {
             Operators[TokenType.And] = new TempOperator(TokenType.And, Logical);
             Operators[TokenType.Or] = new TempOperator(TokenType.Or, Logical);
 
@@ -35,17 +32,15 @@ namespace Scorpio.CodeDom.Temp
             Operators[TokenType.Multiply] = new TempOperator(TokenType.Multiply, HighOperate);
             Operators[TokenType.Divide] = new TempOperator(TokenType.Divide, HighOperate);
             Operators[TokenType.Modulo] = new TempOperator(TokenType.Modulo, HighOperate);
-		}
+        }
         public TokenType Operator;      //符号类型
         public int Level;               //优先级
-        public TempOperator(TokenType oper, int level)
-        {
+        public TempOperator(TokenType oper, int level) {
             this.Operator = oper;
             this.Level = level;
         }
         //获得运算符
-        public static TempOperator GetOper(TokenType oper)
-        {
+        public static TempOperator GetOper(TokenType oper) {
             if (Operators.ContainsKey(oper))
                 return Operators[oper];
             return null;

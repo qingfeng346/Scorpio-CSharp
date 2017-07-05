@@ -6,17 +6,21 @@ using Scorpio;
 using Scorpio.Exception;
 using Scorpio.Variable;
 using Scorpio.Compiler;
-namespace Scorpio.Userdata
-{
+namespace Scorpio.Userdata {
     /// <summary> 保存一个类的所有元素 </summary>
-    public abstract class UserdataType
-    {
-        protected Script m_Script;                                        //脚本系统
-        protected Type m_Type;                                            //类型
-        protected Dictionary<string, string> m_Rename = new Dictionary<string, string>();       //
+    public abstract class UserdataType {
+        protected Script m_Script;                                                              //脚本系统
+        protected Type m_Type;                                                                  //类型
+        protected Dictionary<string, string> m_Rename = new Dictionary<string, string>();       //变量重命名
+        protected Dictionary<TokenType, ScorpioMethod> m_ComputeMethods = new Dictionary<TokenType, ScorpioMethod>();       //运算符重载函数
+        protected Dictionary<TokenType, string> m_ComputeNames = new Dictionary<TokenType, string>();                       //运算符重载名字
         public UserdataType(Script script, Type type) {
             m_Script = script;
             m_Type = type;
+            m_ComputeNames[TokenType.Plus] = "op_Addition";
+            m_ComputeNames[TokenType.Minus] = "op_Subtraction";
+            m_ComputeNames[TokenType.Multiply] = "op_Multiply";
+            m_ComputeNames[TokenType.Divide] = "op_Division";
         }
         /// <summary> 初始化泛型类 </summary>
         public ScriptUserdata MakeGenericType(Type[] parameters) {
@@ -43,19 +47,30 @@ namespace Scorpio.Userdata
                 SetValue_impl(obj, name, value);
             }
         }
+        /// <summary> 获得运算符重载的函数 </summary>
+        public ScorpioMethod GetComputeMethod(TokenType type) {
+            if (m_ComputeMethods.ContainsKey(type)) {
+                return m_ComputeMethods[type];
+            } else {
+                ScorpioMethod method = GetComputeMethod_impl(type);
+                m_ComputeMethods.Add(type, method);
+                return method;
+            }
+        }
+
         public abstract void AddExtensionMethod(MethodInfo method);
         /// <summary> 创建一个实例 </summary>
         public abstract object CreateInstance(ScriptObject[] parameters);
         /// <summary> 获得运算符重载的函数 </summary>
-        public abstract ScorpioMethod GetComputeMethod(TokenType type);
+        public abstract ScorpioMethod GetComputeMethod_impl(TokenType type);
         /// <summary> 获得一个类变量 </summary>
         public abstract object GetValue_impl(object obj, string name);
         /// <summary> 设置一个类变量 </summary>
         public abstract void SetValue_impl(object obj, string name, ScriptObject value);
     }
     public class ReflectUserdataType : UserdataType {
-		private bool m_InitializeConstructor;                           //是否初始化过所有构造函数
-		private bool m_InitializeMethods;                               //是否初始化过所有函数
+        private bool m_InitializeConstructor;                           //是否初始化过所有构造函数
+        private bool m_InitializeMethods;                               //是否初始化过所有函数
         private UserdataMethod m_Constructor;                           //所有构造函数
         private List<MethodInfo> m_Methods;                             //所有函数 包含扩展函数
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
@@ -63,26 +78,26 @@ namespace Scorpio.Userdata
         private Dictionary<string, UserdataMethod> m_Functions;         //所有的函数
         private Dictionary<string, ScorpioMethod> m_ScorpioMethods;     //所有的静态函数和类函数（不包含对象函数）
         public ReflectUserdataType(Script script, Type type) : base(script, type) {
-			m_InitializeConstructor = false;
-			m_InitializeMethods = false;
+            m_InitializeConstructor = false;
+            m_InitializeMethods = false;
             m_Methods = new List<MethodInfo>();
             m_Variables = new Dictionary<string, UserdataVariable>();
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, UserdataMethod>();
             m_ScorpioMethods = new Dictionary<string, ScorpioMethod>();
         }
-		private void InitializeConstructor() {
-			if (m_InitializeConstructor == true) return;
-			m_InitializeConstructor = true;
-			m_Constructor = new ReflectUserdataMethod(m_Script, m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors());
-		}
-		private void InitializeMethods() {
-			if (m_InitializeMethods == true) return;
-			m_InitializeMethods = true;
+        private void InitializeConstructor() {
+            if (m_InitializeConstructor == true) return;
+            m_InitializeConstructor = true;
+            m_Constructor = new ReflectUserdataMethod(m_Script, m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors());
+        }
+        private void InitializeMethods() {
+            if (m_InitializeMethods == true) return;
+            m_InitializeMethods = true;
             m_Methods.AddRange(m_Type.GetTypeInfo().GetMethods(Script.BindingFlag));
-		}
+        }
         private UserdataMethod GetMethod(string name) {
-			InitializeMethods();
+            InitializeMethods();
             foreach (var method in m_Methods) {
                 if (method.Name.Equals(name)) {
                     ReflectUserdataMethod ret = new ReflectUserdataMethod(m_Script, m_Type, name, m_Methods);
@@ -118,18 +133,18 @@ namespace Scorpio.Userdata
         }
         /// <summary> 创建一个实例 </summary>
         public override object CreateInstance(ScriptObject[] parameters) {
-			InitializeConstructor();
+            InitializeConstructor();
             return m_Constructor.Call(null, parameters);
         }
         /// <summary> 获得运算符重载的函数 </summary>
-        public override ScorpioMethod GetComputeMethod(TokenType type) {
-            switch (type) {
-            case TokenType.Plus: return GetValue(null, "op_Addition") as ScorpioMethod;
-            case TokenType.Minus: return GetValue(null, "op_Subtraction") as ScorpioMethod;
-            case TokenType.Multiply: return GetValue(null, "op_Multiply") as ScorpioMethod;
-            case TokenType.Divide: return GetValue(null, "op_Division") as ScorpioMethod;
-            default: return null;
+        public override ScorpioMethod GetComputeMethod_impl(TokenType type) {
+            if (m_ComputeNames.ContainsKey(type)) {
+                object ret = GetValue(null, m_ComputeNames[type]);
+                if (ret is UserdataMethod) {
+                    return new ScorpioStaticMethod(m_ComputeNames[type], (UserdataMethod)ret);
+                }
             }
+            return null;
         }
         /// <summary> 获得一个类变量 </summary>
         public override object GetValue_impl(object obj, string name) {
@@ -162,19 +177,13 @@ namespace Scorpio.Userdata
             m_Constructor = value.GetConstructor();
         }
         public override void AddExtensionMethod(MethodInfo method) {
-            
+
         }
         public override object CreateInstance(ScriptObject[] parameters) {
             return m_Constructor.Call(null, parameters);
         }
-        public override ScorpioMethod GetComputeMethod(TokenType type) {
-            switch (type) {
-            case TokenType.Plus: return m_Value.GetValue(null, "op_Addition") as ScorpioMethod;
-            case TokenType.Minus: return m_Value.GetValue(null, "op_Subtraction") as ScorpioMethod;
-            case TokenType.Multiply: return m_Value.GetValue(null, "op_Multiply") as ScorpioMethod;
-            case TokenType.Divide: return m_Value.GetValue(null, "op_Division") as ScorpioMethod;
-            default: return null;
-            }
+        public override ScorpioMethod GetComputeMethod_impl(TokenType type) {
+            return m_ComputeNames.ContainsKey(type) ? m_Value.GetValue(null, m_ComputeNames[type]) as ScorpioMethod : null;
         }
 
         public override object GetValue_impl(object obj, string name) {

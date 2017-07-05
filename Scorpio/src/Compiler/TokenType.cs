@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Scorpio.Compiler
-{
+namespace Scorpio.Compiler {
     //脚本的表征类型
-    public enum TokenType
-    {
+    public enum TokenType {
         /// <summary>
         /// 空类型（没有实际用途）
         /// </summary>
