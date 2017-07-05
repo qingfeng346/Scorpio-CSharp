@@ -240,6 +240,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
 
 ## master版本更新和修改内容 ##
+(2017-07-05)
+-----------
+* 修复一个运算符重载的BUG
+
 (2017-07-04)
 -----------
 * 修复一个table function 中 赋值 this 的 bug
