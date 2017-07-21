@@ -247,7 +247,7 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return "Array"; }
+        public override string ToString() { return ToJson(); }
         public override string ToJson() {
             StringBuilder builder = new StringBuilder();
             builder.Append("[");

@@ -157,11 +157,7 @@ namespace Scorpio.Library {
         private class print : ScorpioHandle {
             public object Call(ScriptObject[] args) {
                 for (int i = 0; i < args.Length; ++i) {
-                    if (args[i] is ScriptArray || args[i] is ScriptTable) {
-                        Console.WriteLine(args[i].ToJson());
-                    } else {
-                        Console.WriteLine(args[i].ToString());
-                    }
+                    Console.WriteLine(args[i].ToString());
                 }
                 return null;
             }

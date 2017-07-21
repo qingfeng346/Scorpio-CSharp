@@ -1,10 +1,8 @@
 ﻿using System;
 using Scorpio.Exception;
 using Scorpio.Compiler;
-namespace Scorpio
-{
-    public enum ObjectType
-    {
+namespace Scorpio {
+    public enum ObjectType {
         Null,           //Null
         Boolean,        //布尔
         Number,         //数字
@@ -16,20 +14,18 @@ namespace Scorpio
         UserData,       //普通类
     }
     //脚本数据类型
-    public abstract class ScriptObject
-    {
+    public abstract class ScriptObject {
         // 无参                            
         private static readonly ScriptObject[] NOPARAMETER = new ScriptObject[0];
         // Object名字
         public String Name { get; set; }
         // 赋值
-        public virtual ScriptObject Assign() { return this; }                           
+        public virtual ScriptObject Assign() { return this; }
         //设置变量
         public virtual void SetValue(object key, ScriptObject value) { throw new ExecutionException(m_Script, this, "类型[" + Type + "]不支持设置变量[" + key + "]"); }
         //获取变量
         public virtual ScriptObject GetValue(object key) { throw new ExecutionException(m_Script, this, "类型[" + Type + "]不支持获取变量[" + key + "]"); }
-        public object call(params object[] args)
-        {
+        public object call(params object[] args) {
             int length = args.Length;
             ScriptObject[] parameters = new ScriptObject[length];
             for (int i = 0; i < length; ++i) parameters[i] = m_Script.CreateObject(args[i]);
@@ -54,14 +50,14 @@ namespace Scorpio
         // ToString
         public override string ToString() { return ObjectValue.ToString(); }
         // Equals
-        public override bool Equals(object obj) {                                       
+        public override bool Equals(object obj) {
             if (obj == null) return false;
             if (!(obj is ScriptObject)) return false;
             if (ObjectValue == this) return obj == this;
             return ObjectValue.Equals(((ScriptObject)obj).ObjectValue);
         }
         // GetHashCode
-        public override int GetHashCode() {                                             
+        public override int GetHashCode() {
             return base.GetHashCode();
         }
         protected Script m_Script;

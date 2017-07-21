@@ -107,7 +107,7 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return "Table"; }
+        public override string ToString() { return ToJson(); }
         public override string ToJson() {
             StringBuilder builder = new StringBuilder();
             builder.Append("{");

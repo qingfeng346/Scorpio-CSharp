@@ -484,7 +484,8 @@ namespace Scorpio.Runtime
             foreach (CodeTable.TableVariable variable in table.Variables) {
                 ScriptObject value = context.ResolveOperand(variable.value);
                 if (value is ScriptScriptFunction) {
-                    ((ScriptScriptFunction)value).SetTable(ret);
+                    ScriptScriptFunction func = (ScriptScriptFunction)value;
+                    if (func.IsStaticFunction) func.SetTable(ret);
                 }
                 ret.SetValue(variable.key, value);
                 context.SetVariableForce(variable.key.ToString(), value);
