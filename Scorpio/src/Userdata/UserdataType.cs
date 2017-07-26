@@ -76,7 +76,6 @@ namespace Scorpio.Userdata {
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
         private Dictionary<string, ScriptUserdata> m_NestedTypes;       //所有的类中类
         private Dictionary<string, UserdataMethod> m_Functions;         //所有的函数
-        private Dictionary<string, ScorpioMethod> m_ScorpioMethods;     //所有的静态函数和类函数（不包含对象函数）
         public ReflectUserdataType(Script script, Type type) : base(script, type) {
             m_InitializeConstructor = false;
             m_InitializeMethods = false;
@@ -84,7 +83,6 @@ namespace Scorpio.Userdata {
             m_Variables = new Dictionary<string, UserdataVariable>();
             m_NestedTypes = new Dictionary<string, ScriptUserdata>();
             m_Functions = new Dictionary<string, UserdataMethod>();
-            m_ScorpioMethods = new Dictionary<string, ScorpioMethod>();
         }
         private void InitializeConstructor() {
             if (m_InitializeConstructor == true) return;
