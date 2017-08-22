@@ -240,6 +240,18 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
 
 ## master版本更新和修改内容 ##
+(2017-08-22)
+-----------
+* 增加字符串内部变量功能，例如：
+
+```javascript
+var a = 1
+var b = 2
+print("a${a}a${b+1}a")
+//输出 a1a3a
+//字符串内添加 ${变量} 就可以使用
+```
+
 (2017-07-05)
 -----------
 * 修复一个运算符重载的BUG
