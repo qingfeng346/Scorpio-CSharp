@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Exception;
-namespace Scorpio.Compiler
-{
-    public partial class ScriptLexer
-    {
-        enum LexState
-        {
+namespace Scorpio.Compiler {
+    public partial class ScriptLexer {
+        enum LexState {
             /// <summary> 没有关键字 </summary>
             None,
             /// <summary> = 等于或者相等 </summary>
@@ -48,24 +45,18 @@ namespace Scorpio.Compiler
             GreaterOrGreaterEqual,
             /// <summary> < 小于或者小于等于 </summary>
             LessOrLessEqual,
-            /// <summary> " 字符串 </summary>
+            /// <summary> 字符串 双引号 单引号 字符串都可以</summary>
             String,
             /// <summary> \ 格式符 </summary>
             StringEscape,
-            /// <summary> ' 字符串 单引号开始结束</summary>
-            SingleString,
-            /// <summary> \ 格式符</summary>
-            SingleStringEscape,
             /// <summary> @ 开始字符串 </summary>
             SimpleStringStart,
             /// <summary> @" 不格式化的字符串 类似c# @符号 </summary>
             SimpleString,
             /// <summary> 字符串内出现"是引号还是结束符 </summary>
             SimpleStringQuotationMarkOrOver,
-            /// <summary> @" 不格式化的字符串 类似c# @符号 </summary>
-            SingleSimpleString,
-            /// <summary> 字符串内出现"是引号还是结束符 </summary>
-            SingleSimpleStringQuotationMarkOrOver,
+            /// <summary> ${} 格式化字符串 </summary>
+            StringFormat,
             /// <summary> 十进制数字或者十六进制数字 </summary>
             NumberOrHexNumber,
             /// <summary> 十进制数字 </summary>
@@ -79,8 +70,7 @@ namespace Scorpio.Compiler
         private LexState lexState { get { return m_lexState; } set { m_lexState = value; if (m_lexState == LexState.None) { m_strToken = ""; } } }
         bool EndOfSource { get { return m_iSourceLine >= m_listSourceLines.Count; } }
         bool EndOfLine { get { return m_iSourceChar >= m_listSourceLines[m_iSourceLine].Length; } }
-        char ReadChar()
-        {
+        char ReadChar() {
             if (EndOfSource)
                 throw new LexerException("End of source reached.");
             char ch = m_listSourceLines[m_iSourceLine][m_iSourceChar++];
@@ -90,8 +80,7 @@ namespace Scorpio.Compiler
             }
             return ch;
         }
-        void UndoChar()
-        {
+        void UndoChar() {
             if (m_iSourceLine == 0 && m_iSourceChar == 0)
                 throw new LexerException("Cannot undo char beyond start of source.");
             --m_iSourceChar;
@@ -100,33 +89,28 @@ namespace Scorpio.Compiler
                 m_iSourceChar = m_listSourceLines[m_iSourceLine].Length - 1;
             }
         }
-        void IgnoreLine()
-        {
+        void IgnoreLine() {
             ++m_iSourceLine;
             m_iSourceChar = 0;
         }
-        void ThrowInvalidCharacterException(char ch)
-        {
+        void ThrowInvalidCharacterException(char ch) {
             throw new LexerException(m_strBreviary + ":" + (m_iSourceLine + 1) + "  Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar + " [" + m_listSourceLines[m_iSourceLine] + "]");
         }
-        void AddToken(TokenType type)
-        {
+        void AddToken(TokenType type) {
             AddToken(type, ch);
         }
-        void AddToken(TokenType type, object lexeme)
-        {
+        void AddToken(TokenType type, object lexeme) {
             m_listTokens.Add(new Token(type, lexeme, m_iSourceLine, m_iSourceChar));
             lexState = LexState.None;
         }
-        bool IsHexDigit( char c )
-		{
-			if( char.IsDigit( c ) )
-				return true;
-			if( 'a' <= c && c <= 'f' )
-				return true;
-			if( 'A' <= c && c <= 'F' )
-				return true;
-			return false;
-		}
+        bool IsHexDigit(char c) {
+            if (char.IsDigit(c))
+                return true;
+            if ('a' <= c && c <= 'f')
+                return true;
+            if ('A' <= c && c <= 'F')
+                return true;
+            return false;
+        }
     }
 }
