@@ -13,6 +13,18 @@ namespace ScorpioExec
     public class Program
     {
         private static Script script;
+        private class print : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
+                var stackInfo = script.GetCurrentStackInfo();
+                var prefix = stackInfo.Breviary + ":" + stackInfo.Line + " : ";
+                string str = "";
+                for (int i = 0; i < args.Length; ++i) {
+                    str += args[i].ToString() + " ";
+                }
+                Console.WriteLine(prefix + str);
+                return null;
+            }
+        }
         public static Assembly CompilerFile(string path) {
 #if !SCORPIO_NET_CORE
             CSharpCodeProvider Provider = new CSharpCodeProvider();
@@ -80,6 +92,7 @@ namespace ScorpioExec
                     script.PushSearchPath(CurrentDirectory);
                     script.PushSearchPath(path);
                     script.SetObject("__PATH__", path);
+                    script.SetObject("print", script.CreateFunction(new print()));
                     LibraryIO.Load(script);
                     Console.WriteLine("=============================");
                     ScriptObject value = script.LoadFile(file);
