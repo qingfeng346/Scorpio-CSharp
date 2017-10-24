@@ -240,6 +240,11 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
 
 ## master版本更新和修改内容 ##
+
+(2017-10-24)
+-----------
+* 支持 **finally** 关键字
+
 (2017-08-22)
 -----------
 * 增加字符串内部变量功能，例如：
