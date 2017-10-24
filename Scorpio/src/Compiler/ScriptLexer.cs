@@ -497,6 +497,9 @@ namespace Scorpio.Compiler {
                         case "throw":
                             tokenType = TokenType.Throw;
                             break;
+                        case "finally":
+                            tokenType = TokenType.Finally;
+                            break;
                         case "continue":
                             tokenType = TokenType.Continue;
                             break;

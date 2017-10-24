@@ -274,6 +274,10 @@ namespace Scorpio.Compiler {
         /// </summary>
         Throw,
         /// <summary>
+        /// finally
+        /// </summary>
+        Finally,
+        /// <summary>
         /// define
         /// </summary>
         Define,

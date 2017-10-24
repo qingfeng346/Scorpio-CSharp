@@ -7,13 +7,11 @@ using Scorpio.CodeDom.Temp;
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Variable;
-namespace Scorpio.Runtime
-{
+namespace Scorpio.Runtime {
     //执行命令
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
-    public class ScriptContext
-    {
+    public class ScriptContext {
         private Script m_script;                                            //脚本类
         private ScriptContext m_parent;                                     //父级执行命令
         private ScriptInstruction[] m_scriptInstructions;                   //指令集
@@ -25,7 +23,7 @@ namespace Scorpio.Runtime
         private bool m_Break = false;                                       //break跳出
         private bool m_Continue = false;                                    //continue跳出
         private bool m_Over = false;                                        //函数是否已经结束
-        
+
         public ScriptContext(Script script, ScriptExecutable scriptExecutable) : this(script, scriptExecutable, null, Executable_Block.None) { }
         public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent) : this(script, scriptExecutable, parent, Executable_Block.None) { }
         public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent, Executable_Block block) {
@@ -48,28 +46,24 @@ namespace Scorpio.Runtime
             m_variableDictionary.Add(name, obj);
         }
         //初始化所有数据 每次调用 Execute 调用
-        private void Reset()
-        {
+        private void Reset() {
             m_returnObject = null;
             m_Over = false;
             m_Break = false;
             m_Continue = false;
         }
-        private void ApplyVariableObject(string name)
-        {
+        private void ApplyVariableObject(string name) {
             if (!m_variableDictionary.ContainsKey(name))
                 m_variableDictionary.Add(name, m_script.Null);
         }
-        private ScriptObject GetVariableObject(string name)
-        {
+        private ScriptObject GetVariableObject(string name) {
             if (m_variableDictionary.ContainsKey(name))
                 return m_variableDictionary[name];
             if (m_parent != null)
                 return m_parent.GetVariableObject(name);
             return null;
         }
-        private bool SetVariableObject(string name, ScriptObject obj)
-        {
+        private bool SetVariableObject(string name, ScriptObject obj) {
             if (m_variableDictionary.ContainsKey(name)) {
                 m_variableDictionary[name] = obj.Assign();
                 return true;
@@ -82,12 +76,10 @@ namespace Scorpio.Runtime
         private void SetVariableForce(string name, ScriptObject obj) {
             m_variableDictionary[name] = obj.Assign();
         }
-        private object GetMember(CodeMember member)
-        {
+        private object GetMember(CodeMember member) {
             return member.Type == MEMBER_TYPE.VALUE ? member.MemberValue : ResolveOperand(member.MemberObject).KeyValue;
         }
-        private ScriptObject GetVariable(CodeMember member)
-        {
+        private ScriptObject GetVariable(CodeMember member) {
             ScriptObject ret = null;
             if (member.Parent == null) {
                 string name = (string)member.MemberValue;
@@ -123,8 +115,7 @@ namespace Scorpio.Runtime
             }
             return ret;
         }
-        private void SetVariable(CodeMember member, ScriptObject variable)
-        {
+        private void SetVariable(CodeMember member, ScriptObject variable) {
             if (member.Parent == null) {
                 string name = (string)member.MemberValue;
                 if (!SetVariableObject(name, variable))
@@ -133,8 +124,7 @@ namespace Scorpio.Runtime
                 ResolveOperand(member.Parent).SetValue(GetMember(member), variable);
             }
         }
-        public ScriptObject Execute()
-        {
+        public ScriptObject Execute() {
             Reset();
             int iInstruction = 0;
             while (iInstruction < m_InstructionCount) {
@@ -144,13 +134,12 @@ namespace Scorpio.Runtime
             }
             return m_returnObject;
         }
-        private ScriptObject Execute(ScriptExecutable executable)
-        {
+        private ScriptObject Execute(ScriptExecutable executable) {
             if (executable == null) return null;
             Reset();
             ScriptInstruction[] scriptInstructions = executable.ScriptInstructions;
             int iInstruction = 0;
-            int iInstructionCount = scriptInstructions.Length ;
+            int iInstructionCount = scriptInstructions.Length;
             while (iInstruction < iInstructionCount) {
                 m_scriptInstruction = scriptInstructions[iInstruction++];
                 ExecuteInstruction();
@@ -158,10 +147,8 @@ namespace Scorpio.Runtime
             }
             return m_returnObject;
         }
-        private void ExecuteInstruction()
-        {
-            switch (m_scriptInstruction.opcode)
-            {
+        private void ExecuteInstruction() {
+            switch (m_scriptInstruction.opcode) {
                 case Opcode.VAR: ProcessVar(); break;
                 case Opcode.MOV: ProcessMov(); break;
                 case Opcode.RET: ProcessRet(); break;
@@ -180,40 +167,32 @@ namespace Scorpio.Runtime
                 case Opcode.THROW: ProcessThrow(); break;
             }
         }
-        private bool SupportReturnValue()
-        {
+        private bool SupportReturnValue() {
             return m_block == Executable_Block.Function || m_block == Executable_Block.Context;
         }
-        private bool SupportContinue()
-        {
+        private bool SupportContinue() {
             return m_block == Executable_Block.For || m_block == Executable_Block.Foreach || m_block == Executable_Block.While;
         }
-        private bool SupportBreak()
-        {
+        private bool SupportBreak() {
             return m_block == Executable_Block.For || m_block == Executable_Block.Foreach || m_block == Executable_Block.While;
         }
-        void ProcessVar()
-        {
+        void ProcessVar() {
             ApplyVariableObject(m_scriptInstruction.opvalue);
         }
-        void ProcessMov()
-        {
+        void ProcessMov() {
             SetVariable(m_scriptInstruction.operand0 as CodeMember, ResolveOperand(m_scriptInstruction.operand1));
         }
-        void ProcessContinue()
-        {
+        void ProcessContinue() {
             InvokeContinue(m_scriptInstruction.operand0);
         }
-        void ProcessBreak()
-        {
+        void ProcessBreak() {
             InvokeBreak(m_scriptInstruction.operand0);
         }
-        void ProcessCallFor()
-        {
+        void ProcessCallFor() {
             CodeFor code = (CodeFor)m_scriptInstruction.operand0;
             ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.For);
             context.Execute(code.BeginExecutable);
-            for ( ; ; ) {
+            for (; ; ) {
                 if (code.Condition != null) {
                     if (!context.ResolveOperand(code.Condition).LogicOperation()) break;
                 }
@@ -223,8 +202,7 @@ namespace Scorpio.Runtime
                 context.Execute(code.LoopExecutable);
             }
         }
-        void ProcessCallForSimple()
-        {
+        void ProcessCallForSimple() {
             CodeForSimple code = (CodeForSimple)m_scriptInstruction.operand0;
             ScriptNumber beginNumber = ResolveOperand(code.Begin) as ScriptNumber;
             if (beginNumber == null) throw new ExecutionException(m_script, "forsimple 初始值必须是number");
@@ -248,15 +226,14 @@ namespace Scorpio.Runtime
                 if (context.IsOver) break;
             }
         }
-        void ProcessCallForeach()
-        {
+        void ProcessCallForeach() {
             CodeForeach code = (CodeForeach)m_scriptInstruction.operand0;
             ScriptObject loop = ResolveOperand(code.LoopObject);
             if (!(loop is ScriptFunction)) throw new ExecutionException(m_script, "foreach函数必须返回一个ScriptFunction");
             object obj;
             ScriptFunction func = (ScriptFunction)loop;
             ScriptContext context;
-            for ( ; ; ) {
+            for (; ; ) {
                 obj = func.Call();
                 if (obj == null) return;
                 context = new ScriptContext(m_script, code.BlockExecutable, this, Executable_Block.Foreach);
@@ -294,7 +271,7 @@ namespace Scorpio.Runtime
             CodeWhile code = (CodeWhile)m_scriptInstruction.operand0;
             TempCondition condition = code.While;
             ScriptContext context;
-            for ( ; ; ) {
+            for (; ; ) {
                 if (!ProcessAllow(condition)) {
                     break;
                 }
@@ -305,8 +282,7 @@ namespace Scorpio.Runtime
                 }
             }
         }
-        void ProcessCallSwitch()
-        {
+        void ProcessCallSwitch() {
             CodeSwitch code = (CodeSwitch)m_scriptInstruction.operand0;
             ScriptObject obj = ResolveOperand(code.Condition);
             bool exec = false;
@@ -324,8 +300,7 @@ namespace Scorpio.Runtime
                 new ScriptContext(m_script, code.Default.Executable, this, Executable_Block.Switch).Execute();
             }
         }
-        void ProcessTry()
-        {
+        void ProcessTry() {
             CodeTry code = (CodeTry)m_scriptInstruction.operand0;
             try {
                 new ScriptContext(m_script, code.TryExecutable, this).Execute();
@@ -337,33 +312,31 @@ namespace Scorpio.Runtime
                 ScriptContext context = new ScriptContext(m_script, code.CatchExecutable, this);
                 context.Initialize(code.Identifier, m_script.CreateObject(ex));
                 context.Execute();
+            } finally {
+                if (code.FinallyExecutable != null) {
+                    new ScriptContext(m_script, code.FinallyExecutable, this).Execute();
+                }
             }
         }
-        void ProcessThrow()
-        {
+        void ProcessThrow() {
             throw new InteriorException(ResolveOperand(((CodeThrow)m_scriptInstruction.operand0).obj));
         }
-        void ProcessRet()
-        {
+        void ProcessRet() {
             if (m_scriptInstruction.operand0 == null)
                 InvokeReturnValue(null);
             else
                 InvokeReturnValue(ResolveOperand(m_scriptInstruction.operand0));
         }
-        void ProcessResolve()
-        {
+        void ProcessResolve() {
             ResolveOperand(m_scriptInstruction.operand0);
         }
-        void ProcessCallBlock()
-        {
+        void ProcessCallBlock() {
             ParseCallBlock((CodeCallBlock)m_scriptInstruction.operand0);
         }
-        void ProcessCallFunction()
-        {
+        void ProcessCallFunction() {
             ParseCall((CodeCallFunction)m_scriptInstruction.operand0, false);
         }
-        private void InvokeReturnValue(ScriptObject value)
-        {
+        private void InvokeReturnValue(ScriptObject value) {
             m_Over = true;
             if (SupportReturnValue()) {
                 m_returnObject = value;
@@ -371,8 +344,7 @@ namespace Scorpio.Runtime
                 m_parent.InvokeReturnValue(value);
             }
         }
-        private void InvokeContinue(CodeObject con)
-        {
+        private void InvokeContinue(CodeObject con) {
             m_Continue = true;
             if (!SupportContinue()) {
                 if (m_parent == null)
@@ -380,8 +352,7 @@ namespace Scorpio.Runtime
                 m_parent.InvokeContinue(con);
             }
         }
-        private void InvokeBreak(CodeObject bre)
-        {
+        private void InvokeBreak(CodeObject bre) {
             m_Break = true;
             if (!SupportBreak()) {
                 if (m_parent == null)
@@ -389,8 +360,7 @@ namespace Scorpio.Runtime
                 m_parent.InvokeBreak(bre);
             }
         }
-        private ScriptObject ResolveOperand_impl(CodeObject value)
-        {
+        private ScriptObject ResolveOperand_impl(CodeObject value) {
             if (value is CodeScriptObject) {
                 return ParseScriptObject((CodeScriptObject)value);
             } else if (value is CodeRegion) {
@@ -416,13 +386,12 @@ namespace Scorpio.Runtime
             }
             return m_script.Null;
         }
-        ScriptObject ResolveOperand(CodeObject value)
-        {
+        ScriptObject ResolveOperand(CodeObject value) {
             m_script.SetStackInfo(value.StackInfo);
             ScriptObject ret = ResolveOperand_impl(value);
             if (value.Not) {
                 ret = m_script.CreateBool(!ret.LogicOperation());
-            }  else if (value.Minus) {
+            } else if (value.Minus) {
                 ScriptNumber b = ret as ScriptNumber;
                 if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [-] sign");
                 ret = b.Minus();
@@ -433,25 +402,21 @@ namespace Scorpio.Runtime
             }
             return ret;
         }
-        ScriptObject ParseScriptObject(CodeScriptObject obj)
-        {
+        ScriptObject ParseScriptObject(CodeScriptObject obj) {
             //此处原先使用Clone 是因为 number 和 string 有自运算的操作 会影响常量 但是现在设置变量会调用Assign() 基础类型会自动复制一次 所以去掉clone
             return obj.Object;
             //return obj.Object.Clone();
         }
-        ScriptObject ParseRegion(CodeRegion region)
-        {
+        ScriptObject ParseRegion(CodeRegion region) {
             return ResolveOperand(region.Context);
         }
-        ScriptFunction ParseFunction(CodeFunction func)
-        {
+        ScriptFunction ParseFunction(CodeFunction func) {
             return func.Func.Create().SetParentContext(this);
         }
         void ParseCallBlock(CodeCallBlock block) {
             new ScriptContext(m_script, block.Executable, this).Execute();
         }
-        ScriptObject ParseCall(CodeCallFunction scriptFunction, bool needRet)
-        {
+        ScriptObject ParseCall(CodeCallFunction scriptFunction, bool needRet) {
             ScriptObject obj = ResolveOperand(scriptFunction.Member);
             int num = scriptFunction.ParametersCount;
             ScriptObject[] parameters = new ScriptObject[num];
@@ -464,16 +429,14 @@ namespace Scorpio.Runtime
             m_script.PopStackInfo();
             return needRet ? m_script.CreateObject(ret) : null;
         }
-        ScriptArray ParseArray(CodeArray array)
-        {
+        ScriptArray ParseArray(CodeArray array) {
             ScriptArray ret = m_script.CreateArray();
             foreach (CodeObject ele in array.Elements) {
                 ret.Add(ResolveOperand(ele).Assign());
             }
             return ret;
         }
-        ScriptTable ParseTable(CodeTable table)
-        {
+        ScriptTable ParseTable(CodeTable table) {
             ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.None);
             ScriptTable ret = m_script.CreateTable();
             foreach (ScriptScriptFunction func in table.Functions) {
@@ -492,52 +455,49 @@ namespace Scorpio.Runtime
             }
             return ret;
         }
-        ScriptObject ParseOperate(CodeOperator operate)
-        {
+        ScriptObject ParseOperate(CodeOperator operate) {
             TokenType type = operate.Operator;
             ScriptObject left = ResolveOperand(operate.Left);
             switch (type) {
-            case TokenType.Plus:
-                ScriptObject right = ResolveOperand(operate.Right);
-                if (left is ScriptString || right is ScriptString) {
-                    return new ScriptString(m_script, left.ToString() + right.ToString());
-                }
-                return left.Compute(type, right);
-            case TokenType.Minus:
-            case TokenType.Multiply:
-            case TokenType.Divide:
-            case TokenType.Modulo:
-            case TokenType.InclusiveOr:
-            case TokenType.Combine:
-            case TokenType.XOR:
-            case TokenType.Shr:
-            case TokenType.Shi:
-                return left.Compute(type, ResolveOperand(operate.Right));
-            case TokenType.And:
-                if (!left.LogicOperation()) return m_script.False;
-                return m_script.CreateBool(ResolveOperand(operate.Right).LogicOperation());
-            case TokenType.Or:
-                if (left.LogicOperation()) return m_script.True;
-                return m_script.CreateBool(ResolveOperand(operate.Right).LogicOperation());
-            case TokenType.Equal:
-                return m_script.CreateBool(left.Equals(ResolveOperand(operate.Right)));
-            case TokenType.NotEqual:
-                return m_script.CreateBool(!left.Equals(ResolveOperand(operate.Right)));
-            case TokenType.Greater:
-            case TokenType.GreaterOrEqual:
-            case TokenType.Less:
-            case TokenType.LessOrEqual:
-                return m_script.CreateBool(left.Compare(type, ResolveOperand(operate.Right)));
-            default:
-                throw new ExecutionException(m_script, "不支持的运算符 " + type);
+                case TokenType.Plus:
+                    ScriptObject right = ResolveOperand(operate.Right);
+                    if (left is ScriptString || right is ScriptString) {
+                        return new ScriptString(m_script, left.ToString() + right.ToString());
+                    }
+                    return left.Compute(type, right);
+                case TokenType.Minus:
+                case TokenType.Multiply:
+                case TokenType.Divide:
+                case TokenType.Modulo:
+                case TokenType.InclusiveOr:
+                case TokenType.Combine:
+                case TokenType.XOR:
+                case TokenType.Shr:
+                case TokenType.Shi:
+                    return left.Compute(type, ResolveOperand(operate.Right));
+                case TokenType.And:
+                    if (!left.LogicOperation()) return m_script.False;
+                    return m_script.CreateBool(ResolveOperand(operate.Right).LogicOperation());
+                case TokenType.Or:
+                    if (left.LogicOperation()) return m_script.True;
+                    return m_script.CreateBool(ResolveOperand(operate.Right).LogicOperation());
+                case TokenType.Equal:
+                    return m_script.CreateBool(left.Equals(ResolveOperand(operate.Right)));
+                case TokenType.NotEqual:
+                    return m_script.CreateBool(!left.Equals(ResolveOperand(operate.Right)));
+                case TokenType.Greater:
+                case TokenType.GreaterOrEqual:
+                case TokenType.Less:
+                case TokenType.LessOrEqual:
+                    return m_script.CreateBool(left.Compare(type, ResolveOperand(operate.Right)));
+                default:
+                    throw new ExecutionException(m_script, "不支持的运算符 " + type);
             }
         }
-        ScriptObject ParseTernary(CodeTernary ternary)
-        {
+        ScriptObject ParseTernary(CodeTernary ternary) {
             return ResolveOperand(ternary.Allow).LogicOperation() ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
         }
-        ScriptObject ParseAssign(CodeAssign assign)
-        {
+        ScriptObject ParseAssign(CodeAssign assign) {
             if (assign.AssignType == TokenType.Assign) {
                 var ret = ResolveOperand(assign.value);
                 SetVariable(assign.member, ret);
@@ -546,8 +506,7 @@ namespace Scorpio.Runtime
                 return GetVariable(assign.member).AssignCompute(assign.AssignType, ResolveOperand(assign.value));
             }
         }
-        ScriptObject ParseEval(CodeEval eval)
-        {
+        ScriptObject ParseEval(CodeEval eval) {
             ScriptString obj = ResolveOperand(eval.EvalObject) as ScriptString;
             if (obj == null) throw new ExecutionException(m_script, "Eval参数必须是一个字符串");
             return m_script.LoadString("", obj.Value, this, false);
