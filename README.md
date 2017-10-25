@@ -2,6 +2,7 @@
 * author : while
 * QQ群 : 245199668 [加群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 
+* VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio
 * 脚本教程 http://www.fengyuezhu.com/readme/
 * Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/scriptconsole/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/unitysample/
