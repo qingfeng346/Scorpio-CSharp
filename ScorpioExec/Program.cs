@@ -70,14 +70,19 @@ namespace ScorpioExec
             }
         }
         static void Main(string[] args) {
+            string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            if ((args.Length == 1 && args[0] == "__RegisterEnvironment")) {
+                var p = new List<string>(Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User).Split(';'));
+                if (!p.Contains(CurrentDirectory)) {
+                    p.Add(CurrentDirectory);
+                    Environment.SetEnvironmentVariable("Path", string.Join(";", p.ToArray()), EnvironmentVariableTarget.User);
+                }
+                Console.WriteLine("path is already existed");
+                return;
+            }
             script = new Script();
             script.LoadLibrary();
             script.PushAssembly(typeof(Program).GetTypeInfo().Assembly);
-#if !SCORPIO_NET_CORE
-            string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-#else
-            string CurrentDirectory = "";
-#endif
             Console.WriteLine("the current version : " + Script.Version);
             Console.WriteLine("app path is : " + CurrentDirectory);
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
