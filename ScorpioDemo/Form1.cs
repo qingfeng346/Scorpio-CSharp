@@ -29,7 +29,7 @@ namespace ScorpioDemo {
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            m_Path = Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)) + "/Scripts";
+            m_Path = Environment.CurrentDirectory + "/Scripts";
             LoadFileList();
         }
         private void Form1_Activated(object sender, EventArgs e)
