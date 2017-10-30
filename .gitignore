@@ -10,3 +10,5 @@
 /ScorpioExec/obj
 /ScorpioExec/bin
 /ScorpioDemo/bin
+/bin/*.pdb
+/bin/ScorpioDemo.exe.config
