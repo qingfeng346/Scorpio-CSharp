@@ -204,6 +204,7 @@ namespace Scorpio.Serialize {
             case TokenType.Try: return "try";
             case TokenType.Catch: return "catch";
             case TokenType.Throw: return "throw";
+            case TokenType.Finally: return "finally";
             case TokenType.Continue: return "continue";
             case TokenType.Break: return "break";
             case TokenType.Return: return "return";
