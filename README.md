@@ -16,12 +16,12 @@
 
 ## 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现,最低支持.net3.5,兼容.net3.5以上所有平台,语法类似 javascript
 * **脚本示例** 放在 [bin/Scripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/bin/Scripts) 目录
-* **语法测试** 直接运行 `bin/ScorpioDemo.exe`  左侧选中要测试的脚本,点击 `Run Script` 按钮即可
+* **语法测试** 直接运行 **bin/ScorpioDemo.exe**  左侧选中要测试的脚本,点击 **Run Script** 按钮即可
 * **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
 ## 项目宏定义说明:
-* `SCORPIO_NET_CORE` .net4.5平台以后使用(UWP平台 , dotnet core)
-* `SCORPIO_DYNAMIC_DELEGATE` 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android和windows(exe)平台可用
+* **SCORPIO_NET_CORE** .net4.5平台以后使用(UWP平台 , dotnet core)
+* **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android和windows(exe)平台可用
 
 ## 源码目录说明
 * Script 文件是脚本的引擎对象
