@@ -242,6 +242,10 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 
 ## master版本更新和修改内容 ##
 
+(2017-11-02)
+-----------
+* 修改table设置一个key为null 则table的map会删除此key
+
 (2017-10-24)
 -----------
 * 支持 **finally** 关键字
