@@ -19,7 +19,7 @@
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\scorpio\</OutputPath>
     <DefineConstants>TRACE;DEBUG;SCORPIO_DYNAMIC_DELEGATE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -133,8 +133,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) ..\..\..\UnityDemo\Assets\Plugins
-copy $(TargetPath) ..\..\..\ScorpioTest\Assets\Plugins</PostBuildEvent>
+    <PostBuildEvent>copy $(TargetPath) ..\..\ScorpioTest\Assets\Plugins</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
