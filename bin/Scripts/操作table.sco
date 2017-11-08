@@ -6,13 +6,10 @@ a = {
     //等同于 e = 300 
     'e' = 400,
     func1 = function () {
-        //不能使用this 这种声明算静态函数
-        print(this)
-        print("b")
+        print("func1 : " + this.a)
     },
-    //可以使用this 算内部函数
     function func2() {
-        print("this " + this.a)
+        print("func2 : " + this.a)
     }
 }
 //调用函数
