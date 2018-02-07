@@ -241,6 +241,7 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ## master版本更新和修改内容 ##
 
 (2018-02-07)
+-----------
 * 修改解决方案为 .net core, 支持在 windows 和 mac 上直接运行 sco 命令行
 
 (2017-11-02)
