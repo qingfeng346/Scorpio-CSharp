@@ -108,7 +108,7 @@ namespace Scorpio.Library {
             }
         }
         public static void Load(Script script) {
-            script.SetObjectInternal("print", script.CreateFunction(new print()));
+            script.SetObjectInternal("print", script.CreateFunction(new print(script)));
             script.SetObjectInternal("pairs", script.CreateFunction(new pairs(script)));
             script.SetObjectInternal("kpairs", script.CreateFunction(new kpairs(script)));
             script.SetObjectInternal("vpairs", script.CreateFunction(new vpairs(script)));
@@ -155,10 +155,18 @@ namespace Scorpio.Library {
             script.SetObjectInternal("generic_method", script.CreateFunction(new generic_method(script)));
         }
         private class print : ScorpioHandle {
+            private Script m_script;
+            public print(Script script) {
+                m_script = script;
+            }
             public object Call(ScriptObject[] args) {
+                var stackInfo = m_script.GetCurrentStackInfo();
+                var prefix = stackInfo.Breviary + ":" + stackInfo.Line + " : ";
+                string str = "";
                 for (int i = 0; i < args.Length; ++i) {
-                    Console.WriteLine(args[i].ToString());
+                    str += args[i].ToString() + " ";
                 }
+                Console.WriteLine(prefix + str);
                 return null;
             }
         }

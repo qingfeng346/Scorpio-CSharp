@@ -1,53 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 using System.Diagnostics;
-using Scorpio;
 using System.Reflection;
-using Microsoft.CSharp;
-using System.CodeDom;
-using System.CodeDom.Compiler;
+using Scorpio;
+using Scorpio.Serialize;
+
 namespace ScorpioExec
 {
     public class Program
     {
+        public static readonly string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static Script script;
-        private class print : ScorpioHandle {
-            public object Call(ScriptObject[] args) {
-                var stackInfo = script.GetCurrentStackInfo();
-                var prefix = stackInfo.Breviary + ":" + stackInfo.Line + " : ";
-                string str = "";
-                for (int i = 0; i < args.Length; ++i) {
-                    str += args[i].ToString() + " ";
-                }
-                Console.WriteLine(prefix + str);
-                return null;
-            }
-        }
-        public static Assembly CompilerFile(string path) {
-#if !SCORPIO_NET_CORE
-            CSharpCodeProvider Provider = new CSharpCodeProvider();
-            CompilerParameters Parameters = new CompilerParameters();
-            Parameters.ReferencedAssemblies.Add("System.dll");
-            Parameters.GenerateExecutable = false;
-            Parameters.GenerateInMemory = true;
-            string[] fileNames = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
-            CompilerResults cr = Provider.CompileAssemblyFromFile(Parameters, fileNames);
-            if (cr.Errors.HasErrors) {
-                string str = "cs file compiler error : \n";
-                foreach (CompilerError err in cr.Errors) {
-                    str += (err.ToString() + "\n");
-                }
-                throw new Exception(str);
-            }
-            return cr.CompiledAssembly;
-#else
-            return null;
-#endif
-        }
         private static void LoadLibrary(string path) {
-#if !SCORPIO_NET_CORE
             if (!Directory.Exists(path)) { return; }
             string[] files = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
             foreach (var file in files) {
@@ -58,47 +24,61 @@ namespace ScorpioExec
                     Console.WriteLine("load dll file [" + file + "] fail : " + ex.ToString());
                 }
             }
-#endif
         }
-        private static void LoadFiles(string path) {
-            if (!Directory.Exists(path)) { return; }
+        static void Register() {
+            var p = new List<string>(Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User).Split(';'));
+            if (!p.Contains(CurrentDirectory)) {
+                p.Add(CurrentDirectory);
+                Environment.SetEnvironmentVariable("Path", string.Join(";", p.ToArray()), EnvironmentVariableTarget.User);
+            }
+            Console.WriteLine("path is already existed");
+        }
+        static byte[] GetFileBuffer(String fileName) {
+            FileStream stream = File.OpenRead(fileName);
+            long length = stream.Length;
+            byte[] buffer = new byte[length];
+            stream.Read(buffer, 0, buffer.Length);
+            stream.Close();
+            stream.Dispose();
+            return buffer;
+        }
+        static void Pack(string source, string output) {
+            source = Path.Combine(CurrentDirectory, source);
+            output = Path.Combine(CurrentDirectory, output);
             try {
-                script.PushAssembly(CompilerFile(path));
-                Console.WriteLine("compiler path [" + path + "] success");
+                byte[] buffer = GetFileBuffer(source);
+                File.WriteAllBytes(output, ScorpioMaker.Serialize(source, Encoding.UTF8.GetString(buffer, 0, buffer.Length)));
             } catch (System.Exception ex) {
-                Console.WriteLine("compiler path [" + path + "] fail : " + ex.ToString());
+                Console.WriteLine("转换出错 error : " + ex.ToString());	
             }
         }
-        static void Main(string[] args) {
-            string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            if ((args.Length == 1 && args[0] == "__RegisterEnvironment")) {
-                var p = new List<string>(Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User).Split(';'));
-                if (!p.Contains(CurrentDirectory)) {
-                    p.Add(CurrentDirectory);
-                    Environment.SetEnvironmentVariable("Path", string.Join(";", p.ToArray()), EnvironmentVariableTarget.User);
-                }
-                Console.WriteLine("path is already existed");
-                return;
+        static void Unpack(string source, string output) {
+            source = Path.Combine(CurrentDirectory, source);
+            output = Path.Combine(CurrentDirectory, output);
+            try {
+                byte[] buffer = GetFileBuffer(source);
+                File.WriteAllBytes(output, Encoding.UTF8.GetBytes(ScorpioMaker.DeserializeToString(buffer)));
+            } catch (System.Exception ex) {
+                Console.WriteLine("转换出错 error : " + ex.ToString());	
             }
+        }
+        static void Execute(string[] args) {
             script = new Script();
             script.LoadLibrary();
-            script.PushAssembly(typeof(Program).GetTypeInfo().Assembly);
-            Console.WriteLine("the current version : " + Script.Version);
+            script.PushAssembly(typeof(Program).Assembly);
+            Console.WriteLine("os version : " + Environment.OSVersion.ToString());
+            Console.WriteLine("sco version : " + Script.Version);
             Console.WriteLine("app path is : " + CurrentDirectory);
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
-            LoadFiles(Path.Combine(CurrentDirectory, "cs"));
             if (args.Length >= 1) {
                 try {
                     string file = Path.GetFullPath(args[0]);
                     string path = Path.GetDirectoryName(file);
                     LoadLibrary(Path.Combine(path, "dll"));
-                    LoadFiles(Path.Combine(path, "cs"));
                     Stopwatch watch = Stopwatch.StartNew();
                     script.PushSearchPath(CurrentDirectory);
                     script.PushSearchPath(path);
                     script.SetObject("__PATH__", path);
-                    script.SetObject("print", script.CreateFunction(new print()));
-                    LibraryIO.Load(script);
                     Console.WriteLine("=============================");
                     ScriptObject value = script.LoadFile(file);
                     Console.WriteLine("=============================");
@@ -126,6 +106,26 @@ namespace ScorpioExec
                         Console.WriteLine(ex.ToString());
                     }
                 }
+            }
+        }
+        static void Main(string[] args) {
+            CommandLine command = new CommandLine(args);
+            string type = command.Get("-t").ToString();
+            if (type == "register") {
+                Register();
+            } else if (type == "pack" || type == "unpack") {
+                string source = command.Get("-s").ToString();
+                string output = command.Get("-o").ToString();
+                if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(output)) {
+                    Console.WriteLine("参数出错 -s [源文件] -o [输出文件] 是必须参数");
+                    return;
+                }
+                if (type == "pack")
+                    Pack(source, output);
+                else
+                    Unpack(source, output);
+            } else {
+                Execute(args);
             }
         }
     }
