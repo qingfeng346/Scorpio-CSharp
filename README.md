@@ -2,7 +2,9 @@
 * author : while
 * QQ群 : 245199668 [加群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 
-* VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio
+* VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio, 快捷键 windows(alt+g) & mac (alt[option] + g) 可以运行正在编辑的脚本
+    * windows 添加 **bin/win** 目录到 系统变量，或者运行 bin/win/register.bat 自动注册系统变量
+    * mac 注册 **bin/mac** 目录到 .bash_profile 文件 
 * 脚本教程 http://www.fengyuezhu.com/readme/
 * Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/scriptconsole/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/unitysample/
@@ -16,7 +18,7 @@
 
 ## 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现,最低支持.net3.5,兼容.net3.5以上所有平台,语法类似 javascript
 * **脚本示例** 放在 [bin/Scripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/bin/Scripts) 目录
-* **语法测试** 直接运行 **bin/ScorpioDemo.exe**  左侧选中要测试的脚本,点击 **Run Script** 按钮即可
+* **语法测试** 注册环境变量后,直接运行命令行 [sco 文件名],可以运行一个脚本文件 
 * **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
 
 ## 项目宏定义说明:
@@ -145,16 +147,12 @@ namespace ScorpioDelegate {
 
 ## 源码目录说明:
 * **Scorpio** 脚本引擎项目,平常使用只需导入此目录即可
-* **ScorpioDemo** Scorpio例子程序
-* **ScorpioExec** 跟lua.exe一样,命令行调用Scorpio脚本
-* **ScorpioMaker** 把Scorpio脚本序列化成二进制文件,把二进制文件反序列化成文本文件
-* **ScorpioTest** Unity内使用Scorpio脚本例子
-* **ScorpioLibrary** ScorpioExec脚本使用的第三方库,可以直接运行一个脚本然后当作类似python一样的脚本去处理一些简单的任务
+* **ScorpioExec** 跟lua.exe一样,命令行调用Scorpio脚本, 序列化和反序列化脚本
 * **ScorpioReflect** Scorpio脚本去反射机制的实现
+* **ScorpioTest** Unity内使用Scorpio脚本例子
 
 ## Unity导入Scorpio-CSharp:
-* 第一种方法(建议) : 把 [Scorpio/src](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/Scorpio/src) 整个文件夹复制到项目即可
-* 第二种方法 : 用VS打开Scorpio.sln编译一下项目 生成Scorpio.dll文件 然后复制到Unity项目Plugins目录下 (ps:源码的项目文件自带SCORPIO_DYNAMIC_DELEGATE编译符号,请删除后编译)
+* 复制文件夹 [Scorpio/src](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/Scorpio/src) 到Unity项目即可
 
 ## Scorpio脚本Hello World函数 (c#控制台项目):
 ```csharp
@@ -241,6 +239,9 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ```
 
 ## master版本更新和修改内容 ##
+
+(2018-02-07)
+* 修改解决方案为 .net core, 支持在 windows 和 mac 上直接运行 sco 命令行
 
 (2017-11-02)
 -----------
