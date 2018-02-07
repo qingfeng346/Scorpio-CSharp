@@ -1,0 +1,1 @@
+.\sco.exe -t register

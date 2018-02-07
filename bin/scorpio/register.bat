@@ -1,1 +1,0 @@
-sco __RegisterEnvironment
