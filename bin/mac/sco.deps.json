@@ -1,0 +1,335 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.0/osx.10.11-x64",
+    "signature": "923e2e181b433d3bc31e1503a736f521767e30a3"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.0": {},
+    ".NETCoreApp,Version=v2.0/osx.10.11-x64": {
+      "sco/1.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.App": "2.0.0",
+          "Scorpio": "1.0.0"
+        },
+        "runtime": {
+          "sco.dll": {}
+        }
+      },
+      "Microsoft.NETCore.App/2.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.DotNetHostPolicy": "2.0.0",
+          "Microsoft.NETCore.Platforms": "2.0.0",
+          "NETStandard.Library": "2.0.0",
+          "runtime.osx-x64.Microsoft.NETCore.App": "2.0.0"
+        }
+      },
+      "Microsoft.NETCore.DotNetAppHost/2.0.0": {
+        "dependencies": {
+          "runtime.osx-x64.Microsoft.NETCore.DotNetAppHost": "2.0.0"
+        }
+      },
+      "Microsoft.NETCore.DotNetHostPolicy/2.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.DotNetHostResolver": "2.0.0",
+          "runtime.osx-x64.Microsoft.NETCore.DotNetHostPolicy": "2.0.0"
+        }
+      },
+      "Microsoft.NETCore.DotNetHostResolver/2.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.DotNetAppHost": "2.0.0",
+          "runtime.osx-x64.Microsoft.NETCore.DotNetHostResolver": "2.0.0"
+        }
+      },
+      "Microsoft.NETCore.Platforms/2.0.0": {},
+      "NETStandard.Library/2.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.0"
+        }
+      },
+      "runtime.osx-x64.Microsoft.NETCore.App/2.0.0": {
+        "runtime": {
+          "runtimes/osx-x64/lib/netcoreapp2.0/Microsoft.CSharp.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/Microsoft.VisualBasic.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/Microsoft.Win32.Primitives.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/Microsoft.Win32.Registry.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/SOS.NETCore.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.AppContext.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Buffers.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Collections.Concurrent.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Collections.Immutable.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Collections.NonGeneric.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Collections.Specialized.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Collections.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ComponentModel.Annotations.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ComponentModel.Composition.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ComponentModel.DataAnnotations.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ComponentModel.EventBasedAsync.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ComponentModel.Primitives.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ComponentModel.TypeConverter.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ComponentModel.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Configuration.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Console.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Core.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Data.Common.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Data.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.Contracts.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.Debug.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.DiagnosticSource.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.FileVersionInfo.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.Process.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.StackTrace.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.TextWriterTraceListener.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.Tools.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.TraceSource.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Diagnostics.Tracing.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Drawing.Primitives.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Drawing.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Dynamic.Runtime.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Globalization.Calendars.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Globalization.Extensions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Globalization.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.Compression.FileSystem.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.Compression.ZipFile.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.Compression.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.FileSystem.AccessControl.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.FileSystem.DriveInfo.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.FileSystem.Primitives.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.FileSystem.Watcher.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.FileSystem.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.IsolatedStorage.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.MemoryMappedFiles.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.Pipes.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.UnmanagedMemoryStream.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.IO.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Linq.Expressions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Linq.Parallel.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Linq.Queryable.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Linq.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.Http.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.HttpListener.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.Mail.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.NameResolution.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.NetworkInformation.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.Ping.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.Primitives.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.Requests.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.Security.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.ServicePoint.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.Sockets.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.WebClient.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.WebHeaderCollection.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.WebProxy.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.WebSockets.Client.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.WebSockets.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Net.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Numerics.Vectors.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Numerics.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ObjectModel.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Private.DataContractSerialization.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Private.Uri.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Private.Xml.Linq.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Private.Xml.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.DispatchProxy.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.Emit.ILGeneration.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.Emit.Lightweight.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.Emit.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.Extensions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.Metadata.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.Primitives.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.TypeExtensions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Reflection.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Resources.Reader.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Resources.ResourceManager.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Resources.Writer.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.CompilerServices.VisualC.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Extensions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Handles.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.InteropServices.RuntimeInformation.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.InteropServices.WindowsRuntime.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.InteropServices.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Loader.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Numerics.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Serialization.Formatters.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Serialization.Json.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Serialization.Primitives.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Serialization.Xml.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.Serialization.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Runtime.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.AccessControl.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Claims.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Cryptography.Algorithms.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Cryptography.Cng.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Cryptography.Csp.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Cryptography.Encoding.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Cryptography.OpenSsl.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Cryptography.Primitives.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Cryptography.X509Certificates.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Principal.Windows.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.Principal.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.SecureString.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Security.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ServiceModel.Web.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ServiceProcess.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Text.Encoding.Extensions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Text.Encoding.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Text.RegularExpressions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.Overlapped.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.Tasks.Dataflow.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.Tasks.Extensions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.Tasks.Parallel.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.Tasks.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.Thread.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.ThreadPool.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.Timer.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Threading.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Transactions.Local.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Transactions.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.ValueTuple.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Web.HttpUtility.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Web.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Windows.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.Linq.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.ReaderWriter.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.Serialization.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.XDocument.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.XPath.XDocument.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.XPath.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.XmlDocument.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.XmlSerializer.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.Xml.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/System.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/WindowsBase.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/mscorlib.dll": {},
+          "runtimes/osx-x64/lib/netcoreapp2.0/netstandard.dll": {}
+        },
+        "native": {
+          "runtimes/osx-x64/native/System.Globalization.Native.dylib": {},
+          "runtimes/osx-x64/native/System.IO.Compression.Native.dylib": {},
+          "runtimes/osx-x64/native/System.Native.a": {},
+          "runtimes/osx-x64/native/System.Native.dylib": {},
+          "runtimes/osx-x64/native/System.Net.Http.Native.dylib": {},
+          "runtimes/osx-x64/native/System.Net.Security.Native.dylib": {},
+          "runtimes/osx-x64/native/System.Private.CoreLib.dll": {},
+          "runtimes/osx-x64/native/System.Security.Cryptography.Native.Apple.dylib": {},
+          "runtimes/osx-x64/native/System.Security.Cryptography.Native.OpenSsl.dylib": {},
+          "runtimes/osx-x64/native/libclrjit.dylib": {},
+          "runtimes/osx-x64/native/libcoreclr.dylib": {},
+          "runtimes/osx-x64/native/libdbgshim.dylib": {},
+          "runtimes/osx-x64/native/libmscordaccore.dylib": {},
+          "runtimes/osx-x64/native/libmscordbi.dylib": {},
+          "runtimes/osx-x64/native/libsos.dylib": {},
+          "runtimes/osx-x64/native/sosdocsunix.txt": {}
+        }
+      },
+      "runtime.osx-x64.Microsoft.NETCore.DotNetAppHost/2.0.0": {
+        "native": {
+          "runtimes/osx-x64/native/apphost": {}
+        }
+      },
+      "runtime.osx-x64.Microsoft.NETCore.DotNetHostPolicy/2.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.DotNetHostResolver": "2.0.0"
+        },
+        "native": {
+          "runtimes/osx-x64/native/libhostpolicy.dylib": {}
+        }
+      },
+      "runtime.osx-x64.Microsoft.NETCore.DotNetHostResolver/2.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.DotNetAppHost": "2.0.0"
+        },
+        "native": {
+          "runtimes/osx-x64/native/libhostfxr.dylib": {}
+        }
+      },
+      "Scorpio/1.0.0": {
+        "runtime": {
+          "Scorpio.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "sco/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.NETCore.App/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/mzXF+UtZef+VpzzN88EpvFq5U6z4rj54ZMq/J968H6pcvyLOmcupmTRpJ3CJm8ILoCGh9WI7qpDdiKtuzswrQ==",
+      "path": "microsoft.netcore.app/2.0.0",
+      "hashPath": "microsoft.netcore.app.2.0.0.nupkg.sha512"
+    },
+    "Microsoft.NETCore.DotNetAppHost/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-L4GGkcI/Mxl8PKLRpFdGmLb5oI8sGIR05bDTGkzCoamAjdUl1Zhkov2swjEsZvKYT8kkdiz39LtwyGYuCJxm1A==",
+      "path": "microsoft.netcore.dotnetapphost/2.0.0",
+      "hashPath": "microsoft.netcore.dotnetapphost.2.0.0.nupkg.sha512"
+    },
+    "Microsoft.NETCore.DotNetHostPolicy/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rm7mMn0A93fwyAwVhbyOCcPuu2hZNL0A0dAur9sNG9pEkONPfCEQeF7m2mC8KpqZO0Ol6tpV5J0AF3HTXT3GXA==",
+      "path": "microsoft.netcore.dotnethostpolicy/2.0.0",
+      "hashPath": "microsoft.netcore.dotnethostpolicy.2.0.0.nupkg.sha512"
+    },
+    "Microsoft.NETCore.DotNetHostResolver/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-uBbjpeSrwsaTCADZCzRk+3aBzNnMqkC4zftJWBsL+Zk+8u+W+/lMb2thM5Y4hiVrv1YQg9t6dKldXzOKkY+pQw==",
+      "path": "microsoft.netcore.dotnethostresolver/2.0.0",
+      "hashPath": "microsoft.netcore.dotnethostresolver.2.0.0.nupkg.sha512"
+    },
+    "Microsoft.NETCore.Platforms/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VdLJOCXhZaEMY7Hm2GKiULmn7IEPFE4XC5LPSfBVCUIA8YLZVh846gtfBJalsPQF2PlzdD7ecX7DZEulJ402ZQ==",
+      "path": "microsoft.netcore.platforms/2.0.0",
+      "hashPath": "microsoft.netcore.platforms.2.0.0.nupkg.sha512"
+    },
+    "NETStandard.Library/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7jnbRU+L08FXKMxqUflxEXtVymWvNOrS8yHgu9s6EM8Anr6T/wIX4nZ08j/u3Asz+tCufp3YVwFSEvFTPYmBPA==",
+      "path": "netstandard.library/2.0.0",
+      "hashPath": "netstandard.library.2.0.0.nupkg.sha512"
+    },
+    "runtime.osx-x64.Microsoft.NETCore.App/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ysoOCL0RPDMS/93bq9MDswVV5V87sB9NhGd5Q1RZeQ5KE7fXDOiN0bqkPjFAro7F01M6w8zGK3CxixaI4V2MaA==",
+      "path": "runtime.osx-x64.microsoft.netcore.app/2.0.0",
+      "hashPath": "runtime.osx-x64.microsoft.netcore.app.2.0.0.nupkg.sha512"
+    },
+    "runtime.osx-x64.Microsoft.NETCore.DotNetAppHost/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-E5E7xVopvE5xj8ZnHSpvv3erKAsnULqKz2sNTyx3I4DcYTv1uWwjloqg/fhZrKjhPTZ1UJ0xj658f+DirFHCng==",
+      "path": "runtime.osx-x64.microsoft.netcore.dotnetapphost/2.0.0",
+      "hashPath": "runtime.osx-x64.microsoft.netcore.dotnetapphost.2.0.0.nupkg.sha512"
+    },
+    "runtime.osx-x64.Microsoft.NETCore.DotNetHostPolicy/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WsqP5SwWx8gnF0Kxb8M7sx4Nq9BAPDOqG6RoJD5POkFgNgvkuMUjup1yX+WxEW0fgJT4MfzU+l7CA9Bg0rRAjQ==",
+      "path": "runtime.osx-x64.microsoft.netcore.dotnethostpolicy/2.0.0",
+      "hashPath": "runtime.osx-x64.microsoft.netcore.dotnethostpolicy.2.0.0.nupkg.sha512"
+    },
+    "runtime.osx-x64.Microsoft.NETCore.DotNetHostResolver/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-iAabjRA2EXlSkk2a6XRIaJ+X55vtEs5KxjPoSgZmxIFJklmgpkKMPwYTfRJU0gfI1KMyvn1tvTwOqv7g+WEbng==",
+      "path": "runtime.osx-x64.microsoft.netcore.dotnethostresolver/2.0.0",
+      "hashPath": "runtime.osx-x64.microsoft.netcore.dotnethostresolver.2.0.0.nupkg.sha512"
+    },
+    "Scorpio/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
