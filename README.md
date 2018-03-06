@@ -3,8 +3,9 @@
 * QQ群 : 245199668 [加群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio, 快捷键 windows(alt+g) & mac (alt[option] + g) 可以运行正在编辑的脚本
-    * windows 添加 **bin/win** 目录到 系统变量，或者运行 bin/win/register.bat 自动注册系统变量
-    * mac 注册 **bin/mac** 目录到 .bash_profile 文件 
+    * 先安装 .net core 到 windows 或 mac, 然后命令行运行 **build.bat(windows)** 或 **build.sh (mac)** 生成可执行文件 (生成文件较大，没有上传，请自行生成)
+    * **windows** 添加 **bin/win** 目录到 系统变量，或者运行 bin/win/register.bat 自动注册系统变量
+    * **mac** 注册 **bin/mac** 目录到 .bash_profile 文件 
 * 脚本教程 http://www.fengyuezhu.com/readme/
 * Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/scriptconsole/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/unitysample/
