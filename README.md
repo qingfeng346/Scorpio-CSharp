@@ -5,7 +5,7 @@
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio, 快捷键 windows(alt+g) & mac (alt[option] + g) 可以运行正在编辑的脚本
     * 先安装 .net core 到 windows 或 mac, 然后命令行运行 **build.bat(windows)** 或 **build.sh (mac)** 生成可执行文件 (生成文件较大，没有上传，请自行生成)
     * **windows** 添加 **bin/win** 目录到 系统变量，或者运行 bin/win/register.bat 自动注册系统变量
-    * **mac** 注册 **bin/mac** 目录到 .bash_profile 文件 
+    * **mac** 注册 **bin/mac** 目录到 **.bash_profile** 文件 
 * 脚本教程 http://www.fengyuezhu.com/readme/
 * Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/scriptconsole/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/unitysample/
@@ -54,9 +54,10 @@
 ## 注意事项 ##
 * 如果要使用 **Script.LoadFile** 函数，文件编码要改成 **utf8 without bom (无签名的utf8格式)**, 否则bom三个字节会解析失败
 * 使用 **import_type import_extension**  前要确认是否已经添加该类的程序集(Assembly),例如要使用 **UnityEngine.dll** 中的 **UnityEngine.GameObject** 类,要先再c#中调用 **script.PushAssembly(typeof(GameObject).GetTypeInfo().Assembly)** 压入程序集,然后**UnityEngine.dll** 中的类就都可以使用了,也就是 **每个dll文件的程序集** 都要添加一次
-* 脚本内所有c#变量(除了number,string等基础类型)**均为引用**,struct变量也一样
-* c#重载**[]**运算符后脚本里不能直接使用[],请使用 **get_Item set_Item** 函数
-* c#数组对象获取元素不能直接使用**[]**,请使用 **GetValue SetValue** 函数, 具体参数可以参考 **Array** 类的 **GetValue SetValue** 函数
+* 使用 **import_type** 引入内部类时使用 **+**, 例如 **import_type("[namespace].[clasname]+[internalclass]")**
+* 脚本内所有c#变量(除了number,string等基础类型) **均为引用**,struct变量也一样
+* c#重载 **[]** 运算符后脚本里不能直接使用[],请使用 **get_Item set_Item** 函数
+* c#数组对象获取元素不能直接使用 **[]** ,请使用 **GetValue SetValue** 函数, 具体参数可以参考 **Array** 类的 **GetValue SetValue** 函数
 * c#中event对象+= -=操作可以使用函数 **add_[event变量名] remove_[event变量名]** 代替
 * 同类中静态函数和实例函数不要重名,否则会调用失败 例如 static void Test(object a); void Test(object a, object b); 两个函数不一定会当静态还是实例函数处理
 * 同类中重载的函数相同参数不要是继承关系,否则可能调用失败,例如 void Test(object a); void Test(string a); 两个Test函数都可以传入string,但是调用时不一定会调用哪一个
@@ -65,7 +66,7 @@
 * IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
 * UWP平台master配置下 **generic_method** 函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 * UWP平台master配置下 **generic_type** 函数也会出问题
-* 不能使用 **SCORPIO_DYNAMIC_DELEGATE** 的平台,要实现一个继承 DelegateTypeFactory 的类,然后调用ScriptUserdataDelegateType.SetFactory函数设置一下 例如:
+* 不能使用 **SCORPIO_DYNAMIC_DELEGATE** 的平台,要实现一个继承 **DelegateTypeFactory** 的类,然后调用 **ScriptUserdataDelegateType.SetFactory** 函数设置一下 例如:
 
 ```csharp
 public class MyDelegateFactory : DelegateTypeFactory {
@@ -118,13 +119,10 @@ namespace ScorpioDelegate {
 * 不能调用含有ref和out参数的函数
 
 ## Unity3d发布平台支持(亲测):
-- [x] Web Player
-- [x] PC, Mac & Linux Standalone
+- [x] PC, Mac & Linux Standalone(包括IL2CPP)
 - [x] iOS(包括IL2CPP)
-- [x] Android
-- [x] BlackBerry
-- [x] Windows Phone 8
-- [x] Windows 10 (Universal Windows Platform) (请添加 SCORPIO_NET_CORE 宏定义)
+- [x] Android(包括IL2CPP)
+- [x] Universal Windows Platform(包括IL2CPP)
 - [x] WebGL
 - [x] Tizen
 - [ ] 理论上可以支持所有平台
