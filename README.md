@@ -5,9 +5,12 @@
 
 ### 基础介绍
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio, 快捷键 windows(alt+g) & mac (alt[option] + g) 可以运行正在编辑的脚本
-    * 先安装 .net core 到 windows 或 mac, 然后命令行运行 **build.bat(windows)** 或 **build.sh (mac)** 生成可执行文件 (生成文件较大，没有上传，请自行生成)
-    * **windows** 添加 **bin/win** 目录到 系统变量，或者运行 bin/win/register.bat 自动注册系统变量
-    * **mac** 注册 **bin/mac** 目录到 **.bash_profile** 文件 
+    * Windows 设置环境变量
+        * 下载Release版本或者先安装 **.net core**, 然后运行命令行 **build.bat** 生成运行程序
+        * 添加目录到系统目录
+    * Max & Linux 设置环境变量
+        * 下载Release版本或者先安装 **.net core**, 然后运行命令行 **build.sh** 生成运行程序
+        * 添加目录到 **.bash_profile** 文件
 * 脚本教程 http://www.fengyuezhu.com/readme/
 * Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/scriptconsole/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/unitysample/
@@ -251,9 +254,12 @@ script.LoadLibrary();
 script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script));
 ```
 
-## master版本更新和修改内容
+## 版本更新和修改内容
 
-(2018-02-07)
+
+## v1.0.0 (2018-03-29)
+***
+(2018-02-07) 
 -----------
 * 修改解决方案为 .net core, 支持在 windows 和 mac 上直接运行 sco 命令行
 

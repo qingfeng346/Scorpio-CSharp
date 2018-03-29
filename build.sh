@@ -1,6 +1,7 @@
 cd ScorpioExec
-dotnet publish -c release -o ../bin/win -r win7-x64
-dotnet publish -c release -o ../bin/mac -r osx.10.11-x64
-dotnet publish -c release -o ../bin/centos -r centos.7-x64
-dotnet publish -c release -o ../bin/ubuntu -r ubuntu.14.04-x64
-dotnet publish -c release -o ../bin/debian -r debian.8-x64
+version=1.0.0
+dotnet publish -c release -o ../bin/sco-$version-windows-x64 -r win7-x64
+dotnet publish -c release -o ../bin/sco-$version-macos-x64 -r osx.10.11-x64
+dotnet publish -c release -o ../bin/sco-$version-centos-x64 -r centos.7-x64
+dotnet publish -c release -o ../bin/sco-$version-ubuntu-x64 -r ubuntu.14.04-x64
+dotnet publish -c release -o ../bin/sco-$version-debian-x64 -r debian.8-x64
