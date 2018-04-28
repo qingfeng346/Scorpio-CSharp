@@ -43,7 +43,8 @@ namespace Scorpio.Runtime {
                 m_variableDictionary[pair.Key] = pair.Value;
         }
         private void Initialize(string name, ScriptObject obj) {
-            m_variableDictionary.Add(name, obj);
+            m_variableDictionary[name] = obj;
+            //m_variableDictionary.Add(name, obj);
         }
         //初始化所有数据 每次调用 Execute 调用
         private void Reset() {
@@ -127,10 +128,9 @@ namespace Scorpio.Runtime {
         public ScriptObject Execute() {
             Reset();
             int iInstruction = 0;
-            while (iInstruction < m_InstructionCount) {
+            while (iInstruction < m_InstructionCount && !IsExecuted) {
                 m_scriptInstruction = m_scriptInstructions[iInstruction++];
                 ExecuteInstruction();
-                if (IsExecuted) break;
             }
             return m_returnObject;
         }
@@ -140,10 +140,9 @@ namespace Scorpio.Runtime {
             ScriptInstruction[] scriptInstructions = executable.ScriptInstructions;
             int iInstruction = 0;
             int iInstructionCount = scriptInstructions.Length;
-            while (iInstruction < iInstructionCount) {
+            while (iInstruction < iInstructionCount && !IsExecuted) {
                 m_scriptInstruction = scriptInstructions[iInstruction++];
                 ExecuteInstruction();
-                if (IsExecuted) break;
             }
             return m_returnObject;
         }
@@ -192,11 +191,9 @@ namespace Scorpio.Runtime {
             CodeFor code = (CodeFor)m_scriptInstruction.operand0;
             ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.For);
             context.Execute(code.BeginExecutable);
-            for (; ; ) {
-                if (code.Condition != null) {
-                    if (!context.ResolveOperand(code.Condition).LogicOperation()) break;
-                }
-                ScriptContext blockContext = new ScriptContext(m_script, code.BlockExecutable, context, Executable_Block.For);
+            ScriptContext blockContext;
+            while (code.Condition == null || context.ResolveOperand(code.Condition).LogicOperation()) {
+                blockContext = new ScriptContext(m_script, code.BlockExecutable, context, Executable_Block.For);
                 blockContext.Execute();
                 if (blockContext.IsOver) break;
                 context.Execute(code.LoopExecutable);
@@ -218,8 +215,9 @@ namespace Scorpio.Runtime {
             } else {
                 step = 1;
             }
+            int i = begin;
             ScriptContext context;
-            for (double i = begin; i <= finished; i += step) {
+            for (; i <= finished; i += step) {
                 context = new ScriptContext(m_script, code.BlockExecutable, this, Executable_Block.For);
                 context.Initialize(code.Identifier, new ScriptNumberDouble(m_script, i));
                 context.Execute();
