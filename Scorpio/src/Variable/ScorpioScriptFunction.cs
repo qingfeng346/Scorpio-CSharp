@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Text;
 using Scorpio;
 using Scorpio.Runtime;
+using Scorpio.Commons;
+
 namespace Scorpio.Variable
 {
     /// <summary> 脚本函数 </summary>
@@ -30,7 +32,7 @@ namespace Scorpio.Variable
             this.m_ParameterCount = listParameters.Count;
             this.m_Params = bParams;
         }
-        public ScriptObject Call(ScriptContext parentContext, Dictionary<String, ScriptObject> objs, ScriptObject[] parameters) {
+        public ScriptObject Call(ScriptContext parentContext, ScorpioDictionary<ScriptObject> objs, ScriptObject[] parameters) {
             int length = parameters.Length;
             if (m_Params) {
                 ScriptArray paramsArray = m_Script.CreateArray();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Scorpio;
 using Scorpio.Compiler;
 using Scorpio.CodeDom;
@@ -7,6 +6,8 @@ using Scorpio.CodeDom.Temp;
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Variable;
+using Scorpio.Commons;
+
 namespace Scorpio.Runtime {
     //执行命令
     //注意事项:
@@ -18,7 +19,7 @@ namespace Scorpio.Runtime {
         private ScriptInstruction m_scriptInstruction;                      //当前执行的指令
         private int m_InstructionCount;                                     //指令数量
         private Executable_Block m_block;                                   //指令集类型
-        private Dictionary<String, ScriptObject> m_variableDictionary;      //当前作用域所有变量
+        private ScorpioDictionary<ScriptObject> m_variableDictionary;       //当前作用域所有变量
         private ScriptObject m_returnObject = null;                         //返回值
         private bool m_Break = false;                                       //break跳出
         private bool m_Continue = false;                                    //continue跳出
@@ -30,7 +31,7 @@ namespace Scorpio.Runtime {
             m_script = script;
             m_parent = parent;
             m_block = block;
-            m_variableDictionary = new Dictionary<String, ScriptObject>();
+            m_variableDictionary = new ScorpioDictionary<ScriptObject>();
             if (scriptExecutable != null) {
                 m_scriptInstructions = scriptExecutable.ScriptInstructions;
                 m_InstructionCount = m_scriptInstructions.Length;
@@ -38,9 +39,8 @@ namespace Scorpio.Runtime {
         }
         private bool IsOver { get { return m_Break || m_Over; } }                       //break 或者 return  跳出循环
         private bool IsExecuted { get { return m_Break || m_Over || m_Continue; } }     //continue break return 当前模块是否执行完成
-        public void Initialize(Dictionary<String, ScriptObject> variable) {
-            foreach (KeyValuePair<String, ScriptObject> pair in variable)
-                m_variableDictionary[pair.Key] = pair.Value;
+        public void Initialize(ScorpioDictionary<ScriptObject> variable) {
+            m_variableDictionary.Set(variable);
         }
         private void Initialize(string name, ScriptObject obj) {
             m_variableDictionary[name] = obj;
@@ -54,19 +54,16 @@ namespace Scorpio.Runtime {
             m_Continue = false;
         }
         private void ApplyVariableObject(string name) {
-            if (!m_variableDictionary.ContainsKey(name))
-                m_variableDictionary.Add(name, m_script.Null);
+            m_variableDictionary[name] = m_script.Null;
         }
         private ScriptObject GetVariableObject(string name) {
-            if (m_variableDictionary.ContainsKey(name))
-                return m_variableDictionary[name];
-            if (m_parent != null)
-                return m_parent.GetVariableObject(name);
+            var ret = m_variableDictionary[name];
+            if (ret != null) return ret;
+            if (m_parent != null) return m_parent.GetVariableObject(name);
             return null;
         }
         private bool SetVariableObject(string name, ScriptObject obj) {
-            if (m_variableDictionary.ContainsKey(name)) {
-                m_variableDictionary[name] = obj.Assign();
+            if (m_variableDictionary.SetValue(name, obj)) {
                 return true;
             }
             if (m_parent != null) {
