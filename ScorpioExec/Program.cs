@@ -27,12 +27,27 @@ namespace ScorpioExec
             }
         }
         static void Register() {
-            var p = new List<string>(Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User).Split(';'));
-            if (!p.Contains(BaseDirectory)) {
-                p.Add(BaseDirectory);
-                Environment.SetEnvironmentVariable("Path", string.Join(";", p.ToArray()), EnvironmentVariableTarget.User);
+            if (Environment.OSVersion.ToString().ToLower().Contains("windows")) {
+                var p = new List<string>(Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User).Split(';'));
+                if (!p.Contains(BaseDirectory)) {
+                    p.Add(BaseDirectory);
+                    Environment.SetEnvironmentVariable("Path", string.Join(";", p.ToArray()), EnvironmentVariableTarget.User);
+                } else {
+                    Console.WriteLine("path is already existed");
+                }
+            } else {
+                ProcessStartInfo info = new ProcessStartInfo("ln");
+                info.Arguments = "-s " + BaseDirectory + "sco /usr/bin/";
+                info.CreateNoWindow = false;
+                info.ErrorDialog = true;
+                info.UseShellExecute = true;
+                info.RedirectStandardOutput = false;
+                info.RedirectStandardError = false;
+                info.RedirectStandardInput = false;
+                Process process = Process.Start(info);
+                process.WaitForExit();
+                process.Close();
             }
-            Console.WriteLine("path is already existed");
         }
         static byte[] GetFileBuffer(String fileName) {
             FileStream stream = File.OpenRead(fileName);
