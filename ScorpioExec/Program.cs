@@ -11,7 +11,8 @@ namespace ScorpioExec
 {
     public class Program
     {
-        public static readonly string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        public static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        public static readonly string CurrentDirectory = Environment.CurrentDirectory;
         private static Script script;
         private static void LoadLibrary(string path) {
             if (!Directory.Exists(path)) { return; }
@@ -27,8 +28,8 @@ namespace ScorpioExec
         }
         static void Register() {
             var p = new List<string>(Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User).Split(';'));
-            if (!p.Contains(CurrentDirectory)) {
-                p.Add(CurrentDirectory);
+            if (!p.Contains(BaseDirectory)) {
+                p.Add(BaseDirectory);
                 Environment.SetEnvironmentVariable("Path", string.Join(";", p.ToArray()), EnvironmentVariableTarget.User);
             }
             Console.WriteLine("path is already existed");
@@ -68,17 +69,15 @@ namespace ScorpioExec
             script.PushAssembly(typeof(Program).Assembly);
             Console.WriteLine("os version : " + Environment.OSVersion.ToString());
             Console.WriteLine("sco version : " + Script.Version);
-            Console.WriteLine("app path is : " + CurrentDirectory);
+            Console.WriteLine("app path is : " + BaseDirectory);
+            Console.WriteLine("environment path is : " + CurrentDirectory);
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {
-                    string file = Path.GetFullPath(args[0]);
-                    string path = Path.GetDirectoryName(file);
-                    LoadLibrary(Path.Combine(path, "dll"));
+                    string file = Path.Combine(CurrentDirectory, args[0]);
                     Stopwatch watch = Stopwatch.StartNew();
                     script.PushSearchPath(CurrentDirectory);
-                    script.PushSearchPath(path);
-                    script.SetObject("__PATH__", path);
+                    script.SetObject("__PATH__", CurrentDirectory);
                     Console.WriteLine("=============================");
                     ScriptObject value = script.LoadFile(file);
                     Console.WriteLine("=============================");
