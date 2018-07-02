@@ -19,7 +19,7 @@ namespace Scorpio.ScorpioReflect {
             {"op_Inequality", "!="},
         };
         private string GenerateConstructor() {
-            var Constructors = m_Type.GetConstructors();
+            var Constructors = m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
             StringBuilder builder = new StringBuilder();
             bool first = true;
             foreach (var constructor in Constructors) {
