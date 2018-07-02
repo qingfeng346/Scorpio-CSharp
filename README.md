@@ -256,8 +256,13 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 
 ## 版本更新和修改内容
 
+(2018-07-02) 
+-----------
+* 修复struct无参构造函数调用失败
+* 增加Unity生成去反射函数的示例
 
-## v1.0.0 (2018-03-29)
+
+## <font color=#00ff00>v1.0.0 (2018-03-29)</font>
 ***
 (2018-02-07) 
 -----------

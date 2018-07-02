@@ -13,3 +13,9 @@
 /bin/*.pdb
 /bin/ScorpioDemo.exe.config
 /bin
+/ScorpioTest/Assembly-CSharp.csproj
+/ScorpioTest/Assembly-CSharp-Editor.csproj
+/ScorpioTest/ScorpioTest.sln
+/ScorpioTest/Library
+/ScorpioTest/obj
+/ScorpioTest/Temp
