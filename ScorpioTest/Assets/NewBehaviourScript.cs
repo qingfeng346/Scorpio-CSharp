@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Scorpio;
+
 public class NewBehaviourScript : MonoBehaviour {
 	private static string output = "";
 	private class ScriptPrint : ScorpioHandle {
@@ -21,7 +22,7 @@ public class NewBehaviourScript : MonoBehaviour {
         height = Screen.height;
         windowHeight = height / 2 - 30;
         text = PlayerPrefs.GetString("__Text", "print (\"hello world\")");
-		Application.RegisterLogCallbackThreaded (OnLogCallback);
+		Application.logMessageReceived += OnLogCallback;
     }
 	void OnGUI()
 	{
@@ -34,7 +35,9 @@ public class NewBehaviourScript : MonoBehaviour {
 				script.LoadLibrary();
                 script.PushAssembly(GetType().Assembly);
                 script.PushAssembly(typeof(GameObject).Assembly);
+				script.PushAssembly(typeof(UnityEngine.UI.SpriteState).Assembly);
 				script.SetObject("print", script.CreateFunction(new ScriptPrint()));
+				ScorpioClassManager.Initialize(script);
 				ScriptObject ret = script.LoadString(text);
                 OutPut("ReturnValue : " + ret);
 			} catch (System.Exception e) {
