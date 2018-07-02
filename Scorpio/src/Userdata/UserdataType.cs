@@ -87,7 +87,7 @@ namespace Scorpio.Userdata {
         private void InitializeConstructor() {
             if (m_InitializeConstructor == true) return;
             m_InitializeConstructor = true;
-            m_Constructor = new ReflectUserdataMethod(m_Script, m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors());
+            m_Constructor = new ReflectUserdataMethod(m_Script, m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors(Script.BindingFlag));
         }
         private void InitializeMethods() {
             if (m_InitializeMethods == true) return;

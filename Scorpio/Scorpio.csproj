@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="rd /S /Q ..\ScorpioTest\Assets\Scorpio\&#xD;&#xA;mkdir ..\ScorpioTest\Assets\Scorpio\&#xD;&#xA;xcopy /s /e $(ProjectDir)\src\*.* ..\ScorpioTest\Assets\Scorpio\" />
+  </Target>
+
 </Project>

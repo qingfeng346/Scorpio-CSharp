@@ -116,8 +116,10 @@ namespace Scorpio.Userdata {
         private FunctionBase[] m_GenericMethods;        //所有模板函数
         private string m_MethodName;                    //函数名字
         private bool m_IsStatic;                        //是否是静态函数
+        private bool m_IsClass;                         //是否是class
         public string MethodName { get { return m_MethodName; } }
         public bool IsStatic { get { return m_IsStatic; } }
+        public bool IsClass { get { return m_IsClass; } }
         public UserdataMethod() { }
         private UserdataMethod(Script script, Type type, string methodName, List<MethodInfo> methods) {
             m_Script = script;
@@ -146,6 +148,7 @@ namespace Scorpio.Userdata {
         private void Initialize_impl(Type type, string methodName, List<MethodBase> methods)
         {
             m_Type = type;
+            m_IsClass = type.IsClass;
             m_MethodName = methodName;
             List<FunctionBase> functionMethod = new List<FunctionBase>();
             List<FunctionBase> genericMethods = new List<FunctionBase>();
@@ -239,55 +242,59 @@ namespace Scorpio.Userdata {
             return true;
         }
         public object Call(object obj, ScriptObject[] parameters) {
-            FunctionBase methodInfo = null;
-            FunctionBase functionBase = null;
-            for (int i = 0; i < m_Count; ++i) {
-                functionBase = m_Methods[i];
-                if (functionBase.Params || functionBase.HasDefault) { continue; }
-                if (CheckNormalType(parameters, functionBase.ParameterType, functionBase.ParameterCount)) {
-                    methodInfo = functionBase;
-                    goto callMethod;
-                }
-            }
-            for (int i = 0; i < m_Count; ++i) {
-                functionBase = m_Methods[i];
-                if (functionBase.Params || !functionBase.HasDefault) { continue; }
-                if (CheckDefaultType(parameters, functionBase.ParameterType, functionBase.RequiredNumber, functionBase.ParameterCount)) {
-                    methodInfo = functionBase;
-                    goto callMethod;
-                }
-            }
-            for (int i = 0; i < m_Count; ++i) {
-                functionBase = m_Methods[i];
-                if (!functionBase.Params) { continue; }
-                if (CheckArgsType(parameters, functionBase.ParameterType, functionBase.ParamType, functionBase.RequiredNumber, functionBase.ParameterCount)) {
-                    methodInfo = functionBase;
-                    goto callMethod;
-                }
-            }
-            callMethod:
             try {
-                if (methodInfo != null) {
-                    int requiredNumber = methodInfo.RequiredNumber;       //函数必须传入的参数个数
-                    int parameterCount = methodInfo.ParameterCount;       //参数个数
-                    int parameterNumber = parameters.Length;              //脚本传入的参数个数
-                    object[] args = methodInfo.Args;                      //参数数组
-                    if (methodInfo.Params) {
-                        for (int i = 0; i < parameterCount; ++i)
-                            args[i] = i >= parameterNumber ? methodInfo.DefaultParameter[i - requiredNumber] : Util.ChangeType(m_Script, parameters[i], methodInfo.ParameterType[i]);
-                        if (parameterNumber > parameterCount) {
-                            Array array = Array.CreateInstance(methodInfo.ParamType, parameterNumber - parameterCount);
-                            for (int i = parameterCount; i < parameterNumber; ++i)
-                                array.SetValue(Util.ChangeType(m_Script, parameters[i], methodInfo.ParamType), i - parameterCount);
-                            args[parameterCount] = array;
-                        } else {
-                            args[parameterCount] = Array.CreateInstance(methodInfo.ParamType, 0);
+                int parameterNumber = parameters.Length;              //脚本传入的参数个数
+                if (!m_IsClass && parameterNumber == 0) {
+                    return Activator.CreateInstance(m_Type);
+                } else {
+                    FunctionBase methodInfo = null;
+                    FunctionBase functionBase = null;
+                    for (int i = 0; i < m_Count; ++i) {
+                        functionBase = m_Methods[i];
+                        if (functionBase.Params || functionBase.HasDefault) { continue; }
+                        if (CheckNormalType(parameters, functionBase.ParameterType, functionBase.ParameterCount)) {
+                            methodInfo = functionBase;
+                            goto callMethod;
                         }
-                        return methodInfo.Invoke(obj, m_Type);
-                    } else {
-                        for (int i = 0; i < parameterCount; ++i)
-                            args[i] = i >= parameterNumber ? methodInfo.DefaultParameter[i - requiredNumber] : Util.ChangeType(m_Script, parameters[i], methodInfo.ParameterType[i]);
-                        return methodInfo.Invoke(obj, m_Type);
+                    }
+                    for (int i = 0; i < m_Count; ++i) {
+                        functionBase = m_Methods[i];
+                        if (functionBase.Params || !functionBase.HasDefault) { continue; }
+                        if (CheckDefaultType(parameters, functionBase.ParameterType, functionBase.RequiredNumber, functionBase.ParameterCount)) {
+                            methodInfo = functionBase;
+                            goto callMethod;
+                        }
+                    }
+                    for (int i = 0; i < m_Count; ++i) {
+                        functionBase = m_Methods[i];
+                        if (!functionBase.Params) { continue; }
+                        if (CheckArgsType(parameters, functionBase.ParameterType, functionBase.ParamType, functionBase.RequiredNumber, functionBase.ParameterCount)) {
+                            methodInfo = functionBase;
+                            goto callMethod;
+                        }
+                    }
+                    callMethod:
+                    if (methodInfo != null) {
+                        int requiredNumber = methodInfo.RequiredNumber;       //函数必须传入的参数个数
+                        int parameterCount = methodInfo.ParameterCount;       //参数个数
+                        object[] args = methodInfo.Args;                      //参数数组
+                        if (methodInfo.Params) {
+                            for (int i = 0; i < parameterCount; ++i)
+                                args[i] = i >= parameterNumber ? methodInfo.DefaultParameter[i - requiredNumber] : Util.ChangeType(m_Script, parameters[i], methodInfo.ParameterType[i]);
+                            if (parameterNumber > parameterCount) {
+                                Array array = Array.CreateInstance(methodInfo.ParamType, parameterNumber - parameterCount);
+                                for (int i = parameterCount; i < parameterNumber; ++i)
+                                    array.SetValue(Util.ChangeType(m_Script, parameters[i], methodInfo.ParamType), i - parameterCount);
+                                args[parameterCount] = array;
+                            } else {
+                                args[parameterCount] = Array.CreateInstance(methodInfo.ParamType, 0);
+                            }
+                            return methodInfo.Invoke(obj, m_Type);
+                        } else {
+                            for (int i = 0; i < parameterCount; ++i)
+                                args[i] = i >= parameterNumber ? methodInfo.DefaultParameter[i - requiredNumber] : Util.ChangeType(m_Script, parameters[i], methodInfo.ParameterType[i]);
+                            return methodInfo.Invoke(obj, m_Type);
+                        }
                     }
                 }
             } catch (System.Exception e) {
