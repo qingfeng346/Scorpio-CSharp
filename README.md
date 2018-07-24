@@ -12,8 +12,8 @@
         * 下载Release版本或者先安装 **.net core**, 然后运行命令行 **build.sh** 生成运行程序
         * 添加目录到 **.bash_profile** 文件
 * 脚本教程 http://www.fengyuezhu.com/readme/
-* Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/scriptconsole/
-* 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/project/Scorpio-CSharp/unitysample/
+* Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
+* 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/unitysample/
 * 脚本实现Space Shooter 源码地址 https://github.com/qingfeng346/ScorpioUnitySample
 * 网络协议,Excel表数据转换工具 : https://github.com/qingfeng346/ScorpioConversion
 * Sco脚本的Java实现 : https://github.com/qingfeng346/Scorpio-Java
