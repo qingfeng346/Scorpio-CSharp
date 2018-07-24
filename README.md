@@ -256,4 +256,4 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 
 ## 版本更新和修改内容
 
-[更新日志](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ReleaseNote.md)
+[更新日志](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ReleaseNotes.md)
