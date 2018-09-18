@@ -66,41 +66,72 @@ namespace Scorpio.Compiler {
             /// <summary> 描述符 </summary>
             Identifier,
         }
-        private const int BREVIARY_CHAR = 20;       //摘要的字符数
-        private LexState lexState { get { return m_lexState; } set { m_lexState = value; if (m_lexState == LexState.None) { m_strToken = ""; } } }
-        bool EndOfSource { get { return m_iSourceLine >= m_listSourceLines.Count; } }
-        bool EndOfLine { get { return m_iSourceChar >= m_listSourceLines[m_iSourceLine].Length; } }
-        char ReadChar() {
-            if (EndOfSource)
-                throw new LexerException("End of source reached.");
-            char ch = m_listSourceLines[m_iSourceLine][m_iSourceChar++];
-            if (m_iSourceChar >= m_listSourceLines[m_iSourceLine].Length) {
-                m_iSourceChar = 0;
-                ++m_iSourceLine;
+        private const char END_CHAR = (char)0;      //结尾字符
+        private const int BREVIARY_CHAR = 10;       //摘要的字符数
+        private char m_ch;                          //当前解析字符
+        private StringBuilder m_Builder;            //
+        private LexState m_lexState;                //当前解析状态
+        private LexState m_cacheLexState;           //缓存解析状态
+        private List<Token> m_listTokens;           //
+        private String m_strBreviary;               //字符串的摘要 取第一行字符串的前20个字符
+        private String m_strBuffer;                 //解析内容
+        private int m_iLength = 0;                  //Buffer长度
+        private int m_iSourceLine = 0;              //当前解析的行数
+        private int m_iSourceChar = 0;              //当前行解析
+        private int m_iIndex = 0;                   //当前解析
+        private int m_iCacheLine = 0;               //Simple字符串起始行
+        private LexState lexState { get { return m_lexState; } set { m_lexState = value; if (m_lexState == LexState.None) { m_Builder.Clear(); } } }
+        public ScriptLexer(String buffer, String strBreviary) {
+            if (Util.IsNullOrEmpty(strBreviary)) {
+                m_strBreviary = buffer.Length >= BREVIARY_CHAR ? buffer : buffer.Substring(0, BREVIARY_CHAR);
+            } else {
+                m_strBreviary = strBreviary;
             }
-            return ch;
+            m_strBuffer = buffer;
+            m_iLength = buffer.Length;
+            m_Builder = new StringBuilder();
+            m_listTokens = new List<Token>();
+        }
+
+        char ReadChar() {
+            ++m_iIndex;
+            if (m_iIndex < m_iLength) {
+                return m_strBuffer[m_iIndex];
+            } else if (m_iIndex == m_iLength) {
+                return END_CHAR;
+            }
+            throw new LexerException("End of source reached.");
+        }
+        char PeekChar() {
+            int index = m_iIndex + 1;
+            if (index < m_iLength) {
+                return m_strBuffer[index];
+            } else if (index == m_iLength) {
+                return END_CHAR;
+            }
+            throw new LexerException("End of source reached.");
+        }
+        /// <summary> 获得整段字符串的摘要 </summary>
+        public String GetBreviary() {
+            return m_strBreviary;
         }
         void UndoChar() {
-            if (m_iSourceLine == 0 && m_iSourceChar == 0)
+            if (m_iIndex == 0)
                 throw new LexerException("Cannot undo char beyond start of source.");
-            --m_iSourceChar;
-            if (m_iSourceChar < 0) {
-                --m_iSourceLine;
-                m_iSourceChar = m_listSourceLines[m_iSourceLine].Length - 1;
-            }
-        }
-        void IgnoreLine() {
-            ++m_iSourceLine;
-            m_iSourceChar = 0;
+            --m_iIndex;
         }
         void ThrowInvalidCharacterException(char ch) {
-            throw new LexerException(m_strBreviary + ":" + (m_iSourceLine + 1) + "  Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar + " [" + m_listSourceLines[m_iSourceLine] + "]");
+            throw new LexerException(m_strBreviary + ":" + (m_iSourceLine + 1) + "  Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar);
         }
         void AddToken(TokenType type) {
-            AddToken(type, ch);
+            AddToken(type, m_ch);
         }
         void AddToken(TokenType type, object lexeme) {
             m_listTokens.Add(new Token(type, lexeme, m_iSourceLine, m_iSourceChar));
+            lexState = LexState.None;
+        }
+        void AddToken(Token token) {
+            m_listTokens.Add(token);
             lexState = LexState.None;
         }
         bool IsHexDigit(char c) {
@@ -111,6 +142,9 @@ namespace Scorpio.Compiler {
             if ('A' <= c && c <= 'F')
                 return true;
             return false;
+        }
+        private bool IsIdentifier(char ch) {
+            return (ch == '_' || char.IsLetterOrDigit(ch));
         }
     }
 }
