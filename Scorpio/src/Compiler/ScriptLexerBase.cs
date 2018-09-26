@@ -69,10 +69,13 @@ namespace Scorpio.Compiler {
         private const char END_CHAR = (char)0;      //结尾字符
         private const int BREVIARY_CHAR = 10;       //摘要的字符数
         private char m_ch;                          //当前解析字符
-        private StringBuilder m_Builder;            //
+        private char ch;                            //临时保存字符
+        private char ch2;                           //临时保存字符
+        private int m_FormatString;                 //是否正在格式化字符串 0 没有 1普通字符串单引号 2普通字符串双引号 3单纯字符串单引号 4单传字符串双引号
+        private StringBuilder m_Builder;            //当前缓存的字符串
         private LexState m_lexState;                //当前解析状态
         private LexState m_cacheLexState;           //缓存解析状态
-        private List<Token> m_listTokens;           //
+        private List<Token> m_listTokens;           //返回的Token列表
         private String m_strBreviary;               //字符串的摘要 取第一行字符串的前20个字符
         private String m_strBuffer;                 //解析内容
         private int m_iLength = 0;                  //Buffer长度
@@ -120,18 +123,25 @@ namespace Scorpio.Compiler {
                 throw new LexerException("Cannot undo char beyond start of source.");
             --m_iIndex;
         }
+        void ThrowInvalidCharacterException() {
+            ThrowInvalidCharacterException(m_ch);
+        }
         void ThrowInvalidCharacterException(char ch) {
             throw new LexerException(m_strBreviary + ":" + (m_iSourceLine + 1) + "  Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar);
+        }
+        void AddLine() {
+            m_iSourceChar = 0;
+            ++m_iSourceLine;
         }
         void AddToken(TokenType type) {
             AddToken(type, m_ch);
         }
         void AddToken(TokenType type, object lexeme) {
-            m_listTokens.Add(new Token(type, lexeme, m_iSourceLine, m_iSourceChar));
-            lexState = LexState.None;
+            AddToken(new Token(type, lexeme, m_iSourceLine, m_iSourceChar));
         }
         void AddToken(Token token) {
             m_listTokens.Add(token);
+            m_Builder.Clear();
             lexState = LexState.None;
         }
         bool IsHexDigit(char c) {

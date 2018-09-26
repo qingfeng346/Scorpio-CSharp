@@ -7,8 +7,23 @@ namespace Scorpio.Compiler {
 
     /// <summary> 脚本语法解析 </summary>
     public partial class ScriptLexer {
+        /// <summary> . </summary>
+        void ReadDot() {
+            ch = ReadChar();
+            if (ch == '.') {
+                if (ReadChar() == '.') {
+                    AddToken(TokenType.Params, "...");
+                } else {
+                    ThrowInvalidCharacterException();
+                }
+            } else {
+                AddToken(TokenType.Period, ".");
+                UndoChar();
+            }
+        }
+        /// <summary> + </summary>
         void ReadPlus() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '+') {
                 AddToken(TokenType.Increment, "++");
             } else if (ch == '=') {
@@ -18,8 +33,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> - </summary>
         void ReadMinus() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '-') {
                 AddToken(TokenType.Decrement, "--");
             } else if (ch == '=') {
@@ -29,8 +45,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> * </summary>
         void ReadMultiply() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '=') {
                 AddToken(TokenType.AssignMultiply, "*=");
             } else {
@@ -38,10 +55,11 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> / </summary>
         void ReadDivideOrComment() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '/') {
-                lexState = LexState.LineComment;
+                ReadLineComment();
             } else if (ch == '*') {
                 lexState = LexState.BlockCommentStart;
             } else if (ch == '=') {
@@ -51,8 +69,18 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        void ReadLineComment() {
+            do {
+                ch = ReadChar();
+                if (ch == '\n' || ch == END_CHAR) {
+                    UndoChar();
+                    break;
+                }
+            } while (true);
+        }
+        /// <summary> % </summary>
         void ReadModulo() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '=') {
                 AddToken(TokenType.AssignModulo, "%=");
             } else {
@@ -60,8 +88,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> = </summary>
         void ReadAssign() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '=') {
                 AddToken(TokenType.Equal, "==");
             } else {
@@ -69,8 +98,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> & </summary>
         void ReadAnd() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '&') {
                 AddToken(TokenType.And, "&&");
             } else if (ch == '=') {
@@ -80,8 +110,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> | </summary>
         void ReadOr() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '|') {
                 AddToken(TokenType.Or, "||");
             } else if (ch == '=') {
@@ -91,8 +122,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> ! </summary>
         void ReadNot() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '=') {
                 AddToken(TokenType.NotEqual, "!=");
             } else {
@@ -100,8 +132,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> > </summary>
         void ReadGreater() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '=') {
                 AddToken(TokenType.GreaterOrEqual, ">=");
             } else if (ch == '>') {
@@ -111,8 +144,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> < </summary>
         void ReadLess() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '=') {
                 AddToken(TokenType.LessOrEqual, "<=");
             } else if (ch == '<') {
@@ -122,8 +156,9 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
+        /// <summary> ^ </summary>
         void ReadXor() {
-            char ch = ReadChar();
+            ch = ReadChar();
             if (ch == '=') {
                 AddToken(TokenType.AssignXOR, "^=");
             } else {
@@ -131,76 +166,10 @@ namespace Scorpio.Compiler {
                 UndoChar();
             }
         }
-        void ReadSimpleString() {
-            char ch = ReadChar();
-            if (ch != '\"' && ch != '\'') {
-                ThrowInvalidCharacterException(ch);
-            }
-            char c;
-            m_iCacheLine = m_iSourceLine;
-            while (true) {
-                c = ReadChar();
-                if (c == ch) {
-                    if (PeekChar() == ch) {
-                        m_Builder.Append(ch);
-                    } else {
-                        AddToken(new Token(TokenType.SimpleString, m_Builder.ToString(), m_iCacheLine, m_iSourceChar));
-                        break;
-                    }
-                } else if (c == '$' && PeekChar() == '{') {
-                    m_cacheLexState = lexState;
-                } else {
-                    m_Builder.Append(c);
-                }
-            }
-        }
-        void ReadString() {
-            char ch;
-            while (true) {
-                ch = ReadChar();
-                if (ch == '\\') {
-                    if (PeekChar() == m_ch) {
-                        ReadChar();
-                        m_Builder.Append(m_ch);
-                    } else {
-                        m_Builder.Append(ch);
-                        m_Builder.Append(ReadChar());
-                    }
-                } else if (ch == '\n') {
-                    ThrowInvalidCharacterException(ch);
-                } else if (ch == m_ch) {
-                    AddToken(TokenType.String, m_Builder.ToString());
-                    break;
-                } else {
-                    m_Builder.Append(ch);
-                }
-            }
-        }
-        void ReadNumberOrHexNumber() {
-            if (ReadChar() == 'x') {
-                char ch;
-                while (true) {
-                    ch = ReadChar();
-                    if (IsHexDigit(ch)) {
-                        m_Builder.Append(ch);
-                    } else if (m_Builder.Length == 0){
-                        ThrowInvalidCharacterException(ch);
-                    } else {
-                        long value = long.Parse(m_Builder.ToString(), System.Globalization.NumberStyles.HexNumber);
-                        AddToken(TokenType.Number, value);
-                        UndoChar();
-                        break;
-                    }
-                }
-            } else {
-                UndoChar();
-                ReadNumber();
-            }
-        }
+        /// <summary> 读取数字 </summary>
         void ReadNumber() {
             m_Builder.Append(m_ch);
-            char ch;
-            while (true) {
+            do {
                 ch = ReadChar();
                 if (char.IsDigit(ch) || ch == '.') {
                     m_Builder.Append(ch);
@@ -212,12 +181,127 @@ namespace Scorpio.Compiler {
                     UndoChar();
                     break;
                 }
+            } while (true);
+        }
+        /// <summary> 读取16进制数字 </summary>
+        void ReadNumberOrHexNumber() {
+            if (ReadChar() == 'x') {
+                do {
+                    ch = ReadChar();
+                    if (IsHexDigit(ch)) {
+                        m_Builder.Append(ch);
+                    } else if (m_Builder.Length == 0) {
+                        ThrowInvalidCharacterException(ch);
+                    } else {
+                        AddToken(TokenType.Number, long.Parse(m_Builder.ToString(), System.Globalization.NumberStyles.HexNumber));
+                        UndoChar();
+                        break;
+                    }
+                } while (true);
+            } else {
+                UndoChar();
+                ReadNumber();
             }
+        }
+        /// <summary> 读取 }  </summary>
+        void ReadRightBrace() {
+            if (m_FormatString == 0) {
+                AddToken(TokenType.RightBrace, '}');
+            } else {
+                AddToken(TokenType.RightPar, ')');
+                AddToken(TokenType.Plus, '+');
+                if (m_FormatString == 1 || m_FormatString == 2) {
+                    m_ch = m_FormatString == 1 ? '\'' : '\"';
+                    ReadString();
+                } else {
+                    m_ch = m_FormatString == 3 ? '\'' : '\"';
+                    ReadSimpleString(false);
+                }
+            }
+        }
+        void ReadSimpleString(bool symbol) {
+            if (symbol) {
+                m_ch = ReadChar();
+                if (ch != '\'' && ch != '\"') {
+                    ThrowInvalidCharacterException(ch);
+                }
+            }
+            m_iCacheLine = m_iSourceLine;
+            while (true) {
+                ch = ReadChar();
+                if (ch == m_ch) {
+                    ch = ReadChar();
+                    if (ch == m_ch) {
+                        m_Builder.Append(ch);
+                    } else {
+                        UndoChar();
+                        AddToken(new Token(TokenType.SimpleString, m_Builder.ToString(), m_iCacheLine, m_iSourceChar));
+                        break;
+                    }
+                } else if (ch == '$') {
+                    ch = ReadChar();
+                    if (ch == '{') {
+                        AddToken(TokenType.String, m_Builder.ToString());
+                        AddToken(TokenType.Plus, '+');
+                        AddToken(TokenType.LeftPar, '(');
+                        m_FormatString = m_ch == '\'' ? 3 : 4;
+                        break;
+                    } else {
+                        UndoChar();
+                        m_Builder.Append('$');
+                    }
+                } else {
+                    m_Builder.Append(ch);
+                    if (ch == '\n') {
+                        AddLine();
+                    }
+                }
+            }
+        }
+        void ReadString() {
+            do {
+                ch = ReadChar();
+                if (ch == '\\') {
+                    ch2 = ReadChar();
+                    switch (ch2) {
+                        case '\'': m_Builder.Append('\''); break;
+                        case '\"': m_Builder.Append('\"'); break;
+                        case '\\': m_Builder.Append('\\'); break;
+                        case 'a': m_Builder.Append('\a'); break;
+                        case 'b': m_Builder.Append('\b'); break;
+                        case 'f': m_Builder.Append('\f'); break;
+                        case 'n': m_Builder.Append('\n'); break;
+                        case 'r': m_Builder.Append('\r'); break;
+                        case 't': m_Builder.Append('\t'); break;
+                        case 'v': m_Builder.Append('\v'); break;
+                        default: ThrowInvalidCharacterException(ch2); break;
+                    }
+                } else if (ch == '\n') {
+                    ThrowInvalidCharacterException(ch);
+                } else if (ch == m_ch) {
+                    AddToken(TokenType.String, m_Builder.ToString());
+                    break;
+                } else if (ch == '$') {
+                    ch = ReadChar();
+                    if (ch == '{') {
+                        AddToken(TokenType.String, m_Builder.ToString());
+                        AddToken(TokenType.Plus, '+');
+                        AddToken(TokenType.LeftPar, '(');
+                        m_FormatString = m_ch == '\'' ? 1 : 2;
+                        break;
+                    } else {
+                        UndoChar();
+                        m_Builder.Append('$');
+                    }
+                } else {
+                    m_Builder.Append(ch);
+                }
+            }
+            while (true);
         }
         void ReadIdentifier() {
             m_Builder.Append(m_ch);
-            char ch;
-            while (true) {
+            do {
                 ch = ReadChar();
                 if (IsIdentifier(ch)) {
                     m_Builder.Append(ch);
@@ -225,7 +309,7 @@ namespace Scorpio.Compiler {
                     UndoChar();
                     break;
                 }
-            }
+            } while (true);
             TokenType tokenType;
             switch (m_Builder.ToString()) {
             case "eval":
@@ -330,15 +414,15 @@ namespace Scorpio.Compiler {
             m_iSourceChar = 0;
             m_iSourceLine = 0;
             m_iIndex = 0;
+            m_FormatString = 0;
             lexState = LexState.None;
             m_ch = END_CHAR;
             m_Builder.Clear();
             m_listTokens.Clear();
-            for (; m_iIndex < m_iLength; ++m_iIndex,++m_iSourceChar) {
+            for (; m_iIndex < m_iLength; ++m_iIndex, ++m_iSourceChar) {
                 m_ch = m_strBuffer[m_iIndex];
                 if (m_ch == '\n') {
-                    m_iSourceChar = 0;
-                    ++m_iSourceLine;
+                    AddLine();
                 }
                 switch(m_lexState) {
                     case LexState.None:
@@ -381,6 +465,12 @@ namespace Scorpio.Compiler {
                             case '~':
                                 AddToken(TokenType.Negative);
                                 break;
+                            case '}':
+                                ReadRightBrace();
+                                break;
+                            case '.':
+                                ReadDot();
+                                break;
                             case '+':
                                 ReadPlus();
                                 break;
@@ -418,7 +508,7 @@ namespace Scorpio.Compiler {
                                 ReadXor();
                                 break;
                             case '@':
-                                ReadSimpleString();
+                                ReadSimpleString(true);
                                 break;
                             case '\"':
                             case '\'':
@@ -436,11 +526,6 @@ namespace Scorpio.Compiler {
                                     ThrowInvalidCharacterException(m_ch);
                                 }
                                 break;
-                        }
-                        break;
-                    case LexState.LineComment:
-                        if (m_ch == '\n') {
-                            lexState = LexState.None;
                         }
                         break;
                     case LexState.BlockCommentStart:
