@@ -61,7 +61,7 @@ namespace Scorpio.Compiler {
             if (ch == '/') {
                 ReadLineComment();
             } else if (ch == '*') {
-                lexState = LexState.BlockCommentStart;
+                ReadBlockComment();
             } else if (ch == '=') {
                 AddToken(TokenType.AssignDivide, "/=");
             } else {
@@ -74,6 +74,17 @@ namespace Scorpio.Compiler {
                 ch = ReadChar();
                 if (ch == '\n' || ch == END_CHAR) {
                     UndoChar();
+                    break;
+                }
+            } while (true);
+        }
+        void ReadBlockComment() {
+            do {
+                ch = ReadChar();
+                if (ch == '\n') {
+                    AddLine();
+                } else if (ch == '*' && PeekChar() == '/') {
+                    ReadChar();
                     break;
                 }
             } while (true);
@@ -138,7 +149,13 @@ namespace Scorpio.Compiler {
             if (ch == '=') {
                 AddToken(TokenType.GreaterOrEqual, ">=");
             } else if (ch == '>') {
-                lexState = LexState.ShrOrAssignShr;
+                ch = ReadChar();
+                if (ch == '=') {
+                    AddToken(TokenType.AssignShr, ">>=");
+                } else {
+                    AddToken(TokenType.Shr, ">>");
+                    UndoChar();
+                }
             } else {
                 AddToken(TokenType.Greater, ">");
                 UndoChar();
@@ -150,7 +167,13 @@ namespace Scorpio.Compiler {
             if (ch == '=') {
                 AddToken(TokenType.LessOrEqual, "<=");
             } else if (ch == '<') {
-                lexState = LexState.ShiOrAssignShi;
+                ch = ReadChar();
+                if (ch == '=') {
+                    AddToken(TokenType.AssignShi, "<<=");
+                } else {
+                    AddToken(TokenType.Shi, "<<");
+                    UndoChar();
+                }
             } else {
                 AddToken(TokenType.Less, "<");
                 UndoChar();
@@ -222,12 +245,12 @@ namespace Scorpio.Compiler {
         void ReadSimpleString(bool symbol) {
             if (symbol) {
                 m_ch = ReadChar();
-                if (ch != '\'' && ch != '\"') {
-                    ThrowInvalidCharacterException(ch);
+                if (m_ch != '\'' && m_ch != '\"') {
+                    ThrowInvalidCharacterException();
                 }
             }
             m_iCacheLine = m_iSourceLine;
-            while (true) {
+            do {
                 ch = ReadChar();
                 if (ch == m_ch) {
                     ch = ReadChar();
@@ -256,14 +279,14 @@ namespace Scorpio.Compiler {
                         AddLine();
                     }
                 }
-            }
+            } while (true);
         }
         void ReadString() {
             do {
                 ch = ReadChar();
                 if (ch == '\\') {
-                    ch2 = ReadChar();
-                    switch (ch2) {
+                    ch = ReadChar();
+                    switch (ch) {
                         case '\'': m_Builder.Append('\''); break;
                         case '\"': m_Builder.Append('\"'); break;
                         case '\\': m_Builder.Append('\\'); break;
@@ -274,7 +297,8 @@ namespace Scorpio.Compiler {
                         case 'r': m_Builder.Append('\r'); break;
                         case 't': m_Builder.Append('\t'); break;
                         case 'v': m_Builder.Append('\v'); break;
-                        default: ThrowInvalidCharacterException(ch2); break;
+                        case '0': m_Builder.Append('\0'); break;
+                        default: ThrowInvalidCharacterException(ch); break;
                     }
                 } else if (ch == '\n') {
                     ThrowInvalidCharacterException(ch);
@@ -403,138 +427,121 @@ namespace Scorpio.Compiler {
                 AddToken(new Token(tokenType, m_Builder.ToString(), m_iSourceLine, m_iSourceChar));
             }
         }
-        void CheckBlockCommentEnd() {
-            char ch = ReadChar();
-            if (ch == '/') {
-                lexState = LexState.None;
-            }
-        }
         /// <summary> 解析字符串 </summary>
         public List<Token> GetTokens() {
             m_iSourceChar = 0;
             m_iSourceLine = 0;
             m_iIndex = 0;
             m_FormatString = 0;
-            lexState = LexState.None;
             m_ch = END_CHAR;
-            m_Builder.Clear();
+            m_Builder.Length = 0;
             m_listTokens.Clear();
             for (; m_iIndex < m_iLength; ++m_iIndex, ++m_iSourceChar) {
                 m_ch = m_strBuffer[m_iIndex];
                 if (m_ch == '\n') {
                     AddLine();
                 }
-                switch(m_lexState) {
-                    case LexState.None:
-                        switch (m_ch) {
-                            case ' ':
-                            case '\t':
-                            case '\r':
-                            case '\n':
-                                break;
-                            case '(':
-                                AddToken(TokenType.LeftPar);
-                                break;
-                            case ')':
-                                AddToken(TokenType.RightPar);
-                                break;
-                            case '[':
-                                AddToken(TokenType.LeftBracket);
-                                break;
-                            case ']':
-                                AddToken(TokenType.RightBracket);
-                                break;
-                            case '{':
-                                AddToken(TokenType.LeftBrace);
-                                break;
-                            case ',':
-                                AddToken(TokenType.Comma);
-                                break;
-                            case ':':
-                                AddToken(TokenType.Colon);
-                                break;
-                            case ';':
-                                AddToken(TokenType.SemiColon);
-                                break;
-                            case '?':
-                                AddToken(TokenType.QuestionMark);
-                                break;
-                            case '#':
-                                AddToken(TokenType.Sharp);
-                                break;
-                            case '~':
-                                AddToken(TokenType.Negative);
-                                break;
-                            case '}':
-                                ReadRightBrace();
-                                break;
-                            case '.':
-                                ReadDot();
-                                break;
-                            case '+':
-                                ReadPlus();
-                                break;
-                            case '-':
-                                ReadMinus();
-                                break;
-                            case '*':
-                                ReadMultiply();
-                                break;
-                            case '/':
-                                ReadDivideOrComment();
-                                break;
-                            case '%':
-                                ReadModulo();
-                                break;
-                            case '=':
-                                ReadAssign();
-                                break;
-                            case '&':
-                                ReadAnd();
-                                break;
-                            case '|':
-                                ReadOr();
-                                break;
-                            case '!':
-                                ReadNot();
-                                break;
-                            case '>':
-                                ReadGreater();
-                                break;
-                            case '<':
-                                ReadLess();
-                                break;
-                            case '^':
-                                ReadXor();
-                                break;
-                            case '@':
-                                ReadSimpleString(true);
-                                break;
-                            case '\"':
-                            case '\'':
-                                ReadString();
-                                break;
-                            case '0':
-                                ReadNumberOrHexNumber();
-                                break;
-                            default:
-                                if (char.IsDigit(m_ch)) {
-                                    ReadNumber();
-                                } else if (IsIdentifier(m_ch)) {
-                                    ReadIdentifier();
-                                } else {
-                                    ThrowInvalidCharacterException(m_ch);
-                                }
-                                break;
-                        }
+                switch (m_ch) {
+                    case ' ':
+                    case '\t':
+                    case '\r':
+                    case '\n':
                         break;
-                    case LexState.BlockCommentStart:
-                        if (m_ch == '*') {
-                            CheckBlockCommentEnd();
+                    case '(':
+                        AddToken(TokenType.LeftPar);
+                        break;
+                    case ')':
+                        AddToken(TokenType.RightPar);
+                        break;
+                    case '[':
+                        AddToken(TokenType.LeftBracket);
+                        break;
+                    case ']':
+                        AddToken(TokenType.RightBracket);
+                        break;
+                    case '{':
+                        AddToken(TokenType.LeftBrace);
+                        break;
+                    case ',':
+                        AddToken(TokenType.Comma);
+                        break;
+                    case ':':
+                        AddToken(TokenType.Colon);
+                        break;
+                    case ';':
+                        AddToken(TokenType.SemiColon);
+                        break;
+                    case '?':
+                        AddToken(TokenType.QuestionMark);
+                        break;
+                    case '#':
+                        AddToken(TokenType.Sharp);
+                        break;
+                    case '~':
+                        AddToken(TokenType.Negative);
+                        break;
+                    case '}':
+                        ReadRightBrace();
+                        break;
+                    case '.':
+                        ReadDot();
+                        break;
+                    case '+':
+                        ReadPlus();
+                        break;
+                    case '-':
+                        ReadMinus();
+                        break;
+                    case '*':
+                        ReadMultiply();
+                        break;
+                    case '/':
+                        ReadDivideOrComment();
+                        break;
+                    case '%':
+                        ReadModulo();
+                        break;
+                    case '=':
+                        ReadAssign();
+                        break;
+                    case '&':
+                        ReadAnd();
+                        break;
+                    case '|':
+                        ReadOr();
+                        break;
+                    case '!':
+                        ReadNot();
+                        break;
+                    case '>':
+                        ReadGreater();
+                        break;
+                    case '<':
+                        ReadLess();
+                        break;
+                    case '^':
+                        ReadXor();
+                        break;
+                    case '@':
+                        ReadSimpleString(true);
+                        break;
+                    case '\"':
+                    case '\'':
+                        ReadString();
+                        break;
+                    case '0':
+                        ReadNumberOrHexNumber();
+                        break;
+                    default:
+                        if (char.IsDigit(m_ch)) {
+                            ReadNumber();
+                        } else if (IsIdentifier(m_ch)) {
+                            ReadIdentifier();
+                        } else {
+                            ThrowInvalidCharacterException(m_ch);
                         }
                         break;
                 }
-                
             }
             AddToken(new Token(TokenType.Finished, "", m_iSourceLine, m_iSourceChar));
             return m_listTokens;
