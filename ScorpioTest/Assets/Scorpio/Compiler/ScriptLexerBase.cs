@@ -32,6 +32,7 @@ namespace Scorpio.Compiler {
 
         char ReadChar() {
             ++m_iIndex;
+            ++m_iSourceChar;
             if (m_iIndex < m_iLength) {
                 return m_strBuffer[m_iIndex];
             } else if (m_iIndex == m_iLength) {
@@ -56,6 +57,7 @@ namespace Scorpio.Compiler {
             if (m_iIndex == 0)
                 throw new LexerException("Cannot undo char beyond start of source.");
             --m_iIndex;
+            --m_iSourceChar;
         }
         void ThrowInvalidCharacterException() {
             ThrowInvalidCharacterException(m_ch);

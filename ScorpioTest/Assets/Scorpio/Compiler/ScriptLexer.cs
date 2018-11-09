@@ -298,6 +298,7 @@ namespace Scorpio.Compiler {
                         case 't': m_Builder.Append('\t'); break;
                         case 'v': m_Builder.Append('\v'); break;
                         case '0': m_Builder.Append('\0'); break;
+                        case '/': m_Builder.Append("/"); break;
                         default: ThrowInvalidCharacterException(ch); break;
                     }
                 } else if (ch == '\n') {
