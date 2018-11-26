@@ -421,7 +421,7 @@ namespace Scorpio.Compiler {
                 break;
             }
             if (tokenType == TokenType.Boolean) {
-                AddToken(new Token(tokenType, m_Builder.Equals("true"), m_iSourceLine, m_iSourceChar));
+                AddToken(new Token(tokenType, m_Builder.ToString().Equals("true"), m_iSourceLine, m_iSourceChar));
             } else if (tokenType == TokenType.Null) {
                 AddToken(new Token(tokenType, null, m_iSourceLine, m_iSourceChar));
             } else {

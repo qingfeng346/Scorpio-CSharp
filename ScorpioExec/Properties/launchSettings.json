@@ -2,7 +2,7 @@
   "profiles": {
     "ScorpioExec": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\a.sco"
+      "commandLineArgs": "-t pack -s C:\\Users\\qingf\\Desktop\\a.sco -o C:\\Users\\qingf\\Desktop\\a.sco1"
     }
   }
 }
