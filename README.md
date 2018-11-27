@@ -3,6 +3,20 @@
 * QQ群 : 245199668 [加入QQ群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 
 
+### 此脚本为纯c#实现的脚本系统,最低支持 .net framework 3.5和 .net standard 2.0, 语法类似 javascript
+* 兼容各个平台
+    * .net framework 3.5 以上
+    * .net standard 2.0 以上
+    * .net core
+    * unity
+    * asp.net
+    * asp.net core
+    * mono
+    * xamarin
+* **脚本示例** 放在 [bin/ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/develop/ExampleScripts) 目录
+* **语法测试** 注册环境变量后,直接运行命令行 [sco 文件名],可以运行一个脚本文件 
+* **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
+
 ### 基础介绍
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio, 快捷键 windows(alt+g) & mac (alt[option] + g) 可以运行正在编辑的脚本
     * Windows 设置环境变量
@@ -20,10 +34,7 @@
 * 码云地址 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
 
 
-### 此脚本是用作Unity游戏热更新使用的脚本,纯c#实现,最低支持.net3.5,兼容.net3.5以上所有平台,语法类似 javascript
-* **脚本示例** 放在 [bin/Scripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/bin/Scripts) 目录
-* **语法测试** 注册环境变量后,直接运行命令行 [sco 文件名],可以运行一个脚本文件 
-* **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
+
 
 ### 项目宏定义说明:
 * **SCORPIO_NET_CORE** .net4.5平台以后使用(UWP平台 , dotnet core)
