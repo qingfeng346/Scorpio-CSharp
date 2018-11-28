@@ -235,9 +235,11 @@ namespace Scorpio.Compiler {
                 AddToken(TokenType.Plus, '+');
                 if (m_FormatString == 1 || m_FormatString == 2) {
                     m_ch = m_FormatString == 1 ? '\'' : '\"';
+                    m_FormatString = 0;
                     ReadString();
                 } else {
                     m_ch = m_FormatString == 3 ? '\'' : '\"';
+                    m_FormatString = 0;
                     ReadSimpleString(false);
                 }
             }
