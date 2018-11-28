@@ -12,7 +12,6 @@
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage></NeutralLanguage>
     <Version>1.0.2</Version>
-    <PackageReleaseNotes>* 修复新解析系统解析bool时的错误</PackageReleaseNotes>
     <Description>* 纯c#解析脚本,基于.net framework 或 .net standard 2.0 , 脚本语法类似 javascript
 * 无任何依赖库</Description>
   </PropertyGroup>
