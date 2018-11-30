@@ -15,7 +15,6 @@ namespace Scorpio {
     //脚本类
     public class Script {
         public const string DynamicDelegateName = "__DynamicDelegate__";
-        public const string Version = "1.0.0";
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         private const string GLOBAL_TABLE = "_G";                   //全局table
         private const string GLOBAL_VERSION = "_VERSION";           //版本号
@@ -44,7 +43,7 @@ namespace Scorpio {
             m_False = new ScriptBoolean(this, false);
             m_GlobalTable = CreateTable();
             m_GlobalTable.SetValue(GLOBAL_TABLE, m_GlobalTable);
-            m_GlobalTable.SetValue(GLOBAL_VERSION, CreateString(Version));
+            m_GlobalTable.SetValue(GLOBAL_VERSION, CreateObject(typeof(Version)));
             m_GlobalTable.SetValue(GLOBAL_SCRIPT, CreateObject(this));
             PushAssembly(typeof(object).GetTypeInfo().Assembly);                        //mscorlib.dll
             PushAssembly(typeof(System.Net.Sockets.Socket).GetTypeInfo().Assembly);     //System.dll

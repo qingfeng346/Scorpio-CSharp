@@ -83,7 +83,8 @@ namespace ScorpioExec
             script.LoadLibrary();
             script.PushAssembly(typeof(Program).Assembly);
             Console.WriteLine("os version : " + Environment.OSVersion.ToString());
-            Console.WriteLine("sco version : " + Script.Version);
+            Console.WriteLine("sco version : " + Scorpio.Version.version);
+            Console.WriteLine("build date : " + Scorpio.Version.date);
             Console.WriteLine("app path is : " + BaseDirectory);
             Console.WriteLine("environment path is : " + CurrentDirectory);
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
@@ -111,7 +112,8 @@ namespace ScorpioExec
                         } else if (str == "clear") {
                             Console.Clear();
                         } else if (str == "version") {
-                            Console.WriteLine(Script.Version);
+                            Console.WriteLine($@"version : {Scorpio.Version.version}
+build date : {Scorpio.Version.date}");
                         } else {
                             script.LoadString(str);
                         }

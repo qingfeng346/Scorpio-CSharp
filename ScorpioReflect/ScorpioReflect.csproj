@@ -8,8 +8,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Scorpio\Scorpio.csproj" />
   </ItemGroup>
-  
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="rd /S /Q ..\ScorpioTest\Assets\Editor\ScorpioReflect\&#xD;&#xA;mkdir ..\ScorpioTest\Assets\Editor\ScorpioReflect\&#xD;&#xA;xcopy /s /e $(ProjectDir)\src\*.* ..\ScorpioTest\Assets\Editor\ScorpioReflect\" />
-  </Target>
 </Project>

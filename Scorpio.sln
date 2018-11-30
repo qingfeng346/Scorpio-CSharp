@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2019
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio", "Scorpio\Scorpio.csproj", "{9C3CC405-C995-40DA-8F74-3B2A9EE84A62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio", "Scorpio\Scorpio.csproj", "{9C3CC405-C995-40DA-8F74-3B2A9EE84A62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScorpioExec", "ScorpioExec\ScorpioExec.csproj", "{C7AFEFDE-8CDB-4864-8A34-CA5A69E969F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScorpioExec", "ScorpioExec\ScorpioExec.csproj", "{C7AFEFDE-8CDB-4864-8A34-CA5A69E969F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScorpioReflect", "ScorpioReflect\ScorpioReflect.csproj", "{6360B78B-D56C-4CBA-9400-69425B4FB7D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScorpioReflect", "ScorpioReflect\ScorpioReflect.csproj", "{6360B78B-D56C-4CBA-9400-69425B4FB7D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +30,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {24557B56-AF42-4F94-9D19-899725377DDE}
 	EndGlobalSection
 EndGlobal
