@@ -19,12 +19,10 @@
 
 ### 基础介绍
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio, 快捷键 windows(alt+g) & mac (alt[option] + g) 可以运行正在编辑的脚本
-    * Windows 设置环境变量
-        * 下载Release版本或者先安装 **.net core**, 然后运行命令行 **build.bat** 生成运行程序
-        * 添加目录到系统目录
-    * Max & Linux 设置环境变量
-        * 下载Release版本或者先安装 **.net core**, 然后运行命令行 **build.sh** 生成运行程序
-        * 添加目录到 **.bash_profile** 文件
+    * 环境配置
+        * [Release](https://github.com/qingfeng346/Scorpio-CSharp/releases) 下载相应系统的压缩包
+        * 解压文件然后添加解压目录到系统变量
+        * 或者解压文件,然后在解压文件运行命令 **./sco -type register** 自动添加到系统变量
 * 脚本教程 http://www.fengyuezhu.com/readme/
 * nuget地址 https://www.nuget.org/packages/Scorpio-CSharp/
 * Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
