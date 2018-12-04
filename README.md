@@ -26,6 +26,7 @@
         * 下载Release版本或者先安装 **.net core**, 然后运行命令行 **build.sh** 生成运行程序
         * 添加目录到 **.bash_profile** 文件
 * 脚本教程 http://www.fengyuezhu.com/readme/
+* nuget地址 https://www.nuget.org/packages/Scorpio-CSharp/
 * Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/unitysample/
 * 脚本实现Space Shooter 源码地址 https://github.com/qingfeng346/ScorpioUnitySample
@@ -35,9 +36,7 @@
 
 
 
-
 ### 项目宏定义说明:
-* **SCORPIO_NET_CORE** .net4.5平台以后使用(UWP平台 , dotnet core)
 * **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android和windows(exe)平台可用
 
 ### 源码目录说明
@@ -272,3 +271,9 @@ script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_Uni
 ## 版本日志
 
 [版本日志](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ReleaseNotes.md)
+
+## 捐助作者
+### 如果此项目对你有所帮助,可以请作者喝杯咖啡
+
+![](https://github.com/qingfeng346/qingfeng346.github.io/raw/master/img/wx.jpg)
+![](https://github.com/qingfeng346/qingfeng346.github.io/raw/master/img/zfb.jpg)
