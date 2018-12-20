@@ -20,7 +20,7 @@ namespace Scorpio.Compiler {
         private int m_iCacheLine = 0;               //Simple字符串起始行
         public ScriptLexer(String buffer, String strBreviary) {
             if (Util.IsNullOrEmpty(strBreviary)) {
-                m_strBreviary = buffer.Length >= BREVIARY_CHAR ? buffer : buffer.Substring(0, BREVIARY_CHAR);
+                m_strBreviary = buffer.Length <= BREVIARY_CHAR ? buffer : buffer.Substring(0, BREVIARY_CHAR);
             } else {
                 m_strBreviary = strBreviary;
             }

@@ -99,9 +99,10 @@ namespace Scorpio {
                 if (Util.IsNullOrEmpty(strBuffer)) return m_Null;
                 if (clearStack) m_StackInfoStack.Clear();
                 ScriptLexer scriptLexer = new ScriptLexer(strBuffer, strBreviary);
-                return Load(scriptLexer.GetBreviary(), scriptLexer.GetTokens(), context);
+                strBreviary = scriptLexer.GetBreviary();
+                return Load(strBreviary, scriptLexer.GetTokens(), context);
             } catch (System.Exception e) {
-                throw new ScriptException("load buffer [" + strBreviary + "] is error : " + e.ToString());
+                throw new ScriptException("load string [" + strBreviary + "] is error : " + e.ToString());
             }
         }
         public ScriptObject LoadTokens(List<Token> tokens) {
