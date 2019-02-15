@@ -63,7 +63,7 @@ namespace Scorpio.Runtime {
             return null;
         }
         private bool SetVariableObject(string name, ScriptObject obj) {
-            if (m_variableDictionary.SetValue(name, obj)) {
+            if (m_variableDictionary.SetValue(name, obj.Assign())) {
                 return true;
             }
             if (m_parent != null) {
