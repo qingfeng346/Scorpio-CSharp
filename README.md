@@ -262,13 +262,12 @@ script.LoadLibrary();
 script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script));
 ```
 
-## 更新日志
-
-[更新日志](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ChangeLog.md)
-
 ## 版本日志
-
 [版本日志](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ReleaseNotes.md)
+
+
+## 更新日志 (**v1.0.0**版本以前)
+[更新日志](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ChangeLog.md)
 
 ## 捐助作者
 ### 如果此项目对你有所帮助,可以请作者喝杯咖啡

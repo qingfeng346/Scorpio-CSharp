@@ -1,11 +1,4 @@
-## 更新日志
-
-(2018-07-02)
------------
-* 修复struct无参构造函数调用失败
-* 增加Unity生成去反射函数的示例
-
-
+## 最新修改请查看[版本日志](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ReleaseNotes.md)
 ## <font color=#00ff00>v1.0.0 (2018-03-29)</font>
 ***
 (2018-02-07) 
