@@ -19,7 +19,7 @@ namespace Scorpio.ScorpioReflect {
             {"op_Inequality", "!="},
         };
         private string GenerateConstructor() {
-            var Constructors = m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            var Constructors = m_Type.GetConstructors(ScorpioReflectUtil.BindingFlag);
             StringBuilder builder = new StringBuilder();
             bool first = true;
             foreach (var constructor in Constructors) {
@@ -124,6 +124,31 @@ finish:
             str = str.Replace("__methodname", name);
             str = str.Replace("__execute", builder.ToString());
             return str;
+        }
+        string GenerateGetVariableType() {
+            string templateStr = @"        if (name == ""{0}"") return typeof({1});";
+            StringBuilder builder = new StringBuilder();
+            bool first = true;
+            //所有类变量
+            foreach (var field in m_Fields) {
+                if (first) { first = false; } else { builder.AppendLine(); }
+                builder.AppendFormat(templateStr, field.Name, ScorpioReflectUtil.GetFullName(field.FieldType));
+            }
+            //所有属性
+            foreach (var property in m_Propertys) {
+                if (first) { first = false; } else { builder.AppendLine(); }
+                builder.AppendFormat(templateStr, property.Name, ScorpioReflectUtil.GetFullName(property.PropertyType));
+            }
+            //所有的函数
+            List<string> methods = new List<string>();
+            foreach (var method in m_Methods) {
+                string name = method.Name;
+                if (methods.Contains(name) || method.ReturnType == typeof(void)) { continue; }
+                methods.Add(name);
+                if (first) { first = false; } else { builder.AppendLine(); }
+                builder.AppendFormat(templateStr, method.Name, ScorpioReflectUtil.GetFullName(method.ReturnType));
+            }
+            return builder.ToString();
         }
     }
 }

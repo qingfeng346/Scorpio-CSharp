@@ -37,6 +37,9 @@ namespace Scorpio.Userdata {
         public void Rename(string name1, string name2) {
             m_Rename[name2] = name1;
         }
+        public Type GetVariableType(string name) {
+            return m_Rename.ContainsKey(name) ? GetVariableType_impl(m_Rename[name]) : GetVariableType_impl(name);
+        }
         public object GetValue(object obj, string name) {
             return m_Rename.ContainsKey(name) ? GetValue_impl(obj, m_Rename[name]) : GetValue_impl(obj, name);
         }
@@ -57,16 +60,18 @@ namespace Scorpio.Userdata {
                 return method;
             }
         }
-
+        /// <summary> 添加一个扩展函数 </summary>
         public abstract void AddExtensionMethod(MethodInfo method);
         /// <summary> 创建一个实例 </summary>
         public abstract object CreateInstance(ScriptObject[] parameters);
         /// <summary> 获得运算符重载的函数 </summary>
-        public abstract ScorpioMethod GetComputeMethod_impl(TokenType type);
+        protected abstract ScorpioMethod GetComputeMethod_impl(TokenType type);
+        /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
+        protected abstract Type GetVariableType_impl(string name);
         /// <summary> 获得一个类变量 </summary>
-        public abstract object GetValue_impl(object obj, string name);
+        protected abstract object GetValue_impl(object obj, string name);
         /// <summary> 设置一个类变量 </summary>
-        public abstract void SetValue_impl(object obj, string name, ScriptObject value);
+        protected abstract void SetValue_impl(object obj, string name, ScriptObject value);
     }
     public class ReflectUserdataType : UserdataType {
         private bool m_InitializeConstructor;                           //是否初始化过所有构造函数
@@ -108,11 +113,11 @@ namespace Scorpio.Userdata {
         private UserdataVariable GetVariable(string name) {
             if (m_Variables.ContainsKey(name))
                 return m_Variables[name];
-            FieldInfo fInfo = m_Type.GetTypeInfo().GetField(name);
+            FieldInfo fInfo = m_Type.GetTypeInfo().GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(m_Script, fInfo);
             PropertyInfo pInfo = m_Type.GetTypeInfo().GetProperty(name, Script.BindingFlag);
             if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Script, pInfo);
-            EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name);
+            EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name, Script.BindingFlag);
             if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);
             return null;
         }
@@ -125,6 +130,7 @@ namespace Scorpio.Userdata {
             }
             return null;
         }
+        
         public override void AddExtensionMethod(MethodInfo method) {
             if (!m_Methods.Contains(method))
                 m_Methods.Add(method);
@@ -135,7 +141,7 @@ namespace Scorpio.Userdata {
             return m_Constructor.Call(null, parameters);
         }
         /// <summary> 获得运算符重载的函数 </summary>
-        public override ScorpioMethod GetComputeMethod_impl(TokenType type) {
+        protected override ScorpioMethod GetComputeMethod_impl(TokenType type) {
             if (m_ComputeNames.ContainsKey(type)) {
                 object ret = GetValue(null, m_ComputeNames[type]);
                 if (ret is UserdataMethod) {
@@ -144,8 +150,12 @@ namespace Scorpio.Userdata {
             }
             return null;
         }
+        protected override Type GetVariableType_impl(string name) {
+            var variable = GetVariable(name);
+            return variable != null ? variable.FieldType : null;
+        }
         /// <summary> 获得一个类变量 </summary>
-        public override object GetValue_impl(object obj, string name) {
+        protected override object GetValue_impl(object obj, string name) {
             if (m_Functions.ContainsKey(name)) return m_Functions[name];
             if (m_NestedTypes.ContainsKey(name)) return m_NestedTypes[name];
             UserdataVariable variable = GetVariable(name);
@@ -157,7 +167,7 @@ namespace Scorpio.Userdata {
             throw new ExecutionException(m_Script, "GetValue Type[" + m_Type.ToString() + "] 变量 [" + name + "] 不存在");
         }
         /// <summary> 设置一个类变量 </summary>
-        public override void SetValue_impl(object obj, string name, ScriptObject value) {
+        protected override void SetValue_impl(object obj, string name, ScriptObject value) {
             UserdataVariable variable = GetVariable(name);
             if (variable == null) throw new ExecutionException(m_Script, "SetValue Type[" + m_Type + "] 变量 [" + name + "] 不存在");
             try {
@@ -180,15 +190,16 @@ namespace Scorpio.Userdata {
         public override object CreateInstance(ScriptObject[] parameters) {
             return m_Constructor.Call(null, parameters);
         }
-        public override ScorpioMethod GetComputeMethod_impl(TokenType type) {
+        protected override ScorpioMethod GetComputeMethod_impl(TokenType type) {
             return m_ComputeNames.ContainsKey(type) ? m_Value.GetValue(null, m_ComputeNames[type]) as ScorpioMethod : null;
         }
-
-        public override object GetValue_impl(object obj, string name) {
+        protected override Type GetVariableType_impl(string name) {
+            return m_Value.GetVariableType(name);
+        }
+        protected override object GetValue_impl(object obj, string name) {
             return m_Value.GetValue(obj, name);
         }
-
-        public override void SetValue_impl(object obj, string name, ScriptObject value) {
+        protected override void SetValue_impl(object obj, string name, ScriptObject value) {
             m_Value.SetValue(obj, name, value);
         }
     }

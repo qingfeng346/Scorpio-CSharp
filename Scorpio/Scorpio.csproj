@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard2.0;net40;netcoreapp2.0</TargetFrameworks>
     <Authors>while</Authors>
     <Product>Scorpio-CSharp</Product>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>Scorpio-CSharp</PackageId>
     <PackageProjectUrl>https://github.com/qingfeng346/Scorpio-CSharp</PackageProjectUrl>

@@ -17,13 +17,17 @@ public class __class : IScorpioFastReflectClass {
     public FastReflectUserdataMethod GetConstructor() {
         return __class_Constructor.GetMethod(m_Script);
     }
+    public Type GetVariableType(string name) {
+__getvariabletype_content
+        throw new Exception(""__fullname [GetVariableType] 找不到变量 : "" + name);
+    }
     public object GetValue(object obj, string name) {
 __getvalue_content
-        throw new Exception(""__fullname 找不到变量 : "" + name);
+        throw new Exception(""__fullname [GetValue] 找不到变量 : "" + name);
     }
     public void SetValue(object obj, string name, ScriptObject value) {
 __setvalue_content
-        throw new Exception(""__fullname 找不到变量 : "" + name);
+        throw new Exception(""__fullname [SetValue] 找不到变量 : "" + name);
     }
 __constructor_content
 __methods_content

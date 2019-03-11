@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Scorpio;
 using Scorpio.Serialize;
+using ScorpioLibrary;
 
 namespace ScorpioExec
 {
@@ -81,6 +82,7 @@ namespace ScorpioExec
         static void Execute(string[] args) {
             script = new Script();
             script.LoadLibrary();
+            LibraryIO.Load(script);
             script.PushAssembly(typeof(Program).Assembly);
             Console.WriteLine("os version : " + Environment.OSVersion.ToString());
             Console.WriteLine("sco version : " + Scorpio.Version.version);
@@ -91,9 +93,11 @@ namespace ScorpioExec
             if (args.Length >= 1) {
                 try {
                     string file = Path.Combine(CurrentDirectory, args[0]);
+                    string path = Path.GetDirectoryName(file);
                     Stopwatch watch = Stopwatch.StartNew();
+                    script.PushSearchPath(path);
                     script.PushSearchPath(CurrentDirectory);
-                    script.SetObject("__PATH__", CurrentDirectory);
+                    script.SetObject("__PATH__", path);
                     Console.WriteLine("=============================");
                     ScriptObject value = script.LoadFile(file);
                     Console.WriteLine("=============================");
@@ -126,10 +130,6 @@ build date : {Scorpio.Version.date}");
         }
         static void Main(string[] args) {
             try {
-                //Script script = new Script();
-                //script.LoadLibrary();
-                //script.LoadFile(@"C:\Users\qingf\Desktop\a.sco");
-
                 CommandLine command = new CommandLine(args);
                 string type = command.Get("-t").ToString();
                 if (type == "register") {

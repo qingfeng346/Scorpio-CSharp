@@ -53,10 +53,10 @@ namespace Scorpio.ScorpioReflect {
             m_Type = type;
             m_ScorpioClassName = "ScorpioClass_" + GetClassName(type);
             m_FullName = ScorpioReflectUtil.GetFullName(m_Type);
-            m_AllFields.AddRange(m_Type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
-            m_AllEvents.AddRange(m_Type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
-            m_AllPropertys.AddRange(m_Type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy));
-            var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            m_AllFields.AddRange(m_Type.GetFields(ScorpioReflectUtil.BindingFlag));
+            m_AllEvents.AddRange(m_Type.GetEvents(ScorpioReflectUtil.BindingFlag));
+            m_AllPropertys.AddRange(m_Type.GetProperties(ScorpioReflectUtil.BindingFlag));
+            var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(ScorpioReflectUtil.BindingFlag);
             foreach (var method in methods) {
                 string name = method.Name;
                 //屏蔽掉 =重载函数 IsSpecialName 表示为特殊函数 运算符重载 这个值会为true
@@ -127,6 +127,7 @@ namespace Scorpio.ScorpioReflect {
         public string Generate() {
             Init();
             string str = ClassTemplate;
+            str = str.Replace("__getvariabletype_content", GenerateGetVariableType());
             str = str.Replace("__getvalue_content", GenerateGetValue());
             str = str.Replace("__setvalue_content", GenerateSetValue());
             str = str.Replace("__constructor_content", GenerateConstructor());

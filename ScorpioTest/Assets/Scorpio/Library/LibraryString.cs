@@ -7,6 +7,7 @@ namespace Scorpio.Library {
         public static void Load(Script script) {
             ScriptTable Table = script.CreateTable();
             Table.SetValue("format", script.CreateFunction(new format()));
+            Table.SetValue("cs_format", script.CreateFunction(new cs_format()));
             Table.SetValue("substring", script.CreateFunction(new substring()));
             Table.SetValue("length", script.CreateFunction(new length()));
             Table.SetValue("tolower", script.CreateFunction(new tolower()));
@@ -59,6 +60,25 @@ namespace Scorpio.Library {
                 }
                 sbuf.Append(messagePattern.Substring(i));
                 return sbuf.ToString();
+            }
+        }
+        private class cs_format : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
+                if (args == null || args.Length == 0) return null;
+                if (args.Length == 1) { return args[0].ToString(); }
+                int L;
+                if (args[1] is ScriptArray) {
+                    L = 0;
+                    args = ((ScriptArray)args[1]).ToArray();
+                } else {
+                    L = 1;
+                }
+                var length = args.Length;
+                var objs = new object[length - 1];
+                for (var i = L; i < length; ++i) {
+                    objs[i - L] = args[i].ObjectValue;
+                }
+                return string.Format(args[0].ToString(), objs);
             }
         }
         private class substring : ScorpioHandle {

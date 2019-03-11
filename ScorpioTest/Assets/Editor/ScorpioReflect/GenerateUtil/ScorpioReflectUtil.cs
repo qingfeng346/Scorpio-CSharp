@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 public class ScorpioReflectUtil {
+    public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy;
     struct ComparerType : IComparer<Type> {
         public int Compare(Type x, Type y) {
             return x.FullName.CompareTo(y.FullName);

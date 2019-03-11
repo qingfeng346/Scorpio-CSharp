@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ScorpioLibrary\ScorpioLibrary.csproj" />
     <ProjectReference Include="..\Scorpio\Scorpio.csproj" />
+    <ProjectReference Include="..\ScorpioReflect\ScorpioReflect.csproj" />
   </ItemGroup>
 
 </Project>

@@ -25,6 +25,7 @@ namespace Scorpio.Library {
             Table.SetValue("safepopfirst", script.CreateFunction(new safepopfirst()));
             Table.SetValue("poplast", script.CreateFunction(new poplast()));
             Table.SetValue("safepoplast", script.CreateFunction(new safepoplast()));
+            Table.SetValue("toarray", script.CreateFunction(new toarray(script)));
             script.SetObjectInternal("array", Table);
         }
         private class count : ScorpioHandle {
@@ -119,6 +120,22 @@ namespace Scorpio.Library {
         private class safepoplast : ScorpioHandle {
             public object Call(ScriptObject[] args) {
                 return ((ScriptArray)args[0]).SafePopLast();
+            }
+        }
+        private class toarray : ScorpioHandle {
+            private readonly Script m_script;
+            public toarray(Script script) {
+                m_script = script;
+            }
+            public object Call(ScriptObject[] args) {
+                var array = args[0] as ScriptArray;
+                var type = (args[0] as ScriptUserdata).ValueType;
+                var count = array.Count();
+                var ret = Array.CreateInstance(type, count);
+                for (var i = 0; i < count; ++i) {
+                    ret.SetValue(Util.ChangeType(m_script, array.GetValue(i), type), i);
+                }
+                return ret;
             }
         }
     }

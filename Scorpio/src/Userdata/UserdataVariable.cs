@@ -47,7 +47,7 @@ namespace Scorpio.Userdata
         }
     }
     public class UserdataEvent : UserdataVariable {
-        private EventInfo m_Event;
+        private readonly EventInfo m_Event;
         public UserdataEvent(Script script, EventInfo info) {
             m_Script = script;
             Name = info.Name;

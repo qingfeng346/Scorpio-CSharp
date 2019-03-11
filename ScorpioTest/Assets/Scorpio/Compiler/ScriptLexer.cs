@@ -344,6 +344,7 @@ namespace Scorpio.Compiler {
                 break;
             case "var":
             case "local":
+            case "let":
                 tokenType = TokenType.Var;
                 break;
             case "function":

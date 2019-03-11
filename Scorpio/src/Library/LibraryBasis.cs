@@ -92,7 +92,7 @@ namespace Scorpio.Library {
             }
         }
         private class UserdataPairs : ScorpioHandle {
-            Script m_Script;
+            private readonly Script m_Script;
             System.Collections.IEnumerator m_Enumerator;
             public UserdataPairs(Script script, ScriptUserdata obj) {
                 m_Script = script;
@@ -290,7 +290,7 @@ namespace Scorpio.Library {
             }
         }
         private class tonumber : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public tonumber(Script script) {
                 m_script = script;
             }
@@ -301,7 +301,7 @@ namespace Scorpio.Library {
             }
         }
         private class tosbyte : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public tosbyte(Script script) {
                 m_script = script;
             }
@@ -312,7 +312,7 @@ namespace Scorpio.Library {
             }
         }
         private class tobyte : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public tobyte(Script script) {
                 m_script = script;
             }
@@ -323,7 +323,7 @@ namespace Scorpio.Library {
             }
         }
         private class toshort : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public toshort(Script script) {
                 m_script = script;
             }
@@ -334,7 +334,7 @@ namespace Scorpio.Library {
             }
         }
         private class toushort : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public toushort(Script script) {
                 m_script = script;
             }
@@ -345,7 +345,7 @@ namespace Scorpio.Library {
             }
         }
         private class toint : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public toint(Script script) {
                 m_script = script;
             }
@@ -356,7 +356,7 @@ namespace Scorpio.Library {
             }
         }
         private class touint : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public touint(Script script) {
                 m_script = script;
             }
@@ -367,7 +367,7 @@ namespace Scorpio.Library {
             }
         }
         private class tolong : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public tolong(Script script) {
                 m_script = script;
             }
@@ -378,7 +378,7 @@ namespace Scorpio.Library {
             }
         }
         private class toulong : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public toulong(Script script) {
                 m_script = script;
             }
@@ -389,7 +389,7 @@ namespace Scorpio.Library {
             }
         }
         private class tofloat : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public tofloat(Script script) {
                 m_script = script;
             }
@@ -400,7 +400,7 @@ namespace Scorpio.Library {
             }
         }
         private class toenum : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public toenum(Script script) {
                 m_script = script;
             }
@@ -546,7 +546,7 @@ namespace Scorpio.Library {
             }
         }
         private class generic_method : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public generic_method(Script script) {
                 m_script = script;
             }

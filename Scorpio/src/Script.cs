@@ -15,7 +15,7 @@ namespace Scorpio {
     //脚本类
     public class Script {
         public const string DynamicDelegateName = "__DynamicDelegate__";
-        public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+        public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         private const string GLOBAL_TABLE = "_G";                   //全局table
         private const string GLOBAL_VERSION = "_VERSION";           //版本号
         private const string GLOBAL_SCRIPT = "_SCRIPT";             //Script对象
@@ -31,9 +31,9 @@ namespace Scorpio {
         private Dictionary<Type, ScriptUserdataObjectType> m_Types = new Dictionary<Type, ScriptUserdataObjectType>();              //所有的类集合
         private Dictionary<Type, UserdataType> m_UserdataTypes = new Dictionary<Type, UserdataType>();                              //所有的类集合
         private StackInfo m_StackInfo = new StackInfo();                        //最近堆栈数据
-        private ScriptNull m_Null;                                              //null对象
-        private ScriptBoolean m_True;                                           //true对象
-        private ScriptBoolean m_False;                                          //false对象
+        private readonly ScriptNull m_Null;                                     //null对象
+        private readonly ScriptBoolean m_True;                                  //true对象
+        private readonly ScriptBoolean m_False;                                 //false对象
         public ScriptNull Null { get { return m_Null; } }                       //null对象
         public ScriptBoolean True { get { return m_True; } }                    //true对象
         public ScriptBoolean False { get { return m_False; } }                  //false对象
