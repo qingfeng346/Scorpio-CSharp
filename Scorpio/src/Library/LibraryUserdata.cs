@@ -27,12 +27,7 @@ namespace Scorpio.Library {
                 m_script = script;
             }
             public object Call(ScriptObject[] args) {
-                ScriptObject type = args[0];
-                if (type is ScriptUserdataObject || type is ScriptUserdataObjectType) {
-                    m_script.GetScorpioType(((ScriptUserdata)type).ValueType).GetVariableType(args[1].ToString());
-                }
-                return null;
-
+                return m_script.GetScorpioType(((ScriptUserdata)args[0]).ValueType).GetVariableType(args[1].ToString());
             }
         }
     }

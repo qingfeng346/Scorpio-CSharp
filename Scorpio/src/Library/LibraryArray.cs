@@ -129,7 +129,7 @@ namespace Scorpio.Library {
             }
             public object Call(ScriptObject[] args) {
                 var array = args[0] as ScriptArray;
-                var type = (args[0] as ScriptUserdata).ValueType;
+                var type = (args[1] as ScriptUserdata).ValueType;
                 var count = array.Count();
                 var ret = Array.CreateInstance(type, count);
                 for (var i = 0; i < count; ++i) {
