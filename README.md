@@ -14,8 +14,10 @@
     * mono
     * xamarin
 * **脚本示例** 放在 [bin/ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/develop/ExampleScripts) 目录
-* **语法测试** 注册环境变量后,直接运行命令行 [sco 文件名],可以运行一个脚本文件 
-* **性能测试** (C#light,ulua,Scorpio-CSharp) https://github.com/qingfeng346/ScriptTestor
+* 脚本教程 http://www.fengyuezhu.com/readme/
+* **语法测试** 注册环境变量后,直接运行命令行 [sco 文件名],可以运行一个脚本文件, 语法测试地址
+    * http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
+
 
 ### 基础介绍
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio 或者 VSCode 直接搜索 scorpio, 快捷键 windows(alt+g) & mac (alt[option] + g) 可以运行正在编辑的脚本
@@ -23,19 +25,15 @@
         * [Release](https://github.com/qingfeng346/Scorpio-CSharp/releases) 下载相应系统的压缩包
         * 解压文件然后添加解压目录到系统变量
         * 或者解压文件,然后在解压文件运行命令 **./sco -type register** 自动添加到系统变量
-* 脚本教程 http://www.fengyuezhu.com/readme/
 * nuget地址 https://www.nuget.org/packages/Scorpio-CSharp/
-* Scorpio-CSharp语法 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/unitysample/
 * 脚本实现Space Shooter 源码地址 https://github.com/qingfeng346/ScorpioUnitySample
-* 网络协议,Excel表数据转换工具 : https://github.com/qingfeng346/ScorpioConversion
-* Sco脚本的Java实现 : https://github.com/qingfeng346/Scorpio-Java
 * 码云地址 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
 
 
 
 ### 项目宏定义说明:
-* **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android和windows(exe)平台可用
+* **SCORPIO_DYNAMIC_DELEGATE** 动态创建Delegate对象 不适用的请自行实现一个继承 DelegateTypeFactory 的类,目前亲测只有android(mono)和windows(exe)平台可用
 
 ### 源码目录说明
 * Script 文件是脚本的引擎对象
@@ -56,10 +54,10 @@
     * Compiler 此目录下是脚本解释器
     * Exception 脚本引擎抛出的已知异常，例如解析失败，未支持语法等
     * Function 所有的函数类型，脚本函数，扩展函数等
-    * Library 脚本内使用的库的源码，例如**json**,**array**,**table**,**string**,**math**库等，方便使用，初始化脚本时请调用 LoadLibrary 函数后方可使用
+    * Library 脚本内使用的库的源码，例如**json**,**array**,**table**,**string**,**math**,**userdata**库等，方便使用，初始化脚本时请调用 LoadLibrary 函数后方可使用
     * Runtime 此目录是运行 CodeDom 目录下的所有中间代码
     * Serialize 序列化字节码使用，把文本文件解析成二进制数据以及把二进制数据反序列化成文本文件
-    * Userdata   此目录是根据c#代码内object的类型分别处理的代码，例如DefaultScriptUserdataDelegate是处理Delegate类型的对象，DefaultScriptUserdataObject是处理普通的c#对象，DefaultScriptUserdataEnum是处理枚举对象等
+    * Userdata 此目录是根据c#代码内object的类型分别处理的代码
     * Variable 脚本内对象的差异化处理，例如ScriptNumberDouble，ScriptNumberInt，ScriptNumberLong三个类都是处理number类型，但是不同类型的处理方式不同
 
 ### 注意事项 ##
@@ -69,13 +67,13 @@
 
 > 使用 **import_type** 引入内部类时使用 **+**, 例如 **import_type("[namespace].[clasname]+[internalclass]")**
 
-> 脚本内所有c#变量(除了number,string等基础类型) **均为引用**,struct变量也一样
+> 脚本内所有c#变量(除了**number,string**等基础类型) **均为引用**,struct变量也一样
 
-> c#重载 **[]** 运算符后脚本里不能直接使用[],请使用 **get_Item set_Item** 函数
+> **c#重载 []** 运算符后脚本里不能直接使用[],请使用 **get_Item set_Item** 函数
 
-> c#数组对象获取元素不能直接使用 **[]** ,请使用 **GetValue SetValue** 函数, 具体参数可以参考 **Array** 类的 **GetValue SetValue** 函数
+> **c# 数组** 对象获取元素不能直接使用 **[]** ,请使用 **GetValue SetValue** 函数, 具体参数可以参考 **Array** 类的 **GetValue SetValue** 函数
 
-> c#中event对象+= -=操作可以使用函数 **add_[event变量名] remove_[event变量名]** 代替
+> **c# event** 对象+= -=操作可以使用函数 **add_[event变量名] remove_[event变量名]** 代替
 
 > 同类中静态函数和实例函数不要重名,否则会调用失败 例如 static void Test(object a); void Test(object a, object b); 两个函数不一定会当静态还是实例函数处理
 
@@ -87,9 +85,7 @@
 
 > IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
 
-> UWP平台master配置下 **generic_method** 函数会出问题,可能是因为UWP屏蔽了此函数 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
-
-> UWP平台master配置下 **generic_type** 函数也会出问题
+> UWP平台master配置下 **generic_method, generic_type** 函数会出问题,其他平台均无问题 **(android&il2cpp ios&il2cpp webgl等)** 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 
 > 不能使用 **SCORPIO_DYNAMIC_DELEGATE** 的平台,要实现一个继承 **DelegateTypeFactory** 的类,然后调用 **ScriptUserdataDelegateType.SetFactory** 函数设置一下 例如:
 
@@ -150,7 +146,7 @@ namespace ScorpioDelegate {
 - [x] Universal Windows Platform(包括IL2CPP)
 - [x] WebGL
 - [x] Tizen
-- [ ] 理论上可以支持所有平台
+- [x] 理论上可以支持所有平台
 
 ### 反射调用运算符重载函数
 *	\+    op_Addition
