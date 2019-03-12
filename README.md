@@ -14,7 +14,7 @@
     * mono
     * xamarin
 * **脚本示例** 放在 [bin/ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/develop/ExampleScripts) 目录
-* 脚本教程 http://www.fengyuezhu.com/readme/
+* **脚本教程** http://www.fengyuezhu.com/readme/
 * **语法测试** 注册环境变量后,直接运行命令行 [sco 文件名],可以运行一个脚本文件, 语法测试地址
     * http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
 
@@ -69,7 +69,7 @@
 
 > 脚本内所有c#变量(除了**number,string**等基础类型) **均为引用**,struct变量也一样
 
-> **c#重载 []** 运算符后脚本里不能直接使用[],请使用 **get_Item set_Item** 函数
+> **c# 重载[]** 运算符后脚本里不能直接使用[],请使用 **get_Item set_Item** 函数
 
 > **c# 数组** 对象获取元素不能直接使用 **[]** ,请使用 **GetValue SetValue** 函数, 具体参数可以参考 **Array** 类的 **GetValue SetValue** 函数
 
@@ -85,7 +85,7 @@
 
 > IL2CPP生成后,好多Unity的类的函数反射回调用不到,遇到这种情况请自行包一层函数,自己写的c#代码不会有这种情况
 
-> UWP平台master配置下 **generic_method, generic_type** 函数会出问题,其他平台均无问题 **(android&il2cpp ios&il2cpp webgl等)** 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
+> UWP平台master配置下 **generic_method, generic_type** 函数会出问题,其他平台均无问题 **(android&il2cpp ios&il2cpp webgl等)**, 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 
 > 不能使用 **SCORPIO_DYNAMIC_DELEGATE** 的平台,要实现一个继承 **DelegateTypeFactory** 的类,然后调用 **ScriptUserdataDelegateType.SetFactory** 函数设置一下 例如:
 
@@ -105,7 +105,7 @@ public class MyDelegateFactory : DelegateTypeFactory {
 }
 ///然后实现完以后 调用 ScriptUserdataDelegateType.SetFactory(new MyDelegateFactory()); 设置一下
 ```
-> 也可以使用**ScorpioReflect**项目中的**GenerateScorpioDelegate**类可以自动生成一个 DelegateTypeFactory 类  
+> 也可以使用 **ScorpioReflect** 项目中的 **GenerateScorpioDelegate** 类可以自动生成一个 **DelegateTypeFactory** 类  
 
 ```csharp
 var generate = new Scorpio.ScorpioReflect.GenerateScorpioDelegate();
@@ -166,10 +166,10 @@ namespace ScorpioDelegate {
 
 
 ### 源码目录说明
-* **Scorpio** 脚本引擎项目,平常使用只需导入此目录即可
-* **ScorpioExec** 跟lua.exe一样,命令行调用Scorpio脚本, 序列化和反序列化脚本
-* **ScorpioReflect** Scorpio脚本去反射机制的实现
-* **ScorpioTest** Unity内使用Scorpio脚本例子
+* **Scorpio** 脚本引擎源码
+* **ScorpioExec** 生成命令行**sco**,命令行调用脚本,序列化和反序列化脚本
+* **ScorpioReflect** 去反射机制的实现
+* **ScorpioTest** Unity内使用Scorpio脚本示例
 
 ### Unity导入Scorpio-CSharp:
 * 复制文件夹 [Scorpio/src](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/Scorpio/src) 到Unity项目即可
