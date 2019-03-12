@@ -1,6 +1,7 @@
 ### v1.0.7
 *2019-03-11*
 
+* 可以访问 c# 类私有变量和函数（去反射不支持）
 * 增加 **let** 关键字,用法同 **var local**
 * 增加 **string.cs_format** 函数,格式化c#字符串, 示例 : 
 ```javascript
@@ -12,7 +13,7 @@ print(string.cs_format("{0:D5},{1}", toint(100), 200))
 // arr 为 int[] {100,200,300}
 var arr = array.toarray([100,200,300], import_type("System.Int32"))
 ```
-* 增加 **userdata.typeof** 函数,获取c#类变量的类型, 示例 :
+* 增加 **userdata.typeof** 函数,获取c#类变量的类型(支持去反射), 示例 :
 ```c#
 //c# 代码
 public class TestClass {
