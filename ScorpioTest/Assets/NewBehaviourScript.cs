@@ -28,7 +28,7 @@ public class NewBehaviourScript : MonoBehaviour {
 	{
         text = GUI.TextArea(new Rect(0, 0, width, windowHeight), text);
         PlayerPrefs.SetString("__Text", text);
-        if (GUI.Button(new Rect(0, windowHeight, width, 90), "RunScript (" + Script.Version + ")")) {
+        if (GUI.Button(new Rect(0, windowHeight, width, 90), "RunScript (" + Version.version + ")")) {
 			output = "";
 			Script script = new Script();
 			try {

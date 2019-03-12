@@ -12,6 +12,9 @@ public class ScorpioClass_UnityEngine_Application : IScorpioFastReflectClass {
     public FastReflectUserdataMethod GetConstructor() {
         return ScorpioClass_UnityEngine_Application_Constructor.GetMethod(m_Script);
     }
+    public Type GetVariableType(string name) {
+        return null;
+    }
     public object GetValue(object obj, string name) {
         if (name == "absoluteURL") return UnityEngine.Application.absoluteURL;
         if (name == "backgroundLoadingPriority") return UnityEngine.Application.backgroundLoadingPriority;
