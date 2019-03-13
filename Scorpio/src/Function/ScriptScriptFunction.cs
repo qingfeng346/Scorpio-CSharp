@@ -10,7 +10,7 @@ namespace Scorpio.Function {
         private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数
         private ScriptContext m_ParentContext;                                  //父级堆栈
         private bool m_IsStaticFunction;                                        //是否是静态函数(不是table内部函数)
-        private ScorpioDictionary<ScriptObject> m_stackObject = new ScorpioDictionary<ScriptObject>();    //函数变量
+        private ScorpioDictionary<string, ScriptObject> m_stackObject = new ScorpioDictionary<string, ScriptObject>();    //函数变量
         public bool IsStaticFunction { get { return m_IsStaticFunction; } }
         internal ScriptScriptFunction(Script script, String name, ScorpioScriptFunction function) : base(script, name)
         {

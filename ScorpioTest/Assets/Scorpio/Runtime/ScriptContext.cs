@@ -13,17 +13,17 @@ namespace Scorpio.Runtime {
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public class ScriptContext {
-        private Script m_script;                                            //脚本类
-        private ScriptContext m_parent;                                     //父级执行命令
-        private ScriptInstruction[] m_scriptInstructions;                   //指令集
-        private ScriptInstruction m_scriptInstruction;                      //当前执行的指令
-        private int m_InstructionCount;                                     //指令数量
-        private Executable_Block m_block;                                   //指令集类型
-        private ScorpioDictionary<ScriptObject> m_variableDictionary;       //当前作用域所有变量
-        private ScriptObject m_returnObject = null;                         //返回值
-        private bool m_Break = false;                                       //break跳出
-        private bool m_Continue = false;                                    //continue跳出
-        private bool m_Over = false;                                        //函数是否已经结束
+        private Script m_script;                                                //脚本类
+        private ScriptContext m_parent;                                         //父级执行命令
+        private ScriptInstruction[] m_scriptInstructions;                       //指令集
+        private ScriptInstruction m_scriptInstruction;                          //当前执行的指令
+        private int m_InstructionCount;                                         //指令数量
+        private Executable_Block m_block;                                       //指令集类型
+        private ScorpioDictionary<string, ScriptObject> m_variableDictionary;   //当前作用域所有变量
+        private ScriptObject m_returnObject = null;                             //返回值
+        private bool m_Break = false;                                           //break跳出
+        private bool m_Continue = false;                                        //continue跳出
+        private bool m_Over = false;                                            //函数是否已经结束
 
         public ScriptContext(Script script, ScriptExecutable scriptExecutable) : this(script, scriptExecutable, null, Executable_Block.None) { }
         public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent) : this(script, scriptExecutable, parent, Executable_Block.None) { }
@@ -31,7 +31,7 @@ namespace Scorpio.Runtime {
             m_script = script;
             m_parent = parent;
             m_block = block;
-            m_variableDictionary = new ScorpioDictionary<ScriptObject>();
+            m_variableDictionary = new ScorpioDictionary<string, ScriptObject>();
             if (scriptExecutable != null) {
                 m_scriptInstructions = scriptExecutable.ScriptInstructions;
                 m_InstructionCount = m_scriptInstructions.Length;
@@ -39,7 +39,7 @@ namespace Scorpio.Runtime {
         }
         private bool IsOver { get { return m_Break || m_Over; } }                       //break 或者 return  跳出循环
         private bool IsExecuted { get { return m_Break || m_Over || m_Continue; } }     //continue break return 当前模块是否执行完成
-        public void Initialize(ScorpioDictionary<ScriptObject> variable) {
+        public void Initialize(ScorpioDictionary<string, ScriptObject> variable) {
             m_variableDictionary.Set(variable);
         }
         private void Initialize(string name, ScriptObject obj) {
