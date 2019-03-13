@@ -861,12 +861,12 @@ namespace Scorpio.Compiler
                     break;
                 ret._Elements.Add(GetObject());
                 token = PeekToken();
-                if (token.Type == TokenType.Comma) {
-                    ReadComma();
+                if (token.Type == TokenType.Comma || token.Type == TokenType.SemiColon) {
+                    ReadToken();
                 } else if (token.Type == TokenType.RightBracket) {
                     break;
                 } else
-                    throw new ParserException("Comma ',' or right parenthesis ']' expected in array object.", token);
+                    throw new ParserException("Comma ',' or SemiColon ';' or right parenthesis ']' expected in array object.", token);
             }
             ReadRightBracket();
             ret.Init();
