@@ -1,7 +1,37 @@
+### v1.0.8
+*2019-03-14*
+
+* 申请**array**时分隔符支持 分号 **;**  示例;
+```javascript
+var a = [100;200;300]
+//等同于
+var a = [100,200,300]
+```
+* 支持脚本直接调用c#运算符 
+
+运算符号 | 反射名称                       | 脚本直接调用
+-----   |  ----                         | ----
+\+      |  op_Addition                  | 支持(+= 不支持)
+\-      |  op_Subtraction               | 支持(-= 不支持)
+\*      |  op_Multiply                  | 支持(*= 不支持)
+/       |  op_Division                  | 支持(/= 不支持)
+%       |  op_Modulus                   | 支持(%= 不支持)
+\|      |  op_BitwiseOr                 | 支持(\|= 不支持)
+&       |  op_BitwiseAnd                | 支持(&= 不支持)
+^       |  op_ExclusiveOr               | 支持(^= 不支持)
+\>      |  op_GreaterThan               | 支持
+\>=     |  op_GreaterThanOrEqual        | 支持
+<       |  op_LessThan                  | 支持
+<=      |  op_LessThanOrEqual           | 支持
+==      |  op_Equality                  | 不支持
+!=      |  op_Inequality                | 不支持
+[]      |  get_Item(获取变量)            | 不支持
+[]      |  set_Item(设置变量)            | 不支持
+
 ### v1.0.7
 *2019-03-11*
 
-* 可以访问 c# 类私有变量和函数（去反射不支持）
+* 可以访问 c# 类私有变量和函数（去反射模块不支持）
 * 增加 **let** 关键字,用法同 **var local**
 * 增加 **string.cs_format** 函数,格式化c#字符串, 示例 : 
 ```javascript
