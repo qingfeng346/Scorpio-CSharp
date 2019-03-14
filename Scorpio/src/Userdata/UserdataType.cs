@@ -21,6 +21,14 @@ namespace Scorpio.Userdata {
             m_ComputeNames[TokenType.Minus] = "op_Subtraction";
             m_ComputeNames[TokenType.Multiply] = "op_Multiply";
             m_ComputeNames[TokenType.Divide] = "op_Division";
+            m_ComputeNames[TokenType.Modulo] = " op_Modulus";
+            m_ComputeNames[TokenType.InclusiveOr] = "op_BitwiseOr";
+            m_ComputeNames[TokenType.Combine] = "op_BitwiseAnd";
+            m_ComputeNames[TokenType.XOR] = "op_ExclusiveOr";
+            m_ComputeNames[TokenType.Greater] = "op_GreaterThan";
+            m_ComputeNames[TokenType.GreaterOrEqual] = "op_GreaterThanOrEqual";
+            m_ComputeNames[TokenType.Less] = "op_LessThan";
+            m_ComputeNames[TokenType.LessOrEqual] = "op_LessThanOrEqual";
         }
         /// <summary> 初始化泛型类 </summary>
         public ScriptUserdata MakeGenericType(Type[] parameters) {

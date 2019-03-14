@@ -149,20 +149,25 @@ namespace ScorpioDelegate {
 - [x] 理论上可以支持所有平台
 
 ### 反射调用运算符重载函数
-*	\+    op_Addition
-*	\-    op_Subtraction
-*	\*    op_Multiply
-*	/    op_Division
-*	%    op_Modulus
-*	|    op_BitwiseOr
-*	&    op_BitwiseAnd
-*	^    op_ExclusiveOr
-*	\>    op_GreaterThan
-*	<    op_LessThan
-*	==   op_Equality
-*	!=   op_Inequality
-*	[]   get_Item(获取变量)
-*	[]   set_Item(设置变量)
+
+运算符号 | 反射名称                       | 脚本直接调用
+-----   |  ----                         | ----
+\+      |  op_Addition                  | 支持(+= 不支持)
+\-      |  op_Subtraction               | 支持(-= 不支持)
+\*      |  op_Multiply                  | 支持(*= 不支持)
+/       |  op_Division                  | 支持(/= 不支持)
+%       |  op_Modulus                   | 支持(%= 不支持)
+\|      |  op_BitwiseOr                 | 支持(\|= 不支持)
+&       |  op_BitwiseAnd                | 支持(&= 不支持)
+^       |  op_ExclusiveOr               | 支持(^= 不支持)
+\>      |  op_GreaterThan               | 支持
+\>=     |  op_GreaterThanOrEqual        | 支持
+<       |  op_LessThan                  | 支持
+<=      |  op_LessThanOrEqual           | 支持
+==      |  op_Equality                  | 不支持
+!=      |  op_Inequality                | 不支持
+[]      |  get_Item(获取变量)            | 不支持
+[]      |  set_Item(设置变量)            | 不支持
 
 
 ### 源码目录说明

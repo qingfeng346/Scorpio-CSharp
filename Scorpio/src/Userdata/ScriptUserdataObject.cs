@@ -40,5 +40,10 @@ namespace Scorpio.Userdata {
             if (method == null) throw new ExecutionException(m_Script, "找不到运算符重载 " + type);
             return m_Script.CreateObject(method.Call(new ScriptObject[] { this, obj }));
         }
+        public override bool Compare(TokenType type, ScriptObject obj) {
+            ScorpioMethod method = m_UserdataType.GetComputeMethod(type);
+            if (method == null) throw new ExecutionException(m_Script, "找不到运算符重载 " + type);
+            return true.Equals(method.Call(new ScriptObject[] { this, obj }));
+        }
     }
 }
