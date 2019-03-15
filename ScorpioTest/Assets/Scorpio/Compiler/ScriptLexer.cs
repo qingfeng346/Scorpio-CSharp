@@ -228,18 +228,18 @@ namespace Scorpio.Compiler {
         }
         /// <summary> 读取 }  </summary>
         void ReadRightBrace() {
-            if (m_FormatString == 0) {
+            if (m_FormatString == FormatString.None) {
                 AddToken(TokenType.RightBrace, '}');
             } else {
                 AddToken(TokenType.RightPar, ')');
                 AddToken(TokenType.Plus, '+');
-                if (m_FormatString == 1 || m_FormatString == 2) {
-                    m_ch = m_FormatString == 1 ? '\'' : '\"';
-                    m_FormatString = 0;
+                if (m_FormatString == FormatString.SingleQuotes || m_FormatString == FormatString.DoubleQuotes || m_FormatString == FormatString.Point) {
+                    m_ch = m_FormatString == FormatString.SingleQuotes ? '\'' : (m_FormatString == FormatString.DoubleQuotes ? '\"' : '`');
+                    m_FormatString = FormatString.None;
                     ReadString();
                 } else {
-                    m_ch = m_FormatString == 3 ? '\'' : '\"';
-                    m_FormatString = 0;
+                    m_ch = m_FormatString == FormatString.SimpleSingleQuotes ? '\'' : (m_FormatString == FormatString.SimpleDoubleQuotes ? '\"' : '`');
+                    m_FormatString = FormatString.None;
                     ReadSimpleString(false);
                 }
             }
@@ -247,7 +247,7 @@ namespace Scorpio.Compiler {
         void ReadSimpleString(bool symbol) {
             if (symbol) {
                 m_ch = ReadChar();
-                if (m_ch != '\'' && m_ch != '\"') {
+                if (m_ch != '\'' && m_ch != '\"' && m_ch != '`') {
                     ThrowInvalidCharacterException();
                 }
             }
@@ -269,7 +269,11 @@ namespace Scorpio.Compiler {
                         AddToken(TokenType.String, m_Builder.ToString());
                         AddToken(TokenType.Plus, '+');
                         AddToken(TokenType.LeftPar, '(');
-                        m_FormatString = m_ch == '\'' ? 3 : 4;
+                        if (m_ch == '\'') {
+                            m_FormatString = FormatString.SimpleSingleQuotes;
+                        } else {
+                            m_FormatString = m_ch == '\"' ? FormatString.SimpleDoubleQuotes : FormatString.SimplePoint;
+                        }
                         break;
                     } else {
                         UndoChar();
@@ -314,7 +318,11 @@ namespace Scorpio.Compiler {
                         AddToken(TokenType.String, m_Builder.ToString());
                         AddToken(TokenType.Plus, '+');
                         AddToken(TokenType.LeftPar, '(');
-                        m_FormatString = m_ch == '\'' ? 1 : 2;
+                        if (m_ch == '\'') {
+                            m_FormatString = FormatString.SingleQuotes;
+                        } else {
+                            m_FormatString = m_ch == '\"' ? FormatString.DoubleQuotes : FormatString.Point;
+                        }
                         break;
                     } else {
                         UndoChar();
@@ -531,6 +539,7 @@ namespace Scorpio.Compiler {
                         break;
                     case '\"':
                     case '\'':
+                    case '`':
                         ReadString();
                         break;
                     case '0':

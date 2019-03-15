@@ -4,11 +4,21 @@ using System.Text;
 using Scorpio.Exception;
 namespace Scorpio.Compiler {
     public partial class ScriptLexer {
+        enum FormatString {
+            None,               //无
+            SingleQuotes,       //单引号字符串
+            DoubleQuotes,       //双引号字符串
+            Point,              //`符号字符串
+
+            SimpleSingleQuotes, //带 @ 单引号字符串
+            SimpleDoubleQuotes, //带 @ 双引号字符串
+            SimplePoint,        //带 @ `符号字符串
+        }
         private const char END_CHAR = (char)0;      //结尾字符
         private const int BREVIARY_CHAR = 10;       //摘要的字符数
         private char m_ch;                          //当前解析字符
         private char ch;                            //临时保存字符
-        private int m_FormatString;                 //是否正在格式化字符串 0 没有 1普通字符串单引号 2普通字符串双引号 3单纯字符串单引号 4单传字符串双引号
+        private FormatString m_FormatString;        //是否正在格式化字符串
         private StringBuilder m_Builder;            //当前缓存的字符串
         private List<Token> m_listTokens;           //返回的Token列表
         private String m_strBreviary;               //字符串的摘要 取第一行字符串的前20个字符
@@ -24,6 +34,7 @@ namespace Scorpio.Compiler {
             } else {
                 m_strBreviary = strBreviary;
             }
+            m_FormatString = FormatString.None;
             m_strBuffer = buffer;
             m_iLength = buffer.Length;
             m_Builder = new StringBuilder();
