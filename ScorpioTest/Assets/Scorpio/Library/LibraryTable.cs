@@ -15,6 +15,7 @@ namespace Scorpio.Library
             Table.SetValue("containskey", script.CreateFunction(new containskey()));
 			Table.SetValue("keys", script.CreateFunction(new keys()));
 			Table.SetValue("values", script.CreateFunction(new values()));
+            Table.SetValue("define_function", script.CreateFunction(new define_function()));
             script.SetObjectInternal("table", Table);
         }
         private class count : ScorpioHandle {
@@ -49,5 +50,15 @@ namespace Scorpio.Library
 				return ((ScriptTable)args [0]).GetValues ();
 			}
 		}
+        private class define_function : ScorpioHandle {
+            public object Call(ScriptObject[] args) {
+                var table = (ScriptTable)args[0];
+                var name = args[1].ToString();
+                var func = (Scorpio.Function.ScriptScriptFunction)args[2];
+                func.SetTable(table);
+                table.SetValue(name, func);
+                return null;
+            }
+        }
     }
 }

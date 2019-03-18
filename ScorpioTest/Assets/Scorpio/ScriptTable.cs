@@ -16,10 +16,6 @@ namespace Scorpio {
             if (value is ScriptNull) {
                 m_listObject.Remove(key);
             } else {
-                //if (value is ScriptScriptFunction) {
-                //    var func = (ScriptScriptFunction)value;
-                //    if (func.IsStaticFunction) func.SetTable(this);
-                //}
                 m_listObject[key] = value.Assign();
             }
         }

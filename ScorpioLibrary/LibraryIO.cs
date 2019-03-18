@@ -6,7 +6,7 @@ using Scorpio;
 namespace ScorpioLibrary {
     public class LibraryIO {
         public static void Load(Script script) {
-            ScriptTable Table = script.CreateTable();
+            var Table = script.GetValue("io") as ScriptTable ?? script.CreateTable();
             Table.SetValue("file_exist", script.CreateFunction(new file_exist()));
             Table.SetValue("path_exist", script.CreateFunction(new path_exist()));
             Table.SetValue("create_path", script.CreateFunction(new create_path()));
