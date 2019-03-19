@@ -2,6 +2,14 @@
 *2019-03-19*
 
 * 添加 **io** 库
+* **table** 库添加 **define_function** 函数, 可以动态申请内部函数,例如
+```javascript
+var tab = { num = 100 }
+table.define_function(tab, "fun", function() {
+    return this.num
+})
+print(tab.fun()) //输出100
+```
 * **#** 可以代替 **function** 关键字申请函数, 示例:
 ```javascript
 #test() { }
