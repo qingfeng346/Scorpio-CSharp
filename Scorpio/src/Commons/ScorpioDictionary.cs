@@ -5,6 +5,11 @@ namespace Scorpio.Commons {
     public class ScorpioValue<Key,Value> {
         public Key key;
         public Value value;
+        public ScorpioValue<Key, Value> Set(ScorpioValue<Key, Value> v) {
+            this.key = v.key;
+            this.value = v.value;
+            return this;
+        }
     }
     public class ScorpioDictionary<Key, Value> {
         private static readonly ScorpioValue<Key, Value>[] _emptyArray = new ScorpioValue<Key, Value>[0];
@@ -18,7 +23,7 @@ namespace Scorpio.Commons {
             mSize = value.mSize;
             mValues = new ScorpioValue<Key, Value>[mSize];
             for (var i = 0; i < mSize; ++i) {
-                mValues[i] = value.mValues[i];
+                mValues[i] = new ScorpioValue<Key, Value>().Set(value.mValues[i]);
             }
         }
         void SetCapacity(int value) {

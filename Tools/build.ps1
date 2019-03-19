@@ -1,13 +1,13 @@
-$version="1.0.9"
-$name="sco"
+$version = "1.0.10"
+$name = "sco"
 
 
 $today = Get-Date
-$date=$today.ToString('yyyy-MM-dd')
+$date = $today.ToString('yyyy-MM-dd')
 Remove-Item ../bin/* -Force -Recurse
 
 Set-Location ../Scorpio
-$fileData=@"
+$fileData = @"
 namespace Scorpio {
     public static class Version {
         public const string version = "$version";
