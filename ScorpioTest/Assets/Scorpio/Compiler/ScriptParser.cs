@@ -179,8 +179,8 @@ namespace Scorpio.Compiler
         private ScriptScriptFunction ParseFunctionDeclaration(bool needName)
         {
             Token token = ReadToken();
-            if (token.Type != TokenType.Function)
-                throw new ParserException("Function declaration must start with the 'function' keyword.", token);
+            if (token.Type != TokenType.Function && token.Type != TokenType.Sharp)
+                throw new ParserException("Function declaration must start with the 'function' or '#' keyword.", token);
             String strFunctionName = needName ? ReadIdentifier() : (PeekToken().Type == TokenType.Identifier ? ReadIdentifier() : "");
             List<String> listParameters = new List<String>();
             bool bParams = false;
@@ -535,7 +535,8 @@ namespace Scorpio.Compiler
                     m_define = null;
                 }
             } else {
-                throw new ParserException("#后缀不支持" + token.Type, token);
+                UndoToken();
+                ParseFunction();
             }
         }
         private bool IsDefine() {
@@ -733,6 +734,7 @@ namespace Scorpio.Compiler
                     ret = new CodeMember((string)token.Lexeme);
                     break;
                 case TokenType.Function:
+                case TokenType.Sharp:
                     UndoToken();
                     ret = new CodeFunction(ParseFunctionDeclaration(false));
                     break;
