@@ -88,19 +88,17 @@ namespace Scorpio {
         }
         public static void WriteString(BinaryWriter writer, string str) {
             if (string.IsNullOrEmpty(str)) {
-                writer.Write((byte)0);
+                writer.Write(0);
             } else {
-                writer.Write(Encoding.UTF8.GetBytes(str));
-                writer.Write((byte)0);
+                var bytes = Encoding.UTF8.GetBytes(str);
+                writer.Write(bytes.Length);
+                writer.Write(bytes);
             }
         }
         public static string ReadString(BinaryReader reader) {
-            List<byte> sb = new List<byte>();
-            byte ch;
-            while ((ch = reader.ReadByte()) != 0)
-                sb.Add(ch);
-            byte[] buffer = sb.ToArray();
-            return Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+            var length = reader.ReadInt32();
+            if (length <= 0) { return ""; }
+            return Encoding.UTF8.GetString(reader.ReadBytes(length));
         }
         public static bool IsNullOrEmpty(String value) {
             return value == null || value.Length == 0;

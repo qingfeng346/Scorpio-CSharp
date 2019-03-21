@@ -5,15 +5,15 @@ using System.IO;
 using Scorpio.Compiler;
 namespace Scorpio.Serialize {
     public class ScorpioMaker {
-        private static sbyte LineFlag = sbyte.MaxValue;
+        private static byte LineFlag = byte.MaxValue;
         public static byte[] Serialize(String breviary, string data) {
-            List<Token> tokens = new ScriptLexer(data, breviary).GetTokens();
+            var tokens = new ScriptLexer(data, breviary).GetTokens();
             if (tokens.Count == 0) return new byte[0];
             int sourceLine = 0;
             byte[] ret = null;
-            using (MemoryStream stream = new MemoryStream()) {
-                using (BinaryWriter writer = new BinaryWriter(stream)) {
-                    writer.Write((sbyte)0);          //第一个字符写入一个null 以此判断文件是二进制文件还是字符串文件
+            using (var stream = new MemoryStream()) {
+                using (var writer = new BinaryWriter(stream)) {
+                    writer.Write((byte)0);          //第一个字符写入一个null 以此判断文件是二进制文件还是字符串文件
                     writer.Write(tokens.Count);
                     for (int i = 0; i < tokens.Count; ++i) {
                         var token = tokens[i];
@@ -22,10 +22,10 @@ namespace Scorpio.Serialize {
                             writer.Write(LineFlag);
                             writer.Write(token.SourceLine);
                         }
-                        writer.Write((sbyte)token.Type);
+                        writer.Write((byte)token.Type);
                         switch (token.Type) {
                         case TokenType.Boolean:
-                            writer.Write((bool)token.Lexeme ? (sbyte)1 : (sbyte)0);
+                            writer.Write((bool)token.Lexeme ? (byte)1 : (byte)0);
                             break;
                         case TokenType.String:
                         case TokenType.SimpleString:
@@ -36,10 +36,10 @@ namespace Scorpio.Serialize {
                             break;
                         case TokenType.Number:
                             if (token.Lexeme is double) {
-                                writer.Write((sbyte)1);
+                                writer.Write((byte)1);
                                 writer.Write((double)token.Lexeme);
                             } else {
-                                writer.Write((sbyte)2);
+                                writer.Write((byte)2);
                                 writer.Write((long)token.Lexeme);
                             }
                             break;
@@ -54,20 +54,20 @@ namespace Scorpio.Serialize {
             List<Token> tokens = new List<Token>();
             using (MemoryStream stream = new MemoryStream(data)) {
                 using (BinaryReader reader = new BinaryReader(stream)) {
-                    reader.ReadSByte();      //取出第一个null字符
+                    reader.ReadByte();      //取出第一个null字符
                     int count = reader.ReadInt32();
                     int sourceLine = 0;
                     for (int i = 0; i < count; ++i) {
-                        sbyte flag = reader.ReadSByte();
+                        var flag = reader.ReadByte();
                         if (flag == LineFlag) {
                             sourceLine = reader.ReadInt32();
-                            flag = reader.ReadSByte();
+                            flag = reader.ReadByte();
                         }
-                        TokenType type = (TokenType)flag;
+                        var type = (TokenType)flag;
                         object value = null;
                         switch (type) {
                         case TokenType.Boolean:
-                            value = (reader.ReadSByte() == 1);
+                            value = (reader.ReadByte() == 1);
                             break;
                         case TokenType.String:
                         case TokenType.SimpleString:
@@ -77,7 +77,7 @@ namespace Scorpio.Serialize {
                             value = Util.ReadString(reader);
                             break;
                         case TokenType.Number:
-                            if (reader.ReadSByte() == 1)
+                            if (reader.ReadByte() == 1)
                                 value = reader.ReadDouble();
                             else
                                 value = reader.ReadInt64();
@@ -93,25 +93,25 @@ namespace Scorpio.Serialize {
             return tokens;
         }
         public static string DeserializeToString(byte[] data) {
-            StringBuilder builder = new StringBuilder();
-            using (MemoryStream stream = new MemoryStream(data)) {
-                using (BinaryReader reader = new BinaryReader(stream)) {
-                    reader.ReadSByte();      //取出第一个null字符
-                    int count = reader.ReadInt32();
-                    for (int i = 0; i < count; ++i) {
-                        sbyte flag = reader.ReadSByte();
+            var builder = new StringBuilder();
+            using (var stream = new MemoryStream(data)) {
+                using (var reader = new BinaryReader(stream)) {
+                    reader.ReadByte();      //取出第一个null字符
+                    var count = reader.ReadInt32();
+                    for (var i = 0; i < count; ++i) {
+                        var flag = reader.ReadByte();
                         if (flag == LineFlag) {
-                            int line = reader.ReadInt32();
-                            flag = reader.ReadSByte();
-                            int sourceLine = builder.ToString().Split('\n').Length;
-                            for (int j = sourceLine; j < line; ++j)
+                            var line = reader.ReadInt32();
+                            flag = reader.ReadByte();
+                            var sourceLine = builder.ToString().Split('\n').Length;
+                            for (var j = sourceLine; j < line; ++j)
                                 builder.Append('\n');
                         }
                         TokenType type = (TokenType)flag;
                         object value = null;
                         switch (type) {
                         case TokenType.Boolean:
-                            value = (reader.ReadSByte() == 1) ? "true" : "false";
+                            value = (reader.ReadByte() == 1) ? "true" : "false";
                             break;
                         case TokenType.String:
                             value = "\"" + Util.ReadString(reader).Replace("\n", "\\n") + "\"";
@@ -123,7 +123,7 @@ namespace Scorpio.Serialize {
                             value = Util.ReadString(reader);
                             break;
                         case TokenType.Number:
-                            if (reader.ReadSByte() == 1)
+                            if (reader.ReadByte() == 1)
                                 value = reader.ReadDouble();
                             else
                                 value = reader.ReadInt64() + "L";

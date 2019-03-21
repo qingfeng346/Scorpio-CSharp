@@ -2,7 +2,15 @@
   "profiles": {
     "ScorpioExec": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\a.sco"
+      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\a.out"
+    },
+    "pack": {
+      "commandName": "Project",
+      "commandLineArgs": "-t pack -s C:\\Users\\qingf\\Desktop\\a.sco -o C:\\Users\\qingf\\Desktop\\a.out"
+    },
+    "unpack": {
+      "commandName": "Project",
+      "commandLineArgs": "-t unpack -s C:\\Users\\qingf\\Desktop\\a.out -o C:\\Users\\qingf\\Desktop\\a.txt"
     }
   }
 }

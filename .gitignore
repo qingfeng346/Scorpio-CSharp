@@ -21,3 +21,4 @@
 /ScorpioTest/Temp
 *.meta
 /Scorpio/Scorpio.csproj.user
+/ScorpioExec/*.user
