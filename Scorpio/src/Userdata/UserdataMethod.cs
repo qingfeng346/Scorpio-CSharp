@@ -203,6 +203,7 @@ namespace Scorpio.Userdata {
             m_IsStatic = isStatic;
             m_Type = type;
             m_MethodName = methodName;
+            m_IsClass = true;
             List<FunctionBase> functionMethod = new List<FunctionBase>();
             foreach (ScorpioMethodInfo method in methods) {
                 functionMethod.Add(new FunctionFastMethod(fastMethod, method.ParameterType, method.ParamType, method.Params, method.ParameterTypes));
