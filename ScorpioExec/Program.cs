@@ -5,7 +5,6 @@ using System.Text;
 using System.Diagnostics;
 using System.Reflection;
 using Scorpio;
-using Scorpio.Serialize;
 using ScorpioLibrary;
 
 namespace ScorpioExec
@@ -64,7 +63,7 @@ namespace ScorpioExec
             output = Path.Combine(CurrentDirectory, output);
             try {
                 byte[] buffer = GetFileBuffer(source);
-                File.WriteAllBytes(output, ScorpioMaker.Serialize(source, Encoding.UTF8.GetString(buffer, 0, buffer.Length)));
+                //File.WriteAllBytes(output, ScorpioMaker.Serialize(source, Encoding.UTF8.GetString(buffer, 0, buffer.Length)));
             } catch (System.Exception ex) {
                 Console.WriteLine("转换出错 error : " + ex.ToString());	
             }
@@ -74,7 +73,7 @@ namespace ScorpioExec
             output = Path.Combine(CurrentDirectory, output);
             try {
                 byte[] buffer = GetFileBuffer(source);
-                File.WriteAllBytes(output, Encoding.UTF8.GetBytes(ScorpioMaker.DeserializeToString(buffer)));
+                //File.WriteAllBytes(output, Encoding.UTF8.GetBytes(ScorpioMaker.DeserializeToString(buffer)));
             } catch (System.Exception ex) {
                 Console.WriteLine("转换出错 error : " + ex.ToString());	
             }
@@ -97,14 +96,14 @@ namespace ScorpioExec
                     Stopwatch watch = Stopwatch.StartNew();
                     script.PushSearchPath(path);
                     script.PushSearchPath(CurrentDirectory);
-                    script.SetObject("__PATH__", path);
+                    //script.SetObject("__PATH__", path);
                     Console.WriteLine("=============================");
-                    ScriptObject value = script.LoadFile(file);
+                    var value = script.LoadFile(file);
                     Console.WriteLine("=============================");
                     Console.WriteLine("return value : " + value);
                     Console.WriteLine("the execution time : " + watch.ElapsedMilliseconds + " ms");
                 } catch (System.Exception ex) {
-                    Console.WriteLine(script.GetStackInfo());
+                    //Console.WriteLine(script.GetStackInfo());
                     Console.WriteLine(ex.ToString());
                 }
             } else {
@@ -122,7 +121,7 @@ build date : {Scorpio.Version.date}");
                             script.LoadString(str);
                         }
                     } catch (System.Exception ex) {
-                        Console.WriteLine(script.GetStackInfo());
+                        //Console.WriteLine(script.GetStackInfo());
                         Console.WriteLine(ex.ToString());
                     }
                 }
@@ -130,24 +129,30 @@ build date : {Scorpio.Version.date}");
         }
         static void Main(string[] args) {
             try {
-                CommandLine command = new CommandLine(args);
-                string type = command.Get("-t").ToString();
-                if (type == "register") {
-                    Register();
-                } else if (type == "pack" || type == "unpack") {
-                    string source = command.Get("-s").ToString();
-                    string output = command.Get("-o").ToString();
-                    if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(output)) {
-                        Console.WriteLine("参数出错 -s [源文件] -o [输出文件] 是必须参数");
-                        return;
-                    }
-                    if (type == "pack")
-                        Pack(source, output);
-                    else
-                        Unpack(source, output);
-                } else {
-                    Execute(args);
-                }
+                //CommandLine command = new CommandLine(args);
+                //string type = command.Get("-t").ToString();
+                //if (type == "register") {
+                //    Register();
+                //} else if (type == "pack" || type == "unpack") {
+                //    string source = command.Get("-s").ToString();
+                //    string output = command.Get("-o").ToString();
+                //    if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(output)) {
+                //        Console.WriteLine("参数出错 -s [源文件] -o [输出文件] 是必须参数");
+                //        return;
+                //    }
+                //    if (type == "pack")
+                //        Pack(source, output);
+                //    else
+                //        Unpack(source, output);
+                //} else {
+                //    Execute(args);
+                //}
+                var types = new Type[] { typeof(TestClass) };
+                var generate = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(TestClass));
+                //generate.SetClassFilter(new Filter());
+                File.WriteAllBytes(@"E:\Scorpio-CSharp\ScorpioExec\ScorpioTestClass.cs", Encoding.UTF8.GetBytes(generate.Generate()));
+                //FileUtil.CreateFile(EditorUtil.ScriptBuildPath + generate.ScorpioClassName + ".cs", generate.Generate());
+
             } catch (Exception e) {
                 Console.WriteLine(e.ToString());
             }

@@ -2,7 +2,7 @@
   "profiles": {
     "ScorpioExec": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\a.out"
+      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\new.sco"
     },
     "pack": {
       "commandName": "Project",

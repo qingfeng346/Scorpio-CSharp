@@ -1,64 +1,58 @@
 ﻿using System;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
-using Scorpio.Compiler;
-using Scorpio.Exception;
-namespace Scorpio.Userdata
-{
-    /// <summary> 动态委托类型实例 </summary>
+using Scorpio.Commons;
+namespace Scorpio.Userdata {
     public class ScriptUserdataDelegate : ScriptUserdata {
         private class FunctionParameter {
             public Type ParameterType;
             public object DefaultValue;
-            public FunctionParameter(Type type, object def) {
+            public FunctionParameter(Type type, object defaultValue) {
                 this.ParameterType = type;
-                this.DefaultValue = def;
+                this.DefaultValue = defaultValue;
             }
         }
         private Delegate m_Delegate;
-        private List<FunctionParameter> m_Parameters = new List<FunctionParameter>();
+        private FunctionParameter[] m_Parameters;
         private object[] m_Objects;
         public ScriptUserdataDelegate(Script script, Delegate value) : base(script) {
             this.m_Delegate = value;
             this.m_Value = value;
             this.m_ValueType = value.GetType();
-            var method = m_Delegate.GetMethodInfo();
-            var infos = method.GetParameters();
-            var dynamicDelegate = method.Name.Equals(Script.DynamicDelegateName);
-            int length = dynamicDelegate ? infos.Length - 1 : infos.Length;
+            var method = m_Delegate.Method;
+            var parameters = method.GetParameters();
+            var length = parameters.Length;
             m_Objects = new object[length];
+            m_Parameters = new FunctionParameter[length];
             for (int i = 0; i < length; ++i) {
-                var p = infos[dynamicDelegate ? i + 1 : i];
-                m_Parameters.Add(new FunctionParameter(p.ParameterType, p.DefaultValue));
+                var parameter = parameters[i];
+                m_Parameters[i] = new FunctionParameter(parameter.ParameterType, parameter.DefaultValue);
             }
         }
-        public override object Call(ScriptObject[] parameters) {
-            FunctionParameter parameter;
-            for (int i = 0; i < m_Parameters.Count; i++) {
-                parameter = m_Parameters[i];
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            for (int i = 0; i < m_Parameters.Length; i++) {
+                var parameter = m_Parameters[i];
                 if (i >= parameters.Length) {
                     m_Objects[i] = parameter.DefaultValue;
                 } else {
                     m_Objects[i] = Util.ChangeType(m_Script, parameters[i], parameter.ParameterType);
                 }
             }
-            return m_Delegate.DynamicInvoke(m_Objects);
+            return m_Script.CreateObject(m_Delegate.DynamicInvoke(m_Objects));
         }
-        public override ScriptObject Compute(TokenType type, ScriptObject obj)
-        {
-            switch (type) {
-                case TokenType.Plus:
-                    return m_Script.CreateObject(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(m_Script, obj, ValueType)));
-                case TokenType.Minus:
-                    return m_Script.CreateObject(Delegate.Remove(m_Delegate, (Delegate)Util.ChangeType(m_Script, obj, ValueType)));
-                default:
-                    throw new ExecutionException(m_Script, "Delegate 不支持的运算符 " + type);
+        public override ScriptValue Plus(ScriptValue obj) {
+            return m_Script.CreateObject(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(m_Script, obj, m_ValueType)));
+        }
+        public override ScriptValue Minus(ScriptValue obj) {
+            if (obj.valueType == ScriptValue.scriptValueType && obj.scriptValue is ScriptUserdataDelegate) {
+                return m_Script.CreateObject(Delegate.Remove(m_Delegate, (obj.scriptValue as ScriptUserdataDelegate).m_Delegate));
             }
+            return base.Minus(obj); 
         }
-        public override ScriptObject GetValue(object key) {
-            if (!(key is string) || !key.Equals("Type")) throw new ExecutionException(m_Script, "EventInfo GetValue只支持 Type 一个变量");
-            return m_Script.CreateObject(ValueType);
+        public override ScriptValue GetValue(string key) {
+            if (key == "Type") {
+                return m_Script.GetUserdataType(m_ValueType);
+            }
+            return base.GetValue(key);
         }
+        public override string ToString() { return m_Value.ToString(); }
     }
 }

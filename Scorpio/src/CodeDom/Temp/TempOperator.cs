@@ -40,11 +40,52 @@ namespace Scorpio.CodeDom.Temp {
             this.Level = level;
         }
         //获得运算符
-        public static TempOperator GetOper(TokenType oper) {
+        public static TempOperator GetOperator(TokenType oper) {
             if (Operators.ContainsKey(oper))
                 return Operators[oper];
             return null;
         }
 
+        public static Opcode GetOpcode(TokenType type) {
+            switch (type) {
+                case TokenType.Plus:
+                case TokenType.PlusAssign:
+                    return Opcode.Plus;
+                case TokenType.Minus:
+                case TokenType.MinusAssign:
+                    return Opcode.Minus;
+                case TokenType.Multiply:
+                case TokenType.MultiplyAssign:
+                    return Opcode.Multiply;
+                case TokenType.Divide:
+                case TokenType.DivideAssign:
+                    return Opcode.Divide;
+                case TokenType.Modulo:
+                case TokenType.ModuloAssign:
+                    return Opcode.Modulo;
+                case TokenType.InclusiveOr:
+                case TokenType.InclusiveOrAssign:
+                    return Opcode.InclusiveOr;
+                case TokenType.Combine:
+                case TokenType.CombineAssign:
+                    return Opcode.Combine;
+                case TokenType.XOR:
+                case TokenType.XORAssign:
+                    return Opcode.XOR;
+                case TokenType.Shi:
+                case TokenType.ShiAssign:
+                    return Opcode.Shi;
+                case TokenType.Shr:
+                case TokenType.ShrAssign:
+                    return Opcode.Shr;
+                case TokenType.Greater: return Opcode.Greater;
+                case TokenType.GreaterOrEqual: return Opcode.GreaterOrEqual;
+                case TokenType.Less: return Opcode.Less;
+                case TokenType.LessOrEqual: return Opcode.LessOrEqual;
+                case TokenType.Equal: return Opcode.Equal;
+                case TokenType.NotEqual: return Opcode.NotEqual;
+                default: return Opcode.None;
+            }
+        }
     }
 }

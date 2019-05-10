@@ -4,24 +4,27 @@ using System.Text;
 
 namespace Scorpio.Library {
     public class LibraryIO {
+        public static readonly Encoding DefaultEncoding = Encoding.UTF8;
         public static void Load(Script script) {
-            var Table = script.CreateTable();
-            Table.SetValue("tostring", script.CreateFunction(new tostring()));
-            Table.SetValue("tobytes", script.CreateFunction(new tobytes()));
-            script.SetObject("io", Table);
+            var map = script.CreateMap();
+            map.SetValue("toString", script.CreateFunction(new toString()));
+            map.SetValue("toBytes", script.CreateFunction(new toBytes(script)));
+            script.SetGlobal("io", new ScriptValue(map));
         }
-        private class tostring : ScorpioHandle {
-            public object Call(ScriptObject[] args) {
-                var bytes = args[0].ObjectValue;
-                var codepage = args.Length > 1 ? "utf8" : args[1].ToString();
-                return Encoding.GetEncoding(codepage).GetString((byte[])bytes);
+        private class toString : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var encoding = args.Length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding;
+                return new ScriptValue(encoding.GetString((byte[])args[0].Value));
             }
         }
-        private class tobytes : ScorpioHandle {
-            public object Call(ScriptObject[] args) {
-                var str = args[0].ToString();
-                var codepage = args.Length > 1 ? "utf8" : args[1].ToString();
-                return Encoding.GetEncoding(codepage).GetBytes(str);
+        private class toBytes : ScorpioHandle {
+            private Script m_Script;
+            public toBytes(Script script) {
+                m_Script = script;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var encoding = args.Length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding;
+                return m_Script.CreateObject(encoding.GetBytes(args[0].ToString()));
             }
         }
     }

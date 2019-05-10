@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Scorpio;
 using Scorpio.CodeDom;
-using Scorpio.Runtime;
+using Scorpio.Compiler;
 namespace Scorpio.CodeDom.Temp
 {
     /// <summary> switch语句中一个cast条件</summary>

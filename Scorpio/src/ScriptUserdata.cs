@@ -2,13 +2,11 @@
 namespace Scorpio {
     //语言数据
     public abstract class ScriptUserdata : ScriptObject {
-        protected object m_Value;
-        protected Type m_ValueType;
-        public override object ObjectValue { get { return m_Value; } }
-        public override object KeyValue { get { return m_Value; } }
-        public override ObjectType Type { get { return ObjectType.UserData; } }
-        public object Value { get { return m_Value; } }
-        public Type ValueType { get { return m_ValueType; } }
-        public ScriptUserdata(Script script) : base(script) { }
+        protected object m_Value;       //值
+        protected Type m_ValueType;     //值类型
+        public override Type ValueType { get { return m_ValueType; } }      //值类型，如果是Type则返回 typeof(Type)
+        public override Type Type { get { return m_ValueType; } }           //获取类型
+        public override object Value { get { return m_Value; } }            //值
+        public ScriptUserdata(Script script) : base(script, ObjectType.UserData) { }
     }
 }

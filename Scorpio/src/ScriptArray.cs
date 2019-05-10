@@ -2,127 +2,146 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Exception;
+using Scorpio.Commons;
 namespace Scorpio {
     //脚本数组类型
-    public class ScriptArray : ScriptObject {
-        public struct Comparer : IComparer<ScriptObject> {
-            Script script;
+    public class ScriptArray : ScriptInstance, IEnumerable<ScriptValue> {
+        //排序
+        public struct Comparer : IComparer<ScriptValue> {
             ScriptFunction func;
-            internal Comparer(Script script, ScriptFunction func) {
-                this.script = script;
+            ScriptValue[] args;
+            public Comparer(ScriptFunction func) {
                 this.func = func;
+                this.args = new ScriptValue[2];
             }
-            public int Compare(ScriptObject x, ScriptObject y) {
-                ScriptNumber ret = func.Call(new ScriptObject[] { x, y }) as ScriptNumber;
-                if (ret == null) throw new ExecutionException(script, "Sort 返回值 必须是Number类型");
-                return ret.ToInt32();
+            public int Compare(ScriptValue o1, ScriptValue o2) {
+                args[0] = o1;
+                args[1] = o2;
+                var ret = func.Call(ScriptValue.Null, args, 2);
+                if (ret.valueType == ScriptValue.doubleValueType) {
+                    return (int)ret.doubleValue;
+                } else if (ret.valueType == ScriptValue.longValueType) {
+                    return (int)ret.longValue;
+                }
+                throw new ExecutionException("数组排序返回值必须是Number类型");
             }
         }
-        public struct Enumerator : System.Collections.IEnumerator {
-            private ScriptArray list;
+        //数组迭代器
+        public struct Enumerator : IEnumerator<ScriptValue> {
+            private int length;
+            private ScriptValue[] values;
             private int index;
-            private ScriptObject current;
+            private ScriptValue current;
             internal Enumerator(ScriptArray list) {
-                this.list = list;
+                this.length = list.m_Length;
+                this.values = list.m_Objects;
                 this.index = 0;
-                this.current = null;
+                this.current = ScriptValue.Null;
             }
             public bool MoveNext() {
-                if (index < list.m_size) {
-                    current = list.m_listObject[index] ?? list.m_null;
+                if (index < length) {
+                    current = values[index];
                     index++;
                     return true;
                 }
                 return false;
             }
-            public ScriptObject Current { get { return current; } }
+            public ScriptValue Current { get { return current; } }
             object System.Collections.IEnumerator.Current { get { return current; } }
             public void Reset() {
                 index = 0;
-                current = null;
+                current = ScriptValue.Null;
             }
+            public void Dispose() { }
         }
 
-
-        public override ObjectType Type { get { return ObjectType.Array; } }
-        private static readonly ScriptObject[] _emptyArray = new ScriptObject[0];
-        private ScriptObject[] m_listObject;
-        private int m_size;
-        private ScriptObject m_null;
-        public ScriptArray(Script script) : base(script) {
-            m_listObject = _emptyArray;
-            m_size = 0;
-            m_null = script.Null;
-        }
-        public override ScriptObject GetValue(object index) {
-            if (index is double || index is int || index is long) {
-                int i = Util.ToInt32(index);
-                if (i < 0)
-                    throw new ExecutionException(m_Script, this, "Array GetValue索引小于0 index值为:" + index);
-                if (i >= m_size)
-                    return m_null;
-                return m_listObject[i] ?? m_null;
-            } else if (index is string && index.Equals("length")) {
-                return m_Script.CreateDouble(Util.ToDouble(m_size));
-            }
-            throw new ExecutionException(m_Script, this, "Array GetValue只支持Number类型 index值为:" + index);
-        }
-        public override void SetValue(object index, ScriptObject obj) {
-            if (index is double || index is int || index is long) {
-                int i = Util.ToInt32(index);
-                if (i < 0)
-                    throw new ExecutionException(m_Script, this, "Array SetValue索引小于0 index值为:" + index);
-                if (i >= m_size) {
-                    EnsureCapacity(i + 1);
-                    m_size = i + 1;
-                }
-                m_listObject[i] = obj;
-            } else {
-                throw new ExecutionException(m_Script, this, "Array SetValue只支持Number类型 index值为:" + index);
-            }
+        private ScriptValue[] m_Objects;
+        private int m_Length;
+        public ScriptArray(Script script) : base(script, ObjectType.Array, script.TypeArray) {
+            m_Objects = ScriptValue.EMPTY;
+            m_Length = 0;
         }
         void SetCapacity(int value) {
             if (value > 0) {
-                ScriptObject[] array = new ScriptObject[value];
-                if (m_size > 0) {
-                    Array.Copy(m_listObject, 0, array, 0, m_size);
+                var array = new ScriptValue[value];
+                if (m_Length > 0) {
+                    Array.Copy(m_Objects, 0, array, 0, m_Length);
                 }
-                m_listObject = array;
+                m_Objects = array;
             } else {
-                m_listObject = _emptyArray;
+                m_Objects = ScriptValue.EMPTY;
             }
         }
         void EnsureCapacity(int min) {
-            if (m_listObject.Length < min) {
-                int num = (m_listObject.Length == 0) ? 4 : (m_listObject.Length * 2);
-                if (num > 2146435071) {
-                    num = 2146435071;
-                }
-                if (num < min) {
-                    num = min;
-                }
+            if (m_Objects.Length < min) {
+                int num = (m_Objects.Length == 0) ? 4 : (m_Objects.Length * 2);
+                if (num > 2146435071) { num = 2146435071; } else if (num < min) { num = min; }
                 SetCapacity(num);
             }
         }
-        public void Add(ScriptObject obj) {
-            if (m_size == m_listObject.Length) {
-                EnsureCapacity(m_size + 1);
+        public IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
+        public IEnumerator<ScriptValue> GetIterator() { return new Enumerator(this); }
+
+        public override ScriptValue GetValue(object index) {
+            if (index is double || index is long) {
+                var i = Convert.ToInt32(index);
+                if (i >= m_Length) return ScriptValue.Null;
+                if (i < 0) throw new ExecutionException("数组获取变量索引小于0 index : " + i);
+                return m_Objects[i];
             }
-            m_listObject[m_size] = obj;
-            m_size++;
+            return base.GetValue(index);
         }
-        public void Insert(int index, ScriptObject obj) {
-            if (m_size == m_listObject.Length) {
-                EnsureCapacity(m_size + 1);
+        public override void SetValue(object index, ScriptValue value) {
+            if (index is double || index is long) {
+                var i = Convert.ToInt32(index);
+                if (i >= m_Length) {
+                    EnsureCapacity(i + 1);
+                    m_Length = i + 1;
+                } else if (i < 0) {
+                    throw new ExecutionException("数组设置变量索引小于0 index : " + i);
+                }
+                m_Objects[i] = value;
+            } else {
+                base.SetValue(index, value);
             }
-            if (index < m_size) {
-                Array.Copy(m_listObject, index, m_listObject, index + 1, m_size - index);
-            }
-            m_listObject[index] = obj;
-            m_size++;
         }
-        public bool Remove(ScriptObject obj) {
-            int num = IndexOf(obj);
+
+        public virtual ScriptValue this[int i] {
+            get {
+                if (i >= m_Length) return ScriptValue.Null;
+                if (i < 0) throw new ExecutionException("数组获取变量索引小于0 index : " + i);
+                return m_Objects[i];
+            }
+            set {
+                if (i >= m_Length) {
+                    EnsureCapacity(i + 1);
+                    m_Length = i + 1;
+                } else if (i < 0) {
+                    throw new ExecutionException("数组设置变量索引小于0 index : " + i);
+                }
+                m_Objects[i] = value;
+            }
+        }
+        public void Add(ScriptValue value) {
+            if (m_Length == m_Objects.Length) {
+                EnsureCapacity(m_Length + 1);
+            }
+            m_Objects[m_Length] = value;
+            m_Length++;
+        }
+        public void Insert(int index, ScriptValue value) {
+            if (index < 0 || index >= m_Length)
+                throw new ExecutionException("Insert 索引小于0或超过最大值 index : " + index);
+            if (m_Length == m_Objects.Length) {
+                EnsureCapacity(m_Length + 1);
+            }
+            Array.Copy(m_Objects, index, m_Objects, index + 1, m_Length - index);
+            m_Objects[index] = value;
+            m_Length++;
+        }
+        public bool Remove(ScriptValue value) {
+            int num = IndexOf(value);
             if (num >= 0) {
                 RemoveAt(num);
                 return true;
@@ -130,31 +149,31 @@ namespace Scorpio {
             return false;
         }
         public void RemoveAt(int index) {
-            m_size--;
-            if (index < m_size) {
-                Array.Copy(m_listObject, index + 1, m_listObject, index, m_size - index);
-            }
-            m_listObject[m_size] = null;
+            if (index < 0 || index >= m_Length)
+                throw new ExecutionException("RemoveAt 索引小于0或超过最大值 index : " + index);
+            m_Length--;
+            Array.Copy(m_Objects, index + 1, m_Objects, index, m_Length - index);
+            m_Objects[m_Length].valueType = ScriptValue.nullValueType;
         }
-        public bool Contains(ScriptObject obj) {
-            for (int i = 0; i < m_size; ++i) {
-                if (obj.Equals(m_listObject[i])) {
+        public bool Contains(ScriptValue obj) {
+            for (int i = 0; i < m_Length; ++i) {
+                if (obj.Equals(m_Objects[i])) {
                     return true;
                 }
             }
             return false;
         }
-        public int IndexOf(ScriptObject obj) {
-            for (int i = 0; i < m_size; ++i) {
-                if (obj.Equals(m_listObject[i])) {
+        public int IndexOf(ScriptValue obj) {
+            for (int i = 0; i < m_Length; ++i) {
+                if (obj.Equals(m_Objects[i])) {
                     return i;
                 }
             }
             return -1;
         }
-        public int LastIndexOf(ScriptObject obj) {
-            for (int i = m_size - 1; i >= 0; --i) {
-                if (obj.Equals(m_listObject[i])) {
+        public int LastIndexOf(ScriptValue obj) {
+            for (int i = m_Length - 1; i >= 0; --i) {
+                if (obj.Equals(m_Objects[i])) {
                     return i;
                 }
             }
@@ -162,102 +181,97 @@ namespace Scorpio {
         }
         public void Resize(int length) {
             if (length < 0)
-                throw new ExecutionException(m_Script, this, "Resize长度小于0 length:" + length);
-            if (length > m_size) {
+                throw new ExecutionException("Resize长度小于0 length:" + length);
+            if (length > m_Length) {
                 EnsureCapacity(length);
-                m_size = length;
+                m_Length = length;
             } else {
-                Array.Clear(m_listObject, length, m_size - length);
-                m_size = length;
+                Array.Clear(m_Objects, length, m_Length - length);
+                m_Length = length;
             }
         }
         public void Clear() {
-            if (m_size > 0) {
-                Array.Clear(m_listObject, 0, m_size);
-                m_size = 0;
+            if (m_Length > 0) {
+                Array.Clear(m_Objects, 0, m_Length);
+                m_Length = 0;
             }
         }
-        public int Count() {
-            return m_size;
+        public int Length() {
+            return m_Length;
         }
         public void Sort(ScriptFunction func) {
-            Array.Sort<ScriptObject>(m_listObject, 0, m_size, new Comparer(m_Script, func));
+            Array.Sort<ScriptValue>(m_Objects, 0, m_Length, new Comparer(func));
         }
-        public ScriptObject First() {
-            if (m_size > 0)
-                return m_listObject[0];
-            return m_null;
+        public ScriptValue First() {
+            return m_Length > 0 ? m_Objects[0] : ScriptValue.Null;
         }
-        public ScriptObject Last() {
-            if (m_size > 0)
-                return m_listObject[m_size - 1];
-            return m_null;
+        public ScriptValue Last() {
+            return m_Length > 0 ? m_Objects[m_Length - 1] : ScriptValue.Null;
         }
-        public ScriptObject PopFirst() {
-            if (m_size == 0)
-                throw new ExecutionException(m_Script, this, "Array Pop 数组长度为0");
-            ScriptObject obj = m_listObject[0];
+        public ScriptValue PopFirst() {
+            if (m_Length == 0)
+                throw new ExecutionException("Array PopFirst 数组长度为0");
+            var value = m_Objects[0];
             RemoveAt(0);
-            return obj;
+            return value;
         }
-        public ScriptObject SafePopFirst() {
-            if (m_size == 0)
-                return m_null;
-            ScriptObject obj = m_listObject[0];
+        public ScriptValue SafePopFirst() {
+            if (m_Length == 0)
+                return ScriptValue.Null;
+            var value = m_Objects[0];
             RemoveAt(0);
-            return obj;
+            return value;
         }
-        public ScriptObject PopLast() {
-            if (m_size == 0)
-                throw new ExecutionException(m_Script, this, "Array Pop 数组长度为0");
-            int index = m_size - 1;
-            ScriptObject obj = m_listObject[index];
+        public ScriptValue PopLast() {
+            if (m_Length == 0)
+                throw new ExecutionException("Array PopLast 数组长度为0");
+            var index = m_Length - 1;
+            var value = m_Objects[index];
             RemoveAt(index);
-            return obj;
+            return value;
         }
-        public ScriptObject SafePopLast() {
-            if (m_size == 0)
-                return m_null;
-            int index = m_size - 1;
-            ScriptObject obj = m_listObject[index];
+        public ScriptValue SafePopLast() {
+            if (m_Length == 0)
+                return ScriptValue.Null;
+            var index = m_Length - 1;
+            var value = m_Objects[index];
             RemoveAt(index);
-            return obj;
+            return value;
         }
-
-        public Enumerator GetIterator() {
-            return new Enumerator(this);
-        }
-        public ScriptObject[] ToArray() {
-            ScriptObject[] array = new ScriptObject[m_size];
-            Array.Copy(m_listObject, 0, array, 0, m_size);
+        //仅限于number和string
+        public T[] ToArray<T>() {
+            var array = new T[m_Length];
+            for (var i = 0; i < m_Length; ++i) {
+                array[i] = (T)Util.ChangeType(m_Script, m_Objects[i], typeof(T));
+            }
             return array;
         }
         public override ScriptObject Clone() {
-            ScriptArray ret = m_Script.CreateArray();
-            ret.m_listObject = new ScriptObject[m_size];
-            ret.m_size = m_size;
-            for (int i = 0; i < m_size; ++i) {
-                if (m_listObject[i] == this) {
-                    ret.m_listObject[i] = ret;
-                } else if (m_listObject[i] == null) {
-                    ret.m_listObject[i] = m_null;
+            var ret = m_Script.CreateArray();
+            ret.m_Objects = new ScriptValue[m_Length];
+            ret.m_Length = m_Length;
+            for (int i = 0; i < m_Length; ++i) {
+                ref var value = ref m_Objects[i];
+                if (value.valueType == ScriptValue.scriptValueType) {
+                    var scriptObject = value.scriptValue;
+                    if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
+                        ret.m_Objects[i] = new ScriptValue(scriptObject.Clone());
+                    } else {
+                        ret.m_Objects[i] = value;
+                    }
                 } else {
-                    ret.m_listObject[i] = m_listObject[i].Clone();
+                    ret.m_Objects[i] = value;
                 }
             }
             return ret;
         }
         public override string ToString() { return ToJson(); }
         public override string ToJson() {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             builder.Append("[");
-            for (int i = 0; i < m_size; ++i) {
+            for (int i = 0; i < m_Length; ++i) {
                 if (i != 0) builder.Append(",");
-                if (m_listObject[i] == null) {
-                    builder.Append(m_null.ToJson());
-                } else {
-                    builder.Append(m_listObject[i].ToJson());
-                }
+                builder.Append(m_Objects[i].ToJson());
             }
             builder.Append("]");
             return builder.ToString();
