@@ -129,28 +129,28 @@ build date : {Scorpio.Version.date}");
         }
         static void Main(string[] args) {
             try {
-                //CommandLine command = new CommandLine(args);
-                //string type = command.Get("-t").ToString();
-                //if (type == "register") {
-                //    Register();
-                //} else if (type == "pack" || type == "unpack") {
-                //    string source = command.Get("-s").ToString();
-                //    string output = command.Get("-o").ToString();
-                //    if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(output)) {
-                //        Console.WriteLine("参数出错 -s [源文件] -o [输出文件] 是必须参数");
-                //        return;
-                //    }
-                //    if (type == "pack")
-                //        Pack(source, output);
-                //    else
-                //        Unpack(source, output);
-                //} else {
-                //    Execute(args);
-                //}
-                var types = new Type[] { typeof(TestClass) };
-                var generate = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(TestClass));
-                //generate.SetClassFilter(new Filter());
-                File.WriteAllBytes(@"E:\Scorpio-CSharp\ScorpioExec\ScorpioTestClass.cs", Encoding.UTF8.GetBytes(generate.Generate()));
+                CommandLine command = new CommandLine(args);
+                string type = command.Get("-t").ToString();
+                if (type == "register") {
+                    Register();
+                } else if (type == "pack" || type == "unpack") {
+                    string source = command.Get("-s").ToString();
+                    string output = command.Get("-o").ToString();
+                    if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(output)) {
+                        Console.WriteLine("参数出错 -s [源文件] -o [输出文件] 是必须参数");
+                        return;
+                    }
+                    if (type == "pack")
+                        Pack(source, output);
+                    else
+                        Unpack(source, output);
+                } else {
+                    Execute(args);
+                }
+                //var types = new Type[] { typeof(TestClass) };
+                //var generate = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(TestClass));
+                ////generate.SetClassFilter(new Filter());
+                //File.WriteAllBytes(@"E:\Scorpio-CSharp\ScorpioExec\ScorpioTestClass.cs", Encoding.UTF8.GetBytes(generate.Generate()));
                 //FileUtil.CreateFile(EditorUtil.ScriptBuildPath + generate.ScorpioClassName + ".cs", generate.Generate());
 
             } catch (Exception e) {
