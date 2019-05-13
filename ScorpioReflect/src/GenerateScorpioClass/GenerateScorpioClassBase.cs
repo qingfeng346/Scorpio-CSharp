@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Scorpio;
 using Scorpio.Userdata;
-using Scorpio.Variable;
+//using Scorpio.Variable;
 using Scorpio.Commons;
 public class __class : ScorpioFastReflectClass {
     private Script m_Script;
@@ -38,9 +38,9 @@ __methods_content
     public class __name : ScorpioFastReflectMethod {
         private static ScorpioFastReflectMethodInfo[] _methods;
         private static UserdataMethodFastReflect _method;
-        private static ScorpioMethod _instance;
+        //private static ScorpioMethod _instance;
         static __name() {
-            var methods = new List<ScorpioMethodInfo>();
+            var methods = new List<ScorpioFastReflectMethodInfo>();
 __getallmethod
             _methods = methods.ToArray();
         }
@@ -50,12 +50,10 @@ __getallmethod
             }
             return _method;
         }
-        public static ScorpioMethod GetInstance(Script script, object obj) {
-            GetMethod(script);__getmethod
-        }
+
         public object Call(object obj, int methodIndex, object[] args) {
             switch (methodIndex) {__execute
-            default: throw new Exception(""__fullname 找不到合适的函数 : __methodname    type : "" + type);
+            default: throw new Exception(""__fullname 找不到合适的函数 : __methodname    type : "" + methodIndex);
             }
         }
     }";
@@ -136,7 +134,7 @@ __getallmethod
             return (IsStatic ? m_FullName : "((" + m_FullName + ")obj)") + "." + name;
         }
         private string GetAllMethod(MethodBase[] methods) {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             for (var i = 0; i < methods.Length; ++i) {
                 if (i != 0) { builder.AppendLine(); }
                 builder.Append("            methods.Add(" + GetScorpioMethod(methods[i], i) + ");");

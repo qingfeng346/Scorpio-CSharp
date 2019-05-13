@@ -25,4 +25,10 @@ public class TestClass {
             Console.WriteLine("test4 : " + testAction4(100,200,300));
         }
     }
+    public static TestClass operator + (TestClass a, TestClass b) {
+        return a;
+    }
+    public static TestClass operator +(TestClass a, int b) {
+        return a;
+    }
 }

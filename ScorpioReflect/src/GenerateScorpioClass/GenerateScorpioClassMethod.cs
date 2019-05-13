@@ -23,7 +23,7 @@ namespace Scorpio.ScorpioReflect {
             StringBuilder builder = new StringBuilder();
             //bool first = true;
             for (var i = 0; i < Constructors.Length; ++i) {
-                if (i != 0) { builder.AppendLine(); }
+                //if (i != 0) { builder.AppendLine(); }
                 string call = GetScorpioMethodCall(Constructors[i]);
                 builder.AppendFormat(@"
             case {0}: return new __fullname({1});", i, call);
@@ -36,7 +36,7 @@ namespace Scorpio.ScorpioReflect {
             //}
             string str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(Constructors));
-            str = str.Replace("__getmethod", InstanceMethodTemplate);
+            //str = str.Replace("__getmethod", InstanceMethodTemplate);
             str = str.Replace("__name", m_ScorpioClassName + "_Constructor");
             str = str.Replace("__methodstatic", "false");
             str = str.Replace("__methodname", "Constructor");
@@ -101,7 +101,7 @@ namespace Scorpio.ScorpioReflect {
             var builder = new StringBuilder();
             //bool first = true;
             for (var i = 0; i < methods.Count; ++i) {
-                if (i != 0) { builder.AppendLine(); }
+                //if (i != 0) { builder.AppendLine(); }
                 var method = methods[i];
                 string parameterTypes = GetScorpioMethodParameterTypes(method);
                 string parameterCall = GetScorpioMethodCall(method);

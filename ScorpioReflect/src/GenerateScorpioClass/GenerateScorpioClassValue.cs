@@ -7,7 +7,7 @@ namespace Scorpio.ScorpioReflect {
         //生成GetValue函数
         private string GenerateGetValue() {
             string fieldStr = @"        if (name == ""{0}"") return {1};";
-            string methodStr = @"        if (name == ""{0}"") return {1}.GetInstance(m_Script, obj);";
+            string methodStr = @"        if (name == ""{0}"") return {1}.GetMethod(m_Script);";
             StringBuilder builder = new StringBuilder();
             bool first = true;
             //所有类变量
