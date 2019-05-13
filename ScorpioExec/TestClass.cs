@@ -10,6 +10,7 @@ public class TestClass {
     public Action testAction1;
     public Action<int> testAction2;
     public Func<int> testAction3;
+    public int tttt = 100;
     public Func<int,int, int, int> testAction4;
     public void Test() {
         if (testAction1 != null) {
@@ -24,7 +25,9 @@ public class TestClass {
         if (testAction4 != null) {
             Console.WriteLine("test4 : " + testAction4(100,200,300));
         }
+        Console.WriteLine("-----------------------------");
     }
+    public int TestPro { get; set; }
     public static TestClass operator + (TestClass a, TestClass b) {
         return a;
     }

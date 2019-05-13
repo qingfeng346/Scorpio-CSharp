@@ -97,6 +97,7 @@ namespace ScorpioExec
                     script.PushSearchPath(path);
                     script.PushSearchPath(CurrentDirectory);
                     //script.SetObject("__PATH__", path);
+                    script.PushFastReflectClass(typeof(TestClass), new ScorpioClass_TestClass(script));
                     Console.WriteLine("=============================");
                     var value = script.LoadFile(file);
                     Console.WriteLine("=============================");
@@ -147,11 +148,10 @@ build date : {Scorpio.Version.date}");
                 } else {
                     Execute(args);
                 }
-                //var types = new Type[] { typeof(TestClass) };
-                //var generate = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(TestClass));
-                ////generate.SetClassFilter(new Filter());
-                //File.WriteAllBytes(@"E:\Scorpio-CSharp\ScorpioExec\ScorpioTestClass.cs", Encoding.UTF8.GetBytes(generate.Generate()));
-                //FileUtil.CreateFile(EditorUtil.ScriptBuildPath + generate.ScorpioClassName + ".cs", generate.Generate());
+                var types = new Type[] { typeof(TestClass) };
+                var generate = new Scorpio.ScorpioReflect.GenerateScorpioClass(typeof(TestClass));
+                //generate.SetClassFilter(new Filter());
+                File.WriteAllBytes(@"E:\Scorpio-CSharp\ScorpioExec\ScorpioTestClass.cs", Encoding.UTF8.GetBytes(generate.Generate()));
 
             } catch (Exception e) {
                 Console.WriteLine(e.ToString());
