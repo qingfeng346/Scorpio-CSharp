@@ -247,7 +247,7 @@ namespace Scorpio {
             return array;
         }
         public override ScriptObject Clone() {
-            var ret = m_Script.CreateArray();
+            var ret = new ScriptArray(m_Script);
             ret.m_Objects = new ScriptValue[m_Length];
             ret.m_Length = m_Length;
             for (int i = 0; i < m_Length; ++i) {

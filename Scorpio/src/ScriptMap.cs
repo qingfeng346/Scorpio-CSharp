@@ -53,14 +53,14 @@ namespace Scorpio {
             m_Objects.Remove(key);
         }
         public ScriptArray GetKeys() {
-            var ret = m_Script.CreateArray();
+            var ret = new ScriptArray(m_Script);
             foreach (var pair in m_Objects) {
                 ret.Add(m_Script.CreateObject(pair.Key));
             }
             return ret;
         }
         public ScriptArray GetValues() {
-            ScriptArray ret = m_Script.CreateArray();
+            var ret = new ScriptArray(m_Script);
             foreach (var pair in m_Objects) {
                 ret.Add(pair.Value);
             }
@@ -68,7 +68,7 @@ namespace Scorpio {
         }
 
         public override ScriptObject Clone() {
-            var ret = m_Script.CreateMap();
+            var ret = new ScriptMap(m_Script);
             foreach (var pair in m_Objects) {
                 var value = pair.Value;
                 if (value.valueType == ScriptValue.scriptValueType) {

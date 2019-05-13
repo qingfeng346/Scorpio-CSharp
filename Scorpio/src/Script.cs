@@ -24,8 +24,9 @@ namespace Scorpio {
         private List<Assembly> m_Assembly = new List<Assembly>();       //所有代码集合
         private List<string> m_SearchPath = new List<string>();         //request所有文件的路径集合
 
-        private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();            //所有的类集合
-        private Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();      //所有的类集合
+        private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                                      //所有的类集合
+        private Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();                                //所有的类集合
+        private Dictionary<Type, ScorpioFastReflectClass> m_FastReflectClass = new Dictionary<Type, ScorpioFastReflectClass>();     //所有去反射类集合
         
 
         public ScriptType TypeObject { get; private set; }                      //所有类型的基类
@@ -172,7 +173,11 @@ namespace Scorpio {
         public UserdataType GetType(Type type) {
             if (m_Types.ContainsKey(type))
                 return m_Types[type];
-            return m_Types[type] = new UserdataTypeReflect(this, type);
+            if (m_FastReflectClass.ContainsKey(type)) {
+                return m_Types[type] = new UserdataTypeFastReflect(this, type, m_FastReflectClass[type]);
+            } else {
+                return m_Types[type] = new UserdataTypeReflect(this, type);
+            }
         }
         public ScriptValue GetUserdataType(string name) {
             Type type = LoadType(name);
@@ -230,8 +235,11 @@ namespace Scorpio {
                 }
             }
         }
-
-        public ScriptArray CreateArray() { return new ScriptArray(this); }
+        //添加一个去反射类
+        public void PushFastReflectClass(Type type, ScorpioFastReflectClass value) {
+            if (value == null || type == null) { return; }
+            m_FastReflectClass[type] = value;
+        }
         public ScriptMap CreateMap() { return new ScriptMap(this); }
         public ScriptType CreateType(string typeName, ScriptType parentType) { return new ScriptType(this, typeName, parentType); }
         public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }

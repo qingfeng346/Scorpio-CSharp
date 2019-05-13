@@ -115,7 +115,7 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var removeEmpty = length > 1 ? args[1].valueType == ScriptValue.trueValueType : true;
                 var strs = thisObject.stringValue.Split(new string[] { args[0].ToString() }, removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
-                var ret = m_script.CreateArray();
+                var ret = new ScriptArray(m_script);
                 foreach (string str in strs) {
                     ret.Add(new ScriptValue(str));
                 }
@@ -130,7 +130,7 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var removeEmpty = length > 1 ? args[1].valueType == ScriptValue.trueValueType : true;
                 var strs = thisObject.stringValue.Split(args[0].Get<ScriptArray>().ToArray<string>(), removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
-                var ret = m_script.CreateArray();
+                var ret = new ScriptArray(m_script);
                 foreach (string str in strs) {
                     ret.Add(new ScriptValue(str));
                 }
