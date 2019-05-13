@@ -240,8 +240,16 @@ namespace Scorpio {
             if (value == null || type == null) { return; }
             m_FastReflectClass[type] = value;
         }
+        public ScriptArray CreateArray() { return new ScriptArray(this); }
         public ScriptMap CreateMap() { return new ScriptMap(this); }
         public ScriptType CreateType(string typeName, ScriptType parentType) { return new ScriptType(this, typeName, parentType); }
         public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }
+
+        public ScriptValue call(string name, params object[] args) {
+            return Global.GetValue(name).call(this, ScriptValue.Null, args);
+        }
+        public ScriptValue Call(String name, ScriptValue[] args, int length) {
+            return Global.GetValue(name).Call(ScriptValue.Null, args, length);
+        }
     }
 }

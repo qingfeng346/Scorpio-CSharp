@@ -88,6 +88,12 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 {key}");
             }
         }
+        public ScriptValue GetValue(string key) {
+            if (valueType == scriptValueType) {
+                return scriptValue.GetValue(key);
+            }
+            throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 {key}");
+        }
         public ScriptValue GetValue(string key, Script script) {
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);

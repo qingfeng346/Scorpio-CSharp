@@ -52,5 +52,8 @@ namespace Scorpio {
                 m_Objects[key] = value;
             }
         }
+        public bool HasValue(string key) {
+            return m_Indexs.ContainsKey(key);
+        }
     }
 }
