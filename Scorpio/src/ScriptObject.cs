@@ -13,12 +13,13 @@ namespace Scorpio {
     }
     public abstract class ScriptObject {
         protected static ScriptValue[] Parameters = new ScriptValue[64];
-        protected Script m_Script { get; set; }
+        protected Script m_Script;
         // 构图函数
         public ScriptObject(Script script, ObjectType objectType) {
             m_Script = script;
             ObjectType = objectType;
         }
+        public Script Script { get { return m_Script; } }
         public ObjectType ObjectType { get; private set; }                              //类型
         public virtual object Value { get { return this; } }                            //值
         public virtual Type ValueType { get { return GetType(); } }                     //值类型

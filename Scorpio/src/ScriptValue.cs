@@ -281,5 +281,11 @@ namespace Scorpio {
         public T Get<T>() where T : ScriptObject {
             return valueType == scriptValueType ? (scriptValue as T) : null;
         }
+        public bool IsNull { get { return valueType == nullValueType; } }
+        public bool IsTrue { get { return valueType == trueValueType; } }
+        public bool IsFalse { get { return valueType == falseValueType; } }
+        public bool IsNumber { get { return valueType == doubleValueType || valueType == longValueType; } }
+        public bool IsString { get { return valueType == stringValueType; } }
+        public bool IsScriptObject { get { return valueType == scriptValueType; } }
     }
 }

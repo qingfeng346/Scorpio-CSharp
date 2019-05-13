@@ -18,6 +18,9 @@ namespace Scorpio {
                 m_Values[key] = value;
             }
         }
+        public bool HasValue(string key) {
+            return m_Values.ContainsKey(key);
+        }
         public override bool Less(ScriptValue obj) {
             var type = Class;
             var func = type != null ? Class.GetOperator(ScriptOperator.Less) : null;
