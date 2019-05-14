@@ -10,8 +10,8 @@ namespace Scorpio.Commons {
             public int length;
             public Type[] types;
         }
-        private static MethodInfo[] m_VoidMethods = new MethodInfo[32];     //无返回值的数组 有效值只有 0 - 16
-        private static MethodInfo[] m_Methods = new MethodInfo[32];         //有返回值的数组 有效值只有 0 - 16
+        private static MethodInfo[] m_VoidMethods = new MethodInfo[17];     //无返回值的数组 有效值只有 0 - 16
+        private static MethodInfo[] m_Methods = new MethodInfo[17];         //有返回值的数组 有效值只有 0 - 16
         private static Dictionary<Type, DelegateData> m_DelegateDatas = new Dictionary<Type, DelegateData>();
         static ScorpioDelegateFactory() {
             var methods = typeof(ScriptDelegate).GetMethods(Script.BindingFlag);
