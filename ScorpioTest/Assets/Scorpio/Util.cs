@@ -9,7 +9,7 @@ using Scorpio.Exception;
 using System.Runtime.CompilerServices;
 namespace Scorpio {
     public static class Util {
-        private static readonly Type TYPE_VOID = typeof(void);
+        public static readonly Type TYPE_VOID = typeof(void);
         private static readonly Type TYPE_OBJECT = typeof(object);
         private static readonly Type TYPE_TYPE = typeof(Type);
         private static readonly Type TYPE_DELEGATE = typeof(Delegate);
