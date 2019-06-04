@@ -38,11 +38,13 @@ namespace Scorpio.Userdata {
                 m_Assembly.Add(assembly);
         }
         public static Type LoadType(string name) {
+            var type = Type.GetType(name, false, false);
+            if (type != null) return type;
             for (int i = 0; i < m_Assembly.Count; ++i) {
-                Type type = m_Assembly[i].GetType(name);
+                type = m_Assembly[i].GetType(name);
                 if (type != null) return type;
             }
-            return Type.GetType(name, false, false);
+            return null;
         }
         //加载扩展函数
         public static void LoadExtension(string type) {
