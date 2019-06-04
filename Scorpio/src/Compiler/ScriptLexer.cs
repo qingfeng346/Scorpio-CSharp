@@ -340,11 +340,7 @@ namespace Scorpio.Compiler {
             } while (true);
             TokenType tokenType;
             switch (m_Builder.ToString()) {
-                //case "eval":
-                //    tokenType = TokenType.Eval;
-                //    break;
                 case "var":
-                case "local":
                 case "let":
                     tokenType = TokenType.Var;
                     break;
@@ -403,15 +399,6 @@ namespace Scorpio.Compiler {
                 case "return":
                     tokenType = TokenType.Return;
                     break;
-                case "define":
-                    tokenType = TokenType.Define;
-                    break;
-                case "ifndef":
-                    tokenType = TokenType.Ifndef;
-                    break;
-                case "endif":
-                    tokenType = TokenType.Endif;
-                    break;
                 case "null":
                 case "nil":
                     tokenType = TokenType.Null;
@@ -423,9 +410,9 @@ namespace Scorpio.Compiler {
                 case "class":
                     tokenType = TokenType.Class;
                     break;
-                case "const":
-                    tokenType = TokenType.Const;
-                    break;
+                case "new":
+                    m_Builder.Length = 0;
+                    return;
                 default:
                     tokenType = TokenType.Identifier;
                     break;

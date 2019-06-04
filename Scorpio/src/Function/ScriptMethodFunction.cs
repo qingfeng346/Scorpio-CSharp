@@ -1,9 +1,11 @@
 ﻿using Scorpio.Userdata;
 namespace Scorpio.Function {
-    public abstract class ScriptMethodFunction : ScriptFunction {
+    public abstract class ScriptMethodFunction : ScriptObject {
         public UserdataMethod Method;
-        public ScriptMethodFunction(Script script, UserdataMethod method) : base(script, method.MethodName) {
+        public string MethodName;
+        public ScriptMethodFunction(UserdataMethod method) : base(ObjectType.Function) {
             Method = method;
+            MethodName = method.MethodName;
         }
     }
 }

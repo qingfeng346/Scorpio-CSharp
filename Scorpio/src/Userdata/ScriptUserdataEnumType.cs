@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Scorpio.Commons;
+using Scorpio.Tools;
 using Scorpio.Exception;
 namespace Scorpio.Userdata {
     /// <summary> 枚举 Type </summary>
     public class ScriptUserdataEnumType : ScriptUserdata {
         private ScorpioDictionaryString<ScriptValue> m_Enums = new ScorpioDictionaryString<ScriptValue>();     //所有枚举的值
-        public ScriptUserdataEnumType(Script script, Type value) : base(script) {
+        public ScriptUserdataEnumType(Type value) {
             this.m_Value = value;
             this.m_ValueType = value;
             var names = Enum.GetNames(value);
@@ -20,6 +20,14 @@ namespace Scorpio.Userdata {
             if (m_Enums.ContainsKey(key))
                 return m_Enums[key];
             throw new ExecutionException("枚举[" + m_ValueType.ToString() + "] 元素[" + key + "] 不存在");
+        }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            if (parameters[0].valueType == ScriptValue.stringValueType) {
+                var ignoreCase = length > 1 ? parameters[1].valueType == ScriptValue.trueValueType : false;
+                return new ScriptValue(Enum.Parse(m_ValueType, parameters[0].stringValue, ignoreCase));
+            } else {
+                return new ScriptValue(Enum.ToObject(m_ValueType, parameters[0].ToInt32()));
+            }
         }
     }
 }

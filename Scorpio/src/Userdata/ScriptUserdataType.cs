@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using Scorpio.Function;
 using Scorpio.Exception;
-using Scorpio.Commons;
+using Scorpio.Tools;
 namespace Scorpio.Userdata {
     /// <summary> 普通Object Type类型 </summary>
     public class ScriptUserdataType : ScriptUserdata {
         protected UserdataType m_UserdataType;
         protected Dictionary<string, ScriptValue> m_Methods = new Dictionary<string, ScriptValue>();
-        public ScriptUserdataType(Script script, Type value, UserdataType type) : base(script) {
+        public ScriptUserdataType(Type value, UserdataType type) {
             this.m_Value = value;
             this.m_ValueType = value;
             this.m_UserdataType = type;
@@ -21,9 +21,9 @@ namespace Scorpio.Userdata {
             if (m_Methods.ContainsKey(key)) return m_Methods[key];
             var ret = m_UserdataType.GetValue(null, key);
             if (ret is UserdataMethod) {
-                return m_Methods[key] = new ScriptValue(new ScriptStaticMethodFunction(m_Script, (UserdataMethod)ret));
+                return m_Methods[key] = new ScriptValue(new ScriptStaticMethodFunction((UserdataMethod)ret));
             }
-            return m_Script.CreateObject(ret);
+            return ScriptValue.CreateObject(ret);
         }
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(null, key, value);

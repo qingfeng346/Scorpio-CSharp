@@ -2,7 +2,6 @@
 namespace Scorpio.Userdata {
     //一个类的变量
     public abstract class UserdataVariable {
-        protected Script m_Script;
         public string Name { get; protected set; }
         public Type FieldType { get; protected set; }
         public abstract object GetValue(object obj);

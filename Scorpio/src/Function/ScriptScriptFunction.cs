@@ -11,7 +11,7 @@ namespace Scorpio.Function {
             m_internalValues[index] = value;
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return m_Context.Execute(thisObject, parameters, length, m_internalValues);
+            return m_Context.Execute(m_BindObject.valueType == ScriptValue.nullValueType ? thisObject : m_BindObject, parameters, length, m_internalValues);
         }
         public override ScriptObject Clone() {
             return new ScriptScriptFunction(m_Context);

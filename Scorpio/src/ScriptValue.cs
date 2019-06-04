@@ -1,16 +1,18 @@
-﻿using Scorpio.Commons;
+﻿using Scorpio.Tools;
 using Scorpio.Exception;
+using System;
+using Scorpio.Userdata;
 namespace Scorpio {
     public struct ScriptValue {
         public const string Prototype = "prototype";
-        public const byte nullValueType = 0;
-        public const byte scriptValueType = 1;
-        public const byte doubleValueType = 2;
-        public const byte longValueType = 3;
-        public const byte trueValueType = 4;
-        public const byte falseValueType = 5;
-        public const byte stringValueType = 6;
-        public const byte objectValueType = 7;
+        public const byte nullValueType = 0;        //null
+        public const byte scriptValueType = 1;      //脚本变量
+        public const byte doubleValueType = 2;      //double
+        public const byte longValueType = 3;        //long
+        public const byte trueValueType = 4;        //true
+        public const byte falseValueType = 5;       //false
+        public const byte stringValueType = 6;      //string
+        public const byte objectValueType = 7;      //除了 double long 以外的number类型 和 枚举
 
         public static readonly ScriptValue[] EMPTY = new ScriptValue[0];
 
@@ -18,6 +20,7 @@ namespace Scorpio {
         public static readonly ScriptValue True = new ScriptValue(true);
         public static readonly ScriptValue False = new ScriptValue(false);
         public static readonly ScriptValue Zero = new ScriptValue(0.0);
+
 
         public byte valueType;
         public double doubleValue;
@@ -27,20 +30,12 @@ namespace Scorpio {
         public object objectValue;
 
         public ScriptValue(ScriptObject value) {
-            this.valueType = scriptValueType;
+            this.valueType = value == null ? nullValueType : scriptValueType; ;
             this.scriptValue = value;
             this.doubleValue = 0;
             this.longValue = 0;
             this.stringValue = null;
             this.objectValue = null;
-        }
-        public ScriptValue(object value) {
-            this.valueType = value == null ? nullValueType : objectValueType;
-            this.scriptValue = null;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.objectValue = value;
         }
         public ScriptValue(bool value) {
             this.valueType = value ? trueValueType : falseValueType;
@@ -143,12 +138,11 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 {key}");
             }
         }
-
         //调用函数
-        public ScriptValue call(Script script, ScriptValue thisObject, params object[] args) {
+        public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
             var parameters = new ScriptValue[length];
-            for (var i = 0; i < length; ++i) parameters[i] = script.CreateObject(args[i]);
+            for (var i = 0; i < length; ++i) parameters[i] = CreateObject(args[i]);
             return Call(thisObject, parameters, length);
         }
         //调用无参函数
@@ -195,6 +189,89 @@ namespace Scorpio {
                 }
             }
         }
+        public int ToInt32() {
+            switch (valueType) {
+                case doubleValueType: return System.Convert.ToInt32(doubleValue);
+                case longValueType: return System.Convert.ToInt32(longValue);
+                case objectValueType: return System.Convert.ToInt32(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
+            }
+        }
+        public T Get<T>() where T : ScriptObject {
+            return valueType == scriptValueType ? (scriptValue as T) : null;
+        }
+        public bool IsNull { get { return valueType == nullValueType; } }
+        public bool IsTrue { get { return valueType == trueValueType; } }
+        public bool IsFalse { get { return valueType == falseValueType; } }
+        public bool IsNumber { get { return valueType == doubleValueType || valueType == longValueType; } }
+        public bool IsString { get { return valueType == stringValueType; } }
+        public bool IsScriptObject { get { return valueType == scriptValueType; } }
+
+        public ScriptValue(sbyte value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null; 
+            this.objectValue = value;
+        }
+        public ScriptValue(byte value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null; 
+            this.objectValue = value;
+        }
+        public ScriptValue(short value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null; 
+            this.objectValue = value;
+        }
+        public ScriptValue(ushort value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null; 
+            this.objectValue = value;
+        }
+        public ScriptValue(int value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null; 
+            this.objectValue = value;
+        }
+        public ScriptValue(uint value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null; 
+            this.objectValue = value;
+        }
+        public ScriptValue(ulong value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null; 
+            this.objectValue = value;
+        }
+        public ScriptValue(object value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null; 
+            this.objectValue = value;
+        }
+
         public string ToJson() {
             switch (valueType) {
                 case scriptValueType: return scriptValue.ToJson();
@@ -204,7 +281,8 @@ namespace Scorpio {
                 case falseValueType: return "false";
                 case stringValueType: return $"\"{stringValue.Replace("\"", "\\\"")}\"";
                 case nullValueType: return "null";
-                default: return base.ToString();  
+                case objectValueType: return objectValue.ToString();
+                default: return "";
             }
         }
         public override string ToString() {
@@ -217,11 +295,9 @@ namespace Scorpio {
                 case nullValueType: return "null";
                 case scriptValueType: return scriptValue.ToString();
                 case objectValueType: return objectValue.ToString();
-                default: return base.ToString();
+                default: return "";
             }
         }
-
-
         public override int GetHashCode() {
             return base.GetHashCode();
         }
@@ -254,6 +330,9 @@ namespace Scorpio {
                 default: return true;
             }
         }
+
+
+
         public static bool operator ==(ScriptValue a1, ScriptValue a2) {
             return a1.Equals(a2);
         }
@@ -270,28 +349,58 @@ namespace Scorpio {
         public static implicit operator ScriptValue(long value) {
             return new ScriptValue(value);
         }
-        //public static implicit operator ScriptValue(string value) {
-        //    return new ScriptValue(value);
-        //}
+        public static implicit operator ScriptValue(string value) {
+            return new ScriptValue(value);
+        }
+        public static ScriptValue CreateObject(object value) {
+            if (value == null)
+                return Null;
+            else if (value is bool)
+                return (bool)value ? True : False;
+            else if (value is string)
+                return new ScriptValue((string)value);
+            else if (value is long)
+                return new ScriptValue((long)value);
+            else if (value is double)
+                return new ScriptValue((double)value);
+            else if (value is sbyte || value is byte || value is short || value is ushort || value is int || value is uint || value is float || value is decimal)
+                return new ScriptValue(System.Convert.ToDouble(value));
+            else if (value is ScriptValue)
+                return (ScriptValue)value;
+            else if (value is ScriptObject)
+                return new ScriptValue((ScriptObject)value);
+            else if (value is Type)
+                return TypeManager.GetUserdataType((Type)value);
+            else if (value is Delegate)
+                return new ScriptValue(new ScriptUserdataDelegate((Delegate)value));
+            else if (value is Enum)
+                return new ScriptValue(value);
+            return new ScriptValue(new ScriptUserdataObject(value, TypeManager.GetType(value.GetType())));
+        }
 
 
-
-
-        public int ToInt32() {
-            switch (valueType) {
-                case doubleValueType: return System.Convert.ToInt32(doubleValue);
-                case longValueType: return System.Convert.ToInt32(longValue);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
+        public bool Less(ScriptValue value) {
+            if (valueType == ScriptValue.scriptValueType) {
+                return scriptValue.Less(value);
+            } else if (valueType == value.valueType) {
+                switch (valueType) {
+                    case ScriptValue.doubleValueType: return doubleValue < value.doubleValue;
+                    case ScriptValue.longValueType: return longValue < value.longValue;
+                }
             }
+            throw new ExecutionException("【<】运算符不支持当前类型 : " + ValueTypeName);
         }
-        public T Get<T>() where T : ScriptObject {
-            return valueType == scriptValueType ? (scriptValue as T) : null;
+        public bool Greater(ScriptValue value) {
+            if (valueType == ScriptValue.scriptValueType) {
+                return scriptValue.Greater(value);
+            } else if (valueType == value.valueType) {
+                switch (valueType) {
+                    case ScriptValue.doubleValueType: return doubleValue > value.doubleValue;
+                    case ScriptValue.longValueType: return longValue > value.longValue;
+                }
+            }
+            throw new ExecutionException("【>】运算符不支持当前类型 : " + ValueTypeName);
         }
-        public bool IsNull { get { return valueType == nullValueType; } }
-        public bool IsTrue { get { return valueType == trueValueType; } }
-        public bool IsFalse { get { return valueType == falseValueType; } }
-        public bool IsNumber { get { return valueType == doubleValueType || valueType == longValueType; } }
-        public bool IsString { get { return valueType == stringValueType; } }
-        public bool IsScriptObject { get { return valueType == scriptValueType; } }
+
     }
 }

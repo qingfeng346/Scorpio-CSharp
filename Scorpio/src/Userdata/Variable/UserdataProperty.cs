@@ -3,8 +3,7 @@ using Scorpio.Exception;
 namespace Scorpio.Userdata {
     public class UserdataProperty : UserdataVariable {
         private PropertyInfo m_Property;
-        public UserdataProperty(Script script, PropertyInfo info) {
-            m_Script = script;
+        public UserdataProperty(PropertyInfo info) {
             m_Property = info;
             Name = info.Name;
             FieldType = info.PropertyType;

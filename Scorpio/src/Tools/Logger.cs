@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-namespace Scorpio.Commons {
+namespace Scorpio.Tools {
     public static class Logger {
         [Conditional("DEBUG")]
         public static void debug(bool condition, string format) {

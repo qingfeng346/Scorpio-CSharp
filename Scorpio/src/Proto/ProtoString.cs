@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Scorpio.Proto {
@@ -9,12 +8,14 @@ namespace Scorpio.Proto {
             var ret = script.CreateType("String", parentType);
             ret.SetValue("format", script.CreateFunction(new format()));
             ret.SetValue("csFormat", script.CreateFunction(new csFormat()));
-            ret.SetValue("isNullOrEmpty", script.CreateFunction(new isnullorempty()));
+            ret.SetValue("isNullOrEmpty", script.CreateFunction(new isNullOrEmpty()));
             ret.SetValue("join", script.CreateFunction(new join()));
 
             ret.SetValue("length", script.CreateFunction(new length()));
             ret.SetValue("count", script.CreateFunction(new length()));
             ret.SetValue("at", script.CreateFunction(new at()));
+            ret.SetValue("insert", script.CreateFunction(new insert()));
+            ret.SetValue("remove", script.CreateFunction(new remove()));
             ret.SetValue("toLower", script.CreateFunction(new toLower()));
             ret.SetValue("toUpper", script.CreateFunction(new toUpper()));
             ret.SetValue("trim", script.CreateFunction(new trim()));
@@ -26,8 +27,8 @@ namespace Scorpio.Proto {
             ret.SetValue("startsWith", script.CreateFunction(new startsWith()));
             ret.SetValue("endsWith", script.CreateFunction(new endsWith()));
             ret.SetValue("contains", script.CreateFunction(new contains()));
+            ret.SetValue("sub", script.CreateFunction(new sub()));
             ret.SetValue("split", script.CreateFunction(new split(script)));
-            ret.SetValue("splitArray", script.CreateFunction(new splitArray(script)));
             return ret;
         }
         private class length : ScorpioHandle {
@@ -38,6 +39,24 @@ namespace Scorpio.Proto {
         private class at : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return (double)thisObject.stringValue[args[0].ToInt32()];
+            }
+        }
+        private class insert : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (length == 2) {
+                    return new ScriptValue(thisObject.stringValue.Insert(args[0].ToInt32(), args[1].ToString()));
+                }
+                return thisObject;
+            }
+        }
+        private class remove : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (length == 1) {
+                    return new ScriptValue(thisObject.stringValue.Remove(args[0].ToInt32()));
+                } else if (length == 2) {
+                    return new ScriptValue(thisObject.stringValue.Remove(args[0].ToInt32(), args[0].ToInt32()));
+                }
+                return thisObject;
             }
         }
         private class toLower : ScorpioHandle {
@@ -107,29 +126,25 @@ namespace Scorpio.Proto {
                 return thisObject.stringValue.Contains(args[0].ToString()) ? ScriptValue.True : ScriptValue.False;
             }
         }
+        private class sub : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (length == 0)
+                    return thisObject;
+                else if (length == 1)
+                    return new ScriptValue(thisObject.ToString().Substring(args[0].ToInt32()));
+                else
+                    return new ScriptValue(thisObject.ToString().Substring(args[0].ToInt32(), args[1].ToInt32()));
+            }
+        }
         private class split : ScorpioHandle {
             private Script m_script;
             public split(Script script) {
                 this.m_script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var removeEmpty = length > 1 ? args[1].valueType == ScriptValue.trueValueType : true;
-                var strs = thisObject.stringValue.Split(new string[] { args[0].ToString() }, removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
-                var ret = new ScriptArray(m_script);
-                foreach (string str in strs) {
-                    ret.Add(new ScriptValue(str));
-                }
-                return new ScriptValue(ret);
-            }
-        }
-        private class splitArray : ScorpioHandle {
-            private Script m_script;
-            public splitArray(Script script) {
-                this.m_script = script;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var removeEmpty = length > 1 ? args[1].valueType == ScriptValue.trueValueType : true;
-                var strs = thisObject.stringValue.Split(args[0].Get<ScriptArray>().ToArray<string>(), removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
+                var splits = new string[length];
+                for (var i = 0; i < length; ++i) { splits[i] = args[i].ToString(); }
+                var strs = thisObject.stringValue.Split(splits, StringSplitOptions.RemoveEmptyEntries);
                 var ret = new ScriptArray(m_script);
                 foreach (string str in strs) {
                     ret.Add(new ScriptValue(str));
@@ -172,10 +187,13 @@ namespace Scorpio.Proto {
                 return new ScriptValue(string.Format(format, objs));
             }
         }
-        private class isnullorempty : ScorpioHandle {
+        private class isNullOrEmpty : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (args[0].valueType != ScriptValue.stringValueType) { return true; }
-                return string.IsNullOrEmpty(args[0].stringValue) ? ScriptValue.True : ScriptValue.False;
+                switch (args[0].valueType) {
+                    case ScriptValue.nullValueType: return ScriptValue.True;
+                    case ScriptValue.stringValueType: return string.IsNullOrEmpty(args[0].stringValue) ? ScriptValue.True : ScriptValue.False;
+                    default: return ScriptValue.False;
+                }
             }
         }
         private class join : ScorpioHandle {

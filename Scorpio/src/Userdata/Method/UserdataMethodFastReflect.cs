@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Scorpio.Userdata {
     public class UserdataMethodFastReflect : UserdataMethod {
         public UserdataMethodFastReflect(Script script, Type type, string methodName, ScorpioFastReflectMethodInfo[] methods, ScorpioFastReflectMethod fastMethod):
-            base(script, type, methodName) {
+            base(type, methodName) {
             Initialize(methods, fastMethod);
         }
         void Initialize(ScorpioFastReflectMethodInfo[] methods, ScorpioFastReflectMethod fastMethod) {

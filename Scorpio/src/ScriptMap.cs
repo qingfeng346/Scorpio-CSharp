@@ -9,8 +9,11 @@ using Scorpio.Exception;
 namespace Scorpio {
     //脚本map类型
     public class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
+        private Script m_Script;
         private Dictionary<object, ScriptValue> m_Objects = new Dictionary<object, ScriptValue>();  //所有的数据(函数和数据都在一个数组)
-        public ScriptMap(Script script) : base(script, ObjectType.Map, script.TypeMap) { }
+        public ScriptMap(Script script) : base(ObjectType.Map, script.TypeMap) {
+            m_Script = script;
+        }
         public IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
 
@@ -35,7 +38,9 @@ namespace Scorpio {
             }
         }
 
-
+        public override bool HasValue(string key) {
+            return m_Objects.ContainsKey(key);
+        }
         public bool ContainsKey(object key) {
             if (key == null) return false;
             return m_Objects.ContainsKey(key);
@@ -55,7 +60,7 @@ namespace Scorpio {
         public ScriptArray GetKeys() {
             var ret = new ScriptArray(m_Script);
             foreach (var pair in m_Objects) {
-                ret.Add(m_Script.CreateObject(pair.Key));
+                ret.Add(ScriptValue.CreateObject(pair.Key));
             }
             return ret;
         }

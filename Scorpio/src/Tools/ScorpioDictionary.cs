@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace Scorpio.Commons {
+namespace Scorpio.Tools {
     public class ScorpioValue<Key,Value> {
         public Key key;
         public Value value;
@@ -11,7 +11,34 @@ namespace Scorpio.Commons {
             return this;
         }
     }
-    public class ScorpioDictionary<Key, Value> {
+    public class ScorpioDictionary<Key, Value> : IEnumerable<ScorpioValue<Key, Value>> {
+        public struct Enumerator : IEnumerator<ScorpioValue<Key, Value>> {
+            private int length;
+            private int index;
+            private ScorpioDictionary<Key, Value> dictionary;
+            private ScorpioValue<Key, Value> current;
+            internal Enumerator(ScorpioDictionary<Key, Value> dictionary) {
+                this.dictionary = dictionary;
+                this.index = 0;
+                this.length = dictionary.Count;
+                this.current = null;
+            }
+            public bool MoveNext() {
+                if (index < length) {
+                    current = dictionary.mValues[index];
+                    index++;
+                    return true;
+                }
+                return false;
+            }
+            public ScorpioValue<Key, Value> Current { get { return current; } }
+            object System.Collections.IEnumerator.Current { get { return current; } }
+            public void Reset() {
+                index = 0;
+                current = null;
+            }
+            public void Dispose() { }
+        }
         private static readonly ScorpioValue<Key, Value>[] EmptyArray = new ScorpioValue<Key, Value>[0];
         protected int mSize;
         protected ScorpioValue<Key, Value>[] mValues;
@@ -19,6 +46,8 @@ namespace Scorpio.Commons {
             mValues = EmptyArray;
             mSize = 0;
         }
+        public IEnumerator<ScorpioValue<Key, Value>> GetEnumerator() { return new Enumerator(this); }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
         void SetCapacity(int value) {
             if (value > 0) {
                 var array = new ScorpioValue<Key, Value>[value];

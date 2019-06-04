@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Exception;
-using Scorpio.Commons;
+using Scorpio.Tools;
 namespace Scorpio {
     //脚本数组类型
     public class ScriptArray : ScriptInstance, IEnumerable<ScriptValue> {
@@ -54,10 +54,11 @@ namespace Scorpio {
             }
             public void Dispose() { }
         }
-
+        private Script m_Script;
         private ScriptValue[] m_Objects;
         private int m_Length;
-        public ScriptArray(Script script) : base(script, ObjectType.Array, script.TypeArray) {
+        public ScriptArray(Script script) : base(ObjectType.Array, script.TypeArray) {
+            m_Script = script;
             m_Objects = ScriptValue.EMPTY;
             m_Length = 0;
         }
@@ -84,7 +85,7 @@ namespace Scorpio {
         public IEnumerator<ScriptValue> GetIterator() { return new Enumerator(this); }
 
         public override ScriptValue GetValue(object index) {
-            if (index is double || index is long) {
+            if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
                 var i = Convert.ToInt32(index);
                 if (i >= m_Length) return ScriptValue.Null;
                 if (i < 0) throw new ExecutionException("数组获取变量索引小于0 index : " + i);
@@ -93,7 +94,7 @@ namespace Scorpio {
             return base.GetValue(index);
         }
         public override void SetValue(object index, ScriptValue value) {
-            if (index is double || index is long) {
+            if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
                 var i = Convert.ToInt32(index);
                 if (i >= m_Length) {
                     EnsureCapacity(i + 1);
@@ -242,7 +243,7 @@ namespace Scorpio {
         public T[] ToArray<T>() {
             var array = new T[m_Length];
             for (var i = 0; i < m_Length; ++i) {
-                array[i] = (T)Util.ChangeType(m_Script, m_Objects[i], typeof(T));
+                array[i] = (T)Util.ChangeType(m_Objects[i], typeof(T));
             }
             return array;
         }

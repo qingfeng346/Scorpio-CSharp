@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Scorpio.Commons;
+using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptGlobal : ScriptObject {
         private ScriptValue[] m_Objects = ScriptValue.EMPTY;                                //数据
         private int m_Size = 0;                                                             //有效数据数量
         private ScorpioDictionaryString<int> m_Indexs = new ScorpioDictionaryString<int>(); //名字到索引的映射
-        public ScriptGlobal(Script script) : base(script, ObjectType.Global) { }
+        public ScriptGlobal() : base(ObjectType.Global) { }
 
         void SetCapacity(int value) {
             if (value > 0) {

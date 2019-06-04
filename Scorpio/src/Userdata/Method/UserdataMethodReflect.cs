@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Scorpio.Commons;
+using Scorpio.Tools;
 namespace Scorpio.Userdata {
     public class UserdataMethodReflect : UserdataMethod {
         //构造函数
-        public UserdataMethodReflect(Script script, Type type, string methodName, ConstructorInfo[] methods) :
-            base(script, type, methodName) {
+        public UserdataMethodReflect(Type type, string methodName, ConstructorInfo[] methods) :
+            base(type, methodName) {
+            IsStructConstructor = type.IsValueType;
             Initialize(new List<MethodBase>(methods));
         }
         //普通函数
-        public UserdataMethodReflect(Script script, Type type, string methodName, MethodInfo[] methods) :
-            base(script, type, methodName) {
-            IsStructConstructor = type.IsValueType;
+        public UserdataMethodReflect(Type type, string methodName, MethodInfo[] methods) :
+            base(type, methodName) {
             Initialize(new List<MethodBase>(methods));
         }
         protected void Initialize(List<MethodBase> methods) {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using Scorpio.Exception;
-using Scorpio.Commons;
+using Scorpio.Tools;
 namespace Scorpio.Userdata {
     //反射类管理
     public class UserdataTypeReflect : UserdataType {
@@ -14,7 +14,7 @@ namespace Scorpio.Userdata {
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
         private Dictionary<string, ScriptValue> m_NestedTypes;          //所有的内部类
         private Dictionary<string, UserdataMethod> m_Functions;         //所有的函数
-        public UserdataTypeReflect(Script script, Type type) : base(script, type) {
+        public UserdataTypeReflect(Type type) : base(type) {
             m_InitializeConstructor = false;
             m_InitializeMethods = false;
             m_Methods = new List<MethodInfo>();
@@ -27,7 +27,7 @@ namespace Scorpio.Userdata {
         private void InitializeConstructor() {
             if (m_InitializeConstructor == true) return;
             m_InitializeConstructor = true;
-            m_Constructor = new UserdataMethodReflect(m_Script, m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors(Script.BindingFlag));
+            m_Constructor = new UserdataMethodReflect(m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors(Script.BindingFlag));
         }
         //初始化所有函数
         private void InitializeMethods() {
@@ -45,7 +45,7 @@ namespace Scorpio.Userdata {
                 }
             }
             if (methods.Count > 0)
-                return m_Functions[name] = new UserdataMethodReflect(m_Script, m_Type, name, methods.ToArray());
+                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods.ToArray());
             return null;
         }
         //获取一个变量
@@ -53,9 +53,9 @@ namespace Scorpio.Userdata {
             if (m_Variables.ContainsKey(name))
                 return m_Variables[name];
             FieldInfo fInfo = m_Type.GetTypeInfo().GetField(name, Script.BindingFlag);
-            if (fInfo != null) return m_Variables[name] = new UserdataField(m_Script, fInfo);
+            if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
             PropertyInfo pInfo = m_Type.GetTypeInfo().GetProperty(name, Script.BindingFlag);
-            if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Script, pInfo);
+            if (pInfo != null) return m_Variables[name] = new UserdataProperty(pInfo);
             //EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name, Script.BindingFlag);
             //if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);
             return null;
@@ -64,13 +64,13 @@ namespace Scorpio.Userdata {
         private ScriptValue GetNestedType(string name) {
             Type nestedType = m_Type.GetTypeInfo().GetNestedType(name, Script.BindingFlag);
             if (nestedType != null) {
-                return m_NestedTypes[name] = m_Script.GetUserdataType(nestedType);
+                return m_NestedTypes[name] = TypeManager.GetUserdataType(nestedType);
             }
             return ScriptValue.Null;
         }
         /// <summary> 创建一个实例 </summary>
         public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
-            return new ScriptUserdataObject(m_Script, m_Constructor.Call(false, null, parameters, length), this);
+            return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
         }
         //获得一个变量的类型
         protected override Type GetVariableType_impl(string name) {
@@ -94,7 +94,7 @@ namespace Scorpio.Userdata {
             UserdataVariable variable = GetVariable(name);
             if (variable == null) throw new ExecutionException("SetValue 类[" + m_Type + "] 变量 [" + name + "] 不存在");
             try {
-                variable.SetValue(obj, Util.ChangeType(m_Script, value, variable.FieldType));
+                variable.SetValue(obj, Util.ChangeType(value, variable.FieldType));
             } catch (System.Exception e) {
                 throw new ExecutionException("SetValue 出错 源类型:" + value.ValueTypeName + " 目标类型:" + variable.FieldType.Name + " : " + e.ToString());
             }

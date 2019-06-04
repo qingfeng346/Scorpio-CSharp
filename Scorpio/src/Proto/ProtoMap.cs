@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Scorpio.Proto {
+﻿namespace Scorpio.Proto {
     public class ProtoMap {
         public static ScriptType Load(Script script, ScriptType parentType) {
             var ret = script.CreateType("Map", parentType);

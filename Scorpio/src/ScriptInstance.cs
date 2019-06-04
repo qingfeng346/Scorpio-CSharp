@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
-using Scorpio.Commons;
+using Scorpio.Tools;
+using System.Text;
 namespace Scorpio {
     public class ScriptInstance : ScriptObject {
         protected ScorpioDictionaryString<ScriptValue> m_Values = new ScorpioDictionaryString<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
-        public ScriptInstance(Script script, ObjectType objectType, ScriptType type) : base(script, objectType) {
+        public ScriptInstance(ObjectType objectType, ScriptType type) : base(objectType) {
             m_Values[ScriptValue.Prototype] = new ScriptValue(type);
         }
         public override string ValueTypeName { get { return ToString(); } }            //变量名称
         public ScriptType Class { get { return m_Values[ScriptValue.Prototype].scriptValue as ScriptType; } }
         public override ScriptValue GetValue(string key) {
-            return m_Values.ContainsKey(key) ? m_Values[key] : (m_Values.ContainsKey(ScriptValue.Prototype) ? m_Values[ScriptValue.Prototype].GetValue(key, m_Script) : ScriptValue.Null);
+            return m_Values.ContainsKey(key) ? m_Values[key] : (m_Values.ContainsKey(ScriptValue.Prototype) ? m_Values[ScriptValue.Prototype].GetValue(key) : ScriptValue.Null);
         }
         public override void SetValue(string key, ScriptValue value) {
             if (value.valueType == ScriptValue.nullValueType) {
@@ -18,7 +19,7 @@ namespace Scorpio {
                 m_Values[key] = value;
             }
         }
-        public bool HasValue(string key) {
+        public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
         public override bool Less(ScriptValue obj) {
@@ -155,5 +156,18 @@ namespace Scorpio {
             return base.Call(thisObject, parameters, length);
         }
         public override string ToString() { return Class != null ? $"Object<{Class.TypeName}>" : "Object<null>"; }
+        //public override string ToJson() {
+        //    var builder = new StringBuilder();
+        //    builder.Append("{");
+        //    bool first = true;
+        //    foreach (var pair in m_Values) {
+        //        var value = pair.Value;
+        //        if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
+        //        if (first) { first = false; } else { builder.Append(","); }
+        //        builder.Append($"\"{pair.Key}\":{value.ToJson()}");
+        //    }
+        //    builder.Append("}");
+        //    return builder.ToString();
+        //}
     }
 }

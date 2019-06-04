@@ -4,10 +4,11 @@ using System.Text;
 using System.IO;
 using Scorpio.Exception;
 using System.Runtime.CompilerServices;
-namespace Scorpio.Commons {
+namespace Scorpio.Tools {
     public static class Util {
         public static readonly Type TYPE_VOID = typeof(void);
         public static readonly Type TYPE_OBJECT = typeof(object);
+        public static readonly Type TYPE_VALUE = typeof(ScriptValue);
         public static readonly Type TYPE_TYPE = typeof(Type);
         public static readonly Type TYPE_DELEGATE = typeof(Delegate);
         public static readonly Type TYPE_BOOL = typeof(bool);
@@ -36,14 +37,15 @@ namespace Scorpio.Commons {
         //是否是包含扩展函数类
         public static bool IsExtensionType(Type type) { return type.IsDefined(TYPE_EXTENSIONATTRIBUTE, false); }
 
-        public static object ChangeType(Script script, ScriptValue value, Type type) {
+        public static object ChangeType(ScriptValue value, Type type) {
+            if (type == TYPE_VALUE) { return value; }
             switch (value.valueType) {
                 case ScriptValue.doubleValueType:
                 case ScriptValue.longValueType:
                     return Convert.ChangeType(value.Value, type);
                 case ScriptValue.scriptValueType: {
                     if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type)) {
-                        return ScorpioDelegateFactory.CreateDelegate(script, type, value.scriptValue);
+                        return ScorpioDelegateFactory.CreateDelegate(type, value.scriptValue);
                     }
                     return value.scriptValue.Value;
                 }
@@ -51,7 +53,7 @@ namespace Scorpio.Commons {
             }
         }
         public static bool CanChangeType(ScriptValue value, Type type) {
-            if (type == TYPE_OBJECT) return true;
+            if (type == TYPE_OBJECT || type == TYPE_VALUE) return true;
             switch (value.valueType) {
                 case ScriptValue.trueValueType:
                 case ScriptValue.falseValueType:

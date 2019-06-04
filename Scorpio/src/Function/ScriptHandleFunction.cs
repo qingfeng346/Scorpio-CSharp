@@ -9,11 +9,7 @@ namespace Scorpio.Function {
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             try {
-                if (BindObject.valueType == ScriptValue.nullValueType) {
-                    return m_Handle.Call(thisObject, parameters, length);
-                } else {
-                    return m_Handle.Call(BindObject, parameters, length);
-                }
+                return m_Handle.Call(m_BindObject.valueType == ScriptValue.nullValueType ? thisObject : m_BindObject, parameters, length);
             } catch (System.Exception ex) {
                 throw new ExecutionException("CallFunction [" + FunctionName + "] is error : " + ex.ToString());
             }

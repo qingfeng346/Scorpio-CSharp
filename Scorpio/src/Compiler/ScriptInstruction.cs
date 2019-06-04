@@ -29,7 +29,8 @@
         LoadValueString,        //push a value by string
         LoadValueObject,        //push a value by object
         LoadValueObjectDup,     //push a value by object
-        CopyStackTop,           //赋值栈顶的数据
+        CopyStackTop,           //复制栈顶的数据
+        CopyStackTopIndex,      //复制栈顶的数据
         LoadEnd,
 
 
@@ -86,6 +87,7 @@
         JumpBegin,
         Jump,                   //跳转到执行索引
         Pop,                    //弹出栈顶的值
+        PopNumber,              //弹出一定数量的栈顶的值
         FalseTo,                //栈顶如果是false则跳转
         TrueTo,                 //栈顶如果是true则跳转
         FalseLoadFalse,         //如果是false则压入一个false

@@ -8,18 +8,16 @@ namespace Scorpio {
         Function,       //函数
         Instance,       //原表实例
         Enum,           //枚举
+        Namespace,      //namespace
         UserData,       //普通类
         Global,         //全局变量保存类,只有_G是这个类型
     }
     public abstract class ScriptObject {
         protected static ScriptValue[] Parameters = new ScriptValue[64];
-        protected Script m_Script;
         // 构图函数
-        public ScriptObject(Script script, ObjectType objectType) {
-            m_Script = script;
+        public ScriptObject(ObjectType objectType) {
             ObjectType = objectType;
         }
-        public Script Script { get { return m_Script; } }
         public ObjectType ObjectType { get; private set; }                              //类型
         public virtual object Value { get { return this; } }                            //值
         public virtual Type ValueType { get { return GetType(); } }                     //值类型
@@ -42,7 +40,7 @@ namespace Scorpio {
         public virtual bool GreaterOrEqual(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [>=] 运算"); }
         public virtual bool Equals(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.scriptValue == this; }
         public override int GetHashCode() { return base.GetHashCode(); }
-        public override bool Equals(object obj) { return Equals(m_Script.CreateObject(obj)); }
+        public override bool Equals(object obj) { return Equals(ScriptValue.CreateObject(obj)); }
 
         public virtual ScriptValue Plus(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [+] 运算"); }
         public virtual ScriptValue Minus(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [-] 运算"); }
@@ -59,7 +57,7 @@ namespace Scorpio {
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
             var parameters = new ScriptValue[length];
-            for (var i = 0; i < length; ++i) parameters[i] = m_Script.CreateObject(args[i]);
+            for (var i = 0; i < length; ++i) parameters[i] = ScriptValue.CreateObject(args[i]);
             return Call(thisObject, parameters, length);
         }
         //调用函数

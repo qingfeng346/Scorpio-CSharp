@@ -1,5 +1,5 @@
 ﻿using System;
-using Scorpio.Commons;
+using Scorpio.Tools;
 namespace Scorpio.Userdata {
     public class ScriptUserdataDelegate : ScriptUserdata {
         private class FunctionParameter {
@@ -13,7 +13,7 @@ namespace Scorpio.Userdata {
         private Delegate m_Delegate;
         private FunctionParameter[] m_Parameters;
         private object[] m_Objects;
-        public ScriptUserdataDelegate(Script script, Delegate value) : base(script) {
+        public ScriptUserdataDelegate(Delegate value) {
             this.m_Delegate = value;
             this.m_Value = value;
             this.m_ValueType = value.GetType();
@@ -33,23 +33,23 @@ namespace Scorpio.Userdata {
                 if (i >= parameters.Length) {
                     m_Objects[i] = parameter.DefaultValue;
                 } else {
-                    m_Objects[i] = Util.ChangeType(m_Script, parameters[i], parameter.ParameterType);
+                    m_Objects[i] = Util.ChangeType(parameters[i], parameter.ParameterType);
                 }
             }
-            return m_Script.CreateObject(m_Delegate.DynamicInvoke(m_Objects));
+            return ScriptValue.CreateObject(m_Delegate.DynamicInvoke(m_Objects));
         }
         public override ScriptValue Plus(ScriptValue obj) {
-            return m_Script.CreateObject(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(m_Script, obj, m_ValueType)));
+            return ScriptValue.CreateObject(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(obj, m_ValueType)));
         }
         public override ScriptValue Minus(ScriptValue obj) {
             if (obj.valueType == ScriptValue.scriptValueType && obj.scriptValue is ScriptUserdataDelegate) {
-                return m_Script.CreateObject(Delegate.Remove(m_Delegate, (obj.scriptValue as ScriptUserdataDelegate).m_Delegate));
+                return ScriptValue.CreateObject(Delegate.Remove(m_Delegate, (obj.scriptValue as ScriptUserdataDelegate).m_Delegate));
             }
             return base.Minus(obj); 
         }
         public override ScriptValue GetValue(string key) {
             if (key == "Type") {
-                return m_Script.GetUserdataType(m_ValueType);
+                return TypeManager.GetUserdataType(m_ValueType);
             }
             return base.GetValue(key);
         }

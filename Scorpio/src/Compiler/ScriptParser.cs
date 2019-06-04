@@ -115,6 +115,7 @@ namespace Scorpio.Compiler {
                 internalCount = executable.InternalCount,
                 parameterCount = 0,
                 param = false,
+                internals = new int[0],
             };
         }
         //解析整个文件
@@ -258,6 +259,55 @@ namespace Scorpio.Compiler {
         }
         //解析for语句
         void ParseFor() {
+            var startIndex = m_indexToken;
+            ReadLeftParenthesis();
+            if (PeekToken().Type == TokenType.Var) ReadToken();
+            if (PeekToken().Type == TokenType.Identifier) {
+                var identifier = ReadIdentifier();
+                if (ReadToken().Type == TokenType.Assign) {
+                    var obj = GetObject();
+                    if (ReadToken().Type == TokenType.Comma) {
+                        ParseForSimple(identifier, obj);
+                        return;
+                    }
+                }
+            }
+            m_indexToken = startIndex;
+            ParseForNormal();
+        }
+        void ParseForSimple(string identifier, CodeObject obj) {
+            var line = GetSourceLine();
+            m_scriptExecutable.BeginStack();
+            var index = m_scriptExecutable.AddIndex(identifier);
+            PushObject(obj);
+            AddScriptInstruction(Opcode.StoreLocal, index, line);
+            PushObject(GetObject());
+            if (ReadToken().Type == TokenType.Comma) {
+                PushObject(GetObject());
+            } else {
+                UndoToken();
+                AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble(1), line);
+            }
+            var startIndex = AddScriptInstruction(Opcode.CopyStackTopIndex, 1, line);
+            AddScriptInstruction(Opcode.LoadLocal, index, line);
+            AddScriptInstructionWithoutValue(Opcode.GreaterOrEqual, line);
+            var falseTo = AddScriptInstruction(Opcode.FalseTo, 0, line);
+            ReadRightParenthesis();
+            ParseStatementBlock(ExecutableBlock.For);
+            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
+            AddScriptInstruction(Opcode.LoadLocal, index, line);
+            AddScriptInstructionWithoutValue(Opcode.Plus, line);
+            AddScriptInstruction(Opcode.StoreLocal, index, line);
+            AddScriptInstruction(Opcode.Jump, startIndex, line);
+            m_scriptExecutable.EndStack();
+            var endIndex = Index;
+            AddScriptInstruction(Opcode.PopNumber, 2, line);     //弹出栈顶的 end 和 step
+            m_scriptExecutable.SetValue(falseTo, endIndex);
+            foreach (var c in m_Continue) { m_scriptExecutable.SetValue(c, startIndex); }
+            foreach (var b in m_Break) { m_scriptExecutable.SetValue(b, endIndex); }
+        }
+        //正常for循环  for(;;)
+        void ParseForNormal() {
             ReadLeftParenthesis();
             var token = ReadToken();
             var endStackCount = 0;
@@ -462,38 +512,16 @@ namespace Scorpio.Compiler {
                     PushObject(oper.Left);
                     var leftIndex = AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse, obj.Line);
                     PushObject(oper.Right);
-                    var rightIndex = AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse, obj.Line);
                     m_scriptExecutable.SetValue(leftIndex, Index);
-                    m_scriptExecutable.SetValue(rightIndex, Index);
                 } else if (oper.TokenType == TokenType.Or) {
                     PushObject(oper.Left);
                     var leftIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue, obj.Line);
                     PushObject(oper.Right);
-                    var rightIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue, obj.Line);
                     m_scriptExecutable.SetValue(leftIndex, Index);
-                    m_scriptExecutable.SetValue(rightIndex, Index);
                 } else {
                     PushObject(oper.Left);
                     PushObject(oper.Right);
                     AddScriptInstructionWithoutValue(TempOperator.GetOpcode(oper.TokenType), obj.Line);
-                    //switch (oper.TokenType) {
-                    //    case TokenType.Plus: AddScriptInstructionWithoutValue(Opcode.Plus, obj.Line); break;
-                    //    case TokenType.Minus: AddScriptInstructionWithoutValue(Opcode.Minus, obj.Line); break;
-                    //    case TokenType.Multiply: AddScriptInstructionWithoutValue(Opcode.Multiply, obj.Line); break;
-                    //    case TokenType.Divide: AddScriptInstructionWithoutValue(Opcode.Divide, obj.Line); break;
-                    //    case TokenType.Modulo: AddScriptInstructionWithoutValue(Opcode.Modulo, obj.Line); break;
-                    //    case TokenType.InclusiveOr: AddScriptInstructionWithoutValue(Opcode.InclusiveOr, obj.Line); break;
-                    //    case TokenType.Combine: AddScriptInstructionWithoutValue(Opcode.Combine, obj.Line); break;
-                    //    case TokenType.XOR: AddScriptInstructionWithoutValue(Opcode.XOR, obj.Line); break;
-                    //    case TokenType.Shr: AddScriptInstructionWithoutValue(Opcode.Shr, obj.Line); break;
-                    //    case TokenType.Shi: AddScriptInstructionWithoutValue(Opcode.Shi, obj.Line); break;
-                    //    case TokenType.Greater: AddScriptInstructionWithoutValue(Opcode.Greater, obj.Line); break;
-                    //    case TokenType.GreaterOrEqual: AddScriptInstructionWithoutValue(Opcode.GreaterOrEqual, obj.Line); break;
-                    //    case TokenType.Less: AddScriptInstructionWithoutValue(Opcode.Less, obj.Line); break;
-                    //    case TokenType.LessOrEqual: AddScriptInstructionWithoutValue(Opcode.LessOrEqual, obj.Line); break;
-                    //    case TokenType.Equal: AddScriptInstructionWithoutValue(Opcode.Equal, obj.Line); break;
-                    //    case TokenType.NotEqual: AddScriptInstructionWithoutValue(Opcode.NotEqual, obj.Line); break;
-                    //}
                 }
             } else if (obj is CodeRegion) {
                 PushObject((obj as CodeRegion).Context);
@@ -501,11 +529,16 @@ namespace Scorpio.Compiler {
                 AddScriptInstruction(Opcode.NewFunction, (obj as CodeFunction).func, obj.Line);
             } else if (obj is CodeCallFunction) {
                 var func = obj as CodeCallFunction;
-                foreach (var par in func.Parameters) {
-                    PushObject(par);
-                }
+                foreach (var par in func.Parameters) { PushObject(par); }
                 PushObject(func.Member);
                 AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, obj.Line);
+                if (func.Variables != null) {
+                    foreach (var variable in func.Variables.Variables) {
+                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
+                        PushObject(variable.value);
+                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key), obj.Line);
+                    }
+                }
             } else if (obj is CodeArray) {
                 var array = obj as CodeArray;
                 foreach (var ele in array.Elements) {
@@ -637,11 +670,19 @@ namespace Scorpio.Compiler {
                 PushAssign(member as CodeAssign);
             } else if (member is CodeCallFunction) {
                 var func = member as CodeCallFunction;
-                foreach (var par in func.Parameters) {
-                    PushObject(par);
-                }
+                foreach (var par in func.Parameters) { PushObject(par); }
                 PushObject(func.Member);
-                AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Length, member.Line);
+                if (func.Variables == null) {
+                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Length, member.Line);
+                } else {
+                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, member.Line);
+                    foreach (var variable in func.Variables.Variables) {
+                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop, func.line);
+                        PushObject(variable.value);
+                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key), func.line);
+                    }
+                    AddScriptInstructionWithoutValue(Opcode.Pop, func.line);
+                }
             } else {
                 throw new ParserException("语法错误 " + member.GetType(), PeekToken());
             }
@@ -826,6 +867,9 @@ namespace Scorpio.Compiler {
                 } else if (token.Type == TokenType.LeftPar) {
                     UndoToken();
                     ret = GetCallFunction(ret);
+                    if (PeekToken().Type == TokenType.LeftBrace) {
+                        (ret as CodeCallFunction).Variables = GetMap();
+                    }
                 } else {
                     UndoToken();
                     break;

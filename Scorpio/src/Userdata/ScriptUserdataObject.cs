@@ -7,8 +7,8 @@ namespace Scorpio.Userdata {
     public class ScriptUserdataObject : ScriptUserdata {
         protected UserdataType m_UserdataType;
         protected Dictionary<string, ScriptValue> m_Methods = new Dictionary<string, ScriptValue>();
-        protected Dictionary<string, ScriptFunction> m_Operators = new Dictionary<string, ScriptFunction>();
-        public ScriptUserdataObject(Script script, object value, UserdataType type) : base(script) {
+        protected Dictionary<string, ScriptMethodFunction> m_Operators = new Dictionary<string, ScriptMethodFunction>();
+        public ScriptUserdataObject(object value, UserdataType type) {
             this.m_Value = value;
             this.m_ValueType = value.GetType();
             this.m_UserdataType = type;
@@ -17,19 +17,19 @@ namespace Scorpio.Userdata {
             if (m_Methods.ContainsKey(key)) return m_Methods[key];
             var ret = m_UserdataType.GetValue(m_Value, key);
             if (ret is UserdataMethod) {
-                return m_Methods[key] = new ScriptValue(new ScriptInstanceMethodFunction(m_Script, (UserdataMethod)ret, m_Value));
+                return m_Methods[key] = new ScriptValue(new ScriptInstanceMethodFunction((UserdataMethod)ret, m_Value));
             }
-            return m_Script.CreateObject(ret);
+            return ScriptValue.CreateObject(ret);
         }
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(m_Value, key, value);
         }
         public override string ToString() { return m_Value.ToString(); }
-        ScriptFunction GetOperator(string oper) {
+        ScriptMethodFunction GetOperator(string oper) {
             if (m_Operators.ContainsKey(oper)) return m_Operators[oper];
             var ret = m_UserdataType.GetValue(m_Value, oper);
             if (ret is UserdataMethod) {
-                return m_Operators[oper] = new ScriptStaticMethodFunction(m_Script, (UserdataMethod)ret);
+                return m_Operators[oper] = new ScriptStaticMethodFunction((UserdataMethod)ret);
             }
             return m_Operators[oper] = null;
         }

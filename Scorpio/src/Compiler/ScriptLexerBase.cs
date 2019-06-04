@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Exception;
-using Scorpio.Commons;
+using Scorpio.Tools;
 namespace Scorpio.Compiler {
     /// <summary> 脚本语法解析 </summary>
     public partial class ScriptLexer {

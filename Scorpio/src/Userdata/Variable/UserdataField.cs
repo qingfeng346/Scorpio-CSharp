@@ -2,8 +2,7 @@
 namespace Scorpio.Userdata {
     public class UserdataField : UserdataVariable {
         private FieldInfo m_Field;
-        public UserdataField(Script script, FieldInfo info) {
-            m_Script = script;
+        public UserdataField(FieldInfo info) {
             m_Field = info;
             Name = info.Name;
             FieldType = info.FieldType;

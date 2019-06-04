@@ -1,11 +1,10 @@
 ﻿using System;
-using Scorpio.Commons;
+using Scorpio.Tools;
 using Scorpio.Exception;
 using System.Collections.Generic;
 using System.Reflection;
 namespace Scorpio.Userdata {
     public abstract class UserdataMethod {
-        protected Script m_Script;                              //所在脚本引擎
         protected Type m_Type;                                  //所在类
 
         protected FunctionData[] m_Methods;                     //所有函数
@@ -16,8 +15,7 @@ namespace Scorpio.Userdata {
         public string MethodName { get; protected set; }        //函数名字
         public bool IsStructConstructor { get; protected set; } //是否是结构体构造函数,结构体无参构造函数不能获取到
 
-        public UserdataMethod(Script script, Type type, string methodName) {
-            m_Script = script;
+        public UserdataMethod(Type type, string methodName) {
             m_Type = type;
             MethodName = type.FullName + "." + methodName;
         }
@@ -36,7 +34,7 @@ namespace Scorpio.Userdata {
                         }
                     }
                     if (accord) {
-                        return new UserdataMethodGeneric(m_Script, m_Type, MethodName, method.Method.MakeGenericMethod(parameters));
+                        return new UserdataMethodGeneric(m_Type, MethodName, method.Method.MakeGenericMethod(parameters));
                     }
                 }
             }
@@ -111,7 +109,7 @@ namespace Scorpio.Userdata {
                     var parameterCount = methodInfo.ParameterCount;       //参数个数
                     var args = methodInfo.Args;                           //参数数组
                     for (int i = 0; i < parameterCount; ++i)
-                        args[i] = i >= length ? methodInfo.DefaultParameter[i - requiredNumber] : Util.ChangeType(m_Script, parameters[i], methodInfo.ParameterType[i]);
+                        args[i] = i >= length ? methodInfo.DefaultParameter[i - requiredNumber] : Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
                     return methodInfo.Invoke(obj);
                 }
             callArgMethod:
@@ -120,11 +118,11 @@ namespace Scorpio.Userdata {
                     var parameterCount = methodInfo.ParameterCount;       //参数个数
                     var args = methodInfo.Args;                           //参数数组
                     for (int i = 0; i < parameterCount; ++i)
-                        args[i] = i >= length ? methodInfo.DefaultParameter[i - requiredNumber] : Util.ChangeType(m_Script, parameters[i], methodInfo.ParameterType[i]);
+                        args[i] = i >= length ? methodInfo.DefaultParameter[i - requiredNumber] : Util.ChangeType(parameters[i], methodInfo.ParameterType[i]);
                     if (length > parameterCount) {
                         Array array = Array.CreateInstance(methodInfo.ParamType, length - parameterCount);
                         for (int i = parameterCount; i < length; ++i)
-                            array.SetValue(Util.ChangeType(m_Script, parameters[i], methodInfo.ParamType), i - parameterCount);
+                            array.SetValue(Util.ChangeType(parameters[i], methodInfo.ParamType), i - parameterCount);
                         args[parameterCount] = array;
                     } else {
                         args[parameterCount] = Array.CreateInstance(methodInfo.ParamType, 0);

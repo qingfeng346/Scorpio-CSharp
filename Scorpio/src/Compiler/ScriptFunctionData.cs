@@ -11,12 +11,10 @@ namespace Scorpio.Compiler {
         public int[] internals;                             //内部变量赋值
         public string ToString(double[] constDouble, long[] constLong, string[] constString) {
             var builder = new StringBuilder();
-            if (internals != null) {
-                foreach (var inter in internals) {
-                    int source = (inter >> 16);
-                    int target = (inter & 0xffff);
-                    builder.AppendLine($"internal  {source} => {target}");
-                }
+            foreach (var inter in internals) {
+                int source = (inter >> 16);
+                int target = (inter & 0xffff);
+                builder.AppendLine($"internal  {source} => {target}");
             }
             for (int i = 0; i < scriptInstructions.Length; ++i) {
                 var instruction = scriptInstructions[i];

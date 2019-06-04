@@ -8,11 +8,9 @@ using Scorpio.Variable;
 using Scorpio.Compiler;
 namespace Scorpio.Userdata {
     /// <summary> 一个c#类的所有数据 </summary>
-    public abstract class UserdataType {
-        protected Script m_Script;                                                              //脚本系统
+    public abstract class UserdataType {                                                           //脚本系统
         protected Type m_Type;                                                                  //c#类型
-        public UserdataType(Script script, Type type) {
-            m_Script = script;
+        public UserdataType(Type type) {
             m_Type = type;
         }
         /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
@@ -32,7 +30,7 @@ namespace Scorpio.Userdata {
                     if (!types[i].GetTypeInfo().BaseType.GetTypeInfo().IsAssignableFrom(parameters[i]))
                         throw new ExecutionException($"{m_Type.FullName} 泛型类第{i+1}个参数不符合传入规则 需要:{types[i].GetTypeInfo().BaseType.FullName} 传入:{parameters[i].FullName}");
                 }
-                return m_Script.GetUserdataType(m_Type.MakeGenericType(parameters));
+                return TypeManager.GetUserdataType(m_Type.MakeGenericType(parameters));
             }
             throw new ExecutionException($"类 {m_Type.FullName} 不是未定义的泛型类");
         }

@@ -30,7 +30,7 @@ namespace Scorpio.Userdata {
     public class UserdataTypeFastReflect : UserdataType {
         private ScorpioFastReflectClass m_Value;
         private UserdataMethodFastReflect m_Constructor;
-        public UserdataTypeFastReflect(Script script, Type type, ScorpioFastReflectClass value) : base(script, type) {
+        public UserdataTypeFastReflect(Type type, ScorpioFastReflectClass value) : base(type) {
             m_Value = value;
             m_Constructor = value.GetConstructor();
         }
@@ -38,8 +38,8 @@ namespace Scorpio.Userdata {
             //去反射类不支持去反射函数，需要在生成去反射数据时生成
         }
         public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
-            return new ScriptUserdataObject(m_Script, m_Constructor.Call(false, null, parameters, length), this);
-        }
+            return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
+        }  
         protected override Type GetVariableType_impl(string name) {
             return m_Value.GetVariableType(name);
         }

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Scorpio.Commons;
+using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptType : ScriptObject {
         private ScorpioDictionaryString<ScriptValue> m_Values = new ScorpioDictionaryString<ScriptValue>();   //所有的函数
-        public ScriptType(Script script, string typeName, ScriptType parentType) : base(script, ObjectType.Type) {
+        public ScriptType(string typeName, ScriptType parentType) : base(ObjectType.Type) {
             TypeName = typeName;
             if (parentType != null)
                 m_Values[ScriptValue.Prototype] = new ScriptValue(parentType);
@@ -17,10 +17,10 @@ namespace Scorpio {
             }
         }
         public override ScriptValue GetValue(string key) {
-            return m_Values.ContainsKey(key) ? m_Values[key] : (m_Values.ContainsKey(ScriptValue.Prototype) ? m_Values[ScriptValue.Prototype].GetValue(key, m_Script) : ScriptValue.Null);
+            return m_Values.ContainsKey(key) ? m_Values[key] : (m_Values.ContainsKey(ScriptValue.Prototype) ? m_Values[ScriptValue.Prototype].GetValue(key) : ScriptValue.Null);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            var ret = new ScriptValue(new ScriptInstance(m_Script, ObjectType.Instance, this));
+            var ret = new ScriptValue(new ScriptInstance(ObjectType.Instance, this));
             var constructor = GetOperator(ScriptOperator.Constructor);
             if (constructor != null) {
                 constructor.Call(ret, parameters, length);

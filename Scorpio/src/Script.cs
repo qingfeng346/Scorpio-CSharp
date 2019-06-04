@@ -4,12 +4,13 @@ using System.Reflection;
 using Scorpio.Compiler;
 using Scorpio.Exception;
 using System.Collections.Generic;
-using Scorpio.Commons;
+using Scorpio.Tools;
 using Scorpio.Function;
 using Scorpio.Library;
 using Scorpio.Runtime;
 using Scorpio.Proto;
 using Scorpio.Userdata;
+using Scorpio.Serialize;
 using System;
 namespace Scorpio {
     public class Script {
@@ -21,13 +22,7 @@ namespace Scorpio {
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
-        private List<Assembly> m_Assembly = new List<Assembly>();       //所有代码集合
         private List<string> m_SearchPath = new List<string>();         //request所有文件的路径集合
-
-        private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                                      //所有的类集合
-        private Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();                                //所有的类集合
-        private Dictionary<Type, ScorpioFastReflectClass> m_FastReflectClass = new Dictionary<Type, ScorpioFastReflectClass>();     //所有去反射类集合
-        
 
         public ScriptType TypeObject { get; private set; }                      //所有类型的基类
         public ScriptValue TypeObjectValue { get; private set; }                //所有类型的基类
@@ -54,10 +49,10 @@ namespace Scorpio {
 
 
         public Script() {
-            Global = new ScriptGlobal(this);
+            Global = new ScriptGlobal();
             Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
-            Global.SetValue(GLOBAL_SCRIPT, CreateObject(this));
-            Global.SetValue(GLOBAL_VERSION, CreateObject(typeof(Version)));
+            Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateObject(this));
+            Global.SetValue(GLOBAL_VERSION, ScriptValue.CreateObject(typeof(Version)));
 
             TypeObject = ProtoObject.Load(this);
             TypeObjectValue = new ScriptValue(TypeObject);
@@ -88,9 +83,9 @@ namespace Scorpio {
             Global.SetValue(TypeFunction.TypeName, TypeFunctionValue);
 
 
-            PushAssembly(typeof(object).GetTypeInfo().Assembly);                        //mscorlib.dll
-            PushAssembly(typeof(System.Net.Sockets.Socket).GetTypeInfo().Assembly);     //System.dll
-            PushAssembly(GetType().GetTypeInfo().Assembly);                             //当前所在的程序集
+            TypeManager.PushAssembly(typeof(object).GetTypeInfo().Assembly);                        //mscorlib.dll
+            TypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).GetTypeInfo().Assembly);     //System.dll
+            TypeManager.PushAssembly(GetType().GetTypeInfo().Assembly);                             //当前所在的程序集
             LoadLibrary();
         }
         public void LoadLibrary() {
@@ -119,29 +114,24 @@ namespace Scorpio {
         }
         public ScriptValue LoadBuffer(string breviary, byte[] buffer, Encoding encoding) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return LoadString(breviary, encoding.GetString(buffer, 0, buffer.Length));
+            if (buffer[0] == 0)
+                return Execute(breviary, SerializeUtil.Deserialize(buffer));
+            else
+                return Execute(breviary, SerializeUtil.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length)));
         }
         public ScriptValue LoadString(string buffer) {
             return LoadString(Undefined, buffer);
         }
         public ScriptValue LoadString(string breviary, string buffer) {
-            try {
-                if (Util.IsNullOrEmpty(buffer)) return ScriptValue.Null;
-                var scriptLexer = new ScriptLexer(buffer, breviary);
-                breviary = scriptLexer.Breviary;
-                var tokens = scriptLexer.GetTokens();
-                if (tokens.Count == 0) { return ScriptValue.Null; }
-                var scriptParser = new ScriptParser(tokens, breviary);
-                var functionData = scriptParser.Parse();
-                var contexts = new ScriptContext[scriptParser.Functions.Count];
-                for (int i = 0; i < scriptParser.Functions.Count; ++i) {
-                    contexts[i] = new ScriptContext(this, breviary, scriptParser.Functions[i], scriptParser.ConstDouble.ToArray(), scriptParser.ConstLong.ToArray(),
-                        scriptParser.ConstString.ToArray(), contexts);
-                }
-                return new ScriptContext(this, breviary, functionData, scriptParser.ConstDouble.ToArray(), scriptParser.ConstLong.ToArray(), scriptParser.ConstString.ToArray(), contexts).Execute(ScriptValue.Null, null, 0, null);
-            } catch (System.Exception e) {
-                throw new ScriptException("load string [" + breviary + "] is error : " + e.ToString());
+            if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
+            return Execute(breviary, SerializeUtil.Serialize(breviary, buffer));
+        }
+        ScriptValue Execute(string breviary, SerializeData data) {
+            var contexts = new ScriptContext[data.Functions.Length];
+            for (int i = 0; i < data.Functions.Length; ++i) {
+                contexts[i] = new ScriptContext(this, breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts);
             }
+            return new ScriptContext(this, breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts).Execute(ScriptValue.Null, null, 0, null);
         }
         public void PushSearchPath(string path) {
             if (!m_SearchPath.Contains(path))
@@ -158,95 +148,13 @@ namespace Scorpio {
         public void SetGlobal(string key, ScriptValue value) {
             Global.SetValue(key, value);
         }
-        public void PushAssembly(Assembly assembly) {
-            if (assembly == null) return;
-            if (!m_Assembly.Contains(assembly))
-                m_Assembly.Add(assembly);
-        }
-        public Type LoadType(string name) {
-            for (int i = 0; i < m_Assembly.Count; ++i) {
-                Type type = m_Assembly[i].GetType(name);
-                if (type != null) return type;
-            }
-            return Type.GetType(name, false, false);
-        }
-        public UserdataType GetType(Type type) {
-            if (m_Types.ContainsKey(type))
-                return m_Types[type];
-            if (m_FastReflectClass.ContainsKey(type)) {
-                return m_Types[type] = new UserdataTypeFastReflect(this, type, m_FastReflectClass[type]);
-            } else {
-                return m_Types[type] = new UserdataTypeReflect(this, type);
-            }
-        }
-        public ScriptValue GetUserdataType(string name) {
-            Type type = LoadType(name);
-            if (type == null) return ScriptValue.Null;
-            return GetUserdataType(type);
-        }
-        public ScriptValue GetUserdataType(Type type) {
-            if (m_UserdataTypes.ContainsKey(type))
-                return m_UserdataTypes[type];
-            if (Util.IsDelegate(type))
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(this, type));
-            else if (type.IsEnum)
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataEnumType(this, type));
-            else
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataType(this, type, GetType(type)));
-        }
-        public ScriptValue CreateObject(object value) {
-            if (value == null)
-                return ScriptValue.Null;
-            else if (value is bool)
-                return (bool)value ? ScriptValue.True : ScriptValue.False;
-            else if (value is string)
-                return new ScriptValue((string)value);
-            else if (value is long)
-                return new ScriptValue((long)value);
-            else if (value is double)
-                return new ScriptValue((double)value);
-            else if (value is sbyte || value is byte || value is short || value is ushort || value is int || value is uint || value is float || value is decimal)
-                return new ScriptValue(Util.ToDouble(value));
-            else if (value is ScriptValue)
-                return (ScriptValue)value;
-            else if (value is ScriptObject)
-                return new ScriptValue((ScriptObject)value);
-            else if (value is ScorpioHandle)
-                return new ScriptValue(new ScriptHandleFunction(this, (ScorpioHandle)value));
-            else if (value is Type)
-                return GetUserdataType((Type)value);
-            else if (value is Delegate)
-                return new ScriptValue(new ScriptUserdataDelegate(this, (Delegate)value));
-            else if (value is Enum)
-                return new ScriptValue(value);
-            return new ScriptValue(new ScriptUserdataObject(this, value, GetType(value.GetType())));
-        }
-        //加载扩展函数
-        public void LoadExtension(string type) {
-            LoadExtension(LoadType(type));
-        }
-        public void LoadExtension(Type type) {
-            if (type == null) return;
-            if (!Util.IsExtensionType(type)) return;
-            var methods = type.GetMethods(BindingFlag);
-            foreach (var method in methods) {
-                if (Util.IsExtensionMethod(method)) {
-                    GetType(method.GetParameters()[0].ParameterType).AddExtensionMethod(method);
-                }
-            }
-        }
-        //添加一个去反射类
-        public void PushFastReflectClass(Type type, ScorpioFastReflectClass value) {
-            if (value == null || type == null) { return; }
-            m_FastReflectClass[type] = value;
-        }
         public ScriptArray CreateArray() { return new ScriptArray(this); }
         public ScriptMap CreateMap() { return new ScriptMap(this); }
-        public ScriptType CreateType(string typeName, ScriptType parentType) { return new ScriptType(this, typeName, parentType); }
+        public ScriptType CreateType(string typeName, ScriptType parentType) { return new ScriptType(typeName, parentType); }
         public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }
 
         public ScriptValue call(string name, params object[] args) {
-            return Global.GetValue(name).call(this, ScriptValue.Null, args);
+            return Global.GetValue(name).call(ScriptValue.Null, args);
         }
         public ScriptValue Call(String name, ScriptValue[] args, int length) {
             return Global.GetValue(name).Call(ScriptValue.Null, args, length);
