@@ -14,6 +14,7 @@ namespace Scorpio {
         public ScriptMap(Script script) : base(ObjectType.Map, script.TypeMapValue) {
             m_Script = script;
         }
+        public Script getScript() { return m_Script; }
         public IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
 

@@ -20,7 +20,8 @@ namespace Scorpio {
         public static readonly ScriptValue Null = new ScriptValue();
         public static readonly ScriptValue True = new ScriptValue(true);
         public static readonly ScriptValue False = new ScriptValue(false);
-        public static readonly ScriptValue Zero = new ScriptValue(0.0);
+        public static readonly ScriptValue Zero = new ScriptValue((double)0);
+        public static readonly ScriptValue InvalidIndex = new ScriptValue((double)-1);
 
 
         public byte valueType;

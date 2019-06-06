@@ -129,7 +129,18 @@ namespace Scorpio {
             }
             return base.Shr(obj);
         }
-
+        public ScriptValue Call(ScriptValue parameter1) {
+            return Call(ScriptValue.Null, new ScriptValue[] { parameter1 }, 1);
+        }
+        public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2) {
+            return Call(ScriptValue.Null, new ScriptValue[] { parameter1, parameter2 }, 2);
+        }
+        public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2, ScriptValue parameter3) {
+            return Call(ScriptValue.Null, new ScriptValue[] { parameter1, parameter2, parameter3 }, 3);
+        }
+        public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2, ScriptValue parameter3, ScriptValue parameter4) {
+            return Call(ScriptValue.Null, new ScriptValue[] { parameter1, parameter2, parameter3, parameter4 }, 4);
+        }
         public ScriptValue Call(ScriptValue[] parameters, int length) {
             return Call(ScriptValue.Null, parameters, length);
         }
