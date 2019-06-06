@@ -22,7 +22,7 @@ namespace Scorpio {
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             var ret = new ScriptValue(new ScriptInstance(ObjectType.Instance, new ScriptValue(this)));
-            var constructor = m_Prototype.GetValue(ScriptOperator.Constructor).Get<ScriptFunction>();
+            var constructor = GetValue(ScriptOperator.Constructor).Get<ScriptFunction>();
             if (constructor != null) {
                 constructor.Call(ret, parameters, length);
             }
