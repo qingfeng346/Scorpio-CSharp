@@ -13,6 +13,7 @@ namespace Scorpio.Userdata {
         public UserdataType(Type type) {
             m_Type = type;
         }
+        public Type Type { get { return m_Type; } }
         /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
         public Type GetVariableType(string name) { return GetVariableType_impl(name); }
         /// <summary> 获得一个类变量 </summary>

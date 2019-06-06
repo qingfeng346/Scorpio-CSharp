@@ -1,6 +1,7 @@
 ﻿using System;
 using Scorpio.Tools;
 namespace Scorpio.Userdata {
+    /// <summary> delegate object </summary>
     public class ScriptUserdataDelegate : ScriptUserdata {
         private class FunctionParameter {
             public Type ParameterType;

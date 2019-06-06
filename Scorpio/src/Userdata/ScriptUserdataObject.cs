@@ -24,12 +24,28 @@ namespace Scorpio.Userdata {
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(m_Value, key, value);
         }
+        public override ScriptValue GetValue(object index) {
+            var func = GetOperator(UserdataOperator.GetItem);
+            if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
+            return func.Call(ScriptValue.Null, new ScriptValue[] { ScriptValue.CreateObject(index) }, 1);
+        }
+        public override void SetValue(object index, ScriptValue value) {
+            var func = GetOperator(UserdataOperator.SetItem);
+            if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] set ]运算符重载");
+            func.Call(ScriptValue.Null, new ScriptValue[] { ScriptValue.CreateObject(index), value }, 2);
+        }
         public override string ToString() { return m_Value.ToString(); }
         ScriptMethodFunction GetOperator(string oper) {
             if (m_Operators.ContainsKey(oper)) return m_Operators[oper];
             var ret = m_UserdataType.GetValue(m_Value, oper);
             if (ret is UserdataMethod) {
-                return m_Operators[oper] = new ScriptStaticMethodFunction((UserdataMethod)ret);
+                switch (oper) {
+                    case UserdataOperator.SetItem:
+                    case UserdataOperator.GetItem:
+                        return m_Operators[oper] = new ScriptInstanceMethodFunction((UserdataMethod)ret, m_Value);
+                    default:
+                        return m_Operators[oper] = new ScriptStaticMethodFunction((UserdataMethod)ret);
+                }
             }
             return m_Operators[oper] = null;
         }

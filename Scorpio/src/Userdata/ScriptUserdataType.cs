@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Scorpio.Function;
-using Scorpio.Exception;
 using Scorpio.Tools;
 namespace Scorpio.Userdata {
     /// <summary> 普通Object Type类型 </summary>

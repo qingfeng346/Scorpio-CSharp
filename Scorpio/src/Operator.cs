@@ -26,20 +26,23 @@ namespace Scorpio {
     }
     //c#运算符重载
     public class UserdataOperator {
-        public const string Plus = "op_Addition";
-        public const string Minus = "op_Subtraction";
-        public const string Multiply = "op_Multiply";
-        public const string Divide = "op_Division";
-        public const string Modulo = "op_Modulus";
-        public const string InclusiveOr = "op_BitwiseOr";
-        public const string Combine = "op_BitwiseAnd";
-        public const string XOR = "op_ExclusiveOr";
-        public const string Shi = "op_LeftShift";
-        public const string Shr = "op_RightShift";
+        public const string Plus = "op_Addition";                       //运算符重载 +
+        public const string Minus = "op_Subtraction";                   //运算符重载 -
+        public const string Multiply = "op_Multiply";                   //运算符重载 *
+        public const string Divide = "op_Division";                     //运算符重载 /
+        public const string Modulo = "op_Modulus";                      //运算符重载 %
+        public const string InclusiveOr = "op_BitwiseOr";               //运算符重载 |
+        public const string Combine = "op_BitwiseAnd";                  //运算符重载 &
+        public const string XOR = "op_ExclusiveOr";                     //运算符重载 ^
+        public const string Shi = "op_LeftShift";                       //运算符重载 <<
+        public const string Shr = "op_RightShift";                      //运算符重载 >>
 
-        public const string Greater = "op_GreaterThan";
-        public const string GreaterOrEqual = "op_GreaterThanOrEqual";
-        public const string Less = "op_LessThan";
-        public const string LessOrEqual = "op_LessThanOrEqual";
+        public const string Greater = "op_GreaterThan";                 //运算符重载 >
+        public const string GreaterOrEqual = "op_GreaterThanOrEqual";   //运算符重载 >=
+        public const string Less = "op_LessThan";                       //运算符重载 <
+        public const string LessOrEqual = "op_LessThanOrEqual";         //运算符重载 >=
+
+        public const string GetItem = "get_Item";                       //运算符重载 [] get
+        public const string SetItem = "set_Item";                       //运算符重载 [] set
     }
 }

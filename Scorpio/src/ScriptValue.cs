@@ -380,6 +380,8 @@ namespace Scorpio {
                 return new ScriptValue(new ScriptUserdataDelegate((Delegate)value));
             else if (value is Enum)
                 return new ScriptValue(value);
+            else if (value is Array)
+                return new ScriptValue(new ScriptUserdataArray((Array)value, TypeManager.GetType(value.GetType())));
             return new ScriptValue(new ScriptUserdataObject(value, TypeManager.GetType(value.GetType())));
         }
 

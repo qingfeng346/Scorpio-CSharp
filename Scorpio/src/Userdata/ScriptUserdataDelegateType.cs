@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Scorpio.Function;
-using Scorpio.Exception;
 using Scorpio.Tools;
 namespace Scorpio.Userdata {
     /// <summary> 委托 Delegate Type </summary>

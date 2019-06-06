@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Scorpio.Tools;
 using Scorpio.Exception;
 namespace Scorpio.Userdata {
