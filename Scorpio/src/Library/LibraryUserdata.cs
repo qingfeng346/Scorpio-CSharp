@@ -1,6 +1,6 @@
 ﻿using Scorpio.Userdata;
 namespace Scorpio.Library {
-    public class LibraryUserdata {
+    public partial class LibraryUserdata {
         public static void Load(Script script) {
             var map = script.CreateMap();
             map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf()));

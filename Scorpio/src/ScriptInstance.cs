@@ -4,13 +4,14 @@ using System.Text;
 namespace Scorpio {
     public class ScriptInstance : ScriptObject {
         protected ScorpioDictionaryString<ScriptValue> m_Values = new ScorpioDictionaryString<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
-        public ScriptInstance(ObjectType objectType, ScriptType type) : base(objectType) {
-            m_Values[ScriptValue.Prototype] = new ScriptValue(type);
+        protected ScriptValue m_Prototype = ScriptValue.Null;
+        public ScriptInstance(ObjectType objectType, ScriptValue type) : base(objectType) {
+            m_Prototype = type;
         }
         public override string ValueTypeName { get { return ToString(); } }            //变量名称
-        public ScriptType Class { get { return m_Values[ScriptValue.Prototype].scriptValue as ScriptType; } }
+        public ScriptValue Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public override ScriptValue GetValue(string key) {
-            return m_Values.ContainsKey(key) ? m_Values[key] : (m_Values.ContainsKey(ScriptValue.Prototype) ? m_Values[ScriptValue.Prototype].GetValue(key) : ScriptValue.Null);
+            return m_Values.ContainsKey(key) ? m_Values[key] : m_Prototype.GetValue(key);
         }
         public override void SetValue(string key, ScriptValue value) {
             if (value.valueType == ScriptValue.nullValueType) {
@@ -23,40 +24,35 @@ namespace Scorpio {
             return m_Values.ContainsKey(key);
         }
         public override bool Less(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Less) : null;
+            var func = GetValue(ScriptOperator.Less).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1).valueType == ScriptValue.trueValueType;
             }
             return base.Less(obj);
         }
         public override bool LessOrEqual(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.LessOrEqual) : null;
+            var func = GetValue(ScriptOperator.LessOrEqual).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1).valueType == ScriptValue.trueValueType;
             }
             return base.LessOrEqual(obj);
         }
         public override bool Greater(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Greater) : null;
+            var func = GetValue(ScriptOperator.Greater).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1).valueType == ScriptValue.trueValueType;
             }
             return base.Greater(obj);
         }
         public override bool GreaterOrEqual(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.GreaterOrEqual) : null;
+            var func = GetValue(ScriptOperator.GreaterOrEqual).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1).valueType == ScriptValue.trueValueType;
             }
             return base.GreaterOrEqual(obj);
         }
         public override bool Equals(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Equal) : null;
+            var func = GetValue(ScriptOperator.Equal).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1).valueType == ScriptValue.trueValueType;
             }
@@ -64,80 +60,70 @@ namespace Scorpio {
         }
 
         public override ScriptValue Plus(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Plus) : null;
+            var func = GetValue(ScriptOperator.Plus).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.Plus(obj);
         }
         public override ScriptValue Minus(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Minus) : null;
+            var func = GetValue(ScriptOperator.Minus).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.Minus(obj);
         }
         public override ScriptValue Multiply(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Multiply) : null;
+            var func = GetValue(ScriptOperator.Multiply).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.Multiply(obj);
         }
         public override ScriptValue Divide(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Divide) : null;
+            var func = GetValue(ScriptOperator.Divide).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.Divide(obj);
         }
         public override ScriptValue Modulo(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Modulo) : null;
+            var func = GetValue(ScriptOperator.Modulo).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.Modulo(obj);
         }
         public override ScriptValue InclusiveOr(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.InclusiveOr) : null;
+            var func = GetValue(ScriptOperator.InclusiveOr).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.InclusiveOr(obj);
         }
         public override ScriptValue Combine(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Combine) : null;
+            var func = GetValue(ScriptOperator.Combine).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.Combine(obj);
         }
         public override ScriptValue XOR(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.XOR) : null;
+            var func = GetValue(ScriptOperator.XOR).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.XOR(obj);
         }
         public override ScriptValue Shi(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Shi) : null;
+            var func = m_Prototype.GetValue(ScriptOperator.Shi).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
             return base.Shi(obj);
         }
         public override ScriptValue Shr(ScriptValue obj) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Shr) : null;
+            var func = GetValue(ScriptOperator.Shr).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1);
             }
@@ -148,26 +134,25 @@ namespace Scorpio {
             return Call(ScriptValue.Null, parameters, length);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            var type = Class;
-            var func = type != null ? Class.GetOperator(ScriptOperator.Invoke) : null;
+            var func = GetValue(ScriptOperator.Invoke).Get<ScriptFunction>();
             if (func != null) {
                 return func.Call(new ScriptValue(this), parameters, length);
             }
             return base.Call(thisObject, parameters, length);
         }
-        public override string ToString() { return Class != null ? $"Object<{Class.TypeName}>" : "Object<null>"; }
-        //public override string ToJson() {
-        //    var builder = new StringBuilder();
-        //    builder.Append("{");
-        //    bool first = true;
-        //    foreach (var pair in m_Values) {
-        //        var value = pair.Value;
-        //        if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
-        //        if (first) { first = false; } else { builder.Append(","); }
-        //        builder.Append($"\"{pair.Key}\":{value.ToJson()}");
-        //    }
-        //    builder.Append("}");
-        //    return builder.ToString();
-        //}
+        public override string ToString() { return Prototype != null ? $"Object<{m_Prototype.ToString()}>" : "Object<null>"; }
+        public override string ToJson() {
+            var builder = new StringBuilder();
+            builder.Append("{");
+            bool first = true;
+            foreach (var pair in m_Values) {
+                var value = pair.value;
+                if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
+                if (first) { first = false; } else { builder.Append(","); }
+                builder.Append($"\"{pair.key}\":{value.ToJson()}");
+            }
+            builder.Append("}");
+            return builder.ToString();
+        }
     }
 }

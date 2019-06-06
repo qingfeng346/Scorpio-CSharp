@@ -382,13 +382,12 @@ namespace Scorpio.Compiler {
             AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
             AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
             AddScriptInstruction(Opcode.StoreLocal, varIndex, line);
-            AddScriptInstruction(Opcode.LoadValueString, GetConstString("next"), line);
+            AddScriptInstruction(Opcode.LoadValueString, GetConstString(ScriptValue.IteratorNext), line);
             var beginIndex = AddScriptInstruction(Opcode.CallEach, 0, line);
             var falseTo = AddScriptInstruction(Opcode.FalseTo, 0, line);
             ParseStatementBlock(ExecutableBlock.Foreach);
             AddScriptInstruction(Opcode.Jump, beginIndex, line);
             m_scriptExecutable.SetValue(falseTo, Index);             //如果是循环完毕跳出的话要先弹出栈顶的null值
-            //AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的null值
             var endIndex = Index;
             AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的foreach 函数
             AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的foreach map

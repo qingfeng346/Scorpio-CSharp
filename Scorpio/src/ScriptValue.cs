@@ -4,7 +4,8 @@ using System;
 using Scorpio.Userdata;
 namespace Scorpio {
     public struct ScriptValue {
-        public const string Prototype = "prototype";
+        public const string IteratorNext = "next";  //迭代器函数名字
+
         public const byte nullValueType = 0;        //null
         public const byte scriptValueType = 1;      //脚本变量
         public const byte doubleValueType = 2;      //double
@@ -199,6 +200,9 @@ namespace Scorpio {
         }
         public T Get<T>() where T : ScriptObject {
             return valueType == scriptValueType ? (scriptValue as T) : null;
+        }
+        public ScriptObject Get() {
+            return valueType == scriptValueType ? scriptValue : null;
         }
         public bool IsNull { get { return valueType == nullValueType; } }
         public bool IsTrue { get { return valueType == trueValueType; } }

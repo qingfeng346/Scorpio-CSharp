@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Scorpio.Exception;
 namespace Scorpio.Library {
-    public class LibraryJson {
+    public partial class LibraryJson {
         public static void Load(Script script) {
             var map = script.CreateMap();
             map.SetValue("encode", script.CreateFunction(new encode()));

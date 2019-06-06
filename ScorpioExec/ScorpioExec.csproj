@@ -9,7 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ScorpioLibrary\ScorpioLibrary.csproj" />
+    <PackageReference Include="ScorpioCommons" Version="1.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Scorpio\Scorpio.csproj" />
     <ProjectReference Include="..\ScorpioReflect\ScorpioReflect.csproj" />
   </ItemGroup>

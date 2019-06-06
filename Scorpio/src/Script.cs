@@ -58,27 +58,27 @@ namespace Scorpio {
             TypeObjectValue = new ScriptValue(TypeObject);
             Global.SetValue(TypeObject.TypeName, TypeObjectValue);
 
-            TypeBoolean = ProtoBoolean.Load(this, TypeObject);
+            TypeBoolean = ProtoBoolean.Load(this, TypeObjectValue);
             TypeBooleanValue = new ScriptValue(TypeBoolean);
             Global.SetValue(TypeBoolean.TypeName, TypeBooleanValue);
 
-            TypeNumber = ProtoNumber.Load(this, TypeObject);
+            TypeNumber = ProtoNumber.Load(this, TypeObjectValue);
             TypeNumberValue = new ScriptValue(TypeNumber);
             Global.SetValue(TypeNumber.TypeName, TypeNumberValue);
 
-            TypeString = ProtoString.Load(this, TypeObject);
+            TypeString = ProtoString.Load(this, TypeObjectValue);
             TypeStringValue = new ScriptValue(TypeString);
             Global.SetValue(TypeString.TypeName, TypeStringValue);
 
-            TypeArray = ProtoArray.Load(this, TypeObject);
+            TypeArray = ProtoArray.Load(this, TypeObjectValue);
             TypeArrayValue = new ScriptValue(TypeArray);
             Global.SetValue(TypeArray.TypeName, TypeArrayValue);
 
-            TypeMap = ProtoMap.Load(this, TypeObject);
+            TypeMap = ProtoMap.Load(this, TypeObjectValue);
             TypeMapValue = new ScriptValue(TypeMap);
             Global.SetValue(TypeMap.TypeName, TypeMapValue);
 
-            TypeFunction = ProtoFunction.Load(this, TypeObject);
+            TypeFunction = ProtoFunction.Load(this, TypeObjectValue);
             TypeFunctionValue = new ScriptValue(TypeFunction);
             Global.SetValue(TypeFunction.TypeName, TypeFunctionValue);
 
@@ -150,7 +150,7 @@ namespace Scorpio {
         }
         public ScriptArray CreateArray() { return new ScriptArray(this); }
         public ScriptMap CreateMap() { return new ScriptMap(this); }
-        public ScriptType CreateType(string typeName, ScriptType parentType) { return new ScriptType(typeName, parentType); }
+        public ScriptType CreateType(string typeName, ScriptValue parentType) { return new ScriptType(typeName, parentType); }
         public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }
 
         public ScriptValue call(string name, params object[] args) {

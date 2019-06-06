@@ -1,7 +1,7 @@
 ﻿namespace Scorpio.Proto {
     public class ProtoObject {
         public static ScriptType Load(Script script) {
-            var ret = script.CreateType("Object", null);
+            var ret = new ScriptTypeObject("Object");
             ret.SetValue("toString", script.CreateFunction(new toString()));
             return ret;
         }

@@ -6,7 +6,7 @@ using Scorpio.Function;
 using Scorpio.Userdata;
 using System.Reflection;
 namespace Scorpio.Library {
-    public class LibraryBasis {
+    public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
             Script m_Script;
             IEnumerator<ScriptValue> m_Enumerator;
@@ -108,16 +108,27 @@ namespace Scorpio.Library {
             script.SetGlobal("toString", script.CreateFunction(new toString()));
 
             script.SetGlobal("typeOf", script.CreateFunction(new typeOf(script)));
+            script.SetGlobal("setPrototype", script.CreateFunction(new setPrototype()));
+            script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype()));
             script.SetGlobal("clone", script.CreateFunction(new clone()));
-            script.SetGlobal("require", script.CreateFunction(new require(script)));
 
-            script.SetGlobal("push_search", script.CreateFunction(new push_search(script)));
-            script.SetGlobal("push_assembly", script.CreateFunction(new push_assembly(script)));
-            script.SetGlobal("import_type", script.CreateFunction(new import_type(script)));
-            script.SetGlobal("import_extension", script.CreateFunction(new import_extension(script)));
-            script.SetGlobal("import_namespace", script.CreateFunction(new import_namespace()));
-            script.SetGlobal("generic_type", script.CreateFunction(new generic_type(script)));
-            script.SetGlobal("generic_method", script.CreateFunction(new generic_method(script)));
+            script.SetGlobal("require", script.CreateFunction(new require(script)));
+            script.SetGlobal("pushSearch", script.CreateFunction(new pushSearch(script)));
+            script.SetGlobal("push_search", script.CreateFunction(new pushSearch(script)));
+
+            script.SetGlobal("pushAssembly", script.CreateFunction(new pushAssembly()));
+            script.SetGlobal("importType", script.CreateFunction(new importType()));
+            script.SetGlobal("importExtension", script.CreateFunction(new importExtension()));
+            script.SetGlobal("importNamespace", script.CreateFunction(new importNamespace()));
+            script.SetGlobal("genericType", script.CreateFunction(new genericType()));
+            script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod()));
+
+            script.SetGlobal("push_assembly", script.CreateFunction(new pushAssembly()));
+            script.SetGlobal("import_type", script.CreateFunction(new importType()));
+            script.SetGlobal("import_extension", script.CreateFunction(new importExtension()));
+            script.SetGlobal("import_namespace", script.CreateFunction(new importNamespace()));
+            script.SetGlobal("generic_type", script.CreateFunction(new genericType()));
+            script.SetGlobal("generic_method", script.CreateFunction(new genericMethod()));
         }
         private class print : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
@@ -166,18 +177,18 @@ namespace Scorpio.Library {
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
                 if (obj is ScriptArray) {
                     var map = new ScriptMap(m_script);
-                    map.SetValue("next", m_script.CreateFunction(new ArrayPairs(m_script, (ScriptArray)obj, map)));
+                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(m_script, (ScriptArray)obj, map)));
                     return new ScriptValue(map);
                 } else if (obj is ScriptMap) {
                     var map = new ScriptMap(m_script);
-                    map.SetValue("next", m_script.CreateFunction(new MapPairs(m_script, (ScriptMap)obj, map)));
+                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new MapPairs(m_script, (ScriptMap)obj, map)));
                     return new ScriptValue(map);
                 } else if (obj is ScriptUserdata) {
                     var map = new ScriptMap(m_script);
-                    map.SetValue("next", m_script.CreateFunction(new UserdataPairs(m_script, (ScriptUserdata)obj, map)));
+                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new UserdataPairs(m_script, (ScriptUserdata)obj, map)));
                     return new ScriptValue(map);
                 }
-                throw new ExecutionException("pairs必须用于arrar, map, 继承IEnumerable的userdata 类型");
+                throw new ExecutionException("pairs必须用于 array, map 或者 继承IEnumerable的userdata 类型");
             }
         }
         private class isBoolean : ScorpioHandle {
@@ -334,7 +345,7 @@ namespace Scorpio.Library {
                         } else if (value.scriptValue is ScriptFunction) {
                             return m_Script.TypeFunctionValue;
                         } else if (value.scriptValue is ScriptInstance) {
-                            return new ScriptValue((value.scriptValue as ScriptInstance).Class);
+                            return new ScriptValue((value.scriptValue as ScriptInstance).Prototype);
                         } else if (value.scriptValue is ScriptType) {
                             return new ScriptValue(value.scriptValue);
                         } else {
@@ -362,9 +373,9 @@ namespace Scorpio.Library {
                 return m_script.LoadSearchPathFile(args[0].ToString());
             }
         }
-        private class push_search : ScorpioHandle {
+        private class pushSearch : ScorpioHandle {
             private Script m_script;
-            public push_search(Script script) {
+            public pushSearch(Script script) {
                 m_script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
@@ -372,11 +383,30 @@ namespace Scorpio.Library {
                 return ScriptValue.Null;
             }
         }
-        private class push_assembly : ScorpioHandle {
-            private Script m_script;
-            public push_assembly(Script script) {
-                m_script = script;
+        private class setPrototype : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var scriptValue = args[0].Get();
+                if (scriptValue is ScriptType) {
+                    (scriptValue as ScriptType).Prototype = args[1];
+                } else if (scriptValue is ScriptInstance) {
+                    (scriptValue as ScriptInstance).Prototype = args[1];
+                }
+                return ScriptValue.Null;
             }
+        }
+        private class getPrototype : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var scriptValue = args[0].Get();
+                if (scriptValue is ScriptType) {
+                    return (scriptValue as ScriptType).Prototype;
+                } else if (scriptValue is ScriptInstance) {
+                    return (scriptValue as ScriptInstance).Prototype;
+                }
+                return ScriptValue.Null;
+            }
+        }
+
+        private class pushAssembly : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType == ScriptValue.stringValueType) {
                     TypeManager.PushAssembly(Assembly.Load(new AssemblyName(args[0].ToString())));
@@ -386,20 +416,12 @@ namespace Scorpio.Library {
                 return ScriptValue.Null;
             }
         }
-        private class import_type : ScorpioHandle {
-            private Script m_script;
-            public import_type(Script script) {
-                m_script = script;
-            }
+        private class importType : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return TypeManager.GetUserdataType(args[0].ToString());
             }
         }
-        private class import_extension : ScorpioHandle {
-            private Script m_script;
-            public import_extension(Script script) {
-                m_script = script;
-            }
+        private class importExtension : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType == ScriptValue.scriptValueType) {
                     TypeManager.LoadExtension(args[0].scriptValue.Type);
@@ -409,16 +431,12 @@ namespace Scorpio.Library {
                 return ScriptValue.Null;
             }
         }
-        private class import_namespace : ScorpioHandle {
+        private class importNamespace : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(new ScriptNamespace(args[0].ToString()));
             }
         }
-        private class generic_type : ScorpioHandle {
-            private Script m_script;
-            public generic_type(Script script) {
-                m_script = script;
-            }
+        private class genericType : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType != ScriptValue.scriptValueType)
                     throw new ExecutionException("generic_type 第1个参数必须是 Type");
@@ -431,11 +449,7 @@ namespace Scorpio.Library {
                 return TypeManager.GetType(args[0].scriptValue.Type).MakeGenericType(types);
             }
         }
-        private class generic_method : ScorpioHandle {
-            private readonly Script m_script;
-            public generic_method(Script script) {
-                m_script = script;
-            }
+        private class genericMethod : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType != ScriptValue.scriptValueType || !(args[0].scriptValue is ScriptMethodFunction)) {
                     throw new ExecutionException("generic_method 第1个参数必须是函数");

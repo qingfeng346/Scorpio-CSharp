@@ -11,14 +11,14 @@ namespace Scorpio {
     public class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
         private Script m_Script;
         private Dictionary<object, ScriptValue> m_Objects = new Dictionary<object, ScriptValue>();  //所有的数据(函数和数据都在一个数组)
-        public ScriptMap(Script script) : base(ObjectType.Map, script.TypeMap) {
+        public ScriptMap(Script script) : base(ObjectType.Map, script.TypeMapValue) {
             m_Script = script;
         }
         public IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
 
         public override ScriptValue GetValue(string key) {
-            return m_Objects.ContainsKey(key) ? m_Objects[key] : (Class != null ? Class.GetValue(key) : ScriptValue.Null);
+            return m_Objects.ContainsKey(key) ? m_Objects[key] : m_Prototype.GetValue(key);
         }
         public override ScriptValue GetValue(object key) {
             return m_Objects.ContainsKey(key) ? m_Objects[key] : ScriptValue.Null;

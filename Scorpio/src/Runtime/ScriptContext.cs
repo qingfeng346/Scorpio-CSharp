@@ -770,7 +770,7 @@ namespace Scorpio.Runtime {
                                 }
                                 case Opcode.NewType:
                                 case Opcode.NewTypeParent: {
-                                    var parentType = opcode == Opcode.NewTypeParent ? stackObjects[stackIndex - opvalue * 2 - 1].scriptValue as ScriptType : m_script.TypeObject;
+                                    var parentType = opcode == Opcode.NewTypeParent ? stackObjects[stackIndex - opvalue * 2 - 1] : m_script.TypeObjectValue;
                                     var className = stackObjects[stackIndex - opvalue * 2].stringValue;
                                     var type = new ScriptType(className, parentType);
                                     for (var i = opvalue - 1; i >= 0; --i) {

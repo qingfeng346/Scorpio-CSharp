@@ -1,5 +1,5 @@
 ﻿namespace Scorpio.Library {
-    public class LibraryMath {
+    public partial class LibraryMath {
         public const double PI = 3.1415926535897931;
         public const double Deg2Rad = 0.0174532924;
         public const double Rad2Deg = 57.29578;

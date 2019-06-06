@@ -9,7 +9,7 @@ namespace Scorpio
     public abstract class ScriptFunction : ScriptInstance {
         protected Script m_Script;
         protected ScriptValue m_BindObject = ScriptValue.Null;
-        public ScriptFunction(Script script, String name) : base(ObjectType.Function, script.TypeFunction) {
+        public ScriptFunction(Script script, String name) : base(ObjectType.Function, script.TypeFunctionValue) {
             m_Script = script;
             FunctionName = name;
         }

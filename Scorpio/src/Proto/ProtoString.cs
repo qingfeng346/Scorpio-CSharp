@@ -4,7 +4,7 @@ using System.Text;
 namespace Scorpio.Proto {
     public class ProtoString {
         const string DELIM_STR = "{}";
-        public static ScriptType Load(Script script, ScriptType parentType) {
+        public static ScriptType Load(Script script, ScriptValue parentType) {
             var ret = script.CreateType("String", parentType);
             ret.SetValue("format", script.CreateFunction(new format()));
             ret.SetValue("csFormat", script.CreateFunction(new csFormat()));
@@ -191,7 +191,7 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 switch (args[0].valueType) {
                     case ScriptValue.nullValueType: return ScriptValue.True;
-                    case ScriptValue.stringValueType: return string.IsNullOrEmpty(args[0].stringValue) ? ScriptValue.True : ScriptValue.False;
+                    case ScriptValue.stringValueType: return args[0].stringValue.Length == 0 ? ScriptValue.True : ScriptValue.False;
                     default: return ScriptValue.False;
                 }
             }

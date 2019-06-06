@@ -1,6 +1,6 @@
 ﻿namespace Scorpio.Proto {
     public class ProtoMap {
-        public static ScriptType Load(Script script, ScriptType parentType) {
+        public static ScriptType Load(Script script, ScriptValue parentType) {
             var ret = script.CreateType("Map", parentType);
             ret.SetValue("length", script.CreateFunction(new length()));
             ret.SetValue("count", script.CreateFunction(new length()));
