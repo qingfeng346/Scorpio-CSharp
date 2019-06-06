@@ -6,6 +6,7 @@ using Scorpio.Commons;
 using Scorpio;
 using Scorpio.Userdata;
 using Scorpio.Serialize;
+using Scorpio.ScorpioReflect;
 
 namespace ScorpioExec {
     public class LogHelper : ILogger {
@@ -39,8 +40,9 @@ namespace ScorpioExec {
                 var source = command.GetValue("-source", "-s");
                 var output = command.GetValue("-output", "-o");
                 switch (type) {
-                    case "register": Register(); return;
-                    case "pack": Pack(source, output); return;
+                    case "register": Register(); return;            //注册sco到运行环境
+                    case "pack": Pack(source, output); return;      //生成sco IL
+                    case "fast": Fast(command, output); return;     //生成快速反射类
                     default: Execute(args); return;
                 }
             } catch (Exception e) {
@@ -70,6 +72,20 @@ namespace ScorpioExec {
             } catch (System.Exception ex) {
                 Logger.error("转换出错 error : " + ex.ToString());
             }
+        }
+        static void Fast(CommandLine command, string output) {
+            var dll = command.GetValue("-dll");
+            var assembly = string.IsNullOrEmpty(dll) ? null : Assembly.LoadFile(dll);
+            var className = command.GetValue("-class");
+            var clazz = assembly != null ? assembly.GetType(className, false, false) : null;
+            if (clazz == null) { clazz = Type.GetType(className, false, false); }
+            if (clazz == null) { throw new Exception("找不到class,请输入完整类型或检查类名是否正确 : " + className); }
+            var filterName = command.GetValue("-filter");
+            var filter = assembly != null ? assembly.GetType(filterName, false, false) : null;
+            if (filter == null) { filter = Type.GetType(filterName, false, false); }
+            var generate = new GenerateScorpioClass(clazz);
+            if (filter != null && filter.IsSubclassOf(typeof(ClassFilter))) { generate.SetClassFilter( (ClassFilter)System.Activator.CreateInstance(filter) ); }
+            FileUtil.CreateFile(Path.Combine(output, generate.ScorpioClassName + ".cs"), generate.Generate());
         }
         static void Execute(string[] args) {
             script = new Script();
