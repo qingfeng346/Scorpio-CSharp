@@ -19,7 +19,7 @@ namespace Scorpio.Library {
                 m_Script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new JsonParser(args[0].ToString(), m_Script).Parse();
+                return new JsonParser(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true).Parse();
             }
         }
         private class JsonParser {
@@ -37,15 +37,17 @@ namespace Scorpio.Library {
             const string WHITE_SPACE = " \t\n\r";
             const string WORD_BREAK = " \t\n\r{}[],:\"";
 
-            private Script m_script;
+            private Script m_Script;
             private string m_Buffer;
+            private bool m_SupportLong;
             private int m_Index;
             private int m_Length;
-            public JsonParser(string buffer, Script script) {
+            public JsonParser(Script script, string buffer, bool supportLong) {
+                m_Script = script;
+                m_SupportLong = supportLong;
                 m_Buffer = buffer;
                 m_Index = 0;
                 m_Length = buffer.Length;
-                m_script = script;
             }
             char Read() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index++]; }
             char Peek() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index]; }
@@ -150,7 +152,7 @@ namespace Scorpio.Library {
             }
             ScriptValue ParseNumber() {
                 var number = NextWord;
-                if (number.IndexOf('.') == -1) {
+                if (m_SupportLong && number.IndexOf('.') == -1) {
                     long parsedLong;
                     long.TryParse(number, out parsedLong);
                     return new ScriptValue(parsedLong);
@@ -160,7 +162,7 @@ namespace Scorpio.Library {
                 return new ScriptValue(parsedDouble);
             }
             ScriptValue ParseMap() {
-                var map = new ScriptMap(m_script);
+                var map = new ScriptMap(m_Script);
                 var ret = new ScriptValue(map);
                 while (true) {
                     var ch = EatWhiteSpace;
@@ -183,7 +185,7 @@ namespace Scorpio.Library {
                 }
             }
             ScriptValue ParseArray() {
-                var array = new ScriptArray(m_script);
+                var array = new ScriptArray(m_Script);
                 var ret = new ScriptValue(array);
                 while (true) {
                     var ch = EatWhiteSpace;
