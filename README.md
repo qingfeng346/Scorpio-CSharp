@@ -34,11 +34,11 @@
 ### 注意事项 ##
 > 如果要使用 **Script.LoadFile** 函数，文件编码要改成 **utf8 without bom (无签名的utf8格式)**, 否则bom三个字节会解析失败
 
-> 使用 **import_type import_extension**  前要确认是否已经添加该类的程序集(Assembly),例如要使用 **UnityEngine.dll** 中的 **UnityEngine.GameObject** 类,要先再c#中调用 **script.PushAssembly(typeof(GameObject).GetTypeInfo().Assembly)** 压入程序集,然后**UnityEngine.dll** 中的类就都可以使用了,也就是 **每个dll文件的程序集** 都要添加一次
+> 使用 **import_type import_extension** 前要确认是否已经添加该类的程序集(Assembly),例如要使用 **UnityEngine.dll** 中的 **UnityEngine.GameObject** 类,要先再c#中调用 **script.PushAssembly(typeof(GameObject).GetTypeInfo().Assembly)** 压入程序集,然后**UnityEngine.dll** 中的类就都可以使用了,也就是 **每个dll文件的程序集** 都要添加一次
 
 > 使用 **import_type** 引入内部类时使用 **+**, 例如 **import_type("[namespace].[clasname]+[internalclass]")**
 
-> 脚本内所有c#变量(除了**number,string**等基础类型) **均为引用**,struct变量也一样
+> 脚本内所有c#变量(除了**bool,number,string**等基础类型) **均为引用**,struct变量也一样
 
 > **c# event** 对象+= -=操作可以使用函数 **add_[event变量名] remove_[event变量名]** 代替
 
@@ -49,9 +49,16 @@
 > UWP平台master配置下 **generic_method, generic_type** 函数会出问题,其他平台均无问题 **(android&il2cpp ios&il2cpp webgl等)**, 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 
 
-### 使用去反射功能注意事项
+### 使用快速反射功能注意事项
 * 不能调用模板函数
 * 不能调用含有ref和out参数的函数
+
+### 快速反射类生成
+* 使用命令行 **sco -type fast -dll [dll文件路径] -class [class完整名] -output [输出目录]** 可以生成快速反射类文件
+
+### 快速反射类使用
+* 例如使用快速反射的类为 **UnityEngine.GameObject** , 那么生成的快速反射类则为 **ScorpioClass_UnityEngine_GameObject**
+    * 在程序内调用 **Scorpio.Userdata.TypeManager.SetFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script))**
 
 ### Unity3d发布平台支持(亲测):
 - [x] PC, Mac & Linux Standalone(包括IL2CPP)
@@ -160,23 +167,7 @@ print(TestEnum.Test1)                               //直接使用枚举
 }
 ```
 
-### c#去反射类使用
-* 把**ScorpioReflect**项目中的**GenerateScorpioClass**文件夹下的所有cs文件复制到项目工程,放到**Editor**目录即可,此类只用作生成中间代码,后期不会使用,使用示例: 
 
-```csharp
-//就拿UnityEngine.GameObject类为例
-//先生成中间代码
-//使用GenerateScorpioClass生成代码,ScorpioClassName变量是中间类名称,Generate()返回生成后的代码
-//下面两句代码是生成UnityEngine.GameObject的中间类到工程目录
-var gen = new GenerateScorpioClass(typeof(UnityEngine.GameObject));
-System.IO.File.WriteAllText(Application.dataPath + "/Scripts/ScorpioClass/" + gen.ScorpioClassName + ".cs", gen.Generate());
-
-
-//然后调用Script类的PushFastReflectClass函数把typeof(UnityEngine.GameObject)和生成后的类ScorpioClass_UnityEngine_GameObject关联上
-Script script = new Script();
-script.LoadLibrary();
-script.PushFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script));
-```
 
 ## 捐助作者
 ### 如果此项目对你有所帮助,可以请作者喝杯咖啡
