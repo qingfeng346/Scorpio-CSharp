@@ -1,22 +1,38 @@
-a = {
-    1 = 200,	//Key可以直接写数字
-    a = 100,	//Key也可以写名字
-	//等同于 d = 300
-    "d" = 300,	//或者字符串
-    //等同于 e = 300 
-    'e' = 400,
-    func1 = function () {
-        print("func1 : " + this.a)
-    },
-    function func2() {
-        print("func2 : " + this.a)
+var base = {
+    value = 100,
+    hello1() {
+        print("hello1 " + this.value) 
+    }
+    //等同于 hello2()
+    "hello2"() { 
+        print("hello2") 
+    }
+    //重载 () 
+    "()"(arg1, arg2) {
+        print("call () ", arg1, arg2)
+    }
+    //重载 +
+    "+"(value) {
+        this.value += value
+        return this
     }
 }
-//调用函数
-a.func1()
-a.func2()
+base[1] = 1     //[] key可以使用 number
 //数字只能使用 [] 访问
-print(a[1])
-var c = "d"
+print(base[1])
+var c = "hello1"
 //如果是变量可以使用 [] 访问
-print(a[c])
+base[c]()
+
+base.hello1()
+base.hello2()
+base(100, 200)
+base += 300
+print(base.value)
+
+var base1 = clone(base)	    //完全复制一个table 里面的数据不会共享
+var base2 = clone(base)
+base1.value = 111
+base2.value = 222
+print("base1 : " + base1.value)
+print("base2 : " + base2.value)

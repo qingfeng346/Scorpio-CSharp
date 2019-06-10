@@ -1,24 +1,13 @@
 ﻿using System;
 using Scorpio;
+using Scorpio.Compiler;
 namespace Scorpio.Exception
 {
     //执行代码异常
-    class ExecutionException : ScriptException
-    {
-        private string m_Source = "";
-        public ExecutionException(Script script, String strMessage) : base(strMessage)
-        {
-            if (script != null) {
-                StackInfo stackInfo = script.GetCurrentStackInfo();
-                if (stackInfo != null) m_Source = stackInfo.Breviary + ":" + stackInfo.Line + ": ";
-            }
-        }
-        public ExecutionException(Script script, ScriptObject obj, String strMessage) : base(strMessage) {
-            if (script != null) {
-                StackInfo stackInfo = script.GetCurrentStackInfo();
-                if (stackInfo != null) m_Source = stackInfo.Breviary + ":" + stackInfo.Line + "[" + obj.Name + "]:";
-            }
-        }
-        public override string Message { get { return m_Source + base.Message; } }
+    public class ExecutionException : ScriptException {
+        public ExecutionException(string strMessage) : base(strMessage) { }
+    }
+    public class ExecutionStackException : ScriptException {
+        public ExecutionStackException(string strMessage) : base(strMessage) { }
     }
 }

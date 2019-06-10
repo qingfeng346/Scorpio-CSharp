@@ -1,76 +1,58 @@
 ﻿using System;
 using System.Reflection;
 using System.Text;
+using Scorpio.Tools;
 namespace Scorpio.ScorpioReflect {
     public partial class GenerateScorpioClass {
+        //类模板
         public const string ClassTemplate = @"using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Scorpio;
 using Scorpio.Userdata;
-using Scorpio.Variable;
-public class __class : IScorpioFastReflectClass {
+using Scorpio.Tools;
+using Scorpio.Exception;
+public class __class : ScorpioFastReflectClass {
     private Script m_Script;
     public __class(Script script) {
         m_Script = script;
     }
-    public FastReflectUserdataMethod GetConstructor() {
-        return __class_Constructor.GetMethod(m_Script);
+    public UserdataMethodFastReflect GetConstructor() {
+        return __class_Constructor.GetInstance(m_Script);
     }
     public Type GetVariableType(string name) {
-__getvariabletype_content
-        throw new Exception(""__fullname [GetVariableType] 找不到变量 : "" + name);
+        switch (name) {__getvariabletype_content
+            default: throw new ExecutionException(""__fullname [GetVariableType] 找不到变量 : "" + name);
+        }
     }
     public object GetValue(object obj, string name) {
-__getvalue_content
-        throw new Exception(""__fullname [GetValue] 找不到变量 : "" + name);
+        switch (name) {__getvalue_content
+            default: throw new ExecutionException(""__fullname [GetValue] 找不到变量 : "" + name);
+        }
     }
-    public void SetValue(object obj, string name, ScriptObject value) {
-__setvalue_content
-        throw new Exception(""__fullname [SetValue] 找不到变量 : "" + name);
+    public void SetValue(object obj, string name, ScriptValue value) {
+        switch (name) {__setvalue_content
+            default: throw new ExecutionException(""__fullname [SetValue] 找不到变量 : "" + name);
+        }
     }
 __constructor_content
 __methods_content
 }";
+        //单个函数模板
         public const string MethodTemplate = @"
-    public class __name : IScorpioFastReflectMethod {
-        private static ScorpioMethodInfo[] _methods;
-        private static FastReflectUserdataMethod _method;
-        private static ScorpioMethod _instance;
-        static __name() {
-            List<ScorpioMethodInfo> methods = new List<ScorpioMethodInfo>();
-__getallmethod
-            _methods = methods.ToArray();
+    public class __name : ScorpioFastReflectMethod {
+        private static Dictionary<Script, UserdataMethodFastReflect> methods = new Dictionary<Script, UserdataMethodFastReflect>();
+        public static UserdataMethodFastReflect GetInstance(Script script) {
+            if (methods.ContainsKey(script)) { return methods[script]; }
+            var methodInfos = new List<ScorpioFastReflectMethodInfo>();__getallmethod
+            return methods[script] = new UserdataMethodFastReflect(script, typeof(__fullname), ""__methodname"", methodInfos.ToArray(), new __name()); 
         }
-        public static FastReflectUserdataMethod GetMethod(Script script) {
-            if (_method == null) {
-                _method = new FastReflectUserdataMethod(__methodstatic, script, typeof(__fullname), ""__methodname"", _methods, new __name()); 
+        public object Call(object obj, int methodIndex, object[] args) {
+            switch (methodIndex) {__execute
+            default: throw new ExecutionException(""__fullname 找不到合适的函数 : __methodname    type : "" + methodIndex);
             }
-            return _method;
-        }
-        public static ScorpioMethod GetInstance(Script script, object obj) {
-            if (_method == null) {
-                _method = new FastReflectUserdataMethod(__methodstatic, script, typeof(__fullname), ""__methodname"", _methods, new __name()); 
-            }__getmethod
-        }
-        public object Call(object obj, string type, object[] args) {
-__execute
-            throw new Exception(""__fullname 找不到合适的函数 : __methodname    type : "" + type);
         }
     }";
-        public const string StaticMethodTemplate = @"
-            if (_instance == null) {
-                _instance = new ScorpioStaticMethod(""__methodname"", _method);
-            }
-            return _instance;";
-        public const string InstanceMethodTemplate = @"
-            if (obj == null) {
-                if (_instance == null) {
-                    _instance = new ScorpioTypeMethod(script, ""__methodname"", _method, typeof(__fullname));
-                }
-                return _instance;
-            }
-            return new ScorpioObjectMethod(obj, ""__methodname"", _method);";
         //获得最后生成的类的名字 把+和.都换成_
         public string GetClassName(Type type) {
             var fullName = type.FullName;
@@ -90,35 +72,25 @@ __execute
             return fullName;
         }
         //根据MethodInfo生成一个ScorpioMethodInfo对象
-        private string GetScorpioMethod(MethodBase method) {
+        private string GetScorpioMethod(MethodBase method, int index) {
             if (!method.IsGenericMethod || !method.ContainsGenericParameters) {
                 string name = method.Name;
                 string isStatic = method.IsStatic ? "true" : "false";
                 string parameterType = "new Type[] {";
-                string param = "false";
                 string paramType = "null";
                 var pars = method.GetParameters();
                 bool first = true;
                 foreach (var par in pars) {
                     if (first) { first = false; } else { parameterType += ","; }
                     parameterType += "typeof(" + ScorpioReflectUtil.GetFullName(par.ParameterType) + ")";
-                    if (Util.IsParamArray(par)) {
-                        param = "true";
+                    if (Util.IsParams(par)) {
                         paramType = "typeof(" + ScorpioReflectUtil.GetFullName(par.ParameterType.GetElementType()) + ")";
                     }
                 }
                 parameterType += "}";
-                return string.Format(@"new ScorpioMethodInfo(""{0}"", {1}, {2}, {3}, {4}, ""{5}"")", name, isStatic, parameterType, param, paramType, GetScorpioMethodParameterTypes(method));
+                return string.Format(@"new ScorpioFastReflectMethodInfo({0}, {1}, {2}, {3})", isStatic, parameterType, paramType, index);
             }
             return "";
-        }
-        private string GetScorpioMethodParameterTypes(MethodBase method) {
-            string parameterTypes = "";
-            var pars = method.GetParameters();
-            foreach (var par in pars) {
-                parameterTypes += ScorpioReflectUtil.GetFullName(par.ParameterType) + "+";
-            }
-            return parameterTypes;
         }
         private string GetScorpioMethodCall(MethodBase method) {
             var call = "";
@@ -137,11 +109,10 @@ __execute
             return (IsStatic ? m_FullName : "((" + m_FullName + ")obj)") + "." + name;
         }
         private string GetAllMethod(MethodBase[] methods) {
-            StringBuilder builder = new StringBuilder();
-            bool first = true;
-            foreach (var method in methods) {
-                if (first) { first = false; } else { builder.AppendLine(); }
-                builder.Append("            methods.Add(" + GetScorpioMethod(method) + ");");
+            var builder = new StringBuilder();
+            for (var i = 0; i < methods.Length; ++i) {
+                builder.Append(@"
+            methodInfos.Add(" + GetScorpioMethod(methods[i], i) + ");");
             }
             return builder.ToString();
         }

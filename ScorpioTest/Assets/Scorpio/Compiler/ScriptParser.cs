@@ -1,190 +1,955 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Scorpio;
 using Scorpio.Exception;
-using Scorpio.Runtime;
 using Scorpio.CodeDom;
 using Scorpio.CodeDom.Temp;
-using Scorpio.Variable;
-using Scorpio.Function;
-namespace Scorpio.Compiler
-{
-    //上下文解析
-    public partial class ScriptParser
-    {
-        private enum DefineType {
-            None,       //没有进入#if
-            Already,    //已经进入条件了
-            Being,      //还没找到合适的 正在处理
-            Break,      //跳过
+using System.Text;
+namespace Scorpio.Compiler {
+    
+    /// <summary> 编译脚本 </summary>
+    public partial class ScriptParser {
+        struct ClassData {
+            public string name;
+            public int func;
         }
-        private class DefineState {
-            public DefineType State;
-            public DefineState(DefineType state) {
-                this.State = state;
-            }
-        }
-        private class DefineObject {
-            public bool Not;
-        }
-        private class DefineString : DefineObject {
-            public string Define;
-            public DefineString(string define) {
-                this.Define = define;
-            }
-        }
-        private class DefineOperate : DefineObject {
-            public DefineObject Left;       //左边值
-            public DefineObject Right;      //右边值
-            public bool and;                //是否是并且操作
-            public DefineOperate(DefineObject left, DefineObject right, bool and) {
-                this.Left = left;
-                this.Right = right;
-                this.and = and;
-            }
-        }
-        private Script m_script;                                                        //脚本类
-        private string m_strBreviary;                                                   //当前解析的脚本摘要
-        private int m_iNextToken;                                                       //当前读到token
-        private List<Token> m_listTokens;                                               //token列表
-        private Stack<ScriptExecutable> m_Executables = new Stack<ScriptExecutable>();  //指令栈
+        public List<double> ConstDouble { get; private set; } = new List<double>();
+        public List<long> ConstLong { get; private set; } = new List<long>();
+        public List<string> ConstString { get; private set; } = new List<string>();
+        public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>();   //定义的所有 function
+
+        private Stack<List<int>> m_Breaks = new Stack<List<int>>();         //breaks
+        private Stack<List<int>> m_Continues = new Stack<List<int>>();      //continues
+        private List<int> m_Break = new List<int>();                        //break
+        private List<int> m_Continue = new List<int>();                     //continue
+        private List<ScriptExecutable> m_Executables = new List<ScriptExecutable>();  //指令栈
         private ScriptExecutable m_scriptExecutable;                                    //当前指令栈
-        private Stack<DefineState> m_Defines = new Stack<DefineState>();                //define状态
-        private DefineState m_define;                                                   //define当前状态
-        public ScriptParser(Script script, List<Token> listTokens, string strBreviary)
-        {
-            m_script = script;
-            m_strBreviary = strBreviary;
-            m_iNextToken = 0;
-            m_listTokens = new List<Token>(listTokens);
+        public int Index { get { return m_scriptExecutable.Count(); } }
+        public bool SupportBreak(ExecutableBlock block) { return block == ExecutableBlock.For || block == ExecutableBlock.Foreach || block == ExecutableBlock.While; }
+        public bool SupportContinue(ExecutableBlock block) { return block == ExecutableBlock.For || block == ExecutableBlock.Foreach || block == ExecutableBlock.While; }
+        public bool BlockSupportBreak {
+            get {
+                foreach (var block in m_scriptExecutable.Blocks) {
+                    if (SupportBreak(block)) { return true; }
+                }
+                return false;
+            }
         }
-        public void BeginExecutable(Executable_Block block)
-        {
-            m_scriptExecutable = new ScriptExecutable(block);
-            m_Executables.Push(m_scriptExecutable);
+        public bool BlockSupportContinue {
+            get {
+                foreach (var block in m_scriptExecutable.Blocks) {
+                    if (SupportContinue(block)) { return true; }
+                }
+                return false;
+            }
         }
-        public void EndExecutable()
-        {
-            m_Executables.Pop();
-            m_scriptExecutable = (m_Executables.Count > 0) ? m_Executables.Peek() : null;
-        }
-        private int GetSourceLine()
-        {
-            return PeekToken().SourceLine;
-        }
-        //解析脚本
-        public ScriptExecutable Parse()
-        {
-            m_iNextToken = 0;
-            return ParseStatementBlock(Executable_Block.Context, false, TokenType.Finished);
-        }
-        //解析区域代码内容( {} 之间的内容)
-        private ScriptExecutable ParseStatementBlock(Executable_Block block)
-        {
-            return ParseStatementBlock(block, true, TokenType.RightBrace);
-        }
-        //解析区域代码内容( {} 之间的内容)
-        private ScriptExecutable ParseStatementBlock(Executable_Block block, bool readLeftBrace, TokenType finished)
-        {
-            BeginExecutable(block);
-            if (readLeftBrace && PeekToken().Type != TokenType.LeftBrace) {
-                ParseStatement();
-                if (PeekToken().Type == TokenType.SemiColon) ReadToken();
+        ScriptExecutable BeginExecutable(ExecutableBlock block) {
+            if (block == ExecutableBlock.Context || block == ExecutableBlock.Function) {
+                if (m_scriptExecutable != null) { m_Executables.Add(m_scriptExecutable); }
+                m_scriptExecutable = new ScriptExecutable(block);
             } else {
-                if (readLeftBrace) ReadLeftBrace();
-                TokenType tokenType;
-                while (HasMoreTokens()) {
-                    tokenType = ReadToken().Type;
-                    if (tokenType == finished)
-                        break;
-                    UndoToken();
-                    ParseStatement();
+                m_scriptExecutable.BeginStack(block);
+                if (SupportBreak(block)) { m_Breaks.Push(new List<int>()); }
+                if (SupportContinue(block)) { m_Continues.Push(new List<int>()); }
+            }
+            return m_scriptExecutable;
+        }
+        ScriptExecutable EndExecutable(ExecutableBlock block) {
+            var executable = m_scriptExecutable;
+            if (executable.Block == ExecutableBlock.Context || executable.Block == ExecutableBlock.Function) {
+                m_scriptExecutable.Finished();
+                if (m_Executables.Count > 0) {
+                    m_scriptExecutable = m_Executables[m_Executables.Count - 1];
+                    m_Executables.RemoveAt(m_Executables.Count - 1);
+                } else {
+                    m_scriptExecutable = null;
+                }
+            } else {
+                if (SupportBreak(m_scriptExecutable.Block)) { m_Break = m_Breaks.Pop(); }
+                if (SupportContinue(m_scriptExecutable.Block)) { m_Continue = m_Continues.Pop(); }
+                if (block != ExecutableBlock.ForBegin && block != ExecutableBlock.ForEnd) {
+                    m_scriptExecutable.EndStack();
                 }
             }
-            ScriptExecutable ret = m_scriptExecutable;
-            ret.EndScriptInstruction();
-            EndExecutable();
-            return ret;
+            return executable;
         }
-        //解析区域代码内容 ({} 之间的内容)
-        private void ParseStatement()
-        {
-            Token token = ReadToken();
-            switch (token.Type)
-            {
-                case TokenType.Var:
-                    ParseVar();
-                    break;
-                case TokenType.LeftBrace:
-                    ParseBlock();
-                    break;
-                case TokenType.If:
-                    ParseIf();
-                    break;
-                case TokenType.For:
-                    ParseFor();
-                    break;
-                case TokenType.Foreach:
-                    ParseForeach();
-                    break;
-                case TokenType.While:
-                    ParseWhile();
-                    break;
-                case TokenType.Switch:
-                    ParseSwtich();
-                    break;
-                case TokenType.Try:
-                    ParseTry();
-                    break;
-                case TokenType.Throw:
-                    ParseThrow();
-                    break;
-                case TokenType.Return:
-                    ParseReturn();
-                    break;
+        int GetConstDouble(double value) {
+            var index = ConstDouble.IndexOf(value);
+            if (index < 0) {
+                index = ConstDouble.Count;
+                ConstDouble.Add(value);
+                return index;
+            }
+            return index;
+        }
+        int GetConstLong(long value) {
+            var index = ConstLong.IndexOf(value);
+            if (index < 0) {
+                index = ConstLong.Count;
+                ConstLong.Add(value);
+                return index;
+            }
+            return index;
+        }
+        int GetConstString(string value) {
+            var index = ConstString.IndexOf(value);
+            if (index < 0) {
+                index = ConstString.Count;
+                ConstString.Add(value);
+                return index;
+            }
+            return index;
+        }
+        int AddScriptInstruction(Opcode opcode, int opvalue, int line) {
+            return m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(opcode, opvalue, line));
+        }
+        int AddScriptInstructionWithoutValue(Opcode opcode, int line) {
+            return m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(opcode, 0, line));
+        }
+        //解析脚本
+        public ScriptFunctionData Parse() {
+            m_indexToken = 0;
+            var executable = ParseStatementContext();
+            return new ScriptFunctionData() {
+                scriptInstructions = executable.ScriptInstructions,
+                variableCount = executable.VariableCount,
+                internalCount = executable.InternalCount,
+                parameterCount = 0,
+                param = false,
+                internals = new int[0],
+            };
+        }
+        //解析整个文件
+        ScriptExecutable ParseStatementContext() { return ParseStatementBlock(ExecutableBlock.Context, false, true, TokenType.Finished); }
+        //解析一个函数
+        ScriptExecutable ParseStatementFunction() { return ParseStatementBlock(ExecutableBlock.Function, true, false, TokenType.RightBrace); }
+        //解析一个代码块
+        ScriptExecutable ParseStatementBlock() { return ParseStatementBlock(ExecutableBlock.Block, true, true, TokenType.RightBrace); }
+        //解析一个代码块
+        ScriptExecutable ParseStatementBlock(ExecutableBlock block) { return ParseStatementBlock(block, true, true, TokenType.RightBrace); }
+        
+        int IsParentVariable(string str) {
+            int index = m_scriptExecutable.GetInternalIndex(str);
+            if (index >= 0) { return index; }
+            for (int i = m_Executables.Count - 1; i >= 0; --i) {
+                var executable = m_Executables[i];
+                index = executable.GetInternalIndex(str);
+                if (index < 0) {
+                    index = executable.GetParentInternalIndex(str);
+                }
+                if (index >= 0) {
+                    for (int j = i + 1; j < m_Executables.Count; ++j) {
+                        index = m_Executables[j].AddInternalIndex(str, index);
+                    }
+                    return m_scriptExecutable.AddInternalIndex(str, index);
+                }
+            }
+            return -1;
+        }
+        /// <summary>
+        /// 解析代码块
+        /// </summary>
+        /// <param name="block">类型</param>
+        /// <param name="readLeftBrace">是否需要 { </param>
+        /// <param name="finished">结尾 token 类型</param>
+        /// <returns></returns>
+        ScriptExecutable ParseStatementBlock(ExecutableBlock block, bool readLeftBrace, bool beginExcutable, TokenType finished) {
+            if (beginExcutable) { BeginExecutable(block); }
+            if (readLeftBrace) { ReadLeftBrace(); }
+            TokenType tokenType;
+            while (HasMoreTokens()) {
+                tokenType = ReadToken().Type;
+                if (tokenType == finished) { break; }
+                UndoToken();
+                ParseStatement();
+            }
+            return EndExecutable(block);
+        }
+        //解析单据代码内容
+        void ParseStatement() {
+            var token = ReadToken();
+            switch (token.Type) {
+                case TokenType.Var: ParseVar(); return;
+                case TokenType.Identifier: ParseExpression(); return;
+                case TokenType.LeftBrace: ParseBlock(); return;
+                case TokenType.If: ParseIf(); return;
+                case TokenType.For: ParseFor(); return;
+                case TokenType.Foreach: ParseForeach(); break;
+                case TokenType.While: ParseWhile(); return;
+                case TokenType.Class: ParseClass(); break;
+                case TokenType.Function:
                 case TokenType.Sharp:
-                    ParseSharp();
-                    break;
-                case TokenType.Identifier:
-                case TokenType.Increment:
-                case TokenType.Decrement:
-                case TokenType.Eval:
-                    ParseExpression();
-                    break;
+                    ParseFunction();
+                    return;
+                case TokenType.Return: ParseReturn(); return;
                 case TokenType.Break:
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.BREAK, new CodeObject(m_strBreviary, token.SourceLine)));
+                    if (BlockSupportBreak) {
+                        m_Breaks.Peek().Add(AddScriptInstructionWithoutValue(Opcode.Jump, token.SourceLine));
+                    } else {
+                        throw new ParserException("当前代码块不支持 break 操作", token);
+                    }
                     break;
                 case TokenType.Continue:
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CONTINUE, new CodeObject(m_strBreviary, token.SourceLine)));
+                    if (BlockSupportContinue) {
+                        m_Continues.Peek().Add(AddScriptInstructionWithoutValue(Opcode.Jump, token.SourceLine));
+                    } else {
+                        throw new ParserException("当前代码块不支持 continue 操作", token);
+                    }
                     break;
-                case TokenType.Function:
-                    ParseFunction();
+                //    case TokenType.Switch:
+                //        ParseSwtich();
+                //        break;
+                //    case TokenType.Try:
+                //        ParseTry();
+                //        break;
+                //    case TokenType.Throw:
+                //        ParseThrow();
+                //        break;
+                case TokenType.SemiColon: return;
+                default: throw new ParserException("不支持的语法 ", token);
+            }
+        }
+        //解析Var关键字
+        void ParseVar() {
+            m_scriptExecutable.AddIndex(ReadIdentifier());
+            UndoToken();
+        }
+        //解析区域块{}
+        void ParseBlock() {
+            UndoToken();
+            ParseStatementBlock();
+        }
+        //解析if(判断语句)
+        void ParseIf() {
+            var gotos = new List<int>();
+            ParseCondition(true, gotos);
+            for (; ; ) {
+                var token = ReadToken();
+                if (token.Type == TokenType.ElseIf) {
+                    ParseCondition(true, gotos);
+                } else if (token.Type == TokenType.Else && PeekToken().Type == TokenType.If) {
+                    ReadToken();
+                    ParseCondition(true, gotos);
+                } else {
+                    UndoToken();
                     break;
-                case TokenType.SemiColon:
-                    break;
-                default:
-                    throw new ParserException("不支持的语法 ", token);
+                }
+            }
+            if (PeekToken().Type == TokenType.Else) {
+                ReadToken();
+                ParseCondition(false, gotos);
+            }
+            foreach (var g in gotos) {
+                m_scriptExecutable.SetValue(g, Index);
+            }
+        }
+        //解析 if 单个判断模块
+        void ParseCondition(bool condition, List<int> gotos) {
+            int allow = -1;
+            if (condition) {
+                ReadLeftParenthesis();
+                PushObject(GetObject());
+                ReadRightParenthesis();
+                allow = AddScriptInstructionWithoutValue(Opcode.FalseTo, PeekToken().SourceLine);
+            }
+            ParseStatementBlock(ExecutableBlock.If);
+            gotos.Add(AddScriptInstructionWithoutValue(Opcode.Jump, PeekToken().SourceLine));
+            if (allow != -1) {
+                m_scriptExecutable.SetValue(allow, Index);
+            }
+        }
+        //解析for语句
+        void ParseFor() {
+            var startIndex = m_indexToken;
+            ReadLeftParenthesis();
+            if (PeekToken().Type == TokenType.Var) ReadToken();
+            if (PeekToken().Type == TokenType.Identifier) {
+                var identifier = ReadIdentifier();
+                if (ReadToken().Type == TokenType.Assign) {
+                    var obj = GetObject();
+                    if (ReadToken().Type == TokenType.Comma) {
+                        ParseForSimple(identifier, obj);
+                        return;
+                    }
+                }
+            }
+            m_indexToken = startIndex;
+            ParseForNormal();
+        }
+        void ParseForSimple(string identifier, CodeObject obj) {
+            var line = GetSourceLine();
+            m_scriptExecutable.BeginStack();
+            var index = m_scriptExecutable.AddIndex(identifier);
+            PushObject(obj);
+            AddScriptInstruction(Opcode.StoreLocal, index, line);
+            PushObject(GetObject());
+            if (ReadToken().Type == TokenType.Comma) {
+                PushObject(GetObject());
+            } else {
+                UndoToken();
+                AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble(1), line);
+            }
+            var startIndex = AddScriptInstruction(Opcode.CopyStackTopIndex, 1, line);
+            AddScriptInstruction(Opcode.LoadLocal, index, line);
+            AddScriptInstructionWithoutValue(Opcode.GreaterOrEqual, line);
+            var falseTo = AddScriptInstruction(Opcode.FalseTo, 0, line);
+            ReadRightParenthesis();
+            ParseStatementBlock(ExecutableBlock.For);
+            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
+            AddScriptInstruction(Opcode.LoadLocal, index, line);
+            AddScriptInstructionWithoutValue(Opcode.Plus, line);
+            AddScriptInstruction(Opcode.StoreLocal, index, line);
+            AddScriptInstruction(Opcode.Jump, startIndex, line);
+            m_scriptExecutable.EndStack();
+            var endIndex = Index;
+            AddScriptInstruction(Opcode.PopNumber, 2, line);     //弹出栈顶的 end 和 step
+            m_scriptExecutable.SetValue(falseTo, endIndex);
+            foreach (var c in m_Continue) { m_scriptExecutable.SetValue(c, startIndex); }
+            foreach (var b in m_Break) { m_scriptExecutable.SetValue(b, endIndex); }
+        }
+        //正常for循环  for(;;)
+        void ParseForNormal() {
+            ReadLeftParenthesis();
+            var token = ReadToken();
+            var endStackCount = 0;
+            //首先解析第一部分
+            if (token.Type != TokenType.SemiColon) {
+                UndoToken();
+                ParseStatementBlock(ExecutableBlock.ForBegin, false, true, TokenType.SemiColon);
+                endStackCount += 1;
+            }
+            //第二部分开始索引
+            var startIndex = Index;
+            //如果是false就跳出循环
+            int falseTo = -1;
+            {
+                token = ReadToken();
+                //开始解析第二部分
+                if (token.Type != TokenType.SemiColon) {
+                    UndoToken();
+                    PushObject(GetObject());
+                    ReadSemiColon();
+                    falseTo = AddScriptInstructionWithoutValue(Opcode.FalseTo, token.SourceLine);     //如果是false则跳转到循环结尾
+                }
+            }
+            //判断完直接跳到for循环主逻辑
+            var block = AddScriptInstructionWithoutValue(Opcode.Jump, token.SourceLine);
+            //第三部分开始索引
+            var forIndex = Index;
+            {
+                token = ReadToken();
+                if (token.Type != TokenType.RightPar) {
+                    UndoToken();
+                    ParseStatementBlock(ExecutableBlock.ForEnd, false, true, TokenType.RightPar);
+                    endStackCount += 1;
+                }
+                AddScriptInstruction(Opcode.Jump, startIndex, token.SourceLine);      //执行完第三部分跳转到第二部分的判断
+            }
+            m_scriptExecutable.SetValue(block, Index);
+            ParseStatementBlock(ExecutableBlock.For);
+            AddScriptInstruction(Opcode.Jump, forIndex, token.SourceLine);        //执行完主逻辑跳转到第三部分逻辑
+            //for结束索引
+            var endIndex = Index;
+            if (falseTo != -1) {
+                m_scriptExecutable.SetValue(falseTo, endIndex);
+            }
+            foreach (var c in m_Continue) { m_scriptExecutable.SetValue(c, forIndex); }
+            foreach (var b in m_Break) { m_scriptExecutable.SetValue(b, endIndex); }
+            for (var i = 0; i < endStackCount; ++i) {
+                m_scriptExecutable.EndStack();
+            }
+        }
+        //解析while（循环语句）
+        void ParseWhile() {
+            var startIndex = Index;
+            ReadLeftParenthesis();
+            PushObject(GetObject());
+            ReadRightParenthesis();
+            var allow = AddScriptInstructionWithoutValue(Opcode.FalseTo, PeekToken().SourceLine);
+            ParseStatementBlock(ExecutableBlock.While);
+            AddScriptInstruction(Opcode.Jump, startIndex, PeekToken().SourceLine);
+            m_scriptExecutable.SetValue(allow, Index);
+        }
+        //解析foreach语句
+        void ParseForeach() {
+            ReadLeftParenthesis();
+            var line = PeekToken().SourceLine;
+            if (PeekToken().Type == TokenType.Var) ReadToken();
+            m_scriptExecutable.BeginStack();
+            var varIndex = m_scriptExecutable.AddIndex(ReadIdentifier());
+            ReadIn();
+            PushObject(GetObject());
+            ReadRightParenthesis();
+            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
+            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
+            AddScriptInstruction(Opcode.StoreLocal, varIndex, line);
+            AddScriptInstruction(Opcode.LoadValueString, GetConstString(ScriptValue.IteratorNext), line);
+            var beginIndex = AddScriptInstruction(Opcode.CallEach, 0, line);
+            var falseTo = AddScriptInstruction(Opcode.FalseTo, 0, line);
+            ParseStatementBlock(ExecutableBlock.Foreach);
+            AddScriptInstruction(Opcode.Jump, beginIndex, line);
+            m_scriptExecutable.SetValue(falseTo, Index);             //如果是循环完毕跳出的话要先弹出栈顶的null值
+            var endIndex = Index;
+            AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的foreach 函数
+            AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的foreach map
+            foreach (var c in m_Continue) { m_scriptExecutable.SetValue(c, beginIndex); }
+            foreach (var b in m_Break) { m_scriptExecutable.SetValue(b, endIndex); }
+            m_scriptExecutable.EndStack();
+        }
+        //解析Class
+        void ParseClass() {
+            var list = new List<ClassData>();
+            var className = ReadIdentifier();
+            var parent = "";
+            if (PeekToken().Type == TokenType.Colon) {
+                ReadToken();
+                parent = ReadIdentifier();
+            }
+            ReadLeftBrace();
+            while (PeekToken().Type != TokenType.RightBrace) {
+                var token = ReadToken();
+                if (token.Type == TokenType.SemiColon) {
+                    continue;
+                }
+                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString) {
+                    var next = ReadToken();
+                    if (next.Type == TokenType.LeftPar || next.Type == TokenType.LeftBrace) {
+                        UndoToken();
+                        UndoToken();
+                        string functionName = "";
+                        list.Add(new ClassData() { name = token.Lexeme.ToString(), func = ParseFunctionContent(false, ref functionName) });
+                    } else {
+                        throw new ParserException("Class 开始关键字必须为[变量名称]或者[function]关键字", token);
+                    }
+                } else if (token.Type == TokenType.Function || token.Type == TokenType.Sharp) {
+                    UndoToken();
+                    string functionName = "";
+                    var index = ParseFunctionContent(true, ref functionName);
+                    list.Add(new ClassData() { name = functionName, func = index });
+                } else {
+                    throw new ParserException("Class 开始关键字必须为[变量名称]或者[function]关键字", token);
+                }
+            }
+            ReadRightBrace();
+            if (!string.IsNullOrWhiteSpace(parent)) {
+                AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(parent), PeekToken().SourceLine);
+            }
+            AddScriptInstruction(Opcode.LoadConstString, GetConstString(className), PeekToken().SourceLine);
+            foreach (var ele in list) {
+                PushObject(new CodeFunction(ele.func, GetSourceLine()));
+            }
+            foreach (var ele in list) {
+                AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.name), PeekToken().SourceLine);
+            }
+            if (string.IsNullOrWhiteSpace(parent)) {
+                AddScriptInstruction(Opcode.NewType, list.Count, PeekToken().SourceLine);
+            } else {
+                AddScriptInstruction(Opcode.NewTypeParent, list.Count, PeekToken().SourceLine);
             }
         }
         //解析函数（全局函数或类函数）
-        private void ParseFunction()
-        {
-            Token token = PeekToken();
+        void ParseFunction() {
             UndoToken();
-            ScriptScriptFunction func = ParseFunctionDeclaration(true);
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func, m_strBreviary, token.SourceLine)));
+            var functionName = "";
+            var index = ParseFunctionContent(true, ref functionName);
+            AddScriptInstruction(Opcode.NewFunction, index, PeekToken().SourceLine);
+            if (m_scriptExecutable.Block == ExecutableBlock.Context) {
+                AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(functionName), PeekToken().SourceLine);
+            } else {
+                AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.AddIndex(functionName), PeekToken().SourceLine);
+            }
         }
-        //解析函数（返回一个函数）
-        private ScriptScriptFunction ParseFunctionDeclaration(bool needName)
-        {
+        //解析return
+        void ParseReturn() {
+            var peek = PeekToken();
+            if (peek.Type == TokenType.RightBrace || peek.Type == TokenType.SemiColon || peek.Type == TokenType.Finished) {
+                AddScriptInstructionWithoutValue(Opcode.RetNone, peek.SourceLine);
+            } else {
+                PushObject(GetObject());
+                AddScriptInstructionWithoutValue(Opcode.Ret, peek.SourceLine);
+            }
+        }
+        //压入一个值
+        void PushObject(CodeObject obj) {
+            if (obj is CodeNativeObject) {
+                var value = ((CodeNativeObject)obj).obj;
+                if (value == null) {
+                    AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
+                } else if (value is bool) {
+                    AddScriptInstructionWithoutValue((bool)value ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
+                } else if (value is double) {
+                    AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)value), obj.Line);
+                } else if (value is long) {
+                    AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)value), obj.Line);
+                } else if (value is string) {
+                    AddScriptInstruction(Opcode.LoadConstString, GetConstString((string)value), obj.Line);
+                }
+            } else if (obj is CodeMember) {
+                var member = obj as CodeMember;
+                if (member.Parent == null) {
+                    if (obj is CodeMemberIndex) {
+                        AddScriptInstruction(Opcode.LoadLocal, ((CodeMember)obj).index, obj.Line);
+                    } else if (obj is CodeMemberInternal) {
+                        AddScriptInstruction(Opcode.LoadInternal, ((CodeMember)obj).index, obj.Line);
+                    } else if (obj is CodeMemberString) {
+                        AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(((CodeMember)obj).key), obj.Line);
+                    }
+                } else {
+                    PushObject(member.Parent);
+                    if (obj is CodeMemberIndex) {
+                        AddScriptInstruction(Opcode.LoadValue, ((CodeMember)obj).index, obj.Line);
+                    } else if (obj is CodeMemberString) {
+                        AddScriptInstruction(Opcode.LoadValueString, GetConstString(((CodeMember)obj).key), obj.Line);
+                    } else if (obj is CodeMemberObject) {
+                        PushObject(((CodeMemberObject)obj).codeKey);
+                        AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
+                    }
+                }
+
+            } else if (obj is CodeOperator) {
+                var oper = obj as CodeOperator;
+                if (oper.TokenType == TokenType.And) {
+                    PushObject(oper.Left);
+                    var leftIndex = AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse, obj.Line);
+                    PushObject(oper.Right);
+                    m_scriptExecutable.SetValue(leftIndex, Index);
+                } else if (oper.TokenType == TokenType.Or) {
+                    PushObject(oper.Left);
+                    var leftIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue, obj.Line);
+                    PushObject(oper.Right);
+                    m_scriptExecutable.SetValue(leftIndex, Index);
+                } else {
+                    PushObject(oper.Left);
+                    PushObject(oper.Right);
+                    AddScriptInstructionWithoutValue(TempOperator.GetOpcode(oper.TokenType), obj.Line);
+                }
+            } else if (obj is CodeRegion) {
+                PushObject((obj as CodeRegion).Context);
+            } else if (obj is CodeFunction) {
+                AddScriptInstruction(Opcode.NewFunction, (obj as CodeFunction).func, obj.Line);
+            } else if (obj is CodeCallFunction) {
+                var func = obj as CodeCallFunction;
+                foreach (var par in func.Parameters) { PushObject(par); }
+                PushObject(func.Member);
+                AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, obj.Line);
+                if (func.Variables != null) {
+                    foreach (var variable in func.Variables.Variables) {
+                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
+                        PushObject(variable.value);
+                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key), obj.Line);
+                    }
+                }
+            } else if (obj is CodeArray) {
+                var array = obj as CodeArray;
+                foreach (var ele in array.Elements) {
+                    PushObject(ele);
+                }
+                AddScriptInstruction(Opcode.NewArray, array.Elements.Count, obj.Line);
+            } else if (obj is CodeMap) {
+                var map = obj as CodeMap;
+                foreach (var ele in map.Variables) {
+                    if (ele.value == null) {
+                        AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
+                    } else {
+                        PushObject(ele.value);
+                    }
+                }
+                foreach (var ele in map.Variables) {
+                    AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.key), obj.Line);
+                }
+                AddScriptInstruction(Opcode.NewMap, map.Variables.Count, obj.Line);
+            } else if (obj is CodeTernary) {
+                var value = obj as CodeTernary;
+                PushObject(value.Allow);
+                var falseTo = AddScriptInstructionWithoutValue(Opcode.FalseTo, obj.Line);
+                PushObject(value.True);
+                var jump = AddScriptInstructionWithoutValue(Opcode.Jump, obj.Line);
+                m_scriptExecutable.SetValue(falseTo, Index);
+                PushObject(value.False);
+                m_scriptExecutable.SetValue(jump, Index);
+            } else {
+                throw new ParserException("不支持的语法 : " + obj);
+            }
+            if (obj.Not) {
+                AddScriptInstructionWithoutValue(Opcode.FlagNot, obj.Line);
+            } else if (obj.Minus) {
+                AddScriptInstructionWithoutValue(Opcode.FlagMinus, obj.Line);
+            } else if (obj.Negative) {
+                AddScriptInstructionWithoutValue(Opcode.FlagNegative, obj.Line);
+            }
+        }
+        CodeObject IsVariableFunction(CodeObject member) {
+            while (true) {
+                if (member is CodeMember) {
+                    return (member as CodeMember).Parent;
+                } else if (member is CodeCallFunction) {
+                    member = (member as CodeCallFunction).Member;
+                } else {
+                    return null;
+                }
+            }
+        }
+        //压入一个无返回值的赋值公式
+        void PushAssign(CodeAssign assign) {
+            var member = assign.member;
+            var value = assign.value;
+            var index = member.index;
+            var line = member.line;
+            if (assign.AssignType == TokenType.Assign) {
+                if (member.Parent == null) {
+                    PushObject(value);
+                    if (member is CodeMemberIndex) {
+                        AddScriptInstruction(Opcode.StoreLocal, index, line);
+                    } else if (member is CodeMemberInternal) {
+                        AddScriptInstruction(Opcode.StoreInternal, index, line);
+                    } else if (member is CodeMemberString) {
+                        AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(member.key), line);
+                    }
+                } else {
+                    PushObject(member.Parent);
+                    if (member is CodeMemberIndex) {
+                        PushObject(value);
+                        AddScriptInstruction(Opcode.StoreValue, index, line);
+                    } else if (member is CodeMemberString) {
+                        PushObject(value);
+                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(member.key), line);
+                    } else {
+                        PushObject(member.codeKey);
+                        PushObject(value);
+                        AddScriptInstructionWithoutValue(Opcode.StoreValueObject, line);
+                    }
+                }
+            } else {
+                var opcode = TempOperator.GetOpcode(assign.AssignType);
+                if (member.Parent == null) {
+                    if (member is CodeMemberIndex) {
+                        AddScriptInstruction(Opcode.LoadLocal, index, line);
+                        PushObject(value);
+                        AddScriptInstructionWithoutValue(opcode, line);
+                        AddScriptInstruction(Opcode.StoreLocal, index, line);
+                    } else if (member is CodeMemberInternal) {
+                        AddScriptInstruction(Opcode.LoadInternal, index, line);
+                        PushObject(value);
+                        AddScriptInstructionWithoutValue(opcode, line);
+                        AddScriptInstruction(Opcode.StoreInternal, index, line);
+                    } else if (member is CodeMemberString) {
+                        AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(member.key), line);
+                        PushObject(value);
+                        AddScriptInstructionWithoutValue(opcode, line);
+                        AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(member.key), line);
+                    }
+                } else {
+                    PushObject(member.Parent);
+                    if (member is CodeMemberIndex) {
+                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
+                        AddScriptInstruction(Opcode.LoadValue, index, line);
+                        PushObject(value);
+                        AddScriptInstructionWithoutValue(opcode, line);
+                        AddScriptInstruction(Opcode.StoreValue, index, line);
+                    } else if (member is CodeMemberString) {
+                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
+                        AddScriptInstruction(Opcode.LoadValueString, GetConstString(member.key), line);
+                        PushObject(value);
+                        AddScriptInstructionWithoutValue(opcode, line);
+                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(member.key), line);
+                    } else {
+                        PushObject(member.codeKey);
+                        AddScriptInstructionWithoutValue(Opcode.LoadValueObjectDup, line);
+                        PushObject(value);
+                        AddScriptInstructionWithoutValue(opcode, line);
+                        AddScriptInstructionWithoutValue(Opcode.StoreValueObject, line);
+                    }
+                }
+            }
+        }
+        //解析表达式
+        void ParseExpression() {
+            UndoToken();
+            var member = GetObject();
+            if (member is CodeAssign) {
+                PushAssign(member as CodeAssign);
+            } else if (member is CodeCallFunction) {
+                var func = member as CodeCallFunction;
+                foreach (var par in func.Parameters) { PushObject(par); }
+                PushObject(func.Member);
+                if (func.Variables == null) {
+                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Length, member.Line);
+                } else {
+                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, member.Line);
+                    foreach (var variable in func.Variables.Variables) {
+                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop, func.line);
+                        PushObject(variable.value);
+                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key), func.line);
+                    }
+                    AddScriptInstructionWithoutValue(Opcode.Pop, func.line);
+                }
+            } else {
+                throw new ParserException("语法错误 " + member.GetType(), PeekToken());
+            }
+        }
+        //获取一个Object
+        CodeObject GetObject() {
+            Stack<TempOperator> operateStack = new Stack<TempOperator>();
+            Stack<CodeObject> objectStack = new Stack<CodeObject>();
+            int line = GetSourceLine();
+            while (true) {
+                objectStack.Push(GetOneObject());
+                if (!P_Operator(operateStack, objectStack))
+                    break;
+            }
+            while (operateStack.Count > 0) {
+                objectStack.Push(new CodeOperator(objectStack.Pop(), objectStack.Pop(), operateStack.Pop().Operator, line));
+            }
+            CodeObject ret = objectStack.Pop();
+            if (ret is CodeMember) {
+                CodeMember member = ret as CodeMember;
+                Token token = ReadToken();
+                switch (token.Type) {
+                    case TokenType.Assign:
+                    case TokenType.PlusAssign:
+                    case TokenType.MinusAssign:
+                    case TokenType.MultiplyAssign:
+                    case TokenType.DivideAssign:
+                    case TokenType.ModuloAssign:
+                    case TokenType.CombineAssign:
+                    case TokenType.InclusiveOrAssign:
+                    case TokenType.XORAssign:
+                    case TokenType.ShrAssign:
+                    case TokenType.ShiAssign:
+                        ret = new CodeAssign(member, GetObject(), token.Type, token.SourceLine);
+                        break;
+                    default:
+                        UndoToken();
+                        break;
+                }
+            }
+            if (PeekToken().Type == TokenType.QuestionMark) {
+                ReadToken();
+                var ternary = new CodeTernary(GetSourceLine());
+                ternary.Allow = ret;
+                ternary.True = GetObject();
+                ReadColon();
+                ternary.False = GetObject();
+                return ternary;
+            }
+            return ret;
+        }
+        //解析操作符
+        bool P_Operator(Stack<TempOperator> operateStack, Stack<CodeObject> objectStack) {
+            TempOperator curr = TempOperator.GetOperator(PeekToken().Type);
+            if (curr == null) return false;
+            ReadToken();
+            while (operateStack.Count > 0) {
+                if (operateStack.Peek().Level >= curr.Level) {
+                    objectStack.Push(new CodeOperator(objectStack.Pop(), objectStack.Pop(), operateStack.Pop().Operator, GetSourceLine()));
+                } else {
+                    break;
+                }
+            }
+            operateStack.Push(curr);
+            return true;
+        }
+        //获得单一变量
+        CodeObject GetOneObject() {
             Token token = ReadToken();
-            if (token.Type != TokenType.Function && token.Type != TokenType.Sharp)
-                throw new ParserException("Function declaration must start with the 'function' or '#' keyword.", token);
-            String strFunctionName = needName ? ReadIdentifier() : (PeekToken().Type == TokenType.Identifier ? ReadIdentifier() : "");
-            List<String> listParameters = new List<String>();
-            bool bParams = false;
-            Token peek = ReadToken();
+            byte flag = 0;
+            if (token.Type == TokenType.Not) {
+                flag = 1;
+                token = ReadToken();
+            } else if (token.Type == TokenType.Minus) {
+                flag = 2;
+                token = ReadToken();
+            } else if (token.Type == TokenType.Negative) {
+                flag = 3;
+                token = ReadToken();
+            }
+            CodeObject ret = null;
+            switch (token.Type) {
+                case TokenType.Identifier: {
+                    var key = token.Lexeme as string;
+                    if (m_scriptExecutable.HasIndex(key)) {
+                        ret = new CodeMemberIndex(m_scriptExecutable.GetIndex(key), token.SourceLine);
+                    } else {
+                        int index = IsParentVariable(key);
+                        if (index >= 0) {
+                            ret = new CodeMemberInternal(index, token.SourceLine);
+                        } else {
+                            ret = new CodeMemberString(key, token.SourceLine);
+                        }
+                    }
+                }
+                break;
+                case TokenType.Function:
+                case TokenType.Sharp:
+                    UndoToken();
+                    var functionName = "";
+                    ret = new CodeFunction(ParseFunctionContent(true, ref functionName), token.SourceLine);
+                    break;
+                case TokenType.LeftPar:
+                    ret = GetRegionOrFunction();
+                    break;
+                case TokenType.Null:
+                    ret = new CodeNativeObject(null, token.SourceLine);
+                    break;
+                case TokenType.Boolean:
+                case TokenType.Number:
+                case TokenType.String:
+                case TokenType.SimpleString:
+                    ret = new CodeNativeObject(token.Lexeme, token.SourceLine);
+                    break;
+                case TokenType.LeftBracket:
+                    UndoToken();
+                    ret = GetArray();
+                    break;
+                case TokenType.LeftBrace:
+                    UndoToken();
+                    ret = GetMap();
+                    break;
+                default:
+                    throw new ParserException("Object起始关键字错误 ", token);
+            }
+            ret.line = token.SourceLine;
+            ret = GetVariable(ret);
+            if ((ret is CodeNativeObject || (ret is CodeRegion && (ret as CodeRegion).Context is CodeNativeObject)) && flag != 0) {
+                var scriptObject = ret is CodeNativeObject ? (ret as CodeNativeObject) : (ret as CodeRegion).Context as CodeNativeObject;
+                var obj = scriptObject.obj;
+                if (obj is bool) {
+                    if (flag == 1) {
+                        scriptObject.obj = !((bool)obj);
+                    } else {
+                        throw new ParserException("bool 不支持 [-][~] 符号", token);
+                    }
+                } else if (obj is double) {
+                    if (flag == 2) {
+                        scriptObject.obj = -(double)obj;
+                    } else {
+                        throw new ParserException("double 不支持 [!][~] 符号", token);
+                    }
+                } else if (obj is long) {
+                    if (flag == 2) {
+                        scriptObject.obj = -(long)obj;
+                    } else if (flag == 3) {
+                        scriptObject.obj = ~(long)obj;
+                    } else {
+                        throw new ParserException("long 不支持 [!] 符号", token);
+                    }
+                } else {
+                    throw new ParserException("数据类型不支持 [!][-][~] 符号", token);
+                }
+                ret = scriptObject;
+            } else {
+                ret.Not = flag == 1;
+                ret.Minus = flag == 2;
+                ret.Negative = flag == 3;
+            }
+            return ret;
+        }
+        //返回变量数据
+        CodeObject GetVariable(CodeObject parent) {
+            CodeObject ret = parent;
+            for (; ; ) {
+                Token token = ReadToken();
+                if (token.Type == TokenType.Period) {
+                    ret = new CodeMemberString(ReadIdentifier(), ret, token.SourceLine);
+                } else if (token.Type == TokenType.LeftBracket) {
+                    var member = GetObject();
+                    ReadRightBracket();
+                    if (member is CodeNativeObject) {
+                        var obj = ((CodeNativeObject)member).obj;
+                        if (obj is string) {
+                            ret = new CodeMemberString(obj.ToString(), ret, token.SourceLine);
+                        } else {
+                            ret = new CodeMemberObject(member, ret, token.SourceLine);
+                        }
+                    } else {
+                        ret = new CodeMemberObject(member, ret, token.SourceLine);
+                    }
+                } else if (token.Type == TokenType.LeftPar) {
+                    UndoToken();
+                    ret = GetCallFunction(ret);
+                    if (PeekToken().Type == TokenType.LeftBrace) {
+                        (ret as CodeCallFunction).Variables = GetMap();
+                    }
+                } else {
+                    UndoToken();
+                    break;
+                }
+                ret.line = token.SourceLine;
+            }
+            return ret;
+        }
+        //返回一个调用函数 Object
+        CodeCallFunction GetCallFunction(CodeObject member) {
+            ReadLeftParenthesis();
+            var pars = new List<CodeObject>();
+            var token = PeekToken();
+            while (token.Type != TokenType.RightPar) {
+                pars.Add(GetObject());
+                token = PeekToken();
+                if (token.Type == TokenType.Comma)
+                    ReadComma();
+                else if (token.Type == TokenType.RightPar)
+                    break;
+                else
+                    throw new ParserException("Comma ',' or right parenthesis ')' expected in function declararion.", token);
+            }
+            ReadRightParenthesis();
+            return new CodeCallFunction(member, pars, token.SourceLine);
+        }
+        CodeObject GetRegionOrFunction() {
+            UndoToken();
+            var index = m_indexToken;
+            ReadLeftParenthesis();
+            var token = ReadToken();
+            if (token.Type != TokenType.RightPar) {
+                while (true) {
+                    token = ReadToken();
+                    if (token.Type == TokenType.RightPar)
+                        break;
+                }
+            }
+            if (PeekToken().Type == TokenType.Lambda) {
+                m_indexToken = index;
+                var functionName = "";
+                return new CodeFunction(ParseFunctionContent(false, ref functionName), token.SourceLine);
+            } else {
+                m_indexToken = index;
+                ReadLeftParenthesis();
+                var ret = new CodeRegion(GetObject(), token.SourceLine);
+                ReadRightParenthesis();
+                return ret;
+            }
+        }
+        /// <summary>
+        /// 解析一个函数
+        /// </summary>
+        /// <param name="needKeyword">是否需要function,#关键字</param>
+        /// <param name="index">返回function的索引</param>
+        /// <param name="functionName">返回函数的名字</param>
+        /// <returns></returns>
+        int ParseFunctionContent(bool needKeyword, ref string functionName) {
+            var token = ReadToken();
+            if (token.Type != TokenType.Function && token.Type != TokenType.Sharp) {
+                if (needKeyword) {
+                    throw new ParserException("Function declaration must start with the 'function' or '#' keyword.", token);
+                } else {
+                    UndoToken();
+                }
+            }
+            switch (PeekToken().Type) {
+                case TokenType.Identifier:
+                    functionName = ReadIdentifier();
+                    break;
+                case TokenType.String:
+                case TokenType.SimpleString:
+                    functionName = ReadToken().Lexeme.ToString();
+                    break;
+                default:
+                    functionName = m_strBreviary + ":" + token.SourceLine;
+                    break;
+            }
+            var listParameters = new List<string>();    //参数列表(如果是变长参数，包含变长参数名字)
+            var bParams = false;                        //是否是变长参数
+            var peek = ReadToken();
             if (peek.Type == TokenType.LeftPar) {
                 if (PeekToken().Type != TokenType.RightPar) {
                     while (true) {
@@ -196,8 +961,9 @@ namespace Scorpio.Compiler
                         if (token.Type != TokenType.Identifier) {
                             throw new ParserException("Unexpected token '" + token.Lexeme + "' in function declaration.", token);
                         }
-                        String strParameterName = token.Lexeme.ToString();
-                        listParameters.Add(strParameterName);
+                        //参数名字
+                        var parameterName = token.Lexeme.ToString();
+                        listParameters.Add(parameterName);
                         token = PeekToken();
                         if (token.Type == TokenType.Comma && !bParams)
                             ReadComma();
@@ -213,655 +979,31 @@ namespace Scorpio.Compiler
             if (peek.Type == TokenType.LeftBrace) {
                 UndoToken();
             }
-            ScriptExecutable executable = ParseStatementBlock(Executable_Block.Function);
-            return new ScriptScriptFunction(m_script, strFunctionName, new ScorpioScriptFunction(m_script, listParameters, executable, bParams));
-        }
-        //解析Var关键字
-        private void ParseVar()
-        {
-            for (; ; ) {
-                Token peek = PeekToken();
-                if (peek.Type == TokenType.Function) {
-                    ScriptScriptFunction func = ParseFunctionDeclaration(true);
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, func.Name));
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.MOV, new CodeMember(func.Name), new CodeFunction(func, m_strBreviary, peek.SourceLine)));
-                } else {
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.VAR, ReadIdentifier()));
-                    peek = PeekToken();
-                    if (peek.Type == TokenType.Assign) {
-                        UndoToken();
-                        ParseStatement();
-                    }
-                }
-                peek = ReadToken();
-                if (peek.Type != TokenType.Comma) {
-                    UndoToken();
-                    break;
-                }
-                peek = PeekToken();
-                if (peek.Type == TokenType.Var) {
-                    ReadToken();
-                }
+            BeginExecutable(ExecutableBlock.Function);
+            foreach (var par in listParameters) {
+                AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.AddIndex(par), token.SourceLine)  ;
             }
-        }
-        //解析普通代码块 {}
-        private void ParseBlock()
-        {
-            UndoToken();
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_BLOCK, new CodeCallBlock(ParseStatementBlock(Executable_Block.Block))));
-        }
-        //解析if(判断语句)
-        private void ParseIf()
-        {
-            CodeIf ret = new CodeIf();
-            ret.If = ParseCondition(true, Executable_Block.If);
-            List<TempCondition> ElseIf = new List<TempCondition>();
-            for (; ; )
-            {
-                Token token = ReadToken();
-                if (token.Type == TokenType.ElseIf) {
-                    ElseIf.Add(ParseCondition(true, Executable_Block.If));
-                } else if (token.Type == TokenType.Else) {
-                    if (PeekToken().Type == TokenType.If) {
-                        ReadToken();
-                        ElseIf.Add(ParseCondition(true, Executable_Block.If));
-                    } else {
-                        UndoToken();
-                        break;
-                    }
-                } else {
-                    UndoToken();
-                    break;
-                }
-            }
-            if (PeekToken().Type == TokenType.Else)
-            {
-                ReadToken();
-                ret.Else = ParseCondition(false, Executable_Block.If);
-            }
-            ret.Init(ElseIf);
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_IF, ret));
-        }
-        //解析判断内容
-        private TempCondition ParseCondition(bool condition, Executable_Block block)
-        {
-            CodeObject con = null;
-            if (condition) {
-                ReadLeftParenthesis();
-                con = GetObject();
-                ReadRightParenthesis();
-            }
-            return new TempCondition(con, ParseStatementBlock(block), block);
-        }
-        //解析for语句
-        private void ParseFor()
-        {
-            ReadLeftParenthesis();
-            int partIndex = m_iNextToken;
-			if (PeekToken ().Type == TokenType.Var) ReadToken ();
-			Token identifier = ReadToken();
-			if (identifier.Type == TokenType.Identifier) {
-                Token assign = ReadToken();
-                if (assign.Type == TokenType.Assign) {
-                    CodeObject obj = GetObject();
-                    Token comma = ReadToken();
-                    if (comma.Type == TokenType.Comma) {
-						ParseFor_Simple((string)identifier.Lexeme, obj);
-                        return;
-                    }
-                }
-            }
-            m_iNextToken = partIndex;
-            ParseFor_impl();
-        }
-        //解析单纯for循环
-        private void ParseFor_Simple(string Identifier, CodeObject obj)
-        {
-            CodeForSimple ret = new CodeForSimple();
-            ret.Identifier = Identifier;
-            ret.Begin = obj;
-            ret.Finished = GetObject();
-            if (PeekToken().Type == TokenType.Comma)
-            {
-                ReadToken();
-                ret.Step = GetObject();
-            }
-            ReadRightParenthesis();
-            ret.BlockExecutable = ParseStatementBlock(Executable_Block.For);
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FORSIMPLE, ret));
-        }
-        //解析正规for循环
-        private void ParseFor_impl()
-        {
-            CodeFor ret = new CodeFor();
-            Token token = ReadToken();
-            if (token.Type != TokenType.SemiColon)
-            {
-                UndoToken();
-                ret.BeginExecutable = ParseStatementBlock(Executable_Block.ForBegin, false, TokenType.SemiColon);
-            }
-            token = ReadToken();
-            if (token.Type != TokenType.SemiColon)
-            {
-                UndoToken();
-                ret.Condition = GetObject();
-                ReadSemiColon();
-            }
-            token = ReadToken();
-            if (token.Type != TokenType.RightPar)
-            {
-                UndoToken();
-                ret.LoopExecutable = ParseStatementBlock(Executable_Block.ForLoop, false, TokenType.RightPar);
-            }
-            ret.BlockExecutable = ParseStatementBlock(Executable_Block.For);
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FOR, ret));
-        }
-        //解析foreach语句
-        private void ParseForeach()
-        {
-            CodeForeach ret = new CodeForeach();
-            ReadLeftParenthesis();
-            if (PeekToken().Type == TokenType.Var) ReadToken();
-            ret.Identifier = ReadIdentifier();
-            ReadIn();
-            ret.LoopObject = GetObject();
-            ReadRightParenthesis();
-            ret.BlockExecutable = ParseStatementBlock(Executable_Block.Foreach);
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FOREACH, ret));
-        }
-        //解析while（循环语句）
-        private void ParseWhile()
-        {
-            CodeWhile ret = new CodeWhile();
-            ret.While = ParseCondition(true, Executable_Block.While);
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_WHILE, ret));
-        }
-        //解析swtich语句
-        private void ParseSwtich()
-        {
-            CodeSwitch ret = new CodeSwitch();
-            ReadLeftParenthesis();
-            ret.Condition = GetObject();
-            ReadRightParenthesis();
-            ReadLeftBrace();
-            List<TempCase> Cases = new List<TempCase>();
-            for (; ; ) {
-                Token token = ReadToken();
-                if (token.Type == TokenType.Case) {
-                    List<CodeObject> allow = new List<CodeObject>();
-                    ParseCase(allow);
-                    Cases.Add(new TempCase(m_script, allow, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break)));
-                } else if (token.Type == TokenType.Default) {
-                    ReadColon();
-                    ret.Default = new TempCase(m_script, null, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break));
-                } else if (token.Type != TokenType.SemiColon) {
-                    UndoToken();
-                    break;
-                }
-            }
-            ReadRightBrace();
-            ret.SetCases(Cases);
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_SWITCH, ret));
-        }
-        //解析case
-        private void ParseCase(List<CodeObject> allow)
-        {
-            allow.Add(GetObject());
-            ReadColon();
-            if (ReadToken().Type == TokenType.Case) {
-                ParseCase(allow);
-            } else {
-                UndoToken();
-            }
-        }
-        //解析try catch
-        private void ParseTry()
-        {
-            CodeTry ret = new CodeTry();
-            ret.TryExecutable = ParseStatementBlock(Executable_Block.Context);
-            ReadCatch();
-            ReadLeftParenthesis();
-            ret.Identifier = ReadIdentifier();
-            ReadRightParenthesis();
-            ret.CatchExecutable = ParseStatementBlock(Executable_Block.Context);
-            if (PeekToken().Type == TokenType.Finally) {
-                ReadToken();
-                ret.FinallyExecutable = ParseStatementBlock(Executable_Block.Context);
-            }
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_TRY, ret));
-        }
-        //解析throw
-        private void ParseThrow()
-        {
-            CodeThrow ret = new CodeThrow();
-            ret.obj = GetObject();
-            m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.THROW, ret));
-        }
-        //解析return
-        private void ParseReturn()
-        {
-            Token peek = PeekToken();
-            if (peek.Type == TokenType.RightBrace ||
-                peek.Type == TokenType.SemiColon ||
-                peek.Type == TokenType.Finished)
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, (CodeObject)null));
-            else
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RET, GetObject()));
-        }
-        //解析 #
-        private void ParseSharp() {
-            Token token = ReadToken();
-            if (token.Type == TokenType.Define) {
-                if (m_scriptExecutable.m_Block != Executable_Block.Context)
-                    throw new ParserException("#define只能使用在上下文", token);
-                m_script.PushDefine(ReadIdentifier());
-            } else if (token.Type == TokenType.If) {
-                if (m_define == null) {
-                    if (IsDefine()) {
-                        m_define = new DefineState(DefineType.Already);
-                    } else {
-                        m_define = new DefineState(DefineType.Being);
-                        PopSharp();
-                    }
-                } else if (m_define.State == DefineType.Already) {
-                    if (IsDefine()) {
-                        m_Defines.Push(m_define);
-                        m_define = new DefineState(DefineType.Already);
-                    } else {
-                        m_Defines.Push(m_define);
-                        m_define = new DefineState(DefineType.Being);
-                        PopSharp();
-                    }
-                } else if (m_define.State == DefineType.Being) {
-                    m_Defines.Push(m_define);
-                    m_define = new DefineState(DefineType.Break);
-                    PopSharp();
-                } else if (m_define.State == DefineType.Break) {
-                    m_Defines.Push(m_define);
-                    m_define = new DefineState(DefineType.Break);
-                    PopSharp();
-                }
-            } else if (token.Type == TokenType.Ifndef) {
-                if (m_define == null) {
-                    if (!IsDefine()) {
-                        m_define = new DefineState(DefineType.Already);
-                    } else {
-                        m_define = new DefineState(DefineType.Being);
-                        PopSharp();
-                    }
-                } else if (m_define.State == DefineType.Already) {
-                    if (!IsDefine()) {
-                        m_Defines.Push(m_define);
-                        m_define = new DefineState(DefineType.Already);
-                    } else {
-                        m_Defines.Push(m_define);
-                        m_define = new DefineState(DefineType.Being);
-                        PopSharp();
-                    }
-                } else if (m_define.State == DefineType.Being) {
-                    m_Defines.Push(m_define);
-                    m_define = new DefineState(DefineType.Break);
-                    PopSharp();
-                }
-            } else if (token.Type == TokenType.ElseIf) {
-                if (m_define == null) {
-                    throw new ParserException("未找到#if或#ifndef", token);
-                } else if (m_define.State == DefineType.Already || m_define.State == DefineType.Break) {
-                    m_define.State = DefineType.Break;
-                    PopSharp();
-                } else if (IsDefine()) {
-                    m_define.State = DefineType.Already;
-                } else {
-                    m_define.State = DefineType.Being;
-                    PopSharp();
-                }
-            } else if (token.Type == TokenType.Else) {
-                if (m_define == null) {
-                    throw new ParserException("未找到#if或#ifndef", token);
-                } else if (m_define.State == DefineType.Already || m_define.State == DefineType.Break) {
-                    m_define.State = DefineType.Break;
-                    PopSharp();
-                } else {
-                    m_define.State = DefineType.Already;
-                }
-            } else if (token.Type == TokenType.Endif) {
-                if (m_define == null) {
-                    throw new ParserException("未找到#if或#ifndef", token);
-                } else if (m_Defines.Count > 0) {
-                    m_define = m_Defines.Pop();
-                    if (m_define.State == DefineType.Break)
-                        PopSharp();
-                } else {
-                    m_define = null;
-                }
-            } else {
-                UndoToken();
-                ParseFunction();
-            }
-        }
-        private bool IsDefine() {
-            return IsDefine_impl(ReadDefine());
-        }
-        private bool IsDefine_impl(DefineObject define) {
-            bool ret = false;
-            if (define is DefineString) {
-                ret = m_script.ContainDefine(((DefineString)define).Define);
-            } else {
-                DefineOperate oper = (DefineOperate)define;
-                bool left = IsDefine_impl(oper.Left);
-                if (left && !oper.and) {
-                    ret = true;
-                } else if (!left && oper.and) {
-                    ret = false;
-                } else if (oper.and) {
-                    ret = left && IsDefine_impl(oper.Right);
-                } else {
-                    ret = left || IsDefine_impl(oper.Right);
-                }
-            }
-            if (define.Not) { ret = !ret; }
-            return ret;
-        }
-        private DefineObject ReadDefine() {
-            Stack<bool> operateStack = new Stack<bool>();
-            Stack<DefineObject> objectStack = new Stack<DefineObject>();
-            while (true) {
-                objectStack.Push(GetOneDefine());
-                if (!OperatorDefine(operateStack, objectStack))
-                    break;
-            }
-            while (operateStack.Count > 0) {
-                objectStack.Push(new DefineOperate(objectStack.Pop(), objectStack.Pop(), operateStack.Pop()));
-            }
-            return objectStack.Pop();
-        }
-        private bool OperatorDefine(Stack<bool> operateStack, Stack<DefineObject> objectStack) {
-            Token peek = PeekToken();
-            if (peek.Type != TokenType.And && peek.Type != TokenType.Or) { return false; }
-            ReadToken();
-            while (operateStack.Count > 0) {
-                objectStack.Push(new DefineOperate(objectStack.Pop(), objectStack.Pop(), operateStack.Pop()));
-            }
-            operateStack.Push(peek.Type == TokenType.And);
-            return true;
-        }
-        private DefineObject GetOneDefine() {
-            Token token = ReadToken();
-            bool not = false;
-            if (token.Type == TokenType.Not) {
-                not = true;
-                token = ReadToken();
-            }
-            if (token.Type == TokenType.LeftPar) {
-                var ret = ReadDefine();
-                ReadRightParenthesis();
-                ret.Not = not;
-                return ret;
-            } else if (token.Type == TokenType.Identifier) {
-                return new DefineString(token.Lexeme.ToString()) { Not = not };
-            } else {
-                throw new ParserException("宏定义判断只支持 字符串", token);
-            }
-        }
-        //跳过未解析宏定义 
-        private void PopSharp() {
-            for (;;) {
-                if (ReadToken().Type == TokenType.Sharp) {
-                    if (PeekToken().Type == TokenType.Define) {
-                        ReadToken();
-                    } else {
-                        break;
-                    }
-                }
-            }
-            ParseSharp();
-        }
-        //解析表达式
-        private void ParseExpression()
-        {
-            UndoToken();
-            Token peek = PeekToken();
-            CodeObject member = GetObject();
-            if (member is CodeCallFunction) {
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_FUNCTION, member));
-            } else if (member is CodeMember) {
-                if ((member as CodeMember).Calc != CALC.NONE)
-                    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RESOLVE, member));
-                else
-                    throw new ParserException("变量后缀不支持此操作符  " + PeekToken().Type, peek);
-            } else if (member is CodeAssign || member is CodeEval) {
-                m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.RESOLVE, member));
-            } else {
-                throw new ParserException("语法不支持起始符号为 " + member.GetType(), peek);
-            }
-        }
-        //获取一个Object
-        private CodeObject GetObject()
-        {
-            Stack<TempOperator> operateStack = new Stack<TempOperator>();
-            Stack<CodeObject> objectStack = new Stack<CodeObject>();
-            while (true) {
-                objectStack.Push(GetOneObject());
-                if (!P_Operator(operateStack, objectStack))
-                    break;
-            }
-            while (operateStack.Count > 0) {
-                objectStack.Push(new CodeOperator(objectStack.Pop(), objectStack.Pop(), operateStack.Pop().Operator, m_strBreviary, GetSourceLine()));
-            }
-            CodeObject ret = objectStack.Pop();
-            if (ret is CodeMember) {
-                CodeMember member = ret as CodeMember;
-                if (member.Calc == CALC.NONE) {
-                    Token token = ReadToken();
-                    switch (token.Type) {
-                        case TokenType.Assign:
-                        case TokenType.AssignPlus:
-                        case TokenType.AssignMinus:
-                        case TokenType.AssignMultiply:
-                        case TokenType.AssignDivide:
-                        case TokenType.AssignModulo:
-                        case TokenType.AssignCombine:
-                        case TokenType.AssignInclusiveOr:
-                        case TokenType.AssignXOR:
-                        case TokenType.AssignShr:
-                        case TokenType.AssignShi:
-                            ret = new CodeAssign(member, GetObject(), token.Type, m_strBreviary, token.SourceLine);
-                            break;
-                        default:
-                            UndoToken();
-                            break;
-                    }
-                }
-            }
-			if (PeekToken ().Type == TokenType.QuestionMark) {
-				ReadToken();
-				CodeTernary ternary = new CodeTernary();
-				ternary.Allow = ret;
-				ternary.True = GetObject();
-				ReadColon();
-				ternary.False = GetObject();
-				return ternary;
-			}
-            return ret;
-        }
-        //解析操作符
-        private bool P_Operator(Stack<TempOperator> operateStack, Stack<CodeObject> objectStack)
-        {
-            TempOperator curr = TempOperator.GetOper(PeekToken().Type);
-            if (curr == null) return false;
-            ReadToken();
-            while (operateStack.Count > 0) {
-                if (operateStack.Peek().Level >= curr.Level) {
-                    objectStack.Push(new CodeOperator(objectStack.Pop(), objectStack.Pop(), operateStack.Pop().Operator, m_strBreviary, GetSourceLine()));
-                } else {
-                    break;
-                }
-            }
-            operateStack.Push(curr);
-            return true;
-        }
-        //获得单一变量
-        private CodeObject GetOneObject()
-        {
-            CodeObject ret = null;
-            Token token = ReadToken();
-            bool not = false;
-            bool minus = false;
-            bool negative = false;
-            CALC calc = CALC.NONE;
-            while (true) {
-                if (token.Type == TokenType.Not) {
-                    not = true;
-                } else if (token.Type == TokenType.Minus) {
-                    minus = true;
-                } else if (token.Type == TokenType.Negative) {
-                    negative = true;
-                } else {
-                    break;
-                }
-                token = ReadToken();
-            }
-            if (token.Type == TokenType.Increment) {
-                calc = CALC.PRE_INCREMENT;
-                token = ReadToken();
-            } else if (token.Type == TokenType.Decrement) {
-                calc = CALC.PRE_DECREMENT;
-                token = ReadToken();
-            }
-            switch (token.Type)
-            {
-                case TokenType.Identifier:
-                    ret = new CodeMember((string)token.Lexeme);
-                    break;
-                case TokenType.Function:
-                case TokenType.Sharp:
-                    UndoToken();
-                    ret = new CodeFunction(ParseFunctionDeclaration(false));
-                    break;
-                case TokenType.LeftPar:
-                    ret = new CodeRegion(GetObject());
-                    ReadRightParenthesis();
-                    break;
-                case TokenType.LeftBracket:
-                    UndoToken();
-                    ret = GetArray();
-                    break;
-                case TokenType.LeftBrace:
-                    UndoToken();
-                    ret = GetTable();
-                    break;
-                case TokenType.Eval:
-                    ret = GetEval();
-                    break;
-                case TokenType.Null:
-                    ret = new CodeScriptObject(m_script, null);
-                    break;
-                case TokenType.Boolean:
-                case TokenType.Number:
-                case TokenType.String:
-                case TokenType.SimpleString:
-                    ret = new CodeScriptObject(m_script, token.Lexeme);
-                    break;
-                default:
-                    throw new ParserException("Object起始关键字错误 ", token);
-            }
-            ret.StackInfo = new StackInfo(m_strBreviary, token.SourceLine);
-            ret = GetVariable(ret);
-            ret.Not = not;
-            ret.Minus = minus;
-            ret.Negative = negative;
-            if (ret is CodeMember) {
-                if (calc != CALC.NONE) {
-                    ((CodeMember)ret).Calc = calc;
-                } else {
-                    Token peek = ReadToken();
-                    if (peek.Type == TokenType.Increment) {
-                        calc = CALC.POST_INCREMENT;
-                    } else if (peek.Type == TokenType.Decrement) {
-                        calc = CALC.POST_DECREMENT;
-                    } else {
-                        UndoToken();
-                    }
-                    if (calc != CALC.NONE) {
-                        ((CodeMember)ret).Calc = calc;
-                    }
-                }
-            } else if (calc != CALC.NONE) {
-                throw new ParserException("++ 或者 -- 只支持变量的操作", token);
-            }
-            return ret;
-        }
-        //返回变量数据
-        private CodeObject GetVariable(CodeObject parent)
-        {
-            CodeObject ret = parent;
-            for ( ; ; ) {
-                Token m = ReadToken();
-                if (m.Type == TokenType.Period) {
-                    ret = new CodeMember(ReadIdentifier(), ret);
-                } else if (m.Type == TokenType.LeftBracket) {
-                    CodeObject member = GetObject();
-                    ReadRightBracket();
-                    if (member is CodeScriptObject) {
-                        ScriptObject obj = ((CodeScriptObject)member).Object;
-                        if (member.Not) {
-                            ret = new CodeMember(!obj.LogicOperation(), ret);
-                        } else if (member.Minus) {
-                            ScriptNumber num = obj as ScriptNumber;
-                            if (num == null) throw new ParserException("Script Object Type [" + obj.Type + "] is cannot use [-] sign", m);
-                            ret = new CodeMember(num.Minus().KeyValue, ret);
-                        } else if (member.Negative) {
-                            ScriptNumber num = obj as ScriptNumber;
-                            if (num == null) throw new ParserException("Script Object Type [" + obj.Type + "] is cannot use [~] sign", m);
-                            ret = new CodeMember(num.Negative().KeyValue, ret);
-                        } else {
-                            ret = new CodeMember(obj.KeyValue, ret);
-                        }
-                    } else {
-                        ret = new CodeMember(member, ret);
-                    }
-                } else if (m.Type == TokenType.LeftPar) {
-                    UndoToken();
-                    ret = GetFunction(ret);
-                } else {
-                    UndoToken();
-                    break;
-                }
-                ret.StackInfo = new StackInfo(m_strBreviary, m.SourceLine);
-            }
-            return ret;
-        }
-        //返回一个调用函数 Object
-        private CodeCallFunction GetFunction(CodeObject member)
-        {
-            ReadLeftParenthesis();
-            List<CodeObject> pars = new List<CodeObject>();
-            Token token = PeekToken();
-            while (token.Type != TokenType.RightPar)
-            {
-                pars.Add(GetObject());
-                token = PeekToken();
-                if (token.Type == TokenType.Comma)
-                    ReadComma();
-                else if (token.Type == TokenType.RightPar)
-                    break;
-                else
-                    throw new ParserException("Comma ',' or right parenthesis ')' expected in function declararion.", token);
-            }
-            ReadRightParenthesis();
-            return new CodeCallFunction(member, pars);
+            var executable = ParseStatementFunction();
+            var index = Functions.Count;
+            Functions.Add(new ScriptFunctionData() {
+                scriptInstructions = executable.ScriptInstructions,
+                parameterCount = listParameters.Count,
+                param = bParams,
+                variableCount = executable.VariableCount,
+                internalCount = executable.InternalCount,
+                internals = executable.ScriptInternals,
+            });
+            return index;
         }
         //返回数组
-        private CodeArray GetArray()
-        {
+        CodeArray GetArray() {
             ReadLeftBracket();
-            Token token = PeekToken();
-            CodeArray ret = new CodeArray();
-            while (token.Type != TokenType.RightBracket)
-            {
+            var token = PeekToken();
+            var ret = new CodeArray(token.SourceLine);
+            while (token.Type != TokenType.RightBracket) {
                 if (PeekToken().Type == TokenType.RightBracket)
                     break;
-                ret._Elements.Add(GetObject());
+                ret.Elements.Add(GetObject());
                 token = PeekToken();
                 if (token.Type == TokenType.Comma || token.Type == TokenType.SemiColon) {
                     ReadToken();
@@ -871,54 +1013,100 @@ namespace Scorpio.Compiler
                     throw new ParserException("Comma ',' or SemiColon ';' or right parenthesis ']' expected in array object.", token);
             }
             ReadRightBracket();
-            ret.Init();
             return ret;
         }
-        //返回Table数据
-        private CodeTable GetTable()
-        {
-            CodeTable ret = new CodeTable();
+        //返回map数据
+        CodeMap GetMap() {
+            var ret = new CodeMap(GetSourceLine());
             ReadLeftBrace();
             while (PeekToken().Type != TokenType.RightBrace) {
                 Token token = ReadToken();
                 if (token.Type == TokenType.Comma || token.Type == TokenType.SemiColon) {
                     continue;
                 }
-                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString || token.Type == TokenType.Number || 
-                    token.Type == TokenType.Boolean || token.Type == TokenType.Null) {
+                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString) {
                     Token next = ReadToken();
                     if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
-                        if (token.Type == TokenType.Null) {
-                            ret._Variables.Add(new CodeTable.TableVariable(m_script.Null.KeyValue, GetObject()));
-                        } else {
-                            ret._Variables.Add(new CodeTable.TableVariable(token.Lexeme, GetObject()));
-                        }
+                        ret.Variables.Add(new CodeMap.MapVariable(token.Lexeme.ToString(), GetObject()));
                     } else if (next.Type == TokenType.Comma || next.Type == TokenType.SemiColon) {
-                        if (token.Type == TokenType.Null) {
-                            ret._Variables.Add(new CodeTable.TableVariable(m_script.Null.KeyValue, new CodeScriptObject(m_script, null)));
-                        } else {
-                            ret._Variables.Add(new CodeTable.TableVariable(token.Lexeme, new CodeScriptObject(m_script, null)));
-                        }
+                        ret.Variables.Add(new CodeMap.MapVariable(token.Lexeme.ToString(), null));
+                    } else if (next.Type == TokenType.LeftPar) {
+                        UndoToken();
+                        UndoToken();
+                        string functionName = "";
+                        var index = ParseFunctionContent(false, ref functionName);
+                        ret.Variables.Add(new CodeMap.MapVariable(functionName, new CodeFunction(index, token.SourceLine)));
                     } else {
-                        throw new ParserException("Table变量赋值符号为[=]或者[:]", token);
+                        throw new ParserException("Map变量赋值符号为[=]或者[:]", token);
                     }
-                } else if (token.Type == TokenType.Function) {
+                } else if (token.Type == TokenType.Function || token.Type == TokenType.Sharp) {
                     UndoToken();
-                    ret._Functions.Add(ParseFunctionDeclaration(true));
+                    string functionName = "";
+                    var index = ParseFunctionContent(true, ref functionName);
+                    ret.Variables.Add(new CodeMap.MapVariable(functionName, new CodeFunction(index, token.SourceLine)));
                 } else {
-                    throw new ParserException("Table开始关键字必须为[变量名称]或者[function]关键字", token);
+                    throw new ParserException("Map开始关键字必须为[变量名称]或者[function]关键字", token);
                 }
             }
             ReadRightBrace();
-            ret.Init();
             return ret;
         }
-        //返回执行一段字符串
-        private CodeEval GetEval()
-        {
-            CodeEval ret = new CodeEval();
-            ret.EvalObject = GetObject();
-            return ret;
-        }
+        ////解析swtich语句
+        //private void ParseSwtich() {
+        //    CodeSwitch ret = new CodeSwitch();
+        //    ReadLeftParenthesis();
+        //    ret.Condition = GetObject();
+        //    ReadRightParenthesis();
+        //    ReadLeftBrace();
+        //    List<TempCase> Cases = new List<TempCase>();
+        //    for (; ; ) {
+        //        Token token = ReadToken();
+        //        if (token.Type == TokenType.Case) {
+        //            List<CodeObject> allow = new List<CodeObject>();
+        //            ParseCase(allow);
+        //            Cases.Add(new TempCase(m_script, allow, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break)));
+        //        } else if (token.Type == TokenType.Default) {
+        //            ReadColon();
+        //            ret.Default = new TempCase(m_script, null, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break));
+        //        } else if (token.Type != TokenType.SemiColon) {
+        //            UndoToken();
+        //            break;
+        //        }
+        //    }
+        //    ReadRightBrace();
+        //    ret.SetCases(Cases);
+        //    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_SWITCH, ret));
+        //}
+        ////解析case
+        //private void ParseCase(List<CodeObject> allow) {
+        //    allow.Add(GetObject());
+        //    ReadColon();
+        //    if (ReadToken().Type == TokenType.Case) {
+        //        ParseCase(allow);
+        //    } else {
+        //        UndoToken();
+        //    }
+        //}
+        ////解析try catch
+        //private void ParseTry() {
+        //    CodeTry ret = new CodeTry();
+        //    ret.TryExecutable = ParseStatementBlock(Executable_Block.Context);
+        //    ReadCatch();
+        //    ReadLeftParenthesis();
+        //    ret.Identifier = ReadIdentifier();
+        //    ReadRightParenthesis();
+        //    ret.CatchExecutable = ParseStatementBlock(Executable_Block.Context);
+        //    if (PeekToken().Type == TokenType.Finally) {
+        //        ReadToken();
+        //        ret.FinallyExecutable = ParseStatementBlock(Executable_Block.Context);
+        //    }
+        //    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_TRY, ret));
+        //}
+        ////解析throw
+        //private void ParseThrow() {
+        //    CodeThrow ret = new CodeThrow();
+        //    ret.obj = GetObject();
+        //    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.THROW, ret));
+        //}
     }
 }

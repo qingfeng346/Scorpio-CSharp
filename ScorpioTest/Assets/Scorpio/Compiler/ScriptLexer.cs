@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Scorpio;
-using Scorpio.Exception;
+﻿using System.Collections.Generic;
 namespace Scorpio.Compiler {
-
     /// <summary> 脚本语法解析 </summary>
     public partial class ScriptLexer {
         /// <summary> . </summary>
@@ -24,10 +19,8 @@ namespace Scorpio.Compiler {
         /// <summary> + </summary>
         void ReadPlus() {
             ch = ReadChar();
-            if (ch == '+') {
-                AddToken(TokenType.Increment, "++");
-            } else if (ch == '=') {
-                AddToken(TokenType.AssignPlus, "+=");
+            if (ch == '=') {
+                AddToken(TokenType.PlusAssign, "+=");
             } else {
                 AddToken(TokenType.Plus, "+");
                 UndoChar();
@@ -36,10 +29,8 @@ namespace Scorpio.Compiler {
         /// <summary> - </summary>
         void ReadMinus() {
             ch = ReadChar();
-            if (ch == '-') {
-                AddToken(TokenType.Decrement, "--");
-            } else if (ch == '=') {
-                AddToken(TokenType.AssignMinus, "-=");
+            if (ch == '=') {
+                AddToken(TokenType.MinusAssign, "-=");
             } else {
                 AddToken(TokenType.Minus, "-");
                 UndoChar();
@@ -49,7 +40,7 @@ namespace Scorpio.Compiler {
         void ReadMultiply() {
             ch = ReadChar();
             if (ch == '=') {
-                AddToken(TokenType.AssignMultiply, "*=");
+                AddToken(TokenType.MultiplyAssign, "*=");
             } else {
                 AddToken(TokenType.Multiply, "*");
                 UndoChar();
@@ -63,7 +54,7 @@ namespace Scorpio.Compiler {
             } else if (ch == '*') {
                 ReadBlockComment();
             } else if (ch == '=') {
-                AddToken(TokenType.AssignDivide, "/=");
+                AddToken(TokenType.DivideAssign, "/=");
             } else {
                 AddToken(TokenType.Divide, "+");
                 UndoChar();
@@ -93,7 +84,7 @@ namespace Scorpio.Compiler {
         void ReadModulo() {
             ch = ReadChar();
             if (ch == '=') {
-                AddToken(TokenType.AssignModulo, "%=");
+                AddToken(TokenType.ModuloAssign, "%=");
             } else {
                 AddToken(TokenType.Modulo, "%");
                 UndoChar();
@@ -104,6 +95,8 @@ namespace Scorpio.Compiler {
             ch = ReadChar();
             if (ch == '=') {
                 AddToken(TokenType.Equal, "==");
+            } else if (ch == '>') {
+                AddToken(TokenType.Lambda, "=>");
             } else {
                 AddToken(TokenType.Assign, "=");
                 UndoChar();
@@ -115,7 +108,7 @@ namespace Scorpio.Compiler {
             if (ch == '&') {
                 AddToken(TokenType.And, "&&");
             } else if (ch == '=') {
-                AddToken(TokenType.AssignCombine, "&=");
+                AddToken(TokenType.CombineAssign, "&=");
             } else {
                 AddToken(TokenType.Combine, "&");
                 UndoChar();
@@ -127,7 +120,7 @@ namespace Scorpio.Compiler {
             if (ch == '|') {
                 AddToken(TokenType.Or, "||");
             } else if (ch == '=') {
-                AddToken(TokenType.AssignInclusiveOr, "|=");
+                AddToken(TokenType.InclusiveOrAssign, "|=");
             } else {
                 AddToken(TokenType.InclusiveOr, "|");
                 UndoChar();
@@ -151,7 +144,7 @@ namespace Scorpio.Compiler {
             } else if (ch == '>') {
                 ch = ReadChar();
                 if (ch == '=') {
-                    AddToken(TokenType.AssignShr, ">>=");
+                    AddToken(TokenType.ShrAssign, ">>=");
                 } else {
                     AddToken(TokenType.Shr, ">>");
                     UndoChar();
@@ -169,7 +162,7 @@ namespace Scorpio.Compiler {
             } else if (ch == '<') {
                 ch = ReadChar();
                 if (ch == '=') {
-                    AddToken(TokenType.AssignShi, "<<=");
+                    AddToken(TokenType.ShiAssign, "<<=");
                 } else {
                     AddToken(TokenType.Shi, "<<");
                     UndoChar();
@@ -183,7 +176,7 @@ namespace Scorpio.Compiler {
         void ReadXor() {
             ch = ReadChar();
             if (ch == '=') {
-                AddToken(TokenType.AssignXOR, "^=");
+                AddToken(TokenType.XORAssign, "^=");
             } else {
                 AddToken(TokenType.XOR, "^");
                 UndoChar();
@@ -260,7 +253,7 @@ namespace Scorpio.Compiler {
                         m_Builder.Append(ch);
                     } else {
                         UndoChar();
-                        AddToken(new Token(TokenType.SimpleString, m_Builder.ToString(), m_iCacheLine, m_iSourceChar));
+                        AddToken(TokenType.SimpleString, m_Builder.ToString(), m_iCacheLine, m_iSourceChar);
                         break;
                     }
                 } else if (ch == '$') {
@@ -347,96 +340,89 @@ namespace Scorpio.Compiler {
             } while (true);
             TokenType tokenType;
             switch (m_Builder.ToString()) {
-            case "eval":
-                tokenType = TokenType.Eval;
-                break;
-            case "var":
-            case "local":
-            case "let":
-                tokenType = TokenType.Var;
-                break;
-            case "function":
-                tokenType = TokenType.Function;
-                break;
-            case "if":
-                tokenType = TokenType.If;
-                break;
-            case "elseif":
-            case "elif":
-                tokenType = TokenType.ElseIf;
-                break;
-            case "else":
-                tokenType = TokenType.Else;
-                break;
-            case "while":
-                tokenType = TokenType.While;
-                break;
-            case "for":
-                tokenType = TokenType.For;
-                break;
-            case "foreach":
-                tokenType = TokenType.Foreach;
-                break;
-            case "in":
-                tokenType = TokenType.In;
-                break;
-            case "switch":
-                tokenType = TokenType.Switch;
-                break;
-            case "case":
-                tokenType = TokenType.Case;
-                break;
-            case "default":
-                tokenType = TokenType.Default;
-                break;
-            case "try":
-                tokenType = TokenType.Try;
-                break;
-            case "catch":
-                tokenType = TokenType.Catch;
-                break;
-            case "throw":
-                tokenType = TokenType.Throw;
-                break;
-            case "finally":
-                tokenType = TokenType.Finally;
-                break;
-            case "continue":
-                tokenType = TokenType.Continue;
-                break;
-            case "break":
-                tokenType = TokenType.Break;
-                break;
-            case "return":
-                tokenType = TokenType.Return;
-                break;
-            case "define":
-                tokenType = TokenType.Define;
-                break;
-            case "ifndef":
-                tokenType = TokenType.Ifndef;
-                break;
-            case "endif":
-                tokenType = TokenType.Endif;
-                break;
-            case "null":
-            case "nil":
-                tokenType = TokenType.Null;
-                break;
-            case "true":
-            case "false":
-                tokenType = TokenType.Boolean;
-                break;
-            default:
-                tokenType = TokenType.Identifier;
-                break;
+                case "var":
+                case "let":
+                    tokenType = TokenType.Var;
+                    break;
+                case "function":
+                    tokenType = TokenType.Function;
+                    break;
+                case "if":
+                    tokenType = TokenType.If;
+                    break;
+                case "elseif":
+                case "elif":
+                    tokenType = TokenType.ElseIf;
+                    break;
+                case "else":
+                    tokenType = TokenType.Else;
+                    break;
+                case "while":
+                    tokenType = TokenType.While;
+                    break;
+                case "for":
+                    tokenType = TokenType.For;
+                    break;
+                case "foreach":
+                    tokenType = TokenType.Foreach;
+                    break;
+                case "in":
+                    tokenType = TokenType.In;
+                    break;
+                case "switch":
+                    tokenType = TokenType.Switch;
+                    break;
+                case "case":
+                    tokenType = TokenType.Case;
+                    break;
+                case "default":
+                    tokenType = TokenType.Default;
+                    break;
+                case "try":
+                    tokenType = TokenType.Try;
+                    break;
+                case "catch":
+                    tokenType = TokenType.Catch;
+                    break;
+                case "throw":
+                    tokenType = TokenType.Throw;
+                    break;
+                case "finally":
+                    tokenType = TokenType.Finally;
+                    break;
+                case "continue":
+                    tokenType = TokenType.Continue;
+                    break;
+                case "break":
+                    tokenType = TokenType.Break;
+                    break;
+                case "return":
+                    tokenType = TokenType.Return;
+                    break;
+                case "null":
+                case "nil":
+                    tokenType = TokenType.Null;
+                    break;
+                case "true":
+                case "false":
+                    tokenType = TokenType.Boolean;
+                    break;
+                case "class":
+                    tokenType = TokenType.Class;
+                    break;
+                case "new":
+                    m_Builder.Length = 0;
+                    return;
+                default:
+                    tokenType = TokenType.Identifier;
+                    break;
             }
             if (tokenType == TokenType.Boolean) {
-                AddToken(new Token(tokenType, m_Builder.ToString().Equals("true"), m_iSourceLine, m_iSourceChar));
+                AddToken(tokenType, m_Builder.ToString().Equals("true"), m_iSourceLine, m_iSourceChar);
             } else if (tokenType == TokenType.Null) {
-                AddToken(new Token(tokenType, null, m_iSourceLine, m_iSourceChar));
+                AddToken(tokenType, null, m_iSourceLine, m_iSourceChar);
             } else {
-                AddToken(new Token(tokenType, m_Builder.ToString(), m_iSourceLine, m_iSourceChar));
+                AddToken(tokenType, m_Builder.ToString(), m_iSourceLine, m_iSourceChar);
             }
         }
         /// <summary> 解析字符串 </summary>
@@ -556,7 +542,7 @@ namespace Scorpio.Compiler {
                         break;
                 }
             }
-            AddToken(new Token(TokenType.Finished, "", m_iSourceLine, m_iSourceChar));
+            AddToken(TokenType.Finished, END_CHAR);
             return m_listTokens;
         }
     }

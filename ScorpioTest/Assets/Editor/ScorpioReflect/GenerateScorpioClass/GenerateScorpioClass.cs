@@ -55,7 +55,14 @@ namespace Scorpio.ScorpioReflect {
             m_FullName = ScorpioReflectUtil.GetFullName(m_Type);
             m_AllFields.AddRange(m_Type.GetFields(ScorpioReflectUtil.BindingFlag));
             m_AllEvents.AddRange(m_Type.GetEvents(ScorpioReflectUtil.BindingFlag));
-            m_AllPropertys.AddRange(m_Type.GetProperties(ScorpioReflectUtil.BindingFlag));
+            var propertys = m_Type.GetProperties(ScorpioReflectUtil.BindingFlag);
+            foreach (var property in propertys) {
+                //如果是 get 则参数是0个  get 参数是1个  否则就可能是 [] 的重载
+                if ((property.CanRead && property.GetGetMethod().GetParameters().Length == 0) ||
+                    (property.CanWrite && property.GetSetMethod().GetParameters().Length == 1)) {
+                    m_AllPropertys.Add(property);
+                }
+            }
             var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(ScorpioReflectUtil.BindingFlag);
             foreach (var method in methods) {
                 string name = method.Name;

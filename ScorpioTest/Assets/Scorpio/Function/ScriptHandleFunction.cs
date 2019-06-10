@@ -1,19 +1,21 @@
 ﻿using System;
-using Scorpio;
 using Scorpio.Exception;
 namespace Scorpio.Function {
     public class ScriptHandleFunction : ScriptFunction {
         private ScorpioHandle m_Handle;                                         //程序函数执行类
         public ScriptHandleFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().FullName, handle) { }
-        public ScriptHandleFunction(Script script, String name, ScorpioHandle handle) : base(script, name) {
-            this.m_Handle = handle;
+        public ScriptHandleFunction(Script script, string name, ScorpioHandle handle) : base(script, name) {
+            m_Handle = handle;
         }
-        public override object Call(ScriptObject[] parameters) {
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             try {
-                return m_Handle.Call(parameters);
+                return m_Handle.Call(m_BindObject.valueType == ScriptValue.nullValueType ? thisObject : m_BindObject, parameters, length);
             } catch (System.Exception ex) {
-                throw new ExecutionException(m_Script, "CallFunction [" + Name + "] is error : " + ex.ToString());
+                throw new ExecutionException("CallFunction [" + FunctionName + "] is error : " + ex.ToString());
             }
+        }
+        public override ScriptObject Clone() {
+            return new ScriptHandleFunction(m_Script, FunctionName, m_Handle);
         }
     }
 }

@@ -1,40 +1,49 @@
-﻿namespace Scorpio.CodeDom
-{
-    //++或者--标识
-    public enum CALC
-    {
-        NONE,
-        PRE_INCREMENT,      //前置++
-        POST_INCREMENT,     //后置++
-        PRE_DECREMENT,      //前置--
-        POST_DECREMENT,     //后置--
-    }
-    //成员类型
-    public enum MEMBER_TYPE
-    {
-        VALUE,      //Value类型
-        OBJECT,     //变量类型
-    }
+﻿namespace Scorpio.CodeDom {
     //成员类型  a.b["c"].d[1]
-    public class CodeMember : CodeObject
-    {
+    public abstract class CodeMember : CodeObject {
         public CodeObject Parent;
-        public CodeObject MemberObject;
-        public object MemberValue;
-        public MEMBER_TYPE Type;
-        public CALC Calc;
-        public CodeMember(string name) : this (name, null) { }
-        public CodeMember(object value, CodeObject parent)
-        {
-            this.Parent = parent;
-            this.MemberValue = value;
-            this.Type = MEMBER_TYPE.VALUE;
+        public int index;
+        public string key;
+        public CodeObject codeKey;
+        public CodeMember(int line) : base(line) { }
+    }
+    //根据索引获取变量
+    public class CodeMemberIndex : CodeMember {
+        public CodeMemberIndex(int index, int line) : base(line) {
+            this.index = index;
         }
-        public CodeMember(CodeObject member, CodeObject parent)
-        {
-            this.MemberObject = member;
-            this.Parent = parent;
-            this.Type = MEMBER_TYPE.OBJECT;
+        public CodeMemberIndex(int index, CodeObject parment, int line) : base(line) {
+            this.index = index;
+            this.Parent = parment;
+        }
+    }
+    //根据索引获取变量
+    public class CodeMemberInternal : CodeMember {
+        public CodeMemberInternal(int index, int line) : base(line) {
+            this.index = index;
+        }
+        public CodeMemberInternal(int index, CodeObject parment, int line) : base(line) {
+            this.index = index;
+            this.Parent = parment;
+        }
+    }
+    //根据字符串获取变量
+    public class CodeMemberString : CodeMember {
+        public CodeMemberString(string key, int line) : base(line) {
+            this.key = key;
+        }
+        public CodeMemberString(string key, CodeObject parment, int line) : base(line) {
+            this.key = key;
+            this.Parent = parment;
+        }
+    }
+    public class CodeMemberObject : CodeMember {
+        public CodeMemberObject(CodeObject obj, int line) : base(line) {
+            this.codeKey = obj;
+        }
+        public CodeMemberObject(CodeObject obj, CodeObject parment, int line) : base(line) {
+            this.codeKey = obj;
+            this.Parent = parment;
         }
     }
 }

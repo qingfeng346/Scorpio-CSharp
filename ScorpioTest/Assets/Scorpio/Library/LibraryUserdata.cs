@@ -1,33 +1,23 @@
-﻿using Scorpio;
-using Scorpio.Userdata;
+﻿using Scorpio.Userdata;
 namespace Scorpio.Library {
-    public class LibraryUserdata {
+    public partial class LibraryUserdata {
         public static void Load(Script script) {
-            ScriptTable Table = script.CreateTable();
-            Table.SetValue("rename", script.CreateFunction(new rename(script)));
-            Table.SetValue("typeof", script.CreateFunction(new utypeof(script)));
-            script.SetObjectInternal("userdata", Table);
+            var map = new ScriptMap(script);
+            map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf()));
+            map.SetValue("isType", script.CreateFunction(new isType()));
+            script.SetGlobal("userdata", new ScriptValue(map));
         }
-        private class rename : ScorpioHandle {
-            private readonly Script m_script;
-            public rename(Script script) {
-                m_script = script;
+        private class fieldTypeOf : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return TypeManager.GetUserdataType(TypeManager.GetType(args[0].scriptValue.Type).GetVariableType(args[1].ToString()));
             }
-            public object Call(ScriptObject[] args) {
-                ScriptObject type = args[0];
-                if (type is ScriptUserdataObject || type is ScriptUserdataObjectType) {
-                    m_script.GetScorpioType(((ScriptUserdata)type).ValueType).Rename(args[1].ToString(), args[2].ToString());
+        }
+        private class isType : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (length > 1 && args[0].valueType == ScriptValue.scriptValueType && args[1].valueType == ScriptValue.scriptValueType) {
+                    return args[1].scriptValue.Type.IsAssignableFrom(args[0].scriptValue.Type) ? ScriptValue.True : ScriptValue.False;
                 }
-                return null;
-            }
-        }
-        private class utypeof : ScorpioHandle {
-            private readonly Script m_script;
-            public utypeof(Script script) {
-                m_script = script;
-            }
-            public object Call(ScriptObject[] args) {
-                return m_script.GetScorpioType(((ScriptUserdata)args[0]).ValueType).GetVariableType(args[1].ToString());
+                return ScriptValue.False;
             }
         }
     }
