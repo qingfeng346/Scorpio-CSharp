@@ -19,7 +19,7 @@ namespace Scorpio.Library {
                 m_Script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new JsonParser(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true).Parse();
+                return new JsonParser(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true, length > 2 ? args[2].IsTrue : false).Parse();
             }
         }
         private class JsonParser {
@@ -39,12 +39,14 @@ namespace Scorpio.Library {
 
             private Script m_Script;
             private string m_Buffer;
-            private bool m_SupportLong;
+            private bool m_SupportLong;         //是否支持 数字无[.]解析成long值
+            private bool m_SupportKeyNumber;    //是否支持 key值为 number 类型
             private int m_Index;
             private int m_Length;
-            public JsonParser(Script script, string buffer, bool supportLong) {
+            public JsonParser(Script script, string buffer, bool supportLong, bool supportKeyNumber) {
                 m_Script = script;
                 m_SupportLong = supportLong;
+                m_SupportKeyNumber = supportKeyNumber;
                 m_Buffer = buffer;
                 m_Index = 0;
                 m_Length = buffer.Length;
@@ -104,7 +106,7 @@ namespace Scorpio.Library {
                             case TRUE: return ScriptValue.True;
                             case FALSE: return ScriptValue.False;
                             case NULL: return ScriptValue.Null;
-                            default: throw new ExecutionException("未知标识符 : " + word);
+                            default: throw new ExecutionException("Json解析, 未知标识符 : " + word);
                         }
                 }
             }
@@ -170,16 +172,39 @@ namespace Scorpio.Library {
                         case RIGHT_BRACE: return ret;
                         case COMMA: continue;
                         case END_CHAR:
-                            throw new ExecutionException("解析json, 未找到 map 结尾 }");
-                        case QUOTES:
+                            throw new ExecutionException("Json解析, 未找到 map 结尾 [}]");
+                        case QUOTES: {
                             var key = ParseString();
                             if (EatWhiteSpace != ':') {
-                                throw new ExecutionException("解析json, key值后必须跟 : 赋值");
+                                throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                             }
                             map.SetValue(key, ReadObject());
                             break;
+                        }
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                        case '-': {
+                            if (!m_SupportKeyNumber) {
+                                throw new ExecutionException("Json解析, key值 未知符号 : " + ch);
+                            }
+                            --m_Index;
+                            var key = ParseNumber();
+                            if (EatWhiteSpace != ':') {
+                                throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
+                            }
+                            map.SetValue(key, ReadObject());
+                            break;
+                        }
                         default: {
-                            throw new ExecutionException("解析json, 未知符号 : " + ch);
+                            throw new ExecutionException("Json解析, key值 未知符号 : " + ch);
                         }
                     }
                 }
@@ -193,7 +218,7 @@ namespace Scorpio.Library {
                         case RIGHT_BRACKET: return ret;
                         case COMMA: continue;
                         case END_CHAR:
-                            throw new ExecutionException("解析json, 未找到array结尾 ]");
+                            throw new ExecutionException("Json解析, 未找到array结尾 ]");
                         default: {
                             --m_Index;
                             array.Add(ReadObject());
