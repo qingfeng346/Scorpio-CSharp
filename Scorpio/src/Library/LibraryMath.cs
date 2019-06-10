@@ -5,7 +5,7 @@
         public const double Rad2Deg = 57.29578;
         public const double Epsilon = 1.401298E-45;
         public static void Load(Script script) {
-            var map = script.CreateMap();
+            var map = new ScriptMap(script);
             map.SetValue("PI", new ScriptValue(PI));
             map.SetValue("Deg2Rad", new ScriptValue(Deg2Rad));
             map.SetValue("Rad2Deg", new ScriptValue(Rad2Deg));

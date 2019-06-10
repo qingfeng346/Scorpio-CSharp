@@ -3,7 +3,7 @@ using Scorpio.Exception;
 namespace Scorpio.Library {
     public partial class LibraryJson {
         public static void Load(Script script) {
-            var map = script.CreateMap();
+            var map = new ScriptMap(script);
             map.SetValue("encode", script.CreateFunction(new encode()));
             map.SetValue("decode", script.CreateFunction(new decode(script)));
             script.SetGlobal("json", new ScriptValue(map));

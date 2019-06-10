@@ -1,7 +1,7 @@
 ﻿namespace Scorpio.Proto {
     public class ProtoArray {
         public static ScriptType Load(Script script, ScriptValue parentType) {
-            var ret = script.CreateType("Array", parentType);
+            var ret = new ScriptType("Array", parentType);
             ret.SetValue("length", script.CreateFunction(new length()));
             ret.SetValue("count", script.CreateFunction(new length()));
             ret.SetValue("insert", script.CreateFunction(new insert()));

@@ -2,7 +2,7 @@
 namespace Scorpio.Library {
     public partial class LibraryUserdata {
         public static void Load(Script script) {
-            var map = script.CreateMap();
+            var map = new ScriptMap(script);
             map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf()));
             map.SetValue("isType", script.CreateFunction(new isType()));
             script.SetGlobal("userdata", new ScriptValue(map));

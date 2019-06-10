@@ -5,7 +5,7 @@ namespace Scorpio.Library {
     public class LibraryIO {
         public static readonly Encoding DefaultEncoding = Encoding.UTF8;
         public static void Load(Script script) {
-            var map = script.CreateMap();
+            var map = new ScriptMap(script);
             map.SetValue("toString", script.CreateFunction(new toString()));
             map.SetValue("toBytes", script.CreateFunction(new toBytes()));
             map.SetValue("readAll", script.CreateFunction(new readAll()));
