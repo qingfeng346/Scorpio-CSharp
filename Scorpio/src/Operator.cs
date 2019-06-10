@@ -41,6 +41,7 @@ namespace Scorpio {
         public const string GreaterOrEqual = "op_GreaterThanOrEqual";   //运算符重载 >=
         public const string Less = "op_LessThan";                       //运算符重载 <
         public const string LessOrEqual = "op_LessThanOrEqual";         //运算符重载 >=
+        public const string Equal = "op_Equality";                      //运算符重载 ==
 
         public const string GetItem = "get_Item";                       //运算符重载 [] get
         public const string SetItem = "set_Item";                       //运算符重载 [] set

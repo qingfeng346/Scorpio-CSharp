@@ -69,14 +69,11 @@ namespace Scorpio.Userdata {
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[>=]运算符重载");
             return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2).valueType == ScriptValue.trueValueType;
         }
-        //public override bool Equals(ScriptValue obj) {
-        //    var type = Class;
-        //    var func = type != null ? Class.GetOperator(ScriptOperator.Equal) : null;
-        //    if (func != null) {
-        //        return func.Call(new ScriptValue(this), new ScriptValue[] { obj }, 1).valueType == ScriptValue.trueValueType;
-        //    }
-        //    return base.Equals(obj);
-        //}
+        public override bool Equals(ScriptValue obj) {
+            var func = GetOperator(UserdataOperator.Equal);
+            if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[==]运算符重载");
+            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2).valueType == ScriptValue.trueValueType;
+        }
         public override ScriptValue Plus(ScriptValue obj) {
             var func = GetOperator(UserdataOperator.Plus);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[+]运算符重载");
