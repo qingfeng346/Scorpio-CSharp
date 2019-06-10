@@ -51,9 +51,10 @@ namespace Scorpio.ScorpioReflect {
             if (Operators.ContainsKey(name)) {
                 return string.Format("return {0} {1} {2};", GetScorpioMethodArgs(pars, 0), Operators[name], GetScorpioMethodArgs(pars, 1));
             }
-            if (name == "get_Item") {
+            //如果 get_Item 参数是一个 set_Item 参数是两个 就是 [] 的重载
+            if (name == "get_Item" && method.GetParameters().Length == 1) {
                 return string.Format("return {0}[{1}];", variable, GetScorpioMethodArgs(pars, 0));
-            } else if (name == "set_Item") {
+            } else if (name == "set_Item" && method.GetParameters().Length == 2) {
                 return string.Format("{0}[{1}] = {2}; return null;", variable, GetScorpioMethodArgs(pars, 0), GetScorpioMethodArgs(pars, 1));
             }
             return "";
@@ -69,8 +70,7 @@ namespace Scorpio.ScorpioReflect {
             return "";
         }
         private string GetPropertyMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
-            foreach (var property in m_AllPropertys)
-            {
+            foreach (var property in m_AllPropertys) {
                 if (property.GetGetMethod() == method) {
                     return string.Format("return {0}.{1};", variable, property.Name);
                 } else if (property.GetSetMethod() == method) {
