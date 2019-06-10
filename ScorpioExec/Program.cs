@@ -89,6 +89,7 @@ namespace ScorpioExec {
         }
         static void Execute(string[] args) {
             script = new Script();
+            script.LoadLibraryV1();
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {
