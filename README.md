@@ -13,7 +13,7 @@
     * asp.net core
     * mono
     * xamarin
-* **脚本示例** 放在 [bin/ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/develop/ExampleScripts) 目录
+* **脚本示例** 放在 [ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/v2.0/ExampleScripts) 目录
 * **脚本教程** http://www.fengyuezhu.com/readme/
 * **语法测试** 注册环境变量后,直接运行命令行 [sco 文件名],可以运行一个脚本文件, 语法测试地址
     * http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
