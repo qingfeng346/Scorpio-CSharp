@@ -76,7 +76,7 @@
         private class clear : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptArray>().Clear();
-                return ScriptValue.Null;
+                return thisObject;
             }
         }
         private class contains : ScorpioHandle {

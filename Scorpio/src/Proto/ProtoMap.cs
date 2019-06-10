@@ -20,13 +20,15 @@
         private class clear : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptMap>().Clear();
-                return ScriptValue.Null;
+                return thisObject;
             }
         }
         private class remove : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                thisObject.Get<ScriptMap>().Remove(args[0].Value);
-                return ScriptValue.Null;
+                for (var i = 0; i < length; ++i) {
+                    thisObject.Get<ScriptMap>().Remove(args[i].Value);
+                }
+                return thisObject;
             }
         }
         private class containsKey : ScorpioHandle {

@@ -13,7 +13,7 @@ using Scorpio.Userdata;
 using Scorpio.Serialize;
 using System;
 namespace Scorpio {
-    public class Script {
+    public partial class Script {
         //反射获取变量和函数的属性
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
 
@@ -147,6 +147,9 @@ namespace Scorpio {
         }
         public void SetGlobal(string key, ScriptValue value) {
             Global.SetValue(key, value);
+        }
+        public ScriptValue GetGlobal(string key) {
+            return Global.GetValue(key);
         }
         public ScriptArray CreateArray() { return new ScriptArray(this); }
         public ScriptMap CreateMap() { return new ScriptMap(this); }

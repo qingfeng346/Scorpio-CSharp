@@ -408,11 +408,20 @@ namespace Scorpio.Library {
 
         private class pushAssembly : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var throwException = length > 1 ? args[1].IsTrue : true;
+                Assembly assembly = null;
                 if (args[0].valueType == ScriptValue.stringValueType) {
-                    TypeManager.PushAssembly(Assembly.Load(new AssemblyName(args[0].ToString())));
+                    if (throwException) {
+                        assembly = Assembly.Load(new AssemblyName(args[0].ToString()));
+                    } else {
+                        try {
+                            assembly = Assembly.Load(new AssemblyName(args[0].ToString()));
+                        } catch (System.Exception) { }
+                    }
                 } else {
-                    TypeManager.PushAssembly(args[0].Value as Assembly);
+                    assembly = args[0].Value as Assembly;
                 }
+                TypeManager.PushAssembly(assembly);
                 return ScriptValue.Null;
             }
         }

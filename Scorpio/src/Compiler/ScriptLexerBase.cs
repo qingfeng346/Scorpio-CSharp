@@ -95,7 +95,7 @@ namespace Scorpio.Compiler {
             return false;
         }
         private bool IsIdentifier(char ch) {
-            return (ch == '_' || char.IsLetterOrDigit(ch));
+            return (ch == '_' || ch == '$' || char.IsLetterOrDigit(ch));
         }
     }
 }

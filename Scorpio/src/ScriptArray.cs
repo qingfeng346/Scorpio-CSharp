@@ -248,6 +248,13 @@ namespace Scorpio {
             }
             return array;
         }
+        public Array ToArray(Type type) {
+            var array = Array.CreateInstance(type, m_Length);
+            for (var i = 0; i < m_Length; ++i) {
+                array.SetValue(Util.ChangeType(m_Objects[i], type), i);
+            }
+            return array;
+        }
         public override ScriptObject Clone() {
             var ret = new ScriptArray(m_Script);
             ret.m_Objects = new ScriptValue[m_Length];
