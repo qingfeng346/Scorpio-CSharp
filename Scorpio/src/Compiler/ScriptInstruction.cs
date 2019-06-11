@@ -39,6 +39,7 @@
         NewFunction,            //load a new function
         NewArray,               //new array
         NewMap,                 //new map
+        NewMapObject,           //new map with key contain object
         NewType,                //new class
         NewTypeParent,          //new class with parent
         NewEnd,

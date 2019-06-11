@@ -768,6 +768,16 @@ namespace Scorpio.Runtime {
                                     stackObjects[stackIndex].scriptValue = map;
                                     continue;
                                 }
+                                case Opcode.NewMapObject: {
+                                    var map = new ScriptMap(m_script);
+                                    for (var i = opvalue - 1; i >= 0; --i) {
+                                        map.SetValue(stackObjects[stackIndex - i].Value, stackObjects[stackIndex - i - opvalue]);
+                                    }
+                                    stackIndex -= opvalue * 2;
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = map;
+                                    continue;
+                                }
                                 case Opcode.NewType:
                                 case Opcode.NewTypeParent: {
                                     var parentType = opcode == Opcode.NewTypeParent ? stackObjects[stackIndex - opvalue * 2 - 1] : m_script.TypeObjectValue;

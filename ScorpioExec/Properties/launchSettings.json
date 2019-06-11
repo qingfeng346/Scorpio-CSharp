@@ -2,7 +2,7 @@
   "profiles": {
     "ScorpioExec": {
       "commandName": "Project",
-      "commandLineArgs": "-type fast -dll C:\\Users\\qingf\\Desktop\\ConsoleApp1\\ConsoleApp1\\bin\\Debug\\netcoreapp2.2\\ConsoleApp1.dll -class HelloWorld.Test -output C:\\Users\\qingf\\Desktop"
+      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\new.sco"
     },
     "pack": {
       "commandName": "Project",

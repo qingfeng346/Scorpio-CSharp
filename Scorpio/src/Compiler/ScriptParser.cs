@@ -410,7 +410,7 @@ namespace Scorpio.Compiler {
                 if (token.Type == TokenType.SemiColon) {
                     continue;
                 }
-                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString) {
+                if (token.Type == TokenType.Identifier || token.Type == TokenType.String) {
                     var next = ReadToken();
                     if (next.Type == TokenType.LeftPar || next.Type == TokenType.LeftBrace) {
                         UndoToken();
@@ -533,9 +533,11 @@ namespace Scorpio.Compiler {
                 AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, obj.Line);
                 if (func.Variables != null) {
                     foreach (var variable in func.Variables.Variables) {
-                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
-                        PushObject(variable.value);
-                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key), obj.Line);
+                        if (variable.key is string) {
+                            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
+                            PushObject(variable.value);
+                            AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), obj.Line);
+                        }
                     }
                 }
             } else if (obj is CodeArray) {
@@ -553,10 +555,24 @@ namespace Scorpio.Compiler {
                         PushObject(ele.value);
                     }
                 }
+                var hadObjectKey = false;
                 foreach (var ele in map.Variables) {
-                    AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.key), obj.Line);
+                    if (ele.key is string) {
+                        AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.key.ToString()), obj.Line);
+                    } else if (ele.key is double) {
+                        hadObjectKey = true;
+                        AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)ele.key), obj.Line);
+                    } else if (ele.key is long) {
+                        hadObjectKey = true;
+                        AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)ele.key), obj.Line);
+                    } else if (ele.key is bool) {
+                        hadObjectKey = true;
+                        AddScriptInstructionWithoutValue(((bool)ele.key) ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
+                    } else {
+                        throw new ParserException("未知的map key 类型 : " + ele.key.GetType());
+                    }
                 }
-                AddScriptInstruction(Opcode.NewMap, map.Variables.Count, obj.Line);
+                AddScriptInstruction(hadObjectKey ? Opcode.NewMapObject : Opcode.NewMap, map.Variables.Count, obj.Line);
             } else if (obj is CodeTernary) {
                 var value = obj as CodeTernary;
                 PushObject(value.Allow);
@@ -676,9 +692,11 @@ namespace Scorpio.Compiler {
                 } else {
                     AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, member.Line);
                     foreach (var variable in func.Variables.Variables) {
-                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop, func.line);
-                        PushObject(variable.value);
-                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key), func.line);
+                        if (variable.key is string) {
+                            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, func.line);
+                            PushObject(variable.value);
+                            AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), func.line);
+                        }
                     }
                     AddScriptInstructionWithoutValue(Opcode.Pop, func.line);
                 }
@@ -793,7 +811,6 @@ namespace Scorpio.Compiler {
                 case TokenType.Boolean:
                 case TokenType.Number:
                 case TokenType.String:
-                case TokenType.SimpleString:
                     ret = new CodeNativeObject(token.Lexeme, token.SourceLine);
                     break;
                 case TokenType.LeftBracket:
@@ -940,7 +957,6 @@ namespace Scorpio.Compiler {
                     functionName = ReadIdentifier();
                     break;
                 case TokenType.String:
-                case TokenType.SimpleString:
                     functionName = ReadToken().Lexeme.ToString();
                     break;
                 default:
@@ -1020,32 +1036,40 @@ namespace Scorpio.Compiler {
             var ret = new CodeMap(GetSourceLine());
             ReadLeftBrace();
             while (PeekToken().Type != TokenType.RightBrace) {
-                Token token = ReadToken();
-                if (token.Type == TokenType.Comma || token.Type == TokenType.SemiColon) {
-                    continue;
-                }
-                if (token.Type == TokenType.Identifier || token.Type == TokenType.String || token.Type == TokenType.SimpleString) {
-                    Token next = ReadToken();
-                    if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
-                        ret.Variables.Add(new CodeMap.MapVariable(token.Lexeme.ToString(), GetObject()));
-                    } else if (next.Type == TokenType.Comma || next.Type == TokenType.SemiColon) {
-                        ret.Variables.Add(new CodeMap.MapVariable(token.Lexeme.ToString(), null));
-                    } else if (next.Type == TokenType.LeftPar) {
-                        UndoToken();
+                var token = ReadToken();
+                switch (token.Type) {
+                    case TokenType.Comma:
+                    case TokenType.SemiColon:
+                        continue;
+                    case TokenType.Identifier:
+                    case TokenType.String:
+                    case TokenType.Number:
+                    case TokenType.Boolean: {
+                        var next = ReadToken();
+                        if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
+                            ret.Variables.Add(new CodeMap.MapVariable(token.Lexeme, GetObject()));
+                        } else if (next.Type == TokenType.Comma || next.Type == TokenType.SemiColon) {
+                            ret.Variables.Add(new CodeMap.MapVariable(token.Lexeme, null));
+                        } else if ((token.Type == TokenType.Identifier || token.Type == TokenType.String) && next.Type == TokenType.LeftPar) {
+                            UndoToken();
+                            UndoToken();
+                            string functionName = "";
+                            var index = ParseFunctionContent(false, ref functionName);
+                            ret.Variables.Add(new CodeMap.MapVariable(functionName, new CodeFunction(index, token.SourceLine)));
+                        } else {
+                            throw new ParserException("Map变量赋值符号为[=]或者[:]", token);
+                        }
+                        continue;
+                    }
+                    case TokenType.Function:
+                    case TokenType.Sharp: {
                         UndoToken();
                         string functionName = "";
-                        var index = ParseFunctionContent(false, ref functionName);
+                        var index = ParseFunctionContent(true, ref functionName);
                         ret.Variables.Add(new CodeMap.MapVariable(functionName, new CodeFunction(index, token.SourceLine)));
-                    } else {
-                        throw new ParserException("Map变量赋值符号为[=]或者[:]", token);
+                        break;
                     }
-                } else if (token.Type == TokenType.Function || token.Type == TokenType.Sharp) {
-                    UndoToken();
-                    string functionName = "";
-                    var index = ParseFunctionContent(true, ref functionName);
-                    ret.Variables.Add(new CodeMap.MapVariable(functionName, new CodeFunction(index, token.SourceLine)));
-                } else {
-                    throw new ParserException("Map开始关键字必须为[变量名称]或者[function]关键字", token);
+                    default: throw new ParserException("Map开始关键字必须为[变量名称]或者[function]关键字", token);
                 }
             }
             ReadRightBrace();

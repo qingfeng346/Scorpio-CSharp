@@ -3,9 +3,9 @@ namespace Scorpio.CodeDom {
     //返回一个map类型 t = { a = "1", b = "2", function hello() { } }
     public class CodeMap : CodeObject {
         public class MapVariable {
-            public string key;
+            public object key;
             public CodeObject value;
-            public MapVariable(string key, CodeObject value) {
+            public MapVariable(object key, CodeObject value) {
                 this.key = key;
                 this.value = value;
             }

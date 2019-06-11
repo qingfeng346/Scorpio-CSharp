@@ -93,8 +93,8 @@
 
 ### 源码目录说明
 * **Scorpio** 脚本引擎源码
-* **ScorpioExec** 生成命令行**sco**,命令行调用脚本,序列化和反序列化脚本
-* **ScorpioReflect** 去反射机制的实现
+* **ScorpioExec** 命令行**sco**
+* **ScorpioReflect** 快速反射机制的实现
 * **ScorpioTest** Unity内使用Scorpio脚本示例
 
 ### Unity导入Scorpio-CSharp:
