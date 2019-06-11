@@ -11,6 +11,7 @@
             ret.SetValue("keys", script.CreateFunction(new keys()));
             ret.SetValue("values", script.CreateFunction(new values()));
             ret.SetValue("+", script.CreateFunction(new plus()));
+            ret.SetValue("-", script.CreateFunction(new minus()));
             return ret;
         }
         private class length : ScorpioHandle {
@@ -62,6 +63,24 @@
                 }
                 foreach (var pair in map) {
                     ret.SetValue(pair.Key, pair.Value);
+                }
+                return new ScriptValue(ret);
+            }
+        }
+        private class minus : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var thisMap = thisObject.Get<ScriptMap>();
+                var ret = new ScriptMap(thisMap.getScript());
+                foreach (var pair in thisMap) {
+                    ret.SetValue(pair.Key, pair.Value);
+                }
+                var array = args[0].Get<ScriptArray>();
+                if (array != null) {
+                    foreach (var value in array) {
+                        ret.Remove(value.Value);
+                    }
+                } else {
+                    ret.Remove(args[0].Value);
                 }
                 return new ScriptValue(ret);
             }
