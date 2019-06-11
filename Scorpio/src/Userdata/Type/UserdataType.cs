@@ -8,8 +8,10 @@ using Scorpio.Variable;
 using Scorpio.Compiler;
 namespace Scorpio.Userdata {
     /// <summary> 一个c#类的所有数据 </summary>
-    public abstract class UserdataType {                                                           //脚本系统
-        protected Type m_Type;                                                                  //c#类型
+    public abstract class UserdataType {
+        protected Type m_Type;                                                                          //Type
+        protected UserdataMethod[] m_Operators = new UserdataMethod[UserdataOperator.OperatorCount];    //所有重载函数
+        protected bool m_InitializeOperators;                                                           //是否初始化过所有重载函数
         public UserdataType(Type type) {
             m_Type = type;
         }
@@ -34,6 +36,38 @@ namespace Scorpio.Userdata {
                 return TypeManager.GetUserdataType(m_Type.MakeGenericType(parameters));
             }
             throw new ExecutionException($"类 {m_Type.FullName} 不是未定义的泛型类");
+        }
+        protected void InitializeOperators() {
+            if (m_InitializeOperators) { return; }
+            m_InitializeOperators = true;
+            for (var i = 0 ; i < UserdataOperator.OperatorCount; ++i) {
+                try {
+                    string operatorName = "";
+                    switch (i) {
+                        case UserdataOperator.PlusIndex: operatorName = UserdataOperator.Plus; break;
+                        case UserdataOperator.MinusIndex: operatorName = UserdataOperator.Minus; break;
+                        case UserdataOperator.MultiplyIndex: operatorName = UserdataOperator.Multiply; break;
+                        case UserdataOperator.DivideIndex: operatorName = UserdataOperator.Divide; break;
+                        case UserdataOperator.ModuloIndex: operatorName = UserdataOperator.Modulo; break;
+                        case UserdataOperator.InclusiveOrIndex: operatorName = UserdataOperator.InclusiveOr; break;
+                        case UserdataOperator.CombineIndex: operatorName = UserdataOperator.Combine; break;
+                        case UserdataOperator.XORIndex: operatorName = UserdataOperator.XOR; break;
+                        case UserdataOperator.ShiIndex: operatorName = UserdataOperator.Shi; break;
+                        case UserdataOperator.ShrIndex: operatorName = UserdataOperator.Shr; break;
+                        case UserdataOperator.GreaterIndex: operatorName = UserdataOperator.Greater; break;
+                        case UserdataOperator.GreaterOrEqualIndex: operatorName = UserdataOperator.GreaterOrEqual; break;
+                        case UserdataOperator.LessIndex: operatorName = UserdataOperator.Less; break;
+                        case UserdataOperator.LessOrEqualIndex: operatorName = UserdataOperator.LessOrEqual; break;
+                        case UserdataOperator.EqualIndex: operatorName = UserdataOperator.Equal; break;
+                        case UserdataOperator.GetItemIndex: operatorName = UserdataOperator.GetItem; break;
+                        case UserdataOperator.SetItemIndex: operatorName = UserdataOperator.SetItem; break;
+                    }
+                    m_Operators[i] = GetValue(null, operatorName) as UserdataMethod;
+                } catch (System.Exception) {}
+            }
+        }
+        public UserdataMethod GetOperator(int operate) {
+            return m_Operators[operate];
         }
         /// <summary> 创建一个实例 </summary>
         public abstract ScriptUserdata CreateInstance(ScriptValue[] parameters, int length);

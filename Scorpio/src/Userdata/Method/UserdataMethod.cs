@@ -70,7 +70,7 @@ namespace Scorpio.Userdata {
             }
             return true;
         }
-        public object Call(bool isStatic,object obj, ScriptValue[] parameters, int length) {
+        public object Call(bool isStatic, object obj, ScriptValue[] parameters, int length) {
             try {
                 //无参结构体构造函数
                 if (IsStructConstructor && length == 0) { return Activator.CreateInstance(m_Type); }

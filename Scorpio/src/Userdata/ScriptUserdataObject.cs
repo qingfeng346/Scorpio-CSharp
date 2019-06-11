@@ -7,7 +7,6 @@ namespace Scorpio.Userdata {
     public class ScriptUserdataObject : ScriptUserdata {
         protected UserdataType m_UserdataType;
         protected Dictionary<string, ScriptValue> m_Methods = new Dictionary<string, ScriptValue>();
-        protected Dictionary<string, ScriptMethodFunction> m_Operators = new Dictionary<string, ScriptMethodFunction>();
         public ScriptUserdataObject(object value, UserdataType type) {
             this.m_Value = value;
             this.m_ValueType = value.GetType();
@@ -25,104 +24,96 @@ namespace Scorpio.Userdata {
             m_UserdataType.SetValue(m_Value, key, value);
         }
         public override ScriptValue GetValue(object index) {
-            var func = GetOperator(UserdataOperator.GetItem);
+            var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { ScriptValue.CreateObject(index) }, 1);
+            return ScriptValue.CreateObject(func.Call(false, m_Value, new ScriptValue[] { ScriptValue.CreateObject(index) }, 1));
         }
         public override void SetValue(object index, ScriptValue value) {
-            var func = GetOperator(UserdataOperator.SetItem);
+            var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] set ]运算符重载");
-            func.Call(ScriptValue.Null, new ScriptValue[] { ScriptValue.CreateObject(index), value }, 2);
+            func.Call(false, m_Value, new ScriptValue[] { ScriptValue.CreateObject(index), value }, 2);
         }
         public override string ToString() { return m_Value.ToString(); }
-        ScriptMethodFunction GetOperator(string oper) {
-            if (m_Operators.ContainsKey(oper)) return m_Operators[oper];
-            var ret = m_UserdataType.GetValue(m_Value, oper);
-            if (ret is UserdataMethod) {
-                switch (oper) {
-                    case UserdataOperator.SetItem:
-                    case UserdataOperator.GetItem:
-                        return m_Operators[oper] = new ScriptInstanceMethodFunction((UserdataMethod)ret, m_Value);
-                    default:
-                        return m_Operators[oper] = new ScriptStaticMethodFunction((UserdataMethod)ret);
-                }
-            }
-            return m_Operators[oper] = null;
-        }
         public override bool Less(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Less);
+            var func = m_UserdataType.GetOperator(UserdataOperator.LessIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[<]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2).valueType == ScriptValue.trueValueType;
+            return (bool)func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
         }
         public override bool LessOrEqual(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.LessOrEqual);
+            var func = m_UserdataType.GetOperator(UserdataOperator.LessOrEqualIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[<=]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2).valueType == ScriptValue.trueValueType;
+            return (bool)func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
         }
         public override bool Greater(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Greater);
+            var func = m_UserdataType.GetOperator(UserdataOperator.GreaterIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[>]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2).valueType == ScriptValue.trueValueType;
+            return (bool)func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
         }
         public override bool GreaterOrEqual(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.GreaterOrEqual);
+            var func = m_UserdataType.GetOperator(UserdataOperator.GreaterOrEqualIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[>=]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2).valueType == ScriptValue.trueValueType;
+            return (bool)func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
         }
         public override bool Equals(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Equal);
-            if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[==]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2).valueType == ScriptValue.trueValueType;
+            switch (obj.valueType) {
+                case ScriptValue.nullValueType: return false;
+                case ScriptValue.scriptValueType: return m_Value == obj.scriptValue.Value;
+                default: {
+                    var func = m_UserdataType.GetOperator(UserdataOperator.EqualIndex);
+                    if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[==]运算符重载");
+                    return (bool)func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+                }
+            }
         }
         public override ScriptValue Plus(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Plus);
+            var func = m_UserdataType.GetOperator(UserdataOperator.PlusIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[+]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue Minus(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Minus);
+            var func = m_UserdataType.GetOperator(UserdataOperator.MinusIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[-]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue Multiply(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Multiply);
+            var func = m_UserdataType.GetOperator(UserdataOperator.MultiplyIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[*]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue Divide(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Divide);
+            var func = m_UserdataType.GetOperator(UserdataOperator.DivideIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[/]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue Modulo(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Modulo);
+            var func = m_UserdataType.GetOperator(UserdataOperator.ModuloIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[%]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue InclusiveOr(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.InclusiveOr);
+            var func = m_UserdataType.GetOperator(UserdataOperator.InclusiveOrIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[|]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue Combine(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Combine);
+            var func = m_UserdataType.GetOperator(UserdataOperator.CombineIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[&]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue XOR(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.XOR);
+            var func = m_UserdataType.GetOperator(UserdataOperator.XORIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[^]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue Shi(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Shi);
+            var func = m_UserdataType.GetOperator(UserdataOperator.ShiIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[<<]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
         public override ScriptValue Shr(ScriptValue obj) {
-            var func = GetOperator(UserdataOperator.Shr);
+            var func = m_UserdataType.GetOperator(UserdataOperator.ShrIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[>>]运算符重载");
-            return func.Call(ScriptValue.Null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            return ScriptValue.CreateObject(func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2));
         }
     }
 }

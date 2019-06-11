@@ -26,6 +26,29 @@ namespace Scorpio {
     }
     //c#运算符重载
     public class UserdataOperator {
+        public const int PlusIndex = 0;                                 //运算符重载 +
+        public const int MinusIndex = 1;                                //运算符重载 -
+        public const int MultiplyIndex = 2;                             //运算符重载 *
+        public const int DivideIndex = 3;                               //运算符重载 /
+        public const int ModuloIndex = 4;                               //运算符重载 %
+        public const int InclusiveOrIndex = 5;                          //运算符重载 |
+        public const int CombineIndex = 6;                              //运算符重载 &
+        public const int XORIndex = 7;                                  //运算符重载 ^
+        public const int ShiIndex = 8;                                  //运算符重载 <<
+        public const int ShrIndex = 9;                                  //运算符重载 >>
+                                                                        
+        public const int GreaterIndex = 10;                             //运算符重载 >
+        public const int GreaterOrEqualIndex = 11;                      //运算符重载 >=
+        public const int LessIndex = 12;                                //运算符重载 <
+        public const int LessOrEqualIndex = 13;                         //运算符重载 >=
+        public const int EqualIndex = 14;                               //运算符重载 ==
+                                                                        
+        public const int GetItemIndex = 15;                             //运算符重载 [] get
+        public const int SetItemIndex = 16;                             //运算符重载 [] set
+        public const int OperatorCount = 17;
+        
+        
+
         public const string Plus = "op_Addition";                       //运算符重载 +
         public const string Minus = "op_Subtraction";                   //运算符重载 -
         public const string Multiply = "op_Multiply";                   //运算符重载 *

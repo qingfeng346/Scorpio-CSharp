@@ -22,6 +22,8 @@ namespace Scorpio.Userdata {
             m_NestedTypes = new Dictionary<string, ScriptValue>();
             m_Functions = new Dictionary<string, UserdataMethod>();
             InitializeConstructor();
+            InitializeMethods();
+            InitializeOperators();
         }
         //初始化构造函数
         private void InitializeConstructor() {
@@ -37,7 +39,6 @@ namespace Scorpio.Userdata {
         }
         //获取一个函数，名字相同返回值相同
         private UserdataMethod GetMethod(string name) {
-            InitializeMethods();
             var methods = new List<MethodInfo>();
             foreach (var method in m_Methods) {
                 if (method.Name.Equals(name)) {
