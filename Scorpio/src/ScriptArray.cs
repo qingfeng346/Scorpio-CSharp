@@ -274,6 +274,15 @@ namespace Scorpio {
             }
             return ret;
         }
+        public ScriptArray NewCopy() {
+            var ret = new ScriptArray(m_Script);
+            ret.m_Objects = new ScriptValue[m_Length];
+            ret.m_Length = m_Length;
+            for (int i = 0; i < m_Length; ++i) {
+                ret.m_Objects[i] = m_Objects[i];
+            }
+            return ret;
+        }
         public override string ToString() { return ToJson(); }
         public override string ToJson() {
             var builder = new StringBuilder();

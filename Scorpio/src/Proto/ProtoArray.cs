@@ -304,38 +304,30 @@
         }
         private class plus : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var thisArray = thisObject.Get<ScriptArray>();
-                var ret = new ScriptArray(thisArray.getScript());
-                foreach (var value in thisArray) {
-                    ret.Add(value);
-                }
+                var thisArray = thisObject.Get<ScriptArray>().NewCopy();
                 var array = args[0].Get<ScriptArray>();
                 if (array != null) {
                     foreach (var value in array) {
-                        ret.Add(value);
+                        thisArray.Add(value);
                     }
                 } else {
-                    ret.Add(args[0]);
+                    thisArray.Add(args[0]);
                 }
-                return new ScriptValue(ret);
+                return new ScriptValue(thisArray);
             }
         }
         private class minus : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var thisArray = thisObject.Get<ScriptArray>();
-                var ret = new ScriptArray(thisArray.getScript());
-                foreach (var value in thisArray) {
-                    ret.Add(value);
-                }
+                var thisArray = thisObject.Get<ScriptArray>().NewCopy();
                 var array = args[0].Get<ScriptArray>();
                 if (array != null) {
                     foreach (var value in array) {
-                        ret.Remove(value);
+                        thisArray.Remove(value);
                     }
                 } else {
-                    ret.Remove(args[0]);
+                    thisArray.Remove(args[0]);
                 }
-                return new ScriptValue(ret);
+                return new ScriptValue(thisArray);
             }
         }
     }

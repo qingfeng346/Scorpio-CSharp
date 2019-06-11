@@ -90,6 +90,13 @@ namespace Scorpio {
             }
             return ret;
         }
+        public ScriptMap NewCopy() {
+            var ret = new ScriptMap(m_Script);
+            foreach (var pair in m_Objects) {
+                ret.m_Objects[pair.Key] = pair.Value;
+            }
+            return ret;
+        }
         public override string ToString() { return ToJson(); }
         public override string ToJson() {
             var builder = new StringBuilder();
