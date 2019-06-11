@@ -323,6 +323,9 @@ namespace Scorpio.Runtime {
                                                 break;
                                             default: throw new ExecutionException("【+】运算符不支持当前类型");
                                         }
+                                    } else if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
+                                        stackObjects[index].stringValue = stackObjects[index].ToString() + stackObjects[stackIndex].stringValue;
+                                        stackObjects[index].valueType = ScriptValue.stringValueType;
                                     } else {
                                         throw new ExecutionException("【+】运算符必须两边数据类型一致,或者不支持此操作符");
                                     }
