@@ -3,12 +3,28 @@ using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Tools;
 namespace Scorpio.Runtime {
-    
+
     //执行命令
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public class ScriptContext {
-        protected static ScriptValue[] Parameters = new ScriptValue[64];
+        private const int ParameterLength = 128;        //函数参数最大数量
+        private const int ValueCacheLength = 128;       //函数最大调用层级,超过会堆栈溢出
+        private const int StackValueLength = 256;       //堆栈数据最大数量
+        private const int VariableValueLength = 128;    //局部变量最大数量
+        protected static ScriptValue[] Parameters = new ScriptValue[ParameterLength];               //函数调用共用数组
+        protected static ScriptValue[][] VariableValues = new ScriptValue[ValueCacheLength][];      //局部变量数据
+        protected static ScriptValue[][] StackValues = new ScriptValue[ValueCacheLength][];         //堆栈数据
+        protected static int VariableValueIndex = 0;
+        static ScriptContext() {
+            for (var i = 0; i < StackValues.Length; ++i) {
+                StackValues[i] = new ScriptValue[StackValueLength];
+            }
+            for (var i = 0; i < VariableValues.Length; ++i) {
+                VariableValues[i] = new ScriptValue[VariableValueLength];
+            }
+        }
+
         public Script m_script;                                 //脚本类
         private ScriptGlobal m_global;                          //global
 
@@ -18,12 +34,9 @@ namespace Scorpio.Runtime {
         public readonly ScriptContext[] constContexts;          //所有定义的函数 常量
         public int internalCount;                               //内部变量数量
 
-
         private string m_Breviary;                              //摘要
         private ScriptFunctionData m_FunctionData;              //函数数据
         private ScriptInstruction[] m_scriptInstructions;       //指令集
-        private int m_variableCount;                            //临时变量数量
-
 
         public ScriptContext(Script script, string breviary, ScriptFunctionData functionData, double[] constDouble, long[] constLong, string[] constString, ScriptContext[] constContexts) {
             m_script = script;
@@ -37,26 +50,22 @@ namespace Scorpio.Runtime {
             m_Breviary = breviary;
             m_FunctionData = functionData;
             m_scriptInstructions = functionData.scriptInstructions;
-            m_variableCount = functionData.variableCount;
         }
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
-            var constDouble = this.constDouble;
-            var constString = this.constString;
-            var constLong = this.constLong;
-            var constContexts = this.constContexts;
             Logger.debug("执行命令 =>\n" + m_FunctionData.ToString(constDouble, constLong, constString));
-            var scriptInstructions = m_scriptInstructions;              //指令列表
-
-            var variableObjects = new ScriptValue[m_variableCount];     //局部变量
-            var stackObjects = new ScriptValue[256];                    //堆栈数据
-            var internalObjects = new InternalValue[internalCount];     //内部变量，有外部引用
-            for (int i = 0; i < internalCount; ++i) {
-                if (internalValues != null)
-                    internalObjects[i] = internalValues[i] ?? new InternalValue();
-                else
-                    internalObjects[i] = new InternalValue();
-            }
+            var variableObjects = VariableValues[VariableValueIndex];   //局部变量
+            var stackObjects = StackValues[VariableValueIndex++];       //堆栈数据
             variableObjects[0] = thisObject;
+            InternalValue[] internalObjects = null;
+            if (internalCount > 0) {
+                internalObjects = new InternalValue[internalCount];     //内部变量，有外部引用
+                for (int i = 0; i < internalCount; ++i) {
+                    if (internalValues != null)
+                        internalObjects[i] = internalValues[i] ?? new InternalValue();
+                    else
+                        internalObjects[i] = new InternalValue();
+                }
+            }
             var stackIndex = -1;                                        //堆栈索引
             var parameterCount = m_FunctionData.parameterCount;         //参数数量
             var param = m_FunctionData.param;                           //是否是变长参数
@@ -78,11 +87,11 @@ namespace Scorpio.Runtime {
             var parent = ScriptValue.Null;
             var parameters = Parameters;                                //传递参数
             var iInstruction = 0;                                       //当前执行命令索引
-            var iInstructionCount = scriptInstructions.Length;          //指令数量
+            var iInstructionCount = m_scriptInstructions.Length;          //指令数量
             ScriptInstruction instruction = null;
             try {
                 while (iInstruction < iInstructionCount) {
-                    instruction = scriptInstructions[iInstruction++];
+                    instruction = m_scriptInstructions[iInstruction++];
                     var opvalue = instruction.opvalue;
                     var opcode = instruction.opcode;
                     byte valueType;
@@ -804,6 +813,7 @@ namespace Scorpio.Runtime {
             } catch (System.Exception e) {
                 throw new ExecutionException($"{m_Breviary}:{instruction.line}({iInstruction}) : {e.ToString()}");
             } finally {
+                --VariableValueIndex;
                 Logger.debug(stackIndex != -1, "堆栈数据未清空，有泄露情况 : " + stackIndex);
             }
             return ScriptValue.Null;

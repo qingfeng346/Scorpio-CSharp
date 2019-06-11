@@ -23,7 +23,6 @@ namespace Scorpio.Userdata {
             m_Functions = new Dictionary<string, UserdataMethod>();
             InitializeConstructor();
             InitializeMethods();
-            InitializeOperators();
         }
         //初始化构造函数
         private void InitializeConstructor() {
