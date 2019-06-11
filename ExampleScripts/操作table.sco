@@ -16,8 +16,9 @@ var base = {
         this.value += value
         return this
     }
+    //key也可以使用 number
+    1 : 11111
 }
-base[1] = 1     //[] key可以使用 number
 //数字只能使用 [] 访问
 print(base[1])
 var c = "hello1"

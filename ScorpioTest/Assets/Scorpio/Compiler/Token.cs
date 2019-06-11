@@ -289,7 +289,7 @@ namespace Scorpio.Compiler {
         /// <summary>
         /// @"" @'' string
         /// </summary>
-        SimpleString,
+        //SimpleString,
         /// <summary>
         /// null
         /// </summary>

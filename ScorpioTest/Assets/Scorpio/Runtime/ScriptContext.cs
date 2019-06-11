@@ -323,6 +323,9 @@ namespace Scorpio.Runtime {
                                                 break;
                                             default: throw new ExecutionException("【+】运算符不支持当前类型");
                                         }
+                                    } else if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
+                                        stackObjects[index].stringValue = stackObjects[index].ToString() + stackObjects[stackIndex].stringValue;
+                                        stackObjects[index].valueType = ScriptValue.stringValueType;
                                     } else {
                                         throw new ExecutionException("【+】运算符必须两边数据类型一致,或者不支持此操作符");
                                     }
@@ -762,6 +765,16 @@ namespace Scorpio.Runtime {
                                     var map = new ScriptMap(m_script);
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         map.SetValue(stackObjects[stackIndex - i].stringValue, stackObjects[stackIndex - i - opvalue]);
+                                    }
+                                    stackIndex -= opvalue * 2;
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = map;
+                                    continue;
+                                }
+                                case Opcode.NewMapObject: {
+                                    var map = new ScriptMap(m_script);
+                                    for (var i = opvalue - 1; i >= 0; --i) {
+                                        map.SetValue(stackObjects[stackIndex - i].Value, stackObjects[stackIndex - i - opvalue]);
                                     }
                                     stackIndex -= opvalue * 2;
                                     stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;

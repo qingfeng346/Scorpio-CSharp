@@ -65,7 +65,7 @@ namespace Scorpio {
 
         public virtual string ToJson() { return ToString(); }                           // ToJson
         public override string ToString() { return base.ToString(); }                   // ToString
-        public virtual ScriptObject Clone() { return this; }                            // 复制一个变量
+        public virtual ScriptObject Clone(bool deep) { return this; }                   // 复制一个变量 是否深层复制
 
         public bool IsFunction { get { return (ObjectType == ObjectType.Function); } }
         public bool IsArray { get { return (ObjectType == ObjectType.Array); } }

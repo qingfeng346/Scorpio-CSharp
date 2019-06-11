@@ -1,5 +1,10 @@
-//申请一个class
-class TestClass {
+class BaseClass {
+    baseFunc() {
+        print("baseFunc")
+    }
+}
+//申请一个class 可以继承一个类，只支持单继承
+class TestClass : BaseClass {
     //构造函数
     constructor() {
         print("构造函数")
@@ -17,3 +22,4 @@ class TestClass {
 }
 var t = TestClass()
 t.hello()
+t.baseFunc()

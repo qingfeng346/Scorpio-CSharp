@@ -169,7 +169,11 @@ namespace Scorpio.Compiler {
             var token = ReadToken();
             switch (token.Type) {
                 case TokenType.Var: ParseVar(); return;
-                case TokenType.Identifier: ParseExpression(); return;
+                case TokenType.Identifier:
+                case TokenType.String:
+                case TokenType.Boolean:
+                case TokenType.Number:
+                    ParseExpression(); return;
                 case TokenType.LeftBrace: ParseBlock(); return;
                 case TokenType.If: ParseIf(); return;
                 case TokenType.For: ParseFor(); return;

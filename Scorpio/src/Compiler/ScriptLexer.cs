@@ -185,9 +185,14 @@ namespace Scorpio.Compiler {
         /// <summary> 读取数字 </summary>
         void ReadNumber() {
             m_Builder.Append(m_ch);
+            var endPoint = false;
             do {
                 ch = ReadChar();
-                if (char.IsDigit(ch) || ch == '.') {
+                if (char.IsDigit(ch)) {
+                    endPoint = false;
+                    m_Builder.Append(ch);
+                } else if (ch == '.') {
+                    endPoint = true;
                     m_Builder.Append(ch);
                 } else if (ch == 'L') {
                     AddToken(TokenType.Number, long.Parse(m_Builder.ToString()));
@@ -195,6 +200,9 @@ namespace Scorpio.Compiler {
                 } else {
                     AddToken(TokenType.Number, double.Parse(m_Builder.ToString()));
                     UndoChar();
+                    if (endPoint) {
+                        UndoChar();
+                    }
                     break;
                 }
             } while (true);

@@ -13,7 +13,7 @@ namespace Scorpio.Function {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return m_Context.Execute(m_BindObject.valueType == ScriptValue.nullValueType ? thisObject : m_BindObject, parameters, length, m_internalValues);
         }
-        public override ScriptObject Clone() {
+        public override ScriptObject Clone(bool deep) {
             return new ScriptScriptFunction(m_Context);
         }
     }

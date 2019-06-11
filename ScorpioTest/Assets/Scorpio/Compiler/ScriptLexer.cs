@@ -253,7 +253,7 @@ namespace Scorpio.Compiler {
                         m_Builder.Append(ch);
                     } else {
                         UndoChar();
-                        AddToken(TokenType.SimpleString, m_Builder.ToString(), m_iCacheLine, m_iSourceChar);
+                        AddToken(TokenType.String, m_Builder.ToString(), m_iCacheLine, m_iSourceChar);
                         break;
                     }
                 } else if (ch == '$') {

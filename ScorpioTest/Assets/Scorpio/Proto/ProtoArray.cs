@@ -31,6 +31,8 @@
             ret.SetValue("safePopFirst", script.CreateFunction(new safePopFirst()));
             ret.SetValue("popLast", script.CreateFunction(new popLast()));
             ret.SetValue("safePopLast", script.CreateFunction(new safePopLast()));
+            ret.SetValue("+", script.CreateFunction(new plus()));
+            ret.SetValue("-", script.CreateFunction(new minus()));
             return ret;
         }
         private class length : ScorpioHandle {
@@ -246,7 +248,6 @@
                 return ScriptValue.Null;
             }
         }
-
         private class map : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
@@ -299,6 +300,34 @@
         private class safePopLast : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return thisObject.Get<ScriptArray>().SafePopLast();
+            }
+        }
+        private class plus : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var thisArray = thisObject.Get<ScriptArray>().NewCopy();
+                var array = args[0].Get<ScriptArray>();
+                if (array != null) {
+                    foreach (var value in array) {
+                        thisArray.Add(value);
+                    }
+                } else {
+                    thisArray.Add(args[0]);
+                }
+                return new ScriptValue(thisArray);
+            }
+        }
+        private class minus : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var thisArray = thisObject.Get<ScriptArray>().NewCopy();
+                var array = args[0].Get<ScriptArray>();
+                if (array != null) {
+                    foreach (var value in array) {
+                        thisArray.Remove(value);
+                    }
+                } else {
+                    thisArray.Remove(args[0]);
+                }
+                return new ScriptValue(thisArray);
             }
         }
     }

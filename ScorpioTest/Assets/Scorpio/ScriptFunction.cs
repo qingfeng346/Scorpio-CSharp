@@ -16,7 +16,7 @@ namespace Scorpio
         public string FunctionName { get; private set; }
         public ScriptValue BindObject { get { return m_BindObject; } }
         public ScriptFunction SetBindObject(ScriptValue obj) {
-            var ret = Clone() as ScriptFunction;
+            var ret = Clone(false) as ScriptFunction;
             ret.m_BindObject = obj;
             return ret;
         }
