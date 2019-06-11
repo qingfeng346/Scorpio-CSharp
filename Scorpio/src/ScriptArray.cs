@@ -255,21 +255,27 @@ namespace Scorpio {
             }
             return array;
         }
-        public override ScriptObject Clone() {
+        public override ScriptObject Clone(bool deep) {
             var ret = new ScriptArray(m_Script);
             ret.m_Objects = new ScriptValue[m_Length];
             ret.m_Length = m_Length;
-            for (int i = 0; i < m_Length; ++i) {
-                ref var value = ref m_Objects[i];
-                if (value.valueType == ScriptValue.scriptValueType) {
-                    var scriptObject = value.scriptValue;
-                    if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
-                        ret.m_Objects[i] = new ScriptValue(scriptObject.Clone());
+            if (deep) {
+                for (int i = 0; i < m_Length; ++i) {
+                    var value = m_Objects[i];
+                    if (value.valueType == ScriptValue.scriptValueType) {
+                        var scriptObject = value.scriptValue;
+                        if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
+                            ret.m_Objects[i] = new ScriptValue(scriptObject.Clone(true));
+                        } else {
+                            ret.m_Objects[i] = value;
+                        }
                     } else {
                         ret.m_Objects[i] = value;
                     }
-                } else {
-                    ret.m_Objects[i] = value;
+                }
+            } else {
+                for (int i = 0; i < m_Length; ++i) {
+                    ret.m_Objects[i] = m_Objects[i];
                 }
             }
             return ret;

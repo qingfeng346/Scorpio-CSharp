@@ -14,7 +14,7 @@ namespace Scorpio.Function {
                 throw new ExecutionException("CallFunction [" + FunctionName + "] is error : " + ex.ToString());
             }
         }
-        public override ScriptObject Clone() {
+        public override ScriptObject Clone(bool deep) {
             return new ScriptHandleFunction(m_Script, FunctionName, m_Handle);
         }
     }

@@ -73,19 +73,25 @@ namespace Scorpio {
             return ret;
         }
 
-        public override ScriptObject Clone() {
+        public override ScriptObject Clone(bool deep) {
             var ret = new ScriptMap(m_Script);
-            foreach (var pair in m_Objects) {
-                var value = pair.Value;
-                if (value.valueType == ScriptValue.scriptValueType) {
-                    var scriptObject = value.scriptValue;
-                    if (scriptObject is ScriptArray || scriptObject is ScriptMap) {
-                        ret.m_Objects[pair.Key] = new ScriptValue(scriptObject.Clone());
+            if (deep) {
+                foreach (var pair in m_Objects) {
+                    var value = pair.Value;
+                    if (value.valueType == ScriptValue.scriptValueType) {
+                        var scriptObject = value.scriptValue;
+                        if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
+                            ret.m_Objects[pair.Key] = new ScriptValue(scriptObject.Clone(true));
+                        } else {
+                            ret.m_Objects[pair.Key] = value;
+                        }
                     } else {
                         ret.m_Objects[pair.Key] = value;
                     }
-                } else {
-                    ret.m_Objects[pair.Key] = value;
+                }
+            } else {
+                foreach (var pair in m_Objects) {
+                    ret.m_Objects[pair.Key] = pair.Value;
                 }
             }
             return ret;

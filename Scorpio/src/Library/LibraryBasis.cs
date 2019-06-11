@@ -357,8 +357,9 @@ namespace Scorpio.Library {
         }
         private class clone : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var deep = length > 1 ? args[1].IsTrue : true;
                 if (args[0].valueType == ScriptValue.scriptValueType) {
-                    return new ScriptValue(args[0].scriptValue.Clone());
+                    return new ScriptValue(args[0].scriptValue.Clone(deep));
                 } else {
                     return args[0];
                 }
