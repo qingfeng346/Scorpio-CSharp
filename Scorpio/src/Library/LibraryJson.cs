@@ -10,7 +10,7 @@ namespace Scorpio.Library {
         }
         private class encode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(args[0].ToJson());
+                return new ScriptValue(args[0].ToJson(length > 1 ? args[1].IsTrue : false));
             }
         }
         private class decode : ScorpioHandle {
@@ -19,7 +19,7 @@ namespace Scorpio.Library {
                 m_Script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new JsonParser(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true, length > 2 ? args[2].IsTrue : false).Parse();
+                return new JsonParser(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true).Parse();
             }
         }
         private class JsonParser {
@@ -40,13 +40,11 @@ namespace Scorpio.Library {
             private Script m_Script;
             private string m_Buffer;
             private bool m_SupportLong;         //是否支持 数字无[.]解析成long值
-            private bool m_SupportKeyNumber;    //是否支持 key值为 number 类型
             private int m_Index;
             private int m_Length;
-            public JsonParser(Script script, string buffer, bool supportLong, bool supportKeyNumber) {
+            public JsonParser(Script script, string buffer, bool supportLong) {
                 m_Script = script;
                 m_SupportLong = supportLong;
-                m_SupportKeyNumber = supportKeyNumber;
                 m_Buffer = buffer;
                 m_Index = 0;
                 m_Length = buffer.Length;
@@ -192,9 +190,6 @@ namespace Scorpio.Library {
                         case '8':
                         case '9':
                         case '-': {
-                            if (!m_SupportKeyNumber) {
-                                throw new ExecutionException("Json解析, key值 未知符号 : " + ch);
-                            }
                             --m_Index;
                             var key = ParseNumber();
                             if (EatWhiteSpace != ':') {
