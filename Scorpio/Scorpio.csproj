@@ -3,16 +3,21 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net40;netcoreapp2.0</TargetFrameworks>
     <Authors>while</Authors>
-    <Product>Scorpio-CSharp</Product>
+    <Product>sco</Product>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>Scorpio-CSharp</PackageId>
+    <NeutralLanguage>zh-CN</NeutralLanguage>
+    <Language>zh-CN</Language>
+    <Title>sco</Title>
+    <PackageTags>javascript,script,sco,scorpio,scorpio-csharp</PackageTags>
+    <PackageIconUrl>http://www.fengyuezhu.com/resource/icon.png</PackageIconUrl>
+    <PackageDescription>* 纯c#解析脚本,基于.net framework 3.5 或 .net standard 2.0 , 脚本语法类似 javascript
+* 无任何依赖库</PackageDescription>
+    <Description>* 纯c#解析脚本,基于.net framework 3.5 或 .net standard 2.0 , 脚本语法类似 javascript
+* 无任何依赖库</Description>
     <PackageProjectUrl>https://github.com/qingfeng346/Scorpio-CSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/qingfeng346/Scorpio-CSharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <NeutralLanguage></NeutralLanguage>
-    <Version>1.0.4</Version>
-    <Description>* 纯c#解析脚本,基于.net framework 3.5 或 .net standard 2.0 , 脚本语法类似 javascript
-* 无任何依赖库</Description>
   </PropertyGroup>
 </Project>

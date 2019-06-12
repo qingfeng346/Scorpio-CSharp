@@ -1,6 +1,6 @@
-$version = "1.0.11"
+$version = "2.0.0-preview1"
 $name = "sco"
-
+$cur = Get-Location
 
 $today = Get-Date
 $date = $today.ToString('yyyy-MM-dd')
@@ -34,3 +34,5 @@ Remove-Item ../ScorpioTest/Assets/Scorpio/ -Force -Recurse
 Remove-Item ../ScorpioTest/Assets/Editor/ScorpioReflect -Force -Recurse
 Copy-Item ../Scorpio/src/ ../ScorpioTest/Assets/Scorpio/ -Recurse -Force 
 Copy-Item ../ScorpioReflect/src/ ../ScorpioTest/Assets/Editor/ScorpioReflect/ -Recurse -Force
+
+Set-Location $cur
