@@ -25,11 +25,14 @@ namespace ScorpioExec {
             Debugger.Log(0, null, value + "\n");
         }
     }
-    public class TestClass {
+    public static class TestClass {
         public static void TestFunc(ref int aaa, out string bbb, int ccc, ref Vec vec) {
             aaa = 200;
             bbb = "123123123";
             vec = new Vec();
+        }
+        public static void Ex(this Vec v, int a, int b) {
+            Console.WriteLine(v.x + a+ b);
         }
     }
     public struct Vec {

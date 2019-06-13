@@ -9,7 +9,7 @@ namespace Scorpio.Userdata {
 
         protected FunctionData[] m_Methods;                     //所有函数
         protected FunctionData[] m_StaticMethods;               //所有静态函数
-        protected FunctionDataReflect[] m_GenericMethods;       //所有模板函数
+        protected FunctionDataGeneric[] m_GenericMethods;       //所有模板函数
         protected int m_GenericMethodCount = 0;                 //模板函数数量
         public string MethodName { get; protected set; }        //函数名字
 

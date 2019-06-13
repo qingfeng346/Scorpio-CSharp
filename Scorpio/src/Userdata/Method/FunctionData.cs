@@ -40,8 +40,6 @@ namespace Scorpio.Userdata {
         }
         //是否是静态函数
         public virtual bool IsStatic => false;
-        //是否是没有实例的模板函数
-        public virtual bool IsGeneric => false;
         public abstract object Invoke(object obj, ScriptValue[] parameters);
 
         //优先检查无默认值，非不定参的函数
