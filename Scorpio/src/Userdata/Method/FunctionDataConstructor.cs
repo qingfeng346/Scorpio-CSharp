@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Scorpio.Exception;
 namespace Scorpio.Userdata {
     //反射构造函数
     public class FunctionDataConstructor : FunctionData {
@@ -8,18 +9,36 @@ namespace Scorpio.Userdata {
             base(parameterType, defaultParameter, refOut, requiredNumber, paramType) {
             this.Constructor = constructor;
         }
-        public override object Invoke(object obj) {
+        public override object Invoke(object obj, ScriptValue[] parameters) {
             return Constructor.Invoke(Args);
+        }
+    }
+    //包含 ref out 参数的构造函数
+    public class FunctionDataConstructorWithRefOut : FunctionDataConstructor {
+        public FunctionDataConstructorWithRefOut(ConstructorInfo constructor, Type[] parameterType, object[] defaultParameter, bool[] refOut, int requiredNumber, Type paramType) :
+            base(constructor, parameterType, defaultParameter, refOut, requiredNumber, paramType) {
+        }
+        public override object Invoke(object obj, ScriptValue[] parameters) {
+            var ret = Constructor.Invoke(Args);
+            for (var i = 0; i < RequiredNumber; ++i) {
+                if (RefOuts[i]) {
+                    var instance = parameters[i].Get<ScriptInstance>();
+                    if (instance == null) throw new ExecutionException($"带 ref out 标识的字段,必须传入 map, Index : {i}");
+                    instance.SetValue("value", ScriptValue.CreateObject(Args[i]));
+                }
+            }
+            return ret;
         }
     }
     //无参结构体构造函数
     public class FunctionDataStructConstructor : FunctionData {
         private readonly static Type[] EmptyTypes = new Type[0];
+        private readonly static bool[] EmptyBool = new bool[0];
         private Type m_Type;
-        public FunctionDataStructConstructor(Type type) : base(EmptyTypes, null, null, 0, null) {
+        public FunctionDataStructConstructor(Type type) : base(EmptyTypes, null, EmptyBool, 0, null) {
             m_Type = type;
         }
-        public override object Invoke(object obj) {
+        public override object Invoke(object obj, ScriptValue[] parameters) {
             return Activator.CreateInstance(m_Type);
         }
     }

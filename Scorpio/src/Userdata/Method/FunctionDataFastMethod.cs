@@ -9,7 +9,7 @@ namespace Scorpio.Userdata {
             FastMethod = method;
             MethodIndex = methodIndex;
         }
-        public override object Invoke(object obj) {
+        public override object Invoke(object obj, ScriptValue[] parameters) {
             return FastMethod.Call(obj, MethodIndex, Args);
         }
     }

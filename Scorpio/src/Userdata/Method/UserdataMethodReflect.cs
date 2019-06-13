@@ -23,6 +23,7 @@ namespace Scorpio.Userdata {
             var refOut = new List<bool>();                          //是否是 ref out
             var length = methods.Count;                             //函数数量
             var requiredNumber = 0;                                 //必须的参数个数
+            var hasRefOut = false;                                  //是否包含 ref out 参数
             Type paramType = null;                                  //变长参数类型
             FunctionData functionData;
             for (int i = 0; i < length; ++i) {
@@ -30,15 +31,28 @@ namespace Scorpio.Userdata {
                 var parameters = method.GetParameters();            //所有参数
                 if (Util.IsExtensionMethod(method)) {
                     //返回不定参类型
-                    ParseParameters(parameters, 1, parameterTypes, defaultParameter, refOut, ref requiredNumber, ref paramType);
-                    functionData = new FunctionDataReflectExtension(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                    ParseParameters(parameters, 1, parameterTypes, defaultParameter, refOut, ref hasRefOut, ref requiredNumber, ref paramType);
+                    if (hasRefOut) {
+                        functionData = new FunctionDataReflectExtensionWithRefOut(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                    } else {
+                        functionData = new FunctionDataReflectExtension(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                    }
+                    
                 } else {
                     //返回不定参类型
-                    ParseParameters(parameters, 0, parameterTypes, defaultParameter, refOut, ref requiredNumber, ref paramType);
+                    ParseParameters(parameters, 0, parameterTypes, defaultParameter, refOut, ref hasRefOut, ref requiredNumber, ref paramType);
                     if (method is ConstructorInfo) {
-                        functionData = new FunctionDataConstructor(method as ConstructorInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                        if (hasRefOut) {
+                            functionData = new FunctionDataConstructorWithRefOut(method as ConstructorInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                        } else {
+                            functionData = new FunctionDataConstructor(method as ConstructorInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                        }
                     } else {
-                        functionData = new FunctionDataReflectMethod(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                        if (hasRefOut) {
+                            functionData = new FunctionDataReflectMethodWithRefOut(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                        } else {
+                            functionData = new FunctionDataReflectMethod(method as MethodInfo, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+                        }
                     }
                 }
                 if (functionData.IsGeneric)
@@ -57,8 +71,9 @@ namespace Scorpio.Userdata {
             m_GenericMethodCount = m_GenericMethods.Length;
             
         }
-        void ParseParameters(ParameterInfo[] parameters, int begin, List<Type> parameterTypes, List<object> defaultParameter, List<bool> refOut, ref int requiredNumber, ref Type paramType) {
+        void ParseParameters(ParameterInfo[] parameters, int begin, List<Type> parameterTypes, List<object> defaultParameter, List<bool> refOut, ref bool hasRefOut,  ref int requiredNumber, ref Type paramType) {
             var hadDefault = false;
+            hasRefOut = false;
             paramType = null;
             parameterTypes.Clear();
             defaultParameter.Clear();
@@ -66,7 +81,12 @@ namespace Scorpio.Userdata {
             for (int i = begin; i < parameters.Length; ++i) {
                 var parameter = parameters[i];
                 parameterTypes.Add(parameter.ParameterType);
-                refOut.Add(parameter.IsRetval || parameter.IsOut);
+                if (Util.IsRefOut(parameter)) {
+                    hasRefOut = true;
+                    refOut.Add(true);
+                } else {
+                    refOut.Add(false);
+                }
                 if (parameter.DefaultValue != DBNull.Value) {
                     if (!hadDefault) {
                         hadDefault = true;

@@ -26,9 +26,14 @@ namespace ScorpioExec {
         }
     }
     public class TestClass {
-        public static void TestFunc() {
-
+        public static void TestFunc(ref int aaa, out string bbb, int ccc, ref Vec vec) {
+            aaa = 200;
+            bbb = "123123123";
+            vec = new Vec();
         }
+    }
+    public struct Vec {
+        public int x;
     }
     public class Program {
         public static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
