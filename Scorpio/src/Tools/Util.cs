@@ -39,7 +39,7 @@ namespace Scorpio.Tools {
         //是否是还没有定义的模板函数
         public static bool IsGenericMethod(MethodBase method) { return method.IsGenericMethod && method.ContainsGenericParameters; }
         //判断参数是否是 ref out 参数
-        public static bool IsRefOut(ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
+        public static bool IsRetvalOrOut(ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
         public static object ChangeType(ScriptValue value, Type type) {
             if (type == TYPE_VALUE) { return value; }
             switch (value.valueType) {

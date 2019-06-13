@@ -31,6 +31,12 @@ namespace ScorpioExec {
             bbb = "123123123";
             vec = new Vec();
         }
+        public static int TestFunc(ref int aaa, out string bbb, string ccc, ref Vec vec) {
+            aaa = 200;
+            bbb = "123123123";
+            vec = new Vec();
+            return 200;
+        }
         public static void Ex(this Vec v, int a, int b) {
             Console.WriteLine(v.x + a+ b);
         }
@@ -46,13 +52,15 @@ namespace ScorpioExec {
             try {
                 Logger.SetLogger(new LogHelper());
                 Scorpio.Commons.Util.PrintSystemInfo();
-                Logger.info("sco version : " + Scorpio.Version.version);
-                Logger.info("build date : " + Scorpio.Version.date);
+                Logger.info("Sco Version : " + Scorpio.Version.version);
+                Logger.info("Build Date : " + Scorpio.Version.date);
                 var command = CommandLine.Parse(args);
                 var type = command.GetValue("-type", "-t");
                 var source = command.GetValue("-source", "-s");
                 var output = command.GetValue("-output", "-o");
-                switch (type) {
+                if (type == null || type.Length == 0) { type = command.Type; }
+                if (type == null) { type = ""; }
+                switch (type.ToLower()) {
                     case "register": Register(); return;            //注册sco到运行环境
                     case "pack": Pack(source, output); return;      //生成sco IL
                     case "fast": Fast(command, output); return;     //生成快速反射类

@@ -71,7 +71,7 @@ namespace Scorpio.Userdata {
             for (int i = begin; i < parameters.Length; ++i) {
                 var parameter = parameters[i];
                 parameterTypes.Add(parameter.ParameterType);
-                if (Util.IsRefOut(parameter)) {
+                if (Util.IsRetvalOrOut(parameter)) {
                     hasRefOut = true;
                     refOut.Add(true);
                 } else {
