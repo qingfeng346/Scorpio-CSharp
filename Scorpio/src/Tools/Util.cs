@@ -36,6 +36,8 @@ namespace Scorpio.Tools {
         public static bool IsExtensionMethod(MemberInfo method) { return method.IsDefined(TYPE_EXTENSIONATTRIBUTE, false); }
         //是否是包含扩展函数类
         public static bool IsExtensionType(Type type) { return type.IsDefined(TYPE_EXTENSIONATTRIBUTE, false); }
+        //是否是还没有定义的模板函数
+        public static bool IsGenericMethod(MethodInfo method) { return method.IsGenericMethod && method.ContainsGenericParameters; }
 
         public static object ChangeType(ScriptValue value, Type type) {
             if (type == TYPE_VALUE) { return value; }

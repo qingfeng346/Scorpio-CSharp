@@ -103,17 +103,30 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return ToJson(); }
-        public override string ToJson() {
+        public override string ToString() { return ToJson(false); }
+        public override string ToJson(bool supportKeyNumber) {
             var builder = new StringBuilder();
             builder.Append("{");
-            bool first = true;
-            foreach (var pair in m_Objects) {
-                var value = pair.Value;
-                if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
-                if (first) { first = false; } else { builder.Append(","); }
-                builder.Append($"\"{pair.Key}\":{value.ToJson()}");
-            }
+            var first = true;
+            if (supportKeyNumber) {
+                foreach (var pair in m_Objects) {
+                    var value = pair.Value;
+                    if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
+                    if (first) { first = false; } else { builder.Append(","); }
+                    if (pair.Key is string) {
+                        builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber)}");
+                    } else {
+                        builder.Append($"{pair.Key}:{value.ToJson(supportKeyNumber)}");
+                    }
+                }
+            } else {
+                foreach (var pair in m_Objects) {
+                    var value = pair.Value;
+                    if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
+                    if (first) { first = false; } else { builder.Append(","); }
+                    builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber)}");
+                }
+            } 
             builder.Append("}");
             return builder.ToString();
         }

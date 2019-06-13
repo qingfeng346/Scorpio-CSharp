@@ -25,6 +25,11 @@ namespace ScorpioExec {
             Debugger.Log(0, null, value + "\n");
         }
     }
+    public class TestClass {
+        public static void TestFunc() {
+
+        }
+    }
     public class Program {
         public static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string CurrentDirectory = Environment.CurrentDirectory;
@@ -95,6 +100,7 @@ namespace ScorpioExec {
             FileUtil.CreateFile(Path.Combine(output, generate.ScorpioClassName + ".cs"), generate.Generate());
         }
         static void Execute(string[] args) {
+            TypeManager.PushAssembly(typeof(Program).Assembly);
             script = new Script();
             script.LoadLibraryV1();
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));

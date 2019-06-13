@@ -37,7 +37,7 @@ namespace Scorpio {
             }
         }
         public override ScriptValue GetValue(string key) { return m_Indexs.ContainsKey(key) ? GetValueByIndex(m_Indexs[key]) : ScriptValue.Null; }
-        public override ScriptValue GetValueByIndex(int key) { return key >= 0 && key < m_Size ? m_Objects[key] : ScriptValue.Null; }
+        public override ScriptValue GetValueByIndex(int key) { return m_Objects[key]; }
         public override void SetValue(string key, ScriptValue value) {
             if (m_Indexs.ContainsKey(key)) {
                 SetValueByIndex(m_Indexs[key], value);

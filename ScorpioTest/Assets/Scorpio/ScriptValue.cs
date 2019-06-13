@@ -277,9 +277,9 @@ namespace Scorpio {
             this.objectValue = value;
         }
 
-        public string ToJson() {
+        public string ToJson(bool supportKeyNumber) {
             switch (valueType) {
-                case scriptValueType: return scriptValue.ToJson();
+                case scriptValueType: return scriptValue.ToJson(supportKeyNumber);
                 case doubleValueType: return doubleValue.ToString();
                 case longValueType: return longValue.ToString();
                 case trueValueType: return "true";

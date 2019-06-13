@@ -1,13 +1,11 @@
 ﻿using System;
-
 namespace Scorpio.Userdata {
-    //去反射函数
+    //快速反射函数
     public class FunctionDataFastMethod : FunctionData {
         private ScorpioFastReflectMethod FastMethod;
         private int MethodIndex;                     //函数索引(去反射使用)
         public FunctionDataFastMethod(ScorpioFastReflectMethod method, Type[] parameterType, Type paramType, int methodIndex) :
-            base(parameterType, null, paramType) {
-            IsGeneric = false;
+            base(parameterType, null, parameterType.Length, paramType) {
             FastMethod = method;
             MethodIndex = methodIndex;
         }

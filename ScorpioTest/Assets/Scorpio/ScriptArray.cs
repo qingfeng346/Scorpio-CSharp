@@ -289,13 +289,13 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return ToJson(); }
-        public override string ToJson() {
+        public override string ToString() { return ToJson(false); }
+        public override string ToJson(bool supportKeyNumber) {
             var builder = new StringBuilder();
             builder.Append("[");
             for (int i = 0; i < m_Length; ++i) {
                 if (i != 0) builder.Append(",");
-                builder.Append(m_Objects[i].ToJson());
+                builder.Append(m_Objects[i].ToJson(supportKeyNumber));
             }
             builder.Append("]");
             return builder.ToString();

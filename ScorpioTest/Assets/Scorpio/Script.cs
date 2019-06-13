@@ -53,35 +53,43 @@ namespace Scorpio {
             Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
             Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateObject(this));
             Global.SetValue(GLOBAL_VERSION, ScriptValue.CreateObject(typeof(Version)));
-
-            TypeObject = ProtoObject.Load(this);
+            
+            TypeObject = new ScriptTypeObject("Object");
             TypeObjectValue = new ScriptValue(TypeObject);
             Global.SetValue(TypeObject.TypeName, TypeObjectValue);
 
-            TypeBoolean = ProtoBoolean.Load(this, TypeObjectValue);
+            TypeBoolean = new ScriptType("Bool", TypeObjectValue);
             TypeBooleanValue = new ScriptValue(TypeBoolean);
             Global.SetValue(TypeBoolean.TypeName, TypeBooleanValue);
 
-            TypeNumber = ProtoNumber.Load(this, TypeObjectValue);
+            TypeNumber = new ScriptType("Number", TypeObjectValue);
             TypeNumberValue = new ScriptValue(TypeNumber);
             Global.SetValue(TypeNumber.TypeName, TypeNumberValue);
 
-            TypeString = ProtoString.Load(this, TypeObjectValue);
+            TypeString = new ScriptType("String", TypeObjectValue);
             TypeStringValue = new ScriptValue(TypeString);
             Global.SetValue(TypeString.TypeName, TypeStringValue);
 
-            TypeArray = ProtoArray.Load(this, TypeObjectValue);
+            TypeArray = new ScriptType("Array", TypeObjectValue);
             TypeArrayValue = new ScriptValue(TypeArray);
             Global.SetValue(TypeArray.TypeName, TypeArrayValue);
 
-            TypeMap = ProtoMap.Load(this, TypeObjectValue);
+            TypeMap = new ScriptType("Map", TypeObjectValue);
             TypeMapValue = new ScriptValue(TypeMap);
             Global.SetValue(TypeMap.TypeName, TypeMapValue);
 
-            TypeFunction = ProtoFunction.Load(this, TypeObjectValue);
+            TypeFunction = new ScriptType("Function", TypeObjectValue);
             TypeFunctionValue = new ScriptValue(TypeFunction);
             Global.SetValue(TypeFunction.TypeName, TypeFunctionValue);
 
+
+            ProtoObject.Load(this, TypeObject);
+            ProtoBoolean.Load(this, TypeBoolean);
+            ProtoNumber.Load(this, TypeNumber);
+            ProtoString.Load(this, TypeString);
+            ProtoArray.Load(this, TypeArray);
+            ProtoMap.Load(this, TypeMap);
+            ProtoFunction.Load(this, TypeFunction);
 
             TypeManager.PushAssembly(typeof(object).GetTypeInfo().Assembly);                        //mscorlib.dll
             TypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).GetTypeInfo().Assembly);     //System.dll

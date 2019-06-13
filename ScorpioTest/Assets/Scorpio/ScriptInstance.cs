@@ -152,15 +152,15 @@ namespace Scorpio {
             return base.Call(thisObject, parameters, length);
         }
         public override string ToString() { return Prototype != null ? $"Object<{m_Prototype.ToString()}>" : "Object<null>"; }
-        public override string ToJson() {
+        public override string ToJson(bool supportKeyNumber) {
             var builder = new StringBuilder();
             builder.Append("{");
-            bool first = true;
+            var first = true;
             foreach (var pair in m_Values) {
                 var value = pair.value;
                 if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
                 if (first) { first = false; } else { builder.Append(","); }
-                builder.Append($"\"{pair.key}\":{value.ToJson()}");
+                builder.Append($"\"{pair.key}\":{value.ToJson(supportKeyNumber)}");
             }
             builder.Append("}");
             return builder.ToString();
