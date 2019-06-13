@@ -118,14 +118,12 @@ namespace Scorpio.Library {
 
             script.SetGlobal("pushAssembly", script.CreateFunction(new pushAssembly()));
             script.SetGlobal("importType", script.CreateFunction(new importType()));
-            script.SetGlobal("importExtension", script.CreateFunction(new importExtension()));
             script.SetGlobal("importNamespace", script.CreateFunction(new importNamespace()));
             script.SetGlobal("genericType", script.CreateFunction(new genericType()));
             script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod()));
 
             script.SetGlobal("push_assembly", script.CreateFunction(new pushAssembly()));
             script.SetGlobal("import_type", script.CreateFunction(new importType()));
-            script.SetGlobal("import_extension", script.CreateFunction(new importExtension()));
             script.SetGlobal("import_namespace", script.CreateFunction(new importNamespace()));
             script.SetGlobal("generic_type", script.CreateFunction(new genericType()));
             script.SetGlobal("generic_method", script.CreateFunction(new genericMethod()));
@@ -429,16 +427,6 @@ namespace Scorpio.Library {
         private class importType : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return TypeManager.GetUserdataType(args[0].ToString());
-            }
-        }
-        private class importExtension : ScorpioHandle {
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (args[0].valueType == ScriptValue.scriptValueType) {
-                    TypeManager.LoadExtension(args[0].scriptValue.Type);
-                } else {
-                    TypeManager.LoadExtension(args[0].ToString());
-                }
-                return ScriptValue.Null;
             }
         }
         private class importNamespace : ScorpioHandle {

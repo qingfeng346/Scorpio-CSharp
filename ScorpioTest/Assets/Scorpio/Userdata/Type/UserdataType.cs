@@ -71,7 +71,5 @@ namespace Scorpio.Userdata {
         protected abstract object GetValue_impl(object obj, string name);
         /// <summary> 设置一个类变量 </summary>
         protected abstract void SetValue_impl(object obj, string name, ScriptValue value);
-        /// <summary> 添加一个扩展函数 </summary>
-        public abstract void AddExtensionMethod(MethodInfo method);
     }
 }

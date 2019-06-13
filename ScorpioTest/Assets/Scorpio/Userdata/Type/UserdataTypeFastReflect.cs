@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 
 namespace Scorpio.Userdata {
     //去反射类
@@ -26,16 +25,13 @@ namespace Scorpio.Userdata {
             this.MethodIndex = methodIndex;
         }
     }
-    //去反射类管理
+    //快速反射类管理
     public class UserdataTypeFastReflect : UserdataType {
         private ScorpioFastReflectClass m_Value;
         private UserdataMethodFastReflect m_Constructor;
         public UserdataTypeFastReflect(Type type, ScorpioFastReflectClass value) : base(type) {
             m_Value = value;
             m_Constructor = value.GetConstructor();
-        }
-        public override void AddExtensionMethod(MethodInfo method) {
-            //去反射类不支持去反射函数，需要在生成去反射数据时生成
         }
         public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
             return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);

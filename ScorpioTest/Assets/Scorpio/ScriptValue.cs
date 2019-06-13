@@ -360,6 +360,8 @@ namespace Scorpio {
         public static ScriptValue CreateObject(object value) {
             if (value == null)
                 return Null;
+            else if (value is ScriptValue)
+                return (ScriptValue)value;
             else if (value is bool)
                 return (bool)value ? True : False;
             else if (value is string)
@@ -370,8 +372,6 @@ namespace Scorpio {
                 return new ScriptValue((double)value);
             else if (value is sbyte || value is byte || value is short || value is ushort || value is int || value is uint || value is float || value is decimal)
                 return new ScriptValue(System.Convert.ToDouble(value));
-            else if (value is ScriptValue)
-                return (ScriptValue)value;
             else if (value is ScriptObject)
                 return new ScriptValue((ScriptObject)value);
             else if (value is Type)

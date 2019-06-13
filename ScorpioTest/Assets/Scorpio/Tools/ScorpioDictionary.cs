@@ -98,6 +98,14 @@ namespace Scorpio.Tools {
             }
             return false;
         }
+        public Value Get(Key key, Func<Value> func) {
+            for (int i = 0; i < mSize; ++i) {
+                if (mValues[i].key.Equals(key)) {
+                    return mValues[i].value;
+                }
+            }
+            return this[key] = func();
+        } 
         public virtual Value this[Key key] {
             get {
                 for (int i = 0; i < mSize; ++i) {
@@ -172,6 +180,11 @@ namespace Scorpio.Tools {
                 }
                 mValues[mSize] = new ScorpioValue<string, Value>() { key = key, value = value };
                 ++mSize;
+            }
+        }
+        public Value this[int key] {
+            get {
+                return mValues[key].value;
             }
         }
     }

@@ -84,7 +84,6 @@
     * 在程序内调用 **Scorpio.Userdata.TypeManager.SetFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script))**
 
 ##### 注意事项
-* 不能调用模板函数
 * 不能调用含有ref和out参数的函数
 
 ### 源码目录说明

@@ -10,7 +10,7 @@ namespace Scorpio.Userdata {
         private bool m_InitializeConstructor;                           //是否初始化过所有构造函数
         private bool m_InitializeMethods;                               //是否初始化过所有函数
         private UserdataMethod m_Constructor;                           //所有构造函数
-        private List<MethodInfo> m_Methods;                             //所有函数 包含扩展函数
+        private List<MethodInfo> m_Methods;                             //所有函数
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
         private Dictionary<string, ScriptValue> m_NestedTypes;          //所有的内部类
         private Dictionary<string, UserdataMethod> m_Functions;         //所有的函数
@@ -98,11 +98,6 @@ namespace Scorpio.Userdata {
             } catch (System.Exception e) {
                 throw new ExecutionException("SetValue 出错 源类型:" + value.ValueTypeName + " 目标类型:" + variable.FieldType.Name + " : " + e.ToString());
             }
-        }
-        //需要保证调用相同名字函数前 载入扩展函数，后续修改为任何时候都可以载入
-        public override void AddExtensionMethod(MethodInfo method) {
-            if (!m_Methods.Contains(method))
-                m_Methods.Add(method);
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System.IO;
 using System.Text;
-
+using System;
 namespace Scorpio.Library {
     public class LibraryIO {
         public static readonly Encoding DefaultEncoding = Encoding.UTF8;
+        public static readonly long BaseTime = 621355968000000000;          //1970, 1, 1, 0, 0, 0, DateTimeKind.Utc
         public static void Load(Script script) {
             var map = new ScriptMap(script);
+            map.SetValue("unixNow", script.CreateFunction(new unixNow()));
             map.SetValue("toString", script.CreateFunction(new toString()));
             map.SetValue("toBytes", script.CreateFunction(new toBytes()));
             map.SetValue("readAll", script.CreateFunction(new readAll()));
@@ -20,6 +22,11 @@ namespace Scorpio.Library {
             map.SetValue("getFiles", script.CreateFunction(new getFiles()));
             map.SetValue("getPaths", script.CreateFunction(new getPaths()));
             script.SetGlobal("io", new ScriptValue(map));
+        }
+        private class unixNow : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return (DateTime.UtcNow.Ticks - BaseTime) / 10000;
+            }
         }
         private class toString : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

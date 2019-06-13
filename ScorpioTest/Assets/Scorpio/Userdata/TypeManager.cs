@@ -46,19 +46,5 @@ namespace Scorpio.Userdata {
             }
             return null;
         }
-        //加载扩展函数
-        public static void LoadExtension(string type) {
-            LoadExtension(LoadType(type));
-        }
-        public static void LoadExtension(Type type) {
-            if (type == null) return;
-            if (!Util.IsExtensionType(type)) return;
-            var methods = type.GetMethods(Script.BindingFlag);
-            foreach (var method in methods) {
-                if (Util.IsExtensionMethod(method)) {
-                    GetType(method.GetParameters()[0].ParameterType).AddExtensionMethod(method);
-                }
-            }
-        }
     }
 }

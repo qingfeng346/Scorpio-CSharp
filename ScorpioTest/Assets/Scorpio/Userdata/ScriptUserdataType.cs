@@ -6,7 +6,7 @@ namespace Scorpio.Userdata {
     /// <summary> 普通Object Type类型 </summary>
     public class ScriptUserdataType : ScriptUserdata {
         protected UserdataType m_UserdataType;
-        protected Dictionary<string, ScriptValue> m_Methods = new Dictionary<string, ScriptValue>();            //所有函数
+        protected ScorpioDictionaryString<ScriptValue> m_Methods = new ScorpioDictionaryString<ScriptValue>();            //所有函数
         public ScriptUserdataType(Type value, UserdataType type) {
             this.m_Value = value;
             this.m_ValueType = value;
@@ -17,7 +17,8 @@ namespace Scorpio.Userdata {
             return new ScriptValue(m_UserdataType.CreateInstance(parameters, length));
         }
         public override ScriptValue GetValue(string key) {
-            if (m_Methods.ContainsKey(key)) return m_Methods[key];
+            int index;
+            if ((index = m_Methods.IndexOf(key)) != -1) return m_Methods[index];
             var ret = m_UserdataType.GetValue(null, key);
             if (ret is UserdataMethod) {
                 return m_Methods[key] = new ScriptValue(new ScriptStaticMethodFunction((UserdataMethod)ret));
