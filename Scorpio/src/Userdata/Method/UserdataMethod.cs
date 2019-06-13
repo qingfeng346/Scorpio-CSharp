@@ -11,9 +11,7 @@ namespace Scorpio.Userdata {
         protected FunctionData[] m_StaticMethods;               //所有静态函数
         protected FunctionDataReflect[] m_GenericMethods;       //所有模板函数
         protected int m_GenericMethodCount = 0;                 //模板函数数量
-        protected bool m_IsStructConstructor = false;           //是否是结构体的构造函数
         public string MethodName { get; protected set; }        //函数名字
-        public bool IsStructConstructor { get { return m_IsStructConstructor; } }   //是否是结构体构造函数,结构体无参构造函数不能获取到
 
         public UserdataMethod(Type type, string methodName) {
             m_Type = type;
@@ -74,8 +72,6 @@ namespace Scorpio.Userdata {
         }
         public object Call(bool isStatic, object obj, ScriptValue[] parameters, int length) {
             try {
-                //无参结构体构造函数
-                //if (m_IsStructConstructor && length == 0) { return Activator.CreateInstance(m_Type); }
                 //如果obj为null 则调用静态函数
                 var methods = isStatic ? m_StaticMethods : m_Methods;
                 var methodLength = methods.Length;

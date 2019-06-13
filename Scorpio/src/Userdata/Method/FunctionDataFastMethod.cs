@@ -5,7 +5,7 @@ namespace Scorpio.Userdata {
         private ScorpioFastReflectMethod FastMethod;
         private int MethodIndex;                     //函数索引(去反射使用)
         public FunctionDataFastMethod(ScorpioFastReflectMethod method, Type[] parameterType, Type paramType, int methodIndex) :
-            base(parameterType, null, parameterType.Length, paramType) {
+            base(parameterType, null, new bool[parameterType.Length], parameterType.Length, paramType) {
             FastMethod = method;
             MethodIndex = methodIndex;
         }
