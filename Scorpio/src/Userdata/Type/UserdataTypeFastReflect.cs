@@ -26,7 +26,7 @@ namespace Scorpio.Userdata {
             this.MethodIndex = methodIndex;
         }
     }
-    //去反射类管理
+    //快速反射类管理
     public class UserdataTypeFastReflect : UserdataType {
         private ScorpioFastReflectClass m_Value;
         private UserdataMethodFastReflect m_Constructor;

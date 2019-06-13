@@ -13,6 +13,16 @@ namespace Scorpio.Userdata {
         public override bool IsStatic => Method.IsStatic;
         public override bool IsGeneric => Util.IsGenericMethod(Method);
     }
+    //模板函数
+    public class FunctionDataGeneric : FunctionData {
+        public MethodInfo Method;
+        public FunctionDataGeneric(MethodInfo method) : base(EmptyTypes, null, null, 0, null) {
+            Method = method;
+        }
+        public override object Invoke(object obj, ScriptValue[] parameters) {
+            throw new NotImplementedException();
+        }
+    }
     //普通反射函数
     public class FunctionDataReflectMethod : FunctionDataReflect {
         public FunctionDataReflectMethod(MethodInfo method, Type[] parameterType, object[] defaultParameter, bool[] refOut, int requiredNumber, Type paramType) :

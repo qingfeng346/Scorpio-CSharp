@@ -3,6 +3,9 @@ using Scorpio.Tools;
 namespace Scorpio.Userdata {
     //单个函数的所有数据
     public abstract class FunctionData {
+        protected readonly static Type[] EmptyTypes = new Type[0];
+        protected readonly static bool[] EmptyBool = new bool[0];
+
         public Type[] ParameterType;                //所有参数类型
         public object[] DefaultParameter;           //默认参数
         public object[] Args;                       //参数数组（预创建）

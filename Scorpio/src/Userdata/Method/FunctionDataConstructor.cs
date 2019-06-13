@@ -32,8 +32,6 @@ namespace Scorpio.Userdata {
     }
     //无参结构体构造函数
     public class FunctionDataStructConstructor : FunctionData {
-        private readonly static Type[] EmptyTypes = new Type[0];
-        private readonly static bool[] EmptyBool = new bool[0];
         private Type m_Type;
         public FunctionDataStructConstructor(Type type) : base(EmptyTypes, null, EmptyBool, 0, null) {
             m_Type = type;
