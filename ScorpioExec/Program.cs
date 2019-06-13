@@ -50,6 +50,8 @@ namespace ScorpioExec {
         private static Script script;
         static void Main(string[] args) {
             try {
+                var generate = new GenerateScorpioClass(typeof(TestClass));
+                FileUtil.CreateFile("/Users/while/Scorpio-CSharp/ScorpioExec/" + generate.ScorpioClassName + ".cs", generate.Generate());
                 Logger.SetLogger(new LogHelper());
                 Scorpio.Commons.Util.PrintSystemInfo();
                 Logger.info("Sco Version : " + Scorpio.Version.version);

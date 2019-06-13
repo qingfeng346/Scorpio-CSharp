@@ -17,6 +17,9 @@ public class ScorpioReflectUtil {
         if (string.IsNullOrEmpty(fullName))
             return "";
         fullName = fullName.Replace("+", ".");
+        if (type.IsByRef) {
+            fullName = fullName.Substring(0, fullName.Length - 1);
+        }
         if (type.IsGenericType) {
             if (!type.IsNested) {
                 var index = fullName.IndexOf("`");

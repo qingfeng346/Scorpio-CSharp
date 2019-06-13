@@ -101,17 +101,41 @@ namespace Scorpio.ScorpioReflect {
                 execute = GetPropertyMethodExecute(method, variable, pars);
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
                 var callBuilder = new StringBuilder();
+                var hasRefOut = false;
                 var call = $"{variable}.{name}({GetScorpioMethodCall(method)})";
                 for (var j = 0; j < pars.Length; ++j) {
-                    if (Util.IsRetvalOrOut(pars[i])) {
-                        callBuilder.Append($"var retval{i} = default()");
+                    if (Util.IsRetvalOrOut(pars[j])) {
+                        hasRefOut = true;
+                        callBuilder.Append($"var retval{j} = default({ScorpioReflectUtil.GetFullName(pars[j].ParameterType)});");
                     }
                 }
-                if (method.ReturnType == typeof(void)) {
-                    execute = string.Format("{0}; return null;", call);
+                var noReturn = method.ReturnType == typeof(void);
+                if (hasRefOut) {
+                    if (noReturn) {
+                        callBuilder.Append($"{call};");
+                    } else {
+                        callBuilder.Append($"var __Result = {call};");
+                    }
+                    for (var j = 0; j < pars.Length; ++j) {
+                        if (Util.IsRetvalOrOut(pars[j])) {
+                            callBuilder.Append($"args[{j}] = retval{j};");
+                        }
+                    }
+                    if (noReturn) {
+                        callBuilder.Append("return null;");
+                    } else {
+                        callBuilder.Append("return __Result;");
+                    }
+                    execute = callBuilder.ToString();
                 } else {
-                    execute = string.Format("return {0};", call);
+                    if (noReturn) {
+                        callBuilder.Append($"{call}; return null;");
+                    } else {
+                        callBuilder.Append($"return {call};");
+                    }
+                    execute = callBuilder.ToString();
                 }
+                
             finish:
                 builder.AppendFormat(@"
             case {0}: {{ {1} }}", i, execute);
