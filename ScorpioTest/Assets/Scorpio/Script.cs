@@ -159,6 +159,9 @@ namespace Scorpio {
         public ScriptValue GetGlobal(string key) {
             return Global.GetValue(key);
         }
+        public bool HasGlobal(string key) {
+            return Global.HasValue(key);
+        }
         public ScriptArray CreateArray() { return new ScriptArray(this); }
         public ScriptMap CreateMap() { return new ScriptMap(this); }
         public ScriptType CreateType(string typeName, ScriptValue parentType) { return new ScriptType(typeName, parentType); }
