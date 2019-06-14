@@ -17,9 +17,6 @@ public class ScorpioReflectUtil {
         if (string.IsNullOrEmpty(fullName))
             return "";
         fullName = fullName.Replace("+", ".");
-        if (type.IsByRef) {
-            fullName = fullName.Substring(0, fullName.Length - 1);
-        }
         if (type.IsGenericType) {
             if (!type.IsNested) {
                 var index = fullName.IndexOf("`");
@@ -57,14 +54,4 @@ public class ScorpioReflectUtil {
     public static void SortType(List<Type> types) {
         types.Sort(new ComparerType());
     }
-    //是否是带有 ref 和 out 关键字参数的函数
-    //public static bool IsRetvalOrOut(MethodInfo method) {
-    //    var pars = method.GetParameters();
-    //    foreach (var par in pars) {
-    //        if (par.IsRetval || par.IsOut) {
-    //            return true;
-    //        }
-    //    }
-    //    return false;
-    //}
 }

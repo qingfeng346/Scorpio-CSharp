@@ -11,6 +11,10 @@
     "unpack": {
       "commandName": "Project",
       "commandLineArgs": "-t unpack -s C:\\Users\\qingf\\Desktop\\a.out -o C:\\Users\\qingf\\Desktop\\a.txt"
+    },
+    "fast": {
+      "commandName": "Project",
+      "commandLineArgs": "-type fast -class ScorpioExec.TestClass -output E:\\Scorpio-CSharp\\ScorpioExec\\"
     }
   }
 }

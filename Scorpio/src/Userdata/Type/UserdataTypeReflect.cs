@@ -38,20 +38,24 @@ namespace Scorpio.Userdata {
         }
         //获取一个函数，名字相同返回值相同
         private UserdataMethod GetMethod(string name) {
-            var methods = new List<MethodInfo>();
-            foreach (var method in m_Methods) {
-                if (method.Name.Equals(name)) {
-                    methods.Add(method);
-                }
-            }
+            var methods = m_Methods.FindAll((method) => method.Name == name);
             if (methods.Count > 0)
                 return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods.ToArray());
             return null;
         }
+        //获取一个内部类
+        private ScriptValue GetNestedType(string name) {
+            var nestedType = m_Type.GetTypeInfo().GetNestedType(name, Script.BindingFlag);
+            if (nestedType != null) {
+                return m_NestedTypes[name] = TypeManager.GetUserdataType(nestedType);
+            }
+            return ScriptValue.Null;
+        }
         //获取一个变量
         private UserdataVariable GetVariable(string name) {
-            if (m_Variables.ContainsKey(name))
-                return m_Variables[name];
+            UserdataVariable value;
+            if (m_Variables.TryGetValue(name, out value))
+                return value;
             FieldInfo fInfo = m_Type.GetTypeInfo().GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
             PropertyInfo pInfo = m_Type.GetTypeInfo().GetProperty(name, Script.BindingFlag);
@@ -59,14 +63,6 @@ namespace Scorpio.Userdata {
             //EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name, Script.BindingFlag);
             //if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);
             return null;
-        }
-        //获取一个内部类
-        private ScriptValue GetNestedType(string name) {
-            Type nestedType = m_Type.GetTypeInfo().GetNestedType(name, Script.BindingFlag);
-            if (nestedType != null) {
-                return m_NestedTypes[name] = TypeManager.GetUserdataType(nestedType);
-            }
-            return ScriptValue.Null;
         }
         /// <summary> 创建一个实例 </summary>
         public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
@@ -79,19 +75,21 @@ namespace Scorpio.Userdata {
         }
         /// <summary> 获得一个类变量 </summary>
         protected override object GetValue_impl(object obj, string name) {
-            if (m_Functions.ContainsKey(name)) return m_Functions[name];
-            if (m_NestedTypes.ContainsKey(name)) return m_NestedTypes[name];
-            UserdataVariable variable = GetVariable(name);
+            UserdataMethod userdataMethod;
+            if (m_Functions.TryGetValue(name, out userdataMethod)) return userdataMethod;
+            ScriptValue nestedType;
+            if (m_NestedTypes.TryGetValue(name, out nestedType)) return nestedType;
+            var variable = GetVariable(name);
             if (variable != null) return variable.GetValue(obj);
-            var nestedType = GetNestedType(name);
+            userdataMethod = GetMethod(name);
+            if (userdataMethod != null) return userdataMethod;
+            nestedType = GetNestedType(name);
             if (nestedType.valueType != ScriptValue.nullValueType) return nestedType;
-            UserdataMethod func = GetMethod(name);
-            if (func != null) return func;
             throw new ExecutionException("GetValue 类[" + m_Type.ToString() + "] 变量 [" + name + "] 不存在");
         }
         /// <summary> 设置一个类变量 </summary>
         protected override void SetValue_impl(object obj, string name, ScriptValue value) {
-            UserdataVariable variable = GetVariable(name);
+            var variable = GetVariable(name);
             if (variable == null) throw new ExecutionException("SetValue 类[" + m_Type + "] 变量 [" + name + "] 不存在");
             try {
                 variable.SetValue(obj, Util.ChangeType(value, variable.FieldType));

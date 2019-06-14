@@ -47,5 +47,6 @@ namespace Scorpio.Userdata {
         protected override void SetValue_impl(object obj, string name, ScriptValue value) {
             m_Value.SetValue(obj, name, value);
         }
+        public ScorpioFastReflectClass FastReflectClass { get { return m_Value; } }
     }
 }

@@ -82,7 +82,7 @@ __methods_content
             foreach (var par in pars) {
                 if (first) { first = false; } else { parameterType.Append(","); refOut.Append(","); }
                 if (Util.IsRetvalOrOut(par)) {
-                    parameterType.Append("null");
+                    parameterType.Append($"typeof({ScorpioReflectUtil.GetFullName(par.ParameterType.GetElementType())})");
                     refOut.Append("true");
                 } else {
                     refOut.Append("false");
@@ -117,13 +117,13 @@ __methods_content
             return "(" + ScorpioReflectUtil.GetFullName(pars[index].ParameterType) + ")args[" + index + "]";
         }
         private string GetScorpioVariable(bool IsStatic, string name) {
-            return (IsStatic ? m_FullName : "((" + m_FullName + ")obj)") + "." + name;
+            return (IsStatic ? m_FullName : $"(({m_FullName})obj)") + "." + name;
         }
         private string GetAllMethod(MethodBase[] methods) {
             var builder = new StringBuilder();
             for (var i = 0; i < methods.Length; ++i) {
-                builder.Append(@"
-            methodInfos.Add(" + GetScorpioMethod(methods[i], i) + ");");
+                builder.Append($@"
+            methodInfos.Add({GetScorpioMethod(methods[i], i)});");
             }
             return builder.ToString();
         }

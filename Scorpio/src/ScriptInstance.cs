@@ -11,7 +11,8 @@ namespace Scorpio {
         public override string ValueTypeName { get { return ToString(); } }            //变量名称
         public ScriptValue Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public override ScriptValue GetValue(string key) {
-            return m_Values.ContainsKey(key) ? m_Values[key] : m_Prototype.GetValue(key);
+            ScriptValue value;
+            return m_Values.TryGetValue(key, out value) ? value : m_Prototype.GetValue(key);
         }
         public override void SetValue(string key, ScriptValue value) {
             if (value.valueType == ScriptValue.nullValueType) {

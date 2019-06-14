@@ -4,7 +4,7 @@ using Scorpio.Exception;
 namespace Scorpio.Userdata {
     /// <summary> 枚举 Type </summary>
     public class ScriptUserdataEnumType : ScriptUserdata {
-        private ScorpioDictionaryString<ScriptValue> m_Enums = new ScorpioDictionaryString<ScriptValue>();     //所有枚举的值
+        private ScorpioDictionaryStringValue m_Enums = new ScorpioDictionaryStringValue();     //所有枚举的值
         public ScriptUserdataEnumType(Type value) {
             this.m_Value = value;
             this.m_ValueType = value;
@@ -16,8 +16,9 @@ namespace Scorpio.Userdata {
         public override Type ValueType { get { return Util.TYPE_TYPE; } }
         public override string ToString() { return m_ValueType.Name; }
         public override ScriptValue GetValue(string key) {
-            if (m_Enums.ContainsKey(key))
-                return m_Enums[key];
+            ScriptValue value;
+            if (m_Enums.TryGetValue(key, out value))
+                return value;
             throw new ExecutionException("枚举[" + m_ValueType.ToString() + "] 元素[" + key + "] 不存在");
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {

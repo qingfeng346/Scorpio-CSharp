@@ -55,6 +55,26 @@ namespace Scorpio.Tools {
                 default: return value.Value;
             }
         }
+        public static bool CanChangeTypeRefOut(ScriptValue value, Type type) {
+            if (type == TYPE_OBJECT || type == TYPE_VALUE) return true;
+            switch (value.valueType) {
+                case ScriptValue.nullValueType:
+                    return true;
+                case ScriptValue.trueValueType:
+                case ScriptValue.falseValueType:
+                    return type == TYPE_BOOL;
+                case ScriptValue.doubleValueType:
+                case ScriptValue.longValueType:
+                    return type.IsPrimitive;
+                case ScriptValue.stringValueType:
+                    return type == TYPE_STRING;
+                case ScriptValue.objectValueType:
+                    return type.GetTypeInfo().IsAssignableFrom(value.objectValue.GetType());
+                default: {
+                    return TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.GetTypeInfo().IsAssignableFrom(value.scriptValue.ValueType);
+                }
+            }
+        }
         public static bool CanChangeType(ScriptValue value, Type type) {
             if (type == TYPE_OBJECT || type == TYPE_VALUE) return true;
             switch (value.valueType) {

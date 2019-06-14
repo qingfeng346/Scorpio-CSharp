@@ -106,25 +106,34 @@ namespace Scorpio.ScorpioReflect {
                 for (var j = 0; j < pars.Length; ++j) {
                     if (Util.IsRetvalOrOut(pars[j])) {
                         hasRefOut = true;
-                        callBuilder.Append($"var retval{j} = default({ScorpioReflectUtil.GetFullName(pars[j].ParameterType)});");
+                        var typeName = ScorpioReflectUtil.GetFullName(pars[j].ParameterType.GetElementType());
+                        callBuilder.Append($@"
+                var retval{j} = args[{j}] == null ? default({typeName}) : ({typeName})args[{j}]; ");
                     }
                 }
                 var noReturn = method.ReturnType == typeof(void);
                 if (hasRefOut) {
                     if (noReturn) {
-                        callBuilder.Append($"{call};");
+                        callBuilder.Append($@"
+                {call};");
                     } else {
-                        callBuilder.Append($"var __Result = {call};");
+                        callBuilder.Append($@"
+                var __Result = {call};");
                     }
                     for (var j = 0; j < pars.Length; ++j) {
                         if (Util.IsRetvalOrOut(pars[j])) {
-                            callBuilder.Append($"args[{j}] = retval{j};");
+                            callBuilder.Append($@"
+                args[{j}] = retval{j};");
                         }
                     }
                     if (noReturn) {
-                        callBuilder.Append("return null;");
+                        callBuilder.Append(@"
+                return null;
+               ");
                     } else {
-                        callBuilder.Append("return __Result;");
+                        callBuilder.Append(@"
+                return __Result;
+               ");
                     }
                     execute = callBuilder.ToString();
                 } else {
