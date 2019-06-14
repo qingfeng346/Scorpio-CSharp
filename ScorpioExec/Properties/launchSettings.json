@@ -1,20 +1,16 @@
 {
   "profiles": {
-    "ScorpioExec": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\new.sco"
-    },
     "pack": {
       "commandName": "Project",
       "commandLineArgs": "pack -s C:\\Users\\qingf\\Desktop\\a.sco -o C:\\Users\\qingf\\Desktop\\a.out"
     },
-    "unpack": {
-      "commandName": "Project",
-      "commandLineArgs": "unpack -s C:\\Users\\qingf\\Desktop\\a.out -o C:\\Users\\qingf\\Desktop\\a.txt"
-    },
     "fast": {
       "commandName": "Project",
       "commandLineArgs": "fast -class ScorpioExec.TestClass -output E:\\Scorpio-CSharp\\ScorpioExec\\"
+    },
+    "run": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\new.sco"
     }
   }
 }

@@ -28,7 +28,15 @@ namespace ScorpioExec {
     public class Program {
         public static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string CurrentDirectory = Environment.CurrentDirectory;
-        private const string HelpRegister = @"";
+        private const string HelpRegister = @"注册运行程序到环境变量";
+        private const string HelpPack = @"编译生成sco的IL文件
+    -source|-s      脚本文本文件
+    -output|-o      IL输出文件";
+        private const string HelpFast = @"生成快速反射文件
+    -dll            dll文件路径
+    -class          class完整名称
+    -output|-o      快速反射文件输出目录";
+        private const string HelpExecute = @"快速运行一个sco文本文件或IL文件";
         private static Script script;
         static void Main(string[] args) {
             try {
@@ -42,11 +50,20 @@ namespace ScorpioExec {
                 var hasHelp = command.HadValue("-help", "--help", "-h");
                 if (type == null || type.Length == 0) { type = command.Type; }
                 if (type == null) { type = ""; }
-                switch (type.ToLower()) {
-                    case "register": Register(); return;            //注册sco到运行环境
-                    case "pack": Pack(source, output); return;      //生成sco IL
-                    case "fast": Fast(command, output); return;     //生成快速反射类
-                    default: Execute(args); return;
+                if (hasHelp) {
+                    switch (type.ToLower()) {
+                        case "register": Logger.info(HelpRegister); return;
+                        case "pack": Logger.info(HelpPack); return;
+                        case "fast": Logger.info(HelpFast); return;
+                        default: Logger.info(HelpExecute); return;
+                    }
+                } else {
+                    switch (type.ToLower()) {
+                        case "register": Register(); return;            //注册sco到运行环境
+                        case "pack": Pack(source, output); return;      //生成sco IL
+                        case "fast": Fast(command, output); return;     //生成快速反射类
+                        default: Execute(args); return;
+                    }
                 }
             } catch (Exception e) {
                 Logger.error(e.ToString());
@@ -139,6 +156,5 @@ namespace ScorpioExec {
                 }
             }
         }
-
     }
 }
