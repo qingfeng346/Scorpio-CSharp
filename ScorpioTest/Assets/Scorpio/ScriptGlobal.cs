@@ -29,28 +29,27 @@ namespace Scorpio {
         }
 
         public int GetIndex(string key) {
-            if (m_Indexs.ContainsKey(key)) {
-                return m_Indexs[key];
-            } else {
-                SetValue(key, ScriptValue.Null);
-                return m_Indexs[key];
+            int value;
+            if (m_Indexs.TryGetValue(key, out value)) {
+                return value;
             }
+            SetValue(key, ScriptValue.Null);
+            return m_Indexs[key];
         }
         public override ScriptValue GetValue(string key) { return m_Indexs.ContainsKey(key) ? GetValueByIndex(m_Indexs[key]) : ScriptValue.Null; }
         public override ScriptValue GetValueByIndex(int key) { return m_Objects[key]; }
         public override void SetValue(string key, ScriptValue value) {
-            if (m_Indexs.ContainsKey(key)) {
-                SetValueByIndex(m_Indexs[key], value);
-            } else {
-                m_Indexs[key] = m_Size;
-                EnsureCapacity(m_Size + 1);
-                m_Objects[m_Size++] = value;
+            int index;
+            if (m_Indexs.TryGetValue(key, out index)) {
+                SetValueByIndex(index, value);
+                return;
             }
+            m_Indexs[key] = m_Size;
+            EnsureCapacity(m_Size + 1);
+            m_Objects[m_Size++] = value;
         }
         public override void SetValueByIndex(int key, ScriptValue value) {
-            if (key >= 0 && key < m_Size) {
-                m_Objects[key] = value;
-            }
+            m_Objects[key] = value;
         }
         public bool HasValue(string key) {
             return m_Indexs.ContainsKey(key);

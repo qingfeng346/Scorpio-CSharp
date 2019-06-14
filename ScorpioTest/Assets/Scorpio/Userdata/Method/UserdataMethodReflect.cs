@@ -70,12 +70,13 @@ namespace Scorpio.Userdata {
             refOut.Clear();
             for (int i = begin; i < parameters.Length; ++i) {
                 var parameter = parameters[i];
-                parameterTypes.Add(parameter.ParameterType);
-                if (Util.IsRefOut(parameter)) {
+                if (Util.IsRetvalOrOut(parameter)) {
                     hasRefOut = true;
                     refOut.Add(true);
+                    parameterTypes.Add(parameter.ParameterType.GetElementType());
                 } else {
                     refOut.Add(false);
+                    parameterTypes.Add(parameter.ParameterType);
                 }
                 if (parameter.DefaultValue != DBNull.Value) {
                     if (!hadDefault) {

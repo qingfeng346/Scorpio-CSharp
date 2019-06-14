@@ -39,7 +39,7 @@ namespace Scorpio.Tools {
         //是否是还没有定义的模板函数
         public static bool IsGenericMethod(MethodBase method) { return method.IsGenericMethod && method.ContainsGenericParameters; }
         //判断参数是否是 ref out 参数
-        public static bool IsRefOut(ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
+        public static bool IsRetvalOrOut(ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
         public static object ChangeType(ScriptValue value, Type type) {
             if (type == TYPE_VALUE) { return value; }
             switch (value.valueType) {
@@ -53,6 +53,26 @@ namespace Scorpio.Tools {
                     return value.scriptValue.Value;
                 }
                 default: return value.Value;
+            }
+        }
+        public static bool CanChangeTypeRefOut(ScriptValue value, Type type) {
+            if (type == TYPE_OBJECT || type == TYPE_VALUE) return true;
+            switch (value.valueType) {
+                case ScriptValue.nullValueType:
+                    return true;
+                case ScriptValue.trueValueType:
+                case ScriptValue.falseValueType:
+                    return type == TYPE_BOOL;
+                case ScriptValue.doubleValueType:
+                case ScriptValue.longValueType:
+                    return type.IsPrimitive;
+                case ScriptValue.stringValueType:
+                    return type == TYPE_STRING;
+                case ScriptValue.objectValueType:
+                    return type.GetTypeInfo().IsAssignableFrom(value.objectValue.GetType());
+                default: {
+                    return TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.GetTypeInfo().IsAssignableFrom(value.scriptValue.ValueType);
+                }
             }
         }
         public static bool CanChangeType(ScriptValue value, Type type) {

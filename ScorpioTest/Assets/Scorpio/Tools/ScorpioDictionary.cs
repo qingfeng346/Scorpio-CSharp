@@ -98,14 +98,16 @@ namespace Scorpio.Tools {
             }
             return false;
         }
-        public Value Get(Key key, Func<Value> func) {
+        public virtual bool TryGetValue(Key key, out Value value) {
             for (int i = 0; i < mSize; ++i) {
                 if (mValues[i].key.Equals(key)) {
-                    return mValues[i].value;
+                    value = mValues[i].value;
+                    return true;
                 }
             }
-            return this[key] = func();
-        } 
+            value = default(Value);
+            return false;
+        }
         public virtual Value this[Key key] {
             get {
                 for (int i = 0; i < mSize; ++i) {
@@ -159,6 +161,16 @@ namespace Scorpio.Tools {
             }
             return false;
         }
+        public override bool TryGetValue(string key, out Value value) {
+            for (int i = 0; i < mSize; ++i) {
+                if (mValues[i].key == key) {
+                    value = mValues[i].value;
+                    return true;
+                }
+            }
+            value = default(Value);
+            return false;
+        }
         public override Value this[string key] {
             get {
                 for (int i = 0; i < mSize; ++i) {
@@ -182,9 +194,39 @@ namespace Scorpio.Tools {
                 ++mSize;
             }
         }
-        public Value this[int key] {
+    }
+    public class ScorpioDictionaryStringValue : ScorpioDictionary<string, ScriptValue> {
+        public override bool TryGetValue(string key, out ScriptValue value) {
+            for (int i = 0; i < mSize; ++i) {
+                if (mValues[i].key == key) {
+                    value = mValues[i].value;
+                    return true;
+                }
+            }
+            value = ScriptValue.Null;
+            return false;
+        }
+        public override ScriptValue this[string key] {
             get {
-                return mValues[key].value;
+                for (int i = 0; i < mSize; ++i) {
+                    if (mValues[i].key == key) {
+                        return mValues[i].value;
+                    }
+                }
+                return ScriptValue.Null;
+            }
+            set {
+                for (int i = 0; i < mSize; ++i) {
+                    if (mValues[i].key == key) {
+                        mValues[i].value = value;
+                        return;
+                    }
+                }
+                if (mSize == mValues.Length) {
+                    EnsureCapacity(mSize + 1);
+                }
+                mValues[mSize] = new ScorpioValue<string, ScriptValue>() { key = key, value = value };
+                ++mSize;
             }
         }
     }

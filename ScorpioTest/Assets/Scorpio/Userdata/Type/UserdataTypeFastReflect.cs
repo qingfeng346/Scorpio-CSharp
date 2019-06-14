@@ -16,11 +16,13 @@ namespace Scorpio.Userdata {
     public class ScorpioFastReflectMethodInfo {
         public bool IsStatic;           //是否是静态函数
         public Type[] ParameterType;    //参数类型列表
+        public bool[] RefOut;           //ref out
         public Type ParamType;          //不定参类型
         public int MethodIndex;         //函数索引
-        public ScorpioFastReflectMethodInfo(bool isStatic, Type[] parameterType, Type paramType, int methodIndex) {
+        public ScorpioFastReflectMethodInfo(bool isStatic, Type[] parameterType, bool[] refOut, Type paramType, int methodIndex) {
             this.IsStatic = isStatic;
             this.ParameterType = parameterType;
+            this.RefOut = refOut;
             this.ParamType = paramType;
             this.MethodIndex = methodIndex;
         }
@@ -45,5 +47,6 @@ namespace Scorpio.Userdata {
         protected override void SetValue_impl(object obj, string name, ScriptValue value) {
             m_Value.SetValue(obj, name, value);
         }
+        public ScorpioFastReflectClass FastReflectClass { get { return m_Value; } }
     }
 }

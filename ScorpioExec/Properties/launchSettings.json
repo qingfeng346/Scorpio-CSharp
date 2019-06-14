@@ -6,15 +6,15 @@
     },
     "pack": {
       "commandName": "Project",
-      "commandLineArgs": "-t pack -s C:\\Users\\qingf\\Desktop\\a.sco -o C:\\Users\\qingf\\Desktop\\a.out"
+      "commandLineArgs": "pack -s C:\\Users\\qingf\\Desktop\\a.sco -o C:\\Users\\qingf\\Desktop\\a.out"
     },
     "unpack": {
       "commandName": "Project",
-      "commandLineArgs": "-t unpack -s C:\\Users\\qingf\\Desktop\\a.out -o C:\\Users\\qingf\\Desktop\\a.txt"
+      "commandLineArgs": "unpack -s C:\\Users\\qingf\\Desktop\\a.out -o C:\\Users\\qingf\\Desktop\\a.txt"
     },
     "fast": {
       "commandName": "Project",
-      "commandLineArgs": "-type fast -class ScorpioExec.TestClass -output E:\\Scorpio-CSharp\\ScorpioExec\\"
+      "commandLineArgs": "fast -class ScorpioExec.TestClass -output E:\\Scorpio-CSharp\\ScorpioExec\\"
     }
   }
 }

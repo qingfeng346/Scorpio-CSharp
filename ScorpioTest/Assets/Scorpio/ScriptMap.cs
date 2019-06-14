@@ -19,10 +19,12 @@ namespace Scorpio {
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
 
         public override ScriptValue GetValue(string key) {
-            return m_Objects.ContainsKey(key) ? m_Objects[key] : m_Prototype.GetValue(key);
+            ScriptValue value;
+            return m_Objects.TryGetValue(key, out value) ? value : m_Prototype.GetValue(key);
         }
         public override ScriptValue GetValue(object key) {
-            return m_Objects.ContainsKey(key) ? m_Objects[key] : ScriptValue.Null;
+            ScriptValue value;
+            return m_Objects.TryGetValue(key, out value) ? value : ScriptValue.Null;
         }
         public override void SetValue(string key, ScriptValue value) {
             if (value.valueType == ScriptValue.nullValueType) {

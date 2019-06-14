@@ -73,46 +73,57 @@ __methods_content
         }
         //根据MethodInfo生成一个ScorpioMethodInfo对象
         private string GetScorpioMethod(MethodBase method, int index) {
-            if (!method.IsGenericMethod || !method.ContainsGenericParameters) {
-                string name = method.Name;
-                string isStatic = method.IsStatic ? "true" : "false";
-                string parameterType = "new Type[] {";
-                string paramType = "null";
-                var pars = method.GetParameters();
-                bool first = true;
-                foreach (var par in pars) {
-                    if (first) { first = false; } else { parameterType += ","; }
-                    parameterType += "typeof(" + ScorpioReflectUtil.GetFullName(par.ParameterType) + ")";
+            var isStatic = method.IsStatic ? "true" : "false";
+            var paramType = "null";
+            var parameterType = new StringBuilder("new Type[]{");
+            var refOut = new StringBuilder("new bool[]{");
+            var pars = method.GetParameters();
+            bool first = true;
+            foreach (var par in pars) {
+                if (first) { first = false; } else { parameterType.Append(","); refOut.Append(","); }
+                if (Util.IsRetvalOrOut(par)) {
+                    parameterType.Append($"typeof({ScorpioReflectUtil.GetFullName(par.ParameterType.GetElementType())})");
+                    refOut.Append("true");
+                } else {
+                    refOut.Append("false");
+                    parameterType.Append($"typeof({ScorpioReflectUtil.GetFullName(par.ParameterType)})");
                     if (Util.IsParams(par)) {
-                        paramType = "typeof(" + ScorpioReflectUtil.GetFullName(par.ParameterType.GetElementType()) + ")";
+                        paramType = $"typeof({ScorpioReflectUtil.GetFullName(par.ParameterType.GetElementType())})";
                     }
                 }
-                parameterType += "}";
-                return string.Format(@"new ScorpioFastReflectMethodInfo({0}, {1}, {2}, {3})", isStatic, parameterType, paramType, index);
             }
-            return "";
+            parameterType.Append("}");
+            refOut.Append("}");
+            return string.Format(@"new ScorpioFastReflectMethodInfo({0}, {1}, {2}, {3}, {4})", isStatic, parameterType.ToString(), refOut.ToString(), paramType, index);
         }
         private string GetScorpioMethodCall(MethodBase method) {
-            var call = "";
+            var builder = new StringBuilder();
             var pars = method.GetParameters();
             for (int i = 0; i < pars.Length; ++i) {
-                if (i != 0) { call += ","; }
-                call += "(" + ScorpioReflectUtil.GetFullName(pars[i].ParameterType) + ")args[" + i + "]";
+                if (i != 0) { builder.Append(", "); }
+                var par = pars[i];
+                if (par.IsOut) {
+                    builder.Append($"out retval{i}");
+                } else if (par.ParameterType.IsByRef) {
+                    builder.Append($"ref retval{i}");
+                } else {
+                    var typeName = ScorpioReflectUtil.GetFullName(par.ParameterType);
+                    builder.Append($"({typeName})args[{i}]");
+                }
             }
-            call += "";
-            return call;
+            return builder.ToString();
         }
         private string GetScorpioMethodArgs(ParameterInfo[] pars, int index) {
             return "(" + ScorpioReflectUtil.GetFullName(pars[index].ParameterType) + ")args[" + index + "]";
         }
         private string GetScorpioVariable(bool IsStatic, string name) {
-            return (IsStatic ? m_FullName : "((" + m_FullName + ")obj)") + "." + name;
+            return (IsStatic ? m_FullName : $"(({m_FullName})obj)") + "." + name;
         }
         private string GetAllMethod(MethodBase[] methods) {
             var builder = new StringBuilder();
             for (var i = 0; i < methods.Length; ++i) {
-                builder.Append(@"
-            methodInfos.Add(" + GetScorpioMethod(methods[i], i) + ");");
+                builder.Append($@"
+            methodInfos.Add({GetScorpioMethod(methods[i], i)});");
             }
             return builder.ToString();
         }

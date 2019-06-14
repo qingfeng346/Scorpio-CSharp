@@ -121,6 +121,8 @@ namespace Scorpio.Library {
             script.SetGlobal("importNamespace", script.CreateFunction(new importNamespace()));
             script.SetGlobal("genericType", script.CreateFunction(new genericType()));
             script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod()));
+            script.SetGlobal("setFastReflectClass", script.CreateFunction(new setFastReflectClass()));
+            script.SetGlobal("isFastReflectClass", script.CreateFunction(new isFastReflectClass()));
 
             script.SetGlobal("push_assembly", script.CreateFunction(new pushAssembly()));
             script.SetGlobal("import_type", script.CreateFunction(new importType()));
@@ -464,6 +466,19 @@ namespace Scorpio.Library {
                 } else {
                     return new ScriptValue(new ScriptGenericMethodFunction(method));
                 }
+            }
+        }
+        private class setFastReflectClass : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var type = args[0].Get<ScriptUserdataType>().Type;
+                var fastClass = args[1].Value as ScorpioFastReflectClass;
+                TypeManager.SetFastReflectClass(type, fastClass);
+                return ScriptValue.Null;
+            }
+        }
+        private class isFastReflectClass : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return TypeManager.IsFastReflectClass(args[0].Get<ScriptUserdataType>().Type) ? ScriptValue.True : ScriptValue.False;
             }
         }
     }

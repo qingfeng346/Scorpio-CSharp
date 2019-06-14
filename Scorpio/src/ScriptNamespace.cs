@@ -13,13 +13,11 @@ namespace Scorpio {
         }
         public override ScriptValue GetValue(string key) {
             var name = $"{m_Value}.{key}";
-            if (m_Objects.ContainsKey(name))
-                return m_Objects[name];
+            ScriptValue value;
+            if (m_Objects.TryGetValue(key, out value))
+                return value;
             var type = TypeManager.LoadType(name);
-            if (type == null)
-                return m_Objects[name] = new ScriptValue(new ScriptNamespace(name));
-            else
-                return m_Objects[name] = TypeManager.GetUserdataType(type);
+            return m_Objects[name] = type == null ? new ScriptValue(new ScriptNamespace(name)) : TypeManager.GetUserdataType(type);
         }
         public override string ToString() {
             return $"Namespace<{m_Value}>";

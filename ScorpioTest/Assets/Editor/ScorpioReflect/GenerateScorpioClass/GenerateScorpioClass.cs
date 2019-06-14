@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
-using Scorpio;
+using Scorpio.Tools;
 namespace Scorpio.ScorpioReflect {
     //过滤不生成的变量 函数 属性 和 事件 
     public interface ClassFilter {
@@ -65,13 +64,12 @@ namespace Scorpio.ScorpioReflect {
             }
             var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(ScorpioReflectUtil.BindingFlag);
             foreach (var method in methods) {
-                string name = method.Name;
-                //屏蔽掉 =重载函数 IsSpecialName 表示为特殊函数 运算符重载 这个值会为true
-                if (method.IsSpecialName && name == "op_Implicit") { continue; }
+                //屏蔽掉 == 重载函数 IsSpecialName 表示为特殊函数 运算符重载 这个值会为true
+                if (method.IsSpecialName && method.Name == "op_Implicit") { continue; }
                 //屏蔽掉 模版函数
-                if (method.IsGenericMethod) { continue; }
+                if (Util.IsGenericMethod(method)) { continue; }
                 //屏蔽掉 带有 ref 和 out 关键字参数的函数
-                if (ScorpioReflectUtil.IsRetvalOrOut(method)) { continue; }
+                //if (ScorpioReflectUtil.IsRetvalOrOut(method)) { continue; }
                 m_AllMethods.Add(method);
             }
         }

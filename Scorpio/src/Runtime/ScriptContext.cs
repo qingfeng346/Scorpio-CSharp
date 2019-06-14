@@ -87,15 +87,15 @@ namespace Scorpio.Runtime {
             var parent = ScriptValue.Null;
             var parameters = Parameters;                                //传递参数
             var iInstruction = 0;                                       //当前执行命令索引
-            var iInstructionCount = m_scriptInstructions.Length;          //指令数量
+            var iInstructionCount = m_scriptInstructions.Length;        //指令数量
+            byte valueType;
+            int index;
             ScriptInstruction instruction = null;
             try {
                 while (iInstruction < iInstructionCount) {
                     instruction = m_scriptInstructions[iInstruction++];
                     var opvalue = instruction.opvalue;
                     var opcode = instruction.opcode;
-                    byte valueType;
-                    int index;
                     switch (instruction.optype) {
                         case OpcodeType.Load:
                             switch (opcode) {

@@ -12,11 +12,11 @@ namespace Scorpio.Userdata {
             var functionStaticMethod = new List<FunctionData>();    //静态函数
             var genericMethods = new List<FunctionDataGeneric>();   //模板函数
             foreach (var method in methods) {
-                if (method.IsStatic) {
-                    functionStaticMethod.Add(new FunctionDataFastMethod(fastMethod, method.ParameterType, method.ParamType, method.MethodIndex));
-                } else {
-                    functionMethod.Add(new FunctionDataFastMethod(fastMethod, method.ParameterType, method.ParamType, method.MethodIndex));
-                }
+                var hasRefOut = Array.IndexOf(method.RefOut, true) != -1;
+                var functionData = hasRefOut ?
+                                    new FunctionDataFastMethodWithRefOut(fastMethod, method.ParameterType, method.RefOut, method.ParamType, method.MethodIndex) :
+                                    new FunctionDataFastMethod(fastMethod, method.ParameterType, method.RefOut, method.ParamType, method.MethodIndex);
+                (method.IsStatic ? functionStaticMethod : functionMethod).Add(functionData);
             }
             var methodInfos = m_Type.GetTypeInfo().GetMethods(Script.BindingFlag);
             Array.ForEach(methodInfos, (methodInfo) => {
@@ -24,7 +24,6 @@ namespace Scorpio.Userdata {
                     genericMethods.Add(new FunctionDataGeneric(methodInfo));
                 }
             });
-
             m_Methods = functionMethod.ToArray();
             m_StaticMethods = functionStaticMethod.ToArray();
             m_GenericMethods = genericMethods.ToArray();

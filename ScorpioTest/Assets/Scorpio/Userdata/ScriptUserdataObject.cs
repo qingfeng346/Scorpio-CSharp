@@ -13,7 +13,10 @@ namespace Scorpio.Userdata {
             this.m_UserdataType = type;
         }
         public override ScriptValue GetValue(string key) {
-            if (m_Methods.ContainsKey(key)) return m_Methods[key];
+            ScriptValue value;
+            if (m_Methods.TryGetValue(key, out value)) {
+                return value;
+            }
             var ret = m_UserdataType.GetValue(m_Value, key);
             if (ret is UserdataMethod) {
                 return m_Methods[key] = new ScriptValue(new ScriptInstanceMethodFunction((UserdataMethod)ret, m_Value));
@@ -55,15 +58,17 @@ namespace Scorpio.Userdata {
             return (bool)func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
         }
         public override bool Equals(ScriptValue obj) {
-            switch (obj.valueType) {
-                case ScriptValue.nullValueType: return false;
-                case ScriptValue.scriptValueType: return m_Value == obj.scriptValue.Value;
-                default: {
-                    var func = m_UserdataType.GetOperator(UserdataOperator.EqualIndex);
-                    if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[==]运算符重载");
-                    return (bool)func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+            var func = m_UserdataType.GetOperator(UserdataOperator.EqualIndex);
+            if (func == null) {
+                switch (obj.valueType) {
+                    case ScriptValue.nullValueType: return false;
+                    case ScriptValue.scriptValueType: return m_Value == obj.scriptValue.Value;
+                    default: throw new ExecutionException($"类[{m_ValueType.Name}]找不到[==]运算符重载");
                 }
             }
+            return (bool)func.Call(true, null, new ScriptValue[] { new ScriptValue(this), obj }, 2);
+
+            
         }
         public override ScriptValue Plus(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.PlusIndex);

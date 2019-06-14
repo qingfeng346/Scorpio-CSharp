@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
+using Scorpio.Tools;
 
 namespace Scorpio.ScorpioReflect {
     public partial class GenerateScorpioClass {
@@ -90,9 +91,8 @@ namespace Scorpio.ScorpioReflect {
             var builder = new StringBuilder();
             for (var i = 0; i < methods.Count; ++i) {
                 var method = methods[i];
-                string parameterCall = GetScorpioMethodCall(method);
-                string variable = (method.IsStatic ? m_FullName : "((" + m_FullName + ")obj)");
-                ParameterInfo[] pars = method.GetParameters();
+                var variable = method.IsStatic ? m_FullName : $"(({m_FullName})obj)";
+                var pars = method.GetParameters();
                 //运算符重载函数 + - * / [] 等
                 string execute = GetSpeciaMethodExecute(method, variable, pars);
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
@@ -100,12 +100,51 @@ namespace Scorpio.ScorpioReflect {
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
                 execute = GetPropertyMethodExecute(method, variable, pars);
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
-                string call = variable + "." + name + "(" + parameterCall + ")";
-                if (method.ReturnType == typeof(void)) {
-                    execute = string.Format("{0}; return null;", call);
-                } else {
-                    execute = string.Format("return {0};", call);
+                var callBuilder = new StringBuilder();
+                var hasRefOut = false;
+                var call = $"{variable}.{name}({GetScorpioMethodCall(method)})";
+                for (var j = 0; j < pars.Length; ++j) {
+                    if (Util.IsRetvalOrOut(pars[j])) {
+                        hasRefOut = true;
+                        var typeName = ScorpioReflectUtil.GetFullName(pars[j].ParameterType.GetElementType());
+                        callBuilder.Append($@"
+                var retval{j} = args[{j}] == null ? default({typeName}) : ({typeName})args[{j}]; ");
+                    }
                 }
+                var noReturn = method.ReturnType == typeof(void);
+                if (hasRefOut) {
+                    if (noReturn) {
+                        callBuilder.Append($@"
+                {call};");
+                    } else {
+                        callBuilder.Append($@"
+                var __Result = {call};");
+                    }
+                    for (var j = 0; j < pars.Length; ++j) {
+                        if (Util.IsRetvalOrOut(pars[j])) {
+                            callBuilder.Append($@"
+                args[{j}] = retval{j};");
+                        }
+                    }
+                    if (noReturn) {
+                        callBuilder.Append(@"
+                return null;
+               ");
+                    } else {
+                        callBuilder.Append(@"
+                return __Result;
+               ");
+                    }
+                    execute = callBuilder.ToString();
+                } else {
+                    if (noReturn) {
+                        callBuilder.Append($"{call}; return null;");
+                    } else {
+                        callBuilder.Append($"return {call};");
+                    }
+                    execute = callBuilder.ToString();
+                }
+                
             finish:
                 builder.AppendFormat(@"
             case {0}: {{ {1} }}", i, execute);

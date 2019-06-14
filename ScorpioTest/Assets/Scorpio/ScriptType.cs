@@ -18,7 +18,8 @@ namespace Scorpio {
             }
         }
         public override ScriptValue GetValue(string key) {
-            return m_Values.ContainsKey(key) ? m_Values[key] : m_Prototype.GetValue(key);
+            ScriptValue value;
+            return m_Values.TryGetValue(key, out value) ? value : m_Prototype.GetValue(key);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             var ret = new ScriptValue(new ScriptInstance(ObjectType.Instance, new ScriptValue(this)));
@@ -34,7 +35,8 @@ namespace Scorpio {
         public ScriptTypeObject(string typeName) : base(typeName, ScriptValue.Null) { }
         public override ScriptValue Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
         public override ScriptValue GetValue(string key) {
-            return m_Values.ContainsKey(key) ? m_Values[key] : ScriptValue.Null;
+            ScriptValue value;
+            return m_Values.TryGetValue(key, out value) ? value : ScriptValue.Null;
         }
     }
 }

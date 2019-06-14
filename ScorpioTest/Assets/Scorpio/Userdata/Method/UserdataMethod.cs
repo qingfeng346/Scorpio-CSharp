@@ -1,8 +1,5 @@
 ﻿using System;
-using Scorpio.Tools;
 using Scorpio.Exception;
-using System.Collections.Generic;
-using System.Reflection;
 namespace Scorpio.Userdata {
     public abstract class UserdataMethod {
         protected Type m_Type;                                  //所在类

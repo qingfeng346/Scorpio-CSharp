@@ -25,41 +25,21 @@ namespace ScorpioExec {
             Debugger.Log(0, null, value + "\n");
         }
     }
-    public static class TestClass {
-        public static void TestFunc(ref int aaa, out string bbb, int ccc, ref Vec vec) {
-            aaa = 200;
-            bbb = "123123123";
-            vec = new Vec();
-        }
-        public static int TestFunc(ref int aaa, out string bbb, string ccc, ref Vec vec) {
-            aaa = 200;
-            bbb = "123123123";
-            vec = new Vec();
-            return 200;
-        }
-        public static void Ex(this Vec v, int a, int b) {
-            Console.WriteLine(v.x + a+ b);
-        }
-    }
-    public struct Vec {
-        public int x;
-    }
     public class Program {
         public static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string CurrentDirectory = Environment.CurrentDirectory;
+        private const string HelpRegister = @"";
         private static Script script;
         static void Main(string[] args) {
             try {
-                var generate = new GenerateScorpioClass(typeof(TestClass));
-                FileUtil.CreateFile("/Users/while/Scorpio-CSharp/ScorpioExec/" + generate.ScorpioClassName + ".cs", generate.Generate());
                 Logger.SetLogger(new LogHelper());
-                Scorpio.Commons.Util.PrintSystemInfo();
                 Logger.info("Sco Version : " + Scorpio.Version.version);
                 Logger.info("Build Date : " + Scorpio.Version.date);
                 var command = CommandLine.Parse(args);
                 var type = command.GetValue("-type", "-t");
                 var source = command.GetValue("-source", "-s");
                 var output = command.GetValue("-output", "-o");
+                var hasHelp = command.HadValue("-help", "--help", "-h");
                 if (type == null || type.Length == 0) { type = command.Type; }
                 if (type == null) { type = ""; }
                 switch (type.ToLower()) {
@@ -118,6 +98,8 @@ namespace ScorpioExec {
             FileUtil.CreateFile(Path.Combine(output, generate.ScorpioClassName + ".cs"), generate.Generate());
         }
         static void Execute(string[] args) {
+            Scorpio.Commons.Util.PrintSystemInfo();
+            Logger.info("Application Name : " + AppDomain.CurrentDomain.FriendlyName);
             TypeManager.PushAssembly(typeof(Program).Assembly);
             script = new Script();
             script.LoadLibraryV1();

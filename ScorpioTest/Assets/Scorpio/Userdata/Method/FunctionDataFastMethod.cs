@@ -5,8 +5,8 @@ namespace Scorpio.Userdata {
     public class FunctionDataFastMethod : FunctionData {
         protected ScorpioFastReflectMethod FastMethod;
         protected int MethodIndex;                     //函数索引(去反射使用)
-        public FunctionDataFastMethod(ScorpioFastReflectMethod method, Type[] parameterType, Type paramType, int methodIndex) :
-            base(parameterType, null, new bool[parameterType.Length], parameterType.Length, paramType) {
+        public FunctionDataFastMethod(ScorpioFastReflectMethod method, Type[] parameterType, bool[] refOut, Type paramType, int methodIndex) :
+            base(parameterType, null, refOut, parameterType.Length, paramType) {
             FastMethod = method;
             MethodIndex = methodIndex;
         }
@@ -16,8 +16,8 @@ namespace Scorpio.Userdata {
     }
     //带ref out 的快速反射函数
     public class FunctionDataFastMethodWithRefOut : FunctionDataFastMethod {
-        public FunctionDataFastMethodWithRefOut(ScorpioFastReflectMethod method, Type[] parameterType, Type paramType, int methodIndex) :
-            base(method, parameterType, paramType, methodIndex) {
+        public FunctionDataFastMethodWithRefOut(ScorpioFastReflectMethod method, Type[] parameterType, bool[] refOut, Type paramType, int methodIndex) :
+            base(method, parameterType, refOut, paramType, methodIndex) {
         }
         public override object Invoke(object obj, ScriptValue[] parameters) {
             var ret = FastMethod.Call(obj, MethodIndex, Args);

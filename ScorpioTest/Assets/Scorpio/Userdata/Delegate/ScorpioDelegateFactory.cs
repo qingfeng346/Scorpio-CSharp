@@ -24,7 +24,8 @@ namespace Scorpio.Tools {
             }
         }
         static DelegateData GetDelegateData(Type delegateType) {
-            if (m_DelegateDatas.ContainsKey(delegateType)) { return m_DelegateDatas[delegateType]; }
+            DelegateData value;
+            if (m_DelegateDatas.TryGetValue(delegateType, out value)) { return value; }
             var data = new DelegateData();
             var method = delegateType.GetMethod("Invoke");
             var parameters = method.GetParameters();

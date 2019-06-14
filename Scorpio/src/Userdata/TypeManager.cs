@@ -36,15 +36,21 @@ namespace Scorpio.Userdata {
             if (value == null || type == null) { return; }
             m_Types[type] = new UserdataTypeFastReflect(type, value);
         }
-        public static ScorpioFastReflectClass GetFastReflectClass(Type type) {
+        public static UserdataTypeFastReflect GetFastReflectClass(Type type) {
             if (type == null) { return null; }
             UserdataType value;
             if (m_Types.TryGetValue(type, out value)) {
-                if (value is UserdataTypeFastReflect) {
-                    return ((UserdataTypeFastReflect)value).FastReflectClass;
-                }
+                return value as UserdataTypeFastReflect;
             }
             return null;
+        }
+        public static bool IsFastReflectClass(Type type) {
+            if (type == null) { return false; }
+            UserdataType value;
+            if (m_Types.TryGetValue(type, out value)) {
+                return value is UserdataTypeFastReflect;
+            }
+            return false;
         }
         public static void PushAssembly(Assembly assembly) {
             if (assembly == null) return;

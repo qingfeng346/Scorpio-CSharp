@@ -9,18 +9,22 @@ namespace Scorpio.Userdata {
         private static Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                                      //所有的类集合
         private static Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();                                //所有的类集合
         public static UserdataType GetType(Type type) {
-            if (m_Types.ContainsKey(type))
-                return m_Types[type];
+            UserdataType value;
+            if (m_Types.TryGetValue(type, out value)) {
+                return value;
+            }
             return m_Types[type] = new UserdataTypeReflect(type);
         }
         public static ScriptValue GetUserdataType(string name) {
-            Type type = LoadType(name);
+            var type = LoadType(name);
             if (type == null) return ScriptValue.Null;
             return GetUserdataType(type);
         }
         public static ScriptValue GetUserdataType(Type type) {
-            if (m_UserdataTypes.ContainsKey(type))
-                return m_UserdataTypes[type];
+            ScriptValue value;
+            if (m_UserdataTypes.TryGetValue(type, out value)) {
+                return value;
+            }
             if (Util.IsDelegate(type))
                 return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(type));
             else if (type.IsEnum)
@@ -31,6 +35,22 @@ namespace Scorpio.Userdata {
         public static void SetFastReflectClass(Type type, ScorpioFastReflectClass value) {
             if (value == null || type == null) { return; }
             m_Types[type] = new UserdataTypeFastReflect(type, value);
+        }
+        public static UserdataTypeFastReflect GetFastReflectClass(Type type) {
+            if (type == null) { return null; }
+            UserdataType value;
+            if (m_Types.TryGetValue(type, out value)) {
+                return value as UserdataTypeFastReflect;
+            }
+            return null;
+        }
+        public static bool IsFastReflectClass(Type type) {
+            if (type == null) { return false; }
+            UserdataType value;
+            if (m_Types.TryGetValue(type, out value)) {
+                return value is UserdataTypeFastReflect;
+            }
+            return false;
         }
         public static void PushAssembly(Assembly assembly) {
             if (assembly == null) return;
