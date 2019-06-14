@@ -43,7 +43,8 @@ __methods_content
     public class __name : ScorpioFastReflectMethod {
         private static Dictionary<Script, UserdataMethodFastReflect> methods = new Dictionary<Script, UserdataMethodFastReflect>();
         public static UserdataMethodFastReflect GetInstance(Script script) {
-            if (methods.ContainsKey(script)) { return methods[script]; }
+            UserdataMethodFastReflect method;
+            if (methods.TryGetValue(script, out method)) { return method; }
             var methodInfos = new List<ScorpioFastReflectMethodInfo>();__getallmethod
             return methods[script] = new UserdataMethodFastReflect(script, typeof(__fullname), ""__methodname"", methodInfos.ToArray(), new __name()); 
         }
