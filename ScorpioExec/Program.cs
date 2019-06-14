@@ -28,15 +28,23 @@ namespace ScorpioExec {
     public class Program {
         public static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string CurrentDirectory = Environment.CurrentDirectory;
-        private const string HelpRegister = @"注册运行程序到环境变量";
-        private const string HelpPack = @"编译生成sco的IL文件
+        private const string HelpRegister = @"
+注册运行程序到环境变量";
+        private const string HelpPack = @"
+编译生成sco的IL文件
     -source|-s      脚本文本文件
     -output|-o      IL输出文件";
-        private const string HelpFast = @"生成快速反射文件
+        private const string HelpFast = @"
+生成快速反射文件
     -dll            dll文件路径
     -class          class完整名称
     -output|-o      快速反射文件输出目录";
-        private const string HelpExecute = @"快速运行一个sco文本文件或IL文件";
+        private const string HelpExecute = @"
+命令列表
+    register        注册运行程序到环境变量
+    pack            编译生成sco的IL文件
+    fast            生成快速反射文件
+    [文件路径]      运行sco文本文件或IL文件";
         private static Script script;
         static void Main(string[] args) {
             try {
