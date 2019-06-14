@@ -108,6 +108,20 @@ namespace Scorpio.Tools {
             value = default(Value);
             return false;
         }
+        public List<Key> Keys {
+            get {
+                var keys = new List<Key>();
+                Array.ForEach(mValues, (value) => { keys.Add(value.key); });
+                return keys;
+            }
+        }
+        public List<Value> Values {
+            get {
+                var values = new List<Value>();
+                Array.ForEach(mValues, (value) => { values.Add(value.value); });
+                return values;
+            }
+        }
         public virtual Value this[Key key] {
             get {
                 for (int i = 0; i < mSize; ++i) {
