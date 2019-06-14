@@ -1,4 +1,4 @@
-$version = "2.0.0-preview3"
+$version = "2.0.0-preview4"
 $name = "sco"
 $cur = Get-Location
 
