@@ -111,14 +111,18 @@ namespace Scorpio.Tools {
         public List<Key> Keys {
             get {
                 var keys = new List<Key>();
-                Array.ForEach(mValues, (value) => { keys.Add(value.key); });
+                for (int i = 0; i < mSize; ++i) {
+                    keys.Add(mValues[i].key);
+                }
                 return keys;
             }
         }
         public List<Value> Values {
             get {
                 var values = new List<Value>();
-                Array.ForEach(mValues, (value) => { values.Add(value.value); });
+                for (int i = 0; i < mSize; ++i) {
+                    values.Add(mValues[i].value);
+                }
                 return values;
             }
         }
