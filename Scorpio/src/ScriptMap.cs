@@ -27,11 +27,7 @@ namespace Scorpio {
             return m_Objects.TryGetValue(key, out value) ? value : ScriptValue.Null;
         }
         public override void SetValue(string key, ScriptValue value) {
-            if (value.valueType == ScriptValue.nullValueType) {
-                m_Objects.Remove(key);
-            } else {
-                m_Objects[key] = value;
-            }
+            m_Objects[key] = value;
         }
         public override void SetValue(object key, ScriptValue value) {
             if (value.valueType == ScriptValue.nullValueType) {

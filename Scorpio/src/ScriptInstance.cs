@@ -15,11 +15,7 @@ namespace Scorpio {
             return m_Values.TryGetValue(key, out value) ? value : m_Prototype.GetValue(key);
         }
         public override void SetValue(string key, ScriptValue value) {
-            if (value.valueType == ScriptValue.nullValueType) {
-                m_Values.Remove(key);
-            } else {
-                m_Values[key] = value;
-            }
+            m_Values[key] = value;
         }
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
