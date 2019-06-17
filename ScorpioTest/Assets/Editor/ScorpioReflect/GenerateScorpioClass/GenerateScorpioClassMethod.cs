@@ -156,6 +156,7 @@ namespace Scorpio.ScorpioReflect {
             str = str.Replace("__execute", builder.ToString());
             return str;
         }
+        //获取变量类型
         string GenerateGetVariableType() {
             var templateStr = @"
             case ""{0}"": return typeof({1});";
@@ -171,6 +172,21 @@ namespace Scorpio.ScorpioReflect {
                 if (methods.Contains(name) || method.ReturnType == typeof(void)) { continue; }
                 methods.Add(name);
                 builder.AppendFormat(templateStr, method.Name, ScorpioReflectUtil.GetFullName(method.ReturnType));
+            }
+            return builder.ToString();
+        }
+        //获取函数
+        string GenerateGetMethod() {
+            var methodStr = @"
+            case ""{0}"": return {1}.GetInstance(m_Script);";
+            var builder = new StringBuilder();
+            //所有的函数
+            var methods = new List<string>();
+            foreach (var method in m_Methods) {
+                string name = method.Name;
+                if (methods.Contains(name)) { continue; }
+                methods.Add(name);
+                builder.AppendFormat(methodStr, name, m_ScorpioClassName + "_" + name);
             }
             return builder.ToString();
         }

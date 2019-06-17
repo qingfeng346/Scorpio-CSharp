@@ -82,15 +82,16 @@ namespace Scorpio {
                 case trueValueType:
                 case falseValueType:
                     return script.TypeBoolean.GetValueByIndex(key);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 {key}");
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : [{key}]");
             }
         }
         public ScriptValue GetValue(string key) {
             if (valueType == scriptValueType) {
                 return scriptValue.GetValue(key);
             }
-            throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 {key}");
+            throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]");
         }
+        //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
         public ScriptValue GetValue(string key, Script script) {
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);
@@ -102,42 +103,36 @@ namespace Scorpio {
                 case trueValueType:
                 case falseValueType:
                     return script.TypeBoolean.GetValue(key);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 {key}");
+                default:
+                    return script.TypeObject.GetValue(key);
             }
         }
-        public ScriptValue GetValue(object key, Script script) {
-            switch (valueType) {
-                case scriptValueType: return scriptValue.GetValue(key);
-                case doubleValueType:
-                case longValueType:
-                    return script.TypeNumber.GetValue(key);
-                case stringValueType:
-                    return script.TypeString.GetValue(key);
-                case trueValueType:
-                case falseValueType:
-                    return script.TypeBoolean.GetValue(key);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 {key}");
+        public ScriptValue GetValue(object key) {
+            if (key is ScriptFunction) { return new ScriptValue(key as ScriptFunction); }
+            if (valueType == scriptValueType) {
+                return scriptValue.GetValue(key);
             }
+            throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
         }
         public void SetValueByIndex(int key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValueByIndex(key, value);
             } else {
-                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 {key}");
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Index : [{key}]");
             }
         }
         public void SetValue(string key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
             } else {
-                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 {key}");
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 String : [{key}]");
             }
         }
         public void SetValue(object key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
             } else {
-                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 {key}");
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : [{key}]");
             }
         }
         //调用函数

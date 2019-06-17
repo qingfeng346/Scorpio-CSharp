@@ -25,6 +25,11 @@ public class __class : ScorpioFastReflectClass {
             default: throw new ExecutionException(""__fullname [GetVariableType] 找不到变量 : "" + name);
         }
     }
+    public UserdataMethod GetMethod(string name) {
+        switch (name) {__method_content
+            default: return null;
+        }
+    }
     public object GetValue(object obj, string name) {
         switch (name) {__getvalue_content
             default: throw new ExecutionException(""__fullname [GetValue] 找不到变量 : "" + name);
