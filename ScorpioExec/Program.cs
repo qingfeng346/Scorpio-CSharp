@@ -7,6 +7,8 @@ using Scorpio;
 using Scorpio.Userdata;
 using Scorpio.Serialize;
 using Scorpio.ScorpioReflect;
+using System.Net;
+using System.Collections.Generic;
 
 namespace ScorpioExec {
     public class LogHelper : ILogger {
@@ -26,6 +28,7 @@ namespace ScorpioExec {
         }
     }
     public class Program {
+        //private static readonly string DefaultUserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
         public static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string CurrentDirectory = Environment.CurrentDirectory;
         private const string HelpRegister = @"
@@ -39,6 +42,9 @@ namespace ScorpioExec {
     -dll            dll文件路径
     -class          class完整名称
     -output|-o      快速反射文件输出目录";
+        private const string HelpVersion = @"
+查询sco版本，并检查最新版本
+    -preview|-p     是否检查preview版本";
         private const string HelpExecute = @"
 命令列表
     register        注册运行程序到环境变量
@@ -49,8 +55,7 @@ namespace ScorpioExec {
         static void Main(string[] args) {
             try {
                 Logger.SetLogger(new LogHelper());
-                Logger.info("Sco Version : " + Scorpio.Version.version);
-                Logger.info("Build Date : " + Scorpio.Version.date);
+
                 var command = CommandLine.Parse(args);
                 var type = command.GetValue("-type", "-t");
                 var source = command.GetValue("-source", "-s");
@@ -63,6 +68,7 @@ namespace ScorpioExec {
                         case "register": Logger.info(HelpRegister); return;
                         case "pack": Logger.info(HelpPack); return;
                         case "fast": Logger.info(HelpFast); return;
+                        //case "version": Logger.info(HelpVersion); return;
                         default: Logger.info(HelpExecute); return;
                     }
                 } else {
@@ -70,6 +76,7 @@ namespace ScorpioExec {
                         case "register": Register(); return;            //注册sco到运行环境
                         case "pack": Pack(source, output); return;      //生成sco IL
                         case "fast": Fast(command, output); return;     //生成快速反射类
+                        //case "version": Version(command); return;       //
                         default: Execute(args); return;
                     }
                 }
@@ -125,8 +132,60 @@ namespace ScorpioExec {
             FileUtil.CreateFile(outputFile, generate.Generate());
             Logger.info($"生成快速反射类 {className} -> {outputFile}");
         }
+//        static void Version(CommandLine command) {
+//            Logger.info($@"Sco Version : {Scorpio.Version.version}
+//Build Date : {Scorpio.Version.date}");
+//            var result = Request("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
+//                request.Headers.Add("Authorization", "token c9fab45cde8bb710244d791018fefd6f4c6a80b5");
+//            });
+//            if (string.IsNullOrEmpty(result)) { return; }
+//            var isPreview = command.HadValue("-preview", "-p");
+//            var datas = new JsonParser(result, true).Parse() as List<object>;
+//            foreach (Dictionary<string, object> data in datas) {
+//                var name = data["name"] as string;
+//                if (name != Version)
+//                var prerelease = (bool)data["prerelease"];
+//                if (isPreview) {
+//                    Logger.info("发现新版本 : " +);
+//                    Process.Start(data["html_url"])
+//                }
+//                if ()
+//            }
+//        }
+        //private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors) {
+        //    return true; //总是接受
+        //}
+        //public static string Request(string url, Action<HttpWebRequest> postRequest) {
+        //    try {
+        //        ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+        //        var request = (HttpWebRequest)HttpWebRequest.Create(url);
+        //        request.Method = "GET";
+        //        request.ProtocolVersion = HttpVersion.Version10;
+        //        request.UserAgent = DefaultUserAgent;
+        //        request.Credentials = CredentialCache.DefaultCredentials;
+        //        if (postRequest != null) postRequest(request);
+        //        using (var response = request.GetResponse()) {
+        //            using (var stream = response.GetResponseStream()) {
+        //                var bytes = new byte[8192];
+        //                using (var memoryStream = new MemoryStream()) {
+        //                    while (true) {
+        //                        var readSize = stream.Read(bytes, 0, 8192);
+        //                        if (readSize <= 0) { break; }
+        //                        memoryStream.Write(bytes, 0, readSize);
+        //                    }
+        //                    return System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
+        //                }
+        //            }
+        //        }
+        //    } catch (Exception e) {
+        //        Logger.error("Request is Error : {0}", e.Message);
+        //    }
+        //    return null;
+        //}
         static void Execute(string[] args) {
             Scorpio.Commons.Util.PrintSystemInfo();
+            Logger.info("Sco Version : " + Scorpio.Version.version);
+            Logger.info("Build Date : " + Scorpio.Version.date);
             Logger.info("Application Name : " + AppDomain.CurrentDomain.FriendlyName);
             TypeManager.PushAssembly(typeof(Program).Assembly);
             script = new Script();
