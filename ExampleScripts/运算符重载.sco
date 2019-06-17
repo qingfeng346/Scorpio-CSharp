@@ -3,10 +3,20 @@ class TestClass {
     constructor(num) {
         this.num = num
     }
+    //支持的运算符重载有 + - * / % ^ & | << >> ()
     "+"(num) {
         return TestClass() { num = this.num + num}
+    }
+    "-"(num) {
+        return TestClass() { num = this.num - num}
+    }
+    "()" {
+        print("call : " + this.num)
     }
 }
 var t1 = TestClass(100)
 var t2 = t1 + 100
+var t3 = t1 - 50
+t1()
 print(t2.num)
+print(t3.num)
