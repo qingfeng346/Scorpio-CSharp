@@ -102,7 +102,8 @@ namespace Scorpio {
                 case trueValueType:
                 case falseValueType:
                     return script.TypeBoolean.GetValue(key);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 {key}");
+                default:
+                    return script.TypeObject.GetValue(key);
             }
         }
         public ScriptValue GetValue(object key, Script script) {

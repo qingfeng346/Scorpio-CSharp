@@ -109,7 +109,7 @@ namespace Scorpio.Library {
 
             script.SetGlobal("typeOf", script.CreateFunction(new typeOf(script)));
             script.SetGlobal("setPrototype", script.CreateFunction(new setPrototype()));
-            script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype()));
+            script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype(script)));
             script.SetGlobal("clone", script.CreateFunction(new clone()));
 
             script.SetGlobal("require", script.CreateFunction(new require(script)));
@@ -347,11 +347,11 @@ namespace Scorpio.Library {
                         } else if (value.scriptValue is ScriptInstance) {
                             return new ScriptValue((value.scriptValue as ScriptInstance).Prototype);
                         } else if (value.scriptValue is ScriptType) {
-                            return new ScriptValue(value.scriptValue);
+                            return value;
                         } else {
                             return TypeManager.GetUserdataType(value.scriptValue.Type);
                         }
-                    default: return ScriptValue.Null;
+                    default: return m_Script.TypeObjectValue;
                 }
             }
         }
@@ -396,14 +396,37 @@ namespace Scorpio.Library {
             }
         }
         private class getPrototype : ScorpioHandle {
+            private Script m_Script;
+            public getPrototype(Script script) {
+                m_Script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var scriptValue = args[0].Get();
-                if (scriptValue is ScriptType) {
-                    return (scriptValue as ScriptType).Prototype;
-                } else if (scriptValue is ScriptInstance) {
-                    return (scriptValue as ScriptInstance).Prototype;
+                var value = args[0];
+                switch (value.valueType) {
+                    case ScriptValue.trueValueType:
+                    case ScriptValue.falseValueType:
+                        return m_Script.TypeBooleanValue;
+                    case ScriptValue.doubleValueType:
+                    case ScriptValue.longValueType:
+                        return m_Script.TypeNumberValue;
+                    case ScriptValue.stringValueType:
+                        return m_Script.TypeStringValue;
+                    case ScriptValue.scriptValueType:
+                        if (value.scriptValue is ScriptArray) {
+                            return m_Script.TypeArrayValue;
+                        } else if (value.scriptValue is ScriptMap) {
+                            return m_Script.TypeMapValue;
+                        } else if (value.scriptValue is ScriptFunction) {
+                            return m_Script.TypeFunctionValue;
+                        } else if (value.scriptValue is ScriptInstance) {
+                            return (value.scriptValue as ScriptInstance).Prototype;
+                        } else if (value.scriptValue is ScriptType) {
+                            return (value.scriptValue as ScriptType).Prototype;
+                        } else {
+                            throw new ExecutionException("当前类型不支持获取Prototype : " + value.ValueTypeName);
+                        }
+                    default: return m_Script.TypeObjectValue;
                 }
-                return ScriptValue.Null;
             }
         }
 

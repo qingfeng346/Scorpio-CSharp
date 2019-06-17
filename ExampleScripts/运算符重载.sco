@@ -1,0 +1,12 @@
+//所有的class 都支持 运算符重载   number string bool null 除外
+class TestClass {
+    constructor(num) {
+        this.num = num
+    }
+    "+"(num) {
+        return TestClass() { num = this.num + num}
+    }
+}
+var t1 = TestClass(100)
+var t2 = t1 + 100
+print(t2.num)

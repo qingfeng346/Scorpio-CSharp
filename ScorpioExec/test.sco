@@ -1,1 +1,2 @@
-print("hello world")
+var a = null
+print(a.toString())
