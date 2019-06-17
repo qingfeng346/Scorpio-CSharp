@@ -1,8 +1,12 @@
-//普通函数
+//普通函数  函数里的this 取决于获取函数的对象，规则可以参考 javascript
 function hello() {
-    print("hello")
+    print("hello " + this)
 }
-hello()
+hello()         //hello 函数内 this 为 null
+var tab = {}
+tab.hello = hello
+tab.hello()     //hello 函数内 this 为 tab
+
 
 //不定参函数
 function test(a,...b) {

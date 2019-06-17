@@ -15,8 +15,8 @@ class TestClass {
     }
 }
 var t1 = TestClass(100)
-var t2 = t1 + 100
-var t3 = t1 - 50
-t1()
+var t2 = t1 + 100   //TestClass 重载 + 运算符
+var t3 = t1 - 50    //TestClass 重载 - 运算符
+t1()                //TestClass 重载 () 运算符
 print(t2.num)
 print(t3.num)
