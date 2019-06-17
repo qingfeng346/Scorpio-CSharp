@@ -1,2 +1,5 @@
-var a = null
-print(a.toString())
+function test() {
+	print(typeOf(this))
+}
+var a = "feawfaewfaewf"
+a[test]()

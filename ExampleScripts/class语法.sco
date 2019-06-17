@@ -10,6 +10,7 @@ class TestClass : BaseClass {
         print("构造函数")
     }
     hello() {
+        this[base(this).hello]()
         print("hello")
     }
 }

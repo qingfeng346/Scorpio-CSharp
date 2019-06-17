@@ -110,6 +110,7 @@ namespace Scorpio.Library {
             script.SetGlobal("typeOf", script.CreateFunction(new typeOf(script)));
             script.SetGlobal("setPrototype", script.CreateFunction(new setPrototype()));
             script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype(script)));
+            script.SetGlobal("base", script.CreateFunction(new @base()));
             script.SetGlobal("clone", script.CreateFunction(new clone()));
 
             script.SetGlobal("require", script.CreateFunction(new require(script)));
@@ -427,6 +428,19 @@ namespace Scorpio.Library {
                         }
                     default: return m_Script.TypeObjectValue;
                 }
+            }
+        }
+        private class @base : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var value = args[0];
+                if (value.valueType == ScriptValue.scriptValueType) {
+                    if (value.scriptValue is ScriptInstance) {
+                        return ((value.scriptValue as ScriptInstance).Prototype.scriptValue as ScriptType).Prototype;
+                    } else if (value.scriptValue is ScriptType) {
+                        return (value.scriptValue as ScriptType).Prototype;
+                    }
+                }
+                return ScriptValue.Null;
             }
         }
 
