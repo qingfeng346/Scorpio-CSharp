@@ -2,15 +2,15 @@
   "profiles": {
     "pack": {
       "commandName": "Project",
-      "commandLineArgs": "pack -s C:\\Users\\qingf\\Desktop\\a.sco -o C:\\Users\\qingf\\Desktop\\a.out"
+      "commandLineArgs": "pack -s ../../../test.sco -o ../../../test.il"
     },
     "fast": {
       "commandName": "Project",
-      "commandLineArgs": "fast -class ScorpioExec.TestClass -output E:\\Scorpio-CSharp\\ScorpioExec\\"
+      "commandLineArgs": "fast -class ScorpioExec.TestClass -output ../../../"
     },
     "run": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\new.sco"
+      "commandLineArgs": "../../../test.sco"
     }
   }
 }

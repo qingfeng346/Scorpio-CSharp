@@ -13,16 +13,8 @@ namespace Scorpio.Userdata {
         protected UserdataMethod[] m_Operators = new UserdataMethod[UserdataOperator.OperatorCount];    //所有重载函数
         protected bool[] m_InitOperators = new bool[UserdataOperator.OperatorCount];                    //是否初始化过重载函数
         protected bool m_InitializeOperators;                                                           //是否初始化过所有重载函数
-        public UserdataType(Type type) {
-            m_Type = type;
-        }
+        public UserdataType(Type type) { m_Type = type; }
         public Type Type { get { return m_Type; } }
-        /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
-        public Type GetVariableType(string name) { return GetVariableType_impl(name); }
-        /// <summary> 获得一个类变量 </summary>
-        public object GetValue(object obj, string name) { return GetValue_impl(obj, name); }
-        /// <summary> 设置一个类变量 </summary>
-        public void SetValue(object obj, string name, ScriptValue value) { SetValue_impl(obj, name, value); }
         //创建一个模板类
         public ScriptValue MakeGenericType(Type[] parameters) {
             if (m_Type.IsGenericType && m_Type.IsGenericTypeDefinition) {
@@ -38,6 +30,7 @@ namespace Scorpio.Userdata {
             }
             throw new ExecutionException($"类 {m_Type.FullName} 不是未定义的泛型类");
         }
+        //获得操作符重载函数
         public UserdataMethod GetOperator(int operate) {
             if (m_InitOperators[operate]) return m_Operators[operate];
             m_InitOperators[operate] = true;
@@ -61,15 +54,17 @@ namespace Scorpio.Userdata {
                 case UserdataOperator.GetItemIndex: operatorName = UserdataOperator.GetItem; break;
                 case UserdataOperator.SetItemIndex: operatorName = UserdataOperator.SetItem; break;
             }
-            return m_Operators[operate] = GetValue(null, operatorName) as UserdataMethod;
+            return m_Operators[operate] = GetMethod(operatorName);
         }
         /// <summary> 创建一个实例 </summary>
         public abstract ScriptUserdata CreateInstance(ScriptValue[] parameters, int length);
         /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
-        protected abstract Type GetVariableType_impl(string name);
+        public abstract Type GetVariableType(string name);
+        /// <summary> 获取函数 </summary>
+        public abstract UserdataMethod GetMethod(string name);
         /// <summary> 获得一个类变量 </summary>
-        protected abstract object GetValue_impl(object obj, string name);
+        public abstract object GetValue(object obj, string name);
         /// <summary> 设置一个类变量 </summary>
-        protected abstract void SetValue_impl(object obj, string name, ScriptValue value);
+        public abstract void SetValue(object obj, string name, ScriptValue value);
     }
 }

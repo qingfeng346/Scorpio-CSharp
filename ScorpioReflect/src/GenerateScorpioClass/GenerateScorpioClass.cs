@@ -131,15 +131,14 @@ namespace Scorpio.ScorpioReflect {
         }
         public string Generate() {
             Init();
-            string str = ClassTemplate;
-            str = str.Replace("__getvariabletype_content", GenerateGetVariableType());
-            str = str.Replace("__getvalue_content", GenerateGetValue());
-            str = str.Replace("__setvalue_content", GenerateSetValue());
-            str = str.Replace("__constructor_content", GenerateConstructor());
-            str = str.Replace("__methods_content", GenerateMethod());
-            str = str.Replace("__class", m_ScorpioClassName);
-            str = str.Replace("__fullname", m_FullName);
-            return str;
+            return ClassTemplate.Replace("__getvariabletype_content", GenerateGetVariableType())
+                    .Replace("__method_content", GenerateGetMethod())
+                    .Replace("__getvalue_content", GenerateGetValue())
+                    .Replace("__setvalue_content", GenerateSetValue())
+                    .Replace("__constructor_content", GenerateConstructor())
+                    .Replace("__methods_content", GenerateMethod())
+                    .Replace("__class", m_ScorpioClassName)
+                    .Replace("__fullname", m_FullName);
         }
     }
 }

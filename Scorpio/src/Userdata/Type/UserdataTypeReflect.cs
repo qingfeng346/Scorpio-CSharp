@@ -8,7 +8,7 @@ namespace Scorpio.Userdata {
     //反射类管理
     public class UserdataTypeReflect : UserdataType {
         private bool m_InitializeConstructor;                           //是否初始化过所有构造函数
-        private bool m_InitializeMethods;                               //是否初始化过所有函数
+        private bool m_InitializeFunctions;                             //是否初始化过所有函数
         private UserdataMethod m_Constructor;                           //所有构造函数
         private List<MethodInfo> m_Methods;                             //所有函数
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
@@ -16,13 +16,13 @@ namespace Scorpio.Userdata {
         private Dictionary<string, UserdataMethod> m_Functions;         //所有的函数
         public UserdataTypeReflect(Type type) : base(type) {
             m_InitializeConstructor = false;
-            m_InitializeMethods = false;
+            m_InitializeFunctions = false;
             m_Methods = new List<MethodInfo>();
             m_Variables = new Dictionary<string, UserdataVariable>();
             m_NestedTypes = new Dictionary<string, ScriptValue>();
             m_Functions = new Dictionary<string, UserdataMethod>();
             InitializeConstructor();
-            InitializeMethods();
+            InitializeFunctions();
         }
         //初始化构造函数
         private void InitializeConstructor() {
@@ -31,13 +31,13 @@ namespace Scorpio.Userdata {
             m_Constructor = new UserdataMethodReflect(m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors(Script.BindingFlag));
         }
         //初始化所有函数
-        private void InitializeMethods() {
-            if (m_InitializeMethods == true) return;
-            m_InitializeMethods = true;
+        private void InitializeFunctions() {
+            if (m_InitializeFunctions == true) return;
+            m_InitializeFunctions = true;
             m_Methods.AddRange(m_Type.GetTypeInfo().GetMethods(Script.BindingFlag));
         }
         //获取一个函数，名字相同返回值相同
-        private UserdataMethod GetMethod(string name) {
+        private UserdataMethod GetFunction(string name) {
             var methods = m_Methods.FindAll((method) => method.Name == name);
             if (methods.Count > 0)
                 return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods.ToArray());
@@ -69,26 +69,32 @@ namespace Scorpio.Userdata {
             return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
         }
         //获得一个变量的类型
-        protected override Type GetVariableType_impl(string name) {
+        public override Type GetVariableType(string name) {
             var variable = GetVariable(name);
             return variable != null ? variable.FieldType : null;
         }
+        /// <summary> 获得函数 </summary>
+        public override UserdataMethod GetMethod(string name) {
+            UserdataMethod userdataMethod;
+            if (m_Functions.TryGetValue(name, out userdataMethod)) return userdataMethod;
+            return GetFunction(name);
+        }
         /// <summary> 获得一个类变量 </summary>
-        protected override object GetValue_impl(object obj, string name) {
+        public override object GetValue(object obj, string name) {
             UserdataMethod userdataMethod;
             if (m_Functions.TryGetValue(name, out userdataMethod)) return userdataMethod;
             ScriptValue nestedType;
             if (m_NestedTypes.TryGetValue(name, out nestedType)) return nestedType;
             var variable = GetVariable(name);
             if (variable != null) return variable.GetValue(obj);
-            userdataMethod = GetMethod(name);
+            userdataMethod = GetFunction(name);
             if (userdataMethod != null) return userdataMethod;
             nestedType = GetNestedType(name);
             if (nestedType.valueType != ScriptValue.nullValueType) return nestedType;
             throw new ExecutionException("GetValue 类[" + m_Type.ToString() + "] 变量 [" + name + "] 不存在");
         }
         /// <summary> 设置一个类变量 </summary>
-        protected override void SetValue_impl(object obj, string name, ScriptValue value) {
+        public override void SetValue(object obj, string name, ScriptValue value) {
             var variable = GetVariable(name);
             if (variable == null) throw new ExecutionException("SetValue 类[" + m_Type + "] 变量 [" + name + "] 不存在");
             try {

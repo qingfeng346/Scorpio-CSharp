@@ -95,17 +95,18 @@ namespace ScorpioExec {
         static void Pack(string source, string output) {
             if (string.IsNullOrWhiteSpace(source)) { throw new Exception("找不到 -source 参数"); }
             if (string.IsNullOrWhiteSpace(output)) { throw new Exception("找不到 -output 参数"); }
-            source = Path.Combine(Util.CurrentDirectory, source);
-            output = Path.Combine(Util.CurrentDirectory, output);
+            source = Path.GetFullPath(Path.Combine(Util.CurrentDirectory, source));
+            output = Path.GetFullPath(Path.Combine(Util.CurrentDirectory, output));
             try {
                 File.WriteAllBytes(output, SerializeUtil.Serialize(source, FileUtil.GetFileString(source)).ToArray());
+                Logger.info($"生成IL文件  {source} -> {output}");
             } catch (System.Exception ex) {
                 Logger.error("转换出错 error : " + ex.ToString());
             }
         }
         static void Fast(CommandLine command, string output) {
             if (string.IsNullOrWhiteSpace(output)) { throw new Exception("找不到 -output 参数"); }
-            output = Path.Combine(Util.CurrentDirectory, output);
+            output = Path.GetFullPath(Path.Combine(Util.CurrentDirectory, output));
             var dll = command.GetValue("-dll");
             var assembly = string.IsNullOrEmpty(dll) ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
             var className = command.GetValue("-class");
@@ -120,7 +121,9 @@ namespace ScorpioExec {
                 if (filterType == null) { filterType = Type.GetType(filterName, false, false); }
                 if (filterType != null && filterType.IsSubclassOf(typeof(ClassFilter))) { generate.SetClassFilter((ClassFilter)System.Activator.CreateInstance(filterType)); }
             }
-            FileUtil.CreateFile(Path.Combine(output, generate.ScorpioClassName + ".cs"), generate.Generate());
+            var outputFile = Path.Combine(output, generate.ScorpioClassName + ".cs");
+            FileUtil.CreateFile(outputFile, generate.Generate());
+            Logger.info($"生成快速反射类 {className} -> {outputFile}");
         }
         static void Execute(string[] args) {
             Scorpio.Commons.Util.PrintSystemInfo();

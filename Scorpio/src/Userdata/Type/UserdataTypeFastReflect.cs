@@ -3,10 +3,11 @@
 namespace Scorpio.Userdata {
     //去反射类
     public interface ScorpioFastReflectClass {
-        UserdataMethodFastReflect GetConstructor();     //获取构造函数
-        Type GetVariableType(string name);              //获取变量类型
-        object GetValue(object obj, string name);       //获取变量
-        void SetValue(object obj, string name, ScriptValue value);     //设置变量
+        UserdataMethodFastReflect GetConstructor();                     //获取构造函数
+        Type GetVariableType(string name);                              //获取变量类型
+        UserdataMethod GetMethod(string name);                          //获取类函数
+        object GetValue(object obj, string name);                       //获取变量
+        void SetValue(object obj, string name, ScriptValue value);      //设置变量
     }
     //去反射函数
     public interface ScorpioFastReflectMethod {
@@ -37,14 +38,17 @@ namespace Scorpio.Userdata {
         }
         public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
             return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
-        }  
-        protected override Type GetVariableType_impl(string name) {
+        }
+        public override Type GetVariableType(string name) {
             return m_Value.GetVariableType(name);
         }
-        protected override object GetValue_impl(object obj, string name) {
+        public override UserdataMethod GetMethod(string name) {
+            return m_Value.GetMethod(name);
+        }
+        public override object GetValue(object obj, string name) {
             return m_Value.GetValue(obj, name);
         }
-        protected override void SetValue_impl(object obj, string name, ScriptValue value) {
+        public override void SetValue(object obj, string name, ScriptValue value) {
             m_Value.SetValue(obj, name, value);
         }
         public ScorpioFastReflectClass FastReflectClass { get { return m_Value; } }
