@@ -83,9 +83,6 @@
 * 例如使用快速反射的类为 **UnityEngine.GameObject** , 生成的快速反射类则为**ScorpioClass_UnityEngine_GameObject**
     * 在程序内调用 **Scorpio.Userdata.TypeManager.SetFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script))**
 
-##### 注意事项
-* 不能调用含有ref和out参数的函数
-
 ### 源码目录说明
 * **Scorpio** 脚本引擎源码
 * **ScorpioExec** 命令行 **sco**
