@@ -55,7 +55,6 @@ namespace ScorpioExec {
         static void Main(string[] args) {
             try {
                 Logger.SetLogger(new LogHelper());
-
                 var command = CommandLine.Parse(args);
                 var type = command.GetValue("-type", "-t");
                 var source = command.GetValue("-source", "-s");

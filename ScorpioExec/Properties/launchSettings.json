@@ -11,10 +11,6 @@
     "run": {
       "commandName": "Project",
       "commandLineArgs": "../../../test.sco"
-    },
-    "version": {
-      "commandName": "Project",
-      "commandLineArgs": "version -preview"
     }
   }
 }

@@ -52,9 +52,13 @@ namespace Scorpio.ScorpioReflect {
             if (Operators.ContainsKey(name)) {
                 return string.Format("return {0} {1} {2};", GetScorpioMethodArgs(pars, 0), Operators[name], GetScorpioMethodArgs(pars, 1));
             }
-            //如果 get_Item 参数是一个 set_Item 参数是两个 就是 [] 的重载
-            if (name == "get_Item" && method.GetParameters().Length == 1) {
+            //重载 =
+            if (name == "op_Implicit") {
+                return string.Format("return ({0})({1});", ScorpioReflectUtil.GetFullName(method.ReturnType), GetScorpioMethodArgs(pars, 0));
+            //如果 get_Item 参数是一个 就是 [] 的重载
+            } else if (name == "get_Item" && method.GetParameters().Length == 1) {
                 return string.Format("return {0}[{1}];", variable, GetScorpioMethodArgs(pars, 0));
+            //如果 set_Item 参数是两个 就是 [] 的重载
             } else if (name == "set_Item" && method.GetParameters().Length == 2) {
                 return string.Format("{0}[{1}] = {2}; return null;", variable, GetScorpioMethodArgs(pars, 0), GetScorpioMethodArgs(pars, 1));
             }
