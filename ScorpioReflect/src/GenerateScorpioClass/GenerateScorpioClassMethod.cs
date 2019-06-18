@@ -153,7 +153,7 @@ namespace Scorpio.ScorpioReflect {
                 builder.AppendFormat(@"
             case {0}: {{ {1} }}", i, execute);
             }
-            string str = MethodTemplate;
+            var str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(methods.ToArray()));
             str = str.Replace("__name", m_ScorpioClassName + "_" + name);
             str = str.Replace("__methodname", name);
@@ -182,7 +182,7 @@ namespace Scorpio.ScorpioReflect {
         //获取函数
         string GenerateGetMethod() {
             var methodStr = @"
-            case ""{0}"": return {1}.GetInstance(m_Script);";
+            case ""{0}"": return {1}.GetInstance();";
             var builder = new StringBuilder();
             //所有的函数
             var methods = new List<string>();

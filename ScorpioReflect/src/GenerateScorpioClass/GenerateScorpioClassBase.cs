@@ -13,12 +13,8 @@ using Scorpio.Userdata;
 using Scorpio.Tools;
 using Scorpio.Exception;
 public class __class : ScorpioFastReflectClass {
-    private Script m_Script;
-    public __class(Script script) {
-        m_Script = script;
-    }
     public UserdataMethodFastReflect GetConstructor() {
-        return __class_Constructor.GetInstance(m_Script);
+        return __class_Constructor.GetInstance();
     }
     public Type GetVariableType(string name) {
         switch (name) {__getvariabletype_content
@@ -46,12 +42,11 @@ __methods_content
         //单个函数模板
         public const string MethodTemplate = @"
     public class __name : ScorpioFastReflectMethod {
-        private static Dictionary<Script, UserdataMethodFastReflect> methods = new Dictionary<Script, UserdataMethodFastReflect>();
-        public static UserdataMethodFastReflect GetInstance(Script script) {
-            UserdataMethodFastReflect method;
-            if (methods.TryGetValue(script, out method)) { return method; }
+        private static UserdataMethodFastReflect _instance = null;
+        public static UserdataMethodFastReflect GetInstance() {
+            if (_instance != null) { return _instance; }
             var methodInfos = new List<ScorpioFastReflectMethodInfo>();__getallmethod
-            return methods[script] = new UserdataMethodFastReflect(script, typeof(__fullname), ""__methodname"", methodInfos.ToArray(), new __name()); 
+            return _instance = new UserdataMethodFastReflect(typeof(__fullname), ""__methodname"", methodInfos.ToArray(), new __name()); 
         }
         public object Call(object obj, int methodIndex, object[] args) {
             switch (methodIndex) {__execute

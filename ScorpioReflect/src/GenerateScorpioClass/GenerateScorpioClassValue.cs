@@ -9,7 +9,7 @@ namespace Scorpio.ScorpioReflect {
             var fieldStr = @"
             case ""{0}"": return {1};";
             var methodStr = @"
-            case ""{0}"": return {1}.GetInstance(m_Script);";
+            case ""{0}"": return {1}.GetInstance();";
             var builder = new StringBuilder();
             //所有类变量
             m_Fields.ForEach((field) => builder.AppendFormat(fieldStr, field.Name, GetScorpioVariable(field.IsStatic, field.Name)) );
