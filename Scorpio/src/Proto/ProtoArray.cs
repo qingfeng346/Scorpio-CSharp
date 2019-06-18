@@ -30,7 +30,7 @@
             ret.SetValue("safePopFirst", script.CreateFunction(new safePopFirst()));
             ret.SetValue("popLast", script.CreateFunction(new popLast()));
             ret.SetValue("safePopLast", script.CreateFunction(new safePopLast()));
-            map.SetValue("join", script.CreateFunction(new join()));
+            ret.SetValue("join", script.CreateFunction(new join()));
             ret.SetValue("+", script.CreateFunction(new plus()));
             ret.SetValue("-", script.CreateFunction(new minus()));
             return ret;
