@@ -30,6 +30,7 @@
             ret.SetValue("safePopFirst", script.CreateFunction(new safePopFirst()));
             ret.SetValue("popLast", script.CreateFunction(new popLast()));
             ret.SetValue("safePopLast", script.CreateFunction(new safePopLast()));
+            map.SetValue("join", script.CreateFunction(new join()));
             ret.SetValue("+", script.CreateFunction(new plus()));
             ret.SetValue("-", script.CreateFunction(new minus()));
             return ret;
@@ -299,6 +300,16 @@
         private class safePopLast : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return thisObject.Get<ScriptArray>().SafePopLast();
+            }
+        }
+        private class join : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var separator = args[0].ToString();
+                var value = thisObject.Get<ScriptArray>();
+                var count = value.Length();
+                var values = new string[count];
+                for (int i = 0; i < count; ++i) { values[i] = value[i].ToString(); }
+                return new ScriptValue(string.Join(separator, values));
             }
         }
         private class plus : ScorpioHandle {
