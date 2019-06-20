@@ -95,52 +95,5 @@ namespace Scorpio.Tools {
                 }
             }
         }
-        //public static void Assert(bool b, Script script, string message) {
-        //    if (!b) throw new ExecutionException(script, message);
-        //}
-        //public static void WriteString(BinaryWriter writer, string str) {
-        //    if (string.IsNullOrEmpty(str)) {
-        //        writer.Write(0);
-        //    } else {
-        //        var bytes = Encoding.UTF8.GetBytes(str);
-        //        writer.Write(bytes.Length);
-        //        writer.Write(bytes);
-        //    }
-        //}
-        //public static string ReadString(BinaryReader reader) {
-        //    var length = reader.ReadInt32();
-        //    if (length <= 0) { return ""; }
-        //    return Encoding.UTF8.GetString(reader.ReadBytes(length));
-        //}
-        public static bool IsNullOrEmpty(String value) {
-            return value == null || value.Length == 0;
-        }
-        //public static string Join(String separator, String[] stringarray) {
-        //    int startindex = 0;
-        //    int count = stringarray.Length;
-        //    String result = "";
-        //    for (int index = startindex; index < count; index++) {
-        //        if (index > startindex)
-        //            result += separator;
-        //        result += stringarray[index];
-        //    }
-        //    return result;
-        //}
-        //public static object ChangeType_impl(object value, Type conversionType) {
-        //    return Convert.ChangeType(value, conversionType);
-        //}
-        //public static object ToEnum(Type type, int value) {
-        //    return Enum.ToObject(type, value);
-        //}
-        public static sbyte ToSByte(object value) { return Convert.ToSByte(value); }
-        public static byte ToByte(object value) { return Convert.ToByte(value); }
-        public static Int16 ToInt16(object value) { return Convert.ToInt16(value); }
-        public static UInt16 ToUInt16(object value) { return Convert.ToUInt16(value); }
-        public static Int32 ToInt32(object value) { return Convert.ToInt32(value); }
-        public static UInt32 ToUInt32(object value) { return Convert.ToUInt32(value); }
-        public static Int64 ToInt64(object value) { return Convert.ToInt64(value); }
-        public static UInt64 ToUInt64(object value) { return Convert.ToUInt64(value); }
-        public static float ToSingle(object value) { return Convert.ToSingle(value); }
-        public static double ToDouble(object value) { return Convert.ToDouble(value); }
     }
 }
