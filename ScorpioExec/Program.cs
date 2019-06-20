@@ -60,8 +60,7 @@ namespace ScorpioExec {
                 var source = command.GetValue("-source", "-s");
                 var output = command.GetValue("-output", "-o");
                 var hasHelp = command.HadValue("-help", "--help", "-h");
-                if (type == null || type.Length == 0) { type = command.Type; }
-                if (type == null) { type = ""; }
+                if (type == null || type.Length == 0) { type = command.Type ?? ""; }
                 if (hasHelp) {
                     switch (type.ToLower()) {
                         case "register": Logger.info(HelpRegister); return;

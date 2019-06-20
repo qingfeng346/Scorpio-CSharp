@@ -1,5 +1,3 @@
-function test() {
-	print(typeOf(this))
+foreach (var pair in pairs(_G)) {
+	print(pair)
 }
-var a = "feawfaewfaewf"
-a[test]()

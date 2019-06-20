@@ -1,8 +1,39 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Tools;
 namespace Scorpio {
-    public class ScriptGlobal : ScriptObject {
+    public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
+        public struct Enumerator : IEnumerator<ScorpioValue<string, ScriptValue>> {
+            private string[] keys;
+            private int[] values;
+            private ScriptValue[] objects;
+            private int index;
+            private ScorpioValue<string, ScriptValue> current;
+            internal Enumerator(ScriptGlobal global) {
+                this.keys = global.m_Indexs.Keys;
+                this.values = global.m_Indexs.Values;
+                this.objects = global.m_Objects;
+                this.current = new ScorpioValue<string, ScriptValue>();
+                this.index = 0;
+            }
+            public bool MoveNext() {
+                if (index < values.Length) {
+                    current.key = keys[index];
+                    current.value = objects[values[index]];
+                    index++;
+                    return true;
+                }
+                return false;
+            }
+            public ScorpioValue<string, ScriptValue> Current { get { return current; } }
+            object System.Collections.IEnumerator.Current { get { return current; } }
+            public void Reset() {
+                index = 0;
+            }
+            public void Dispose() {
+            }
+        }
         private ScriptValue[] m_Objects = ScriptValue.EMPTY;                                //数据
         private int m_Size = 0;                                                             //有效数据数量
         private ScorpioDictionaryString<int> m_Indexs = new ScorpioDictionaryString<int>(); //名字到索引的映射
@@ -57,6 +88,13 @@ namespace Scorpio {
         public bool HasValue(string key) {
             return m_Indexs.ContainsKey(key);
         }
-        public List<string> GetKeys() { return m_Indexs.Keys; }
+        public string[] GetKeys() { return m_Indexs.Keys; }
+
+        public IEnumerator<ScorpioValue<string, ScriptValue>> GetEnumerator() {
+            return new Enumerator(this);
+        }
+        IEnumerator IEnumerable.GetEnumerator() {
+            return new Enumerator(this);
+        }
     }
 }

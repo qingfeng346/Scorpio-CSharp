@@ -1,11 +1,6 @@
-﻿using System;
-using System.Reflection;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Scorpio.Function;
-using Scorpio.Compiler;
-using Scorpio.Exception;
 namespace Scorpio {
     //脚本map类型
     public class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
@@ -30,11 +25,7 @@ namespace Scorpio {
             m_Objects[key] = value;
         }
         public override void SetValue(object key, ScriptValue value) {
-            if (value.valueType == ScriptValue.nullValueType) {
-                m_Objects.Remove(key);
-            } else {
-                m_Objects[key] = value;
-            }
+            m_Objects[key] = value;
         }
 
         public override bool HasValue(string key) {
