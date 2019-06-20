@@ -14,17 +14,17 @@ namespace ScorpioExec {
     public class LogHelper : ILogger {
         public void info(string value) {
             Console.WriteLine(value);
-            Debugger.Log(0, null, value + "\n");
+            //Debugger.Log(0, null, value + "\n");
         }
         public void warn(string value) {
             value = "[warn]" + value;
             Console.WriteLine(value);
-            Debugger.Log(0, null, value + "\n");
+            //Debugger.Log(0, null, value + "\n");
         }
         public void error(string value) {
             value = "[error]" + value;
             Console.WriteLine(value);
-            Debugger.Log(0, null, value + "\n");
+            //Debugger.Log(0, null, value + "\n");
         }
     }
     public class Program {
@@ -55,6 +55,7 @@ namespace ScorpioExec {
         static void Main(string[] args) {
             try {
                 Logger.SetLogger(new LogHelper());
+                Logger.info(Util.CurrentDirectory);
                 var command = CommandLine.Parse(args);
                 var type = command.GetValue("-type", "-t");
                 var source = command.GetValue("-source", "-s");

@@ -151,7 +151,7 @@ namespace Scorpio.Library {
                     builder.Append(args[i]);
                 }
                 System.Console.WriteLine(builder);
-                System.Diagnostics.Debug.WriteLine(builder);
+                // System.Diagnostics.Debug.WriteLine(builder);
                 return ScriptValue.Null;
             }
         }
