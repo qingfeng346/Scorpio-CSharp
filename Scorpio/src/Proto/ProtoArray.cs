@@ -225,13 +225,15 @@
                 var func = args[0].Get<ScriptFunction>();
                 if (func != null) {
                     var array = thisObject.Get<ScriptArray>();
-                    foreach (var value in array) {
-                        if (func.Call(value).IsTrue) {
-                            return ScriptValue.Null;
+                    var index = 0;
+                    for (var i = 0; i < array.Length(); ++i) {
+                        ++index;
+                        if (!func.Call(array[i], new ScriptValue((double)i)).IsTrue) {
+                            return new ScriptValue((double)index);
                         }
                     }
                 }
-                return ScriptValue.Null;
+                return ScriptValue.Zero;
             }
         }
         private class forEachLast : ScorpioHandle {
@@ -239,13 +241,15 @@
                 var func = args[0].Get<ScriptFunction>();
                 if (func != null) {
                     var array = thisObject.Get<ScriptArray>();
+                    var index = 0;
                     for (var i = array.Length(); i >= 0; --i) {
-                        if (func.Call(array[i]).IsTrue) {
-                            return ScriptValue.Null;
+                        ++index;
+                        if (!func.Call(array[i], new ScriptValue((double)i)).IsTrue) {
+                            return new ScriptValue((double)index);
                         }
                     }
                 }
-                return ScriptValue.Null;
+                return ScriptValue.Zero;
             }
         }
         private class map : ScorpioHandle {
