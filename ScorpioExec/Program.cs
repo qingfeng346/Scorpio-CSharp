@@ -3,17 +3,14 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using Scorpio.Commons;
-using Scorpio;
 using Scorpio.Userdata;
 using Scorpio.Serialize;
 using Scorpio.ScorpioReflect;
-using System.Net;
-using System.Collections.Generic;
 
 namespace ScorpioExec {
     public class Program {
-        private static readonly string CurrentDirectory = Scorpio.Commons.Util.CurrentDirectory;
-        private static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        private static readonly string CurrentDirectory = Util.CurrentDirectory;
+        private static readonly string BaseDirectory = Util.BaseDirectory;
         
         private const string HelpRegister = @"
 注册运行程序到环境变量";
@@ -43,7 +40,7 @@ namespace ScorpioExec {
             Launch.Start(args, null, null);
         }
         static void Register(CommandLine command, string[] args) {
-            Scorpio.Commons.Util.RegisterApplication(Scorpio.Commons.Util.BaseDirectory + "/sco");
+            Util.RegisterApplication(Scorpio.Commons.Util.BaseDirectory + "/sco");
         }
         static void Pack(CommandLine command, string[] args) {
             var source = Launch.GetPath("-source", "-s");
@@ -53,8 +50,8 @@ namespace ScorpioExec {
         }
         static void Fast(CommandLine command, string[] args) {
             var output = Launch.GetPath("-output", "-o");
-            var dll = Launch.GetPath("-dll");
-            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(dll);
+            var dll = command.GetValue("-dll");
+            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
             var className = command.GetValue("-class");
             if (className.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
             var clazz = assembly != null ? assembly.GetType(className, false, false) : null;
@@ -72,12 +69,12 @@ namespace ScorpioExec {
             Logger.info($"生成快速反射类 {className} -> {outputFile}");
         }
         static void Execute(CommandLine command, string[] args) {
-            Scorpio.Commons.Util.PrintSystemInfo();
+            Util.PrintSystemInfo();
             Logger.info("Sco Version : " + Scorpio.Version.version);
             Logger.info("Build Date : " + Scorpio.Version.date);
             Logger.info("Application Name : " + AppDomain.CurrentDomain.FriendlyName);
             TypeManager.PushAssembly(typeof(Program).Assembly);
-            var script = new Script();
+            var script = new Scorpio.Script();
             script.LoadLibraryV1();
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
             if (args.Length >= 1) {

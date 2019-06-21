@@ -24,8 +24,10 @@ namespace Scorpio.ScorpioReflect {
             var Constructors = m_Type.GetConstructors(ScorpioReflectUtil.BindingFlag);
             var builder = new StringBuilder();
             for (var i = 0; i < Constructors.Length; ++i) {
+                var con = Constructors[i];
+                var call = $"new __fullname({GetScorpioMethodCall(con)})";
                 builder.AppendFormat(@"
-            case {0}: return new __fullname({1});", i, GetScorpioMethodCall(Constructors[i]));
+                case {0}: {{ {1} }}", i, GetExecuteMethod(con.GetParameters(), true, call));
             }
             string str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(Constructors));
@@ -104,54 +106,11 @@ namespace Scorpio.ScorpioReflect {
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
                 execute = GetPropertyMethodExecute(method, variable, pars);
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
-                var callBuilder = new StringBuilder();
-                var hasRefOut = false;
                 var call = $"{variable}.{name}({GetScorpioMethodCall(method)})";
-                for (var j = 0; j < pars.Length; ++j) {
-                    if (Util.IsRetvalOrOut(pars[j])) {
-                        hasRefOut = true;
-                        var typeName = ScorpioReflectUtil.GetFullName(pars[j].ParameterType.GetElementType());
-                        callBuilder.Append($@"
-                var retval{j} = args[{j}] == null ? default({typeName}) : ({typeName})args[{j}]; ");
-                    }
-                }
-                var noReturn = method.ReturnType == typeof(void);
-                if (hasRefOut) {
-                    if (noReturn) {
-                        callBuilder.Append($@"
-                {call};");
-                    } else {
-                        callBuilder.Append($@"
-                var __Result = {call};");
-                    }
-                    for (var j = 0; j < pars.Length; ++j) {
-                        if (Util.IsRetvalOrOut(pars[j])) {
-                            callBuilder.Append($@"
-                args[{j}] = retval{j};");
-                        }
-                    }
-                    if (noReturn) {
-                        callBuilder.Append(@"
-                return null;
-               ");
-                    } else {
-                        callBuilder.Append(@"
-                return __Result;
-               ");
-                    }
-                    execute = callBuilder.ToString();
-                } else {
-                    if (noReturn) {
-                        callBuilder.Append($"{call}; return null;");
-                    } else {
-                        callBuilder.Append($"return {call};");
-                    }
-                    execute = callBuilder.ToString();
-                }
-                
+                execute = GetExecuteMethod(pars, method.ReturnType != typeof(void), call);
             finish:
                 builder.AppendFormat(@"
-            case {0}: {{ {1} }}", i, execute);
+                case {0}: {{ {1} }}", i, execute);
             }
             var str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(methods.ToArray()));
