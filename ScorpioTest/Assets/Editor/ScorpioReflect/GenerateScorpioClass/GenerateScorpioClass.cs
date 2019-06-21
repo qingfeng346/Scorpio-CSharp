@@ -56,7 +56,7 @@ namespace Scorpio.ScorpioReflect {
             m_AllEvents.AddRange(m_Type.GetEvents(ScorpioReflectUtil.BindingFlag));
             var propertys = m_Type.GetProperties(ScorpioReflectUtil.BindingFlag);
             foreach (var property in propertys) {
-                //如果是 get 则参数是0个  get 参数是1个  否则就可能是 [] 的重载
+                //如果是 get 则参数是0个  set 参数是1个  否则就可能是 [] 的重载
                 if ((property.CanRead && property.GetGetMethod().GetParameters().Length == 0) ||
                     (property.CanWrite && property.GetSetMethod().GetParameters().Length == 1)) {
                     m_AllPropertys.Add(property);
@@ -64,12 +64,8 @@ namespace Scorpio.ScorpioReflect {
             }
             var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(ScorpioReflectUtil.BindingFlag);
             foreach (var method in methods) {
-                //屏蔽掉 == 重载函数 IsSpecialName 表示为特殊函数 运算符重载 这个值会为true
-                if (method.IsSpecialName && method.Name == "op_Implicit") { continue; }
-                //屏蔽掉 模版函数
+                //屏蔽掉 模版函数 模板函数只能使用反射
                 if (Util.IsGenericMethod(method)) { continue; }
-                //屏蔽掉 带有 ref 和 out 关键字参数的函数
-                //if (ScorpioReflectUtil.IsRetvalOrOut(method)) { continue; }
                 m_AllMethods.Add(method);
             }
         }

@@ -13,12 +13,8 @@ using Scorpio.Userdata;
 using Scorpio.Tools;
 using Scorpio.Exception;
 public class __class : ScorpioFastReflectClass {
-    private Script m_Script;
-    public __class(Script script) {
-        m_Script = script;
-    }
     public UserdataMethodFastReflect GetConstructor() {
-        return __class_Constructor.GetInstance(m_Script);
+        return __class_Constructor.GetInstance();
     }
     public Type GetVariableType(string name) {
         switch (name) {__getvariabletype_content
@@ -46,16 +42,15 @@ __methods_content
         //单个函数模板
         public const string MethodTemplate = @"
     public class __name : ScorpioFastReflectMethod {
-        private static Dictionary<Script, UserdataMethodFastReflect> methods = new Dictionary<Script, UserdataMethodFastReflect>();
-        public static UserdataMethodFastReflect GetInstance(Script script) {
-            UserdataMethodFastReflect method;
-            if (methods.TryGetValue(script, out method)) { return method; }
+        private static UserdataMethodFastReflect _instance = null;
+        public static UserdataMethodFastReflect GetInstance() {
+            if (_instance != null) { return _instance; }
             var methodInfos = new List<ScorpioFastReflectMethodInfo>();__getallmethod
-            return methods[script] = new UserdataMethodFastReflect(script, typeof(__fullname), ""__methodname"", methodInfos.ToArray(), new __name()); 
+            return _instance = new UserdataMethodFastReflect(typeof(__fullname), ""__methodname"", methodInfos.ToArray(), new __name()); 
         }
         public object Call(object obj, int methodIndex, object[] args) {
             switch (methodIndex) {__execute
-            default: throw new ExecutionException(""__fullname 找不到合适的函数 : __methodname    type : "" + methodIndex);
+                default: throw new ExecutionException(""__fullname 找不到合适的函数 : __methodname    type : "" + methodIndex);
             }
         }
     }";
@@ -101,6 +96,50 @@ __methods_content
             parameterType.Append("}");
             refOut.Append("}");
             return string.Format(@"new ScorpioFastReflectMethodInfo({0}, {1}, {2}, {3}, {4})", isStatic, parameterType.ToString(), refOut.ToString(), paramType, index);
+        }
+        private string GetExecuteMethod(ParameterInfo[] pars, bool hasReturn, string call) {
+            var callBuilder = new StringBuilder();
+            var hasRefOut = false;
+            for (var j = 0; j < pars.Length; ++j) {
+                if (Util.IsRetvalOrOut(pars[j])) {
+                    hasRefOut = true;
+                    var typeName = ScorpioReflectUtil.GetFullName(pars[j].ParameterType.GetElementType());
+                    callBuilder.Append($@"
+                    var retval{j} = args[{j}] == null ? default({typeName}) : ({typeName})args[{j}]; ");
+                }
+            }
+            if (hasRefOut) {
+                if (hasReturn) {
+                    callBuilder.Append($@"
+                    var __Result = {call};");
+                } else {
+                    callBuilder.Append($@"
+                    {call};");
+                }
+                for (var j = 0; j < pars.Length; ++j) {
+                    if (Util.IsRetvalOrOut(pars[j])) {
+                        callBuilder.Append($@"
+                    args[{j}] = retval{j};");
+                    }
+                }
+                if (hasReturn) {
+                    callBuilder.Append(@"
+                    return __Result;
+               ");
+                } else {
+                    callBuilder.Append(@"
+                    return null;
+               ");
+                }
+                return callBuilder.ToString();
+            } else {
+                if (hasReturn) {
+                    callBuilder.Append($"return {call};");
+                } else {
+                    callBuilder.Append($"{call}; return null;");
+                }
+                return callBuilder.ToString();
+            }
         }
         private string GetScorpioMethodCall(MethodBase method) {
             var builder = new StringBuilder();

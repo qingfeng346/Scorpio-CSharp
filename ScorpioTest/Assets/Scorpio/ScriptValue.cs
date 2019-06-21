@@ -103,6 +103,8 @@ namespace Scorpio {
                 case trueValueType:
                 case falseValueType:
                     return script.TypeBoolean.GetValue(key);
+                case nullValueType:
+                    throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]");
                 default:
                     return script.TypeObject.GetValue(key);
             }
@@ -170,7 +172,7 @@ namespace Scorpio {
         public string ValueTypeName {
             get {
                 switch (valueType) {
-                    case nullValueType: return "null";
+                    case nullValueType: return "Null";
                     case trueValueType:
                     case falseValueType:
                         return "Boolean";

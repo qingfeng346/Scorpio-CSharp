@@ -31,7 +31,7 @@ namespace Scorpio.Compiler {
         private int m_iIndex = 0;                   //当前解析
         private int m_iCacheLine = 0;               //Simple字符串起始行
         public ScriptLexer(string buffer, string breviary) {
-            Breviary = Util.IsNullOrEmpty(breviary) ? buffer.Substring(0, Math.Min(BREVIARY_CHAR, buffer.Length)) : breviary;
+            Breviary = breviary == null || breviary.Length == 0 ? buffer.Substring(0, Math.Min(BREVIARY_CHAR, buffer.Length)) : breviary;
             m_FormatString = FormatString.None;
             m_strBuffer = buffer;
             m_iLength = buffer.Length;

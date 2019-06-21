@@ -24,8 +24,10 @@ namespace Scorpio.ScorpioReflect {
             var Constructors = m_Type.GetConstructors(ScorpioReflectUtil.BindingFlag);
             var builder = new StringBuilder();
             for (var i = 0; i < Constructors.Length; ++i) {
+                var con = Constructors[i];
+                var call = $"new __fullname({GetScorpioMethodCall(con)})";
                 builder.AppendFormat(@"
-            case {0}: return new __fullname({1});", i, GetScorpioMethodCall(Constructors[i]));
+                case {0}: {{ {1} }}", i, GetExecuteMethod(con.GetParameters(), true, call));
             }
             string str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(Constructors));
@@ -52,9 +54,13 @@ namespace Scorpio.ScorpioReflect {
             if (Operators.ContainsKey(name)) {
                 return string.Format("return {0} {1} {2};", GetScorpioMethodArgs(pars, 0), Operators[name], GetScorpioMethodArgs(pars, 1));
             }
-            //如果 get_Item 参数是一个 set_Item 参数是两个 就是 [] 的重载
-            if (name == "get_Item" && method.GetParameters().Length == 1) {
+            //重载 =
+            if (name == "op_Implicit") {
+                return string.Format("return ({0})({1});", ScorpioReflectUtil.GetFullName(method.ReturnType), GetScorpioMethodArgs(pars, 0));
+            //如果 get_Item 参数是一个 就是 [] 的重载
+            } else if (name == "get_Item" && method.GetParameters().Length == 1) {
                 return string.Format("return {0}[{1}];", variable, GetScorpioMethodArgs(pars, 0));
+            //如果 set_Item 参数是两个 就是 [] 的重载
             } else if (name == "set_Item" && method.GetParameters().Length == 2) {
                 return string.Format("{0}[{1}] = {2}; return null;", variable, GetScorpioMethodArgs(pars, 0), GetScorpioMethodArgs(pars, 1));
             }
@@ -100,56 +106,13 @@ namespace Scorpio.ScorpioReflect {
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
                 execute = GetPropertyMethodExecute(method, variable, pars);
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
-                var callBuilder = new StringBuilder();
-                var hasRefOut = false;
                 var call = $"{variable}.{name}({GetScorpioMethodCall(method)})";
-                for (var j = 0; j < pars.Length; ++j) {
-                    if (Util.IsRetvalOrOut(pars[j])) {
-                        hasRefOut = true;
-                        var typeName = ScorpioReflectUtil.GetFullName(pars[j].ParameterType.GetElementType());
-                        callBuilder.Append($@"
-                var retval{j} = args[{j}] == null ? default({typeName}) : ({typeName})args[{j}]; ");
-                    }
-                }
-                var noReturn = method.ReturnType == typeof(void);
-                if (hasRefOut) {
-                    if (noReturn) {
-                        callBuilder.Append($@"
-                {call};");
-                    } else {
-                        callBuilder.Append($@"
-                var __Result = {call};");
-                    }
-                    for (var j = 0; j < pars.Length; ++j) {
-                        if (Util.IsRetvalOrOut(pars[j])) {
-                            callBuilder.Append($@"
-                args[{j}] = retval{j};");
-                        }
-                    }
-                    if (noReturn) {
-                        callBuilder.Append(@"
-                return null;
-               ");
-                    } else {
-                        callBuilder.Append(@"
-                return __Result;
-               ");
-                    }
-                    execute = callBuilder.ToString();
-                } else {
-                    if (noReturn) {
-                        callBuilder.Append($"{call}; return null;");
-                    } else {
-                        callBuilder.Append($"return {call};");
-                    }
-                    execute = callBuilder.ToString();
-                }
-                
+                execute = GetExecuteMethod(pars, method.ReturnType != typeof(void), call);
             finish:
                 builder.AppendFormat(@"
-            case {0}: {{ {1} }}", i, execute);
+                case {0}: {{ {1} }}", i, execute);
             }
-            string str = MethodTemplate;
+            var str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(methods.ToArray()));
             str = str.Replace("__name", m_ScorpioClassName + "_" + name);
             str = str.Replace("__methodname", name);
@@ -178,7 +141,7 @@ namespace Scorpio.ScorpioReflect {
         //获取函数
         string GenerateGetMethod() {
             var methodStr = @"
-            case ""{0}"": return {1}.GetInstance(m_Script);";
+            case ""{0}"": return {1}.GetInstance();";
             var builder = new StringBuilder();
             //所有的函数
             var methods = new List<string>();

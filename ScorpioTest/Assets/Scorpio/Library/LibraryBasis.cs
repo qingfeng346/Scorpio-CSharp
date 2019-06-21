@@ -4,62 +4,74 @@ using System.Text;
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Userdata;
+using Scorpio.Tools;
 using System.Reflection;
 namespace Scorpio.Library {
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
-            Script m_Script;
+            ScriptMap m_ItorResult;
+            double m_Index = 0;
             IEnumerator<ScriptValue> m_Enumerator;
-            int m_Index = 0;
-            ScriptMap m_Map;
-            public ArrayPairs(Script script, ScriptArray obj, ScriptMap map) {
-                m_Script = script;
+            public ArrayPairs(ScriptArray array, ScriptMap itorResult) {
                 m_Index = 0;
-                m_Enumerator = obj.GetEnumerator();
-                m_Map = map;
+                m_Enumerator = array.GetEnumerator();
+                m_ItorResult = itorResult;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
-                    m_Map.SetValue("key", new ScriptValue(Convert.ToDouble(m_Index++)));
-                    m_Map.SetValue("value", m_Enumerator.Current);
+                    m_ItorResult.SetValue("key", new ScriptValue(m_Index++));
+                    m_ItorResult.SetValue("value", m_Enumerator.Current);
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;
             }
         }
         private class MapPairs : ScorpioHandle {
-            Script m_Script;
+            ScriptMap m_ItorResult;
             IEnumerator<KeyValuePair<object, ScriptValue>> m_Enumerator;
-            ScriptMap m_Map;
-            public MapPairs(Script script, ScriptMap obj, ScriptMap map) {
-                m_Script = script;
-                m_Enumerator = obj.GetEnumerator();
-                m_Map = map;
+            public MapPairs(ScriptMap map, ScriptMap itorResult) {
+                m_Enumerator = map.GetEnumerator();
+                m_ItorResult = itorResult;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_Map.SetValue("key", ScriptValue.CreateObject(value.Key));
-                    m_Map.SetValue("value", value.Value);
+                    m_ItorResult.SetValue("key", ScriptValue.CreateObject(value.Key));
+                    m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;
             }
         }
         private class UserdataPairs : ScorpioHandle {
-            Script m_Script;
+            ScriptMap m_ItorResult;
             System.Collections.IEnumerator m_Enumerator;
-            ScriptMap m_Map;
-            public UserdataPairs(Script script, ScriptUserdata obj, ScriptMap map) {
-                m_Script = script;
-                var ienumerable = obj.Value as System.Collections.IEnumerable;
+            public UserdataPairs(ScriptUserdata userdata, ScriptMap itorResult) {
+                var ienumerable = userdata.Value as System.Collections.IEnumerable;
                 if (ienumerable == null) throw new ExecutionException("pairs 只支持继承 IEnumerable 的类");
                 m_Enumerator = ienumerable.GetEnumerator();
-                m_Map = map;
+                m_ItorResult = itorResult;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
-                    m_Map.SetValue("value", ScriptValue.CreateObject(m_Enumerator.Current));
+                    m_ItorResult.SetValue("value", ScriptValue.CreateObject(m_Enumerator.Current));
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
+            }
+        }
+        private class GlobalPairs : ScorpioHandle {
+            ScriptMap m_ItorResult;
+            IEnumerator<ScorpioValue<string, ScriptValue>> m_Enumerator;
+            public GlobalPairs(ScriptGlobal global, ScriptMap itorResult) {
+                m_Enumerator = global.GetEnumerator();
+                m_ItorResult = itorResult;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (m_Enumerator.MoveNext()) {
+                    var value = m_Enumerator.Current;
+                    m_ItorResult.SetValue("key", new ScriptValue(value.key));
+                    m_ItorResult.SetValue("value", value.value);
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;
@@ -139,7 +151,7 @@ namespace Scorpio.Library {
                     builder.Append(args[i]);
                 }
                 System.Console.WriteLine(builder);
-                System.Diagnostics.Debug.WriteLine(builder);
+                // System.Diagnostics.Debug.WriteLine(builder);
                 return ScriptValue.Null;
             }
         }
@@ -178,15 +190,19 @@ namespace Scorpio.Library {
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
                 if (obj is ScriptArray) {
                     var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(m_script, (ScriptArray)obj, map)));
+                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new ArrayPairs((ScriptArray)obj, map)));
                     return new ScriptValue(map);
                 } else if (obj is ScriptMap) {
                     var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new MapPairs(m_script, (ScriptMap)obj, map)));
+                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new MapPairs((ScriptMap)obj, map)));
                     return new ScriptValue(map);
                 } else if (obj is ScriptUserdata) {
                     var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new UserdataPairs(m_script, (ScriptUserdata)obj, map)));
+                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj, map)));
+                    return new ScriptValue(map);
+                } else if (obj is ScriptGlobal) {
+                    var map = new ScriptMap(m_script);
+                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new GlobalPairs((ScriptGlobal)obj, map)));
                     return new ScriptValue(map);
                 }
                 throw new ExecutionException("pairs必须用于 array, map 或者 继承IEnumerable的userdata 类型");

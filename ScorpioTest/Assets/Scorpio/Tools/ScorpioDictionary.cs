@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 namespace Scorpio.Tools {
     public class ScorpioValue<Key,Value> {
         public Key key;
@@ -108,20 +107,20 @@ namespace Scorpio.Tools {
             value = default(Value);
             return false;
         }
-        public List<Key> Keys {
+        public Key[] Keys {
             get {
-                var keys = new List<Key>();
+                var keys = new Key[mSize];
                 for (int i = 0; i < mSize; ++i) {
-                    keys.Add(mValues[i].key);
+                    keys[i] = mValues[i].key;
                 }
                 return keys;
             }
         }
-        public List<Value> Values {
+        public Value[] Values {
             get {
-                var values = new List<Value>();
+                var values = new Value[mSize];
                 for (int i = 0; i < mSize; ++i) {
-                    values.Add(mValues[i].value);
+                    values[i] = mValues[i].value;
                 }
                 return values;
             }
