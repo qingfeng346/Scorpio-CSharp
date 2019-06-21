@@ -19,7 +19,10 @@ namespace Scorpio.Compiler {
         /// <summary> + </summary>
         void ReadPlus() {
             ch = ReadChar();
-            if (ch == '=') {
+            if (ch == '+') {
+                AddToken(TokenType.PlusAssign, "+=");
+                AddToken(TokenType.Number, (double)1);
+            } else if (ch == '=') {
                 AddToken(TokenType.PlusAssign, "+=");
             } else {
                 AddToken(TokenType.Plus, "+");

@@ -58,13 +58,15 @@
                 var func = args[0].Get<ScriptFunction>();
                 if (func != null) {
                     var map = thisObject.Get<ScriptMap>();
+                    var index = 0;
                     foreach (var pair in map) {
-                        if (func.Call(ScriptValue.CreateObject(pair.Key), pair.Value).IsTrue) {
-                            return ScriptValue.Null;
+                        ++index;
+                        if (!func.Call(ScriptValue.CreateObject(pair.Key), pair.Value).IsTrue) {
+                            return new ScriptValue((double)index);
                         }
                     }
                 }
-                return ScriptValue.Null;
+                return ScriptValue.Zero;
             }
         }
         private class plus : ScorpioHandle {

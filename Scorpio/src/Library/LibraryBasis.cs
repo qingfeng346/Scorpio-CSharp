@@ -9,9 +9,9 @@ using System.Reflection;
 namespace Scorpio.Library {
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
-            ScriptMap m_ItorResult;
+            readonly ScriptMap m_ItorResult;
+            readonly IEnumerator<ScriptValue> m_Enumerator;
             double m_Index = 0;
-            IEnumerator<ScriptValue> m_Enumerator;
             public ArrayPairs(ScriptArray array, ScriptMap itorResult) {
                 m_Index = 0;
                 m_Enumerator = array.GetEnumerator();
@@ -27,8 +27,8 @@ namespace Scorpio.Library {
             }
         }
         private class MapPairs : ScorpioHandle {
-            ScriptMap m_ItorResult;
-            IEnumerator<KeyValuePair<object, ScriptValue>> m_Enumerator;
+            readonly ScriptMap m_ItorResult;
+            readonly IEnumerator<KeyValuePair<object, ScriptValue>> m_Enumerator;
             public MapPairs(ScriptMap map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -44,8 +44,8 @@ namespace Scorpio.Library {
             }
         }
         private class UserdataPairs : ScorpioHandle {
-            ScriptMap m_ItorResult;
-            System.Collections.IEnumerator m_Enumerator;
+            readonly ScriptMap m_ItorResult;
+            readonly System.Collections.IEnumerator m_Enumerator;
             public UserdataPairs(ScriptUserdata userdata, ScriptMap itorResult) {
                 var ienumerable = userdata.Value as System.Collections.IEnumerable;
                 if (ienumerable == null) throw new ExecutionException("pairs 只支持继承 IEnumerable 的类");
@@ -61,8 +61,8 @@ namespace Scorpio.Library {
             }
         }
         private class GlobalPairs : ScorpioHandle {
-            ScriptMap m_ItorResult;
-            IEnumerator<ScorpioValue<string, ScriptValue>> m_Enumerator;
+            readonly ScriptMap m_ItorResult;
+            readonly IEnumerator<ScorpioValue<string, ScriptValue>> m_Enumerator;
             public GlobalPairs(ScriptGlobal global, ScriptMap itorResult) {
                 m_Enumerator = global.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -116,7 +116,7 @@ namespace Scorpio.Library {
             script.SetGlobal("toNumber", script.CreateFunction(new toDouble()));
             script.SetGlobal("toDouble", script.CreateFunction(new toDouble()));
 
-            script.SetGlobal("toEnum", script.CreateFunction(new toEnum(script)));
+            script.SetGlobal("toEnum", script.CreateFunction(new toEnum()));
             script.SetGlobal("toString", script.CreateFunction(new toString()));
 
             script.SetGlobal("typeOf", script.CreateFunction(new typeOf(script)));
@@ -182,7 +182,7 @@ namespace Scorpio.Library {
             }
         }
         private class pairs : ScorpioHandle {
-            private Script m_script;
+            private readonly Script m_script;
             public pairs(Script script) {
                 m_script = script;
             }
@@ -318,10 +318,6 @@ namespace Scorpio.Library {
             }
         }
         private class toEnum : ScorpioHandle {
-            private readonly Script m_script;
-            public toEnum(Script script) {
-                m_script = script;
-            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var type = args[0].Get<ScriptUserdataEnumType>();
                 if (args[1].valueType == ScriptValue.stringValueType) {
@@ -339,7 +335,7 @@ namespace Scorpio.Library {
         }
 
         private class typeOf : ScorpioHandle {
-            private Script m_Script;
+            readonly Script m_Script;
             public typeOf(Script script) {
                 m_Script = script;
             }
@@ -383,7 +379,7 @@ namespace Scorpio.Library {
             }
         }
         private class require : ScorpioHandle {
-            private Script m_script;
+            readonly Script m_script;
             public require(Script script) {
                 m_script = script;
             }
@@ -392,7 +388,7 @@ namespace Scorpio.Library {
             }
         }
         private class pushSearch : ScorpioHandle {
-            private Script m_script;
+            readonly Script m_script;
             public pushSearch(Script script) {
                 m_script = script;
             }
@@ -413,7 +409,7 @@ namespace Scorpio.Library {
             }
         }
         private class getPrototype : ScorpioHandle {
-            private Script m_Script;
+            readonly Script m_Script;
             public getPrototype(Script script) {
                 m_Script = script;
             }

@@ -14,9 +14,7 @@ namespace Scorpio.Function {
             return m_Context.Execute(thisObject, parameters, length, m_internalValues);
         }
         public override ScriptFunction SetBindObject(ScriptValue obj) {
-            var ret = new ScriptScriptBindFunction(m_Context);
-            ret.m_BindObject = obj;
-            return ret;
+            return new ScriptScriptBindFunction(m_Context) { m_BindObject = obj };
         }
     }
     public class ScriptScriptBindFunction : ScriptScriptFunction {

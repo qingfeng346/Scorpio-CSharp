@@ -54,13 +54,13 @@ namespace ScorpioExec {
             var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
             var className = command.GetValue("-class");
             if (className.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
-            var clazz = assembly != null ? assembly.GetType(className, false, false) : null;
+            var clazz = assembly?.GetType(className, false, false);
             if (clazz == null) { clazz = Type.GetType(className, false, false); }
             if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
             var generate = new GenerateScorpioClass(clazz);
             var filterName = command.GetValue("-filter");
             if (!string.IsNullOrWhiteSpace(filterName)) {
-                var filterType = assembly != null ? assembly.GetType(filterName, false, false) : null;
+                var filterType = assembly?.GetType(filterName, false, false);
                 if (filterType == null) { filterType = Type.GetType(filterName, false, false); }
                 if (filterType != null && filterType.IsSubclassOf(typeof(ClassFilter))) { generate.SetClassFilter((ClassFilter)System.Activator.CreateInstance(filterType)); }
             }
@@ -80,10 +80,10 @@ namespace ScorpioExec {
             if (args.Length >= 1) {
                 var file = Path.Combine(CurrentDirectory, args[0]);
                 var path = Path.GetDirectoryName(file);
-                var watch = Stopwatch.StartNew();
                 script.PushSearchPath(path);
                 script.PushSearchPath(CurrentDirectory);
                 Logger.info("=============================");
+                var watch = Stopwatch.StartNew();
                 var value = script.LoadFile(file);
                 Logger.info("=============================");
                 Logger.info("return value : " + value);
