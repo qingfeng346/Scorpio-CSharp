@@ -785,6 +785,15 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                         }
+                                        case ScriptValue.stringValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
+                                                stackObjects[index].valueType = stackObjects[index].stringValue == stackObjects[stackIndex].stringValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            } else {
+                                                stackObjects[index].valueType = ScriptValue.falseValueType;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
                                         case ScriptValue.trueValueType:
                                         case ScriptValue.nullValueType:
                                         case ScriptValue.falseValueType: {
@@ -835,6 +844,15 @@ namespace Scorpio.Runtime {
                                                 default:
                                                     stackObjects[index].valueType = ScriptValue.trueValueType;
                                                     break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.stringValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
+                                                stackObjects[index].valueType = stackObjects[index].stringValue == stackObjects[stackIndex].stringValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                            } else {
+                                                stackObjects[index].valueType = ScriptValue.falseValueType;
                                             }
                                             --stackIndex;
                                             continue;
