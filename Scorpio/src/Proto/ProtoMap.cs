@@ -61,7 +61,7 @@
                     var index = 0;
                     foreach (var pair in map) {
                         ++index;
-                        if (!func.Call(ScriptValue.CreateObject(pair.Key), pair.Value).IsTrue) {
+                        if (func.Call(ScriptValue.CreateObject(pair.Key), pair.Value).valueType == ScriptValue.falseValueType) {
                             return new ScriptValue((double)index);
                         }
                     }
