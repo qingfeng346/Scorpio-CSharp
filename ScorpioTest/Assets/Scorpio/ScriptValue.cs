@@ -190,10 +190,26 @@ namespace Scorpio {
         }
         public int ToInt32() {
             switch (valueType) {
-                case doubleValueType: return System.Convert.ToInt32(doubleValue);
-                case longValueType: return System.Convert.ToInt32(longValue);
-                case objectValueType: return System.Convert.ToInt32(objectValue);
+                case doubleValueType: return Convert.ToInt32(doubleValue);
+                case longValueType: return Convert.ToInt32(longValue);
+                case objectValueType: return Convert.ToInt32(objectValue);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
+            }
+        }
+        public double ToDouble() {
+            switch (valueType) {
+                case doubleValueType: return doubleValue;
+                case longValueType: return Convert.ToDouble(longValue);
+                case objectValueType: return Convert.ToDouble(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
+            }
+        }
+        public long ToLong() {
+            switch (valueType) {
+                case doubleValueType: return Convert.ToInt64(doubleValue);
+                case longValueType: return longValue;
+                case objectValueType: return Convert.ToInt64(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");
             }
         }
         public T Get<T>() where T : ScriptObject {
