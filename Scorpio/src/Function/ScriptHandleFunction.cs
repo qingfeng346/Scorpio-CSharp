@@ -15,16 +15,18 @@ namespace Scorpio.Function {
             }
         }
         public override ScriptFunction SetBindObject(ScriptValue obj) {
-            var ret = new ScriptHandleBindFunction(m_Script, FunctionName, m_Handle);
-            ret.m_BindObject = obj;
-            return ret;
+            return new ScriptHandleBindFunction(m_Script, FunctionName, m_Handle, obj);
         }
     }
     public class ScriptHandleBindFunction : ScriptHandleFunction {
-        public ScriptHandleBindFunction(Script script, string name, ScorpioHandle handle) : base(script, name, handle) { }
+        private ScriptValue m_BindObject = ScriptValue.Null;
+        public ScriptHandleBindFunction(Script script, string name, ScorpioHandle handle, ScriptValue bindObject) : base(script, name, handle) {
+            m_BindObject = bindObject;
+        }
+        public override ScriptValue BindObject { get { return m_BindObject; } }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             try {
-                return m_Handle.Call(m_BindObject.valueType == ScriptValue.nullValueType ? thisObject : m_BindObject, parameters, length);
+                return m_Handle.Call(m_BindObject, parameters, length);
             } catch (System.Exception ex) {
                 throw new ExecutionException("CallFunction [" + FunctionName + "] is error : " + ex.ToString());
             }

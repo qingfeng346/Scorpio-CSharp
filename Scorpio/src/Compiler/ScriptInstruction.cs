@@ -37,6 +37,7 @@
         //New操作
         NewBegin,
         NewFunction,            //load a new function
+        NewLambadaFunction,     //load a new lambada function
         NewArray,               //new array
         NewMap,                 //new map
         NewMapObject,           //new map with key contain object

@@ -419,14 +419,14 @@ namespace Scorpio.Compiler {
                     if (next.Type == TokenType.LeftPar || next.Type == TokenType.LeftBrace) {
                         UndoToken();
                         UndoToken();
-                        string functionName = "";
+                        var functionName = "";
                         list.Add(new ClassData() { name = token.Lexeme.ToString(), func = ParseFunctionContent(false, ref functionName) });
                     } else {
                         throw new ParserException("Class 开始关键字必须为[变量名称]或者[function]关键字", token);
                     }
                 } else if (token.Type == TokenType.Function || token.Type == TokenType.Sharp) {
                     UndoToken();
-                    string functionName = "";
+                    var functionName = "";
                     var index = ParseFunctionContent(true, ref functionName);
                     list.Add(new ClassData() { name = functionName, func = index });
                 } else {
@@ -474,120 +474,135 @@ namespace Scorpio.Compiler {
         }
         //压入一个值
         void PushObject(CodeObject obj) {
-            if (obj is CodeNativeObject) {
-                var value = ((CodeNativeObject)obj).obj;
-                if (value == null) {
-                    AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
-                } else if (value is bool) {
-                    AddScriptInstructionWithoutValue((bool)value ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
-                } else if (value is double) {
-                    AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)value), obj.Line);
-                } else if (value is long) {
-                    AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)value), obj.Line);
-                } else if (value is string) {
-                    AddScriptInstruction(Opcode.LoadConstString, GetConstString((string)value), obj.Line);
-                }
-            } else if (obj is CodeMember) {
-                var member = obj as CodeMember;
-                if (member.Parent == null) {
-                    if (obj is CodeMemberIndex) {
-                        AddScriptInstruction(Opcode.LoadLocal, ((CodeMember)obj).index, obj.Line);
-                    } else if (obj is CodeMemberInternal) {
-                        AddScriptInstruction(Opcode.LoadInternal, ((CodeMember)obj).index, obj.Line);
-                    } else if (obj is CodeMemberString) {
-                        AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(((CodeMember)obj).key), obj.Line);
+            switch (obj) {
+                case CodeNativeObject native: {
+                    var value = native.obj;
+                    if (value == null) {
+                        AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
+                    } else if (value is bool) {
+                        AddScriptInstructionWithoutValue((bool)value ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
+                    } else if (value is double) {
+                        AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)value), obj.Line);
+                    } else if (value is long) {
+                        AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)value), obj.Line);
+                    } else if (value is string) {
+                        AddScriptInstruction(Opcode.LoadConstString, GetConstString((string)value), obj.Line);
                     }
-                } else {
-                    PushObject(member.Parent);
-                    if (obj is CodeMemberIndex) {
-                        AddScriptInstruction(Opcode.LoadValue, ((CodeMember)obj).index, obj.Line);
-                    } else if (obj is CodeMemberString) {
-                        AddScriptInstruction(Opcode.LoadValueString, GetConstString(((CodeMember)obj).key), obj.Line);
-                    } else if (obj is CodeMemberObject) {
-                        PushObject(((CodeMemberObject)obj).codeKey);
-                        AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
-                    }
+                    break;
                 }
-
-            } else if (obj is CodeOperator) {
-                var oper = obj as CodeOperator;
-                if (oper.TokenType == TokenType.And) {
-                    PushObject(oper.Left);
-                    var leftIndex = AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse, obj.Line);
-                    PushObject(oper.Right);
-                    m_scriptExecutable.SetValue(leftIndex, Index);
-                } else if (oper.TokenType == TokenType.Or) {
-                    PushObject(oper.Left);
-                    var leftIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue, obj.Line);
-                    PushObject(oper.Right);
-                    m_scriptExecutable.SetValue(leftIndex, Index);
-                } else {
-                    PushObject(oper.Left);
-                    PushObject(oper.Right);
-                    AddScriptInstructionWithoutValue(TempOperator.GetOpcode(oper.TokenType), obj.Line);
-                }
-            } else if (obj is CodeRegion) {
-                PushObject((obj as CodeRegion).Context);
-            } else if (obj is CodeFunction) {
-                AddScriptInstruction(Opcode.NewFunction, (obj as CodeFunction).func, obj.Line);
-            } else if (obj is CodeCallFunction) {
-                var func = obj as CodeCallFunction;
-                foreach (var par in func.Parameters) { PushObject(par); }
-                PushObject(func.Member);
-                AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, obj.Line);
-                if (func.Variables != null) {
-                    foreach (var variable in func.Variables.Variables) {
-                        if (variable.key is string) {
-                            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
-                            PushObject(variable.value);
-                            AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), obj.Line);
+                case CodeMember member: {
+                    if (member.Parent == null) {
+                        if (obj is CodeMemberIndex) {
+                            AddScriptInstruction(Opcode.LoadLocal, ((CodeMember)obj).index, obj.Line);
+                        } else if (obj is CodeMemberInternal) {
+                            AddScriptInstruction(Opcode.LoadInternal, ((CodeMember)obj).index, obj.Line);
+                        } else if (obj is CodeMemberString) {
+                            AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(((CodeMember)obj).key), obj.Line);
+                        }
+                    } else {
+                        PushObject(member.Parent);
+                        if (obj is CodeMemberIndex) {
+                            AddScriptInstruction(Opcode.LoadValue, ((CodeMember)obj).index, obj.Line);
+                        } else if (obj is CodeMemberString) {
+                            AddScriptInstruction(Opcode.LoadValueString, GetConstString(((CodeMember)obj).key), obj.Line);
+                        } else if (obj is CodeMemberObject) {
+                            PushObject(((CodeMemberObject)obj).codeKey);
+                            AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
                         }
                     }
+                    break;
                 }
-            } else if (obj is CodeArray) {
-                var array = obj as CodeArray;
-                foreach (var ele in array.Elements) {
-                    PushObject(ele);
-                }
-                AddScriptInstruction(Opcode.NewArray, array.Elements.Count, obj.Line);
-            } else if (obj is CodeMap) {
-                var map = obj as CodeMap;
-                foreach (var ele in map.Variables) {
-                    if (ele.value == null) {
-                        AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
+                case CodeOperator oper: {
+                    if (oper.TokenType == TokenType.And) {
+                        PushObject(oper.Left);
+                        var leftIndex = AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse, obj.Line);
+                        PushObject(oper.Right);
+                        m_scriptExecutable.SetValue(leftIndex, Index);
+                    } else if (oper.TokenType == TokenType.Or) {
+                        PushObject(oper.Left);
+                        var leftIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue, obj.Line);
+                        PushObject(oper.Right);
+                        m_scriptExecutable.SetValue(leftIndex, Index);
                     } else {
-                        PushObject(ele.value);
+                        PushObject(oper.Left);
+                        PushObject(oper.Right);
+                        AddScriptInstructionWithoutValue(TempOperator.GetOpcode(oper.TokenType), obj.Line);
                     }
+                    break;
                 }
-                var hadObjectKey = false;
-                foreach (var ele in map.Variables) {
-                    if (ele.key is string) {
-                        AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.key.ToString()), obj.Line);
-                    } else if (ele.key is double) {
-                        hadObjectKey = true;
-                        AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)ele.key), obj.Line);
-                    } else if (ele.key is long) {
-                        hadObjectKey = true;
-                        AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)ele.key), obj.Line);
-                    } else if (ele.key is bool) {
-                        hadObjectKey = true;
-                        AddScriptInstructionWithoutValue(((bool)ele.key) ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
+                case CodeRegion region: {
+                    PushObject(region.Context);
+                    break;
+                }
+                case CodeFunction func: {
+                    if (func.lambada) {
+                        AddScriptInstruction(Opcode.NewLambadaFunction, func.func, obj.Line);
                     } else {
-                        throw new ParserException("未知的map key 类型 : " + ele.key.GetType());
+                        AddScriptInstruction(Opcode.NewFunction, func.func, obj.Line);
                     }
+                    break;
                 }
-                AddScriptInstruction(hadObjectKey ? Opcode.NewMapObject : Opcode.NewMap, map.Variables.Count, obj.Line);
-            } else if (obj is CodeTernary) {
-                var value = obj as CodeTernary;
-                PushObject(value.Allow);
-                var falseTo = AddScriptInstructionWithoutValue(Opcode.FalseTo, obj.Line);
-                PushObject(value.True);
-                var jump = AddScriptInstructionWithoutValue(Opcode.Jump, obj.Line);
-                m_scriptExecutable.SetValue(falseTo, Index);
-                PushObject(value.False);
-                m_scriptExecutable.SetValue(jump, Index);
-            } else {
-                throw new ParserException("不支持的语法 : " + obj);
+                case CodeCallFunction func: {
+                    foreach (var par in func.Parameters) { PushObject(par); }
+                    PushObject(func.Member);
+                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, obj.Line);
+                    if (func.Variables != null) {
+                        foreach (var variable in func.Variables.Variables) {
+                            if (variable.key is string) {
+                                AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
+                                PushObject(variable.value);
+                                AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), obj.Line);
+                            }
+                        }
+                    }
+                    break;
+                }
+                case CodeArray array: {
+                    foreach (var ele in array.Elements) {
+                        PushObject(ele);
+                    }
+                    AddScriptInstruction(Opcode.NewArray, array.Elements.Count, obj.Line);
+                    break;
+                }
+                case CodeMap map: {
+                    foreach (var ele in map.Variables) {
+                        if (ele.value == null) {
+                            AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
+                        } else {
+                            PushObject(ele.value);
+                        }
+                    }
+                    var hadObjectKey = false;
+                    foreach (var ele in map.Variables) {
+                        if (ele.key is string) {
+                            AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.key.ToString()), obj.Line);
+                        } else if (ele.key is double) {
+                            hadObjectKey = true;
+                            AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)ele.key), obj.Line);
+                        } else if (ele.key is long) {
+                            hadObjectKey = true;
+                            AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)ele.key), obj.Line);
+                        } else if (ele.key is bool) {
+                            hadObjectKey = true;
+                            AddScriptInstructionWithoutValue(((bool)ele.key) ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
+                        } else {
+                            throw new ParserException("未知的map key 类型 : " + ele.key.GetType());
+                        }
+                    }
+                    AddScriptInstruction(hadObjectKey ? Opcode.NewMapObject : Opcode.NewMap, map.Variables.Count, obj.Line);
+                    break;
+                }
+                case CodeTernary ternary: {
+                    PushObject(ternary.Allow);
+                    var falseTo = AddScriptInstructionWithoutValue(Opcode.FalseTo, obj.Line);
+                    PushObject(ternary.True);
+                    var jump = AddScriptInstructionWithoutValue(Opcode.Jump, obj.Line);
+                    m_scriptExecutable.SetValue(falseTo, Index);
+                    PushObject(ternary.False);
+                    m_scriptExecutable.SetValue(jump, Index);
+                    break;
+                }
+                default: throw new ParserException("不支持的语法 : " + obj);
             }
             if (obj.Not) {
                 AddScriptInstructionWithoutValue(Opcode.FlagNot, obj.Line);
@@ -931,7 +946,7 @@ namespace Scorpio.Compiler {
             if (PeekToken().Type == TokenType.Lambda) {
                 m_indexToken = index;
                 var functionName = "";
-                return new CodeFunction(ParseFunctionContent(false, ref functionName), token.SourceLine);
+                return new CodeFunction(ParseFunctionContent(false, ref functionName), true, token.SourceLine);
             } else {
                 m_indexToken = index;
                 ReadLeftParenthesis();
@@ -944,7 +959,6 @@ namespace Scorpio.Compiler {
         /// 解析一个函数
         /// </summary>
         /// <param name="needKeyword">是否需要function,#关键字</param>
-        /// <param name="index">返回function的索引</param>
         /// <param name="functionName">返回函数的名字</param>
         /// <returns></returns>
         int ParseFunctionContent(bool needKeyword, ref string functionName) {

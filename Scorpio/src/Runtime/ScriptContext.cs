@@ -142,7 +142,7 @@ namespace Scorpio.Runtime {
                                             stackObjects[++stackIndex].objectValue = variableObjects[opvalue].objectValue;
                                             stackObjects[stackIndex].valueType = ScriptValue.objectValueType;
                                             continue;
-                                        default: throw new ExecutionException("LoadLocal : 未知错误数据类型 : " + variableObjects[opvalue].valueType);
+                                        default: throw new ExecutionException($"LoadLocal : 未知错误数据类型 : {variableObjects[opvalue].ValueTypeName}");
                                     }
                                 }
                                 case Opcode.LoadInternal: {
@@ -191,7 +191,7 @@ namespace Scorpio.Runtime {
                                         case ScriptValue.longValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].longValue); break;
                                         case ScriptValue.scriptValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].scriptValue); break;
                                         case ScriptValue.objectValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].objectValue); break;
-                                        default: throw new ExecutionException("不支持当前类型获取变量 : " + stackObjects[stackIndex].valueType);
+                                        default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObject : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                     --stackIndex;
                                     continue;
@@ -204,7 +204,7 @@ namespace Scorpio.Runtime {
                                         case ScriptValue.longValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].longValue); break;
                                         case ScriptValue.scriptValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].scriptValue); break;
                                         case ScriptValue.objectValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].objectValue); break;
-                                        default: throw new ExecutionException("不支持当前类型获取变量 : " + stackObjects[stackIndex].valueType);
+                                        default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObjectDup : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                     ++stackIndex;
                                     continue;
@@ -256,7 +256,7 @@ namespace Scorpio.Runtime {
                                             variableObjects[opvalue].objectValue = stackObjects[index].objectValue;
                                             variableObjects[opvalue].valueType = ScriptValue.objectValueType;
                                             continue;
-                                        default: throw new ExecutionException("StoreLocal : 未知错误数据类型 : " + stackObjects[index].valueType);
+                                        default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[index].ValueTypeName}");
                                     }
                                 }
                                 case Opcode.StoreInternal: {
@@ -311,7 +311,7 @@ namespace Scorpio.Runtime {
                                         case ScriptValue.longValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].longValue, stackObjects[stackIndex]); break;
                                         case ScriptValue.scriptValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].scriptValue, stackObjects[stackIndex]); break;
                                         case ScriptValue.objectValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]); break;
-                                        default: throw new ExecutionException("不支持当前类型设置变量 : " + stackObjects[stackIndex - 1].valueType);
+                                        default: throw new ExecutionException($"不支持当前类型设置变量 : {stackObjects[stackIndex - 1].ValueTypeName}");
                                     }
                                     stackIndex -= 3;
                                     continue;
@@ -604,14 +604,14 @@ namespace Scorpio.Runtime {
                                     switch (stackObjects[stackIndex].valueType) {
                                         case ScriptValue.trueValueType: stackObjects[stackIndex].valueType = ScriptValue.falseValueType; continue;
                                         case ScriptValue.falseValueType: stackObjects[stackIndex].valueType = ScriptValue.trueValueType; continue;
-                                        default: throw new ExecutionException("当前数据类型不支持取反操作 : " + stackObjects[stackIndex].ValueTypeName);
+                                        default: throw new ExecutionException($"当前数据类型不支持取反操作 : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                 }
                                 case Opcode.FlagMinus: {
                                     switch (stackObjects[stackIndex].valueType) {
                                         case ScriptValue.doubleValueType: stackObjects[stackIndex].doubleValue = -stackObjects[stackIndex].doubleValue; continue;
                                         case ScriptValue.longValueType: stackObjects[stackIndex].longValue = -stackObjects[stackIndex].longValue; continue;
-                                        default: throw new ExecutionException("当前数据类型不支持取负操作 : " + stackObjects[stackIndex].ValueTypeName);
+                                        default: throw new ExecutionException($"当前数据类型不支持取负操作 : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                 }
                                 case Opcode.FlagNegative: {
@@ -619,7 +619,7 @@ namespace Scorpio.Runtime {
                                         stackObjects[stackIndex].longValue = ~stackObjects[stackIndex].longValue;
                                         continue;
                                     } else {
-                                        throw new ExecutionException("当前数据类型不支持取非操作 : " + stackObjects[stackIndex].ValueTypeName);
+                                        throw new ExecutionException($"当前数据类型不支持取非操作 : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                 }
                             }
@@ -973,15 +973,14 @@ namespace Scorpio.Runtime {
                             continue;
                         case OpcodeType.New:
                             switch (opcode) {
-                                case Opcode.NewFunction: {
-                                    var functionData = constContexts[opvalue];
-                                    var function = new ScriptScriptFunction(functionData);
-                                    for (int i = 0; i < functionData.m_FunctionData.internals.Length; ++i) {
-                                        var internalIndex = functionData.m_FunctionData.internals[i];
-                                        function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                case Opcode.NewMap: {
+                                    var map = new ScriptMap(m_script);
+                                    for (var i = opvalue - 1; i >= 0; --i) {
+                                        map.SetValue(stackObjects[stackIndex - i].stringValue, stackObjects[stackIndex - i - opvalue]);
                                     }
+                                    stackIndex -= opvalue * 2;
                                     stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                    stackObjects[stackIndex].scriptValue = function;
+                                    stackObjects[stackIndex].scriptValue = map;
                                     continue;
                                 }
                                 case Opcode.NewArray: {
@@ -994,16 +993,6 @@ namespace Scorpio.Runtime {
                                     stackObjects[stackIndex].scriptValue = array;
                                     continue;
                                 }
-                                case Opcode.NewMap: {
-                                    var map = new ScriptMap(m_script);
-                                    for (var i = opvalue - 1; i >= 0; --i) {
-                                        map.SetValue(stackObjects[stackIndex - i].stringValue, stackObjects[stackIndex - i - opvalue]);
-                                    }
-                                    stackIndex -= opvalue * 2;
-                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                    stackObjects[stackIndex].scriptValue = map;
-                                    continue;
-                                }
                                 case Opcode.NewMapObject: {
                                     var map = new ScriptMap(m_script);
                                     for (var i = opvalue - 1; i >= 0; --i) {
@@ -1012,6 +1001,28 @@ namespace Scorpio.Runtime {
                                     stackIndex -= opvalue * 2;
                                     stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
                                     stackObjects[stackIndex].scriptValue = map;
+                                    continue;
+                                }
+                                case Opcode.NewFunction: {
+                                    var functionData = constContexts[opvalue];
+                                    var function = new ScriptScriptFunction(functionData);
+                                    for (int i = 0; i < functionData.m_FunctionData.internals.Length; ++i) {
+                                        var internalIndex = functionData.m_FunctionData.internals[i];
+                                        function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                    }
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = function;
+                                    continue;
+                                }
+                                case Opcode.NewLambadaFunction: {
+                                    var functionData = constContexts[opvalue];
+                                    var function = new ScriptScriptBindFunction(functionData, thisObject);
+                                    for (int i = 0; i < functionData.m_FunctionData.internals.Length; ++i) {
+                                        var internalIndex = functionData.m_FunctionData.internals[i];
+                                        function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                    }
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = function;
                                     continue;
                                 }
                                 case Opcode.NewType:

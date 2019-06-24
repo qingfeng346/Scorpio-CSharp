@@ -14,13 +14,17 @@ namespace Scorpio.Function {
             return m_Context.Execute(thisObject, parameters, length, m_internalValues);
         }
         public override ScriptFunction SetBindObject(ScriptValue obj) {
-            return new ScriptScriptBindFunction(m_Context) { m_BindObject = obj };
+            return new ScriptScriptBindFunction(m_Context, obj);
         }
     }
     public class ScriptScriptBindFunction : ScriptScriptFunction {
-        public ScriptScriptBindFunction(ScriptContext context) : base(context) { }
+        private ScriptValue m_BindObject = ScriptValue.Null;
+        public ScriptScriptBindFunction(ScriptContext context, ScriptValue bindObject) : base(context) {
+            m_BindObject = bindObject;
+        }
+        public override ScriptValue BindObject { get { return m_BindObject; } }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return m_Context.Execute(m_BindObject.valueType == ScriptValue.nullValueType ? thisObject : m_BindObject, parameters, length, m_internalValues);
+            return m_Context.Execute(m_BindObject, parameters, length, m_internalValues);
         }
     }
 }
