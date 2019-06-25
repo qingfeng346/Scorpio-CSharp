@@ -1,13 +1,12 @@
-// function Test() {
-//     var a = 100
-//     var c = class {
-//         testFunc() {
-//             print(a)
-//         }
-//     }
-//     a = 200
-//     return c
-// }
+var t = {
+    function Test() {
+        return t
+    }
+}   
+
+t.Test() { a : 100}
+var a = t.Test() { b : 200}
+print(t)
 // Test().testFunc()
 // function test() {
 

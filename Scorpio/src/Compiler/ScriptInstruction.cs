@@ -95,11 +95,9 @@ namespace Scorpio.Compiler {
         TrueTo,                 //栈顶如果是true则跳转
         FalseLoadFalse,         //如果是false则压入一个false
         TrueLoadTrue,           //如果是true则压入一个true
-        Call,                   //call a function
-        CallRet,                //call a function need ret
         CallEach,               //call a function when in foreach
+        Call,                   //调用一个函数
         CallVi,                 //调用内部函数
-        CallViRet,              //调用内部函数带返回值
         RetNone,                //return
         Ret,                    //return a value
         JumpEnd,

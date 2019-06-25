@@ -906,21 +906,7 @@ namespace Scorpio.Runtime {
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
-                                    value.Call(ScriptValue.Null, parameters, opvalue);
-                                    continue;
-                                }
-                                case Opcode.CallRet: {
-                                    var value = stackObjects[stackIndex--];
-                                    for (var i = opvalue - 1; i >= 0; --i) {
-                                        parameters[i] = stackObjects[stackIndex--];
-                                    }
                                     stackObjects[++stackIndex] = value.Call(ScriptValue.Null, parameters, opvalue);
-                                    continue;
-                                }
-                                case Opcode.CallEach: {
-                                    index = stackIndex - 1;
-                                    var value = stackObjects[stackIndex];
-                                    stackObjects[++stackIndex] = value.Call(stackObjects[index]);
                                     continue;
                                 }
                                 case Opcode.CallVi: {
@@ -928,15 +914,13 @@ namespace Scorpio.Runtime {
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
-                                    value.Call(parent, parameters, opvalue);
+                                    stackObjects[++stackIndex] = value.Call(parent, parameters, opvalue);
                                     continue;
                                 }
-                                case Opcode.CallViRet: {
-                                    var value = stackObjects[stackIndex--];
-                                    for (var i = opvalue - 1; i >= 0; --i) {
-                                        parameters[i] = stackObjects[stackIndex--];
-                                    }
-                                    stackObjects[++stackIndex] = value.Call(parent, parameters, opvalue);
+                                case Opcode.CallEach: {
+                                    index = stackIndex - 1;
+                                    var value = stackObjects[stackIndex];
+                                    stackObjects[++stackIndex] = value.Call(stackObjects[index]);
                                     continue;
                                 }
                                 case Opcode.TrueTo: {

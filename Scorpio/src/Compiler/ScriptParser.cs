@@ -521,7 +521,7 @@ namespace Scorpio.Compiler {
                 case CodeCallFunction func: {
                     foreach (var par in func.Parameters) { PushObject(par); }
                     PushObject(func.Member);
-                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, obj.Line);
+                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Length, obj.Line);
                     if (func.Variables != null) {
                         foreach (var variable in func.Variables.Variables) {
                             if (variable.key is string) {
@@ -683,22 +683,8 @@ namespace Scorpio.Compiler {
             if (member is CodeAssign) {
                 PushAssign(member as CodeAssign);
             } else if (member is CodeCallFunction) {
-                var func = member as CodeCallFunction;
-                foreach (var par in func.Parameters) { PushObject(par); }
-                PushObject(func.Member);
-                if (func.Variables == null) {
-                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Length, member.Line);
-                } else {
-                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViRet : Opcode.CallRet, func.Parameters.Length, member.Line);
-                    foreach (var variable in func.Variables.Variables) {
-                        if (variable.key is string) {
-                            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, func.line);
-                            PushObject(variable.value);
-                            AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), func.line);
-                        }
-                    }
-                    AddScriptInstructionWithoutValue(Opcode.Pop, func.line);
-                }
+                PushObject(member);
+                AddScriptInstructionWithoutValue(Opcode.Pop, member.line);      //弹出call的返回值
             } else {
                 throw new ParserException("语法错误 " + member.GetType(), PeekToken());
             }
