@@ -8,14 +8,16 @@ namespace Scorpio.Serialize {
         public long[] ConstLong { get; private set; }
         public string[] ConstString { get; private set; }
         public ScriptFunctionData Context { get; private set; }
-        public ScriptFunctionData[] Functions { get; private set; }   //定义的所有 function
+        public ScriptFunctionData[] Functions { get; private set; }     //定义的所有 function
+        public ScriptClassData[] Classes { get; private set; }          //定义的所有class
         public SerializeData() { }
-        public SerializeData(double[] constDouble, long[] constLong, string[] constString, ScriptFunctionData context, ScriptFunctionData[] functions) {
+        public SerializeData(double[] constDouble, long[] constLong, string[] constString, ScriptFunctionData context, ScriptFunctionData[] functions, ScriptClassData[] classes) {
             this.ConstDouble = constDouble;
             this.ConstLong = constLong;
             this.ConstString = constString;
             this.Context = context;
             this.Functions = functions;
+            this.Classes = classes;
         }
         public byte[] ToArray() {
             using (var stream = new MemoryStream()) {
@@ -30,6 +32,8 @@ namespace Scorpio.Serialize {
                     WriterFunction(writer, Context);
                     writer.Write(Functions.Length);
                     Array.ForEach(Functions, (value) => WriterFunction(writer, value));
+                    writer.Write(Classes.Length);
+                    Array.ForEach(Classes, (value) => WriteClass(writer, value));
                     return stream.ToArray();
                 }
             }
@@ -54,6 +58,10 @@ namespace Scorpio.Serialize {
                     Functions = new ScriptFunctionData[reader.ReadInt32()];
                     for (var i = 0; i < Functions.Length; ++i) {
                         Functions[i] = ReadFunction(reader);
+                    }
+                    Classes = new ScriptClassData[reader.ReadInt32()];
+                    for (var i = 0; i < Classes.Length; ++i) {
+                        Classes[i] = ReadClass(reader);
                     }
                     return this;
                 }
@@ -82,6 +90,14 @@ namespace Scorpio.Serialize {
                 writer.Write(value.line);
             });
         }
+        void WriteClass(BinaryWriter writer, ScriptClassData data) {
+            writer.Write(data.name);
+            writer.Write(data.parent);
+            writer.Write(data.functions.Length);
+            Array.ForEach(data.functions, (value) => {
+                writer.Write(value);
+            });
+        }
         string ReadString(BinaryReader reader) {
             var length = reader.ReadInt32();
             if (length == 0) { return ""; }
@@ -107,6 +123,19 @@ namespace Scorpio.Serialize {
                 internalCount = internalCount,
                 internals = internals,
                 scriptInstructions = instructions
+            };
+        }
+        ScriptClassData ReadClass(BinaryReader reader) {
+            var name = reader.ReadInt32();
+            var parent = reader.ReadInt32();
+            var functions = new long[reader.ReadInt32()];
+            for (var i = 0; i < functions.Length; ++i) {
+                functions[i] = reader.ReadInt64();
+            }
+            return new ScriptClassData() {
+                name = name,
+                parent = parent,
+                functions = functions
             };
         }
     }

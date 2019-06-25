@@ -1,3 +1,14 @@
+function Test() {
+    var a = 100
+    var c = class {
+        testFunc() {
+            print(a)
+        }
+    }
+    a = 200
+    return c
+}
+Test().testFunc()
 // var eee = 0
 // for (var i = 0; i < 10000000; i += 1) {
 //     var a = i + 1
@@ -20,13 +31,14 @@
 // var a = 100L
 // var b = 100
 // print(isDouble(b + a))
-var a = {
-    num = 100,
-    func() {
-        var b = () => {
-            print(this)
-        }
-        b()
-    }
-}
-a.func()
+// var a = null
+// var a = {
+//     num = 100,
+//     func() {
+//         var b = () => {
+//             print(this)
+//         }
+//         b()
+//     }
+// }
+// a.func()

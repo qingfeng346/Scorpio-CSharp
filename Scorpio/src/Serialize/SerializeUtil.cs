@@ -6,7 +6,12 @@ namespace Scorpio.Serialize {
             breviary = lexer.Breviary;
             var parser = new ScriptParser(lexer.GetTokens(), breviary);
             var context = parser.Parse();
-            return new SerializeData(parser.ConstDouble.ToArray(), parser.ConstLong.ToArray(), parser.ConstString.ToArray(), context, parser.Functions.ToArray());
+            return new SerializeData(parser.ConstDouble.ToArray(), 
+                                        parser.ConstLong.ToArray(), 
+                                        parser.ConstString.ToArray(), 
+                                        context, 
+                                        parser.Functions.ToArray(), 
+                                        parser.Classes.ToArray());
         }
         public static SerializeData Deserialize(byte[] data) {
             return new SerializeData().Parser(data);

@@ -31,20 +31,22 @@ namespace Scorpio.Runtime {
         private readonly double[] constDouble;                      //double常量
         private readonly long[] constLong;                          //long常量
         private readonly string[] constString;                      //string常量
-        private readonly ScriptContext[] constContexts;             //所有定义的函数 常量
+        private readonly ScriptContext[] constContexts;             //所有定义的函数
+        private readonly ScriptClassData[] constClasses;            //定义所有的类
         public readonly int internalCount;                          //内部变量数量
 
         private readonly string m_Breviary;                         //摘要
         private readonly ScriptFunctionData m_FunctionData;         //函数数据
         private readonly ScriptInstruction[] m_scriptInstructions;  //指令集
 
-        public ScriptContext(Script script, string breviary, ScriptFunctionData functionData, double[] constDouble, long[] constLong, string[] constString, ScriptContext[] constContexts) {
+        public ScriptContext(Script script, string breviary, ScriptFunctionData functionData, double[] constDouble, long[] constLong, string[] constString, ScriptContext[] constContexts, ScriptClassData[] constClasses) {
             m_script = script;
             m_global = script.Global;
             this.constDouble = constDouble;
             this.constLong = constLong;
             this.constString = constString;
             this.constContexts = constContexts;
+            this.constClasses = constClasses;
             this.internalCount = functionData.internalCount;
 
             m_Breviary = breviary;
@@ -1005,9 +1007,10 @@ namespace Scorpio.Runtime {
                                 }
                                 case Opcode.NewFunction: {
                                     var functionData = constContexts[opvalue];
+                                    var internals = functionData.m_FunctionData.internals;
                                     var function = new ScriptScriptFunction(functionData);
-                                    for (int i = 0; i < functionData.m_FunctionData.internals.Length; ++i) {
-                                        var internalIndex = functionData.m_FunctionData.internals[i];
+                                    for (var i = 0; i < internals.Length; ++i) {
+                                        var internalIndex = internals[i];
                                         function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                     }
                                     stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
@@ -1016,25 +1019,35 @@ namespace Scorpio.Runtime {
                                 }
                                 case Opcode.NewLambadaFunction: {
                                     var functionData = constContexts[opvalue];
+                                    var internals = functionData.m_FunctionData.internals;
                                     var function = new ScriptScriptBindFunction(functionData, thisObject);
-                                    for (int i = 0; i < functionData.m_FunctionData.internals.Length; ++i) {
-                                        var internalIndex = functionData.m_FunctionData.internals[i];
+                                    for (var i = 0; i < internals.Length; ++i) {
+                                        var internalIndex = internals[i];
                                         function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                     }
                                     stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
                                     stackObjects[stackIndex].scriptValue = function;
                                     continue;
                                 }
-                                case Opcode.NewType:
-                                case Opcode.NewTypeParent: {
-                                    var parentType = opcode == Opcode.NewTypeParent ? stackObjects[stackIndex - opvalue * 2 - 1] : m_script.TypeObjectValue;
-                                    var className = stackObjects[stackIndex - opvalue * 2].stringValue;
+                                case Opcode.NewType: {
+                                    var classData = constClasses[opvalue];
+                                    var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
+                                    var className = constString[classData.name];
                                     var type = new ScriptType(className, parentType);
-                                    for (var i = opvalue - 1; i >= 0; --i) {
-                                        type.SetValue(stackObjects[stackIndex - i].stringValue, stackObjects[stackIndex - i - opvalue]);
+                                    var functions = classData.functions;
+                                    for (var j = 0; j < functions.Length; ++j) {
+                                        var func = functions[j];
+                                        var functionData = constContexts[func & 0xffffffff];
+                                        var internals = functionData.m_FunctionData.internals;
+                                        var function = new ScriptScriptFunction(functionData);
+                                        for (var i = 0; i < internals.Length; ++i) {
+                                            var internalIndex = internals[i];
+                                            function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                        }
+                                        type.SetValue(constString[func >> 32], new ScriptValue(function));
                                     }
-                                    stackIndex -= (opvalue * 2 + (opcode == Opcode.NewTypeParent ? 2 : 1));
-                                    m_global.SetValue(className, new ScriptValue(type));
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = type;
                                     continue;
                                 }
                             }

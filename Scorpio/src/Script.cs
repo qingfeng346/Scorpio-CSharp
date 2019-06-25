@@ -137,9 +137,9 @@ namespace Scorpio {
         ScriptValue Execute(string breviary, SerializeData data) {
             var contexts = new ScriptContext[data.Functions.Length];
             for (int i = 0; i < data.Functions.Length; ++i) {
-                contexts[i] = new ScriptContext(this, breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts);
+                contexts[i] = new ScriptContext(this, breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
             }
-            return new ScriptContext(this, breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts).Execute(ScriptValue.Null, null, 0, null);
+            return new ScriptContext(this, breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
         }
         public void PushSearchPath(string path) {
             if (!m_SearchPath.Contains(path))
