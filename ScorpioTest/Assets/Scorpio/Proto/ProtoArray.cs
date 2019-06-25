@@ -228,7 +228,7 @@
                     var index = 0;
                     for (var i = 0; i < array.Length(); ++i) {
                         ++index;
-                        if (!func.Call(array[i], new ScriptValue((double)i)).IsTrue) {
+                        if (func.Call(array[i], new ScriptValue((double)i)).valueType == ScriptValue.falseValueType) {
                             return new ScriptValue((double)index);
                         }
                     }
@@ -244,7 +244,7 @@
                     var index = 0;
                     for (var i = array.Length(); i >= 0; --i) {
                         ++index;
-                        if (!func.Call(array[i], new ScriptValue((double)i)).IsTrue) {
+                        if (func.Call(array[i], new ScriptValue((double)i)).valueType == ScriptValue.falseValueType) {
                             return new ScriptValue((double)index);
                         }
                     }

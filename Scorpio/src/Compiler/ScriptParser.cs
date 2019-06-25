@@ -430,11 +430,12 @@ namespace Scorpio.Compiler {
             UndoToken();
             var functionName = "";
             var index = ParseFunctionContent(true, ref functionName);
-            AddScriptInstruction(Opcode.NewFunction, index, PeekToken().SourceLine);
+            var sourceLine = PeekToken().SourceLine;
+            AddScriptInstruction(Opcode.NewFunction, index, sourceLine);
             if (m_scriptExecutable.Block == ExecutableBlock.Context) {
-                AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(functionName), PeekToken().SourceLine);
+                AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(functionName), sourceLine);
             } else {
-                AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.AddIndex(functionName), PeekToken().SourceLine);
+                AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.AddIndex(functionName), sourceLine);
             }
         }
         //解析return

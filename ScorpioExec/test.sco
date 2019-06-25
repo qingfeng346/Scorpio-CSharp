@@ -1,14 +1,20 @@
-function Test() {
-    var a = 100
-    var c = class {
-        testFunc() {
-            print(a)
-        }
-    }
-    a = 200
-    return c
-}
-Test().testFunc()
+// function Test() {
+//     var a = 100
+//     var c = class {
+//         testFunc() {
+//             print(a)
+//         }
+//     }
+//     a = 200
+//     return c
+// }
+// Test().testFunc()
+// function test() {
+
+// }
+// var a = [100,200]
+// var b = [200,300]
+// test(a..., vvv, b... )
 // var eee = 0
 // for (var i = 0; i < 10000000; i += 1) {
 //     var a = i + 1
