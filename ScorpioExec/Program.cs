@@ -6,6 +6,7 @@ using Scorpio.Commons;
 using Scorpio.Userdata;
 using Scorpio.Serialize;
 using Scorpio.ScorpioReflect;
+using System.Collections.Generic;
 
 namespace ScorpioExec {
     public class Program {
@@ -31,16 +32,18 @@ namespace ScorpioExec {
     register        注册运行程序到环境变量
     pack            编译生成sco的IL文件
     fast            生成快速反射文件
+    version         查询sco版本，并检查最新版本
     [文件路径]       运行sco文本文件或IL文件";
         static void Main(string[] args) {
             Launch.AddExecute("register", HelpRegister, Register);
             Launch.AddExecute("pack", HelpPack, Pack);
             Launch.AddExecute("fast", HelpFast, Fast);
+            Launch.AddExecute("version", HelpVersion, VersionExec);
             Launch.AddExecute("", HelpExecute, Execute);
             Launch.Start(args, null, null);
         }
-        static void Register(CommandLine command, string[] args) {
-            Util.RegisterApplication(Scorpio.Commons.Util.BaseDirectory + "/sco");
+        static void Register(CommandLine command, string[] args) { 
+            Util.RegisterApplication($"{Util.BaseDirectory}/{AppDomain.CurrentDomain.FriendlyName}");
         }
         static void Pack(CommandLine command, string[] args) {
             var source = Launch.GetPath("-source", "-s");
@@ -67,6 +70,40 @@ namespace ScorpioExec {
             var outputFile = Path.Combine(output, generate.ScorpioClassName + ".cs");
             FileUtil.CreateFile(outputFile, generate.Generate());
             Logger.info($"生成快速反射类 {className} -> {outputFile}");
+        }
+        static void VersionExec(CommandLine command, string[] args) {
+            Logger.info($@"Sco Version : {Scorpio.Version.version}
+Build Date : {Scorpio.Version.date}");
+            var result = Util.RequestString("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
+                request.Headers.Add("Authorization", "token c9fab45cde8bb710244d791018fefd6f4c6a80b5");
+            });
+            var isPreview = command.HadValue("-preview", "-p");
+            var datas = Json.Deserialize(result, true) as List<object>;
+            foreach (Dictionary<string, object> data in datas) {
+                var name = data["name"] as string;
+                if (name.Contains(Scorpio.Version.version)) {
+                    Logger.info($"当前已经是最新版本 : {name}");
+                    return;
+                }
+                bool newVersion = false;
+                if ((bool)data["prerelease"]) {
+                    if (isPreview) { newVersion = true; }
+                } else {
+                    newVersion = true;
+                }
+                if (newVersion) {
+                    var url = data["html_url"].ToString();
+                    Logger.info($"发现新版本 : {name}");
+                    Logger.info($"下载地址 : {url}");
+                    //Logger.info($"是否立刻去下载  是(Y)√  否(N)");
+                    //var str = Console.ReadLine();
+                    //if (string.IsNullOrWhiteSpace(str) || str.ToUpper() == "Y") {
+                    //    var url = data["html_url"].ToString().Replace("https://", "http://");
+                    //    Logger.info("打开网页 : " + url);
+                    //}
+                    return;
+                }
+            }
         }
         static void Execute(CommandLine command, string[] args) {
             Util.PrintSystemInfo();
@@ -96,9 +133,6 @@ namespace ScorpioExec {
                             break;
                         } else if (str == "clear") {
                             Console.Clear();
-                        } else if (str == "version") {
-                            Logger.info($@"version : {Scorpio.Version.version}
-        build date : {Scorpio.Version.date}");
                         } else {
                             script.LoadString(str);
                         }
@@ -120,57 +154,5 @@ namespace ScorpioExec {
                 }
             }
         }
-        
-//        static void Version(CommandLine command) {
-//            Logger.info($@"Sco Version : {Scorpio.Version.version}
-//Build Date : {Scorpio.Version.date}");
-//            var result = Request("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
-//                request.Headers.Add("Authorization", "token c9fab45cde8bb710244d791018fefd6f4c6a80b5");
-//            });
-//            if (string.IsNullOrEmpty(result)) { return; }
-//            var isPreview = command.HadValue("-preview", "-p");
-//            var datas = new JsonParser(result, true).Parse() as List<object>;
-//            foreach (Dictionary<string, object> data in datas) {
-//                var name = data["name"] as string;
-//                if (name != Version)
-//                var prerelease = (bool)data["prerelease"];
-//                if (isPreview) {
-//                    Logger.info("发现新版本 : " +);
-//                    Process.Start(data["html_url"])
-//                }
-//                if ()
-//            }
-//        }
-        //private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors) {
-        //    return true; //总是接受
-        //}
-        //public static string Request(string url, Action<HttpWebRequest> postRequest) {
-        //    try {
-        //        ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
-        //        var request = (HttpWebRequest)HttpWebRequest.Create(url);
-        //        request.Method = "GET";
-        //        request.ProtocolVersion = HttpVersion.Version10;
-        //        request.UserAgent = DefaultUserAgent;
-        //        request.Credentials = CredentialCache.DefaultCredentials;
-        //        if (postRequest != null) postRequest(request);
-        //        using (var response = request.GetResponse()) {
-        //            using (var stream = response.GetResponseStream()) {
-        //                var bytes = new byte[8192];
-        //                using (var memoryStream = new MemoryStream()) {
-        //                    while (true) {
-        //                        var readSize = stream.Read(bytes, 0, 8192);
-        //                        if (readSize <= 0) { break; }
-        //                        memoryStream.Write(bytes, 0, readSize);
-        //                    }
-        //                    return System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
-        //                }
-        //            }
-        //        }
-        //    } catch (Exception e) {
-        //        Logger.error("Request is Error : {0}", e.Message);
-        //    }
-        //    return null;
-        //}
-        
     }
 }
