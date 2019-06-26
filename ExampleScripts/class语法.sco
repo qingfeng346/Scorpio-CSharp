@@ -17,20 +17,29 @@ class TestClass : BaseClass {
     hello() {
         this[base(this).hello]()    //调用父级同名函数等用于c#  base.hello()
         print("hello : " + this.num)
+        var inNum = 100
+        var test = class {
+            hello() {
+                print("临时class : " + inNum)
+            }
+        }
+        inNum = 200
+        return test
     }
 }
 var t = TestClass()
-t.hello()
 t.baseFunc()
+t.hello().hello()
+
 
 //原生对象支持的 prototype 类请查看 Proto 文件夹下所有类
 //可以修改原生对象的 prototype 例如 
-Number.testFunc = () => {
+Number.testFunc = function () {
     print("testFunc " + this)
 }
 100.testFunc()
 
-String.end = (str) => {
+String.end = function (str) {
     return this.endsWith(str)
 }
 print("str".end("r"))

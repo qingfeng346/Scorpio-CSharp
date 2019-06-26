@@ -12,8 +12,8 @@ public class TestClass {
 }
 */
 //sco 代码
-TestClass = import_type("TestClass")
+TestClass = import_type("ScorpioExec.TestClass")
 var refNum = {value : 100}
 var outNum = {}
-TestClass.TestFunc(refNum, outNum)  //ref out 的参数 必须传入map值，然后 ref out 返回的值会设置为 value
+TestClass.TestOut(refNum, outNum)  //ref out 的参数 必须传入map值，然后 ref out 返回的值会设置为 value
 print(refNum.value, outNum.value)

@@ -15,7 +15,7 @@ namespace ScorpioExec {
         public void TestOut(int[] results, ref int num, out string str) {
             str = "test";
         }
-        public int TestOut(ref int num, out string str) {
+        public static int TestOut(ref int num, out string str) {
             str = "test";
             return 100;
         }
