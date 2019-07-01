@@ -41,6 +41,8 @@ namespace ScorpioExec {
     version         查询sco版本，并检查最新版本
     [文件路径]       运行sco文本文件或IL文件";
         static void Main(string[] args) {
+            var name = typeof(TestClass);
+            var t2 = typeof(TestClass1);
             Launch.AddExecute("register", HelpRegister, Register);
             Launch.AddExecute("pack", HelpPack, Pack);
             Launch.AddExecute("fast", HelpFast, Fast);

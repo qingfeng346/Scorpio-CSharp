@@ -36,6 +36,8 @@ public class DelegateFactory : IDelegateFactory {
                 if (!TYPE_DELEGATE.IsAssignableFrom(type)) { continue; }
                 // MulticastDelegate 是 event
                 if (type == typeof(MulticastDelegate)) { continue; }
+                var fullName = ScorpioReflectUtil.GetFullName(type);
+                if (string.IsNullOrWhiteSpace(fullName)) { continue; }
                 var InvokeMethod = type.GetMethod("Invoke");
                 if (InvokeMethod == null) { throw new System.Exception("找不到Invoke函数 : " + type.FullName); }
                 var parameters = InvokeMethod.GetParameters();
@@ -65,7 +67,7 @@ public class DelegateFactory : IDelegateFactory {
                 } else {
                     call = $"return ({returnFullName}){invoke}.Value";
                 }
-                var fullName = ScorpioReflectUtil.GetFullName(type);
+                
                 builder.Append($@"
         delegates[typeof({fullName})] = (scriptObject) => {{ return new {fullName}( ({pars}) => {{ {call}; }} ); }};");
             }
