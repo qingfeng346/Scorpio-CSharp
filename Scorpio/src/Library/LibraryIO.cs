@@ -21,6 +21,8 @@ namespace Scorpio.Library {
             map.SetValue("deletePath", script.CreateFunction(new deletePath()));
             map.SetValue("getFiles", script.CreateFunction(new getFiles()));
             map.SetValue("getPaths", script.CreateFunction(new getPaths()));
+            map.SetValue("workPath", script.CreateFunction(new workPath()));
+            map.SetValue("lineArgs", script.CreateFunction(new lineArgs()));
             script.SetGlobal("io", new ScriptValue(map));
         }
         private class unixNow : ScorpioHandle {
@@ -109,6 +111,16 @@ namespace Scorpio.Library {
                 var searchPattern = length > 1 ? args[1].ToString() : "*";
                 var searchOption = length > 2 ? (args[1].IsTrue ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly) : SearchOption.TopDirectoryOnly;
                 return new ScriptValue(Directory.GetDirectories(path, searchPattern, searchOption));
+            }
+        }
+        private class workPath : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(Environment.CurrentDirectory);
+            }
+        }
+        private class lineArgs : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return ScriptValue.CreateObject(Environment.GetCommandLineArgs());
             }
         }
     }

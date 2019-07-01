@@ -1,7 +1,9 @@
 ﻿using Scorpio.Tools;
 using Scorpio.Exception;
+using System.Collections;
+using System.Collections.Generic;
 namespace Scorpio {
-    public class ScriptType : ScriptObject {
+    public class ScriptType : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
         protected ScorpioDictionaryString<ScriptValue> m_Values = new ScorpioDictionaryString<ScriptValue>();   //所有的函数
         protected ScriptValue m_Prototype = ScriptValue.Null;
         public ScriptType(string typeName, ScriptValue parentType) : base(ObjectType.Type) {
@@ -29,6 +31,8 @@ namespace Scorpio {
             }
             return ret;
         }
+        public IEnumerator<ScorpioValue<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
         public override string ToString() { return $"Class<{TypeName}>"; }
     }
     //自带类型的原表,不支持动态申请,只能已特定形式申请变量

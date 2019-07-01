@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Scorpio.Tools;
 using System.Text;
 namespace Scorpio {
-    public class ScriptInstance : ScriptObject {
+    public class ScriptInstance : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
         protected ScorpioDictionaryString<ScriptValue> m_Values = new ScorpioDictionaryString<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptValue m_Prototype = ScriptValue.Null;
         public ScriptInstance(ObjectType objectType, ScriptValue type) : base(objectType) {
@@ -20,6 +21,15 @@ namespace Scorpio {
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
+        public ScriptArray GetKeys(Script script) {
+            var ret = new ScriptArray(script);
+            foreach (var pair in m_Values) {
+                ret.Add(ScriptValue.CreateObject(pair.key));
+            }
+            return ret;
+        }
+        public IEnumerator<ScorpioValue<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
         public override bool Less(ScriptValue obj) {
             var func = GetValue(ScriptOperator.Less).Get<ScriptFunction>();
             if (func != null) {

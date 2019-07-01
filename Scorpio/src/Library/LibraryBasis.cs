@@ -60,6 +60,23 @@ namespace Scorpio.Library {
                 return ScriptValue.False;
             }
         }
+        private class TypePairs : ScorpioHandle {
+            readonly ScriptInstance m_ItorResult;
+            readonly IEnumerator<ScorpioValue<string, ScriptValue>> m_Enumerator;
+            public TypePairs(ScriptType map, ScriptMap itorResult) {
+                m_Enumerator = map.GetEnumerator();
+                m_ItorResult = itorResult;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (m_Enumerator.MoveNext()) {
+                    var value = m_Enumerator.Current;
+                    m_ItorResult.SetValue("key", ScriptValue.CreateObject(value.key));
+                    m_ItorResult.SetValue("value", value.value);
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
+            }
+        }
         private class UserdataPairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
             readonly System.Collections.IEnumerator m_Enumerator;
@@ -221,6 +238,10 @@ namespace Scorpio.Library {
                 } else if (obj is ScriptInstance) {
                     var map = new ScriptMap(m_script);
                     map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new InstancePairs((ScriptInstance)obj, map)));
+                    return new ScriptValue(map);
+                } else if (obj is ScriptType) {
+                    var map = new ScriptMap(m_script);
+                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new TypePairs((ScriptType)obj, map)));
                     return new ScriptValue(map);
                 } else if (obj is ScriptGlobal) {
                     var map = new ScriptMap(m_script);

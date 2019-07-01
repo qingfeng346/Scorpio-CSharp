@@ -389,18 +389,6 @@ namespace Scorpio.Compiler {
                 case "default":
                     tokenType = TokenType.Default;
                     break;
-                case "try":
-                    tokenType = TokenType.Try;
-                    break;
-                case "catch":
-                    tokenType = TokenType.Catch;
-                    break;
-                case "throw":
-                    tokenType = TokenType.Throw;
-                    break;
-                case "finally":
-                    tokenType = TokenType.Finally;
-                    break;
                 case "continue":
                     tokenType = TokenType.Continue;
                     break;
@@ -422,6 +410,7 @@ namespace Scorpio.Compiler {
                     tokenType = TokenType.Class;
                     break;
                 case "new":
+                case "gvar":
                     m_Builder.Length = 0;
                     return;
                 default:
