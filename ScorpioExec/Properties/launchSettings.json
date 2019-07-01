@@ -15,6 +15,10 @@
     "version": {
       "commandName": "Project",
       "commandLineArgs": "version"
+    },
+    "delegate": {
+      "commandName": "Project",
+      "commandLineArgs": "delegate -output ../../../DelegateFactory.cs -class ScorpioExec.TestDelegate1;ScorpioExec.TestDelegate2;ScorpioExec.TestDelegate3;ScorpioExec.TestDelegate4"
     }
   }
 }

@@ -70,6 +70,7 @@ namespace Scorpio.ScorpioReflect {
             }
         }
         public void SetClassFilter(ClassFilter classFilter) {
+            if (classFilter == null) { return; }
             m_ClassFilter = classFilter;
         }
         void Init() {

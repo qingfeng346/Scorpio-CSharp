@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace ScorpioExec {
+    public delegate void TestDelegate1();
+    public delegate int TestDelegate2(int a1);
+    public delegate string TestDelegate3(int a1, int a2);
+    public delegate TestClass TestDelegate4(int a1, int a2);
+    //public delegate string TestDelegate3(int a1, int a2);
     public class TestClass {
         public int num;
         public TestClass(int num, ref int tNum) {

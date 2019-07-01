@@ -22,8 +22,14 @@ namespace ScorpioExec {
         private const string HelpFast = @"
 生成快速反射文件
     -dll            dll文件路径
-    -class          class完整名称
+    -class          class完整名称,多class使用分号;隔开
+    -filter         过滤器,多过滤器使用分号;隔开
     -output|-o      快速反射文件输出目录";
+        private const string HelpDelegate = @"
+生成Delegate仓库
+    -dll            dll文件路径
+    -class          class完整名称,多class使用分号;隔开
+    -output|-o      Delegate仓库输出文件";
         private const string HelpVersion = @"
 查询sco版本，并检查最新版本
     -preview|-p     是否检查preview版本";
@@ -38,6 +44,7 @@ namespace ScorpioExec {
             Launch.AddExecute("register", HelpRegister, Register);
             Launch.AddExecute("pack", HelpPack, Pack);
             Launch.AddExecute("fast", HelpFast, Fast);
+            Launch.AddExecute("delegate", HelpDelegate, DelegateFactory);
             Launch.AddExecute("version", HelpVersion, VersionExec);
             Launch.AddExecute("", HelpExecute, Execute);
             Launch.Start(args, null, null);
@@ -55,21 +62,54 @@ namespace ScorpioExec {
             var output = Launch.GetPath("-output", "-o");
             var dll = command.GetValue("-dll");
             var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
-            var className = command.GetValue("-class");
-            if (className.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
-            var clazz = assembly?.GetType(className, false, false);
-            if (clazz == null) { clazz = Type.GetType(className, false, false); }
-            if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
-            var generate = new GenerateScorpioClass(clazz);
-            var filterName = command.GetValue("-filter");
-            if (!string.IsNullOrWhiteSpace(filterName)) {
-                var filterType = assembly?.GetType(filterName, false, false);
-                if (filterType == null) { filterType = Type.GetType(filterName, false, false); }
-                if (filterType != null && filterType.IsSubclassOf(typeof(ClassFilter))) { generate.SetClassFilter((ClassFilter)System.Activator.CreateInstance(filterType)); }
+            var strClass = command.GetValue("-class");
+            if (strClass.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
+
+            ClassFilter filter = null;
+            var strFilter = command.GetValue("-filter");
+            if (!strFilter.isNullOrWhiteSpace()) {
+                var filterType = GetType(assembly, strFilter, typeof(ClassFilter));
+                if (filterType != null) {
+                    filter = (ClassFilter)Activator.CreateInstance(filterType);
+                }
             }
-            var outputFile = Path.Combine(output, generate.ScorpioClassName + ".cs");
-            FileUtil.CreateFile(outputFile, generate.Generate());
-            Logger.info($"生成快速反射类 {className} -> {outputFile}");
+            var classNames = strClass.Split(";");
+            foreach (var className in classNames) {
+                var clazz = GetType(assembly, className, null);
+                if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
+                var generate = new GenerateScorpioClass(clazz);
+                generate.SetClassFilter(filter);
+                var outputFile = Path.Combine(output, generate.ScorpioClassName + ".cs");
+                FileUtil.CreateFile(outputFile, generate.Generate());
+                Logger.info($"生成快速反射类 {className} -> {outputFile}");
+            }
+        }
+        static void DelegateFactory(CommandLine command, string[] args) {
+            var output = Launch.GetPath("-output", "-o");
+            var dll = command.GetValue("-dll");
+            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
+            var strClass = command.GetValue("-class");
+            if (strClass.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
+            var generate = new GenerateScorpioDelegate();
+            var classNames = strClass.Split(";");
+            foreach (var className in classNames) {
+                var clazz = GetType(assembly, className, null);
+                if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
+                generate.AddType(clazz);
+            }
+            FileUtil.CreateFile(output, generate.Generate());
+            Logger.info($"生成Delegate残酷 {output}");
+        }
+        static Type GetType(Assembly assembly, string typeName, Type parent) {
+            var type = assembly?.GetType(typeName, false, false);
+            if (type == null) { type = Type.GetType(typeName, false, false); }
+            if (parent != null) {
+                if (type != null && type.IsSubclassOf(parent)) {
+                    return type;
+                }
+                return null;
+            }
+            return type;
         }
         static void VersionExec(CommandLine command, string[] args) {
             Logger.info($@"Sco Version : {Scorpio.Version.version}
