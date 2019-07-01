@@ -29,9 +29,17 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return "Class<" + TypeName + ">"; }
+        public override string ToString() { return $"Class<{TypeName}>"; }
     }
-    public class ScriptTypeObject : ScriptType {
+    //自带类型的原表,不支持动态申请,只能已特定形式申请变量
+    public class ScriptBasicType : ScriptType {
+        public ScriptBasicType(string typeName, ScriptValue parentType) : base(typeName, parentType) { }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            throw new ExecutionException($"Class<{TypeName}>不支持自定义构造");
+        }
+    }
+    //Object原表
+    public class ScriptTypeObject : ScriptBasicType {
         public ScriptTypeObject(string typeName) : base(typeName, ScriptValue.Null) { }
         public override ScriptValue Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
         public override ScriptValue GetValue(string key) {

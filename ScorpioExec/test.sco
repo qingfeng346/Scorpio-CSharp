@@ -1,12 +1,18 @@
-var t = {
-    function Test() {
-        return t
-    }
-}   
+class Cl {
 
-t.Test() { a : 100}
-var a = t.Test() { b : 200}
-print(t)
+}
+var a = new Cl()
+setPropertys(a, {a : 100, b : 200})
+print(json.encode(a))
+// var t = {
+//     function Test() {
+//         return t
+//     }
+// }   
+
+// t.Test() { a : 100}
+// var a = t.Test() { b : 200}
+// print(t)
 // Test().testFunc()
 // function test() {
 

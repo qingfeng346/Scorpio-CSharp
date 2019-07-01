@@ -55,27 +55,27 @@ namespace Scorpio {
             TypeObjectValue = new ScriptValue(TypeObject);
             Global.SetValue(TypeObject.TypeName, TypeObjectValue);
 
-            TypeBoolean = new ScriptType("Bool", TypeObjectValue);
+            TypeBoolean = new ScriptBasicType("Bool", TypeObjectValue);
             TypeBooleanValue = new ScriptValue(TypeBoolean);
             Global.SetValue(TypeBoolean.TypeName, TypeBooleanValue);
 
-            TypeNumber = new ScriptType("Number", TypeObjectValue);
+            TypeNumber = new ScriptBasicType("Number", TypeObjectValue);
             TypeNumberValue = new ScriptValue(TypeNumber);
             Global.SetValue(TypeNumber.TypeName, TypeNumberValue);
 
-            TypeString = new ScriptType("String", TypeObjectValue);
+            TypeString = new ScriptBasicType("String", TypeObjectValue);
             TypeStringValue = new ScriptValue(TypeString);
             Global.SetValue(TypeString.TypeName, TypeStringValue);
 
-            TypeArray = new ScriptType("Array", TypeObjectValue);
+            TypeArray = new ScriptBasicType("Array", TypeObjectValue);
             TypeArrayValue = new ScriptValue(TypeArray);
             Global.SetValue(TypeArray.TypeName, TypeArrayValue);
 
-            TypeMap = new ScriptType("Map", TypeObjectValue);
+            TypeMap = new ScriptBasicType("Map", TypeObjectValue);
             TypeMapValue = new ScriptValue(TypeMap);
             Global.SetValue(TypeMap.TypeName, TypeMapValue);
 
-            TypeFunction = new ScriptType("Function", TypeObjectValue);
+            TypeFunction = new ScriptBasicType("Function", TypeObjectValue);
             TypeFunctionValue = new ScriptValue(TypeFunction);
             Global.SetValue(TypeFunction.TypeName, TypeFunctionValue);
 

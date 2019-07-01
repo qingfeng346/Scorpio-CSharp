@@ -81,7 +81,7 @@ namespace Scorpio {
                 SetCapacity(num);
             }
         }
-        public IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
+        public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
         public IEnumerator<ScriptValue> GetIterator() { return new Enumerator(this); }
 

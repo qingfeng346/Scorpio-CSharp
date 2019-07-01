@@ -45,7 +45,7 @@ namespace Scorpio.Tools {
             switch (value.valueType) {
                 case ScriptValue.doubleValueType:
                 case ScriptValue.longValueType:
-                    return Convert.ChangeType(value.Value, type);
+                    return type.IsEnum ? Enum.ToObject(type, value.ToInt32()) : Convert.ChangeType(value.Value, type);
                 case ScriptValue.scriptValueType: {
                     if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type)) {
                         return ScorpioDelegateFactory.CreateDelegate(type, value.scriptValue);
