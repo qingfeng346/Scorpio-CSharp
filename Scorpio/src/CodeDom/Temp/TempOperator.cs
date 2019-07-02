@@ -41,8 +41,9 @@ namespace Scorpio.CodeDom.Temp {
         }
         //获得运算符
         public static TempOperator GetOperator(TokenType oper) {
-            if (Operators.ContainsKey(oper))
-                return Operators[oper];
+            TempOperator ret;
+            if (Operators.TryGetValue(oper, out ret))
+                return ret;
             return null;
         }
 

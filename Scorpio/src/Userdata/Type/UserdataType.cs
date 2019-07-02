@@ -18,13 +18,13 @@ namespace Scorpio.Userdata {
         //创建一个模板类
         public ScriptValue MakeGenericType(Type[] parameters) {
             if (m_Type.IsGenericType && m_Type.IsGenericTypeDefinition) {
-                var types = m_Type.GetTypeInfo().GetGenericArguments();
+                var types = m_Type.GetGenericArguments();
                 var length = types.Length;
                 if (length != parameters.Length)
                     throw new ExecutionException($"{m_Type.FullName} 传入的泛型参数个数错误 需要:{types.Length} 传入:{parameters.Length}");
                 for (int i = 0; i < length; ++i) {
-                    if (!types[i].GetTypeInfo().BaseType.GetTypeInfo().IsAssignableFrom(parameters[i]))
-                        throw new ExecutionException($"{m_Type.FullName} 泛型类第{i+1}个参数不符合传入规则 需要:{types[i].GetTypeInfo().BaseType.FullName} 传入:{parameters[i].FullName}");
+                    if (!types[i].BaseType.IsAssignableFrom(parameters[i]))
+                        throw new ExecutionException($"{m_Type.FullName} 泛型类第{i+1}个参数不符合传入规则 需要:{types[i].BaseType.FullName} 传入:{parameters[i].FullName}");
                 }
                 return TypeManager.GetUserdataType(m_Type.MakeGenericType(parameters));
             }

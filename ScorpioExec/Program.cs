@@ -41,8 +41,6 @@ namespace ScorpioExec {
     version         查询sco版本，并检查最新版本
     [文件路径]       运行sco文本文件或IL文件";
         static void Main(string[] args) {
-            var name = typeof(TestClass);
-            var t2 = typeof(TestClass1);
             Launch.AddExecute("register", HelpRegister, Register);
             Launch.AddExecute("pack", HelpPack, Pack);
             Launch.AddExecute("fast", HelpFast, Fast);
@@ -99,8 +97,8 @@ namespace ScorpioExec {
                 if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
                 generate.AddType(clazz);
             }
-            FileUtil.CreateFile(output, generate.Generate());
-            Logger.info($"生成Delegate残酷 {output}");
+            FileUtil.CreateFile(output, generate.Generate(0));
+            Logger.info($"生成Delegate仓库 {output}");
         }
         static Type GetType(Assembly assembly, string typeName, Type parent) {
             var type = assembly?.GetType(typeName, false, false);

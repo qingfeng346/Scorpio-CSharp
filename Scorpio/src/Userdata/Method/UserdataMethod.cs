@@ -23,7 +23,7 @@ namespace Scorpio.Userdata {
                 if (length == parameters.Length) {
                     var accord = true;
                     for (var j = 0; j < length; ++j) {
-                        if (!types[j].GetTypeInfo().BaseType.GetTypeInfo().IsAssignableFrom(parameters[j])) {
+                        if (!types[j].BaseType.IsAssignableFrom(parameters[j])) {
                             accord = false;
                             break;
                         }

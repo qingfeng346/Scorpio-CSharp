@@ -91,9 +91,9 @@ namespace Scorpio {
             ProtoMap.Load(this, TypeMap);
             ProtoFunction.Load(this, TypeFunction);
 
-            TypeManager.PushAssembly(typeof(object).GetTypeInfo().Assembly);                        //mscorlib.dll
-            TypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).GetTypeInfo().Assembly);     //System.dll
-            TypeManager.PushAssembly(GetType().GetTypeInfo().Assembly);                             //当前所在的程序集
+            TypeManager.PushAssembly(typeof(object).Assembly);                        //mscorlib.dll
+            TypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).Assembly);     //System.dll
+            TypeManager.PushAssembly(GetType().Assembly);                             //当前所在的程序集
             LoadLibrary();
         }
         public void LoadLibrary() {

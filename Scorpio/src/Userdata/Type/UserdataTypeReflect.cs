@@ -28,13 +28,13 @@ namespace Scorpio.Userdata {
         private void InitializeConstructor() {
             if (m_InitializeConstructor == true) return;
             m_InitializeConstructor = true;
-            m_Constructor = new UserdataMethodReflect(m_Type, m_Type.ToString(), m_Type.GetTypeInfo().GetConstructors(Script.BindingFlag));
+            m_Constructor = new UserdataMethodReflect(m_Type, m_Type.ToString(), m_Type.GetConstructors(Script.BindingFlag));
         }
         //初始化所有函数
         private void InitializeFunctions() {
             if (m_InitializeFunctions == true) return;
             m_InitializeFunctions = true;
-            m_Methods.AddRange(m_Type.GetTypeInfo().GetMethods(Script.BindingFlag));
+            m_Methods.AddRange(m_Type.GetMethods(Script.BindingFlag));
         }
         //获取一个函数，名字相同返回值相同
         private UserdataMethod GetFunction(string name) {
@@ -45,7 +45,7 @@ namespace Scorpio.Userdata {
         }
         //获取一个内部类
         private ScriptValue GetNestedType(string name) {
-            var nestedType = m_Type.GetTypeInfo().GetNestedType(name, Script.BindingFlag);
+            var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
             if (nestedType != null) {
                 return m_NestedTypes[name] = TypeManager.GetUserdataType(nestedType);
             }
@@ -56,9 +56,9 @@ namespace Scorpio.Userdata {
             UserdataVariable value;
             if (m_Variables.TryGetValue(name, out value))
                 return value;
-            FieldInfo fInfo = m_Type.GetTypeInfo().GetField(name, Script.BindingFlag);
+            FieldInfo fInfo = m_Type.GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
-            PropertyInfo pInfo = m_Type.GetTypeInfo().GetProperty(name, Script.BindingFlag);
+            PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
             if (pInfo != null) return m_Variables[name] = new UserdataProperty(pInfo);
             //EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name, Script.BindingFlag);
             //if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);

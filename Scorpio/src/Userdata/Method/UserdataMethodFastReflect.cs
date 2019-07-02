@@ -18,7 +18,7 @@ namespace Scorpio.Userdata {
                                     new FunctionDataFastMethod(fastMethod, method.ParameterType, method.RefOut, method.ParamType, method.MethodIndex);
                 (method.IsStatic ? functionStaticMethod : functionMethod).Add(functionData);
             }
-            var methodInfos = m_Type.GetTypeInfo().GetMethods(Script.BindingFlag);
+            var methodInfos = m_Type.GetMethods(Script.BindingFlag);
             Array.ForEach(methodInfos, (methodInfo) => {
                 if (methodInfo.Name.Equals(methodName) && Util.IsGenericMethod(methodInfo)) {
                     genericMethods.Add(new FunctionDataGeneric(methodInfo));

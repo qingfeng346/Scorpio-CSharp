@@ -1,10 +1,23 @@
-﻿using System;
+﻿//#define SCORPIO_DYNAMIC_DELEGATE
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
+using Scorpio.Tools;
 
-namespace Scorpio.Tools {
+namespace Scorpio {
+    public interface IDelegateFactory {
+        Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject);
+    }
     public class ScorpioDelegateFactory {
+#if !SCORPIO_DYNAMIC_DELEGATE
+        private static IDelegateFactory m_Factory = null;
+        public static void SetFactory(IDelegateFactory factory) {
+            m_Factory = factory;
+        }
+        public static Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
+            return m_Factory != null ? m_Factory.CreateDelegate(delegateType, scriptObject) : null;
+        }
+#else
         class DelegateData {
             public bool ret;        //是否有返回值
             public int length;      //参数个数
@@ -46,6 +59,7 @@ namespace Scorpio.Tools {
             }
             return m_DelegateDatas[delegateType] = data;
         }
+        public static void SetFactory(IDelegateFactory factory) { }
         public static Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
             var data = GetDelegateData(delegateType);
             var func = new ScriptDelegate(scriptObject);
@@ -262,5 +276,6 @@ namespace Scorpio.Tools {
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25, T26 t26, T27 t27, T28 t28, T29 t29, T30 t30, T31 t31, T32 t32) {
             return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31, t32), typeof(TResult));
         }
+#endif
     }
 }

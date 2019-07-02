@@ -27,7 +27,7 @@ namespace Scorpio.Tools {
         public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof(ExtensionAttribute);      //扩展函数属性
 
         //是否是委托
-        public static bool IsDelegate(Type type) { return TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type); }
+        public static bool IsDelegate(Type type) { return TYPE_DELEGATE.IsAssignableFrom(type); }
         //是否是void
         public static bool IsVoid(Type type) { return type == TYPE_VOID; }
         //是否是不定参
@@ -47,7 +47,7 @@ namespace Scorpio.Tools {
                 case ScriptValue.longValueType:
                     return type.IsEnum ? Enum.ToObject(type, value.ToInt32()) : Convert.ChangeType(value.Value, type);
                 case ScriptValue.scriptValueType: {
-                    if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type)) {
+                    if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom(type)) {
                         return ScorpioDelegateFactory.CreateDelegate(type, value.scriptValue);
                     }
                     return value.scriptValue.Value;
@@ -69,9 +69,9 @@ namespace Scorpio.Tools {
                 case ScriptValue.stringValueType:
                     return type == TYPE_STRING;
                 case ScriptValue.objectValueType:
-                    return type.GetTypeInfo().IsAssignableFrom(value.objectValue.GetType());
+                    return type.IsAssignableFrom(value.objectValue.GetType());
                 default: {
-                    return TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.GetTypeInfo().IsAssignableFrom(value.scriptValue.ValueType);
+                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom(value.scriptValue.ValueType);
                 }
             }
         }
@@ -89,9 +89,9 @@ namespace Scorpio.Tools {
                 case ScriptValue.nullValueType:
                     return !type.IsValueType;
                 case ScriptValue.objectValueType:
-                    return type.GetTypeInfo().IsAssignableFrom(value.objectValue.GetType());
+                    return type.IsAssignableFrom(value.objectValue.GetType());
                 default: {
-                    return TYPE_DELEGATE.GetTypeInfo().IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.GetTypeInfo().IsAssignableFrom(value.scriptValue.ValueType);
+                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom(value.scriptValue.ValueType);
                 }
             }
         }
