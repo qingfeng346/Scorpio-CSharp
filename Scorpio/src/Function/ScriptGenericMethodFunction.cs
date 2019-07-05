@@ -7,7 +7,7 @@ namespace Scorpio.Function {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             var args = new ScriptValue[length - 1];
             Array.Copy(parameters, 1, args, 0, args.Length);
-            return ScriptValue.CreateObject(Method.Call(true, parameters[0].Value, args, args.Length));
+            return ScriptValue.CreateValue(Method.Call(true, parameters[0].Value, args, args.Length));
         }
     }
 }

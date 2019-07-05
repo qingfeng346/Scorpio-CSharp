@@ -62,7 +62,7 @@
                     var index = 0;
                     foreach (var pair in map) {
                         ++index;
-                        if (func.Call(ScriptValue.CreateObject(pair.Key), pair.Value).valueType == ScriptValue.falseValueType) {
+                        if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).valueType == ScriptValue.falseValueType) {
                             return new ScriptValue((double)index);
                         }
                     }
@@ -78,7 +78,7 @@
                     var index = 0;
                     foreach (var pair in map) {
                         ++index;
-                        if (func.Call(pair.Value, ScriptValue.CreateObject(pair.Key)).valueType == ScriptValue.falseValueType) {
+                        if (func.Call(pair.Value, ScriptValue.CreateValue(pair.Key)).valueType == ScriptValue.falseValueType) {
                             return new ScriptValue((double)index);
                         }
                     }

@@ -80,8 +80,8 @@ namespace Scorpio {
             Global.SetValue(TypeFunction.TypeName, TypeFunctionValue);
 
             Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
-            Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateObject(this));
-            Global.SetValue(GLOBAL_VERSION, ScriptValue.CreateObject(typeof(Version)));
+            Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateValue(this));
+            Global.SetValue(GLOBAL_VERSION, ScriptValue.CreateValue(typeof(Version)));
 
             ProtoObject.Load(this, TypeObject);
             ProtoBoolean.Load(this, TypeBoolean);

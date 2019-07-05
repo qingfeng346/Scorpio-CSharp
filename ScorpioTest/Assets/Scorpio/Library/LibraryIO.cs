@@ -39,7 +39,7 @@ namespace Scorpio.Library {
         private class toBytes : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var encoding = length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding;
-                return ScriptValue.CreateObject(encoding.GetBytes(args[0].ToString()));
+                return ScriptValue.CreateValue(encoding.GetBytes(args[0].ToString()));
             }
         }
         private class readAll : ScorpioHandle {
@@ -120,7 +120,7 @@ namespace Scorpio.Library {
         }
         private class lineArgs : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScriptValue.CreateObject(Environment.GetCommandLineArgs());
+                return ScriptValue.CreateValue(Environment.GetCommandLineArgs());
             }
         }
     }

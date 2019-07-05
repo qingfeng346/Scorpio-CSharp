@@ -12,7 +12,7 @@ namespace Scorpio.Userdata {
         }
         public override ScriptValue GetValue(object index) {
             if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
-                return ScriptValue.CreateObject(m_Array.GetValue(Convert.ToInt32(index)));
+                return ScriptValue.CreateValue(m_Array.GetValue(Convert.ToInt32(index)));
             }
             return base.GetValue(index);
         }

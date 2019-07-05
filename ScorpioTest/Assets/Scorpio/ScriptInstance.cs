@@ -24,7 +24,7 @@ namespace Scorpio {
         public ScriptArray GetKeys(Script script) {
             var ret = new ScriptArray(script);
             foreach (var pair in m_Values) {
-                ret.Add(ScriptValue.CreateObject(pair.key));
+                ret.Add(ScriptValue.CreateValue(pair.key));
             }
             return ret;
         }

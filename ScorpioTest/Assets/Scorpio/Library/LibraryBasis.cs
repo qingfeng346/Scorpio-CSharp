@@ -36,7 +36,7 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateObject(value.Key));
+                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key));
                     m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
@@ -53,7 +53,7 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateObject(value.key));
+                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.key));
                     m_ItorResult.SetValue("value", value.value);
                     return ScriptValue.True;
                 }
@@ -70,7 +70,7 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateObject(value.key));
+                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.key));
                     m_ItorResult.SetValue("value", value.value);
                     return ScriptValue.True;
                 }
@@ -88,7 +88,7 @@ namespace Scorpio.Library {
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
-                    m_ItorResult.SetValue("value", ScriptValue.CreateObject(m_Enumerator.Current));
+                    m_ItorResult.SetValue("value", ScriptValue.CreateValue(m_Enumerator.Current));
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;

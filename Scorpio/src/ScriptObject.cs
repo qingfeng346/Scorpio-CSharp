@@ -40,7 +40,7 @@ namespace Scorpio {
         public virtual bool GreaterOrEqual(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [>=] 运算"); }
         public virtual bool Equals(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.scriptValue == this; }
         public override int GetHashCode() { return base.GetHashCode(); }
-        public override bool Equals(object obj) { return Equals(ScriptValue.CreateObject(obj)); }
+        public override bool Equals(object obj) { return Equals(ScriptValue.CreateValue(obj)); }
 
         public virtual ScriptValue Plus(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [+] 运算"); }
         public virtual ScriptValue Minus(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [-] 运算"); }
@@ -57,7 +57,7 @@ namespace Scorpio {
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
             var parameters = new ScriptValue[length];
-            for (var i = 0; i < length; ++i) parameters[i] = ScriptValue.CreateObject(args[i]);
+            for (var i = 0; i < length; ++i) parameters[i] = ScriptValue.CreateValue(args[i]);
             return Call(thisObject, parameters, length);
         }
         //调用函数

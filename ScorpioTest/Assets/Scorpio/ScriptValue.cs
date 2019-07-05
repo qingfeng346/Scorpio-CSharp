@@ -141,7 +141,7 @@ namespace Scorpio {
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
             var parameters = new ScriptValue[length];
-            for (var i = 0; i < length; ++i) parameters[i] = CreateObject(args[i]);
+            for (var i = 0; i < length; ++i) parameters[i] = CreateValue(args[i]);
             return Call(thisObject, parameters, length);
         }
         //调用无参函数
@@ -370,7 +370,7 @@ namespace Scorpio {
         public static implicit operator ScriptValue(string value) {
             return new ScriptValue(value);
         }
-        public static ScriptValue CreateObject(object value) {
+        public static ScriptValue CreateValue(object value) {
             if (value == null)
                 return Null;
             else if (value is ScriptValue)

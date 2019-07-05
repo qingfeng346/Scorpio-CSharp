@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using Scorpio;
 public class DelegateFactory : IDelegateFactory {
     private static Dictionary<Type, Func<ScriptObject, Delegate>> delegates = new Dictionary<Type, Func<ScriptObject, Delegate>>();
-    public static void Initialize() {
-        ScorpioDelegateFactory.SetFactory(new DelegateFactory());__CreateDelegate
+    public static void Initialize(Script script) {
+        ScorpioDelegateFactory.SetFactory(new DelegateFactory());__DelegateList__CreateDelegate
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
         Func<ScriptObject, Delegate> func;
@@ -24,8 +24,8 @@ public class DelegateFactory : IDelegateFactory {
 using System.Collections.Generic;
 using Scorpio;
 public class DelegateFactory : IDelegateFactory {
-    public static void Initialize() {
-        ScorpioDelegateFactory.SetFactory(new DelegateFactory());
+    public static void Initialize(Script script) {
+        ScorpioDelegateFactory.SetFactory(new DelegateFactory());__DelegateList
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {__CreateDelegate
         throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);
@@ -41,7 +41,16 @@ public class DelegateFactory : IDelegateFactory {
         }
         public string Generate(int buildType) {
             ScorpioReflectUtil.SortType(m_Delegates);
-            return (buildType == 0 ? Template : TemplateIf).Replace("__CreateDelegate", CreateDelegate(buildType));
+            return (buildType == 0 ? Template : TemplateIf).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate(buildType));
+        }
+        string DelegateList() {
+            var builder = new StringBuilder();
+            foreach (var type in m_Delegates) {
+                var fullName = ScorpioReflectUtil.GetFullName(type);
+                builder.Append($@"
+        script.SetGlobal(""{fullName}"", ScriptValue.CreateValue(typeof({fullName})));");
+            }
+            return builder.ToString();
         }
         string CreateDelegate(int buildType) {
             var builder = new StringBuilder();

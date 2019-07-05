@@ -25,7 +25,7 @@ namespace Scorpio.Userdata {
             if (ret is UserdataMethod) {
                 return m_Methods[key] = new ScriptValue(new ScriptStaticMethodFunction((UserdataMethod)ret));
             }
-            return ScriptValue.CreateObject(ret);
+            return ScriptValue.CreateValue(ret);
         }
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(null, key, value);

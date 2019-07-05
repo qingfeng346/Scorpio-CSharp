@@ -46,6 +46,7 @@ namespace ScorpioExec {
             Launch.AddExecute("fast", HelpFast, Fast);
             Launch.AddExecute("delegate", HelpDelegate, DelegateFactory);
             Launch.AddExecute("version", HelpVersion, VersionExec);
+            Launch.AddExecute("sversion", HelpVersion, SVersionExec);
             Launch.AddExecute("", HelpExecute, Execute);
             Launch.Start(args, null, null);
         }
@@ -111,11 +112,14 @@ namespace ScorpioExec {
             }
             return type;
         }
+        static void SVersionExec(CommandLine command, string[] args) {
+            Logger.info(Scorpio.Version.version);
+        }
         static void VersionExec(CommandLine command, string[] args) {
             Logger.info($@"Sco Version : {Scorpio.Version.version}
 Build Date : {Scorpio.Version.date}");
             var result = Util.RequestString("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
-                request.Headers.Add("Authorization", "token c9fab45cde8bb710244d791018fefd6f4c6a80b5");
+                request.Headers.Add("Authorization", "token e5ff670eb105f044273f4c81276a67cd1341e649");
             });
             var isPreview = command.HadValue("-preview", "-p");
             var datas = Json.Deserialize(result, true) as List<object>;

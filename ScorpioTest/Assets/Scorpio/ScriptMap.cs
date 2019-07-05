@@ -50,7 +50,7 @@ namespace Scorpio {
         public ScriptArray GetKeys() {
             var ret = new ScriptArray(m_Script);
             foreach (var pair in m_Objects) {
-                ret.Add(ScriptValue.CreateObject(pair.Key));
+                ret.Add(ScriptValue.CreateValue(pair.Key));
             }
             return ret;
         }

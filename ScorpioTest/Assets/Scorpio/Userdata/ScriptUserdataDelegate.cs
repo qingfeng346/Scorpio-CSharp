@@ -37,14 +37,14 @@ namespace Scorpio.Userdata {
                     m_Objects[i] = Util.ChangeType(parameters[i], parameter.ParameterType);
                 }
             }
-            return ScriptValue.CreateObject(m_Delegate.DynamicInvoke(m_Objects));
+            return ScriptValue.CreateValue(m_Delegate.DynamicInvoke(m_Objects));
         }
         public override ScriptValue Plus(ScriptValue obj) {
-            return ScriptValue.CreateObject(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(obj, m_ValueType)));
+            return ScriptValue.CreateValue(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(obj, m_ValueType)));
         }
         public override ScriptValue Minus(ScriptValue obj) {
             if (obj.valueType == ScriptValue.scriptValueType && obj.scriptValue is ScriptUserdataDelegate) {
-                return ScriptValue.CreateObject(Delegate.Remove(m_Delegate, (obj.scriptValue as ScriptUserdataDelegate).m_Delegate));
+                return ScriptValue.CreateValue(Delegate.Remove(m_Delegate, (obj.scriptValue as ScriptUserdataDelegate).m_Delegate));
             }
             return base.Minus(obj); 
         }
