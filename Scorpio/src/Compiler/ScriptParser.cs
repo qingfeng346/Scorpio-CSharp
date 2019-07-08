@@ -13,12 +13,15 @@ namespace Scorpio.Compiler {
         public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>();                           //定义的所有 class
         private Stack<List<ScriptInstructionCompiler>> m_Breaks = new Stack<List<ScriptInstructionCompiler>>();             //breaks
         private Stack<List<ScriptInstructionCompiler>> m_Continues = new Stack<List<ScriptInstructionCompiler>>();          //continues
+        private Stack<List<ScriptInstructionCompiler>> m_Cases = new Stack<List<ScriptInstructionCompiler>>();               //cases
         private List<ScriptInstructionCompiler> m_Break = new List<ScriptInstructionCompiler>();                            //break
         private List<ScriptInstructionCompiler> m_Continue = new List<ScriptInstructionCompiler>();                         //continue
-        private List<ScriptExecutable> m_Executables = new List<ScriptExecutable>();  //指令栈
-        private ScriptExecutable m_scriptExecutable;                                    //当前指令栈
+        private List<ScriptInstructionCompiler> m_Case = new List<ScriptInstructionCompiler>();                                 //case
+        private List<ScriptExecutable> m_Executables = new List<ScriptExecutable>();                                        //指令栈
+        private ScriptExecutable m_scriptExecutable;                                                                        //当前指令栈
         public int Index { get { return m_scriptExecutable.Count(); } }
-        public bool SupportBreak(ExecutableBlock block) { return block == ExecutableBlock.For || block == ExecutableBlock.Foreach || block == ExecutableBlock.While; }
+        public bool SupportCase(ExecutableBlock block) { return block == ExecutableBlock.Switch; }
+        public bool SupportBreak(ExecutableBlock block) { return block == ExecutableBlock.For || block == ExecutableBlock.Foreach || block == ExecutableBlock.While || block == ExecutableBlock.Switch; }
         public bool SupportContinue(ExecutableBlock block) { return block == ExecutableBlock.For || block == ExecutableBlock.Foreach || block == ExecutableBlock.While; }
         public bool BlockSupportBreak {
             get {
@@ -44,6 +47,7 @@ namespace Scorpio.Compiler {
                 m_scriptExecutable.BeginStack(block);
                 if (SupportBreak(block)) { m_Breaks.Push(new List<ScriptInstructionCompiler>()); }
                 if (SupportContinue(block)) { m_Continues.Push(new List<ScriptInstructionCompiler>()); }
+                if (SupportCase(block)) { m_Cases.Push(new List<ScriptInstructionCompiler>()); }
             }
             return m_scriptExecutable;
         }
@@ -60,6 +64,7 @@ namespace Scorpio.Compiler {
             } else {
                 if (SupportBreak(m_scriptExecutable.Block)) { m_Break = m_Breaks.Pop(); }
                 if (SupportContinue(m_scriptExecutable.Block)) { m_Continue = m_Continues.Pop(); }
+                if (SupportCase(m_scriptExecutable.Block)) { m_Case = m_Cases.Pop(); }
                 if (block != ExecutableBlock.ForBegin && block != ExecutableBlock.ForEnd) {
                     m_scriptExecutable.EndStack();
                 }
@@ -210,9 +215,15 @@ namespace Scorpio.Compiler {
                         throw new ParserException("当前代码块不支持 continue 操作", token);
                     }
                     return;
-                //    case TokenType.Switch:
-                //        ParseSwtich();
-                //        break;
+                case TokenType.Switch:
+                    ParseSwtich();
+                    return;
+                case TokenType.Case:
+                    ParseCase();
+                    return;
+                case TokenType.Default:
+                    ParseDefault();
+                    break;
                 //    case TokenType.Try:
                 //        ParseTry();
                 //        break;
@@ -381,6 +392,42 @@ namespace Scorpio.Compiler {
             ParseStatementBlock(ExecutableBlock.While);
             AddScriptInstruction(Opcode.Jump, startIndex, PeekToken().SourceLine);
             allow.SetValue(Index);
+        }
+        //解析swtich语句
+        void ParseSwtich() {
+            ReadLeftParenthesis();
+            PushObject(GetObject());
+            PushObject(new CodeNativeObject(false, PeekToken().SourceLine));
+            ReadRightParenthesis();
+            ParseStatementBlock(ExecutableBlock.Switch);
+            var endIndex = Index;
+            AddScriptInstruction(Opcode.PopNumber, 2);       //弹出switch值 和 false 值
+            m_Break.SetValue(endIndex);
+            foreach (var instruction in m_Case) {
+                instruction.SetValue(endIndex);
+            }
+        }
+        //解析case
+        void ParseCase() {
+            foreach (var instruction in m_Cases.Peek()) {
+                instruction.SetValue(Index);
+            }
+            m_Cases.Peek().Clear();
+            var leftIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue);
+            AddScriptInstructionWithoutValue(Opcode.CopyStackTop);
+            PushObject(GetObject());
+            ReadColon();
+            AddScriptInstructionWithoutValue(Opcode.Equal);
+            leftIndex.SetValue(Index);
+            m_Cases.Peek().Add(AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse));
+            PushObject(new CodeNativeObject(true, PeekToken().SourceLine));
+        }
+        void ParseDefault() {
+            foreach (var instruction in m_Cases.Peek()) {
+                instruction.SetValue(Index);
+            }
+            m_Cases.Peek().Clear();
+            ReadColon();
         }
         //解析foreach语句
         void ParseForeach() {
@@ -1103,32 +1150,6 @@ namespace Scorpio.Compiler {
             });
             return index;
         }
-        ////解析swtich语句
-        //private void ParseSwtich() {
-        //    CodeSwitch ret = new CodeSwitch();
-        //    ReadLeftParenthesis();
-        //    ret.Condition = GetObject();
-        //    ReadRightParenthesis();
-        //    ReadLeftBrace();
-        //    List<TempCase> Cases = new List<TempCase>();
-        //    for (; ; ) {
-        //        Token token = ReadToken();
-        //        if (token.Type == TokenType.Case) {
-        //            List<CodeObject> allow = new List<CodeObject>();
-        //            ParseCase(allow);
-        //            Cases.Add(new TempCase(m_script, allow, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break)));
-        //        } else if (token.Type == TokenType.Default) {
-        //            ReadColon();
-        //            ret.Default = new TempCase(m_script, null, ParseStatementBlock(Executable_Block.Switch, false, TokenType.Break));
-        //        } else if (token.Type != TokenType.SemiColon) {
-        //            UndoToken();
-        //            break;
-        //        }
-        //    }
-        //    ReadRightBrace();
-        //    ret.SetCases(Cases);
-        //    m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(Opcode.CALL_SWITCH, ret));
-        //}
         ////解析case
         //private void ParseCase(List<CodeObject> allow) {
         //    allow.Add(GetObject());

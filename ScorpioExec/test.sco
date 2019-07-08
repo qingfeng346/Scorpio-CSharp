@@ -1,9 +1,29 @@
-class Cl {
-
+var a = 100
+var b = 111
+switch (a) {
+    case 50 + 50:
+    case 300:
+        for (var i = 0;i<100;i++) {
+            if (i == 10) {
+                print("ffffffffffffff")
+                break
+            }
+        }
+        print("111111111111")
+    case 200:
+        print(200)
+        
+    default:
+        print("default")
+        break
 }
-var a = new Cl()
-setPropertys(a, {a : 100, b : 200})
-print(json.encode(a))
+
+// class Cl {
+
+// }
+// var a = new Cl()
+// setPropertys(a, {a : 100, b : 200})
+// print(json.encode(a))
 // var t = {
 //     function Test() {
 //         return t
