@@ -39,16 +39,13 @@ namespace Scorpio.Compiler {
         private ScriptIndexs m_VariableIndexs;                                              //索引表
         private int m_StackIndex = 0;                                                       //当前层级
         private Dictionary<int, int> m_Stacks = new Dictionary<int, int>();                 //当前层级
-
-
-        private Stack<ExecutableBlock> m_Blocks;                                            //块代码层级
         private Dictionary<int, int> m_VariableToInternal = new Dictionary<int, int>();     //临时变量转为内部变量
         private List<int> m_ParentInternal = new List<int>();                               //父级内部变量到本地内部变量的对应关系
 
         private ScriptIndexs m_InternalIndexs;                                              //内部变量索引
 
-        public ExecutableBlock Block { get { return m_Blocks.Peek(); } }                    //当前块类型
-        public Stack<ExecutableBlock> Blocks { get { return m_Blocks; } }                   //所有块类型
+        public ExecutableBlock Block { get { return Blocks.Peek(); } }                      //当前块类型
+        public Stack<ExecutableBlock> Blocks { get; private set; }                          //所有块类型
         public int VariableCount { get { return m_VariableIndexs.Count - m_VariableToInternal.Count; } }     //临时变量个数
         public int InternalCount { get { return m_InternalIndexs.Count; } }                 //内部变量个数
         public ScriptExecutable(ExecutableBlock block) {
@@ -57,8 +54,8 @@ namespace Scorpio.Compiler {
             m_VariableIndexs = new ScriptIndexs();
             m_InternalIndexs = new ScriptIndexs();
             m_listScriptInstructions = new List<ScriptInstruction>();
-            m_Blocks = new Stack<ExecutableBlock>();
-            m_Blocks.Push(block);
+            Blocks = new Stack<ExecutableBlock>();
+            Blocks.Push(block);
             AddIndex("this");
         }
         //使用了父级的临时变量
@@ -94,22 +91,19 @@ namespace Scorpio.Compiler {
             } else {
                 m_Stacks[m_StackIndex] = 0;
             }
-            m_Blocks.Push(block);
+            Blocks.Push(block);
         }
         public void EndStack() {
             --m_StackIndex;
-            m_Blocks.Pop();
+            Blocks.Pop();
+        }
+        public ScriptInstructionCompiler AddScriptInstruction(Opcode opcode, int opvalue, int line) {
+            return AddScriptInstruction(new ScriptInstruction(opcode, opvalue, line));
         }
         //添加一条指令
-        public int AddScriptInstruction(ScriptInstruction val) {
-            var index = m_listScriptInstructions.Count;
-            m_listScriptInstructions.Add(val);
-            return index;
-        }
-        public void SetValue(int index, int opvalue) {
-            var ret = m_listScriptInstructions[index];
-            ret.opvalue = opvalue;
-            m_listScriptInstructions[index] = ret;
+        ScriptInstructionCompiler AddScriptInstruction(ScriptInstruction instruction) {
+            m_listScriptInstructions.Add(instruction);
+            return new ScriptInstructionCompiler() { instruction = instruction, index = m_listScriptInstructions.Count - 1};
         }
         public int AddIndex(string str) {
             int count = m_Stacks[m_StackIndex];

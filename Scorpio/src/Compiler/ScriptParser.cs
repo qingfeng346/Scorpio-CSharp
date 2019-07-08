@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Scorpio.Exception;
 using Scorpio.CodeDom;
 using Scorpio.CodeDom.Temp;
-using System.Text;
 namespace Scorpio.Compiler {
     
     /// <summary> 编译脚本 </summary>
@@ -11,13 +9,12 @@ namespace Scorpio.Compiler {
         public List<double> ConstDouble { get; private set; } = new List<double>();
         public List<long> ConstLong { get; private set; } = new List<long>();
         public List<string> ConstString { get; private set; } = new List<string>();
-        public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>();   //定义的所有 function
-        public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>();           //定义的所有 class
-
-        private Stack<List<int>> m_Breaks = new Stack<List<int>>();         //breaks
-        private Stack<List<int>> m_Continues = new Stack<List<int>>();      //continues
-        private List<int> m_Break = new List<int>();                        //break
-        private List<int> m_Continue = new List<int>();                     //continue
+        public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>();                   //定义的所有 function
+        public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>();                           //定义的所有 class
+        private Stack<List<ScriptInstructionCompiler>> m_Breaks = new Stack<List<ScriptInstructionCompiler>>();             //breaks
+        private Stack<List<ScriptInstructionCompiler>> m_Continues = new Stack<List<ScriptInstructionCompiler>>();          //continues
+        private List<ScriptInstructionCompiler> m_Break = new List<ScriptInstructionCompiler>();                            //break
+        private List<ScriptInstructionCompiler> m_Continue = new List<ScriptInstructionCompiler>();                         //continue
         private List<ScriptExecutable> m_Executables = new List<ScriptExecutable>();  //指令栈
         private ScriptExecutable m_scriptExecutable;                                    //当前指令栈
         public int Index { get { return m_scriptExecutable.Count(); } }
@@ -45,8 +42,8 @@ namespace Scorpio.Compiler {
                 m_scriptExecutable = new ScriptExecutable(block);
             } else {
                 m_scriptExecutable.BeginStack(block);
-                if (SupportBreak(block)) { m_Breaks.Push(new List<int>()); }
-                if (SupportContinue(block)) { m_Continues.Push(new List<int>()); }
+                if (SupportBreak(block)) { m_Breaks.Push(new List<ScriptInstructionCompiler>()); }
+                if (SupportContinue(block)) { m_Continues.Push(new List<ScriptInstructionCompiler>()); }
             }
             return m_scriptExecutable;
         }
@@ -96,11 +93,11 @@ namespace Scorpio.Compiler {
             }
             return index;
         }
-        int AddScriptInstruction(Opcode opcode, int opvalue, int line) {
-            return m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(opcode, opvalue, line));
+        ScriptInstructionCompiler AddScriptInstruction(Opcode opcode, int opvalue, int line = -1) {
+            return m_scriptExecutable.AddScriptInstruction(opcode, opvalue, line == -1 ? PeekToken().SourceLine : line);
         }
-        int AddScriptInstructionWithoutValue(Opcode opcode, int line) {
-            return m_scriptExecutable.AddScriptInstruction(new ScriptInstruction(opcode, 0, line));
+        ScriptInstructionCompiler AddScriptInstructionWithoutValue(Opcode opcode, int line = -1) {
+            return m_scriptExecutable.AddScriptInstruction(opcode, 0, line == -1 ? PeekToken().SourceLine : line);
         }
         //解析脚本
         public ScriptFunctionData Parse() {
@@ -238,7 +235,7 @@ namespace Scorpio.Compiler {
         }
         //解析if(判断语句)
         void ParseIf() {
-            var gotos = new List<int>();
+            var gotos = new List<ScriptInstructionCompiler>();
             ParseCondition(true, gotos);
             for (; ; ) {
                 var token = ReadToken();
@@ -256,13 +253,11 @@ namespace Scorpio.Compiler {
                 ReadToken();
                 ParseCondition(false, gotos);
             }
-            foreach (var g in gotos) {
-                m_scriptExecutable.SetValue(g, Index);
-            }
+            gotos.SetValue(Index);
         }
         //解析 if 单个判断模块
-        void ParseCondition(bool condition, List<int> gotos) {
-            int allow = -1;
+        void ParseCondition(bool condition, List<ScriptInstructionCompiler> gotos) {
+            ScriptInstructionCompiler allow = null;
             if (condition) {
                 ReadLeftParenthesis();
                 PushObject(GetObject());
@@ -271,8 +266,8 @@ namespace Scorpio.Compiler {
             }
             ParseStatementBlock(ExecutableBlock.If);
             gotos.Add(AddScriptInstructionWithoutValue(Opcode.Jump, PeekToken().SourceLine));
-            if (allow != -1) {
-                m_scriptExecutable.SetValue(allow, Index);
+            if (allow != null) {
+                allow.SetValue(Index);
             }
         }
         //解析for语句
@@ -316,13 +311,13 @@ namespace Scorpio.Compiler {
             AddScriptInstruction(Opcode.LoadLocal, index, line);
             AddScriptInstructionWithoutValue(Opcode.Plus, line);
             AddScriptInstruction(Opcode.StoreLocal, index, line);
-            AddScriptInstruction(Opcode.Jump, startIndex, line);
+            AddScriptInstruction(Opcode.Jump, startIndex.index, line);
             m_scriptExecutable.EndStack();
             var endIndex = Index;
             AddScriptInstruction(Opcode.PopNumber, 2, line);     //弹出栈顶的 end 和 step
-            m_scriptExecutable.SetValue(falseTo, endIndex);
-            foreach (var c in m_Continue) { m_scriptExecutable.SetValue(c, startIndex); }
-            foreach (var b in m_Break) { m_scriptExecutable.SetValue(b, endIndex); }
+            falseTo.SetValue(endIndex);
+            m_Continue.SetValue(startIndex);
+            m_Break.SetValue(endIndex);
         }
         //正常for循环  for(;;)
         void ParseForNormal() {
@@ -338,7 +333,7 @@ namespace Scorpio.Compiler {
             //第二部分开始索引
             var startIndex = Index;
             //如果是false就跳出循环
-            int falseTo = -1;
+            ScriptInstructionCompiler falseTo = null;
             {
                 token = ReadToken();
                 //开始解析第二部分
@@ -362,16 +357,16 @@ namespace Scorpio.Compiler {
                 }
                 AddScriptInstruction(Opcode.Jump, startIndex, token.SourceLine);      //执行完第三部分跳转到第二部分的判断
             }
-            m_scriptExecutable.SetValue(block, Index);
+            block.SetValue(Index);
             ParseStatementBlock(ExecutableBlock.For);
             AddScriptInstruction(Opcode.Jump, forIndex, token.SourceLine);        //执行完主逻辑跳转到第三部分逻辑
             //for结束索引
             var endIndex = Index;
-            if (falseTo != -1) {
-                m_scriptExecutable.SetValue(falseTo, endIndex);
+            if (falseTo != null) {
+                falseTo.SetValue(endIndex);
             }
-            foreach (var c in m_Continue) { m_scriptExecutable.SetValue(c, forIndex); }
-            foreach (var b in m_Break) { m_scriptExecutable.SetValue(b, endIndex); }
+            m_Continue.SetValue(forIndex);
+            m_Break.SetValue(endIndex);
             for (var i = 0; i < endStackCount; ++i) {
                 m_scriptExecutable.EndStack();
             }
@@ -385,7 +380,7 @@ namespace Scorpio.Compiler {
             var allow = AddScriptInstructionWithoutValue(Opcode.FalseTo, PeekToken().SourceLine);
             ParseStatementBlock(ExecutableBlock.While);
             AddScriptInstruction(Opcode.Jump, startIndex, PeekToken().SourceLine);
-            m_scriptExecutable.SetValue(allow, Index);
+            allow.SetValue(Index);
         }
         //解析foreach语句
         void ParseForeach() {
@@ -404,13 +399,13 @@ namespace Scorpio.Compiler {
             var beginIndex = AddScriptInstruction(Opcode.CallEach, 0, line);
             var falseTo = AddScriptInstruction(Opcode.FalseTo, 0, line);
             ParseStatementBlock(ExecutableBlock.Foreach);
-            AddScriptInstruction(Opcode.Jump, beginIndex, line);
-            m_scriptExecutable.SetValue(falseTo, Index);             //如果是循环完毕跳出的话要先弹出栈顶的null值
+            AddScriptInstruction(Opcode.Jump, beginIndex.index, line);
+            falseTo.SetValue(Index);                                //如果是循环完毕跳出的话要先弹出栈顶的null值           
             var endIndex = Index;
             AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的foreach 函数
             AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的foreach map
-            foreach (var c in m_Continue) { m_scriptExecutable.SetValue(c, beginIndex); }
-            foreach (var b in m_Break) { m_scriptExecutable.SetValue(b, endIndex); }
+            m_Continue.SetValue(beginIndex);
+            m_Break.SetValue(endIndex);
             m_scriptExecutable.EndStack();
         }
         //解析Class
@@ -493,12 +488,12 @@ namespace Scorpio.Compiler {
                         PushObject(oper.Left);
                         var leftIndex = AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse, obj.Line);
                         PushObject(oper.Right);
-                        m_scriptExecutable.SetValue(leftIndex, Index);
+                        leftIndex.SetValue(Index);
                     } else if (oper.TokenType == TokenType.Or) {
                         PushObject(oper.Left);
                         var leftIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue, obj.Line);
                         PushObject(oper.Right);
-                        m_scriptExecutable.SetValue(leftIndex, Index);
+                        leftIndex.SetValue(Index);
                     } else {
                         PushObject(oper.Left);
                         PushObject(oper.Right);
@@ -577,9 +572,9 @@ namespace Scorpio.Compiler {
                     var falseTo = AddScriptInstructionWithoutValue(Opcode.FalseTo, obj.Line);
                     PushObject(ternary.True);
                     var jump = AddScriptInstructionWithoutValue(Opcode.Jump, obj.Line);
-                    m_scriptExecutable.SetValue(falseTo, Index);
+                    falseTo.SetValue(Index);
                     PushObject(ternary.False);
-                    m_scriptExecutable.SetValue(jump, Index);
+                    jump.SetValue(Index);
                     break;
                 }
                 default: throw new ParserException("不支持的语法 : " + obj);

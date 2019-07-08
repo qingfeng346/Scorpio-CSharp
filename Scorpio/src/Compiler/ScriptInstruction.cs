@@ -1,5 +1,6 @@
 ﻿using System.Text;
 namespace Scorpio.Compiler {
+    //指令集大类型
     public enum OpcodeType : byte {
         None,       //无效类型
         Load,       //压栈
@@ -102,6 +103,7 @@ namespace Scorpio.Compiler {
         Ret,                    //return a value
         JumpEnd,
     }
+    //不能使用 struct 编译时会稍后修改内部值 
     //单条指令
     public class ScriptInstruction {
         public OpcodeType optype;   //指令类型
