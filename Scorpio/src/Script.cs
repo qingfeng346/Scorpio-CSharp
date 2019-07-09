@@ -10,7 +10,6 @@ using Scorpio.Runtime;
 using Scorpio.Proto;
 using Scorpio.Userdata;
 using Scorpio.Serialize;
-using Scorpio.Compile.Serialize;
 namespace Scorpio {
     public partial class Script {
         //反射获取变量和函数的属性

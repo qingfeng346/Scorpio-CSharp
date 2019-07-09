@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Scorpio.Commons;
 using Scorpio.Userdata;
-using Scorpio.Compile.Serialize;
+using Scorpio.Serialize;
 using Scorpio.ScorpioReflect;
 using System.Collections.Generic;
 

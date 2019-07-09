@@ -1,6 +1,6 @@
 ﻿using Scorpio.Instruction;
 using Scorpio.Compile.Compiler;
-namespace Scorpio.Compile.Serialize {
+namespace Scorpio.Serialize {
     public class Serializer {
         public static SerializeData Serialize(string breviary, string buffer) {
             var lexer = new ScriptLexer(buffer, breviary);
