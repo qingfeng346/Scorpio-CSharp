@@ -4,6 +4,13 @@ class BaseClass {
         print("baseFunc")
     }
     hello() {
+        var value = 100
+        //可以动态定义一个class
+        var tempClass = class {
+            fun() {
+                print(value)
+            }
+        }
         print("base hello : " + this.num)
     }
 }
