@@ -2,7 +2,6 @@
 * author : while
 * QQ群 : 245199668 [加入QQ群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 
-
 ### 此脚本为纯c#实现的脚本系统,最低支持 .net framework 3.5和 .net standard 2.0, 语法类似 javascript
 
 * **脚本示例** [ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/v2.0/ExampleScripts)
@@ -10,6 +9,11 @@
 * **语法测试** http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
 
 ### 基础介绍
+* 安装**sco**命令行
+    * windows 7, windows 8, MacOS, Linux 需要预先安装 [PowerShell Core](https://github.com/PowerShell/PowerShell/releases) , 然后运行命令行
+        > pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
+    * windows 10 直接运行命令行, 也可以安装 **PowerShell Core** 使用上面的方法安装
+        > powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio
 * nuget地址 https://www.nuget.org/packages/Scorpio-CSharp/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/unitysample/
