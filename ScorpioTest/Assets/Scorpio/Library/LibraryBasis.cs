@@ -6,6 +6,7 @@ using Scorpio.Function;
 using Scorpio.Userdata;
 using Scorpio.Tools;
 using System.Reflection;
+using Scorpio.Instruction;
 namespace Scorpio.Library {
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
@@ -223,32 +224,23 @@ namespace Scorpio.Library {
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
+                var map = new ScriptMap(m_script);
                 if (obj is ScriptArray) {
-                    var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new ArrayPairs((ScriptArray)obj, map)));
-                    return new ScriptValue(map);
+                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new ArrayPairs((ScriptArray)obj, map)));
                 } else if (obj is ScriptMap) {
-                    var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new MapPairs((ScriptMap)obj, map)));
-                    return new ScriptValue(map);
+                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new MapPairs((ScriptMap)obj, map)));
                 } else if (obj is ScriptUserdata) {
-                    var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj, map)));
-                    return new ScriptValue(map);
+                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj, map)));
                 } else if (obj is ScriptInstance) {
-                    var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new InstancePairs((ScriptInstance)obj, map)));
-                    return new ScriptValue(map);
+                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new InstancePairs((ScriptInstance)obj, map)));
                 } else if (obj is ScriptType) {
-                    var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new TypePairs((ScriptType)obj, map)));
-                    return new ScriptValue(map);
+                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new TypePairs((ScriptType)obj, map)));
                 } else if (obj is ScriptGlobal) {
-                    var map = new ScriptMap(m_script);
-                    map.SetValue(ScriptValue.IteratorNext, m_script.CreateFunction(new GlobalPairs((ScriptGlobal)obj, map)));
-                    return new ScriptValue(map);
+                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new GlobalPairs((ScriptGlobal)obj, map)));
+                } else {
+                    throw new ExecutionException("pairs 必须用于 array, map, type, global 或者 继承 IEnumerable 的 userdata 类型");
                 }
-                throw new ExecutionException("pairs必须用于 array, map 或者 继承IEnumerable的userdata 类型");
+                return new ScriptValue(map);
             }
         }
         private class isBoolean : ScorpioHandle {

@@ -1,4 +1,4 @@
-﻿using Scorpio.Compiler;
+﻿using Scorpio.Instruction;
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Tools;
@@ -324,37 +324,15 @@ namespace Scorpio.Runtime {
                             switch (opcode) {
                                 case Opcode.Plus: {
                                     index = stackIndex - 1;
-                                    switch (stackObjects[index].valueType) {
-                                        case ScriptValue.doubleValueType: {
-                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                                stackObjects[index].doubleValue += stackObjects[stackIndex].doubleValue;
-                                            } else {
-                                                stackObjects[index].doubleValue += stackObjects[stackIndex].ToDouble();
-                                            }
-                                            --stackIndex;
-                                            continue;
-                                        }
-                                        case ScriptValue.stringValueType:
+                                    valueType = stackObjects[index].valueType;
+                                    switch (valueType) {
+                                        case ScriptValue.stringValueType: {
                                             stackObjects[index].stringValue += stackObjects[stackIndex].ToString();
                                             --stackIndex;
                                             continue;
-                                        case ScriptValue.scriptValueType:
+                                        }
+                                        case ScriptValue.scriptValueType: {
                                             stackObjects[index] = stackObjects[index].scriptValue.Plus(stackObjects[stackIndex]);
-                                            --stackIndex;
-                                            continue;
-                                        case ScriptValue.longValueType: {
-                                            switch (stackObjects[stackIndex].valueType) {
-                                                case ScriptValue.longValueType:
-                                                    stackObjects[index].longValue += stackObjects[stackIndex].longValue;
-                                                    break;
-                                                case ScriptValue.doubleValueType:
-                                                    stackObjects[index].doubleValue = stackObjects[index].longValue + stackObjects[stackIndex].doubleValue;
-                                                    stackObjects[index].valueType = ScriptValue.doubleValueType;
-                                                    break;
-                                                default:
-                                                    stackObjects[index].longValue += stackObjects[stackIndex].ToLong();
-                                                    break;
-                                            }
                                             --stackIndex;
                                             continue;
                                         }
@@ -363,7 +341,28 @@ namespace Scorpio.Runtime {
                                                 stackObjects[index].stringValue = stackObjects[index].ToString() + stackObjects[stackIndex].stringValue;
                                                 stackObjects[index].valueType = ScriptValue.stringValueType;
                                             } else {
-                                                throw new ExecutionException($"【+】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                                if (valueType == ScriptValue.doubleValueType) {
+                                                    if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                        stackObjects[index].doubleValue += stackObjects[stackIndex].doubleValue;
+                                                    } else {
+                                                        stackObjects[index].doubleValue += stackObjects[stackIndex].ToDouble();
+                                                    }
+                                                } else if (valueType == ScriptValue.longValueType) {
+                                                    switch (stackObjects[stackIndex].valueType) {
+                                                        case ScriptValue.longValueType:
+                                                            stackObjects[index].longValue += stackObjects[stackIndex].longValue;
+                                                            break;
+                                                        case ScriptValue.doubleValueType:
+                                                            stackObjects[index].doubleValue = stackObjects[index].longValue + stackObjects[stackIndex].doubleValue;
+                                                            stackObjects[index].valueType = ScriptValue.doubleValueType;
+                                                            break;
+                                                        default:
+                                                            stackObjects[index].longValue += stackObjects[stackIndex].ToLong();
+                                                            break;
+                                                    }
+                                                } else {
+                                                    throw new ExecutionException($"【+】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                                }
                                             }
                                             --stackIndex;
                                             continue;
@@ -382,10 +381,11 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                         }
-                                        case ScriptValue.scriptValueType:
+                                        case ScriptValue.scriptValueType: {
                                             stackObjects[index] = stackObjects[index].scriptValue.Minus(stackObjects[stackIndex]);
                                             --stackIndex;
                                             continue;
+                                        }
                                         case ScriptValue.longValueType: {
                                             switch (stackObjects[stackIndex].valueType) {
                                                 case ScriptValue.longValueType:
@@ -417,10 +417,11 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                         }
-                                        case ScriptValue.scriptValueType:
+                                        case ScriptValue.scriptValueType: {
                                             stackObjects[index] = stackObjects[index].scriptValue.Multiply(stackObjects[stackIndex]);
                                             --stackIndex;
                                             continue;
+                                        }
                                         case ScriptValue.longValueType: {
                                             switch (stackObjects[stackIndex].valueType) {
                                                 case ScriptValue.longValueType:
@@ -452,10 +453,11 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                         }
-                                        case ScriptValue.scriptValueType:
+                                        case ScriptValue.scriptValueType: {
                                             stackObjects[index] = stackObjects[index].scriptValue.Divide(stackObjects[stackIndex]);
                                             --stackIndex;
                                             continue;
+                                        }
                                         case ScriptValue.longValueType: {
                                             switch (stackObjects[stackIndex].valueType) {
                                                 case ScriptValue.longValueType:
@@ -487,10 +489,11 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                         }
-                                        case ScriptValue.scriptValueType:
+                                        case ScriptValue.scriptValueType: {
                                             stackObjects[index] = stackObjects[index].scriptValue.Modulo(stackObjects[stackIndex]);
                                             --stackIndex;
                                             continue;
+                                        }
                                         case ScriptValue.longValueType: {
                                             switch (stackObjects[stackIndex].valueType) {
                                                 case ScriptValue.longValueType:

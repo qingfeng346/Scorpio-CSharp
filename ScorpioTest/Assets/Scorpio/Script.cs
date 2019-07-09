@@ -1,23 +1,20 @@
 ﻿using System.IO;
 using System.Text;
 using System.Reflection;
-using Scorpio.Compiler;
+using Scorpio.Instruction;
 using Scorpio.Exception;
 using System.Collections.Generic;
-using Scorpio.Tools;
 using Scorpio.Function;
 using Scorpio.Library;
 using Scorpio.Runtime;
 using Scorpio.Proto;
 using Scorpio.Userdata;
 using Scorpio.Serialize;
-using System;
 namespace Scorpio {
     public partial class Script {
         //反射获取变量和函数的属性
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
-
-        private static readonly Encoding UTF8 = Encoding.UTF8;          //默认编码格式
+        public static readonly Encoding UTF8 = Encoding.UTF8;          //默认编码格式
         private const string Undefined = "Undefined";                   //Undefined
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
@@ -103,37 +100,6 @@ namespace Scorpio {
             LibraryUserdata.Load(this);
             LibraryIO.Load(this);
         }
-        public ScriptValue LoadFile(string fileName) {
-            return LoadFile(fileName, UTF8);
-        }
-        public ScriptValue LoadFile(string fileName, Encoding encoding) {
-            using (var stream = File.OpenRead(fileName)) {
-                var length = stream.Length;
-                var buffer = new byte[length];
-                stream.Read(buffer, 0, buffer.Length);
-                return LoadBuffer(fileName, buffer, encoding);
-            }
-        }
-        public ScriptValue LoadBuffer(byte[] buffer) {
-            return LoadBuffer(Undefined, buffer, UTF8);
-        }
-        public ScriptValue LoadBuffer(string breviary, byte[] buffer) {
-            return LoadBuffer(breviary, buffer, UTF8);
-        }
-        public ScriptValue LoadBuffer(string breviary, byte[] buffer, Encoding encoding) {
-            if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            if (buffer[0] == 0)
-                return Execute(breviary, SerializeUtil.Deserialize(buffer));
-            else
-                return Execute(breviary, SerializeUtil.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length)));
-        }
-        public ScriptValue LoadString(string buffer) {
-            return LoadString(Undefined, buffer);
-        }
-        public ScriptValue LoadString(string breviary, string buffer) {
-            if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(breviary, SerializeUtil.Serialize(breviary, buffer));
-        }
         ScriptValue Execute(string breviary, SerializeData data) {
             var contexts = new ScriptContext[data.Functions.Length];
             for (int i = 0; i < data.Functions.Length; ++i) {
@@ -170,8 +136,39 @@ namespace Scorpio {
         public ScriptValue call(string name, params object[] args) {
             return Global.GetValue(name).call(ScriptValue.Null, args);
         }
-        public ScriptValue Call(String name, ScriptValue[] args, int length) {
+        public ScriptValue Call(string name, ScriptValue[] args, int length) {
             return Global.GetValue(name).Call(ScriptValue.Null, args, length);
+        }
+        public ScriptValue LoadFile(string fileName) {
+            return LoadFile(fileName, UTF8);
+        }
+        public ScriptValue LoadFile(string fileName, Encoding encoding) {
+            using (var stream = File.OpenRead(fileName)) {
+                var length = stream.Length;
+                var buffer = new byte[length];
+                stream.Read(buffer, 0, buffer.Length);
+                return LoadBuffer(fileName, buffer, encoding);
+            }
+        }
+        public ScriptValue LoadString(string buffer) {
+            return LoadString(Undefined, buffer);
+        }
+        public ScriptValue LoadString(string breviary, string buffer) {
+            if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
+            return Execute(breviary, Serializer.Serialize(breviary, buffer));
+        }
+        public ScriptValue LoadBuffer(byte[] buffer) {
+            return LoadBuffer(Undefined, buffer, UTF8);
+        }
+        public ScriptValue LoadBuffer(string breviary, byte[] buffer) {
+            return LoadBuffer(breviary, buffer, UTF8);
+        }
+        public ScriptValue LoadBuffer(string breviary, byte[] buffer, Encoding encoding) {
+            if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
+            if (buffer[0] == 0)
+                return Execute(breviary, Deserializer.Deserialize(buffer));
+            else
+                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length)));
         }
     }
 }
