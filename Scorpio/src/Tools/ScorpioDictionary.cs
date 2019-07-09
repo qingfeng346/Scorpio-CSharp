@@ -12,9 +12,9 @@ namespace Scorpio.Tools {
     }
     public class ScorpioDictionary<Key, Value> : IEnumerable<ScorpioValue<Key, Value>> {
         public struct Enumerator : IEnumerator<ScorpioValue<Key, Value>> {
-            private int length;
+            private readonly int length;
+            private readonly ScorpioDictionary<Key, Value> dictionary;
             private int index;
-            private ScorpioDictionary<Key, Value> dictionary;
             private ScorpioValue<Key, Value> current;
             internal Enumerator(ScorpioDictionary<Key, Value> dictionary) {
                 this.dictionary = dictionary;
@@ -85,7 +85,7 @@ namespace Scorpio.Tools {
             if (index < mSize) {
                 Array.Copy(mValues, index + 1, mValues, index, mSize - index);
             }
-            mValues[mSize].value = default(Value);
+            mValues[mSize].value = default;
             return true;
         }
         public virtual bool SetValue(Key key, Value value) {
@@ -104,7 +104,7 @@ namespace Scorpio.Tools {
                     return true;
                 }
             }
-            value = default(Value);
+            value = default;
             return false;
         }
         public Key[] Keys {
@@ -132,7 +132,7 @@ namespace Scorpio.Tools {
                         return mValues[i].value;
                     }
                 }
-                return default(Value);
+                return default;
             }
             set {
                 int index = IndexOf(key);
@@ -172,7 +172,7 @@ namespace Scorpio.Tools {
                     if (i < mSize) {
                         Array.Copy(mValues, i + 1, mValues, i, mSize - i);
                     }
-                    mValues[mSize].value = default(Value);
+                    mValues[mSize].value = default;
                     return true;
                 }
             }
@@ -185,7 +185,7 @@ namespace Scorpio.Tools {
                     return true;
                 }
             }
-            value = default(Value);
+            value = default;
             return false;
         }
         public override Value this[string key] {
@@ -195,7 +195,7 @@ namespace Scorpio.Tools {
                         return mValues[i].value;
                     }
                 }
-                return default(Value);
+                return default;
             }
             set {
                 for (int i = 0; i < mSize; ++i) {

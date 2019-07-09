@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Scorpio.Commons;
 using Scorpio.Userdata;
-using Scorpio.Serialize;
+using Scorpio.Compile.Serialize;
 using Scorpio.ScorpioReflect;
 using System.Collections.Generic;
 
@@ -56,7 +56,7 @@ namespace ScorpioExec {
         static void Pack(CommandLine command, string[] args) {
             var source = Launch.GetPath("-source", "-s");
             var output = Launch.GetPath("-output", "-o");
-            File.WriteAllBytes(output, SerializeUtil.Serialize(source, FileUtil.GetFileString(source)).ToArray());
+            File.WriteAllBytes(output, Serializer.Serialize(source, FileUtil.GetFileString(source)).ToArray());
             Logger.info($"生成IL文件  {source} -> {output}");
         }
         static void Fast(CommandLine command, string[] args) {

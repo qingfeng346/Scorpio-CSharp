@@ -8,6 +8,10 @@
 	<RuntimeIdentifiers>win7-x64;osx.10.11-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;SCORPIO_DYNAMIC_COMPILE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="ScorpioCommons" Version="1.0.11" />
   </ItemGroup>

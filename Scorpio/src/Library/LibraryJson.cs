@@ -14,7 +14,7 @@ namespace Scorpio.Library {
             }
         }
         private class decode : ScorpioHandle {
-            private Script m_Script;
+            private readonly Script m_Script;
             public decode(Script script) {
                 m_Script = script;
             }
@@ -37,11 +37,11 @@ namespace Scorpio.Library {
             const string WHITE_SPACE = " \t\n\r";
             const string WORD_BREAK = " \t\n\r{}[],:\"";
 
-            private Script m_Script;
-            private string m_Buffer;
-            private bool m_SupportLong;         //是否支持 数字无[.]解析成long值
+            private readonly Script m_Script;
+            private readonly string m_Buffer;
+            private readonly bool m_SupportLong;         //是否支持 数字无[.]解析成long值
             private int m_Index;
-            private int m_Length;
+            private readonly int m_Length;
             public JsonParser(Script script, string buffer, bool supportLong) {
                 m_Script = script;
                 m_SupportLong = supportLong;
@@ -153,12 +153,10 @@ namespace Scorpio.Library {
             ScriptValue ParseNumber() {
                 var number = NextWord;
                 if (m_SupportLong && number.IndexOf('.') == -1) {
-                    long parsedLong;
-                    long.TryParse(number, out parsedLong);
+                    long.TryParse(number, out long parsedLong);
                     return new ScriptValue(parsedLong);
                 }
-                double parsedDouble;
-                double.TryParse(number, out parsedDouble);
+                double.TryParse(number, out double parsedDouble);
                 return new ScriptValue(parsedDouble);
             }
             ScriptValue ParseMap() {

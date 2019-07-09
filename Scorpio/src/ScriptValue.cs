@@ -1,11 +1,8 @@
-﻿using Scorpio.Tools;
-using Scorpio.Exception;
+﻿using Scorpio.Exception;
 using System;
 using Scorpio.Userdata;
 namespace Scorpio {
     public struct ScriptValue {
-        public const string IteratorNext = "next";  //迭代器函数名字
-
         public const byte nullValueType = 0;        //null
         public const byte scriptValueType = 1;      //脚本变量
         public const byte doubleValueType = 2;      //double
