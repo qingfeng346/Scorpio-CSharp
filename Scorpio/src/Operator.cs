@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Scorpio {
+﻿namespace Scorpio {
     //运算符重载
     public class ScriptOperator {
         public const string Plus = "+";
