@@ -46,13 +46,13 @@
 
 * 脚本内所有c#实例(除了**bool,number,string,enum**等基础类型) **均为引用**, **struct** 变量也一样
 
-* **event** 对象**+= -=**操作可以使用函数 **add_[event变量名] remove_[event变量名]** 代替
+* **event** 对象 **+= -=** 操作可以使用函数 **add_[event变量名] remove_[event变量名]** 代替
 
-* c#扩展函数,请调用一次 **importExtension** ,参数参考 **importType** , 注: 此函数一定要在扩展函数调用之前调用
+* c# 扩展函数, 请使用静态函数方式调用
 
 * **Unity3d** 使用 **IL2CPP** 后, 部分**Unity3D**的类或函数不能反射获取,请自行包一层函数,或者使用快速反射功能
 
-* UWP平台master配置下 **genericMethod, genericType** 函数会出问题,其他平台均无问题 **(android&il2cpp ios&il2cpp webgl等)**, 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
+* UWP平台master配置下 **genericMethod, genericType** 函数会出问题, 其他平台均无问题 **(android&il2cpp ios&il2cpp webgl等)**, 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
 
 
 
@@ -80,10 +80,10 @@
 
 ### 快速反射
 
-##### 快速反射类生成
+#### 快速反射类生成
 * 使用命令行 **sco fast -dll [dll文件路径] -class [class完整名] -output [输出目录]** 生成快速反射类文件
 
-##### 快速反射类使用
+#### 快速反射类使用
 * 例如使用快速反射的类为 **UnityEngine.GameObject** , 生成的快速反射类则为**ScorpioClass_UnityEngine_GameObject**
     * 在程序内调用 **Scorpio.Userdata.TypeManager.SetFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script))**
 
