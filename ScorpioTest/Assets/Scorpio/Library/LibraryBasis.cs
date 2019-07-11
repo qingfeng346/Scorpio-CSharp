@@ -154,10 +154,11 @@ namespace Scorpio.Library {
             script.SetGlobal("toEnum", script.CreateFunction(new toEnum()));
             script.SetGlobal("toString", script.CreateFunction(new toString()));
 
-            script.SetGlobal("typeOf", script.CreateFunction(new typeOf(script)));
+            script.SetGlobal("typeOf", script.CreateFunction(new getPrototype(script)));
             script.SetGlobal("setPrototype", script.CreateFunction(new setPrototype()));
             script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype(script)));
             script.SetGlobal("setPropertys", script.CreateFunction(new setPropertys()));
+            script.SetGlobal("createArray", script.CreateFunction(new createArray()));
             script.SetGlobal("base", script.CreateFunction(new @base()));
             script.SetGlobal("clone", script.CreateFunction(new clone()));
 
@@ -368,41 +369,6 @@ namespace Scorpio.Library {
                 return new ScriptValue(args[0].ToString());
             }
         }
-
-        private class typeOf : ScorpioHandle {
-            readonly Script m_Script;
-            public typeOf(Script script) {
-                m_Script = script;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var value = args[0];
-                switch (value.valueType) {
-                    case ScriptValue.trueValueType:
-                    case ScriptValue.falseValueType:
-                        return m_Script.TypeBooleanValue;
-                    case ScriptValue.doubleValueType:
-                    case ScriptValue.longValueType:
-                        return m_Script.TypeNumberValue;
-                    case ScriptValue.stringValueType:
-                        return m_Script.TypeStringValue;
-                    case ScriptValue.scriptValueType:
-                        if (value.scriptValue is ScriptArray) {
-                            return m_Script.TypeArrayValue;
-                        } else if (value.scriptValue is ScriptMap) {
-                            return m_Script.TypeMapValue;
-                        } else if (value.scriptValue is ScriptFunction) {
-                            return m_Script.TypeFunctionValue;
-                        } else if (value.scriptValue is ScriptInstance) {
-                            return new ScriptValue((value.scriptValue as ScriptInstance).Prototype);
-                        } else if (value.scriptValue is ScriptType) {
-                            return value;
-                        } else {
-                            return TypeManager.GetUserdataType(value.scriptValue.Type);
-                        }
-                    default: return m_Script.TypeObjectValue;
-                }
-            }
-        }
         private class clone : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var deep = length > 1 ? args[1].IsTrue : true;
@@ -471,7 +437,7 @@ namespace Scorpio.Library {
                         } else if (value.scriptValue is ScriptType) {
                             return (value.scriptValue as ScriptType).Prototype;
                         } else {
-                            throw new ExecutionException("当前类型不支持获取Prototype : " + value.ValueTypeName);
+                            return TypeManager.GetUserdataType(value.scriptValue.Type);
                         }
                     default: return m_Script.TypeObjectValue;
                 }
@@ -493,6 +459,11 @@ namespace Scorpio.Library {
                     }
                 }
                 return args[0];
+            }
+        }
+        private class createArray : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return ScriptValue.CreateValue(Array.CreateInstance(args[0].Get<ScriptUserdata>().Type, args[1].ToInt32()));
             }
         }
         private class @base : ScorpioHandle {
@@ -572,7 +543,7 @@ namespace Scorpio.Library {
         }
         private class setFastReflectClass : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var type = args[0].Get<ScriptUserdataType>().Type;
+                var type = args[0].Get<ScriptUserdata>().Type;
                 var fastClass = args[1].Value as ScorpioFastReflectClass;
                 TypeManager.SetFastReflectClass(type, fastClass);
                 return ScriptValue.Null;
@@ -580,7 +551,7 @@ namespace Scorpio.Library {
         }
         private class isFastReflectClass : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return TypeManager.IsFastReflectClass(args[0].Get<ScriptUserdataType>().Type) ? ScriptValue.True : ScriptValue.False;
+                return TypeManager.IsFastReflectClass(args[0].Get<ScriptUserdata>().Type) ? ScriptValue.True : ScriptValue.False;
             }
         }
     }
