@@ -5,6 +5,7 @@
             ret.SetValue("count", script.CreateFunction(new length()));
             ret.SetValue("insert", script.CreateFunction(new insert()));
             ret.SetValue("add", script.CreateFunction(new add()));
+            ret.SetValue("push", script.CreateFunction(new add()));
             ret.SetValue("remove", script.CreateFunction(new remove()));
             ret.SetValue("removeAt", script.CreateFunction(new removeAt()));
             ret.SetValue("clear", script.CreateFunction(new clear()));
