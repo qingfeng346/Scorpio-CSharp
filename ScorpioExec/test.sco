@@ -1,11 +1,14 @@
 class Test {
 
 }
-class Test1 : Test {
-
+class Test1 : Test2 {
+	func() {
+		print(this.num)
+	}
 }
 var a = new Test1()
-print(a.instanceOf(Test1))
+a.num = 100
+print(a.func())
 // class www {
 
 // }

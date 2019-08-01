@@ -1020,7 +1020,7 @@ namespace Scorpio.Runtime {
                                     var classData = constClasses[opvalue];
                                     var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
                                     var className = constString[classData.name];
-                                    var type = new ScriptType(className, parentType);
+                                    var type = new ScriptType(className, parentType.valueType == ScriptValue.nullValueType ? m_script.TypeObjectValue : parentType);
                                     var functions = classData.functions;
                                     for (var j = 0; j < functions.Length; ++j) {
                                         var func = functions[j];
