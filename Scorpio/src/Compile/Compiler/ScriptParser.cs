@@ -238,7 +238,20 @@ namespace Scorpio.Compile.Compiler {
         //解析Var关键字
         void ParseVar() {
             m_scriptExecutable.AddIndex(ReadIdentifier());
-            UndoToken();
+            while (true) {
+                switch (PeekToken().Type) {
+                    case TokenType.Comma: {
+                        ReadToken();
+                        m_scriptExecutable.AddIndex(ReadIdentifier());
+                        break;
+                    }
+                    case TokenType.Assign: {
+                        UndoToken();
+                        return;
+                    }
+                    default: return;
+                }
+            }
         }
         //解析区域块{}
         void ParseBlock() {

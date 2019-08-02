@@ -31,20 +31,20 @@ namespace Scorpio.Instruction {
                     case Opcode.LoadConstString:
                     case Opcode.LoadGlobalString:
                     case Opcode.StoreGlobalString:
+                    case Opcode.StoreGlobalStringAssign:
                     case Opcode.LoadValueString:
                     case Opcode.StoreValueString:
                         value = constString[instruction.opvalue].ToString();
                         break;
-                    case Opcode.LoadInternal: value = "load_internal_" + instruction.opvalue; break;
-                    case Opcode.LoadLocal: value = "load_local_" + instruction.opvalue; break;
-                    case Opcode.LoadGlobal: value = "load_global_" + instruction.opvalue; break;
-                    
-                    case Opcode.StoreLocal: value = "store_local_" + instruction.opvalue; break;
-                    case Opcode.StoreGlobal: value = "store_global_" + instruction.opvalue; break;
-
-                    case Opcode.StoreLocalAssign: value = "store_local_assign_" + instruction.opvalue; break;
-                    case Opcode.StoreInternalAssign: value = "store_internal_assign_" + instruction.opvalue; break;
-
+                    case Opcode.LoadInternal:
+                    case Opcode.LoadLocal:
+                    case Opcode.LoadGlobal:
+                    case Opcode.StoreLocal:
+                    case Opcode.StoreGlobal:
+                    case Opcode.StoreLocalAssign:
+                    case Opcode.StoreInternalAssign:
+                        value = instruction.opvalue.ToString("D2");
+                        break;
                     case Opcode.Jump:
                     case Opcode.FalseTo:
                     case Opcode.TrueTo:

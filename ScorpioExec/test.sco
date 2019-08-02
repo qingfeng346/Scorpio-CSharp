@@ -1,9 +1,7 @@
 
-a = 200
-for (var i = 0 ; i < 2; i += 1) {
-	b = a = 300
-	print(b)
-}
+var a
+var b
+a = b = c = 200
 
 // class www {
 
