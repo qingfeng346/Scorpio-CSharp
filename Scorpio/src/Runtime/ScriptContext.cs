@@ -232,6 +232,97 @@ namespace Scorpio.Runtime {
                             continue;
                         case OpcodeType.Store:
                             switch (opcode) {
+                                //-------------下面为 = *= -= 等赋值操作, 压入计算结果
+                                case Opcode.StoreLocalAssign: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            variableObjects[opvalue].scriptValue = stackObjects[stackIndex].scriptValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            variableObjects[opvalue].doubleValue = stackObjects[stackIndex].doubleValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: variableObjects[opvalue].valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: variableObjects[opvalue].valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: variableObjects[opvalue].valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            variableObjects[opvalue].stringValue = stackObjects[stackIndex].stringValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            variableObjects[opvalue].longValue = stackObjects[stackIndex].longValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            variableObjects[opvalue].objectValue = stackObjects[stackIndex].objectValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.StoreInternalAssign: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            internalObjects[opvalue].value.scriptValue = stackObjects[stackIndex].scriptValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            internalObjects[opvalue].value.doubleValue = stackObjects[stackIndex].doubleValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: internalObjects[opvalue].value.valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: internalObjects[opvalue].value.valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: internalObjects[opvalue].value.valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            internalObjects[opvalue].value.stringValue = stackObjects[stackIndex].stringValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            internalObjects[opvalue].value.longValue = stackObjects[stackIndex].longValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            internalObjects[opvalue].value.objectValue = stackObjects[stackIndex].objectValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException("StoreInternal : 未知错误数据类型 : " + stackObjects[stackIndex].valueType);
+                                    }
+                                }
+                                case Opcode.StoreValueStringAssign: {
+                                    index = stackIndex;
+                                    stackObjects[stackIndex - 1].SetValue(constString[opvalue], stackObjects[stackIndex]);
+                                    stackObjects[--stackIndex] = stackObjects[index];
+                                    continue;
+                                }
+                                case Opcode.StoreValueObjectAssign: {
+                                    index = stackIndex;
+                                    switch (stackObjects[stackIndex - 1].valueType) {
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].stringValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].doubleValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].longValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].scriptValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]); break;
+                                        default: throw new ExecutionException($"不支持当前类型设置变量 : {stackObjects[stackIndex - 1].ValueTypeName}");
+                                    }
+                                    stackObjects[stackIndex -= 2] = stackObjects[index];
+                                    continue;
+                                }
+                                case Opcode.StoreGlobalAssign: m_global.SetValueByIndex(opvalue, stackObjects[stackIndex]); continue;
+                                case Opcode.StoreGlobalStringAssign: {
+                                    m_global.SetValue(constString[opvalue], stackObjects[stackIndex]);
+                                    instruction.SetOpcode(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]));
+                                    continue;
+                                }
+                                case Opcode.StoreValueAssign: {
+                                    index = stackIndex;
+                                    stackObjects[stackIndex - 1].SetValueByIndex(opvalue, stackObjects[stackIndex]);
+                                    stackObjects[--stackIndex] = stackObjects[index];
+                                    continue;
+                                }
+
+
+                                //-----------------下面为普通赋值操作 不压入结果
                                 case Opcode.StoreLocal: {
                                     index = stackIndex--;
                                     switch (stackObjects[index].valueType) {
@@ -258,64 +349,18 @@ namespace Scorpio.Runtime {
                                             variableObjects[opvalue].objectValue = stackObjects[index].objectValue;
                                             variableObjects[opvalue].valueType = ScriptValue.objectValueType;
                                             continue;
-                                        default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[index].ValueTypeName}");
+                                        default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
                                     }
-                                }
-                                case Opcode.StoreInternal: {
-                                    index = stackIndex--;
-                                    switch (stackObjects[index].valueType) {
-                                        case ScriptValue.scriptValueType:
-                                            internalObjects[opvalue].value.scriptValue = stackObjects[index].scriptValue;
-                                            internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
-                                            continue;
-                                        case ScriptValue.doubleValueType:
-                                            internalObjects[opvalue].value.doubleValue = stackObjects[index].doubleValue;
-                                            internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
-                                            continue;
-                                        case ScriptValue.nullValueType: internalObjects[opvalue].value.valueType = ScriptValue.nullValueType; continue;
-                                        case ScriptValue.trueValueType: internalObjects[opvalue].value.valueType = ScriptValue.trueValueType; continue;
-                                        case ScriptValue.falseValueType: internalObjects[opvalue].value.valueType = ScriptValue.falseValueType; continue;
-                                        case ScriptValue.stringValueType:
-                                            internalObjects[opvalue].value.stringValue = stackObjects[index].stringValue;
-                                            internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
-                                            continue;
-                                        case ScriptValue.longValueType:
-                                            internalObjects[opvalue].value.longValue = stackObjects[index].longValue;
-                                            internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
-                                            continue;
-                                        case ScriptValue.objectValueType:
-                                            internalObjects[opvalue].value.objectValue = stackObjects[index].objectValue;
-                                            internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
-                                            continue;
-                                        default: throw new ExecutionException("StoreInternal : 未知错误数据类型 : " + stackObjects[index].valueType);
-                                    }
-                                }
-                                case Opcode.StoreGlobal: m_global.SetValueByIndex(opvalue, stackObjects[stackIndex--]); continue;
-                                case Opcode.StoreGlobalString: {
-                                    m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
-                                    instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
-                                    continue;
-                                }
-                                case Opcode.StoreValue: {
-                                    stackObjects[stackIndex - 1].SetValueByIndex(opvalue, stackObjects[stackIndex]);
-                                    stackIndex -= 2;
-                                    continue;
                                 }
                                 case Opcode.StoreValueString: {
                                     stackObjects[stackIndex - 1].SetValue(constString[opvalue], stackObjects[stackIndex]);
                                     stackIndex -= 2;
                                     continue;
                                 }
-                                case Opcode.StoreValueObject: {
-                                    switch (stackObjects[stackIndex - 1].valueType) {
-                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].stringValue, stackObjects[stackIndex]); break;
-                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].doubleValue, stackObjects[stackIndex]); break;
-                                        case ScriptValue.longValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].longValue, stackObjects[stackIndex]); break;
-                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].scriptValue, stackObjects[stackIndex]); break;
-                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]); break;
-                                        default: throw new ExecutionException($"不支持当前类型设置变量 : {stackObjects[stackIndex - 1].ValueTypeName}");
-                                    }
-                                    stackIndex -= 3;
+                                case Opcode.StoreGlobal: m_global.SetValueByIndex(opvalue, stackObjects[stackIndex--]); continue;
+                                case Opcode.StoreGlobalString: {
+                                    m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
+                                    instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
                                     continue;
                                 }
                             }

@@ -1,14 +1,10 @@
-class Test {
 
+a = 200
+for (var i = 0 ; i < 2; i += 1) {
+	b = a = 300
+	print(b)
 }
-class Test1 : Test2 {
-	func() {
-		print(this.num)
-	}
-}
-var a = new Test1()
-a.num = 100
-print(a.func())
+
 // class www {
 
 // }

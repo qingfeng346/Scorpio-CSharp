@@ -132,7 +132,7 @@ namespace Scorpio.Compile.Compiler {
                 if (instruction.opcode == Opcode.LoadLocal && m_VariableToInternal.ContainsKey(instruction.opvalue)) {
                     instruction.SetOpcode(Opcode.LoadInternal, m_VariableToInternal[instruction.opvalue]);
                 } else if (instruction.opcode == Opcode.StoreLocal && m_VariableToInternal.ContainsKey(instruction.opvalue)) {
-                    instruction.SetOpcode(Opcode.StoreInternal, m_VariableToInternal[instruction.opvalue]);
+                    instruction.SetOpcode(Opcode.StoreInternalAssign, m_VariableToInternal[instruction.opvalue]);
                 }
             }
             foreach (var instruction in m_listScriptInstructions) {

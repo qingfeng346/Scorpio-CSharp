@@ -18,8 +18,8 @@ namespace Scorpio.Instruction {
             for (int i = 0; i < scriptInstructions.Length; ++i) {
                 var instruction = scriptInstructions[i];
                 var opcode = instruction.opcode.ToString();
-                if (opcode.Length < 20) {
-                    for (int j = opcode.Length; j < 20; ++j) {
+                if (opcode.Length < 25) {
+                    for (int j = opcode.Length; j < 25; ++j) {
                         opcode += " ";
                     }
                 }
@@ -35,24 +35,16 @@ namespace Scorpio.Instruction {
                     case Opcode.StoreValueString:
                         value = constString[instruction.opvalue].ToString();
                         break;
-                    case Opcode.LoadInternal:
-                        value = "load_internal_" + instruction.opvalue;
-                        break;
-                    case Opcode.LoadLocal:
-                        value = "load_local_" + instruction.opvalue;
-                        break;
-                    case Opcode.LoadGlobal:
-                        value = "load_global_" + instruction.opvalue;
-                        break;
-                    case Opcode.StoreInternal:
-                        value = "store_internal_" + instruction.opvalue;
-                        break;
-                    case Opcode.StoreLocal:
-                        value = "store_local_" + instruction.opvalue;
-                        break;
-                    case Opcode.StoreGlobal:
-                        value = "store_global_" + instruction.opvalue;
-                        break;
+                    case Opcode.LoadInternal: value = "load_internal_" + instruction.opvalue; break;
+                    case Opcode.LoadLocal: value = "load_local_" + instruction.opvalue; break;
+                    case Opcode.LoadGlobal: value = "load_global_" + instruction.opvalue; break;
+                    
+                    case Opcode.StoreLocal: value = "store_local_" + instruction.opvalue; break;
+                    case Opcode.StoreGlobal: value = "store_global_" + instruction.opvalue; break;
+
+                    case Opcode.StoreLocalAssign: value = "store_local_assign_" + instruction.opvalue; break;
+                    case Opcode.StoreInternalAssign: value = "store_internal_assign_" + instruction.opvalue; break;
+
                     case Opcode.Jump:
                     case Opcode.FalseTo:
                     case Opcode.TrueTo:

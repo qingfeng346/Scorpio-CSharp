@@ -625,6 +625,10 @@ namespace Scorpio.Compile.Compiler {
                     jump.SetValue(Index);
                     break;
                 }
+                case CodeAssign assign: {
+                    PushAssign(assign);
+                    break;
+                }
                 default: throw new ParserException("不支持的语法 : " + obj);
             }
             if (obj.Not) {
@@ -652,30 +656,32 @@ namespace Scorpio.Compile.Compiler {
             var value = assign.value;
             var index = member.index;
             var line = member.line;
+            // = 操作
             if (assign.AssignType == TokenType.Assign) {
                 if (member.Parent == null) {
                     PushObject(value);
                     if (member is CodeMemberIndex) {
-                        AddScriptInstruction(Opcode.StoreLocal, index, line);
+                        AddScriptInstruction(Opcode.StoreLocalAssign, index, line);
                     } else if (member is CodeMemberInternal) {
-                        AddScriptInstruction(Opcode.StoreInternal, index, line);
+                        AddScriptInstruction(Opcode.StoreInternalAssign, index, line);
                     } else if (member is CodeMemberString) {
-                        AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(member.key), line);
+                        AddScriptInstruction(Opcode.StoreGlobalStringAssign, GetConstString(member.key), line);
                     }
                 } else {
                     PushObject(member.Parent);
                     if (member is CodeMemberIndex) {
                         PushObject(value);
-                        AddScriptInstruction(Opcode.StoreValue, index, line);
+                        AddScriptInstruction(Opcode.StoreValueAssign, index, line);
                     } else if (member is CodeMemberString) {
                         PushObject(value);
-                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(member.key), line);
+                        AddScriptInstruction(Opcode.StoreValueStringAssign, GetConstString(member.key), line);
                     } else {
                         PushObject(member.codeKey);
                         PushObject(value);
-                        AddScriptInstructionWithoutValue(Opcode.StoreValueObject, line);
+                        AddScriptInstructionWithoutValue(Opcode.StoreValueObjectAssign, line);
                     }
                 }
+            // += -= 等计算赋值操作
             } else {
                 var opcode = TempOperator.GetOpcode(assign.AssignType);
                 if (member.Parent == null) {
@@ -683,17 +689,17 @@ namespace Scorpio.Compile.Compiler {
                         AddScriptInstruction(Opcode.LoadLocal, index, line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreLocal, index, line);
+                        AddScriptInstruction(Opcode.StoreLocalAssign, index, line);
                     } else if (member is CodeMemberInternal) {
                         AddScriptInstruction(Opcode.LoadInternal, index, line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreInternal, index, line);
+                        AddScriptInstruction(Opcode.StoreInternalAssign, index, line);
                     } else if (member is CodeMemberString) {
                         AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(member.key), line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(member.key), line);
+                        AddScriptInstruction(Opcode.StoreGlobalStringAssign, GetConstString(member.key), line);
                     }
                 } else {
                     PushObject(member.Parent);
@@ -702,19 +708,19 @@ namespace Scorpio.Compile.Compiler {
                         AddScriptInstruction(Opcode.LoadValue, index, line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreValue, index, line);
+                        AddScriptInstruction(Opcode.StoreValueAssign, index, line);
                     } else if (member is CodeMemberString) {
                         AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
                         AddScriptInstruction(Opcode.LoadValueString, GetConstString(member.key), line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(member.key), line);
+                        AddScriptInstruction(Opcode.StoreValueStringAssign, GetConstString(member.key), line);
                     } else {
                         PushObject(member.codeKey);
                         AddScriptInstructionWithoutValue(Opcode.LoadValueObjectDup, line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstructionWithoutValue(Opcode.StoreValueObject, line);
+                        AddScriptInstructionWithoutValue(Opcode.StoreValueObjectAssign, line);
                     }
                 }
             }
@@ -725,6 +731,7 @@ namespace Scorpio.Compile.Compiler {
             var member = GetObject();
             if (member is CodeAssign) {
                 PushAssign(member as CodeAssign);
+                AddScriptInstructionWithoutValue(Opcode.Pop);                   //弹出赋值的返回值
             } else if (member is CodeCallFunction) {
                 PushObject(member);
                 AddScriptInstructionWithoutValue(Opcode.Pop, member.line);      //弹出call的返回值
