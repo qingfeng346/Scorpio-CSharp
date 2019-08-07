@@ -1,6 +1,7 @@
 ﻿using Scorpio.Exception;
 using System;
 using Scorpio.Userdata;
+using Scorpio.Tools;
 namespace Scorpio {
     public struct ScriptValue {
         public const byte nullValueType = 0;        //null
@@ -294,9 +295,9 @@ namespace Scorpio {
                 case longValueType: return longValue.ToString();
                 case trueValueType: return "true";
                 case falseValueType: return "false";
-                case stringValueType: return $"\"{stringValue.Replace("\"", "\\\"")}\"";
+                case stringValueType: return Util.ParseJsonString(stringValue);
                 case nullValueType: return "null";
-                case objectValueType: return objectValue.ToString();
+                case objectValueType: return Util.ParseJsonString(objectValue.ToString());
                 default: return "";
             }
         }
