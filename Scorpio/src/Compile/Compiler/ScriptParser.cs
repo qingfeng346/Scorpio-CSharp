@@ -575,9 +575,17 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeCallFunction func: {
-                    foreach (var par in func.Parameters) { PushObject(par); }
-                    PushObject(func.Member);
-                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Length, obj.Line);
+                    var spreadCount = 0;
+                    foreach (var parameter in func.Parameters) {
+                        PushObject(parameter.obj);
+                        if (parameter.spread) { spreadCount++; }
+                    }
+                    if (spreadCount == 0) {
+                        PushObject(func.Member);
+                        AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Count, obj.Line);
+                    } else {
+
+                    }
                     if (func.Variables != null) {
                         foreach (var variable in func.Variables.Variables) {
                             if (variable.key is string) {
@@ -952,11 +960,18 @@ namespace Scorpio.Compile.Compiler {
         //返回一个调用函数 Object
         CodeCallFunction GetCallFunction(CodeObject member) {
             ReadLeftParenthesis();
-            var pars = new List<CodeObject>();
+            var paramters = new List<CodeFunctionParameter>();
             var token = PeekToken();
             while (token.Type != TokenType.RightPar) {
-                pars.Add(GetObject());
+                var obj = GetObject();
                 token = PeekToken();
+                var spread = false;
+                if (token.Type == TokenType.Params) {
+                    spread = true;
+                    ReadToken();
+                    token = PeekToken();
+                }
+                paramters.Add(new CodeFunctionParameter() { spread = spread, obj = obj } );
                 if (token.Type == TokenType.Comma)
                     ReadComma();
                 else if (token.Type == TokenType.RightPar)
@@ -965,7 +980,7 @@ namespace Scorpio.Compile.Compiler {
                     throw new ParserException("Comma ',' or right parenthesis ')' expected in function declararion.", token);
             }
             ReadRightParenthesis();
-            return new CodeCallFunction(member, pars, token.SourceLine);
+            return new CodeCallFunction(member, paramters, token.SourceLine);
         }
         CodeObject GetRegionOrFunction() {
             UndoToken();
