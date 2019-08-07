@@ -72,6 +72,7 @@ namespace Scorpio.Compile.Compiler {
             }
             return executable;
         }
+        //获取一个double常量的索引
         int GetConstDouble(double value) {
             var index = ConstDouble.IndexOf(value);
             if (index < 0) {
@@ -81,6 +82,7 @@ namespace Scorpio.Compile.Compiler {
             }
             return index;
         }
+        //获取一个long常量的索引
         int GetConstLong(long value) {
             var index = ConstLong.IndexOf(value);
             if (index < 0) {
@@ -90,6 +92,7 @@ namespace Scorpio.Compile.Compiler {
             }
             return index;
         }
+        //获取一个string常量的索引
         int GetConstString(string value) {
             var index = ConstString.IndexOf(value);
             if (index < 0) {
@@ -575,17 +578,21 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeCallFunction func: {
-                    var spreadCount = 0;
-                    foreach (var parameter in func.Parameters) {
+                    var unfold = 0L;
+                    for (var i = 0; i < func.Parameters.Count; ++i) {
+                        var parameter = func.Parameters[i];
                         PushObject(parameter.obj);
-                        if (parameter.spread) { spreadCount++; }
+                        if (parameter.unfold) {
+                            unfold |= 1L << i;
+                        }
                     }
-                    //if (spreadCount == 0) {
-                        PushObject(func.Member);
+                    PushObject(func.Member);
+                    if (unfold == 0L) {
                         AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Count, obj.Line);
-                    //} else {
-
-                    //}
+                    } else {
+                        var index = System.Convert.ToInt64(func.Parameters.Count) << 8 | unfold;
+                        AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViUnfold : Opcode.CallUnfold, GetConstLong(index), obj.Line);
+                    }
                     if (func.Variables != null) {
                         foreach (var variable in func.Variables.Variables) {
                             if (variable.key is string) {
@@ -971,7 +978,7 @@ namespace Scorpio.Compile.Compiler {
                     ReadToken();
                     token = PeekToken();
                 }
-                paramters.Add(new CodeFunctionParameter() { spread = spread, obj = obj } );
+                paramters.Add(new CodeFunctionParameter() { unfold = spread, obj = obj } );
                 if (token.Type == TokenType.Comma)
                     ReadComma();
                 else if (token.Type == TokenType.RightPar)

@@ -63,6 +63,7 @@ namespace Scorpio {
             m_Length = 0;
         }
         public Script getScript() { return m_Script; }
+        internal ScriptValue[] getObjects() { return m_Objects; }
         void SetCapacity(int value) {
             if (value > 0) {
                 var array = new ScriptValue[value];

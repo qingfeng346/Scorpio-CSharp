@@ -979,19 +979,19 @@ namespace Scorpio.Runtime {
                                 case Opcode.Pop: --stackIndex; continue;
                                 case Opcode.PopNumber: stackIndex -= opvalue; continue;
                                 case Opcode.Call: {
-                                    var value = stackObjects[stackIndex--];
+                                    var func = stackObjects[stackIndex--];
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
-                                    stackObjects[++stackIndex] = value.Call(ScriptValue.Null, parameters, opvalue);
+                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, opvalue);
                                     continue;
                                 }
                                 case Opcode.CallVi: {
-                                    var value = stackObjects[stackIndex--];
+                                    var func = stackObjects[stackIndex--];
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
-                                    stackObjects[++stackIndex] = value.Call(parent, parameters, opvalue);
+                                    stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
                                     continue;
                                 }
                                 case Opcode.CallEach: {
@@ -1032,6 +1032,62 @@ namespace Scorpio.Runtime {
                                 case Opcode.FalseLoadFalse: if (stackObjects[stackIndex].valueType == ScriptValue.falseValueType) { iInstruction = opvalue; } else { --stackIndex; } continue;
                                 case Opcode.RetNone: return ScriptValue.Null;
                                 case Opcode.Ret: return stackObjects[stackIndex--];
+                                case Opcode.CallUnfold: {
+                                    var func = stackObjects[stackIndex--];      //函数对象
+                                    var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                                    var unfold = value & 0xff;                  //折叠标志位
+                                    var funcParameterCount = (int)(value >> 8); //参数个数
+                                    var startIndex = stackIndex - funcParameterCount + 1;
+                                    var parameterIndex = 0;
+                                    for (var i = 0; i < funcParameterCount; ++i) {
+                                        var parameter = stackObjects[startIndex + i];
+                                        if ((unfold & (1L << i)) != 0) {
+                                            var array = parameter.Get<ScriptArray>();
+                                            if (array != null) {
+                                                var values = array.getObjects();
+                                                var valueLength = array.Length();
+                                                for (var j = 0; j < valueLength; ++j) {
+                                                    parameters[parameterIndex++] = values[j];
+                                                }
+                                            } else {
+                                                parameters[parameterIndex++] = parameter;
+                                            }
+                                        } else {
+                                            parameters[parameterIndex++] = parameter;
+                                        }
+                                    }
+                                    stackIndex -= funcParameterCount;
+                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, parameterIndex);
+                                    continue;
+                                }
+                                case Opcode.CallViUnfold: {
+                                    var func = stackObjects[stackIndex--];      //函数对象
+                                    var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                                    var unfold = value & 0xff;                  //折叠标志位
+                                    var funcParameterCount = (int)(value >> 8); //参数个数
+                                    var startIndex = stackIndex - funcParameterCount + 1;
+                                    var parameterIndex = 0;
+                                    for (var i = 0; i < funcParameterCount; ++i) {
+                                        var parameter = stackObjects[startIndex + i];
+                                        if ((unfold & (1L << i)) != 0) {
+                                            var array = parameter.Get<ScriptArray>();
+                                            if (array != null) {
+                                                var values = array.getObjects();
+                                                var valueLength = array.Length();
+                                                for (var j = 0; j < valueLength; ++j) {
+                                                    parameters[parameterIndex++] = values[j];
+                                                }
+                                            } else {
+                                                parameters[parameterIndex++] = parameter;
+                                            }
+                                        } else {
+                                            parameters[parameterIndex++] = parameter;
+                                        }
+                                    }
+                                    stackIndex -= funcParameterCount;
+                                    stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
+                                    continue;
+                                }
                             }
                             continue;
                         case OpcodeType.New:

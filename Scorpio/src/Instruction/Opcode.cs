@@ -104,6 +104,8 @@
         CallEach,               //call a function when in foreach
         Call,                   //调用一个函数
         CallVi,                 //调用内部函数
+        CallUnfold,             //调用一个函数 有参数需要展开
+        CallViUnfold,           //调用内部函数 有参数需要展开
         RetNone,                //return
         Ret,                    //return a value
         JumpEnd,

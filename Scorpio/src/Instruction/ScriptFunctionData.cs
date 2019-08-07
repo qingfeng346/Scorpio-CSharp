@@ -52,6 +52,13 @@ namespace Scorpio.Instruction {
                     case Opcode.FalseLoadFalse:
                         value = instruction.opvalue.ToString("D5");
                         break;
+                    case Opcode.CallUnfold:
+                    case Opcode.CallViUnfold: {
+                        var longValue = constLong[instruction.opvalue];
+                        var unfold = longValue & 0xff;
+                        value = $"{longValue >> 8} - {System.Convert.ToString(unfold, 2)}";
+                        break;
+                    }
                     case Opcode.LoadConstNull: value = "null"; break;
                     case Opcode.LoadConstTrue: value = "true"; break;
                     case Opcode.LoadConstFalse: value = "false"; break;
