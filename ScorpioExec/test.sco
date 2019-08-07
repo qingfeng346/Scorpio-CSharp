@@ -1,8 +1,25 @@
+// var a = b == 100 ? 100 : 200
+// print(a)
+UI_DOWNLOAD = {
 
-var a
-var b
-a = b = c = 200
-
+}
+UI = {
+    Objects = {},       		//所有UI的信息
+    function InitializeUI(index) {
+        // print("=================== " + index)
+		// if (this.Objects.containsKey(index)) { return this.Objects[index]; }
+		// print("22222222222222222222222222222 " + index)
+        // var str = "${index}_ATTR"
+        // print(str)
+        // var attribute = _G["${index}_ATTR"]
+        var com = UI_DOWNLOAD
+        // var com = isMap(value) ? clone(value) : value()		//如果是map就clone 否则就是 class 直接new一个对象
+        // var com = clone(value)
+        com.Hide = function(args) { UI.Hide(index, args) }
+        com.Hide()
+    }
+}
+UI.InitializeUI("feawfaewfaewf")
 // class www {
 
 // }

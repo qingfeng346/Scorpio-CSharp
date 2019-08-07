@@ -57,6 +57,7 @@
         StoreValueAssign,       //store a value by index and assign
 
         StoreLocal,             //store local value
+        StoreInternal,          //store internal value
         StoreGlobal,            //store global value by index
         StoreGlobalString,      //store global value by string
         StoreValueString,       //store a value by string

@@ -580,12 +580,12 @@ namespace Scorpio.Compile.Compiler {
                         PushObject(parameter.obj);
                         if (parameter.spread) { spreadCount++; }
                     }
-                    if (spreadCount == 0) {
+                    //if (spreadCount == 0) {
                         PushObject(func.Member);
                         AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Count, obj.Line);
-                    } else {
+                    //} else {
 
-                    }
+                    //}
                     if (func.Variables != null) {
                         foreach (var variable in func.Variables.Variables) {
                             if (variable.key is string) {

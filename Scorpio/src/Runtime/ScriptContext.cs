@@ -258,7 +258,7 @@ namespace Scorpio.Runtime {
                                             variableObjects[opvalue].objectValue = stackObjects[stackIndex].objectValue;
                                             variableObjects[opvalue].valueType = ScriptValue.objectValueType;
                                             continue;
-                                        default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
+                                        default: throw new ExecutionException($"StoreLocalAssign : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                 }
                                 case Opcode.StoreInternalAssign: {
@@ -286,7 +286,7 @@ namespace Scorpio.Runtime {
                                             internalObjects[opvalue].value.objectValue = stackObjects[stackIndex].objectValue;
                                             internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
                                             continue;
-                                        default: throw new ExecutionException("StoreInternal : 未知错误数据类型 : " + stackObjects[stackIndex].valueType);
+                                        default: throw new ExecutionException("StoreInternalAssign : 未知错误数据类型 : " + stackObjects[stackIndex].valueType);
                                     }
                                 }
                                 case Opcode.StoreValueStringAssign: {
@@ -350,6 +350,35 @@ namespace Scorpio.Runtime {
                                             variableObjects[opvalue].valueType = ScriptValue.objectValueType;
                                             continue;
                                         default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.StoreInternal: {
+                                    index = stackIndex--;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            internalObjects[opvalue].value.scriptValue = stackObjects[index].scriptValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            internalObjects[opvalue].value.doubleValue = stackObjects[index].doubleValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: internalObjects[opvalue].value.valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: internalObjects[opvalue].value.valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: internalObjects[opvalue].value.valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            internalObjects[opvalue].value.stringValue = stackObjects[index].stringValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            internalObjects[opvalue].value.longValue = stackObjects[index].longValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            internalObjects[opvalue].value.objectValue = stackObjects[index].objectValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException("StoreInternal : 未知错误数据类型 : " + stackObjects[index].valueType);
                                     }
                                 }
                                 case Opcode.StoreValueString: {
