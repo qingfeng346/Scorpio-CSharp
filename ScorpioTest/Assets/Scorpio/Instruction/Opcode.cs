@@ -48,13 +48,19 @@
 
         //取栈操作
         StoreBegin,
+        StoreLocalAssign,       //store local value and assign
+        StoreInternalAssign,    //store internal value and assign
+        StoreValueStringAssign, //store a value by string and assign
+        StoreValueObjectAssign, //store a value by object and assign
+        StoreGlobalAssign,      //store global value by index and assign
+        StoreGlobalStringAssign,//store global value by string and assign
+        StoreValueAssign,       //store a value by index and assign
+
         StoreLocal,             //store local value
         StoreInternal,          //store internal value
         StoreGlobal,            //store global value by index
         StoreGlobalString,      //store global value by string
-        StoreValue,             //store a value by index
         StoreValueString,       //store a value by string
-        StoreValueObject,       //store a value by object
         StoreEnd,
 
         //运算指令
@@ -98,6 +104,8 @@
         CallEach,               //call a function when in foreach
         Call,                   //调用一个函数
         CallVi,                 //调用内部函数
+        CallUnfold,             //调用一个函数 有参数需要展开
+        CallViUnfold,           //调用内部函数 有参数需要展开
         RetNone,                //return
         Ret,                    //return a value
         JumpEnd,

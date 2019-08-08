@@ -128,15 +128,22 @@ namespace Scorpio.Compile.Compiler {
         public ScriptInstruction[] ScriptInstructions { get { return m_listScriptInstructions.ToArray(); } }
         public int[] ScriptInternals { get { return m_ParentInternal.ToArray(); } }
         public void Finished() {
+            //计算局部变量是否是内部引用变量，并修改为 内部变量赋值 Opcode
             foreach (var instruction in m_listScriptInstructions) {
-                if (instruction.opcode == Opcode.LoadLocal && m_VariableToInternal.ContainsKey(instruction.opvalue)) {
-                    instruction.SetOpcode(Opcode.LoadInternal, m_VariableToInternal[instruction.opvalue]);
-                } else if (instruction.opcode == Opcode.StoreLocal && m_VariableToInternal.ContainsKey(instruction.opvalue)) {
-                    instruction.SetOpcode(Opcode.StoreInternal, m_VariableToInternal[instruction.opvalue]);
+                var internalValue = 0;
+                if (m_VariableToInternal.TryGetValue(instruction.opvalue, out internalValue)) {
+                    if (instruction.opcode == Opcode.LoadLocal) {
+                        instruction.SetOpcode(Opcode.LoadInternal, internalValue);
+                    } else if (instruction.opcode == Opcode.StoreLocal) {
+                        instruction.SetOpcode(Opcode.StoreInternal, internalValue);
+                    } else if (instruction.opcode == Opcode.StoreLocalAssign) {
+                        instruction.SetOpcode(Opcode.StoreInternalAssign, internalValue);
+                    }
                 }
             }
+            //重新计算操作局部变量 索引
             foreach (var instruction in m_listScriptInstructions) {
-                if (instruction.opcode == Opcode.LoadLocal || instruction.opcode == Opcode.StoreLocal) {
+                if (instruction.opcode == Opcode.LoadLocal || instruction.opcode == Opcode.StoreLocal || instruction.opcode == Opcode.StoreLocalAssign) {
                     var count = 0;
                     foreach (var pair in m_VariableToInternal) {
                         if (instruction.opvalue > pair.Key) {

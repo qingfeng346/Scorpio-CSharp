@@ -18,8 +18,8 @@ namespace Scorpio.Instruction {
             for (int i = 0; i < scriptInstructions.Length; ++i) {
                 var instruction = scriptInstructions[i];
                 var opcode = instruction.opcode.ToString();
-                if (opcode.Length < 20) {
-                    for (int j = opcode.Length; j < 20; ++j) {
+                if (opcode.Length < 25) {
+                    for (int j = opcode.Length; j < 25; ++j) {
                         opcode += " ";
                     }
                 }
@@ -31,27 +31,19 @@ namespace Scorpio.Instruction {
                     case Opcode.LoadConstString:
                     case Opcode.LoadGlobalString:
                     case Opcode.StoreGlobalString:
+                    case Opcode.StoreGlobalStringAssign:
                     case Opcode.LoadValueString:
                     case Opcode.StoreValueString:
                         value = constString[instruction.opvalue].ToString();
                         break;
                     case Opcode.LoadInternal:
-                        value = "load_internal_" + instruction.opvalue;
-                        break;
                     case Opcode.LoadLocal:
-                        value = "load_local_" + instruction.opvalue;
-                        break;
                     case Opcode.LoadGlobal:
-                        value = "load_global_" + instruction.opvalue;
-                        break;
-                    case Opcode.StoreInternal:
-                        value = "store_internal_" + instruction.opvalue;
-                        break;
                     case Opcode.StoreLocal:
-                        value = "store_local_" + instruction.opvalue;
-                        break;
                     case Opcode.StoreGlobal:
-                        value = "store_global_" + instruction.opvalue;
+                    case Opcode.StoreLocalAssign:
+                    case Opcode.StoreInternalAssign:
+                        value = instruction.opvalue.ToString("D2");
                         break;
                     case Opcode.Jump:
                     case Opcode.FalseTo:
@@ -60,6 +52,13 @@ namespace Scorpio.Instruction {
                     case Opcode.FalseLoadFalse:
                         value = instruction.opvalue.ToString("D5");
                         break;
+                    case Opcode.CallUnfold:
+                    case Opcode.CallViUnfold: {
+                        var longValue = constLong[instruction.opvalue];
+                        var unfold = longValue & 0xff;
+                        value = $"{longValue >> 8} - {System.Convert.ToString(unfold, 2)}";
+                        break;
+                    }
                     case Opcode.LoadConstNull: value = "null"; break;
                     case Opcode.LoadConstTrue: value = "true"; break;
                     case Opcode.LoadConstFalse: value = "false"; break;

@@ -95,5 +95,44 @@ namespace Scorpio.Tools {
                 }
             }
         }
+        public static string ParseJsonString(string value) {
+            var builder = new StringBuilder();
+            builder.Append('\"');
+            foreach (var c in value.ToCharArray()) {
+                switch (c) {
+                case '"':
+                    builder.Append("\\\"");
+                    break;
+                case '\\':
+                    builder.Append("\\\\");
+                    break;
+                case '\b':
+                    builder.Append("\\b");
+                    break;
+                case '\f':
+                    builder.Append("\\f");
+                    break;
+                case '\n':
+                    builder.Append("\\n");
+                    break;
+                case '\r':
+                    builder.Append("\\r");
+                    break;
+                case '\t':
+                    builder.Append("\\t");
+                    break;
+                default:
+                    int codepoint = Convert.ToInt32(c);
+                    if ((codepoint >= 32) && (codepoint <= 126)) {
+                        builder.Append(c);
+                    } else {
+                        builder.Append("\\u" + Convert.ToString(codepoint, 16).PadLeft(4, '0'));
+                    }
+                    break;
+                }
+            }
+            builder.Append('\"');
+            return builder.ToString();
+        }
     }
 }

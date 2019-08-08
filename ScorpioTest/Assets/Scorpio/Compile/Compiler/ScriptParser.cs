@@ -72,6 +72,7 @@ namespace Scorpio.Compile.Compiler {
             }
             return executable;
         }
+        //获取一个double常量的索引
         int GetConstDouble(double value) {
             var index = ConstDouble.IndexOf(value);
             if (index < 0) {
@@ -81,6 +82,7 @@ namespace Scorpio.Compile.Compiler {
             }
             return index;
         }
+        //获取一个long常量的索引
         int GetConstLong(long value) {
             var index = ConstLong.IndexOf(value);
             if (index < 0) {
@@ -90,6 +92,7 @@ namespace Scorpio.Compile.Compiler {
             }
             return index;
         }
+        //获取一个string常量的索引
         int GetConstString(string value) {
             var index = ConstString.IndexOf(value);
             if (index < 0) {
@@ -238,7 +241,20 @@ namespace Scorpio.Compile.Compiler {
         //解析Var关键字
         void ParseVar() {
             m_scriptExecutable.AddIndex(ReadIdentifier());
-            UndoToken();
+            while (true) {
+                switch (PeekToken().Type) {
+                    case TokenType.Comma: {
+                        ReadToken();
+                        m_scriptExecutable.AddIndex(ReadIdentifier());
+                        break;
+                    }
+                    case TokenType.Assign: {
+                        UndoToken();
+                        return;
+                    }
+                    default: return;
+                }
+            }
         }
         //解析区域块{}
         void ParseBlock() {
@@ -562,9 +578,21 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeCallFunction func: {
-                    foreach (var par in func.Parameters) { PushObject(par); }
+                    var unfold = 0L;
+                    for (var i = 0; i < func.Parameters.Count; ++i) {
+                        var parameter = func.Parameters[i];
+                        PushObject(parameter.obj);
+                        if (parameter.unfold) {
+                            unfold |= 1L << i;
+                        }
+                    }
                     PushObject(func.Member);
-                    AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Length, obj.Line);
+                    if (unfold == 0L) {
+                        AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Count, obj.Line);
+                    } else {
+                        var index = System.Convert.ToInt64(func.Parameters.Count) << 8 | unfold;
+                        AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViUnfold : Opcode.CallUnfold, GetConstLong(index), obj.Line);
+                    }
                     if (func.Variables != null) {
                         foreach (var variable in func.Variables.Variables) {
                             if (variable.key is string) {
@@ -625,6 +653,10 @@ namespace Scorpio.Compile.Compiler {
                     jump.SetValue(Index);
                     break;
                 }
+                case CodeAssign assign: {
+                    PushAssign(assign);
+                    break;
+                }
                 default: throw new ParserException("不支持的语法 : " + obj);
             }
             if (obj.Not) {
@@ -652,30 +684,32 @@ namespace Scorpio.Compile.Compiler {
             var value = assign.value;
             var index = member.index;
             var line = member.line;
+            // = 操作
             if (assign.AssignType == TokenType.Assign) {
                 if (member.Parent == null) {
                     PushObject(value);
                     if (member is CodeMemberIndex) {
-                        AddScriptInstruction(Opcode.StoreLocal, index, line);
+                        AddScriptInstruction(Opcode.StoreLocalAssign, index, line);
                     } else if (member is CodeMemberInternal) {
-                        AddScriptInstruction(Opcode.StoreInternal, index, line);
+                        AddScriptInstruction(Opcode.StoreInternalAssign, index, line);
                     } else if (member is CodeMemberString) {
-                        AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(member.key), line);
+                        AddScriptInstruction(Opcode.StoreGlobalStringAssign, GetConstString(member.key), line);
                     }
                 } else {
                     PushObject(member.Parent);
                     if (member is CodeMemberIndex) {
                         PushObject(value);
-                        AddScriptInstruction(Opcode.StoreValue, index, line);
+                        AddScriptInstruction(Opcode.StoreValueAssign, index, line);
                     } else if (member is CodeMemberString) {
                         PushObject(value);
-                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(member.key), line);
+                        AddScriptInstruction(Opcode.StoreValueStringAssign, GetConstString(member.key), line);
                     } else {
                         PushObject(member.codeKey);
                         PushObject(value);
-                        AddScriptInstructionWithoutValue(Opcode.StoreValueObject, line);
+                        AddScriptInstructionWithoutValue(Opcode.StoreValueObjectAssign, line);
                     }
                 }
+            // += -= 等计算赋值操作
             } else {
                 var opcode = TempOperator.GetOpcode(assign.AssignType);
                 if (member.Parent == null) {
@@ -683,17 +717,17 @@ namespace Scorpio.Compile.Compiler {
                         AddScriptInstruction(Opcode.LoadLocal, index, line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreLocal, index, line);
+                        AddScriptInstruction(Opcode.StoreLocalAssign, index, line);
                     } else if (member is CodeMemberInternal) {
                         AddScriptInstruction(Opcode.LoadInternal, index, line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreInternal, index, line);
+                        AddScriptInstruction(Opcode.StoreInternalAssign, index, line);
                     } else if (member is CodeMemberString) {
                         AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(member.key), line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(member.key), line);
+                        AddScriptInstruction(Opcode.StoreGlobalStringAssign, GetConstString(member.key), line);
                     }
                 } else {
                     PushObject(member.Parent);
@@ -702,19 +736,19 @@ namespace Scorpio.Compile.Compiler {
                         AddScriptInstruction(Opcode.LoadValue, index, line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreValue, index, line);
+                        AddScriptInstruction(Opcode.StoreValueAssign, index, line);
                     } else if (member is CodeMemberString) {
                         AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
                         AddScriptInstruction(Opcode.LoadValueString, GetConstString(member.key), line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstruction(Opcode.StoreValueString, GetConstString(member.key), line);
+                        AddScriptInstruction(Opcode.StoreValueStringAssign, GetConstString(member.key), line);
                     } else {
                         PushObject(member.codeKey);
                         AddScriptInstructionWithoutValue(Opcode.LoadValueObjectDup, line);
                         PushObject(value);
                         AddScriptInstructionWithoutValue(opcode, line);
-                        AddScriptInstructionWithoutValue(Opcode.StoreValueObject, line);
+                        AddScriptInstructionWithoutValue(Opcode.StoreValueObjectAssign, line);
                     }
                 }
             }
@@ -725,6 +759,7 @@ namespace Scorpio.Compile.Compiler {
             var member = GetObject();
             if (member is CodeAssign) {
                 PushAssign(member as CodeAssign);
+                AddScriptInstructionWithoutValue(Opcode.Pop);                   //弹出赋值的返回值
             } else if (member is CodeCallFunction) {
                 PushObject(member);
                 AddScriptInstructionWithoutValue(Opcode.Pop, member.line);      //弹出call的返回值
@@ -932,11 +967,18 @@ namespace Scorpio.Compile.Compiler {
         //返回一个调用函数 Object
         CodeCallFunction GetCallFunction(CodeObject member) {
             ReadLeftParenthesis();
-            var pars = new List<CodeObject>();
+            var paramters = new List<CodeFunctionParameter>();
             var token = PeekToken();
             while (token.Type != TokenType.RightPar) {
-                pars.Add(GetObject());
+                var obj = GetObject();
                 token = PeekToken();
+                var spread = false;
+                if (token.Type == TokenType.Params) {
+                    spread = true;
+                    ReadToken();
+                    token = PeekToken();
+                }
+                paramters.Add(new CodeFunctionParameter() { unfold = spread, obj = obj } );
                 if (token.Type == TokenType.Comma)
                     ReadComma();
                 else if (token.Type == TokenType.RightPar)
@@ -945,7 +987,7 @@ namespace Scorpio.Compile.Compiler {
                     throw new ParserException("Comma ',' or right parenthesis ')' expected in function declararion.", token);
             }
             ReadRightParenthesis();
-            return new CodeCallFunction(member, pars, token.SourceLine);
+            return new CodeCallFunction(member, paramters, token.SourceLine);
         }
         CodeObject GetRegionOrFunction() {
             UndoToken();

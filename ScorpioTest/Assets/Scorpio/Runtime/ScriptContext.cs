@@ -232,6 +232,97 @@ namespace Scorpio.Runtime {
                             continue;
                         case OpcodeType.Store:
                             switch (opcode) {
+                                //-------------下面为 = *= -= 等赋值操作, 压入计算结果
+                                case Opcode.StoreLocalAssign: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            variableObjects[opvalue].scriptValue = stackObjects[stackIndex].scriptValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            variableObjects[opvalue].doubleValue = stackObjects[stackIndex].doubleValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: variableObjects[opvalue].valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: variableObjects[opvalue].valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: variableObjects[opvalue].valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            variableObjects[opvalue].stringValue = stackObjects[stackIndex].stringValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            variableObjects[opvalue].longValue = stackObjects[stackIndex].longValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            variableObjects[opvalue].objectValue = stackObjects[stackIndex].objectValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException($"StoreLocalAssign : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.StoreInternalAssign: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            internalObjects[opvalue].value.scriptValue = stackObjects[stackIndex].scriptValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            internalObjects[opvalue].value.doubleValue = stackObjects[stackIndex].doubleValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: internalObjects[opvalue].value.valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: internalObjects[opvalue].value.valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: internalObjects[opvalue].value.valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            internalObjects[opvalue].value.stringValue = stackObjects[stackIndex].stringValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            internalObjects[opvalue].value.longValue = stackObjects[stackIndex].longValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            internalObjects[opvalue].value.objectValue = stackObjects[stackIndex].objectValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException("StoreInternalAssign : 未知错误数据类型 : " + stackObjects[stackIndex].valueType);
+                                    }
+                                }
+                                case Opcode.StoreValueStringAssign: {
+                                    index = stackIndex;
+                                    stackObjects[stackIndex - 1].SetValue(constString[opvalue], stackObjects[stackIndex]);
+                                    stackObjects[--stackIndex] = stackObjects[index];
+                                    continue;
+                                }
+                                case Opcode.StoreValueObjectAssign: {
+                                    index = stackIndex;
+                                    switch (stackObjects[stackIndex - 1].valueType) {
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].stringValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].doubleValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].longValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].scriptValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]); break;
+                                        default: throw new ExecutionException($"不支持当前类型设置变量 : {stackObjects[stackIndex - 1].ValueTypeName}");
+                                    }
+                                    stackObjects[stackIndex -= 2] = stackObjects[index];
+                                    continue;
+                                }
+                                case Opcode.StoreGlobalAssign: m_global.SetValueByIndex(opvalue, stackObjects[stackIndex]); continue;
+                                case Opcode.StoreGlobalStringAssign: {
+                                    m_global.SetValue(constString[opvalue], stackObjects[stackIndex]);
+                                    instruction.SetOpcode(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]));
+                                    continue;
+                                }
+                                case Opcode.StoreValueAssign: {
+                                    index = stackIndex;
+                                    stackObjects[stackIndex - 1].SetValueByIndex(opvalue, stackObjects[stackIndex]);
+                                    stackObjects[--stackIndex] = stackObjects[index];
+                                    continue;
+                                }
+
+
+                                //-----------------下面为普通赋值操作 不压入结果
                                 case Opcode.StoreLocal: {
                                     index = stackIndex--;
                                     switch (stackObjects[index].valueType) {
@@ -258,7 +349,7 @@ namespace Scorpio.Runtime {
                                             variableObjects[opvalue].objectValue = stackObjects[index].objectValue;
                                             variableObjects[opvalue].valueType = ScriptValue.objectValueType;
                                             continue;
-                                        default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[index].ValueTypeName}");
+                                        default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                 }
                                 case Opcode.StoreInternal: {
@@ -290,32 +381,15 @@ namespace Scorpio.Runtime {
                                         default: throw new ExecutionException("StoreInternal : 未知错误数据类型 : " + stackObjects[index].valueType);
                                     }
                                 }
-                                case Opcode.StoreGlobal: m_global.SetValueByIndex(opvalue, stackObjects[stackIndex--]); continue;
-                                case Opcode.StoreGlobalString: {
-                                    m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
-                                    instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
-                                    continue;
-                                }
-                                case Opcode.StoreValue: {
-                                    stackObjects[stackIndex - 1].SetValueByIndex(opvalue, stackObjects[stackIndex]);
-                                    stackIndex -= 2;
-                                    continue;
-                                }
                                 case Opcode.StoreValueString: {
                                     stackObjects[stackIndex - 1].SetValue(constString[opvalue], stackObjects[stackIndex]);
                                     stackIndex -= 2;
                                     continue;
                                 }
-                                case Opcode.StoreValueObject: {
-                                    switch (stackObjects[stackIndex - 1].valueType) {
-                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].stringValue, stackObjects[stackIndex]); break;
-                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].doubleValue, stackObjects[stackIndex]); break;
-                                        case ScriptValue.longValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].longValue, stackObjects[stackIndex]); break;
-                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].scriptValue, stackObjects[stackIndex]); break;
-                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]); break;
-                                        default: throw new ExecutionException($"不支持当前类型设置变量 : {stackObjects[stackIndex - 1].ValueTypeName}");
-                                    }
-                                    stackIndex -= 3;
+                                case Opcode.StoreGlobal: m_global.SetValueByIndex(opvalue, stackObjects[stackIndex--]); continue;
+                                case Opcode.StoreGlobalString: {
+                                    m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
+                                    instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
                                     continue;
                                 }
                             }
@@ -905,19 +979,19 @@ namespace Scorpio.Runtime {
                                 case Opcode.Pop: --stackIndex; continue;
                                 case Opcode.PopNumber: stackIndex -= opvalue; continue;
                                 case Opcode.Call: {
-                                    var value = stackObjects[stackIndex--];
+                                    var func = stackObjects[stackIndex--];
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
-                                    stackObjects[++stackIndex] = value.Call(ScriptValue.Null, parameters, opvalue);
+                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, opvalue);
                                     continue;
                                 }
                                 case Opcode.CallVi: {
-                                    var value = stackObjects[stackIndex--];
+                                    var func = stackObjects[stackIndex--];
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
-                                    stackObjects[++stackIndex] = value.Call(parent, parameters, opvalue);
+                                    stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
                                     continue;
                                 }
                                 case Opcode.CallEach: {
@@ -958,6 +1032,62 @@ namespace Scorpio.Runtime {
                                 case Opcode.FalseLoadFalse: if (stackObjects[stackIndex].valueType == ScriptValue.falseValueType) { iInstruction = opvalue; } else { --stackIndex; } continue;
                                 case Opcode.RetNone: return ScriptValue.Null;
                                 case Opcode.Ret: return stackObjects[stackIndex--];
+                                case Opcode.CallUnfold: {
+                                    var func = stackObjects[stackIndex--];      //函数对象
+                                    var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                                    var unfold = value & 0xff;                  //折叠标志位
+                                    var funcParameterCount = (int)(value >> 8); //参数个数
+                                    var startIndex = stackIndex - funcParameterCount + 1;
+                                    var parameterIndex = 0;
+                                    for (var i = 0; i < funcParameterCount; ++i) {
+                                        var parameter = stackObjects[startIndex + i];
+                                        if ((unfold & (1L << i)) != 0) {
+                                            var array = parameter.Get<ScriptArray>();
+                                            if (array != null) {
+                                                var values = array.getObjects();
+                                                var valueLength = array.Length();
+                                                for (var j = 0; j < valueLength; ++j) {
+                                                    parameters[parameterIndex++] = values[j];
+                                                }
+                                            } else {
+                                                parameters[parameterIndex++] = parameter;
+                                            }
+                                        } else {
+                                            parameters[parameterIndex++] = parameter;
+                                        }
+                                    }
+                                    stackIndex -= funcParameterCount;
+                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, parameterIndex);
+                                    continue;
+                                }
+                                case Opcode.CallViUnfold: {
+                                    var func = stackObjects[stackIndex--];      //函数对象
+                                    var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                                    var unfold = value & 0xff;                  //折叠标志位
+                                    var funcParameterCount = (int)(value >> 8); //参数个数
+                                    var startIndex = stackIndex - funcParameterCount + 1;
+                                    var parameterIndex = 0;
+                                    for (var i = 0; i < funcParameterCount; ++i) {
+                                        var parameter = stackObjects[startIndex + i];
+                                        if ((unfold & (1L << i)) != 0) {
+                                            var array = parameter.Get<ScriptArray>();
+                                            if (array != null) {
+                                                var values = array.getObjects();
+                                                var valueLength = array.Length();
+                                                for (var j = 0; j < valueLength; ++j) {
+                                                    parameters[parameterIndex++] = values[j];
+                                                }
+                                            } else {
+                                                parameters[parameterIndex++] = parameter;
+                                            }
+                                        } else {
+                                            parameters[parameterIndex++] = parameter;
+                                        }
+                                    }
+                                    stackIndex -= funcParameterCount;
+                                    stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
+                                    continue;
+                                }
                             }
                             continue;
                         case OpcodeType.New:
@@ -1020,7 +1150,7 @@ namespace Scorpio.Runtime {
                                     var classData = constClasses[opvalue];
                                     var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
                                     var className = constString[classData.name];
-                                    var type = new ScriptType(className, parentType);
+                                    var type = new ScriptType(className, parentType.valueType == ScriptValue.nullValueType ? m_script.TypeObjectValue : parentType);
                                     var functions = classData.functions;
                                     for (var j = 0; j < functions.Length; ++j) {
                                         var func = functions[j];
