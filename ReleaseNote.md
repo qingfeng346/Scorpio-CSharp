@@ -1,3 +1,35 @@
+## v2.0.0_preview11
+### 新增功能
+* 增加 赋值操作返回值(重要) [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.sco)
+* 增加 函数参数展开传递(重要) [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/%E5%87%BD%E6%95%B0.sco)
+* 增加 同时申请多个局部变量 例如 : var a,b,c,d
+* 增加 createArray 函数, 快速创建一个 c# 数组
+* Array 类增加 push 函数, 功能同 add
+### 修改内容
+* 修改定义class时父类为null,则自动继承Object
+### BUG修复
+* 修复 json 格式化字符串时特殊字符未格式化完全的问题
+
+## v2.0.0_preview10
+### 修改内容
+* 增加switch语法 [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/switch.sco)
+* 支持 long 和 double 之间直接运算比较
+* lambada 表达式申请的函数, this 继承父级 [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/%E5%87%BD%E6%95%B0.sco)
+* 支持动态定义class [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/class%E8%AF%AD%E6%B3%95.sco)
+* foreach pairs 支持传入 type 实例 和 _G
+* Array 原表增加 join 函数
+* Map 原表增加 forEach forEachValue 函数
+* Array Map forEach 函数返回 false 时停止循环
+* math 库增加 三角函数
+* 快速反射支持 op_Implicit 函数
+* 命令行增加 version 命令
+* 优化 == 运行逻辑
+
+### BUG修复
+* 修复 + 运算符 右侧为 string 时某些情况下返回的不是 string 的问题
+* 修复 快速反射 构造函数含有 ref out 标识时生成出错
+
+
 ## v2.0.0_preview9
 
 * 支持 **long** 和 **double** 类型之间直接运算比较
