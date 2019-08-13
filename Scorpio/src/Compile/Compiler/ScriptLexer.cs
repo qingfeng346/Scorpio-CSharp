@@ -403,7 +403,11 @@ namespace Scorpio.Compile.Compiler {
                     tokenType = TokenType.Null;
                     break;
                 case "true":
+                case "TRUE":
+                case "True":
                 case "false":
+                case "FALSE":
+                case "False":
                     tokenType = TokenType.Boolean;
                     break;
                 case "class":
@@ -418,7 +422,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
             }
             if (tokenType == TokenType.Boolean) {
-                AddToken(tokenType, m_Builder.ToString().Equals("true"), m_iSourceLine, m_iSourceChar);
+                AddToken(tokenType, m_Builder.ToString().ToLower().Equals("true"), m_iSourceLine, m_iSourceChar);
             } else if (tokenType == TokenType.Null) {
                 AddToken(tokenType, null, m_iSourceLine, m_iSourceChar);
             } else {
