@@ -39,11 +39,13 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 整段字符串的摘要 取第一行字符串的前20个字符</summary>
         public string Breviary { get; private set; }
+        public int SourceLine => m_iSourceLine;
+        public int SourceChar => m_iSourceChar;
         void ThrowInvalidCharacterException() {
             ThrowInvalidCharacterException(m_ch);
         }
         void ThrowInvalidCharacterException(char ch) {
-            throw new LexerException(Breviary + ":" + (m_iSourceLine + 1) + "  Unexpected character [" + ch + "]  Line:" + (m_iSourceLine + 1) + " Column:" + m_iSourceChar);
+            throw new LexerException(this, $"Unexpected character [{ch}]  Line:{m_iSourceLine + 1} Column:{m_iSourceChar}");
         }
         char ReadChar() {
             ++m_iIndex;
@@ -53,7 +55,7 @@ namespace Scorpio.Compile.Compiler {
             } else if (m_iIndex == m_iLength) {
                 return END_CHAR;
             }
-            throw new LexerException("End of source reached.");
+            throw new LexerException(this, "End of source reached.");
         }
         char PeekChar() {
             int index = m_iIndex + 1;
@@ -62,11 +64,11 @@ namespace Scorpio.Compile.Compiler {
             } else if (index == m_iLength) {
                 return END_CHAR;
             }
-            throw new LexerException("End of source reached.");
+            throw new LexerException(this, "End of source reached.");
         }
         void UndoChar() {
             if (m_iIndex == 0)
-                throw new LexerException("Cannot undo char beyond start of source.");
+                throw new LexerException(this, "Cannot undo char beyond start of source.");
             --m_iIndex;
             --m_iSourceChar;
         }
