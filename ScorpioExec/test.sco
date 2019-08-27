@@ -1,12 +1,14 @@
-function hello(a1,a2,a3,a4) {
-}
+var b = "123213"
+print(b != "123213")
+// function hello(a1,a2,a3,a4) {
+// }
 // for (var i = 0 ; i < 1000000; i ++) {
 //     hello([100,200]...,[300,400]...)
 // }
 // for (var i = 0 ; i < 1000000; i ++) {
 //     hello([100,200],[300,400])
 // }
-hello([100,200]...,[300,400], ["feawf", "feawfafw"]...)
+// hello([100,200]...,[300,400], ["feawf", "feawfafw"]...)
 // // var a = b == 100 ? 100 : 200
 // // print(a)
 // UI_DOWNLOAD = {

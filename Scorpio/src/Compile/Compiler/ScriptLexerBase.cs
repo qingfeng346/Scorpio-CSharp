@@ -6,29 +6,29 @@ namespace Scorpio.Compile.Compiler {
     /// <summary> 脚本语法解析 </summary>
     public partial class ScriptLexer {
         enum FormatString {
-            None,               //无
-            SingleQuotes,       //单引号字符串
-            DoubleQuotes,       //双引号字符串
-            Point,              //`符号字符串
-
-            SimpleSingleQuotes, //带 @ 单引号字符串
-            SimpleDoubleQuotes, //带 @ 双引号字符串
-            SimplePoint,        //带 @ `符号字符串
+            None,                   //无
+            SingleQuotes,           //单引号字符串
+            DoubleQuotes,           //双引号字符串
+            Point,                  //`符号字符串
+    
+            SimpleSingleQuotes,     //带 @ 单引号字符串
+            SimpleDoubleQuotes,     //带 @ 双引号字符串
+            SimplePoint,            //带 @ `符号字符串
         }
-        private const char END_CHAR = (char)0;      //结尾字符
-        private const int BREVIARY_CHAR = 10;       //摘要的字符数
+        private const char END_CHAR = char.MaxValue;    //结尾字符
+        private const int BREVIARY_CHAR = 10;           //摘要的字符数
 
-        private char m_ch;                          //当前解析字符
-        private char ch;                            //临时保存字符
-        private FormatString m_FormatString;        //是否正在格式化字符串
-        private StringBuilder m_Builder;            //当前缓存的字符串
-        private List<Token> m_listTokens;           //返回的Token列表
-        private string m_strBuffer;                 //解析内容
-        private int m_iLength = 0;                  //Buffer长度
-        private int m_iSourceLine = 0;              //当前解析的行数
-        private int m_iSourceChar = 0;              //当前行解析
-        private int m_iIndex = 0;                   //当前解析
-        private int m_iCacheLine = 0;               //Simple字符串起始行
+        private char m_ch;                              //当前解析字符
+        private char ch;                                //临时保存字符
+        private FormatString m_FormatString;            //是否正在格式化字符串
+        private StringBuilder m_Builder;                //当前缓存的字符串
+        private List<Token> m_listTokens;               //返回的Token列表
+        private string m_strBuffer;                     //解析内容
+        private int m_iLength = 0;                      //Buffer长度
+        private int m_iSourceLine = 0;                  //当前解析的行数
+        private int m_iSourceChar = 0;                  //当前行解析
+        private int m_iIndex = 0;                       //当前解析
+        private int m_iCacheLine = 0;                   //Simple字符串起始行
         public ScriptLexer(string buffer, string breviary) {
             Breviary = breviary == null || breviary.Length == 0 ? buffer.Substring(0, Math.Min(BREVIARY_CHAR, buffer.Length)) : breviary;
             m_FormatString = FormatString.None;
