@@ -1,5 +1,8 @@
-var b = "123213"
-print(b != "123213")
+var a = []
+a.addUnique(100)
+a.addUnique(100)
+print(a.popLast())
+print(a.popLast())
 // function hello(a1,a2,a3,a4) {
 // }
 // for (var i = 0 ; i < 1000000; i ++) {

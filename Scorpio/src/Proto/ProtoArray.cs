@@ -6,6 +6,7 @@
             ret.SetValue("insert", script.CreateFunction(new insert()));
             ret.SetValue("add", script.CreateFunction(new add()));
             ret.SetValue("push", script.CreateFunction(new add()));
+            ret.SetValue("addUnique", script.CreateFunction(new addUnique()));
             ret.SetValue("remove", script.CreateFunction(new remove()));
             ret.SetValue("removeAt", script.CreateFunction(new removeAt()));
             ret.SetValue("clear", script.CreateFunction(new clear()));
@@ -56,6 +57,15 @@
                 var array = thisObject.Get<ScriptArray>();
                 for (int i = 0; i < length; ++i) {
                     array.Add(args[i]);
+                }
+                return thisObject;
+            }
+        }
+        private class addUnique : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptArray>();
+                for (int i = 0; i < length; ++i) {
+                    array.AddUnique(args[i]);
                 }
                 return thisObject;
             }
