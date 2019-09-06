@@ -329,7 +329,7 @@ namespace Scorpio.Compile.Compiler {
             this.SourceChar = sourceChar;
         }
         public override String ToString() {
-            return Type.ToString() + "(" + Lexeme.ToString() + ")";
+            return $"{Type}({Lexeme})";
         }
     }
 }

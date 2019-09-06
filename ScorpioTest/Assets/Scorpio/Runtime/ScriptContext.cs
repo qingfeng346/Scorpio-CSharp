@@ -931,7 +931,7 @@ namespace Scorpio.Runtime {
                                             if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
                                                 stackObjects[index].valueType = stackObjects[index].stringValue == stackObjects[stackIndex].stringValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
                                             } else {
-                                                stackObjects[index].valueType = ScriptValue.falseValueType;
+                                                stackObjects[index].valueType = ScriptValue.trueValueType;
                                             }
                                             --stackIndex;
                                             continue;

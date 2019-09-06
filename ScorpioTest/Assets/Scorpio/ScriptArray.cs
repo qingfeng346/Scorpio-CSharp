@@ -130,8 +130,18 @@ namespace Scorpio {
             if (m_Length == m_Objects.Length) {
                 EnsureCapacity(m_Length + 1);
             }
-            m_Objects[m_Length] = value;
-            m_Length++;
+            m_Objects[m_Length++] = value;
+        }
+        public void AddUnique(ScriptValue value) {
+            for (int i = 0; i < m_Length; ++i) {
+                if (value.Equals(m_Objects[i])) {
+                    return;
+                }
+            }
+            if (m_Length == m_Objects.Length) {
+                EnsureCapacity(m_Length + 1);
+            }
+            m_Objects[m_Length++] = value;
         }
         public void Insert(int index, ScriptValue value) {
             if (index < 0 || index >= m_Length)
@@ -228,18 +238,12 @@ namespace Scorpio {
         public ScriptValue PopLast() {
             if (m_Length == 0)
                 throw new ExecutionException("Array PopLast 数组长度为0");
-            var index = m_Length - 1;
-            var value = m_Objects[index];
-            RemoveAt(index);
-            return value;
+            return m_Objects[--m_Length];
         }
         public ScriptValue SafePopLast() {
             if (m_Length == 0)
                 return ScriptValue.Null;
-            var index = m_Length - 1;
-            var value = m_Objects[index];
-            RemoveAt(index);
-            return value;
+            return m_Objects[--m_Length];
         }
         //仅限于number和string
         public T[] ToArray<T>() {
