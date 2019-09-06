@@ -1,3 +1,11 @@
+### v2.0.0
+*2019-09-06*
+
+### 主要内容
+* 运行方式改为**IL**执行,执行效率大幅提升
+* 增加原表操作
+* 其他修改内容可以查看 **v2.0.0-preview** 版本更新日志
+
 ### v2.0.0_preview11
 *2019-08-08*
 
@@ -61,7 +69,6 @@
 * 支持生成脚本 IL 文件，运行时可以省去解析编译的过程
 * 添加 ScriptNamespace 类， 可以使用 importNamespace 导入， 引用c#的命名空间
 * 增加 IO 库
-* 可以直接赋值c#的delegate, 不用再生成 DelegateFactory 类, (测试 UWP 不可用, Android IOS 正常)
 * 命令行增加生成快速反射文件和IL文件命令, 可以使用 sco -help 查看
 * 优化脚本性能, 修改为栈编译运行,部分运行测试,左侧为2.0版本,测试结果,基础运算大幅提升,其他操作也有较大的提升
     ![](https://raw.githubusercontent.com/qingfeng346/Scorpio-CSharp/v2.0/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/1.png)
