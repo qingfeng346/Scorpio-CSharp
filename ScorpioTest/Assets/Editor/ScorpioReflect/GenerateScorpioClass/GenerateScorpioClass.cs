@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
-using Scorpio;
+using Scorpio.Tools;
 namespace Scorpio.ScorpioReflect {
     //过滤不生成的变量 函数 属性 和 事件 
     public interface ClassFilter {
@@ -55,20 +54,23 @@ namespace Scorpio.ScorpioReflect {
             m_FullName = ScorpioReflectUtil.GetFullName(m_Type);
             m_AllFields.AddRange(m_Type.GetFields(ScorpioReflectUtil.BindingFlag));
             m_AllEvents.AddRange(m_Type.GetEvents(ScorpioReflectUtil.BindingFlag));
-            m_AllPropertys.AddRange(m_Type.GetProperties(ScorpioReflectUtil.BindingFlag));
+            var propertys = m_Type.GetProperties(ScorpioReflectUtil.BindingFlag);
+            foreach (var property in propertys) {
+                //如果是 get 则参数是0个  set 参数是1个  否则就可能是 [] 的重载
+                if ((property.CanRead && property.GetGetMethod().GetParameters().Length == 0) ||
+                    (property.CanWrite && property.GetSetMethod().GetParameters().Length == 1)) {
+                    m_AllPropertys.Add(property);
+                }
+            }
             var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(ScorpioReflectUtil.BindingFlag);
             foreach (var method in methods) {
-                string name = method.Name;
-                //屏蔽掉 =重载函数 IsSpecialName 表示为特殊函数 运算符重载 这个值会为true
-                if (method.IsSpecialName && name == "op_Implicit") { continue; }
-                //屏蔽掉 模版函数
-                if (method.IsGenericMethod) { continue; }
-                //屏蔽掉 带有 ref 和 out 关键字参数的函数
-                if (ScorpioReflectUtil.IsRetvalOrOut(method)) { continue; }
+                //屏蔽掉 模版函数 模板函数只能使用反射
+                if (Util.IsGenericMethod(method)) { continue; }
                 m_AllMethods.Add(method);
             }
         }
         public void SetClassFilter(ClassFilter classFilter) {
+            if (classFilter == null) { return; }
             m_ClassFilter = classFilter;
         }
         void Init() {
@@ -126,15 +128,14 @@ namespace Scorpio.ScorpioReflect {
         }
         public string Generate() {
             Init();
-            string str = ClassTemplate;
-            str = str.Replace("__getvariabletype_content", GenerateGetVariableType());
-            str = str.Replace("__getvalue_content", GenerateGetValue());
-            str = str.Replace("__setvalue_content", GenerateSetValue());
-            str = str.Replace("__constructor_content", GenerateConstructor());
-            str = str.Replace("__methods_content", GenerateMethod());
-            str = str.Replace("__class", m_ScorpioClassName);
-            str = str.Replace("__fullname", m_FullName);
-            return str;
+            return ClassTemplate.Replace("__getvariabletype_content", GenerateGetVariableType())
+                    .Replace("__method_content", GenerateGetMethod())
+                    .Replace("__getvalue_content", GenerateGetValue())
+                    .Replace("__setvalue_content", GenerateSetValue())
+                    .Replace("__constructor_content", GenerateConstructor())
+                    .Replace("__methods_content", GenerateMethod())
+                    .Replace("__class", m_ScorpioClassName)
+                    .Replace("__fullname", m_FullName);
         }
     }
 }

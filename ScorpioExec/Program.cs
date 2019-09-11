@@ -1,155 +1,201 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Diagnostics;
 using System.Reflection;
-using Scorpio;
+using Scorpio.Commons;
+using Scorpio.Userdata;
 using Scorpio.Serialize;
-using ScorpioLibrary;
+using Scorpio.ScorpioReflect;
+using System.Collections.Generic;
 
-namespace ScorpioExec
-{
-    public class Program
-    {
-        public static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        public static readonly string CurrentDirectory = Environment.CurrentDirectory;
-        private static Script script;
-        private static void LoadLibrary(string path) {
-            if (!Directory.Exists(path)) { return; }
-            string[] files = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
-            foreach (var file in files) {
-                try {
-                    script.PushAssembly(Assembly.LoadFile(file));
-                    Console.WriteLine("load dll file [" + file + "] success");
-                } catch (System.Exception ex) {
-                    Console.WriteLine("load dll file [" + file + "] fail : " + ex.ToString());
+namespace ScorpioExec {
+    public class Program {
+        private static readonly string CurrentDirectory = Util.CurrentDirectory;
+        private static readonly string BaseDirectory = Util.BaseDirectory;
+        
+        private const string HelpRegister = @"
+注册运行程序到环境变量";
+        private const string HelpPack = @"
+编译生成sco的IL文件
+    -source|-s      脚本文本文件
+    -output|-o      IL输出文件";
+        private const string HelpFast = @"
+生成快速反射文件
+    -dll            dll文件路径
+    -class          class完整名称,多class使用分号;隔开
+    -filter         过滤器,多过滤器使用分号;隔开
+    -output|-o      快速反射文件输出目录";
+        private const string HelpDelegate = @"
+生成Delegate仓库
+    -dll            dll文件路径
+    -class          class完整名称,多class使用分号;隔开
+    -output|-o      Delegate仓库输出文件";
+        private const string HelpVersion = @"
+查询sco版本，并检查最新版本
+    -preview|-p     是否检查preview版本";
+        private const string HelpExecute = @"
+命令列表
+    register        注册运行程序到环境变量
+    pack            编译生成sco的IL文件
+    fast            生成快速反射文件
+    version         查询sco版本，并检查最新版本
+    [文件路径]       运行sco文本文件或IL文件";
+        static void Main(string[] args) {
+            Launch.AddExecute("register", HelpRegister, Register);
+            Launch.AddExecute("pack", HelpPack, Pack);
+            Launch.AddExecute("fast", HelpFast, Fast);
+            Launch.AddExecute("delegate", HelpDelegate, DelegateFactory);
+            Launch.AddExecute("version", HelpVersion, VersionExec);
+            Launch.AddExecute("sversion", HelpVersion, SVersionExec);
+            Launch.AddExecute("", HelpExecute, Execute);
+            Launch.Start(args, null, null);
+        }
+        static void Register(CommandLine command, string[] args) { 
+            Util.RegisterApplication($"{Util.BaseDirectory}/{AppDomain.CurrentDomain.FriendlyName}");
+        }
+        static void Pack(CommandLine command, string[] args) {
+            var source = Launch.GetPath("-source", "-s");
+            var output = Launch.GetPath("-output", "-o");
+            File.WriteAllBytes(output, Serializer.Serialize(source, FileUtil.GetFileString(source)).ToArray());
+            Logger.info($"生成IL文件  {source} -> {output}");
+        }
+        static void Fast(CommandLine command, string[] args) {
+            var output = Launch.GetPath("-output", "-o");
+            var dll = command.GetValue("-dll");
+            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
+            var strClass = command.GetValue("-class");
+            if (strClass.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
+
+            ClassFilter filter = null;
+            var strFilter = command.GetValue("-filter");
+            if (!strFilter.isNullOrWhiteSpace()) {
+                var filterType = GetType(assembly, strFilter, typeof(ClassFilter));
+                if (filterType != null) {
+                    filter = (ClassFilter)Activator.CreateInstance(filterType);
                 }
             }
+            var classNames = strClass.Split(";");
+            foreach (var className in classNames) {
+                var clazz = GetType(assembly, className, null);
+                if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
+                var generate = new GenerateScorpioClass(clazz);
+                generate.SetClassFilter(filter);
+                var outputFile = Path.Combine(output, generate.ScorpioClassName + ".cs");
+                FileUtil.CreateFile(outputFile, generate.Generate());
+                Logger.info($"生成快速反射类 {className} -> {outputFile}");
+            }
         }
-        static void Register() {
-            if (Environment.OSVersion.ToString().ToLower().Contains("windows")) {
-                var p = new List<string>(Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User).Split(';'));
-                if (!p.Contains(BaseDirectory)) {
-                    p.Add(BaseDirectory);
-                    Environment.SetEnvironmentVariable("Path", string.Join(";", p.ToArray()), EnvironmentVariableTarget.User);
+        static void DelegateFactory(CommandLine command, string[] args) {
+            var output = Launch.GetPath("-output", "-o");
+            var dll = command.GetValue("-dll");
+            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
+            var strClass = command.GetValue("-class");
+            if (strClass.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
+            var generate = new GenerateScorpioDelegate();
+            var classNames = strClass.Split(";");
+            foreach (var className in classNames) {
+                var clazz = GetType(assembly, className, null);
+                if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
+                generate.AddType(clazz);
+            }
+            FileUtil.CreateFile(output, generate.Generate(0));
+            Logger.info($"生成Delegate仓库 {output}");
+        }
+        static Type GetType(Assembly assembly, string typeName, Type parent) {
+            var type = assembly?.GetType(typeName, false, false);
+            if (type == null) { type = Type.GetType(typeName, false, false); }
+            if (parent != null) {
+                if (type != null && type.IsSubclassOf(parent)) {
+                    return type;
+                }
+                return null;
+            }
+            return type;
+        }
+        static void SVersionExec(CommandLine command, string[] args) {
+            Logger.info(Scorpio.Version.version);
+        }
+        static void VersionExec(CommandLine command, string[] args) {
+            Logger.info($@"Sco Version : {Scorpio.Version.version}
+Build Date : {Scorpio.Version.date}");
+            var result = Util.RequestString("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
+                request.Headers.Add("Authorization", "token e5ff670eb105f044273f4c81276a67cd1341e649");
+            });
+            var isPreview = command.HadValue("-preview", "-p");
+            var datas = Json.Deserialize(result, true) as List<object>;
+            foreach (Dictionary<string, object> data in datas) {
+                var name = data["name"] as string;
+                if (name.Contains(Scorpio.Version.version)) {
+                    Logger.info($"当前已经是最新版本 : {name}");
+                    return;
+                }
+                bool newVersion = false;
+                if ((bool)data["prerelease"]) {
+                    if (isPreview) { newVersion = true; }
                 } else {
-                    Console.WriteLine("path is already existed");
+                    newVersion = true;
                 }
-            } else {
-                ProcessStartInfo info = new ProcessStartInfo("ln");
-                info.Arguments = "-s " + BaseDirectory + "sco /usr/bin/";
-                info.CreateNoWindow = false;
-                info.ErrorDialog = true;
-                info.UseShellExecute = true;
-                info.RedirectStandardOutput = false;
-                info.RedirectStandardError = false;
-                info.RedirectStandardInput = false;
-                Process process = Process.Start(info);
-                process.WaitForExit();
-                process.Close();
+                if (newVersion) {
+                    var url = data["html_url"].ToString();
+                    Logger.info($"发现新版本 : {name}");
+                    Logger.info($"下载地址 : {url}");
+                    //Logger.info($"是否立刻去下载  是(Y)√  否(N)");
+                    //var str = Console.ReadLine();
+                    //if (string.IsNullOrWhiteSpace(str) || str.ToUpper() == "Y") {
+                    //    var url = data["html_url"].ToString().Replace("https://", "http://");
+                    //    Logger.info("打开网页 : " + url);
+                    //}
+                    return;
+                }
             }
         }
-        static byte[] GetFileBuffer(String fileName) {
-            FileStream stream = File.OpenRead(fileName);
-            long length = stream.Length;
-            byte[] buffer = new byte[length];
-            stream.Read(buffer, 0, buffer.Length);
-            stream.Close();
-            stream.Dispose();
-            return buffer;
-        }
-        static void Pack(string source, string output) {
-            source = Path.Combine(CurrentDirectory, source);
-            output = Path.Combine(CurrentDirectory, output);
-            try {
-                byte[] buffer = GetFileBuffer(source);
-                File.WriteAllBytes(output, ScorpioMaker.Serialize(source, Encoding.UTF8.GetString(buffer, 0, buffer.Length)));
-            } catch (System.Exception ex) {
-                Console.WriteLine("转换出错 error : " + ex.ToString());	
-            }
-        }
-        static void Unpack(string source, string output) {
-            source = Path.Combine(CurrentDirectory, source);
-            output = Path.Combine(CurrentDirectory, output);
-            try {
-                byte[] buffer = GetFileBuffer(source);
-                File.WriteAllBytes(output, Encoding.UTF8.GetBytes(ScorpioMaker.DeserializeToString(buffer)));
-            } catch (System.Exception ex) {
-                Console.WriteLine("转换出错 error : " + ex.ToString());	
-            }
-        }
-        static void Execute(string[] args) {
-            script = new Script();
-            script.LoadLibrary();
-            LibraryIO.Load(script);
-            script.PushAssembly(typeof(Program).Assembly);
-            Console.WriteLine("os version : " + Environment.OSVersion.ToString());
-            Console.WriteLine("sco version : " + Scorpio.Version.version);
-            Console.WriteLine("build date : " + Scorpio.Version.date);
-            Console.WriteLine("app path is : " + BaseDirectory);
-            Console.WriteLine("environment path is : " + CurrentDirectory);
+        static void Execute(CommandLine command, string[] args) {
+            Util.PrintSystemInfo();
+            Logger.info("Sco Version : " + Scorpio.Version.version);
+            Logger.info("Build Date : " + Scorpio.Version.date);
+            Logger.info("Application Name : " + AppDomain.CurrentDomain.FriendlyName);
+            TypeManager.PushAssembly(typeof(Program).Assembly);
+            var script = new Scorpio.Script();
+            script.LoadLibraryV1();
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
             if (args.Length >= 1) {
-                try {
-                    string file = Path.Combine(CurrentDirectory, args[0]);
-                    string path = Path.GetDirectoryName(file);
-                    Stopwatch watch = Stopwatch.StartNew();
-                    script.PushSearchPath(path);
-                    script.PushSearchPath(CurrentDirectory);
-                    script.SetObject("__PATH__", path);
-                    Console.WriteLine("=============================");
-                    ScriptObject value = script.LoadFile(file);
-                    Console.WriteLine("=============================");
-                    Console.WriteLine("return value : " + value);
-                    Console.WriteLine("the execution time : " + watch.ElapsedMilliseconds + " ms");
-                } catch (System.Exception ex) {
-                    Console.WriteLine(script.GetStackInfo());
-                    Console.WriteLine(ex.ToString());
-                }
+                var file = Path.Combine(CurrentDirectory, args[0]);
+                var path = Path.GetDirectoryName(file);
+                script.PushSearchPath(path);
+                script.PushSearchPath(CurrentDirectory);
+                Logger.info("=============================");
+                var watch = Stopwatch.StartNew();
+                var value = script.LoadFile(file);
+                Logger.info("=============================");
+                Logger.info("return value : " + value);
+                Logger.info("the execution time : " + watch.ElapsedMilliseconds + " ms");
             } else {
                 while (true) {
                     try {
                         string str = Console.ReadLine();
-                        if (str == "exit")  { 
+                        if (str == "exit") {
                             break;
                         } else if (str == "clear") {
                             Console.Clear();
-                        } else if (str == "version") {
-                            Console.WriteLine($@"version : {Scorpio.Version.version}
-build date : {Scorpio.Version.date}");
                         } else {
                             script.LoadString(str);
                         }
                     } catch (System.Exception ex) {
-                        Console.WriteLine(script.GetStackInfo());
-                        Console.WriteLine(ex.ToString());
+                        Logger.error(ex.ToString());
                     }
                 }
             }
         }
-        static void Main(string[] args) {
-            try {
-                CommandLine command = new CommandLine(args);
-                string type = command.Get("-t").ToString();
-                if (type == "register") {
-                    Register();
-                } else if (type == "pack" || type == "unpack") {
-                    string source = command.Get("-s").ToString();
-                    string output = command.Get("-o").ToString();
-                    if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(output)) {
-                        Console.WriteLine("参数出错 -s [源文件] -o [输出文件] 是必须参数");
-                        return;
-                    }
-                    if (type == "pack")
-                        Pack(source, output);
-                    else
-                        Unpack(source, output);
-                } else {
-                    Execute(args);
+        static void LoadLibrary(string path) {
+            if (!Directory.Exists(path)) { return; }
+            string[] files = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
+            foreach (var file in files) {
+                try {
+                    TypeManager.PushAssembly(Assembly.LoadFile(file));
+                    Logger.info("load dll file [" + file + "] success");
+                } catch (System.Exception ex) {
+                    Logger.error("load dll file [" + file + "] fail : " + ex.ToString());
                 }
-            } catch (Exception e) {
-                Console.WriteLine(e.ToString());
             }
         }
     }

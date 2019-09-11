@@ -1,54 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using Scorpio;
-using Scorpio.Runtime;
-using Scorpio.Variable;
-using Scorpio.Exception;
-using Scorpio.Commons;
+﻿using Scorpio.Runtime;
 namespace Scorpio.Function {
     public class ScriptScriptFunction : ScriptFunction {
-        private ScorpioScriptFunction m_ScriptFunction;                         //脚本函数
-        private ScriptContext m_ParentContext;                                  //父级堆栈
-        private bool m_IsStaticFunction;                                        //是否是静态函数(不是table内部函数)
-        private ScorpioDictionary<string, ScriptObject> m_stackObject = new ScorpioDictionary<string, ScriptObject>();    //函数变量
-        public bool IsStaticFunction { get { return m_IsStaticFunction; } }
-        internal ScriptScriptFunction(Script script, String name, ScorpioScriptFunction function) : base(script, name)
-        {
-            this.m_IsStaticFunction = true;
-            this.m_ScriptFunction = function;
+        protected ScriptContext m_Context;
+        protected InternalValue[] m_internalValues;               //父级内部变量
+        public ScriptScriptFunction(ScriptContext context) : base(context.m_script, "") {
+            m_Context = context;
+            m_internalValues = new InternalValue[context.internalCount];
         }
-        public override int GetParamCount() { return m_ScriptFunction.GetParameterCount(); }
-        public override bool IsParams() { return m_ScriptFunction.IsParams(); }
-        public override bool IsStatic() { return m_IsStaticFunction; }
-        public override ScriptArray GetParams() { return m_ScriptFunction.GetParameters(); }
-        public override void SetValue(object key, ScriptObject value) {
-            if (!(key is string)) throw new ExecutionException(this.m_Script, this, "Function SetValue只支持String类型 key值为:" + key);
-            m_stackObject[(string)key] = value;
+        public void SetInternal(int index, InternalValue value) {
+            m_internalValues[index] = value;
         }
-        public override ScriptObject GetValue(object key) {
-            if (!(key is string)) throw new ExecutionException(this.m_Script, this, "Function GetValue只支持String类型 key值为:" + key);
-            string skey = (string)key;
-            return m_stackObject.ContainsKey(skey) ? m_stackObject[skey] : m_Script.Null;
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            return m_Context.Execute(thisObject, parameters, length, m_internalValues);
         }
-        public void SetTable(ScriptTable table) {
-            m_IsStaticFunction = false;
-            m_stackObject["this"] = table;
-            m_stackObject["self"] = table;
+        public override ScriptFunction SetBindObject(ScriptValue obj) {
+            return new ScriptScriptBindFunction(m_Context, obj);
         }
-        public ScriptScriptFunction SetParentContext(ScriptContext context) {
-            m_ParentContext = context;
-            return this;
+    }
+    public class ScriptScriptBindFunction : ScriptScriptFunction {
+        private ScriptValue m_BindObject = ScriptValue.Null;
+        public ScriptScriptBindFunction(ScriptContext context, ScriptValue bindObject) : base(context) {
+            m_BindObject = bindObject;
         }
-        public ScriptScriptFunction Create() {
-            ScriptScriptFunction ret = new ScriptScriptFunction(m_Script, Name, m_ScriptFunction);
-            ret.m_IsStaticFunction = IsStaticFunction;
-            return ret;
-        }
-        public override object Call(ScriptObject[] parameters) {
-            return m_ScriptFunction.Call(m_ParentContext, m_stackObject, parameters);
-        }
-        public override ScriptObject Clone() {
-            return Create();
+        public override ScriptValue BindObject { get { return m_BindObject; } }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            return m_Context.Execute(m_BindObject, parameters, length, m_internalValues);
         }
     }
 }

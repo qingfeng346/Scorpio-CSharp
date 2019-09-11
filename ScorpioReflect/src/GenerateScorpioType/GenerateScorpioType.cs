@@ -5,11 +5,9 @@ namespace Scorpio.ScorpioReflect {
     public partial class GenerateScorpioType {
         private const string Template = @"using System;
 using Scorpio;
-using Scorpio.Userdata;
 namespace __Namespace {
     public class __ClassName {
-        public static void Initialize(Script script) {
-__CreateObject
+        public static void Initialize(Script script) {__CreateObject
         }
     }
 }";
@@ -22,17 +20,16 @@ __CreateObject
         public string Generate() {
             ScorpioReflectUtil.SortType(m_Types);
             string str = Template;
-            str = str.Replace("__Namespace", string.IsNullOrEmpty(Namespace) ? "ScorpioDelegate" : Namespace);
-            str = str.Replace("__ClassName", string.IsNullOrEmpty(ClassName) ? "ScorpioDelegateFactory" : ClassName);
+            str = str.Replace("__Namespace", string.IsNullOrEmpty(Namespace) ? "ScorpioType" : Namespace);
+            str = str.Replace("__ClassName", string.IsNullOrEmpty(ClassName) ? "ScorpioTypeFactory" : ClassName);
             str = str.Replace("__CreateObject", CreateObject());
             return str;
         }
         public string CreateObject() {
-            StringBuilder builder = new StringBuilder();
-            bool first = true;
+            var builder = new StringBuilder();
             foreach (var type in m_Types) {
-                if (first) { first = false; } else { builder.AppendLine(); }
-                builder.AppendFormat("            script.SetObject(\"{0}\", script.CreateObject(typeof({0})));", ScorpioReflectUtil.GetFullName(type));
+                builder.AppendFormat(@"
+            script.SetGlobal(""{0}"", ScriptValue.CreateObject(typeof({0})));", ScorpioReflectUtil.GetFullName(type));
             }
             return builder.ToString();
         }

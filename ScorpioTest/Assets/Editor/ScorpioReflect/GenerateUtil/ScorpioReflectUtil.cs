@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Text;
 public class ScorpioReflectUtil {
     public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy;
     struct ComparerType : IComparer<Type> {
         public int Compare(Type x, Type y) {
-            return x.FullName.CompareTo(y.FullName);
+            if (x == null || y == null) { return 0; }
+            return GetFullName(x).CompareTo(GetFullName(y));
         }
     }
     public static string GetFullName(Type type) {
@@ -17,51 +19,27 @@ public class ScorpioReflectUtil {
         if (string.IsNullOrEmpty(fullName))
             return "";
         fullName = fullName.Replace("+", ".");
+        var builder = new StringBuilder();
         if (type.IsGenericType) {
-            if (!type.IsNested) {
-                var index = fullName.IndexOf("`");
-                fullName = fullName.Substring(0, index);
-                fullName += "<";
-                var types = args == null ? type.GetGenericArguments() : args;
-                bool first = true;
-                foreach (var t in types) {
-                    if (first == false) { fullName += ","; } else { first = false; }
-                    fullName += GetFullName(t, types);
-                }
-                fullName += ">";
-            } else {
-                int index = fullName.IndexOf("[");
-                if (index >= 0) fullName = fullName.Substring(0, index);
-                index = fullName.LastIndexOf("`");
-                int num = int.Parse(fullName.Substring(index + 1, fullName.Length - index - 1));
-                fullName = fullName.Substring(0, index);
-                index = fullName.LastIndexOf(".");
-                fullName = fullName.Substring(index + 1, fullName.Length - index - 1);
-                var types = args == null ? type.GetGenericArguments() : args;
-                fullName += "<";
-                for (var i = 0; i < num;++i) {
-                    if (i != 0) { fullName += ","; }
-                    fullName += GetFullName(types[types.Length - num + i]);
-                }
-                fullName += ">";
-                var tttt = new Type[types.Length - num];
-                Array.Copy(types, 0, tttt, 0, tttt.Length);
-                fullName = GetFullName(type.DeclaringType, tttt) + "." + fullName;
+            if (type.IsGenericTypeDefinition) {
+                throw new Exception("未声明的模板类 : " + fullName);
             }
+            var index = fullName.IndexOf("`");
+            builder.Append(fullName.Substring(0, index));
+            builder.Append("<");
+            var types = type.GetGenericArguments();
+            bool first = true;
+            foreach (var t in types) {
+                if (first == false) { builder.Append(","); } else { first = false; }
+                builder.Append(GetFullName(t));
+            }
+            builder.Append(">");
+        } else {
+            builder.Append(fullName);
         }
-        return fullName;
+        return builder.ToString();
     }
     public static void SortType(List<Type> types) {
         types.Sort(new ComparerType());
-    }
-    //是否是带有 ref 和 out 关键字参数的函数
-    public static bool IsRetvalOrOut(MethodInfo method) {
-        var pars = method.GetParameters();
-        foreach (var par in pars) {
-            if (par.IsRetval || par.IsOut) {
-                return true;
-            }
-        }
-        return false;
     }
 }

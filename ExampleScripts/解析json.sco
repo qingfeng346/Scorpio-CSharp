@@ -21,5 +21,5 @@ print(str)
 var dec = json.decode(str)
 foreach (pair in pairs(dec))
 {
-    print(pair.key + " = " + pair.value + "(" + type(pair.value) + ")")
+    print("${pair.key} = ${pair.value}")
 }

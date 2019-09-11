@@ -1,16 +1,24 @@
 {
   "profiles": {
-    "ScorpioExec": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\qingf\\Desktop\\a.sco"
-    },
     "pack": {
       "commandName": "Project",
-      "commandLineArgs": "-t pack -s C:\\Users\\qingf\\Desktop\\a.sco -o C:\\Users\\qingf\\Desktop\\a.out"
+      "commandLineArgs": "pack -s ../../../test.sco -o ../../../test.il"
     },
-    "unpack": {
+    "fast": {
       "commandName": "Project",
-      "commandLineArgs": "-t unpack -s C:\\Users\\qingf\\Desktop\\a.out -o C:\\Users\\qingf\\Desktop\\a.txt"
+      "commandLineArgs": "fast -class ScorpioExec.TestClass -output ../../../"
+    },
+    "run": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../test.sco"
+    },
+    "version": {
+      "commandName": "Project",
+      "commandLineArgs": "version"
+    },
+    "delegate": {
+      "commandName": "Project",
+      "commandLineArgs": "delegate -output ../../../DelegateFactory.cs -class ScorpioExec.TestDelegate1;ScorpioExec.TestDelegate2;ScorpioExec.TestDelegate3;ScorpioExec.TestDelegate4"
     }
   }
 }

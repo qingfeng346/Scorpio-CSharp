@@ -5,73 +5,94 @@ namespace Scorpio.ScorpioReflect {
     public partial class GenerateScorpioDelegate {
         private static readonly Type TYPE_DELEGATE = typeof(Delegate);
         private const string Template = @"using System;
+using System.Collections.Generic;
 using Scorpio;
-using Scorpio.Userdata;
-namespace __Namespace {
-    public class __ClassName : DelegateTypeFactory {
-        public static void Initialize() {
-            ScriptUserdataDelegateType.SetFactory(new __ClassName());
+public class DelegateFactory : IDelegateFactory {
+    private static Dictionary<Type, Func<ScriptObject, Delegate>> delegates = new Dictionary<Type, Func<ScriptObject, Delegate>>();
+    public static void Initialize(Script script) {
+        ScorpioDelegateFactory.SetFactory(new DelegateFactory());__DelegateList__CreateDelegate
+    }
+    public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
+        Func<ScriptObject, Delegate> func;
+        if (delegates.TryGetValue(delegateType, out func)) {
+            return func(scriptObject);
         }
-        public Delegate CreateDelegate(Script script, Type type, ScriptFunction func) {
-__CreateDelegate
-            throw new Exception(""Delegate Type is not found : "" + type + ""  func : "" + func);
-        }
+        throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);
     }
 }";
-        public string Namespace = "ScorpioDelegate";
-        public string ClassName = "ScorpioDelegateFactory";
+        private const string TemplateIf = @"using System;
+using System.Collections.Generic;
+using Scorpio;
+public class DelegateFactory : IDelegateFactory {
+    public static void Initialize(Script script) {
+        ScorpioDelegateFactory.SetFactory(new DelegateFactory());__DelegateList
+    }
+    public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {__CreateDelegate
+        throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);
+    }
+}";
         private List<Type> m_Delegates = new List<Type>();
         public void AddType(Type type) {
-            if (!m_Delegates.Contains(type))
-                m_Delegates.Add(type);
+            if (type == null || !TYPE_DELEGATE.IsAssignableFrom(type) ||
+                // MulticastDelegate 是 event
+                type == typeof(MulticastDelegate) || string.IsNullOrWhiteSpace(ScorpioReflectUtil.GetFullName(type)) ||
+                m_Delegates.Contains(type)) { return; }
+            m_Delegates.Add(type);
         }
-        public string Generate() {
+        public string Generate(int buildType) {
             ScorpioReflectUtil.SortType(m_Delegates);
-            string str = Template;
-            str = str.Replace("__Namespace", string.IsNullOrEmpty(Namespace) ? "ScorpioDelegate" : Namespace);
-            str = str.Replace("__ClassName", string.IsNullOrEmpty(ClassName) ? "ScorpioDelegateFactory" : ClassName);
-            str = str.Replace("__CreateDelegate", CreateDelegate());
-            return str;
+            return (buildType == 0 ? Template : TemplateIf).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate(buildType));
         }
-        public string CreateDelegate() {
-            StringBuilder builder = new StringBuilder();
-            bool first = true;
+        string DelegateList() {
+            var builder = new StringBuilder();
             foreach (var type in m_Delegates) {
-                if (!TYPE_DELEGATE.IsAssignableFrom(type)) { continue; }
-                if (first) { first = false; } else { builder.AppendLine(); }
-                builder.AppendLine("            if (type == typeof(__Name))".Replace("__Name", ScorpioReflectUtil.GetFullName(type)));
-                builder.Append("                return new __Name(".Replace("__Name", ScorpioReflectUtil.GetFullName(type)));
+                var fullName = ScorpioReflectUtil.GetFullName(type);
+                builder.Append($@"
+        script.SetGlobal(""{fullName}"", ScriptValue.CreateValue(typeof({fullName})));");
+            }
+            return builder.ToString();
+        }
+        string CreateDelegate(int buildType) {
+            var builder = new StringBuilder();
+            foreach (var type in m_Delegates) {
+                var fullName = ScorpioReflectUtil.GetFullName(type);
                 var InvokeMethod = type.GetMethod("Invoke");
                 var parameters = InvokeMethod.GetParameters();
-                string pars = "";
-				for (int i = 0;i < parameters.Length; ++i) {
-					if (i != 0) { pars += ","; }
-					pars += ("arg" + i);
-				}
-                builder.Append("(" + pars + ") => { ");
+                var pars = "";
+                for (int i = 0; i < parameters.Length; ++i) {
+                    if (i != 0) { pars += ","; }
+                    pars += $"arg{i}";
+                }
+                var invoke = parameters.Length == 0 ? $"scriptObject.call(ScriptValue.Null)" : $"scriptObject.call(ScriptValue.Null,{pars})";
                 var returnType = InvokeMethod.ReturnType;
+                var returnFullName = ScorpioReflectUtil.GetFullName(returnType);
+                var call = "";
                 if (returnType == typeof(void)) {
-                    builder.Append("func.call(" + pars + ");");
+                    call = $"{invoke}";
+                } else if (returnType == typeof(ScriptValue)) {
+                    call = $"return {invoke}";
                 } else if (returnType == typeof(bool)) {
-                    builder.Append("return script.CreateObject(func.call(" + pars + ")).LogicOperation();");
+                    call = $"return {invoke}.IsTrue";
                 } else if (returnType == typeof(string)) {
-                    builder.Append("return script.CreateObject(func.call(" + pars + ")).ToString();");
+                    call = $"return {invoke}.ToString()";
                 } else if (returnType == typeof(sbyte) || returnType == typeof(byte) ||
                             returnType == typeof(short) || returnType == typeof(ushort) ||
                             returnType == typeof(int) || returnType == typeof(uint) ||
                             returnType == typeof(long) || returnType == typeof(ulong) ||
                             returnType == typeof(float) || returnType == typeof(double) || returnType == typeof(decimal)) {
-                    string str = "return (__Type)Convert.ChangeType(script.CreateObject(func.call(" + pars + ")).ObjectValue, typeof(__Type));";
-                    str = str.Replace("__Type", ScorpioReflectUtil.GetFullName(returnType));
-                    builder.Append(str);
-                } else if (typeof(ScriptObject).IsAssignableFrom(returnType)) {
-                    builder.Append("return script.CreateObject(func.call(" + pars + "));");
+                    call = $"return ({returnFullName})Convert.ChangeType({invoke}.Value, typeof({returnFullName}))";
                 } else {
-                    string str = "return (__Type)script.CreateObject(func.call(" + pars + ")).ObjectValue;";
-                    str = str.Replace("__Type", ScorpioReflectUtil.GetFullName(returnType));
-                    builder.Append(str);
+                    call = $"return ({returnFullName}){invoke}.Value";
                 }
-                builder.Append(" });");
+                var func = $"return new {fullName}( ({pars}) => {{ {call}; }} );";
+                if (buildType == 0) {
+                    builder.Append($@"
+        delegates[typeof({fullName})] = (scriptObject) => {{ {func} }};");
+                } else {
+                    builder.Append($@"
+        if (delegateType == typeof({fullName}))
+            {func}");
+                }
             }
             return builder.ToString();
         }

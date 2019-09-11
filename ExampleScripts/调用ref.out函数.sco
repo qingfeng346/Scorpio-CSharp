@@ -1,0 +1,19 @@
+// c# 代码
+/*
+public class TestClass {
+    public static void TestFunc(ref int refNum, out string outNum) {
+        if (refNum == 100) {
+            outNum = 100;
+        } else {
+            outNum = 200;
+        }
+        refNum = 500;
+    }
+}
+*/
+//sco 代码
+TestClass = import_type("ScorpioExec.TestClass")
+var refNum = {value : 100}
+var outNum = {}
+TestClass.TestOut(refNum, outNum)  //ref out 的参数 必须传入map值，然后 ref out 返回的值会设置为 value
+print(refNum.value, outNum.value)

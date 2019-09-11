@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
+using Scorpio.Tools;
 
 namespace Scorpio.ScorpioReflect {
     public partial class GenerateScorpioClass {
@@ -18,21 +19,19 @@ namespace Scorpio.ScorpioReflect {
             {"op_Equality", "=="},
             {"op_Inequality", "!="},
         };
+        //获得构造函数
         private string GenerateConstructor() {
             var Constructors = m_Type.GetConstructors(ScorpioReflectUtil.BindingFlag);
-            StringBuilder builder = new StringBuilder();
-            bool first = true;
-            foreach (var constructor in Constructors) {
-                if (first) { first = false; } else { builder.AppendLine(); }
-                string parameterTypes = GetScorpioMethodParameterTypes(constructor);
-                string call = GetScorpioMethodCall(constructor);
-                builder.AppendFormat("		    if (type == \"{0}\") return new __fullname({1});", parameterTypes, call);
+            var builder = new StringBuilder();
+            for (var i = 0; i < Constructors.Length; ++i) {
+                var con = Constructors[i];
+                var call = $"new __fullname({GetScorpioMethodCall(con)})";
+                builder.AppendFormat(@"
+                case {0}: {{ {1} }}", i, GetExecuteMethod(con.GetParameters(), true, call));
             }
             string str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(Constructors));
-            str = str.Replace("__getmethod", InstanceMethodTemplate);
             str = str.Replace("__name", m_ScorpioClassName + "_Constructor");
-            str = str.Replace("__methodstatic", "false");
             str = str.Replace("__methodname", "Constructor");
             str = str.Replace("__execute", builder.ToString());
             return str;
@@ -55,9 +54,14 @@ namespace Scorpio.ScorpioReflect {
             if (Operators.ContainsKey(name)) {
                 return string.Format("return {0} {1} {2};", GetScorpioMethodArgs(pars, 0), Operators[name], GetScorpioMethodArgs(pars, 1));
             }
-            if (name == "get_Item") {
+            //重载 =
+            if (name == "op_Implicit") {
+                return string.Format("return ({0})({1});", ScorpioReflectUtil.GetFullName(method.ReturnType), GetScorpioMethodArgs(pars, 0));
+            //如果 get_Item 参数是一个 就是 [] 的重载
+            } else if (name == "get_Item" && method.GetParameters().Length == 1) {
                 return string.Format("return {0}[{1}];", variable, GetScorpioMethodArgs(pars, 0));
-            } else if (name == "set_Item") {
+            //如果 set_Item 参数是两个 就是 [] 的重载
+            } else if (name == "set_Item" && method.GetParameters().Length == 2) {
                 return string.Format("{0}[{1}] = {2}; return null;", variable, GetScorpioMethodArgs(pars, 0), GetScorpioMethodArgs(pars, 1));
             }
             return "";
@@ -73,33 +77,28 @@ namespace Scorpio.ScorpioReflect {
             return "";
         }
         private string GetPropertyMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
-            foreach (var property in m_AllPropertys)
-            {
+            foreach (var property in m_AllPropertys) {
                 if (property.GetGetMethod() == method) {
                     return string.Format("return {0}.{1};", variable, property.Name);
                 } else if (property.GetSetMethod() == method) {
-                    return string.Format("{0}.{1} = {2};", variable, property.Name, GetScorpioMethodArgs(pars, 0));
+                    return string.Format("{0}.{1} = {2}; return null;", variable, property.Name, GetScorpioMethodArgs(pars, 0));
                 }
             }
             return "";
         }
+        //生成一个函数的类
         private string GenerateMethodExecute(string name) {
-            bool isStatic = false;
-            List<MethodInfo> methods = new List<MethodInfo>();
+            var methods = new List<MethodInfo>();
             foreach (var method in m_Methods) {
                 if (method.Name == name) {
                     methods.Add(method);
-                    isStatic = method.IsStatic;
                 }
             }
-            StringBuilder builder = new StringBuilder();
-            bool first = true;
-            foreach (var method in methods) {
-                if (first) { first = false; } else { builder.AppendLine(); }
-                string parameterTypes = GetScorpioMethodParameterTypes(method);
-                string parameterCall = GetScorpioMethodCall(method);
-                string variable = (method.IsStatic ? m_FullName : "((" + m_FullName + ")obj)");
-                ParameterInfo[] pars = method.GetParameters();
+            var builder = new StringBuilder();
+            for (var i = 0; i < methods.Count; ++i) {
+                var method = methods[i];
+                var variable = method.IsStatic ? m_FullName : $"(({m_FullName})obj)";
+                var pars = method.GetParameters();
                 //运算符重载函数 + - * / [] 等
                 string execute = GetSpeciaMethodExecute(method, variable, pars);
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
@@ -107,46 +106,50 @@ namespace Scorpio.ScorpioReflect {
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
                 execute = GetPropertyMethodExecute(method, variable, pars);
                 if (!string.IsNullOrEmpty(execute)) { goto finish; }
-                string call = variable + "." + name + "(" + parameterCall + ")";
-                if (method.ReturnType == typeof(void)) {
-                    execute = string.Format("{0}; return null;", call);
-                } else {
-                    execute = string.Format("return {0};", call);
-                }
-finish:
-                builder.AppendFormat("            if (type == \"{0}\") {{ {1} }}", parameterTypes, execute);
+                var call = $"{variable}.{name}({GetScorpioMethodCall(method)})";
+                execute = GetExecuteMethod(pars, method.ReturnType != typeof(void), call);
+            finish:
+                builder.AppendFormat(@"
+                case {0}: {{ {1} }}", i, execute);
             }
-            string str = MethodTemplate;
+            var str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(methods.ToArray()));
-            str = str.Replace("__getmethod", isStatic ? StaticMethodTemplate : InstanceMethodTemplate);
             str = str.Replace("__name", m_ScorpioClassName + "_" + name);
-            str = str.Replace("__methodstatic", isStatic ? "true" : "false");
             str = str.Replace("__methodname", name);
             str = str.Replace("__execute", builder.ToString());
             return str;
         }
+        //获取变量类型
         string GenerateGetVariableType() {
-            string templateStr = @"        if (name == ""{0}"") return typeof({1});";
-            StringBuilder builder = new StringBuilder();
-            bool first = true;
+            var templateStr = @"
+            case ""{0}"": return typeof({1});";
+            var builder = new StringBuilder();
             //所有类变量
-            foreach (var field in m_Fields) {
-                if (first) { first = false; } else { builder.AppendLine(); }
-                builder.AppendFormat(templateStr, field.Name, ScorpioReflectUtil.GetFullName(field.FieldType));
-            }
+            m_Fields.ForEach((field) => builder.AppendFormat(templateStr, field.Name, ScorpioReflectUtil.GetFullName(field.FieldType)) );
             //所有属性
-            foreach (var property in m_Propertys) {
-                if (first) { first = false; } else { builder.AppendLine(); }
-                builder.AppendFormat(templateStr, property.Name, ScorpioReflectUtil.GetFullName(property.PropertyType));
-            }
+            m_Propertys.ForEach((property) => builder.AppendFormat(templateStr, property.Name, ScorpioReflectUtil.GetFullName(property.PropertyType)) );
             //所有的函数
-            List<string> methods = new List<string>();
+            var methods = new List<string>();
             foreach (var method in m_Methods) {
                 string name = method.Name;
                 if (methods.Contains(name) || method.ReturnType == typeof(void)) { continue; }
                 methods.Add(name);
-                if (first) { first = false; } else { builder.AppendLine(); }
                 builder.AppendFormat(templateStr, method.Name, ScorpioReflectUtil.GetFullName(method.ReturnType));
+            }
+            return builder.ToString();
+        }
+        //获取函数
+        string GenerateGetMethod() {
+            var methodStr = @"
+            case ""{0}"": return {1}.GetInstance();";
+            var builder = new StringBuilder();
+            //所有的函数
+            var methods = new List<string>();
+            foreach (var method in m_Methods) {
+                string name = method.Name;
+                if (methods.Contains(name)) { continue; }
+                methods.Add(name);
+                builder.AppendFormat(methodStr, name, m_ScorpioClassName + "_" + name);
             }
             return builder.ToString();
         }

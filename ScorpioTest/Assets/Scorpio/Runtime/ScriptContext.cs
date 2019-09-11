@@ -1,510 +1,1187 @@
-﻿using System;
-using Scorpio;
-using Scorpio.Compiler;
-using Scorpio.CodeDom;
-using Scorpio.CodeDom.Temp;
+﻿using Scorpio.Instruction;
 using Scorpio.Exception;
 using Scorpio.Function;
-using Scorpio.Variable;
-using Scorpio.Commons;
-
+using Scorpio.Tools;
 namespace Scorpio.Runtime {
+
     //执行命令
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public class ScriptContext {
-        private Script m_script;                                                //脚本类
-        private ScriptContext m_parent;                                         //父级执行命令
-        private ScriptInstruction[] m_scriptInstructions;                       //指令集
-        private ScriptInstruction m_scriptInstruction;                          //当前执行的指令
-        private int m_InstructionCount;                                         //指令数量
-        private Executable_Block m_block;                                       //指令集类型
-        private ScorpioDictionary<string, ScriptObject> m_variableDictionary;   //当前作用域所有变量
-        private ScriptObject m_returnObject = null;                             //返回值
-        private bool m_Break = false;                                           //break跳出
-        private bool m_Continue = false;                                        //continue跳出
-        private bool m_Over = false;                                            //函数是否已经结束
+        private const int ParameterLength = 128;        //函数参数最大数量
+        private const int ValueCacheLength = 128;       //函数最大调用层级,超过会堆栈溢出
+        private const int StackValueLength = 256;       //堆栈数据最大数量
+        private const int VariableValueLength = 128;    //局部变量最大数量
+        protected static ScriptValue[] Parameters = new ScriptValue[ParameterLength];               //函数调用共用数组
+        protected static ScriptValue[][] VariableValues = new ScriptValue[ValueCacheLength][];      //局部变量数据
+        protected static ScriptValue[][] StackValues = new ScriptValue[ValueCacheLength][];         //堆栈数据
+        protected static int VariableValueIndex = 0;
+        static ScriptContext() {
+            for (var i = 0; i < StackValues.Length; ++i) {
+                StackValues[i] = new ScriptValue[StackValueLength];
+            }
+            for (var i = 0; i < VariableValues.Length; ++i) {
+                VariableValues[i] = new ScriptValue[VariableValueLength];
+            }
+        }
 
-        public ScriptContext(Script script, ScriptExecutable scriptExecutable) : this(script, scriptExecutable, null, Executable_Block.None) { }
-        public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent) : this(script, scriptExecutable, parent, Executable_Block.None) { }
-        public ScriptContext(Script script, ScriptExecutable scriptExecutable, ScriptContext parent, Executable_Block block) {
+        public readonly Script m_script;                            //脚本类
+        private readonly ScriptGlobal m_global;                     //global
+
+        private readonly double[] constDouble;                      //double常量
+        private readonly long[] constLong;                          //long常量
+        private readonly string[] constString;                      //string常量
+        private readonly ScriptContext[] constContexts;             //所有定义的函数
+        private readonly ScriptClassData[] constClasses;            //定义所有的类
+        public readonly int internalCount;                          //内部变量数量
+
+        private readonly string m_Breviary;                         //摘要
+        private readonly ScriptFunctionData m_FunctionData;         //函数数据
+        private readonly ScriptInstruction[] m_scriptInstructions;  //指令集
+
+        public ScriptContext(Script script, string breviary, ScriptFunctionData functionData, double[] constDouble, long[] constLong, string[] constString, ScriptContext[] constContexts, ScriptClassData[] constClasses) {
             m_script = script;
-            m_parent = parent;
-            m_block = block;
-            m_variableDictionary = new ScorpioDictionary<string, ScriptObject>();
-            if (scriptExecutable != null) {
-                m_scriptInstructions = scriptExecutable.ScriptInstructions;
-                m_InstructionCount = m_scriptInstructions.Length;
+            m_global = script.Global;
+            this.constDouble = constDouble;
+            this.constLong = constLong;
+            this.constString = constString;
+            this.constContexts = constContexts;
+            this.constClasses = constClasses;
+            this.internalCount = functionData.internalCount;
+
+            m_Breviary = breviary;
+            m_FunctionData = functionData;
+            m_scriptInstructions = functionData.scriptInstructions;
+        }
+        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
+            Logger.debug("执行命令 =>\n" + m_FunctionData.ToString(constDouble, constLong, constString));
+            var variableObjects = VariableValues[VariableValueIndex];   //局部变量
+            var stackObjects = StackValues[VariableValueIndex++];       //堆栈数据
+            variableObjects[0] = thisObject;
+            InternalValue[] internalObjects = null;
+            if (internalCount > 0) {
+                internalObjects = new InternalValue[internalCount];     //内部变量，有外部引用
+                for (int i = 0; i < internalCount; ++i) {
+                    if (internalValues != null)
+                        internalObjects[i] = internalValues[i] ?? new InternalValue();
+                    else
+                        internalObjects[i] = new InternalValue();
+                }
             }
-        }
-        private bool IsOver { get { return m_Break || m_Over; } }                       //break 或者 return  跳出循环
-        private bool IsExecuted { get { return m_Break || m_Over || m_Continue; } }     //continue break return 当前模块是否执行完成
-        public void Initialize(ScorpioDictionary<string, ScriptObject> variable) {
-            m_variableDictionary.Set(variable);
-        }
-        private void Initialize(string name, ScriptObject obj) {
-            m_variableDictionary[name] = obj;
-            //m_variableDictionary.Add(name, obj);
-        }
-        //初始化所有数据 每次调用 Execute 调用
-        private void Reset() {
-            m_returnObject = null;
-            m_Over = false;
-            m_Break = false;
-            m_Continue = false;
-        }
-        private void ApplyVariableObject(string name) {
-            m_variableDictionary[name] = m_script.Null;
-        }
-        private ScriptObject GetVariableObject(string name) {
-            var ret = m_variableDictionary[name];
-            if (ret != null) return ret;
-            if (m_parent != null) return m_parent.GetVariableObject(name);
-            return null;
-        }
-        private bool SetVariableObject(string name, ScriptObject obj) {
-            if (m_variableDictionary.SetValue(name, obj.Assign())) {
-                return true;
-            }
-            if (m_parent != null) {
-                return m_parent.SetVariableObject(name, obj);
-            }
-            return false;
-        }
-        private void SetVariableForce(string name, ScriptObject obj) {
-            m_variableDictionary[name] = obj.Assign();
-        }
-        private object GetMember(CodeMember member) {
-            return member.Type == MEMBER_TYPE.VALUE ? member.MemberValue : ResolveOperand(member.MemberObject).KeyValue;
-        }
-        private ScriptObject GetVariable(CodeMember member) {
-            ScriptObject ret = null;
-            if (member.Parent == null) {
-                string name = (string)member.MemberValue;
-                ScriptObject obj = GetVariableObject(name);
-                ret = (obj == null ? m_script.GetValue(name) : obj);
-                ret.Name = name;
+            var stackIndex = -1;                                        //堆栈索引
+            var parameterCount = m_FunctionData.parameterCount;         //参数数量
+            var param = m_FunctionData.param;                           //是否是变长参数
+            if (param) {
+                var array = new ScriptArray(m_script);
+                for (var i = parameterCount - 1; i < length; ++i) {
+                    array.Add(args[i]);
+                }
+                stackObjects[++stackIndex].scriptValue = array;
+                stackObjects[stackIndex].valueType = ScriptValue.scriptValueType;
+                for (var i = parameterCount - 2; i >= 0; --i) {
+                    stackObjects[++stackIndex] = i >= length ? ScriptValue.Null : args[i];
+                }
             } else {
-                ScriptObject parent = ResolveOperand(member.Parent);
-                /*此处设置一下堆栈位置 否则 函数返回值取值出错会报错位置 例如  
-                    function Get() { 
-                        return null 
-                    } 
-                    Get().a
-                    
-                上述代码报错会报道 return null 那一行 但实际出错 是 .a 的时候 下面这句话就是把堆栈设置回 .a 那一行
-                */
-                m_script.SetStackInfo(member.StackInfo);
-                if (member.Type == MEMBER_TYPE.VALUE) {
-                    object name = member.MemberValue;
-                    ret = parent.GetValue(name);
-                    ret.Name = parent.Name + "." + name.ToString();
-                } else {
-                    object name = ResolveOperand(member.MemberObject).KeyValue;
-                    ret = parent.GetValue(name);
-                    ret.Name = parent.Name + "." + name.ToString();
+                for (var i = parameterCount - 1; i >= 0; --i) {
+                    stackObjects[++stackIndex] = i >= length ? ScriptValue.Null : args[i];
                 }
             }
-            if (ret == null) throw new ExecutionException(m_script, "GetVariable member is error");
-            if (member.Calc != CALC.NONE) {
-                ScriptNumber num = ret as ScriptNumber;
-                if (num == null) throw new ExecutionException(m_script, "++或者--只能应用于Number类型");
-                return num.Calc(member.Calc);
-            }
-            return ret;
-        }
-        private void SetVariable(CodeMember member, ScriptObject variable) {
-            if (member.Parent == null) {
-                string name = (string)member.MemberValue;
-                if (!SetVariableObject(name, variable))
-                    m_script.SetObjectInternal(name, variable);
-            } else {
-                ResolveOperand(member.Parent).SetValue(GetMember(member), variable);
-            }
-        }
-        public ScriptObject Execute() {
-            Reset();
-            int iInstruction = 0;
-            while (iInstruction < m_InstructionCount && !IsExecuted) {
-                m_scriptInstruction = m_scriptInstructions[iInstruction++];
-                ExecuteInstruction();
-            }
-            return m_returnObject;
-        }
-        private ScriptObject Execute(ScriptExecutable executable) {
-            if (executable == null) return null;
-            Reset();
-            ScriptInstruction[] scriptInstructions = executable.ScriptInstructions;
-            int iInstruction = 0;
-            int iInstructionCount = scriptInstructions.Length;
-            while (iInstruction < iInstructionCount && !IsExecuted) {
-                m_scriptInstruction = scriptInstructions[iInstruction++];
-                ExecuteInstruction();
-            }
-            return m_returnObject;
-        }
-        private void ExecuteInstruction() {
-            switch (m_scriptInstruction.opcode) {
-                case Opcode.VAR: ProcessVar(); break;
-                case Opcode.MOV: ProcessMov(); break;
-                case Opcode.RET: ProcessRet(); break;
-                case Opcode.RESOLVE: ProcessResolve(); break;
-                case Opcode.CONTINUE: ProcessContinue(); break;
-                case Opcode.BREAK: ProcessBreak(); break;
-                case Opcode.CALL_BLOCK: ProcessCallBlock(); break;
-                case Opcode.CALL_FUNCTION: ProcessCallFunction(); break;
-                case Opcode.CALL_IF: ProcessCallIf(); break;
-                case Opcode.CALL_FOR: ProcessCallFor(); break;
-                case Opcode.CALL_FORSIMPLE: ProcessCallForSimple(); break;
-                case Opcode.CALL_FOREACH: ProcessCallForeach(); break;
-                case Opcode.CALL_WHILE: ProcessCallWhile(); break;
-                case Opcode.CALL_SWITCH: ProcessCallSwitch(); break;
-                case Opcode.CALL_TRY: ProcessTry(); break;
-                case Opcode.THROW: ProcessThrow(); break;
-            }
-        }
-        private bool SupportReturnValue() {
-            return m_block == Executable_Block.Function || m_block == Executable_Block.Context;
-        }
-        private bool SupportContinue() {
-            return m_block == Executable_Block.For || m_block == Executable_Block.Foreach || m_block == Executable_Block.While;
-        }
-        private bool SupportBreak() {
-            return m_block == Executable_Block.For || m_block == Executable_Block.Foreach || m_block == Executable_Block.While;
-        }
-        void ProcessVar() {
-            ApplyVariableObject(m_scriptInstruction.opvalue);
-        }
-        void ProcessMov() {
-            SetVariable(m_scriptInstruction.operand0 as CodeMember, ResolveOperand(m_scriptInstruction.operand1));
-        }
-        void ProcessContinue() {
-            InvokeContinue(m_scriptInstruction.operand0);
-        }
-        void ProcessBreak() {
-            InvokeBreak(m_scriptInstruction.operand0);
-        }
-        void ProcessCallFor() {
-            CodeFor code = (CodeFor)m_scriptInstruction.operand0;
-            ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.For);
-            context.Execute(code.BeginExecutable);
-            ScriptContext blockContext;
-            while (code.Condition == null || context.ResolveOperand(code.Condition).LogicOperation()) {
-                blockContext = new ScriptContext(m_script, code.BlockExecutable, context, Executable_Block.For);
-                blockContext.Execute();
-                if (blockContext.IsOver) break;
-                context.Execute(code.LoopExecutable);
-            }
-        }
-        void ProcessCallForSimple() {
-            CodeForSimple code = (CodeForSimple)m_scriptInstruction.operand0;
-            ScriptNumber beginNumber = ResolveOperand(code.Begin) as ScriptNumber;
-            if (beginNumber == null) throw new ExecutionException(m_script, "forsimple 初始值必须是number");
-            ScriptNumber finishedNumber = ResolveOperand(code.Finished) as ScriptNumber;
-            if (finishedNumber == null) throw new ExecutionException(m_script, "forsimple 最大值必须是number");
-            int begin = beginNumber.ToInt32();
-            int finished = finishedNumber.ToInt32();
-            int step;
-            if (code.Step != null) {
-                ScriptNumber stepNumber = ResolveOperand(code.Step) as ScriptNumber;
-                if (stepNumber == null) throw new ExecutionException(m_script, "forsimple Step必须是number");
-                step = stepNumber.ToInt32();
-            } else {
-                step = 1;
-            }
-            int i = begin;
-            ScriptContext context;
-            for (; i <= finished; i += step) {
-                context = new ScriptContext(m_script, code.BlockExecutable, this, Executable_Block.For);
-                context.Initialize(code.Identifier, new ScriptNumberDouble(m_script, i));
-                context.Execute();
-                if (context.IsOver) break;
-            }
-        }
-        void ProcessCallForeach() {
-            CodeForeach code = (CodeForeach)m_scriptInstruction.operand0;
-            ScriptObject loop = ResolveOperand(code.LoopObject);
-            if (!(loop is ScriptFunction)) throw new ExecutionException(m_script, "foreach函数必须返回一个ScriptFunction");
-            object obj;
-            ScriptFunction func = (ScriptFunction)loop;
-            ScriptContext context;
-            for (; ; ) {
-                obj = func.Call();
-                if (obj == null) return;
-                context = new ScriptContext(m_script, code.BlockExecutable, this, Executable_Block.Foreach);
-                context.Initialize(code.Identifier, m_script.CreateObject(obj));
-                context.Execute();
-                if (context.IsOver) break;
-            }
-        }
-        void ProcessCallIf() {
-            CodeIf code = (CodeIf)m_scriptInstruction.operand0;
-            if (ProcessAllow(code.If)) {
-                ProcessCondition(code.If);
-                return;
-            }
-            foreach (TempCondition ElseIf in code.ElseIf) {
-                if (ProcessAllow(ElseIf)) {
-                    ProcessCondition(ElseIf);
-                    return;
-                }
-            }
-            if (code.Else != null && ProcessAllow(code.Else)) {
-                ProcessCondition(code.Else);
-            }
-        }
-        bool ProcessAllow(TempCondition con) {
-            if (con.Allow != null && !ResolveOperand(con.Allow).LogicOperation()) {
-                return false;
-            }
-            return true;
-        }
-        void ProcessCondition(TempCondition condition) {
-            new ScriptContext(m_script, condition.Executable, this, condition.Block).Execute();
-        }
-        void ProcessCallWhile() {
-            CodeWhile code = (CodeWhile)m_scriptInstruction.operand0;
-            TempCondition condition = code.While;
-            ScriptContext context;
-            for (; ; ) {
-                if (!ProcessAllow(condition)) {
-                    break;
-                }
-                context = new ScriptContext(m_script, condition.Executable, this, Executable_Block.While);
-                context.Execute();
-                if (context.IsOver) {
-                    break;
-                }
-            }
-        }
-        void ProcessCallSwitch() {
-            CodeSwitch code = (CodeSwitch)m_scriptInstruction.operand0;
-            ScriptObject obj = ResolveOperand(code.Condition);
-            bool exec = false;
-            foreach (TempCase Case in code.Cases) {
-                foreach (CodeObject allow in Case.Allow) {
-                    if (ResolveOperand(allow).Equals(obj)) {
-                        exec = true;
-                        new ScriptContext(m_script, Case.Executable, this, Executable_Block.Switch).Execute();
-                        break;
-                    }
-                }
-                if (exec) { break; }
-            }
-            if (exec == false && code.Default != null) {
-                new ScriptContext(m_script, code.Default.Executable, this, Executable_Block.Switch).Execute();
-            }
-        }
-        void ProcessTry() {
-            CodeTry code = (CodeTry)m_scriptInstruction.operand0;
+            var parent = ScriptValue.Null;
+            var parameters = Parameters;                                //传递参数
+            var iInstruction = 0;                                       //当前执行命令索引
+            var iInstructionCount = m_scriptInstructions.Length;        //指令数量
+            byte valueType;
+            int index;
+            ScriptInstruction instruction = null;
             try {
-                new ScriptContext(m_script, code.TryExecutable, this).Execute();
-            } catch (InteriorException ex) {
-                ScriptContext context = new ScriptContext(m_script, code.CatchExecutable, this);
-                context.Initialize(code.Identifier, ex.obj);
-                context.Execute();
-            } catch (System.Exception ex) {
-                ScriptContext context = new ScriptContext(m_script, code.CatchExecutable, this);
-                context.Initialize(code.Identifier, m_script.CreateObject(ex));
-                context.Execute();
-            } finally {
-                if (code.FinallyExecutable != null) {
-                    new ScriptContext(m_script, code.FinallyExecutable, this).Execute();
-                }
-            }
-        }
-        void ProcessThrow() {
-            throw new InteriorException(ResolveOperand(((CodeThrow)m_scriptInstruction.operand0).obj));
-        }
-        void ProcessRet() {
-            if (m_scriptInstruction.operand0 == null)
-                InvokeReturnValue(null);
-            else
-                InvokeReturnValue(ResolveOperand(m_scriptInstruction.operand0));
-        }
-        void ProcessResolve() {
-            ResolveOperand(m_scriptInstruction.operand0);
-        }
-        void ProcessCallBlock() {
-            ParseCallBlock((CodeCallBlock)m_scriptInstruction.operand0);
-        }
-        void ProcessCallFunction() {
-            ParseCall((CodeCallFunction)m_scriptInstruction.operand0, false);
-        }
-        private void InvokeReturnValue(ScriptObject value) {
-            m_Over = true;
-            if (SupportReturnValue()) {
-                m_returnObject = value;
-            } else {
-                m_parent.InvokeReturnValue(value);
-            }
-        }
-        private void InvokeContinue(CodeObject con) {
-            m_Continue = true;
-            if (!SupportContinue()) {
-                if (m_parent == null)
-                    throw new ExecutionException(m_script, "当前模块不支持continue语法");
-                m_parent.InvokeContinue(con);
-            }
-        }
-        private void InvokeBreak(CodeObject bre) {
-            m_Break = true;
-            if (!SupportBreak()) {
-                if (m_parent == null)
-                    throw new ExecutionException(m_script, "当前模块不支持break语法");
-                m_parent.InvokeBreak(bre);
-            }
-        }
-        private ScriptObject ResolveOperand_impl(CodeObject value) {
-            if (value is CodeScriptObject) {
-                return ParseScriptObject((CodeScriptObject)value);
-            } else if (value is CodeRegion) {
-                return ParseRegion((CodeRegion)value);
-            } else if (value is CodeFunction) {
-                return ParseFunction((CodeFunction)value);
-            } else if (value is CodeCallFunction) {
-                return ParseCall((CodeCallFunction)value, true);
-            } else if (value is CodeMember) {
-                return GetVariable((CodeMember)value);
-            } else if (value is CodeArray) {
-                return ParseArray((CodeArray)value);
-            } else if (value is CodeTable) {
-                return ParseTable((CodeTable)value);
-            } else if (value is CodeOperator) {
-                return ParseOperate((CodeOperator)value);
-            } else if (value is CodeTernary) {
-                return ParseTernary((CodeTernary)value);
-            } else if (value is CodeAssign) {
-                return ParseAssign((CodeAssign)value);
-            } else if (value is CodeEval) {
-                return ParseEval((CodeEval)value);
-            }
-            return m_script.Null;
-        }
-        ScriptObject ResolveOperand(CodeObject value) {
-            m_script.SetStackInfo(value.StackInfo);
-            ScriptObject ret = ResolveOperand_impl(value);
-            if (value.Not) {
-                ret = m_script.CreateBool(!ret.LogicOperation());
-            } else if (value.Minus) {
-                ScriptNumber b = ret as ScriptNumber;
-                if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [-] sign");
-                ret = b.Minus();
-            } else if (value.Negative) {
-                ScriptNumber b = ret as ScriptNumber;
-                if (b == null) throw new ExecutionException(m_script, "Script Object Type [" + ret.Type + "] is cannot use [~] sign");
-                ret = b.Negative();
-            }
-            return ret;
-        }
-        ScriptObject ParseScriptObject(CodeScriptObject obj) {
-            //此处原先使用Clone 是因为 number 和 string 有自运算的操作 会影响常量 但是现在设置变量会调用Assign() 基础类型会自动复制一次 所以去掉clone
-            return obj.Object;
-            //return obj.Object.Clone();
-        }
-        ScriptObject ParseRegion(CodeRegion region) {
-            return ResolveOperand(region.Context);
-        }
-        ScriptFunction ParseFunction(CodeFunction func) {
-            return func.Func.Create().SetParentContext(this);
-        }
-        void ParseCallBlock(CodeCallBlock block) {
-            new ScriptContext(m_script, block.Executable, this).Execute();
-        }
-        ScriptObject ParseCall(CodeCallFunction scriptFunction, bool needRet) {
-            ScriptObject obj = ResolveOperand(scriptFunction.Member);
-            int num = scriptFunction.ParametersCount;
-            ScriptObject[] parameters = new ScriptObject[num];
-            for (int i = 0; i < num; ++i) {
-                //此处要调用Assign 如果传入number string等基础类型  在函数内自运算的话 会影响 传入的值
-                parameters[i] = ResolveOperand(scriptFunction.Parameters[i]).Assign();
-            }
-            m_script.PushStackInfo();
-            object ret = obj.Call(parameters);
-            m_script.PopStackInfo();
-            return needRet ? m_script.CreateObject(ret) : null;
-        }
-        ScriptArray ParseArray(CodeArray array) {
-            ScriptArray ret = m_script.CreateArray();
-            foreach (CodeObject ele in array.Elements) {
-                ret.Add(ResolveOperand(ele).Assign());
-            }
-            return ret;
-        }
-        ScriptTable ParseTable(CodeTable table) {
-            ScriptContext context = new ScriptContext(m_script, null, this, Executable_Block.None);
-            ScriptTable ret = m_script.CreateTable();
-            foreach (ScriptScriptFunction func in table.Functions) {
-                func.SetTable(ret);
-                ret.SetValue(func.Name, func);
-                context.SetVariableForce(func.Name, func);
-            }
-            foreach (CodeTable.TableVariable variable in table.Variables) {
-                ScriptObject value = context.ResolveOperand(variable.value);
-                if (value is ScriptScriptFunction) {
-                    ScriptScriptFunction func = (ScriptScriptFunction)value;
-                    if (func.IsStaticFunction) func.SetTable(ret);
-                }
-                ret.SetValue(variable.key, value);
-                context.SetVariableForce(variable.key.ToString(), value);
-            }
-            return ret;
-        }
-        ScriptObject ParseOperate(CodeOperator operate) {
-            TokenType type = operate.Operator;
-            ScriptObject left = ResolveOperand(operate.Left);
-            switch (type) {
-                case TokenType.Plus:
-                    ScriptObject right = ResolveOperand(operate.Right);
-                    if (left is ScriptString || right is ScriptString) {
-                        return new ScriptString(m_script, left.ToString() + right.ToString());
+                while (iInstruction < iInstructionCount) {
+                    instruction = m_scriptInstructions[iInstruction++];
+                    var opvalue = instruction.opvalue;
+                    var opcode = instruction.opcode;
+                    switch (instruction.optype) {
+                        case OpcodeType.Load:
+                            switch (opcode) {
+                                case Opcode.LoadConstDouble: {
+                                    stackObjects[++stackIndex].doubleValue = constDouble[opvalue];
+                                    stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
+                                    continue;
+                                } 
+                                case Opcode.LoadConstString: {
+                                    stackObjects[++stackIndex].stringValue = constString[opvalue];
+                                    stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
+                                    continue;
+                                }
+                                case Opcode.LoadConstNull: stackObjects[++stackIndex].valueType = ScriptValue.nullValueType; continue;
+                                case Opcode.LoadConstTrue: stackObjects[++stackIndex].valueType = ScriptValue.trueValueType; continue;
+                                case Opcode.LoadConstFalse: stackObjects[++stackIndex].valueType = ScriptValue.falseValueType; continue;
+                                case Opcode.LoadConstLong: {
+                                    stackObjects[++stackIndex].longValue = constLong[opvalue];
+                                    stackObjects[stackIndex].valueType = ScriptValue.longValueType;
+                                    continue;
+                                }
+                                case Opcode.LoadLocal: {
+                                    switch (variableObjects[opvalue].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            stackObjects[++stackIndex].scriptValue = variableObjects[opvalue].scriptValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            stackObjects[++stackIndex].doubleValue = variableObjects[opvalue].doubleValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: stackObjects[++stackIndex].valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: stackObjects[++stackIndex].valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: stackObjects[++stackIndex].valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            stackObjects[++stackIndex].stringValue = variableObjects[opvalue].stringValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            stackObjects[++stackIndex].longValue = variableObjects[opvalue].longValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            stackObjects[++stackIndex].objectValue = variableObjects[opvalue].objectValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException($"LoadLocal : 未知错误数据类型 : {variableObjects[opvalue].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.LoadInternal: {
+                                    switch (internalObjects[opvalue].value.valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            stackObjects[++stackIndex].scriptValue = internalObjects[opvalue].value.scriptValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            stackObjects[++stackIndex].doubleValue = internalObjects[opvalue].value.doubleValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: stackObjects[++stackIndex].valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: stackObjects[++stackIndex].valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: stackObjects[++stackIndex].valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            stackObjects[++stackIndex].stringValue = internalObjects[opvalue].value.stringValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            stackObjects[++stackIndex].longValue = internalObjects[opvalue].value.longValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            stackObjects[++stackIndex].objectValue = internalObjects[opvalue].value.objectValue;
+                                            stackObjects[stackIndex].valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException("LoadInternal : 未知错误数据类型 : " + internalObjects[opvalue].value.valueType);
+                                    }
+                                }
+                                case Opcode.LoadValue: {
+                                    parent = stackObjects[stackIndex];
+                                    stackObjects[stackIndex] = stackObjects[stackIndex].GetValueByIndex(opvalue, m_script);
+                                    continue;
+                                }
+                                case Opcode.LoadValueString: {
+                                    parent = stackObjects[stackIndex];
+                                    stackObjects[stackIndex] = stackObjects[stackIndex].GetValue(constString[opvalue], m_script);
+                                    continue;
+                                }
+                                case Opcode.LoadValueObject: {
+                                    parent = stackObjects[stackIndex - 1];
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue, m_script); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].doubleValue); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].longValue); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].scriptValue); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].objectValue); break;
+                                        default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObject : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                    --stackIndex;
+                                    continue;
+                                }
+                                case Opcode.LoadValueObjectDup: {
+                                    parent = stackObjects[stackIndex - 1];
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue, m_script); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].doubleValue); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].longValue); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].scriptValue); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].objectValue); break;
+                                        default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObjectDup : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                    ++stackIndex;
+                                    continue;
+                                }
+                                case Opcode.LoadGlobal: {
+                                    stackObjects[++stackIndex] = m_global.GetValueByIndex(opvalue);
+                                    continue;
+                                }
+                                case Opcode.LoadGlobalString: {
+                                    stackObjects[++stackIndex] = m_global.GetValue(constString[opvalue]);
+                                    instruction.SetOpcode(Opcode.LoadGlobal, m_global.GetIndex(constString[opvalue]));
+                                    continue;
+                                }
+                                case Opcode.CopyStackTop: {
+                                    stackObjects[++stackIndex] = stackObjects[stackIndex - 1];
+                                    continue;
+                                }
+                                case Opcode.CopyStackTopIndex: {
+                                    stackObjects[++stackIndex] = stackObjects[stackIndex - opvalue - 1];
+                                    continue;
+                                }
+                            }
+                            continue;
+                        case OpcodeType.Store:
+                            switch (opcode) {
+                                //-------------下面为 = *= -= 等赋值操作, 压入计算结果
+                                case Opcode.StoreLocalAssign: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            variableObjects[opvalue].scriptValue = stackObjects[stackIndex].scriptValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            variableObjects[opvalue].doubleValue = stackObjects[stackIndex].doubleValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: variableObjects[opvalue].valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: variableObjects[opvalue].valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: variableObjects[opvalue].valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            variableObjects[opvalue].stringValue = stackObjects[stackIndex].stringValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            variableObjects[opvalue].longValue = stackObjects[stackIndex].longValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            variableObjects[opvalue].objectValue = stackObjects[stackIndex].objectValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException($"StoreLocalAssign : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.StoreInternalAssign: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            internalObjects[opvalue].value.scriptValue = stackObjects[stackIndex].scriptValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            internalObjects[opvalue].value.doubleValue = stackObjects[stackIndex].doubleValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: internalObjects[opvalue].value.valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: internalObjects[opvalue].value.valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: internalObjects[opvalue].value.valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            internalObjects[opvalue].value.stringValue = stackObjects[stackIndex].stringValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            internalObjects[opvalue].value.longValue = stackObjects[stackIndex].longValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            internalObjects[opvalue].value.objectValue = stackObjects[stackIndex].objectValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException("StoreInternalAssign : 未知错误数据类型 : " + stackObjects[stackIndex].valueType);
+                                    }
+                                }
+                                case Opcode.StoreValueStringAssign: {
+                                    index = stackIndex;
+                                    stackObjects[stackIndex - 1].SetValue(constString[opvalue], stackObjects[stackIndex]);
+                                    stackObjects[--stackIndex] = stackObjects[index];
+                                    continue;
+                                }
+                                case Opcode.StoreValueObjectAssign: {
+                                    index = stackIndex;
+                                    switch (stackObjects[stackIndex - 1].valueType) {
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].stringValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].doubleValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].longValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].scriptValue, stackObjects[stackIndex]); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]); break;
+                                        default: throw new ExecutionException($"不支持当前类型设置变量 : {stackObjects[stackIndex - 1].ValueTypeName}");
+                                    }
+                                    stackObjects[stackIndex -= 2] = stackObjects[index];
+                                    continue;
+                                }
+                                case Opcode.StoreGlobalAssign: m_global.SetValueByIndex(opvalue, stackObjects[stackIndex]); continue;
+                                case Opcode.StoreGlobalStringAssign: {
+                                    m_global.SetValue(constString[opvalue], stackObjects[stackIndex]);
+                                    instruction.SetOpcode(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]));
+                                    continue;
+                                }
+                                case Opcode.StoreValueAssign: {
+                                    index = stackIndex;
+                                    stackObjects[stackIndex - 1].SetValueByIndex(opvalue, stackObjects[stackIndex]);
+                                    stackObjects[--stackIndex] = stackObjects[index];
+                                    continue;
+                                }
+
+
+                                //-----------------下面为普通赋值操作 不压入结果
+                                case Opcode.StoreLocal: {
+                                    index = stackIndex--;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            variableObjects[opvalue].scriptValue = stackObjects[index].scriptValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            variableObjects[opvalue].doubleValue = stackObjects[index].doubleValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: variableObjects[opvalue].valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: variableObjects[opvalue].valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: variableObjects[opvalue].valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            variableObjects[opvalue].stringValue = stackObjects[index].stringValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            variableObjects[opvalue].longValue = stackObjects[index].longValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            variableObjects[opvalue].objectValue = stackObjects[index].objectValue;
+                                            variableObjects[opvalue].valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.StoreInternal: {
+                                    index = stackIndex--;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.scriptValueType:
+                                            internalObjects[opvalue].value.scriptValue = stackObjects[index].scriptValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
+                                            continue;
+                                        case ScriptValue.doubleValueType:
+                                            internalObjects[opvalue].value.doubleValue = stackObjects[index].doubleValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
+                                            continue;
+                                        case ScriptValue.nullValueType: internalObjects[opvalue].value.valueType = ScriptValue.nullValueType; continue;
+                                        case ScriptValue.trueValueType: internalObjects[opvalue].value.valueType = ScriptValue.trueValueType; continue;
+                                        case ScriptValue.falseValueType: internalObjects[opvalue].value.valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.stringValueType:
+                                            internalObjects[opvalue].value.stringValue = stackObjects[index].stringValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
+                                            continue;
+                                        case ScriptValue.longValueType:
+                                            internalObjects[opvalue].value.longValue = stackObjects[index].longValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
+                                            continue;
+                                        case ScriptValue.objectValueType:
+                                            internalObjects[opvalue].value.objectValue = stackObjects[index].objectValue;
+                                            internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
+                                            continue;
+                                        default: throw new ExecutionException("StoreInternal : 未知错误数据类型 : " + stackObjects[index].valueType);
+                                    }
+                                }
+                                case Opcode.StoreValueString: {
+                                    stackObjects[stackIndex - 1].SetValue(constString[opvalue], stackObjects[stackIndex]);
+                                    stackIndex -= 2;
+                                    continue;
+                                }
+                                case Opcode.StoreGlobal: m_global.SetValueByIndex(opvalue, stackObjects[stackIndex--]); continue;
+                                case Opcode.StoreGlobalString: {
+                                    m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
+                                    instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
+                                    continue;
+                                }
+                            }
+                            continue;
+                        case OpcodeType.Compute:
+                            switch (opcode) {
+                                case Opcode.Plus: {
+                                    index = stackIndex - 1;
+                                    valueType = stackObjects[index].valueType;
+                                    switch (valueType) {
+                                        case ScriptValue.stringValueType: {
+                                            stackObjects[index].stringValue += stackObjects[stackIndex].ToString();
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.Plus(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
+                                                stackObjects[index].stringValue = stackObjects[index].ToString() + stackObjects[stackIndex].stringValue;
+                                                stackObjects[index].valueType = ScriptValue.stringValueType;
+                                            } else {
+                                                if (valueType == ScriptValue.doubleValueType) {
+                                                    if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                        stackObjects[index].doubleValue += stackObjects[stackIndex].doubleValue;
+                                                    } else {
+                                                        stackObjects[index].doubleValue += stackObjects[stackIndex].ToDouble();
+                                                    }
+                                                } else if (valueType == ScriptValue.longValueType) {
+                                                    switch (stackObjects[stackIndex].valueType) {
+                                                        case ScriptValue.longValueType:
+                                                            stackObjects[index].longValue += stackObjects[stackIndex].longValue;
+                                                            break;
+                                                        case ScriptValue.doubleValueType:
+                                                            stackObjects[index].doubleValue = stackObjects[index].longValue + stackObjects[stackIndex].doubleValue;
+                                                            stackObjects[index].valueType = ScriptValue.doubleValueType;
+                                                            break;
+                                                        default:
+                                                            stackObjects[index].longValue += stackObjects[stackIndex].ToLong();
+                                                            break;
+                                                    }
+                                                } else {
+                                                    throw new ExecutionException($"【+】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                                }
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                case Opcode.Minus: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                stackObjects[index].doubleValue -= stackObjects[stackIndex].doubleValue;
+                                            } else {
+                                                stackObjects[index].doubleValue -= stackObjects[stackIndex].ToDouble();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.Minus(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].longValue -= stackObjects[stackIndex].longValue;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].doubleValue = stackObjects[index].longValue - stackObjects[stackIndex].doubleValue;
+                                                    stackObjects[index].valueType = ScriptValue.doubleValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].longValue += stackObjects[stackIndex].ToLong();
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【-】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.Multiply: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                stackObjects[index].doubleValue *= stackObjects[stackIndex].doubleValue;
+                                            } else {
+                                                stackObjects[index].doubleValue *= stackObjects[stackIndex].ToDouble();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.Multiply(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].longValue *= stackObjects[stackIndex].longValue;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].doubleValue = stackObjects[index].longValue * stackObjects[stackIndex].doubleValue;
+                                                    stackObjects[index].valueType = ScriptValue.doubleValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].longValue *= stackObjects[stackIndex].ToLong();
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【*】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.Divide: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                stackObjects[index].doubleValue /= stackObjects[stackIndex].doubleValue;
+                                            } else {
+                                                stackObjects[index].doubleValue /= stackObjects[stackIndex].ToDouble();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.Divide(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].longValue /= stackObjects[stackIndex].longValue;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].doubleValue = stackObjects[index].longValue / stackObjects[stackIndex].doubleValue;
+                                                    stackObjects[index].valueType = ScriptValue.doubleValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].longValue /= stackObjects[stackIndex].ToLong();
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【/】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.Modulo: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                stackObjects[index].doubleValue %= stackObjects[stackIndex].doubleValue;
+                                            } else {
+                                                stackObjects[index].doubleValue %= stackObjects[stackIndex].ToDouble();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.Modulo(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].longValue %= stackObjects[stackIndex].longValue;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].doubleValue = stackObjects[index].longValue % stackObjects[stackIndex].doubleValue;
+                                                    stackObjects[index].valueType = ScriptValue.doubleValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].longValue %= stackObjects[stackIndex].ToLong();
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【%】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.InclusiveOr: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.longValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.longValueType) {
+                                                stackObjects[index].longValue |= stackObjects[stackIndex].longValue;
+                                            } else {
+                                                stackObjects[index].longValue |= stackObjects[stackIndex].ToLong();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.InclusiveOr(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【|】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.Combine: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.longValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.longValueType) {
+                                                stackObjects[index].longValue &= stackObjects[stackIndex].longValue;
+                                            } else {
+                                                stackObjects[index].longValue &= stackObjects[stackIndex].ToLong();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.Combine(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【&】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.XOR: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.longValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.longValueType) {
+                                                stackObjects[index].longValue ^= stackObjects[stackIndex].longValue;
+                                            } else {
+                                                stackObjects[index].longValue ^= stackObjects[stackIndex].ToLong();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.XOR(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【^】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.Shi: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.longValueType: {
+                                            stackObjects[index].longValue <<= stackObjects[stackIndex].ToInt32();
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.Shi(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【<<】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.Shr: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.longValueType: {
+                                            stackObjects[index].longValue >>= stackObjects[stackIndex].ToInt32();
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index] = stackObjects[index].scriptValue.Shr(stackObjects[stackIndex]);
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【>>】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.FlagNot: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.trueValueType: stackObjects[stackIndex].valueType = ScriptValue.falseValueType; continue;
+                                        case ScriptValue.falseValueType: stackObjects[stackIndex].valueType = ScriptValue.trueValueType; continue;
+                                        default: throw new ExecutionException($"当前数据类型不支持取反操作 : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.FlagMinus: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex].doubleValue = -stackObjects[stackIndex].doubleValue; continue;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex].longValue = -stackObjects[stackIndex].longValue; continue;
+                                        default: throw new ExecutionException($"当前数据类型不支持取负操作 : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.FlagNegative: {
+                                    if (stackObjects[stackIndex].valueType == ScriptValue.longValueType) {
+                                        stackObjects[stackIndex].longValue = ~stackObjects[stackIndex].longValue;
+                                        continue;
+                                    } else {
+                                        throw new ExecutionException($"当前数据类型不支持取非操作 : {stackObjects[stackIndex].ValueTypeName}");
+                                    }
+                                }
+                            }
+                            continue;
+                        case OpcodeType.Compare:
+                            switch (opcode) {
+                                case Opcode.Less: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                stackObjects[index].valueType = stackObjects[index].doubleValue < stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            } else {
+                                                stackObjects[index].valueType = stackObjects[index].doubleValue < stackObjects[stackIndex].ToDouble() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue < stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue < stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue < stackObjects[stackIndex].ToLong() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index].valueType = stackObjects[index].scriptValue.Less(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【<】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.LessOrEqual: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                stackObjects[index].valueType = stackObjects[index].doubleValue <= stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            } else {
+                                                stackObjects[index].valueType = stackObjects[index].doubleValue <= stackObjects[stackIndex].ToDouble() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue <= stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue <= stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue <= stackObjects[stackIndex].ToLong() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index].valueType = stackObjects[index].scriptValue.LessOrEqual(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【<=】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.Greater: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                stackObjects[index].valueType = stackObjects[index].doubleValue > stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            } else {
+                                                stackObjects[index].valueType = stackObjects[index].doubleValue > stackObjects[stackIndex].ToDouble() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue > stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue > stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue > stackObjects[stackIndex].ToLong() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index].valueType = stackObjects[index].scriptValue.Greater(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【>】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.GreaterOrEqual: {
+                                    index = stackIndex - 1;
+                                    switch (stackObjects[index].valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                stackObjects[index].valueType = stackObjects[index].doubleValue >= stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            } else {
+                                                stackObjects[index].valueType = stackObjects[index].doubleValue >= stackObjects[stackIndex].ToDouble() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue >= stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue >= stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue >= stackObjects[stackIndex].ToLong() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index].valueType = stackObjects[index].scriptValue.GreaterOrEqual(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【>=】运算符不支持当前类型 : {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.Equal: {
+                                    index = stackIndex - 1;
+                                    valueType = stackObjects[index].valueType;
+                                    switch (valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].doubleValue == stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].doubleValue == stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = ScriptValue.falseValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.stringValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
+                                                stackObjects[index].valueType = stackObjects[index].stringValue == stackObjects[stackIndex].stringValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            } else {
+                                                stackObjects[index].valueType = ScriptValue.falseValueType;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.trueValueType:
+                                        case ScriptValue.nullValueType:
+                                        case ScriptValue.falseValueType: {
+                                            stackObjects[index].valueType = valueType == stackObjects[stackIndex].valueType ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue == stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue == stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = ScriptValue.falseValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index].valueType = stackObjects[index].scriptValue.Equals(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.objectValueType: {
+                                            stackObjects[index].valueType = stackObjects[index].objectValue.Equals(stackObjects[stackIndex].Value) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【==】未知的数据类型 {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                                case Opcode.NotEqual: {
+                                    index = stackIndex - 1;
+                                    valueType = stackObjects[index].valueType;
+                                    switch (valueType) {
+                                        case ScriptValue.doubleValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].doubleValue == stackObjects[stackIndex].doubleValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                    break;
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].doubleValue == stackObjects[stackIndex].longValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = ScriptValue.trueValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.stringValueType: {
+                                            if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
+                                                stackObjects[index].valueType = stackObjects[index].stringValue == stackObjects[stackIndex].stringValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                            } else {
+                                                stackObjects[index].valueType = ScriptValue.trueValueType;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.trueValueType:
+                                        case ScriptValue.nullValueType:
+                                        case ScriptValue.falseValueType: {
+                                            stackObjects[index].valueType = valueType == stackObjects[stackIndex].valueType ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.longValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.longValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue == stackObjects[stackIndex].longValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                    break;
+                                                case ScriptValue.doubleValueType:
+                                                    stackObjects[index].valueType = stackObjects[index].longValue == stackObjects[stackIndex].doubleValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = ScriptValue.trueValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.scriptValueType: {
+                                            stackObjects[index].valueType = stackObjects[index].scriptValue.Equals(stackObjects[stackIndex]) ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.objectValueType: {
+                                            stackObjects[index].valueType = stackObjects[index].objectValue.Equals(stackObjects[stackIndex].Value) ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: throw new ExecutionException($"【!=】未知的数据类型 {stackObjects[index].ValueTypeName}");
+                                    }
+                                }
+                            }
+                            continue;
+                        case OpcodeType.Jump:
+                            switch (opcode) {
+                                case Opcode.Jump: iInstruction = opvalue; continue;
+                                case Opcode.Pop: --stackIndex; continue;
+                                case Opcode.PopNumber: stackIndex -= opvalue; continue;
+                                case Opcode.Call: {
+                                    var func = stackObjects[stackIndex--];
+                                    for (var i = opvalue - 1; i >= 0; --i) {
+                                        parameters[i] = stackObjects[stackIndex--];
+                                    }
+                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, opvalue);
+                                    continue;
+                                }
+                                case Opcode.CallVi: {
+                                    var func = stackObjects[stackIndex--];
+                                    for (var i = opvalue - 1; i >= 0; --i) {
+                                        parameters[i] = stackObjects[stackIndex--];
+                                    }
+                                    stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
+                                    continue;
+                                }
+                                case Opcode.CallEach: {
+                                    index = stackIndex - 1;
+                                    var value = stackObjects[stackIndex];
+                                    stackObjects[++stackIndex] = value.Call(stackObjects[index]);
+                                    continue;
+                                }
+                                case Opcode.TrueTo: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.falseValueType:
+                                        case ScriptValue.nullValueType: {
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: {
+                                            iInstruction = opvalue;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                case Opcode.FalseTo: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.falseValueType:
+                                        case ScriptValue.nullValueType: {
+                                            iInstruction = opvalue;
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: {
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                case Opcode.TrueLoadTrue: if (stackObjects[stackIndex].valueType == ScriptValue.trueValueType) { iInstruction = opvalue; } else { --stackIndex; } continue;
+                                case Opcode.FalseLoadFalse: if (stackObjects[stackIndex].valueType == ScriptValue.falseValueType) { iInstruction = opvalue; } else { --stackIndex; } continue;
+                                case Opcode.RetNone: return ScriptValue.Null;
+                                case Opcode.Ret: return stackObjects[stackIndex--];
+                                case Opcode.CallUnfold: {
+                                    var func = stackObjects[stackIndex--];      //函数对象
+                                    var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                                    var unfold = value & 0xff;                  //折叠标志位
+                                    var funcParameterCount = (int)(value >> 8); //参数个数
+                                    var startIndex = stackIndex - funcParameterCount + 1;
+                                    var parameterIndex = 0;
+                                    for (var i = 0; i < funcParameterCount; ++i) {
+                                        var parameter = stackObjects[startIndex + i];
+                                        if ((unfold & (1L << i)) != 0) {
+                                            var array = parameter.Get<ScriptArray>();
+                                            if (array != null) {
+                                                var values = array.getObjects();
+                                                var valueLength = array.Length();
+                                                for (var j = 0; j < valueLength; ++j) {
+                                                    parameters[parameterIndex++] = values[j];
+                                                }
+                                            } else {
+                                                parameters[parameterIndex++] = parameter;
+                                            }
+                                        } else {
+                                            parameters[parameterIndex++] = parameter;
+                                        }
+                                    }
+                                    stackIndex -= funcParameterCount;
+                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, parameterIndex);
+                                    continue;
+                                }
+                                case Opcode.CallViUnfold: {
+                                    var func = stackObjects[stackIndex--];      //函数对象
+                                    var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                                    var unfold = value & 0xff;                  //折叠标志位
+                                    var funcParameterCount = (int)(value >> 8); //参数个数
+                                    var startIndex = stackIndex - funcParameterCount + 1;
+                                    var parameterIndex = 0;
+                                    for (var i = 0; i < funcParameterCount; ++i) {
+                                        var parameter = stackObjects[startIndex + i];
+                                        if ((unfold & (1L << i)) != 0) {
+                                            var array = parameter.Get<ScriptArray>();
+                                            if (array != null) {
+                                                var values = array.getObjects();
+                                                var valueLength = array.Length();
+                                                for (var j = 0; j < valueLength; ++j) {
+                                                    parameters[parameterIndex++] = values[j];
+                                                }
+                                            } else {
+                                                parameters[parameterIndex++] = parameter;
+                                            }
+                                        } else {
+                                            parameters[parameterIndex++] = parameter;
+                                        }
+                                    }
+                                    stackIndex -= funcParameterCount;
+                                    stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
+                                    continue;
+                                }
+                            }
+                            continue;
+                        case OpcodeType.New:
+                            switch (opcode) {
+                                case Opcode.NewMap: {
+                                    var map = new ScriptMap(m_script);
+                                    for (var i = opvalue - 1; i >= 0; --i) {
+                                        map.SetValue(stackObjects[stackIndex - i].stringValue, stackObjects[stackIndex - i - opvalue]);
+                                    }
+                                    stackIndex -= opvalue * 2;
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = map;
+                                    continue;
+                                }
+                                case Opcode.NewArray: {
+                                    var array = new ScriptArray(m_script);
+                                    for (var i = opvalue - 1; i >= 0; --i) {
+                                        array.Add(stackObjects[stackIndex - i]);
+                                    }
+                                    stackIndex -= opvalue;
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = array;
+                                    continue;
+                                }
+                                case Opcode.NewMapObject: {
+                                    var map = new ScriptMap(m_script);
+                                    for (var i = opvalue - 1; i >= 0; --i) {
+                                        map.SetValue(stackObjects[stackIndex - i].Value, stackObjects[stackIndex - i - opvalue]);
+                                    }
+                                    stackIndex -= opvalue * 2;
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = map;
+                                    continue;
+                                }
+                                case Opcode.NewFunction: {
+                                    var functionData = constContexts[opvalue];
+                                    var internals = functionData.m_FunctionData.internals;
+                                    var function = new ScriptScriptFunction(functionData);
+                                    for (var i = 0; i < internals.Length; ++i) {
+                                        var internalIndex = internals[i];
+                                        function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                    }
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = function;
+                                    continue;
+                                }
+                                case Opcode.NewLambadaFunction: {
+                                    var functionData = constContexts[opvalue];
+                                    var internals = functionData.m_FunctionData.internals;
+                                    var function = new ScriptScriptBindFunction(functionData, thisObject);
+                                    for (var i = 0; i < internals.Length; ++i) {
+                                        var internalIndex = internals[i];
+                                        function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                    }
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = function;
+                                    continue;
+                                }
+                                case Opcode.NewType: {
+                                    var classData = constClasses[opvalue];
+                                    var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
+                                    var className = constString[classData.name];
+                                    var type = new ScriptType(className, parentType.valueType == ScriptValue.nullValueType ? m_script.TypeObjectValue : parentType);
+                                    var functions = classData.functions;
+                                    for (var j = 0; j < functions.Length; ++j) {
+                                        var func = functions[j];
+                                        var functionData = constContexts[func & 0xffffffff];
+                                        var internals = functionData.m_FunctionData.internals;
+                                        var function = new ScriptScriptFunction(functionData);
+                                        for (var i = 0; i < internals.Length; ++i) {
+                                            var internalIndex = internals[i];
+                                            function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                        }
+                                        type.SetValue(constString[func >> 32], new ScriptValue(function));
+                                    }
+                                    stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                    stackObjects[stackIndex].scriptValue = type;
+                                    continue;
+                                }
+                            }
+                            continue;
                     }
-                    return left.Compute(type, right);
-                case TokenType.Minus:
-                case TokenType.Multiply:
-                case TokenType.Divide:
-                case TokenType.Modulo:
-                case TokenType.InclusiveOr:
-                case TokenType.Combine:
-                case TokenType.XOR:
-                case TokenType.Shr:
-                case TokenType.Shi:
-                    return left.Compute(type, ResolveOperand(operate.Right));
-                case TokenType.And:
-                    if (!left.LogicOperation()) return m_script.False;
-                    return m_script.CreateBool(ResolveOperand(operate.Right).LogicOperation());
-                case TokenType.Or:
-                    if (left.LogicOperation()) return m_script.True;
-                    return m_script.CreateBool(ResolveOperand(operate.Right).LogicOperation());
-                case TokenType.Equal:
-                    return m_script.CreateBool(left.Equals(ResolveOperand(operate.Right)));
-                case TokenType.NotEqual:
-                    return m_script.CreateBool(!left.Equals(ResolveOperand(operate.Right)));
-                case TokenType.Greater:
-                case TokenType.GreaterOrEqual:
-                case TokenType.Less:
-                case TokenType.LessOrEqual:
-                    return m_script.CreateBool(left.Compare(type, ResolveOperand(operate.Right)));
-                default:
-                    throw new ExecutionException(m_script, "不支持的运算符 " + type);
+                }
+            } catch (ExecutionException e) {
+                throw new ExecutionStackException($"{m_Breviary}:{instruction.line}({iInstruction})\n    {e.ToString()}");
+            } catch (ExecutionStackException e) {
+                throw new ExecutionStackException($"{m_Breviary}:{instruction.line}({iInstruction})\n    {e.ToString()}");
+            } catch (System.Exception e) {
+                throw new ExecutionException($"{m_Breviary}:{instruction.line}({iInstruction}) : {e.ToString()}");
+            } finally {
+                --VariableValueIndex;
+                Logger.debug(stackIndex != -1, "堆栈数据未清空，有泄露情况 : " + stackIndex);
             }
-        }
-        ScriptObject ParseTernary(CodeTernary ternary) {
-            return ResolveOperand(ternary.Allow).LogicOperation() ? ResolveOperand(ternary.True) : ResolveOperand(ternary.False);
-        }
-        ScriptObject ParseAssign(CodeAssign assign) {
-            if (assign.AssignType == TokenType.Assign) {
-                var ret = ResolveOperand(assign.value);
-                SetVariable(assign.member, ret);
-                return ret;
-            } else {
-                return GetVariable(assign.member).AssignCompute(assign.AssignType, ResolveOperand(assign.value));
-            }
-        }
-        ScriptObject ParseEval(CodeEval eval) {
-            ScriptString obj = ResolveOperand(eval.EvalObject) as ScriptString;
-            if (obj == null) throw new ExecutionException(m_script, "Eval参数必须是一个字符串");
-            return m_script.LoadString("", obj.Value, this, false);
+            return ScriptValue.Null;
         }
     }
 }

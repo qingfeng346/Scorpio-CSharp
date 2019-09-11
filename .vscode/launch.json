@@ -1,0 +1,41 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "run",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ScorpioExec/bin/Debug/netcoreapp2.0/sco.dll",
+            "args": ["./test.sco"],
+            "cwd": "${workspaceFolder}/ScorpioExec",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "fast",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ScorpioExec/bin/Debug/netcoreapp2.0/sco.dll",
+            "args": ["fast", "-class", "ScorpioExec.TestClass", "-output", "./"],
+            "cwd": "${workspaceFolder}/ScorpioExec",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "pack",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ScorpioExec/bin/Debug/netcoreapp2.0/sco.dll",
+            "args": ["pack", "-source", "./test.sco", "-output", "./test.il"],
+            "cwd": "${workspaceFolder}/ScorpioExec",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        }
+    ]
+}
