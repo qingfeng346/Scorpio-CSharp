@@ -23,6 +23,8 @@ namespace Scorpio.Library {
             }
         }
         private class JsonParser {
+            const long MinInt = int.MinValue;
+            const long MaxInt = int.MaxValue;
             const char END_CHAR = (char)0;
             const char QUOTES = '"';            //引号
             const char LEFT_BRACE = '{';        //{
@@ -152,12 +154,19 @@ namespace Scorpio.Library {
             }
             ScriptValue ParseNumber() {
                 var number = NextWord;
-                if (m_SupportLong && number.IndexOf('.') == -1) {
-                    long.TryParse(number, out long parsedLong);
-                    return new ScriptValue(parsedLong);
+                var length = number.Length - 1;
+                if (number.IndexOf('.') >= 0) {
+                    return new ScriptValue(double.Parse(number));
+                } else if (number[number.Length - 1] == 'L') {
+                    return new ScriptValue(long.Parse(number.Substring(0, number.Length - 1)));
+                } else {
+                    var parsedLong = long.Parse(number);
+                    if (m_SupportLong || parsedLong < MinInt || parsedLong > MaxInt) {
+                        return new ScriptValue(parsedLong);
+                    } else {
+                        return new ScriptValue(System.Convert.ToDouble(parsedLong));
+                    }
                 }
-                double.TryParse(number, out double parsedDouble);
-                return new ScriptValue(parsedDouble);
             }
             ScriptValue ParseMap() {
                 var map = new ScriptMap(m_Script);
