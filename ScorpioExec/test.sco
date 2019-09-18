@@ -1,8 +1,14 @@
-var a = []
-a.addUnique(100)
-a.addUnique(100)
-print(a.popLast())
-print(a.popLast())
+// var a = null
+// var b = false
+// var c = (a ?? b) ?? "fewa"
+// print(c)
+var a = json.decode(`{"aaaa" : 100L}`)
+print(a)
+// var a = []
+// a.addUnique(100)
+// a.addUnique(100)
+// print(a.popLast())
+// print(a.popLast())
 // function hello(a1,a2,a3,a4) {
 // }
 // for (var i = 0 ; i < 1000000; i ++) {

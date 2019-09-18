@@ -653,6 +653,13 @@ namespace Scorpio.Compile.Compiler {
                     jump.SetValue(Index);
                     break;
                 }
+                case CodeEmptyRet emptyRet: {
+                    PushObject(emptyRet.Emtpy);
+                    var emptyTo = AddScriptInstructionWithoutValue(Opcode.ExistTo, obj.Line);
+                    PushObject(emptyRet.Ret);
+                    emptyTo.SetValue(Index);
+                    break;
+                }
                 case CodeAssign assign: {
                     PushAssign(assign);
                     break;
@@ -803,16 +810,25 @@ namespace Scorpio.Compile.Compiler {
                         break;
                 }
             }
-            if (PeekToken().Type == TokenType.QuestionMark) {
-                ReadToken();
-                var ternary = new CodeTernary(GetSourceLine());
-                ternary.Allow = ret;
-                ternary.True = GetObject();
-                ReadColon();
-                ternary.False = GetObject();
-                return ternary;
+            switch (PeekToken().Type) {
+                case TokenType.QuestionMark: {
+                    ReadToken();
+                    var ternary = new CodeTernary(GetSourceLine());
+                    ternary.Allow = ret;
+                    ternary.True = GetObject();
+                    ReadColon();
+                    ternary.False = GetObject();
+                    return ternary;
+                }
+                case TokenType.EmptyRet: {
+                    ReadToken();
+                    var emptyRet = new CodeEmptyRet(GetSourceLine());
+                    emptyRet.Emtpy = ret;
+                    emptyRet.Ret = GetObject();
+                    return emptyRet;
+                }
+                default: return ret;
             }
-            return ret;
         }
         //解析操作符
         bool P_Operator(Stack<TempOperator> operateStack, Stack<CodeObject> objectStack) {

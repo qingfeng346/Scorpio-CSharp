@@ -9,16 +9,23 @@
 * **语法测试** http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
 
 ### 基础介绍
-* 安装**sco**命令行
-    * windows 7, windows 8, MacOS, Linux 需要预先安装 [PowerShell Core](https://github.com/PowerShell/PowerShell/releases) , 然后运行命令行
-        > pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
-    * windows 10 直接运行命令行, 也可以安装 **PowerShell Core** 使用上面的方法安装
-        > powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio
 * nuget地址 https://www.nuget.org/packages/Scorpio-CSharp/
 * 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/unitysample/
 * 脚本实现Space Shooter 源码地址 https://github.com/qingfeng346/ScorpioUnitySample
 * 码云地址 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
+
+### 安装 **sco** 命令行
+
+* windows 7, windows 8, MacOS, Linux 需要预先安装 [PowerShell Core](https://github.com/PowerShell/PowerShell/releases), 然后运行命令行
+```powershellcore
+pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
+```
+
+* windows 10 直接运行命令行, 也可以安装 **PowerShell Core** 使用上面的方法安装
+```powershellcore
+powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
+```
 
 ### 兼容大部分 **.net** 平台
 * .net framework 3.5 及以上
@@ -81,11 +88,16 @@
 ### 快速反射
 
 #### 快速反射类生成
-* 使用命令行 **sco fast -dll [dll文件路径] -class [class完整名] -output [输出目录]** 生成快速反射类文件
+* 使用命令行可以生成快速反射类文件,例子
+```
+sco fast -dll [dll文件路径] -class [class完整名] -output [输出目录]
+```
 
 #### 快速反射类使用
-* 例如使用快速反射的类为 **UnityEngine.GameObject** , 生成的快速反射类则为**ScorpioClass_UnityEngine_GameObject**
-    * 在程序内调用 **Scorpio.Userdata.TypeManager.SetFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script))**
+* 例如使用快速反射的类为 **UnityEngine.GameObject** , 生成的快速反射类则为**ScorpioClass_UnityEngine_GameObject**, 然后 **c#** 调用
+```csharp
+Scorpio.Userdata.TypeManager.SetFastReflectClass(typeof(UnityEngine.GameObject), new ScorpioClass_UnityEngine_GameObject(script))
+```
 
 ### 源码目录说明
 * **Scorpio** 脚本引擎源码
