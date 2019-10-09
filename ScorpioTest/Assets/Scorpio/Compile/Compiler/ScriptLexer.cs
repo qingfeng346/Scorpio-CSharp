@@ -63,6 +63,7 @@ namespace Scorpio.Compile.Compiler {
                 UndoChar();
             }
         }
+
         void ReadLineComment() {
             do {
                 ch = ReadChar();
@@ -228,6 +229,14 @@ namespace Scorpio.Compile.Compiler {
             } else {
                 UndoChar();
                 ReadNumber();
+            }
+        }
+        void ReadQuestionMark() {
+            if (ReadChar() == '?') {
+                AddToken(TokenType.EmptyRet, "??");
+            } else {
+                AddToken(TokenType.QuestionMark, "?");
+                UndoChar();
             }
         }
         /// <summary> 读取 }  </summary>
@@ -473,14 +482,14 @@ namespace Scorpio.Compile.Compiler {
                     case ';':
                         AddToken(TokenType.SemiColon);
                         break;
-                    case '?':
-                        AddToken(TokenType.QuestionMark);
-                        break;
                     case '#':
                         AddToken(TokenType.Sharp);
                         break;
                     case '~':
                         AddToken(TokenType.Negative);
+                        break;
+                    case '?':
+                        ReadQuestionMark();
                         break;
                     case '}':
                         ReadRightBrace();

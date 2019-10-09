@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Scorpio.Compile.CodeDom {
+﻿namespace Scorpio.Compile.CodeDom {
     //三目运算符 true ? xxx : xxx
     public class CodeTernary : CodeObject {
         public CodeObject Allow; //判断条件

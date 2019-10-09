@@ -108,6 +108,7 @@
         CallViUnfold,           //调用内部函数 有参数需要展开
         RetNone,                //return
         Ret,                    //return a value
+        ExistTo,                //如果栈顶不为null则跳转
         JumpEnd,
     }
 }

@@ -1088,6 +1088,18 @@ namespace Scorpio.Runtime {
                                     stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
                                     continue;
                                 }
+                                case Opcode.ExistTo: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.nullValueType: {
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        default: {
+                                            iInstruction = opvalue;
+                                            continue;
+                                        }
+                                    }
+                                }
                             }
                             continue;
                         case OpcodeType.New:

@@ -24,7 +24,7 @@ namespace Scorpio.Userdata {
                 if (RefOuts[i]) {
                     var instance = parameters[i].Get<ScriptInstance>();
                     if (instance == null) throw new ExecutionException($"带 ref out 标识的字段,必须传入 map, Index : {i}");
-                    instance.SetValue("value", ScriptValue.CreateValue(Args[i]));
+                    instance.SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
                 }
             }
             return ret;

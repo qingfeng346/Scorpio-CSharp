@@ -55,6 +55,10 @@ namespace Scorpio.Compile.Compiler {
         /// </summary>
         QuestionMark,
         /// <summary>
+        /// ??
+        /// </summary>
+        EmptyRet,
+        /// <summary>
         /// #
         /// </summary>
         Sharp,

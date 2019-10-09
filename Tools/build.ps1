@@ -1,4 +1,4 @@
-$version = "2.0.0"
+$version = "2.0.1"
 $name = "sco"
 $cur = Get-Location
 
@@ -21,9 +21,9 @@ dotnet build
 dotnet pack -p:PackageVersion=$version -o ../bin
 
 Set-Location ../ScorpioExec
-dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64
-dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64
-dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64
+dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true
+dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true
+dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true
 
 
 Compress-Archive ../bin/sco-win-x64 ../bin/$name-$version-win-x64.zip -Force
