@@ -6,7 +6,7 @@
     },
     "fast": {
       "commandName": "Project",
-      "commandLineArgs": "fast -class ScorpioExec.TestClass -output ../../../"
+      "commandLineArgs": "fast -class ScorpioExec.TestClass -extension ScorpioExec.TestClassEx -output ../../../ "
     },
     "run": {
       "commandName": "Project",

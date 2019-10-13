@@ -8,9 +8,12 @@ namespace ScorpioExec {
     public delegate string TestDelegate3(int a1, int a2);
     public delegate TestClass TestDelegate4(int a1, int a2);
     //public delegate string TestDelegate3(int a1, int a2);
-    internal class TestClass1 {
+    public static class TestClassEx {
+        public static void TestFuncEx(this TestClass cl) {
 
+        }
     }
+
     public class TestClass {
         public int num;
         public TestClass(int num, ref int tNum) {
@@ -26,6 +29,12 @@ namespace ScorpioExec {
         public static int TestOut(ref int num, out string str) {
             str = "test";
             return 100;
+        }
+        public void TestFunc() {
+
+        }
+        public void TestTemplate<T>(T arg) {
+
         }
         public static implicit operator TestClass(int value) {
             int refOut = 0;

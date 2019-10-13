@@ -65,6 +65,7 @@ namespace ScorpioExec {
             var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
             var strClass = command.GetValue("-class");
             if (strClass.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
+            var strExtension = command.GetValue("-extension");
 
             ClassFilter filter = null;
             var strFilter = command.GetValue("-filter");
@@ -74,12 +75,21 @@ namespace ScorpioExec {
                     filter = (ClassFilter)Activator.CreateInstance(filterType);
                 }
             }
+            var extensions = new List<Type>();
+            if (!strExtension.isNullOrWhiteSpace()) {
+                foreach (var cl in strExtension.Split(';')) {
+                    extensions.Add(GetType(assembly, cl, null));
+                }
+            }
             var classNames = strClass.Split(";");
             foreach (var className in classNames) {
                 var clazz = GetType(assembly, className, null);
                 if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
                 var generate = new GenerateScorpioClass(clazz);
                 generate.SetClassFilter(filter);
+                foreach (var ex in extensions) {
+                    generate.AddExtensionType(ex);
+                }
                 var outputFile = Path.Combine(output, generate.ScorpioClassName + ".cs");
                 FileUtil.CreateFile(outputFile, generate.Generate());
                 Logger.info($"生成快速反射类 {className} -> {outputFile}");
