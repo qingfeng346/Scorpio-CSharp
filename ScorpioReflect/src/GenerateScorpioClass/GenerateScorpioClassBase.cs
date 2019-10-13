@@ -11,8 +11,7 @@ using System.Reflection;
 using Scorpio;
 using Scorpio.Userdata;
 using Scorpio.Tools;
-using Scorpio.Exception;
-__extensions_using
+using Scorpio.Exception;__extensions_using
 public class __class : ScorpioFastReflectClass {
     public UserdataMethodFastReflect GetConstructor() {
         return __class_Constructor.GetInstance();

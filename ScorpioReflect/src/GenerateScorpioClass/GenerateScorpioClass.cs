@@ -148,11 +148,12 @@ namespace Scorpio.ScorpioReflect {
                         //判断是模板函数
                         if (paramterType.IsGenericParameter && paramterType.BaseType != null && m_Type.IsSubclassOf(paramterType.BaseType)) {
                             m_ExtensionMethods.Add(method);
-                            if (!m_ExtensionUsing.Contains(nameSpace)) m_ExtensionUsing.Add(nameSpace);
                         } else if (ScorpioReflectUtil.CheckGenericMethod(method) && paramterType == m_Type || m_Type.IsSubclassOf(paramterType)) {
                             m_ExtensionMethods.Add(method);
-                            if (!m_ExtensionUsing.Contains(nameSpace)) m_ExtensionUsing.Add(nameSpace);
+                        } else {
+                            continue;
                         }
+                        if (!string.IsNullOrWhiteSpace(nameSpace) && !m_ExtensionUsing.Contains(nameSpace)) m_ExtensionUsing.Add(nameSpace);
                     }
                 }
                 m_ExtensionUsing.Sort();
@@ -176,7 +177,7 @@ namespace Scorpio.ScorpioReflect {
         string GetExtensionsUsing() {
             var builder = new StringBuilder();
             foreach (var name in m_ExtensionUsing) {
-                builder.AppendLine($@"
+                builder.Append($@"
 using {name};");
             }
             return builder.ToString();
