@@ -13,8 +13,10 @@ namespace ScorpioExec {
 
         }
     }
-
-    public class TestClass {
+    public class BaseClass {
+        public int TestNumber { get; set; }
+    }
+    public class TestClass : BaseClass {
         public int num;
         public TestClass(int num, ref int tNum) {
             tNum = 0;
@@ -30,6 +32,7 @@ namespace ScorpioExec {
             str = "test";
             return 100;
         }
+        public int TestNumber { get; set; }
         public void TestFunc() {
 
         }

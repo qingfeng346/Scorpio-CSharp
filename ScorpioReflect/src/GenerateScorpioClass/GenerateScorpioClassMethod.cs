@@ -83,6 +83,13 @@ namespace Scorpio.ScorpioReflect {
                     return string.Format("{0}.{1} = {2}; return null;", variable, property.Name, GetScorpioMethodArgs(pars, 0));
                 }
             }
+            if (method.IsSpecialName) {
+                if (method.GetParameters().Length == 0) {
+                    return string.Format("return {0}.{1};", variable, method.Name.Replace("get_", ""));
+                } else if (method.GetParameters().Length == 1) {
+                    return string.Format("{0}.{1} = {2}; return null;", variable, method.Name.Replace("set_", ""), GetScorpioMethodArgs(pars, 0));
+                }
+            }
             return "";
         }
         //生成一个函数的类
