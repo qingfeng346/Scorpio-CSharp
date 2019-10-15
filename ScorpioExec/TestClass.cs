@@ -32,7 +32,7 @@ namespace ScorpioExec {
             str = "test";
             return 100;
         }
-        public int TestNumber { get; set; }
+        public new int TestNumber { get; set; }
         public void TestFunc() {
 
         }

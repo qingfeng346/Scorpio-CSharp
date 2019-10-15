@@ -84,10 +84,11 @@ namespace Scorpio.ScorpioReflect {
                 }
             }
             if (method.IsSpecialName) {
+                //Substring 去除 get_ set_ 
                 if (method.GetParameters().Length == 0) {
-                    return string.Format("return {0}.{1};", variable, method.Name.Replace("get_", ""));
+                    return string.Format("return {0}.{1};", variable, method.Name.Substring(4));
                 } else if (method.GetParameters().Length == 1) {
-                    return string.Format("{0}.{1} = {2}; return null;", variable, method.Name.Replace("set_", ""), GetScorpioMethodArgs(pars, 0));
+                    return string.Format("{0}.{1} = {2}; return null;", variable, method.Name.Substring(4), GetScorpioMethodArgs(pars, 0));
                 }
             }
             return "";
