@@ -66,7 +66,7 @@ namespace Scorpio.Tools {
                 SetCapacity(num);
             }
         }
-        public int Count { get { return mSize; } }
+        public int Count => mSize;
         public virtual int IndexOf(Key key) {
             for (int i = 0; i < mSize; ++i) {
                 if (mValues[i].key.Equals(key)) {
@@ -75,8 +75,19 @@ namespace Scorpio.Tools {
             }
             return -1;
         }
+        public virtual int IndexOfValue(Value value) {
+            for (int i = 0; i < mSize; ++i) {
+                if (mValues[i].value.Equals(value)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
         public virtual bool ContainsKey(Key key) {
             return IndexOf(key) > -1;
+        }
+        public virtual bool ContainsValue(Value value) {
+            return IndexOfValue(value) > -1;
         }
         public virtual bool Remove(Key key) {
             int index = IndexOf(key);
@@ -106,6 +117,17 @@ namespace Scorpio.Tools {
             }
             value = default;
             return false;
+        }
+        public virtual ScorpioValue<Key, Value> Get(int index) {
+            return mValues[index];
+        }
+        public virtual Key GetKey(Value value) {
+            for (int i = 0; i < mSize; ++i) {
+                if (mValues[i].value.Equals(value)) {
+                    return mValues[i].key;
+                }
+            }
+            return default(Key);
         }
         public Key[] Keys {
             get {
