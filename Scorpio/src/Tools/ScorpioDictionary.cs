@@ -67,6 +67,9 @@ namespace Scorpio.Tools {
             }
         }
         public int Count => mSize;
+        public virtual void Add(Key key, Value value) {
+            this[key] = value;
+        }
         public virtual int IndexOf(Key key) {
             for (int i = 0; i < mSize; ++i) {
                 if (mValues[i].key.Equals(key)) {

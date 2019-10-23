@@ -33,6 +33,7 @@
             ret.SetValue("popLast", script.CreateFunction(new popLast()));
             ret.SetValue("safePopLast", script.CreateFunction(new safePopLast()));
             ret.SetValue("join", script.CreateFunction(new join()));
+            ret.SetValue("toArray", script.CreateFunction(new toArray()));
             ret.SetValue("+", script.CreateFunction(new plus()));
             ret.SetValue("-", script.CreateFunction(new minus()));
             return ret;
@@ -325,6 +326,12 @@
                 var values = new string[count];
                 for (int i = 0; i < count; ++i) { values[i] = value[i].ToString(); }
                 return new ScriptValue(string.Join(separator, values));
+            }
+        }
+        private class toArray : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var type = args[0].Get<Scorpio.Userdata.ScriptUserdataType>();
+                return type == null ? ScriptValue.Null : ScriptValue.CreateValue(thisObject.Get<ScriptArray>().ToArray(type.Type));
             }
         }
         private class plus : ScorpioHandle {
