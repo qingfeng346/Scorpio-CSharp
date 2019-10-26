@@ -15,6 +15,7 @@ namespace Scorpio.Library {
             map.SetValue("max", script.CreateFunction(new max()));          //取最大值
             map.SetValue("abs", script.CreateFunction(new abs()));          //取绝对值
             map.SetValue("floor", script.CreateFunction(new floor()));      //向下取整
+            map.SetValue("ceil", script.CreateFunction(new ceil()));        //向上取整
             map.SetValue("round", script.CreateFunction(new round()));      //四舍五入
             map.SetValue("clamp", script.CreateFunction(new clamp()));      //指定最大最小值取合适值
             map.SetValue("sqrt", script.CreateFunction(new sqrt()));        //开平方根
@@ -75,6 +76,15 @@ namespace Scorpio.Library {
                 var value = args[0];
                 switch (value.valueType) {
                     case ScriptValue.doubleValueType: return new ScriptValue(Math.Floor(value.doubleValue));
+                    default: return value;
+                }
+            }
+        }
+        private class ceil : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var value = args[0];
+                switch (value.valueType) {
+                    case ScriptValue.doubleValueType: return new ScriptValue(Math.Ceiling(value.doubleValue));
                     default: return value;
                 }
             }

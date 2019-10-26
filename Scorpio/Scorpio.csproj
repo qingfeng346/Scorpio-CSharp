@@ -23,5 +23,6 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
+    <GenerateSerializationAssemblies></GenerateSerializationAssemblies>
   </PropertyGroup>
 </Project>

@@ -2,8 +2,10 @@
 // var b = false
 // var c = (a ?? b) ?? "fewa"
 // print(c)
-var a = json.decode(`{"aaaa" : 100L}`)
-print(a)
+var d = !w
+print (d)
+// var a = json.decode(`{"aaaa" : 100L}`)
+// print(a)
 // var a = []
 // a.addUnique(100)
 // a.addUnique(100)
