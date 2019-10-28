@@ -113,7 +113,7 @@ namespace Scorpio.Library {
             }
         }
         public static void Load(Script script) {
-            script.SetGlobal("print", script.CreateFunction(new print()));
+            script.SetGlobal("print", script.CreateFunction(new print(script)));
             script.SetGlobal("printf", script.CreateFunction(new printf()));
             script.SetGlobal("pairs", script.CreateFunction(new pairs(script)));
 
@@ -181,14 +181,19 @@ namespace Scorpio.Library {
             script.SetGlobal("generic_method", script.CreateFunction(new genericMethod()));
         }
         private class print : ScorpioHandle {
+            private Script script;
+            internal print(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var builder = new StringBuilder();
+                var stack = script.GetStackInfo();
+                builder.Append($"{stack.Breviary}:{stack.Line} ");
                 for (var i = 0; i < length; ++i) {
                     if (i != 0) { builder.Append("    "); }
                     builder.Append(args[i]);
                 }
                 System.Console.WriteLine(builder);
-                // System.Diagnostics.Debug.WriteLine(builder);
                 return ScriptValue.Null;
             }
         }

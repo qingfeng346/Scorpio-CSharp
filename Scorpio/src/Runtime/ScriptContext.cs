@@ -54,24 +54,29 @@ namespace Scorpio.Runtime {
             m_scriptInstructions = functionData.scriptInstructions;
         }
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
-            Logger.debug("执行命令 =>\n" + m_FunctionData.ToString(constDouble, constLong, constString));
+#if SCORPIO_DEBUG
+            Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
+#endif
             var variableObjects = VariableValues[VariableValueIndex];   //局部变量
             var stackObjects = StackValues[VariableValueIndex++];       //堆栈数据
             variableObjects[0] = thisObject;
             InternalValue[] internalObjects = null;
             if (internalCount > 0) {
                 internalObjects = new InternalValue[internalCount];     //内部变量，有外部引用
-                for (int i = 0; i < internalCount; ++i) {
-                    if (internalValues != null)
-                        internalObjects[i] = internalValues[i] ?? new InternalValue();
-                    else
+                if (internalValues == null) {
+                    for (int i = 0; i < internalCount; ++i) {
                         internalObjects[i] = new InternalValue();
+                    }
+                } else {
+                    for (int i = 0; i < internalCount; ++i) {
+                        internalObjects[i] = internalValues[i] ?? new InternalValue();
+                    }
                 }
             }
             var stackIndex = -1;                                        //堆栈索引
             var parameterCount = m_FunctionData.parameterCount;         //参数数量
-            var param = m_FunctionData.param;                           //是否是变长参数
-            if (param) {
+            //是否是变长参数
+            if (m_FunctionData.param) {
                 var array = new ScriptArray(m_script);
                 for (var i = parameterCount - 1; i < length; ++i) {
                     array.Add(args[i]);
@@ -988,7 +993,13 @@ namespace Scorpio.Runtime {
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
+#if SCORPIO_DEBUG
+                                    m_script.PushStackInfo(m_Breviary, instruction.line);
                                     stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, opvalue);
+                                    m_script.PopStackInfo();
+#else
+                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, opvalue);
+#endif
                                     continue;
                                 }
                                 case Opcode.CallVi: {
@@ -996,7 +1007,13 @@ namespace Scorpio.Runtime {
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
+#if SCORPIO_DEBUG
+                                    m_script.PushStackInfo(m_Breviary, instruction.line);
                                     stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
+                                    m_script.PopStackInfo();
+#else
+                                    stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
+#endif
                                     continue;
                                 }
                                 case Opcode.CallEach: {
@@ -1074,7 +1091,13 @@ namespace Scorpio.Runtime {
                                         }
                                     }
                                     stackIndex -= funcParameterCount;
+#if SCORPIO_DEBUG
+                                    m_script.PushStackInfo(m_Breviary, instruction.line);
                                     stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, parameterIndex);
+                                    m_script.PopStackInfo();
+#else
+                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, parameterIndex);
+#endif
                                     continue;
                                 }
                                 case Opcode.CallViUnfold: {
@@ -1102,7 +1125,13 @@ namespace Scorpio.Runtime {
                                         }
                                     }
                                     stackIndex -= funcParameterCount;
+#if SCORPIO_DEBUG
+                                    m_script.PushStackInfo(m_Breviary, instruction.line);
                                     stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
+                                    m_script.PopStackInfo();
+#else
+                                    stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
+#endif
                                     continue;
                                 }
                                 case Opcode.ExistTo: {

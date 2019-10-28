@@ -2,8 +2,9 @@
 // var b = false
 // var c = (a ?? b) ?? "fewa"
 // print(c)
-var d = !w
-print (d)
+print("hello world")
+//var d = !w
+//print (d)
 // var a = json.decode(`{"aaaa" : 100L}`)
 // print(a)
 // var a = []

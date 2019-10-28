@@ -154,23 +154,21 @@ namespace Scorpio.Proto {
 
         public class format : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (length == 0) return ScriptValue.Null;
                 var format = args[0].ToString();
-                if (length == 1) return new ScriptValue(format);
+                var index = 0;
+                var strLength = format.Length;
+                var strLength1 = strLength - 1;
                 var builder = new StringBuilder();
-                var startIndex = 0;
-                for (var i = 1; i < length; ++i) {
-                    var index = format.IndexOf(DELIM_STR, startIndex);
-                    if (index >= 0) {
-                        builder.Append(format.Substring(startIndex, index - startIndex));
-                        builder.Append(args[i].ToString());
-                        startIndex = index + 2;
+                for (var i = 0; i < strLength;) {
+                    var c = format[i];
+                    if (c == '{' && i < strLength1 && format[i + 1] == '}') {
+                        i += 2;
+                        builder.Append(args[index++]);
                     } else {
-                        builder.Append(format.Substring(startIndex));
-                        return new ScriptValue(builder.ToString());
+                        builder.Append(c);
+                        ++i;
                     }
                 }
-                builder.Append(format.Substring(startIndex));
                 return new ScriptValue(builder.ToString());
             }
         }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net40;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net40;</TargetFrameworks>
     <Authors>while</Authors>
     <Product>sco</Product>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;SCORPIO_DEBUG</DefineConstants>
     <GenerateSerializationAssemblies></GenerateSerializationAssemblies>
   </PropertyGroup>
 </Project>
