@@ -63,7 +63,7 @@ namespace Scorpio.Library {
         }
         private class TypePairs : ScorpioHandle {
             readonly ScriptInstance m_ItorResult;
-            readonly IEnumerator<ScorpioValue<string, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
             public TypePairs(ScriptType map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -71,8 +71,8 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.key));
-                    m_ItorResult.SetValue("value", value.value);
+                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key));
+                    m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;

@@ -30,7 +30,7 @@ namespace Scorpio {
         public object objectValue;
 
         public ScriptValue(ScriptObject value) {
-            this.valueType = value == null ? nullValueType : scriptValueType; ;
+            this.valueType = value == null ? nullValueType : scriptValueType;
             this.scriptValue = value;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -362,12 +362,12 @@ namespace Scorpio {
         public static implicit operator ScriptValue(double value) {
             return new ScriptValue(value);
         }
-        public static implicit operator ScriptValue(long value) {
-            return new ScriptValue(value);
-        }
-        public static implicit operator ScriptValue(string value) {
-            return new ScriptValue(value);
-        }
+        //public static implicit operator ScriptValue(long value) {
+        //    return new ScriptValue(value);
+        //}
+        //public static implicit operator ScriptValue(string value) {
+        //    return new ScriptValue(value);
+        //}
         public static ScriptValue CreateValue(object value) {
             if (value == null)
                 return Null;
