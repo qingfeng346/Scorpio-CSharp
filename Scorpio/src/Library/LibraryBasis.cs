@@ -114,7 +114,7 @@ namespace Scorpio.Library {
         }
         public static void Load(Script script) {
             script.SetGlobal("print", script.CreateFunction(new print(script)));
-            script.SetGlobal("printf", script.CreateFunction(new printf()));
+            script.SetGlobal("printf", script.CreateFunction(new printf(script)));
             script.SetGlobal("pairs", script.CreateFunction(new pairs(script)));
 
             script.SetGlobal("isBoolean", script.CreateFunction(new isBoolean()));
@@ -198,28 +198,29 @@ namespace Scorpio.Library {
             }
         }
         private class printf : ScorpioHandle {
-            const string DELIM_STR = "{}";
+            private Script script;
+            internal printf(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var format = args[0].ToString();
+                var index = 1;
+                var strLength = format.Length;
+                var strLength1 = strLength - 1;
                 var builder = new StringBuilder();
-                if (length == 1) {
-                    builder.Append(args[0].ToString());
-                } else if (length > 1) {
-                    var format = args[0].ToString();
-                    var startIndex = 0;
-                    for (var i = 1; i < length; ++i) {
-                        var index = format.IndexOf(DELIM_STR, startIndex);
-                        if (index >= 0) {
-                            builder.Append(format.Substring(startIndex, index - startIndex));
-                            builder.Append(args[i].ToString());
-                            startIndex = index + 2;
-                        } else {
-                            break;
-                        }
+                var stack = script.GetStackInfo();
+                builder.Append($"{stack.Breviary}:{stack.Line} ");
+                for (var i = 0; i < strLength;) {
+                    var c = format[i];
+                    if (c == '{' && i < strLength1 && format[i + 1] == '}') {
+                        i += 2;
+                        builder.Append(args[index++]);
+                    } else {
+                        builder.Append(c);
+                        ++i;
                     }
-                    builder.Append(format.Substring(startIndex));
                 }
                 System.Console.WriteLine(builder);
-                System.Diagnostics.Debug.WriteLine(builder);
                 return ScriptValue.Null;
             }
         }

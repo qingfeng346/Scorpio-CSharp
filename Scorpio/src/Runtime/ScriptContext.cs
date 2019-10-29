@@ -995,8 +995,11 @@ namespace Scorpio.Runtime {
                                     }
 #if SCORPIO_DEBUG
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
-                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, opvalue);
-                                    m_script.PopStackInfo();
+                                    try {
+                                        stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, opvalue);
+                                    } finally {
+                                        m_script.PopStackInfo();
+                                    }
 #else
                                     stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, opvalue);
 #endif
@@ -1009,8 +1012,11 @@ namespace Scorpio.Runtime {
                                     }
 #if SCORPIO_DEBUG
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
-                                    stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
-                                    m_script.PopStackInfo();
+                                    try {
+                                        stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
+                                    } finally {
+                                        m_script.PopStackInfo();
+                                    }
 #else
                                     stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
 #endif
@@ -1093,8 +1099,11 @@ namespace Scorpio.Runtime {
                                     stackIndex -= funcParameterCount;
 #if SCORPIO_DEBUG
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
-                                    stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, parameterIndex);
-                                    m_script.PopStackInfo();
+                                    try {
+                                        stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, parameterIndex);
+                                    } finally {
+                                        m_script.PopStackInfo();
+                                    }
 #else
                                     stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters, parameterIndex);
 #endif
@@ -1127,8 +1136,11 @@ namespace Scorpio.Runtime {
                                     stackIndex -= funcParameterCount;
 #if SCORPIO_DEBUG
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
-                                    stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
-                                    m_script.PopStackInfo();
+                                    try {
+                                        stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
+                                    } finally {
+                                        m_script.PopStackInfo();
+                                    }
 #else
                                     stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
 #endif

@@ -3,6 +3,7 @@
 // var c = (a ?? b) ?? "fewa"
 // print(c)
 print("hello world")
+print(String.format("aaaa{}wwww", 100, 200))
 //var d = !w
 //print (d)
 // var a = json.decode(`{"aaaa" : 100L}`)

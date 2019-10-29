@@ -3,7 +3,6 @@ using System.Text;
 
 namespace Scorpio.Proto {
     public class ProtoString {
-        const string DELIM_STR = "{}";
         public static ScriptType Load(Script script, ScriptType ret) {
             ret.SetValue("format", script.CreateFunction(new format()));
             ret.SetValue("csFormat", script.CreateFunction(new csFormat()));
@@ -155,7 +154,7 @@ namespace Scorpio.Proto {
         public class format : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var format = args[0].ToString();
-                var index = 0;
+                var index = 1;
                 var strLength = format.Length;
                 var strLength1 = strLength - 1;
                 var builder = new StringBuilder();
