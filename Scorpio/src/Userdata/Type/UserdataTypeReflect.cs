@@ -75,8 +75,7 @@ namespace Scorpio.Userdata {
         }
         /// <summary> 获得函数 </summary>
         public override UserdataMethod GetMethod(string name) {
-            UserdataMethod userdataMethod;
-            if (m_Functions.TryGetValue(name, out userdataMethod)) return userdataMethod;
+            if (m_Functions.TryGetValue(name, out var userdataMethod)) return userdataMethod;
             return GetFunction(name);
         }
         /// <summary> 获得一个类变量 </summary>

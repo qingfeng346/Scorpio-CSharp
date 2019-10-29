@@ -46,7 +46,7 @@ namespace Scorpio.Library {
         }
         private class InstancePairs : ScorpioHandle {
             readonly ScriptInstance m_ItorResult;
-            readonly IEnumerator<ScorpioValue<string, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
             public InstancePairs(ScriptInstance map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
