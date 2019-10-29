@@ -90,22 +90,22 @@ namespace Scorpio.Proto {
         private class indexOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (length == 3) {
-                    return (double)thisObject.stringValue.IndexOf(args[0].ToString(), args[1].ToInt32(), args[2].ToInt32());
+                    return new ScriptValue((double)thisObject.stringValue.IndexOf(args[0].ToString(), args[1].ToInt32(), args[2].ToInt32()));
                 } else if (length == 2) {
-                    return (double)thisObject.stringValue.IndexOf(args[0].ToString(), args[1].ToInt32());
+                    return new ScriptValue((double)thisObject.stringValue.IndexOf(args[0].ToString(), args[1].ToInt32()));
                 } else {
-                    return (double)thisObject.stringValue.IndexOf(args[0].ToString());
+                    return new ScriptValue((double)thisObject.stringValue.IndexOf(args[0].ToString()));
                 }
             }
         }
         private class lastIndexOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (length == 3) {
-                    return (double)thisObject.stringValue.LastIndexOf(args[0].ToString(), args[1].ToInt32(), args[2].ToInt32());
+                    return new ScriptValue((double)thisObject.stringValue.LastIndexOf(args[0].ToString(), args[1].ToInt32(), args[2].ToInt32()));
                 } else if (length == 2) {
-                    return (double)thisObject.stringValue.LastIndexOf(args[0].ToString(), args[1].ToInt32());
+                    return new ScriptValue((double)thisObject.stringValue.LastIndexOf(args[0].ToString(), args[1].ToInt32()));
                 } else {
-                    return (double)thisObject.stringValue.LastIndexOf(args[0].ToString());
+                    return new ScriptValue((double)thisObject.stringValue.LastIndexOf(args[0].ToString()));
                 }
             }
         }

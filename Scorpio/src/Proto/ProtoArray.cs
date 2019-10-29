@@ -40,7 +40,7 @@
         }
         private class length : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return (double)thisObject.Get<ScriptArray>().Length();
+                return new ScriptValue((double)thisObject.Get<ScriptArray>().m_Length);
             }
         }
         private class insert : ScorpioHandle {
@@ -225,7 +225,7 @@
                 if (func != null) {
                     for (var i = array.Length(); i >= 0; --i) {
                         if (func.Call(array[i]).IsTrue) {
-                            ret.Add((double)i);
+                            ret.Add(new ScriptValue((double)i));
                         }
                     }
                 }

@@ -62,7 +62,7 @@ namespace Scorpio.Proto {
                         }
                     }
                 } else if (scriptObject is ScriptUserdata) {
-                    return (scriptObject as ScriptUserdata).Type.IsAssignableFrom(args[0].Get<ScriptUserdata>().Type);
+                    return ((scriptObject as ScriptUserdata).Type.IsAssignableFrom(args[0].Get<ScriptUserdata>().Type)) ? ScriptValue.True : ScriptValue.False;
                 } else {
                     return ScriptValue.False;
                 }

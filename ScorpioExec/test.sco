@@ -1,9 +1,22 @@
+class Cl {
+
+}
+var a = Cl()
+for (var i = 0 ; i < 10000000; i++) {
+	a.a = 100
+	a.b = 100
+	a.c = 200
+	a.d = 2222
+	a.e = "feawfaewf"
+	a.f = "wefwae"
+	a.h = "wweee"
+}
 // var a = null
 // var b = false
 // var c = (a ?? b) ?? "fewa"
 // print(c)
-print("hello world")
-print(String.format("aaaa{}wwww", 100, 200))
+//print("hello world")
+//print(String.format("aaaa{}wwww", 100, 200))
 //var d = !w
 //print (d)
 // var a = json.decode(`{"aaaa" : 100L}`)

@@ -13,7 +13,7 @@ namespace Scorpio.LibraryV1 {
         }
         private class count : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return (double)args[0].Get<ScriptMap>().Count();
+                return new ScriptValue((double)args[0].Get<ScriptMap>().Count());
             }
         }
         private class clear : ScorpioHandle {

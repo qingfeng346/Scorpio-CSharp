@@ -4,7 +4,7 @@ using Scorpio.Tools;
 using System.Text;
 namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
-        protected ScorpioDictionaryString<ScriptValue> m_Values = new ScorpioDictionaryString<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
+        protected ScorpioDictionaryStringValue m_Values = new ScorpioDictionaryStringValue();         //所有的数据(函数和数据都在一个数组)
         protected ScriptValue m_Prototype = ScriptValue.Null;
         public ScriptInstance(ObjectType objectType, ScriptValue type) : base(objectType) {
             m_Prototype = type;
@@ -12,8 +12,7 @@ namespace Scorpio {
         public override string ValueTypeName { get { return ToString(); } }            //变量名称
         public ScriptValue Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public override ScriptValue GetValue(string key) {
-            ScriptValue value;
-            return m_Values.TryGetValue(key, out value) ? value : m_Prototype.GetValue(key);
+            return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
         public override void SetValue(string key, ScriptValue value) {
             m_Values[key] = value;
@@ -24,7 +23,7 @@ namespace Scorpio {
         public ScriptArray GetKeys(Script script) {
             var ret = new ScriptArray(script);
             foreach (var pair in m_Values) {
-                ret.Add(ScriptValue.CreateValue(pair.key));
+                ret.Add(ScriptValue.CreateValue(pair.Key));
             }
             return ret;
         }
@@ -189,10 +188,10 @@ namespace Scorpio {
             builder.Append("{");
             var first = true;
             foreach (var pair in m_Values) {
-                var value = pair.value;
+                var value = pair.Value;
                 if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
                 if (first) { first = false; } else { builder.Append(","); }
-                builder.Append($"\"{pair.key}\":{value.ToJson(supportKeyNumber)}");
+                builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber)}");
             }
             builder.Append("}");
             return builder.ToString();

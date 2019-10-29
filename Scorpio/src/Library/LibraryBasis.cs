@@ -54,8 +54,8 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.key));
-                    m_ItorResult.SetValue("value", value.value);
+                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key));
+                    m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;
@@ -105,8 +105,8 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", new ScriptValue(value.key));
-                    m_ItorResult.SetValue("value", value.value);
+                    m_ItorResult.SetValue("key", new ScriptValue(value.Key));
+                    m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;
@@ -253,58 +253,58 @@ namespace Scorpio.Library {
         private class isBoolean : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var valueType = args[0].valueType;
-                return valueType == ScriptValue.trueValueType || valueType == ScriptValue.falseValueType;
+                return (valueType == ScriptValue.trueValueType || valueType == ScriptValue.falseValueType) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isNumber : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var valueType = args[0].valueType;
-                return valueType == ScriptValue.doubleValueType || valueType == ScriptValue.longValueType;
+                return (valueType == ScriptValue.doubleValueType || valueType == ScriptValue.longValueType) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isDouble : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.doubleValueType;
+                return (args[0].valueType == ScriptValue.doubleValueType) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isLong : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.longValueType;
+                return (args[0].valueType == ScriptValue.longValueType) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isString : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.stringValueType;
+                return args[0].valueType == ScriptValue.stringValueType ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isFunction : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptFunction;
+                return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptFunction) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isArray : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptArray;
+                return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptArray) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isMap : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptMap;
+                return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptMap) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isUserdata : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptUserdata;
+                return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptUserdata) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isType : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptType;
+                return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptType) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isInstance : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue.GetType() == typeof(ScriptInstance);
+                return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue.GetType() == typeof(ScriptInstance)) ? ScriptValue.True : ScriptValue.False;
             }
         }
 
@@ -461,7 +461,7 @@ namespace Scorpio.Library {
                     }
                 } else {
                     foreach (var pair in target) {
-                        source.SetValue(pair.key, pair.value);
+                        source.SetValue(pair.Key, pair.Value);
                     }
                 }
                 return args[0];
