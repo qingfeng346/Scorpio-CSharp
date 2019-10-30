@@ -1,16 +1,27 @@
-class Cl {
+var a = 100
+switch (a) {
+	case 100:
+		print("111111111111111111")
+		continue
+	case 200:
+		print("222222222222222")
+}
+print("fffffffffffff")
 
-}
-var a = Cl()
-for (var i = 0 ; i < 10000000; i++) {
-	a.a = 100
-	a.b = 100
-	a.c = 200
-	a.d = 2222
-	a.e = "feawfaewf"
-	a.f = "wefwae"
-	a.h = "wweee"
-}
+
+// class Cl {
+
+// }
+// var a = Cl()
+// for (var i = 0 ; i < 10000000; i++) {
+// 	a.a = 100
+// 	a.b = 100
+// 	a.c = 200
+// 	a.d = 2222
+// 	a.e = "feawfaewf"
+// 	a.f = "wefwae"
+// 	a.h = "wweee"
+// }
 // var a = null
 // var b = false
 // var c = (a ?? b) ?? "fewa"

@@ -408,7 +408,10 @@ namespace Scorpio.Compile.Compiler {
             var allow = AddScriptInstructionWithoutValue(Opcode.FalseTo, PeekToken().SourceLine);
             ParseStatementBlock(ExecutableBlock.While);
             AddScriptInstruction(Opcode.Jump, startIndex, PeekToken().SourceLine);
-            allow.SetValue(Index);
+            m_Continue.SetValue(startIndex);
+            var endIndex = Index;
+            allow.SetValue(endIndex);
+            m_Break.SetValue(endIndex);
         }
         //解析swtich语句
         void ParseSwtich() {
@@ -420,9 +423,10 @@ namespace Scorpio.Compile.Compiler {
             var endIndex = Index;
             AddScriptInstruction(Opcode.PopNumber, 2);       //弹出switch值 和 false 值
             m_Break.SetValue(endIndex);
-            foreach (var instruction in m_Case) {
-                instruction.SetValue(endIndex);
-            }
+            m_Case.SetValue(endIndex);
+            //foreach (var instruction in m_Case) {
+            //    instruction.SetValue(endIndex);
+            //}
         }
         //解析case
         void ParseCase() {
