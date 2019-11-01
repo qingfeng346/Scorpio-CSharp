@@ -17,7 +17,7 @@
         }
         private class length : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return (double)thisObject.Get<ScriptMap>().Count();
+                return new ScriptValue((double)thisObject.Get<ScriptMap>().Count());
             }
         }
         private class clear : ScorpioHandle {

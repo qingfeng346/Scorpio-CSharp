@@ -30,7 +30,7 @@ namespace Scorpio {
         public object objectValue;
 
         public ScriptValue(ScriptObject value) {
-            this.valueType = value == null ? nullValueType : scriptValueType; ;
+            this.valueType = value == null ? nullValueType : scriptValueType;
             this.scriptValue = value;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -349,25 +349,25 @@ namespace Scorpio {
 
 
 
-        public static bool operator ==(ScriptValue a1, ScriptValue a2) {
-            return a1.Equals(a2);
-        }
-        public static bool operator !=(ScriptValue a1, ScriptValue a2) {
-            return !a1.Equals(a2);
-        }
+        //public static bool operator ==(ScriptValue a1, ScriptValue a2) {
+        //    return a1.Equals(a2);
+        //}
+        //public static bool operator !=(ScriptValue a1, ScriptValue a2) {
+        //    return !a1.Equals(a2);
+        //}
 
-        public static implicit operator ScriptValue(bool value) {
-            return value ? True : False;
-        }
-        public static implicit operator ScriptValue(double value) {
-            return new ScriptValue(value);
-        }
-        public static implicit operator ScriptValue(long value) {
-            return new ScriptValue(value);
-        }
-        public static implicit operator ScriptValue(string value) {
-            return new ScriptValue(value);
-        }
+        //public static implicit operator ScriptValue(bool value) {
+        //    return value ? True : False;
+        //}
+        //public static implicit operator ScriptValue(double value) {
+        //    return new ScriptValue(value);
+        //}
+        //public static implicit operator ScriptValue(long value) {
+        //    return new ScriptValue(value);
+        //}
+        //public static implicit operator ScriptValue(string value) {
+        //    return new ScriptValue(value);
+        //}
         public static ScriptValue CreateValue(object value) {
             if (value == null)
                 return Null;

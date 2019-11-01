@@ -3,8 +3,8 @@ using Scorpio.Exception;
 using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
-    public class ScriptType : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
-        protected ScorpioDictionaryString<ScriptValue> m_Values = new ScorpioDictionaryString<ScriptValue>();   //所有的函数
+    public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
+        protected Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();   //所有的函数
         protected ScriptValue m_Prototype = ScriptValue.Null;
         public ScriptType(string typeName, ScriptValue parentType) : base(ObjectType.Type) {
             TypeName = typeName;
@@ -24,14 +24,14 @@ namespace Scorpio {
             return m_Values.TryGetValue(key, out value) ? value : m_Prototype.GetValue(key);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            var ret = new ScriptValue(new ScriptInstance(ObjectType.Instance, new ScriptValue(this)));
+            var ret = new ScriptValue(new ScriptInstance(ObjectType.Instance, ThisValue));
             var constructor = GetValue(ScriptOperator.Constructor).Get<ScriptFunction>();
             if (constructor != null) {
                 constructor.Call(ret, parameters, length);
             }
             return ret;
         }
-        public IEnumerator<ScorpioValue<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
+        public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
         public override string ToString() { return $"Class<{TypeName}>"; }
     }

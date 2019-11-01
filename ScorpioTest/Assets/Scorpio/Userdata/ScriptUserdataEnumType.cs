@@ -1,10 +1,11 @@
 ﻿using System;
 using Scorpio.Tools;
 using Scorpio.Exception;
+using System.Collections.Generic;
 namespace Scorpio.Userdata {
     /// <summary> 枚举 Type </summary>
     public class ScriptUserdataEnumType : ScriptUserdata {
-        private ScorpioDictionaryStringValue m_Enums = new ScorpioDictionaryStringValue();     //所有枚举的值
+        private Dictionary<string, ScriptValue> m_Enums = new Dictionary<string, ScriptValue>();     //所有枚举的值
         public ScriptUserdataEnumType(Type value) {
             this.m_Value = value;
             this.m_ValueType = value;

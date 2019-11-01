@@ -24,7 +24,7 @@
         }
         private class count : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return (double)args[0].Get<ScriptArray>().Length();
+                return new ScriptValue((double)args[0].Get<ScriptArray>().Length());
             }
         }
         private class insert : ScorpioHandle {

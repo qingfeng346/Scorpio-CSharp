@@ -55,7 +55,7 @@ namespace Scorpio.Runtime {
         }
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
 #if SCORPIO_DEBUG
-            Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
+            // Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
 #endif
             var variableObjects = VariableValues[VariableValueIndex];   //局部变量
             var stackObjects = StackValues[VariableValueIndex++];       //堆栈数据

@@ -13,7 +13,8 @@ namespace Scorpio {
         Global,         //全局变量保存类,只有_G是这个类型
     }
     public abstract class ScriptObject {
-        protected static ScriptValue[] Parameters = new ScriptValue[64];
+        private static ScriptValue CommonThisValue = new ScriptValue() { valueType = ScriptValue.scriptValueType };
+        protected static ScriptValue[] CommonParameters = new ScriptValue[8];        //公共参数数组
         // 构图函数
         public ScriptObject(ObjectType objectType) {
             ObjectType = objectType;
@@ -23,6 +24,12 @@ namespace Scorpio {
         public virtual Type ValueType { get { return GetType(); } }                     //值类型
         public virtual Type Type { get { return GetType(); } }                          //获取类型
         public virtual string ValueTypeName { get { return ObjectType.ToString(); } }   //类型名称
+        public ScriptValue ThisValue { 
+            get {
+                CommonThisValue.scriptValue = this;
+                return CommonThisValue;
+            }
+        }
         //获取变量
         public virtual ScriptValue GetValueByIndex(int key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : [{key}]"); }
         public virtual ScriptValue GetValue(string key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]"); }
@@ -33,7 +40,7 @@ namespace Scorpio {
         public virtual void SetValue(string key, ScriptValue value) { throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 String : [{key}]"); }
         public virtual void SetValue(object key, ScriptValue value) { throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : [{key}]"); }
 
-
+        //比较运算符比较
         public virtual bool Less(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [<] 运算"); }
         public virtual bool LessOrEqual(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [<=] 运算"); }
         public virtual bool Greater(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [>] 运算"); }
@@ -42,6 +49,7 @@ namespace Scorpio {
         public override int GetHashCode() { return base.GetHashCode(); }
         public override bool Equals(object obj) { return Equals(ScriptValue.CreateValue(obj)); }
 
+        //运算符
         public virtual ScriptValue Plus(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [+] 运算"); }
         public virtual ScriptValue Minus(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [-] 运算"); }
         public virtual ScriptValue Multiply(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [*] 运算"); }
@@ -67,12 +75,12 @@ namespace Scorpio {
         public override string ToString() { return base.ToString(); }                   // ToString
         public virtual ScriptObject Clone(bool deep) { return this; }                   // 复制一个变量 是否深层复制
 
-        public bool IsFunction { get { return (ObjectType == ObjectType.Function); } }
-        public bool IsArray { get { return (ObjectType == ObjectType.Array); } }
-        public bool IsMap { get { return (ObjectType == ObjectType.Map); } }
-        public bool IsType { get { return (ObjectType == ObjectType.Type); } }
-        public bool IsInstance { get { return (ObjectType == ObjectType.Instance); } }
-        public bool IsEnum { get { return (ObjectType == ObjectType.Enum); } }
-        public bool IsUserData { get { return (ObjectType == ObjectType.UserData); } }
+        public bool IsFunction => ObjectType == ObjectType.Function;
+        public bool IsArray => ObjectType == ObjectType.Array;
+        public bool IsMap => ObjectType == ObjectType.Map;
+        public bool IsType => ObjectType == ObjectType.Type;
+        public bool IsInstance => ObjectType == ObjectType.Instance;
+        public bool IsEnum => ObjectType == ObjectType.Enum;
+        public bool IsUserData => ObjectType == ObjectType.UserData;
     }
 }

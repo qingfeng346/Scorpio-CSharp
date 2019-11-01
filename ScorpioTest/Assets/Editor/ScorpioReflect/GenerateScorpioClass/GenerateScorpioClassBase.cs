@@ -11,7 +11,7 @@ using System.Reflection;
 using Scorpio;
 using Scorpio.Userdata;
 using Scorpio.Tools;
-using Scorpio.Exception;
+using Scorpio.Exception;__extensions_using
 public class __class : ScorpioFastReflectClass {
     public UserdataMethodFastReflect GetConstructor() {
         return __class_Constructor.GetInstance();
@@ -73,12 +73,10 @@ __methods_content
             return fullName;
         }
         //根据MethodInfo生成一个ScorpioMethodInfo对象
-        private string GetScorpioMethod(MethodBase method, int index) {
-            var isStatic = method.IsStatic ? "true" : "false";
+        private string GetScorpioMethod(bool isStatic, ParameterInfo[] pars, int index) {
             var paramType = "null";
             var parameterType = new StringBuilder("new Type[]{");
             var refOut = new StringBuilder("new bool[]{");
-            var pars = method.GetParameters();
             bool first = true;
             foreach (var par in pars) {
                 if (first) { first = false; } else { parameterType.Append(","); refOut.Append(","); }
@@ -95,7 +93,7 @@ __methods_content
             }
             parameterType.Append("}");
             refOut.Append("}");
-            return string.Format(@"new ScorpioFastReflectMethodInfo({0}, {1}, {2}, {3}, {4})", isStatic, parameterType.ToString(), refOut.ToString(), paramType, index);
+            return string.Format(@"new ScorpioFastReflectMethodInfo({0}, {1}, {2}, {3}, {4})", isStatic ? "true" : "false", parameterType.ToString(), refOut.ToString(), paramType, index);
         }
         private string GetExecuteMethod(ParameterInfo[] pars, bool hasReturn, string call) {
             var callBuilder = new StringBuilder();
@@ -141,9 +139,8 @@ __methods_content
                 return callBuilder.ToString();
             }
         }
-        private string GetScorpioMethodCall(MethodBase method) {
+        private string GetScorpioMethodCall(ParameterInfo[] pars) {
             var builder = new StringBuilder();
-            var pars = method.GetParameters();
             for (int i = 0; i < pars.Length; ++i) {
                 if (i != 0) { builder.Append(", "); }
                 var par = pars[i];
@@ -167,8 +164,9 @@ __methods_content
         private string GetAllMethod(MethodBase[] methods) {
             var builder = new StringBuilder();
             for (var i = 0; i < methods.Length; ++i) {
+                var method = methods[i];
                 builder.Append($@"
-            methodInfos.Add({GetScorpioMethod(methods[i], i)});");
+            methodInfos.Add({GetScorpioMethod(method.IsStatic, method.GetParameters(), i)});");
             }
             return builder.ToString();
         }

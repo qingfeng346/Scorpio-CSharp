@@ -55,8 +55,8 @@ namespace Scorpio {
             public void Dispose() { }
         }
         private Script m_Script;
-        private ScriptValue[] m_Objects;
-        private int m_Length;
+        internal ScriptValue[] m_Objects;
+        internal int m_Length;
         public ScriptArray(Script script) : base(ObjectType.Array, script.TypeArrayValue) {
             m_Script = script;
             m_Objects = ScriptValue.EMPTY;

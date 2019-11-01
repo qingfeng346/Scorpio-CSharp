@@ -20,11 +20,7 @@ namespace Scorpio.ScorpioReflect {
                 }
             }
             //所有的函数
-            var methods = new List<string>();
-            foreach (var method in m_Methods) {
-                string name = method.Name;
-                if (methods.Contains(name)) { continue; }
-                methods.Add(name);
+            foreach (var name in m_MethodNames) {
                 builder.AppendFormat(methodStr, name, m_ScorpioClassName + "_" + name);
             }
             return builder.ToString();

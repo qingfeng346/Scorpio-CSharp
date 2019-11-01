@@ -19,8 +19,8 @@ namespace Scorpio {
             }
             public bool MoveNext() {
                 if (index < values.Length) {
-                    current.key = keys[index];
-                    current.value = objects[values[index]];
+                    current.Key = keys[index];
+                    current.Value = objects[values[index]];
                     index++;
                     return true;
                 }

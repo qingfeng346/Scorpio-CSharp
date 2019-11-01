@@ -20,7 +20,6 @@ namespace Scorpio {
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
         private List<string> m_SearchPath = new List<string>();         //request所有文件的路径集合
-
         public ScriptType TypeObject { get; private set; }                      //所有类型的基类
         public ScriptValue TypeObjectValue { get; private set; }                //所有类型的基类
 
@@ -170,5 +169,30 @@ namespace Scorpio {
             else
                 return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length)));
         }
+
+
+#if SCORPIO_DEBUG
+        private Stack<StackInfo> m_StackInfos = new Stack<StackInfo>(); //堆栈信息
+        internal void PushStackInfo(string breviary, int line) {
+            m_StackInfos.Push(new StackInfo() { Breviary = breviary, Line = line });
+        }
+        internal void PopStackInfo() {
+            m_StackInfos.Pop();
+        }
+        public StackInfo GetStackInfo() {
+            return m_StackInfos.Count > 0 ? m_StackInfos.Peek() : default;
+        }
+        public StackInfo[] GetStackInfos() {
+            return m_StackInfos.ToArray();
+        }
+#else
+        private readonly static StackInfo[] EmptyStackInfos = new StackInfo[0];
+        public StackInfo GetStackInfo() {
+            return default;
+        }
+        public StackInfo[] GetStackInfos() {
+            return EmptyStackInfos;
+        }
+#endif
     }
 }
