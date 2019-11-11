@@ -2,7 +2,6 @@ var a = 100
 switch (a) {
 	case 100:
 		print("111111111111111111")
-		continue
 	case 200:
 		print("222222222222222")
 }
