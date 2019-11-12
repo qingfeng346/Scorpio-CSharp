@@ -1,11 +1,9 @@
-var a = 100
-switch (a) {
-	case 100:
-		print("111111111111111111")
-	case 200:
-		print("222222222222222")
+function fun() {
+	return function() {
+		print(this)
+	}
 }
-print("fffffffffffff")
+fun()()
 
 
 // class Cl {

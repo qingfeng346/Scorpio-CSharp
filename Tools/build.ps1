@@ -40,3 +40,6 @@ Copy-Item ../Scorpio/src/ ../ScorpioTest/Assets/Scorpio/ -Recurse -Force
 Copy-Item ../ScorpioReflect/src/ ../ScorpioTest/Assets/Editor/ScorpioReflect/ -Recurse -Force
 
 Set-Location $cur
+
+
+# dotnet push ./a.nupkg -k oy2ibgtbm2lzfxzi3b4akycdlwhiwgxuzd3mdopbdtdqre -s https://api.nuget.org/v3/index.json

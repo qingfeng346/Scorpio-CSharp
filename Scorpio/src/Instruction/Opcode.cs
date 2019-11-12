@@ -32,6 +32,8 @@
         LoadValueObjectDup,     //push a value by object
         CopyStackTop,           //复制栈顶的数据
         CopyStackTopIndex,      //复制栈顶的数据
+        LoadValueStringNull,    //push a value by string
+        LoadValueObjectNull,    //push a value by object
         LoadEnd,
 
 

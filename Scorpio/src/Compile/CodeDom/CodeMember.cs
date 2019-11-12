@@ -1,10 +1,11 @@
 ﻿namespace Scorpio.Compile.CodeDom {
     //成员类型  a.b["c"].d[1]
     public abstract class CodeMember : CodeObject {
-        public CodeObject Parent;
-        public int index;
-        public string key;
-        public CodeObject codeKey;
+        public CodeObject Parent;       //父级
+        public int index;               //索引
+        public string key;              //字符串
+        public CodeObject codeKey;      //变量
+        public bool nullRet = false;    //父级为null的时候返回null
         public CodeMember(int line) : base(line) { }
     }
     //根据索引获取变量
@@ -12,9 +13,9 @@
         public CodeMemberIndex(int index, int line) : base(line) {
             this.index = index;
         }
-        public CodeMemberIndex(int index, CodeObject parment, int line) : base(line) {
+        public CodeMemberIndex(int index, CodeObject parent, int line) : base(line) {
             this.index = index;
-            this.Parent = parment;
+            this.Parent = parent;
         }
     }
     //根据索引获取变量
@@ -22,28 +23,21 @@
         public CodeMemberInternal(int index, int line) : base(line) {
             this.index = index;
         }
-        public CodeMemberInternal(int index, CodeObject parment, int line) : base(line) {
-            this.index = index;
-            this.Parent = parment;
-        }
     }
     //根据字符串获取变量
     public class CodeMemberString : CodeMember {
         public CodeMemberString(string key, int line) : base(line) {
             this.key = key;
         }
-        public CodeMemberString(string key, CodeObject parment, int line) : base(line) {
+        public CodeMemberString(string key, CodeObject parent, int line) : base(line) {
             this.key = key;
-            this.Parent = parment;
+            this.Parent = parent;
         }
     }
     public class CodeMemberObject : CodeMember {
-        public CodeMemberObject(CodeObject obj, int line) : base(line) {
+        public CodeMemberObject(CodeObject obj, CodeObject parent, int line) : base(line) {
             this.codeKey = obj;
-        }
-        public CodeMemberObject(CodeObject obj, CodeObject parment, int line) : base(line) {
-            this.codeKey = obj;
-            this.Parent = parment;
+            this.Parent = parent;
         }
     }
 }
