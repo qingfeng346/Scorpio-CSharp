@@ -6,6 +6,7 @@
         public Opcode opcode;       //指令类型
         public int opvalue;         //指令值
         public int line;            //代码在多少行
+        public ScriptInstruction(int opcode, int opvalue, int line) : this((Opcode)opcode, opvalue, line) { }
         public ScriptInstruction(Opcode opcode, int opvalue, int line) {
             this.optype = OpcodeType.None;
             this.opcode = opcode;

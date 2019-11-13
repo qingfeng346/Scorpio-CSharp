@@ -113,7 +113,7 @@ namespace Scorpio.Instruction {
             }
             var instructions = new ScriptInstruction[reader.ReadInt32()];
             for (var i = 0; i < instructions.Length; ++i) {
-                instructions[i] = new ScriptInstruction((Opcode)reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+                instructions[i] = new ScriptInstruction(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
             }
             return new ScriptFunctionData() {
                 parameterCount = parameterCount,
