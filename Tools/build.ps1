@@ -21,6 +21,8 @@ dotnet build
 dotnet pack -p:PackageVersion=$version -o ../bin
 
 Set-Location ../ScorpioExec
+
+# dotnet pack -p:PackageVersion=$version -o ../bin
 # dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true
 # dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true
 # dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true

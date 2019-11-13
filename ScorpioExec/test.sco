@@ -1,10 +1,7 @@
-function fun() {
-	return function() {
-		print(this)
-	}
-}
-fun()()
-
+var a = false
+a |= true
+print(a)
+print(a)
 
 // class Cl {
 

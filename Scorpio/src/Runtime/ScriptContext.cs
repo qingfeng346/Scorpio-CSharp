@@ -630,6 +630,22 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                         }
+                                        case ScriptValue.trueValueType: {
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.falseValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.nullValueType:
+                                                case ScriptValue.falseValueType:
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = ScriptValue.trueValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
                                         case ScriptValue.scriptValueType: {
                                             stackObjects[index] = stackObjects[index].scriptValue.InclusiveOr(stackObjects[stackIndex]);
                                             --stackIndex;
@@ -646,6 +662,20 @@ namespace Scorpio.Runtime {
                                                 stackObjects[index].longValue &= stackObjects[stackIndex].longValue;
                                             } else {
                                                 stackObjects[index].longValue &= stackObjects[stackIndex].ToLong();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.falseValueType: {
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.trueValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.nullValueType:
+                                                case ScriptValue.falseValueType:
+                                                    stackObjects[index].valueType = ScriptValue.falseValueType;
+                                                    break;
                                             }
                                             --stackIndex;
                                             continue;
