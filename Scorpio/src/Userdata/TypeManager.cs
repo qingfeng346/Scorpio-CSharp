@@ -9,8 +9,7 @@ namespace Scorpio.Userdata {
         private static Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                                      //所有的类集合
         private static Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();                                //所有的类集合
         public static UserdataType GetType(Type type) {
-            UserdataType value;
-            if (m_Types.TryGetValue(type, out value)) {
+            if (m_Types.TryGetValue(type, out var value)) {
                 return value;
             }
             return m_Types[type] = new UserdataTypeReflect(type);
@@ -21,14 +20,13 @@ namespace Scorpio.Userdata {
             return GetUserdataType(type);
         }
         public static ScriptValue GetUserdataType(Type type) {
-            ScriptValue value;
-            if (m_UserdataTypes.TryGetValue(type, out value)) {
+            if (m_UserdataTypes.TryGetValue(type, out var value)) {
                 return value;
             }
-            if (Util.IsDelegate(type))
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(type));
-            else if (type.IsEnum)
+            if (type.IsEnum)
                 return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataEnumType(type));
+            else if (Util.IsDelegate(type))
+                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(type));
             else
                 return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataType(type, GetType(type)));
         }
@@ -38,16 +36,14 @@ namespace Scorpio.Userdata {
         }
         public static UserdataTypeFastReflect GetFastReflectClass(Type type) {
             if (type == null) { return null; }
-            UserdataType value;
-            if (m_Types.TryGetValue(type, out value)) {
+            if (m_Types.TryGetValue(type, out var value)) {
                 return value as UserdataTypeFastReflect;
             }
             return null;
         }
         public static bool IsFastReflectClass(Type type) {
             if (type == null) { return false; }
-            UserdataType value;
-            if (m_Types.TryGetValue(type, out value)) {
+            if (m_Types.TryGetValue(type, out var value)) {
                 return value is UserdataTypeFastReflect;
             }
             return false;
@@ -65,6 +61,22 @@ namespace Scorpio.Userdata {
                 if (type != null) return type;
             }
             return null;
+        }
+        //加载扩展类
+        public static void LoadExtension(string type) {
+            LoadExtension(LoadType(type));
+        }
+        public static void LoadExtension(Type type) {
+            if (type == null || !Util.IsExtensionType(type)) { return; }
+            var methods = type.GetMethods(Script.BindingFlag);
+            foreach (var method in methods) {
+                if (Util.IsExtensionMethod(method)) {
+                    var userdataType = GetType(method.GetParameters()[0].ParameterType);
+                    if (userdataType is UserdataTypeReflect) {
+                        ((UserdataTypeReflect)userdataType).AddExtensionMethod(method);
+                    }
+                }
+            }
         }
     }
 }

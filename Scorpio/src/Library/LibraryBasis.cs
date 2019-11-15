@@ -173,10 +173,12 @@ namespace Scorpio.Library {
             script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod()));
             script.SetGlobal("setFastReflectClass", script.CreateFunction(new setFastReflectClass()));
             script.SetGlobal("isFastReflectClass", script.CreateFunction(new isFastReflectClass()));
+            script.SetGlobal("importExtension", script.CreateFunction(new importExtension()));
 
             script.SetGlobal("push_assembly", script.CreateFunction(new pushAssembly()));
             script.SetGlobal("import_type", script.CreateFunction(new importType()));
             script.SetGlobal("import_namespace", script.CreateFunction(new importNamespace()));
+            script.SetGlobal("import_extension", script.CreateFunction(new importExtension()));
             script.SetGlobal("generic_type", script.CreateFunction(new genericType()));
             script.SetGlobal("generic_method", script.CreateFunction(new genericMethod()));
         }
@@ -513,6 +515,19 @@ namespace Scorpio.Library {
         private class importNamespace : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(new ScriptNamespace(args[0].ToString()));
+            }
+        }
+        private class importExtension : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (args[0].valueType == ScriptValue.stringValueType) {
+                    TypeManager.LoadExtension(args[0].stringValue);
+                } else {
+                    var userdata = args[0].Get<ScriptUserdata>();
+                    if (userdata != null) {
+                        TypeManager.LoadExtension(userdata.Type);
+                    }
+                }
+                return ScriptValue.Null;
             }
         }
         private class genericType : ScorpioHandle {

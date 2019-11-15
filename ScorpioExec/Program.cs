@@ -42,10 +42,10 @@ namespace ScorpioExec {
     [文件路径]       运行sco文本文件或IL文件";
         static void Main(string[] args) {
             Launch.AddExecute("register", HelpRegister, Register);
+            Launch.AddExecute("version", HelpVersion, VersionExec);
             Launch.AddExecute("pack", HelpPack, Pack);
             Launch.AddExecute("fast", HelpFast, Fast);
             Launch.AddExecute("delegate", HelpDelegate, DelegateFactory);
-            Launch.AddExecute("version", HelpVersion, VersionExec);
             Launch.AddExecute("sversion", HelpVersion, SVersionExec);
             Launch.AddExecute("", HelpExecute, Execute);
             Launch.Start(args, null, null);
@@ -122,10 +122,10 @@ namespace ScorpioExec {
             }
             return type;
         }
-        static void SVersionExec(CommandLine command, string[] args) {
+        static void VersionExec(CommandLine command, string[] args) {
             Logger.info(Scorpio.Version.version);
         }
-        static void VersionExec(CommandLine command, string[] args) {
+        static void SVersionExec(CommandLine command, string[] args) {
             Logger.info($@"Sco Version : {Scorpio.Version.version}
 Build Date : {Scorpio.Version.date}");
             var result = Util.RequestString("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
@@ -170,6 +170,10 @@ Build Date : {Scorpio.Version.date}");
             LoadLibrary(Path.Combine(CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 var file = Path.Combine(CurrentDirectory, args[0]);
+                if (!File.Exists(file)) {
+                    Logger.info($"文件 : {file} 不存在");
+                    return;
+                }
                 var path = Path.GetDirectoryName(file);
                 script.PushSearchPath(path);
                 script.PushSearchPath(CurrentDirectory);

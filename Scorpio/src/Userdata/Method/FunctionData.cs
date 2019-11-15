@@ -44,7 +44,7 @@ namespace Scorpio.Userdata {
         public abstract object Invoke(object obj, ScriptValue[] parameters);
 
         //优先检查无默认值，非不定参的函数
-        public bool CheckNormalType(ScriptValue[] parameters, int length) {
+        public virtual bool CheckNormalType(ScriptValue[] parameters, int length) {
             if (IsNormal && length == ParameterCount) {
                 for (var i = 0; i < length; ++i) {
                     if (RefOuts[i] ? !Util.CanChangeTypeRefOut(parameters[i].GetValue(RefOutValue), ParameterType[i]) : !Util.CanChangeType(parameters[i], ParameterType[i])) {
@@ -59,7 +59,7 @@ namespace Scorpio.Userdata {
             return false;
         }
         //检查有默认参数的函数
-        public bool CheckDefaultType(ScriptValue[] parameters, int length) {
+        public virtual bool CheckDefaultType(ScriptValue[] parameters, int length) {
             if (IsDefault && length >= RequiredNumber && length <= ParameterCount) {
                 for (var i = 0; i < length; ++i) {
                     if (RefOuts[i] ? !Util.CanChangeTypeRefOut(parameters[i].GetValue(RefOutValue), ParameterType[i]) : !Util.CanChangeType(parameters[i], ParameterType[i])) {
@@ -74,7 +74,7 @@ namespace Scorpio.Userdata {
             return false;
         }
         //检查不定参函数
-        public bool CheckArgsType(ScriptValue[] parameters, int length) {
+        public virtual bool CheckArgsType(ScriptValue[] parameters, int length) {
             if (IsParams && length >= RequiredNumber) {
                 for (var i = 0; i < ParameterCount; ++i) {
                     if (RefOuts[i] ? !Util.CanChangeTypeRefOut(parameters[i].GetValue(RefOutValue), ParameterType[i]) : !Util.CanChangeType(parameters[i], ParameterType[i])) {
@@ -92,7 +92,7 @@ namespace Scorpio.Userdata {
                 if (length > ParameterCount) {
                     var array = Array.CreateInstance(ParamType, length - ParameterCount);
                     for (int i = ParameterCount; i < length; ++i)
-                        array.SetValue(Util.ChangeType(parameters[i], ParamType), i);
+                        array.SetValue(Util.ChangeType(parameters[i], ParamType), i - ParameterCount);
                     Args[ParameterCount] = array;
                 } else {
                     Args[ParameterCount] = Array.CreateInstance(ParamType, 0);
@@ -101,6 +101,5 @@ namespace Scorpio.Userdata {
             }
             return false;
         }
-
     }
 }
