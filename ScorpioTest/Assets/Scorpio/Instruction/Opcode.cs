@@ -9,12 +9,12 @@
         Compare,    //比较
         Jump,       //跳转
     }
-    //指令类型
+    //指令类型, 枚举使用byte 类型 switch 会比int 稍快一丢丢
     public enum Opcode : byte {
         None,
 
         //压栈操作
-        LoadBegin,
+        LoadBegin = 1,
         LoadConstNull,          //push null
         LoadConstDouble,        //push double
         LoadConstLong,          //push long
@@ -32,11 +32,13 @@
         LoadValueObjectDup,     //push a value by object
         CopyStackTop,           //复制栈顶的数据
         CopyStackTopIndex,      //复制栈顶的数据
+        LoadValueStringNull,    //push a value by string
+        LoadValueObjectNull,    //push a value by object
         LoadEnd,
 
 
         //New操作
-        NewBegin,
+        NewBegin = LoadBegin + 40,
         NewFunction,            //load a new function
         NewLambadaFunction,     //load a new lambada function
         NewArray,               //new array
@@ -47,7 +49,7 @@
         NewEnd,
 
         //取栈操作
-        StoreBegin,
+        StoreBegin = NewBegin + 20,
         StoreLocalAssign,       //store local value and assign
         StoreInternalAssign,    //store internal value and assign
         StoreValueStringAssign, //store a value by string and assign
@@ -64,7 +66,7 @@
         StoreEnd,
 
         //运算指令
-        ComputeBegin,
+        ComputeBegin = StoreBegin + 30,
         Plus,
         Minus,
         Multiply,
@@ -81,7 +83,7 @@
         ComputeEnd,
 
         //比较指令
-        CompareBegin,
+        CompareBegin = ComputeBegin + 20,
         Greater,
         GreaterOrEqual,
         Less,
@@ -93,7 +95,7 @@
         CompareEnd,
 
         //跳转指令
-        JumpBegin,
+        JumpBegin = CompareBegin + 20,
         Jump,                   //跳转到执行索引
         Pop,                    //弹出栈顶的值
         PopNumber,              //弹出一定数量的栈顶的值

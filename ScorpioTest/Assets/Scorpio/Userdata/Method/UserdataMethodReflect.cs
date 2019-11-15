@@ -14,6 +14,10 @@ namespace Scorpio.Userdata {
             base(type, methodName) {
             Initialize(new List<MethodBase>(methods), false);
         }
+        //空白扩展函数
+        public UserdataMethodReflect(Type type, string methodName) : base(type, methodName) {
+            m_Methods = new FunctionData[0];
+        }
         protected void Initialize(List<MethodBase> methods, bool isConstructor) {
             var functionMethod = new List<FunctionData>();          //实例函数
             var functionStaticMethod = new List<FunctionData>();    //静态函数
@@ -59,7 +63,27 @@ namespace Scorpio.Userdata {
             m_StaticMethods = functionStaticMethod.ToArray();
             m_GenericMethods = genericMethods.ToArray();
             m_GenericMethodCount = m_GenericMethods.Length;
-            
+        }
+        //添加一个扩展函数
+        public void AddExtensionMethod(MethodInfo method) {
+            var length = m_Methods.Length;
+            for (var i = 0; i < length; ++i) {
+                var methodInfo = m_Methods[i] as FunctionDataExtensionMethod;
+                if (methodInfo != null && methodInfo.Method == method) { return; }
+            }
+            Array.Resize(ref m_Methods, length + 1);
+            var parameterTypes = new List<Type>();                  //参数类型
+            var defaultParameter = new List<object>();              //默认参数
+            var refOut = new List<bool>();                          //是否是 ref out
+            var requiredNumber = 0;                                 //必须的参数个数
+            var hasRefOut = false;                                  //是否包含 ref out 参数
+            Type paramType = null;                                  //变长参数类型
+            ParseParameters(method.GetParameters(), 0, parameterTypes, defaultParameter, refOut, ref hasRefOut, ref requiredNumber, ref paramType);
+            if (hasRefOut) {
+                m_Methods[length] = new FunctionDataExtensionMethodWithRefOut(method, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+            } else {
+                m_Methods[length] = new FunctionDataExtensionMethod(method, parameterTypes.ToArray(), defaultParameter.ToArray(), refOut.ToArray(), requiredNumber, paramType);
+            }
         }
         void ParseParameters(ParameterInfo[] parameters, int begin, List<Type> parameterTypes, List<object> defaultParameter, List<bool> refOut, ref bool hasRefOut,  ref int requiredNumber, ref Type paramType) {
             var hadDefault = false;

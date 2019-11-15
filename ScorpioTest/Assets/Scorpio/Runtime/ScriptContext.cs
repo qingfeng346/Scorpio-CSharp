@@ -182,22 +182,22 @@ namespace Scorpio.Runtime {
                                 }
                                 case Opcode.LoadValue: {
                                     parent = stackObjects[stackIndex];
-                                    stackObjects[stackIndex] = stackObjects[stackIndex].GetValueByIndex(opvalue, m_script);
+                                    stackObjects[stackIndex] = parent.GetValueByIndex(opvalue, m_script);
                                     continue;
                                 }
                                 case Opcode.LoadValueString: {
                                     parent = stackObjects[stackIndex];
-                                    stackObjects[stackIndex] = stackObjects[stackIndex].GetValue(constString[opvalue], m_script);
+                                    stackObjects[stackIndex] = parent.GetValue(constString[opvalue], m_script);
                                     continue;
                                 }
                                 case Opcode.LoadValueObject: {
                                     parent = stackObjects[stackIndex - 1];
                                     switch (stackObjects[stackIndex].valueType) {
-                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue, m_script); break;
-                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].doubleValue); break;
-                                        case ScriptValue.longValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].longValue); break;
-                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].scriptValue); break;
-                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].objectValue); break;
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].stringValue, m_script); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].doubleValue); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].longValue); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].scriptValue); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].objectValue); break;
                                         default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObject : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                     --stackIndex;
@@ -206,11 +206,11 @@ namespace Scorpio.Runtime {
                                 case Opcode.LoadValueObjectDup: {
                                     parent = stackObjects[stackIndex - 1];
                                     switch (stackObjects[stackIndex].valueType) {
-                                        case ScriptValue.stringValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue, m_script); break;
-                                        case ScriptValue.doubleValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].doubleValue); break;
-                                        case ScriptValue.longValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].longValue); break;
-                                        case ScriptValue.scriptValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].scriptValue); break;
-                                        case ScriptValue.objectValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].objectValue); break;
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].stringValue, m_script); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].doubleValue); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].longValue); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].scriptValue); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].objectValue); break;
                                         default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObjectDup : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                     ++stackIndex;
@@ -231,6 +231,32 @@ namespace Scorpio.Runtime {
                                 }
                                 case Opcode.CopyStackTopIndex: {
                                     stackObjects[++stackIndex] = stackObjects[stackIndex - opvalue - 1];
+                                    continue;
+                                }
+                                case Opcode.LoadValueStringNull: {
+                                    parent = stackObjects[stackIndex];
+                                    if (parent.valueType == ScriptValue.nullValueType) {
+                                        stackObjects[stackIndex].valueType = ScriptValue.nullValueType;
+                                    } else {
+                                        stackObjects[stackIndex] = parent.GetValue(constString[opvalue], m_script);
+                                    }
+                                    continue;
+                                }
+                                case Opcode.LoadValueObjectNull: {
+                                    parent = stackObjects[stackIndex - 1];
+                                    if (parent.valueType == ScriptValue.nullValueType) {
+                                        stackObjects[stackIndex - 1].valueType = ScriptValue.nullValueType;
+                                    } else {
+                                        switch (stackObjects[stackIndex].valueType) {
+                                            case ScriptValue.stringValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].stringValue, m_script); break;
+                                            case ScriptValue.doubleValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].doubleValue); break;
+                                            case ScriptValue.longValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].longValue); break;
+                                            case ScriptValue.scriptValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].scriptValue); break;
+                                            case ScriptValue.objectValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].objectValue); break;
+                                            default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObject : {stackObjects[stackIndex].ValueTypeName}");
+                                        }
+                                    }
+                                    --stackIndex;
                                     continue;
                                 }
                             }
@@ -604,6 +630,22 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                         }
+                                        case ScriptValue.trueValueType: {
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.falseValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.nullValueType:
+                                                case ScriptValue.falseValueType:
+                                                    break;
+                                                default:
+                                                    stackObjects[index].valueType = ScriptValue.trueValueType;
+                                                    break;
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
                                         case ScriptValue.scriptValueType: {
                                             stackObjects[index] = stackObjects[index].scriptValue.InclusiveOr(stackObjects[stackIndex]);
                                             --stackIndex;
@@ -620,6 +662,20 @@ namespace Scorpio.Runtime {
                                                 stackObjects[index].longValue &= stackObjects[stackIndex].longValue;
                                             } else {
                                                 stackObjects[index].longValue &= stackObjects[stackIndex].ToLong();
+                                            }
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.falseValueType: {
+                                            --stackIndex;
+                                            continue;
+                                        }
+                                        case ScriptValue.trueValueType: {
+                                            switch (stackObjects[stackIndex].valueType) {
+                                                case ScriptValue.nullValueType:
+                                                case ScriptValue.falseValueType:
+                                                    stackObjects[index].valueType = ScriptValue.falseValueType;
+                                                    break;
                                             }
                                             --stackIndex;
                                             continue;

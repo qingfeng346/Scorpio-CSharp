@@ -13,14 +13,14 @@ namespace Scorpio.Userdata {
         private List<MethodInfo> m_Methods;                             //所有函数
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
         private Dictionary<string, ScriptValue> m_NestedTypes;          //所有的内部类
-        private Dictionary<string, UserdataMethod> m_Functions;         //所有的函数
+        private Dictionary<string, UserdataMethodReflect> m_Functions;  //所有的函数
         public UserdataTypeReflect(Type type) : base(type) {
             m_InitializeConstructor = false;
             m_InitializeFunctions = false;
             m_Methods = new List<MethodInfo>();
             m_Variables = new Dictionary<string, UserdataVariable>();
             m_NestedTypes = new Dictionary<string, ScriptValue>();
-            m_Functions = new Dictionary<string, UserdataMethod>();
+            m_Functions = new Dictionary<string, UserdataMethodReflect>();
             InitializeConstructor();
             InitializeFunctions();
         }
@@ -37,7 +37,7 @@ namespace Scorpio.Userdata {
             m_Methods.AddRange(m_Type.GetMethods(Script.BindingFlag));
         }
         //获取一个函数，名字相同返回值相同
-        private UserdataMethod GetFunction(string name) {
+        private UserdataMethodReflect GetFunction(string name) {
             var methods = m_Methods.FindAll((method) => method.Name == name);
             if (methods.Count > 0)
                 return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods.ToArray());
@@ -64,6 +64,15 @@ namespace Scorpio.Userdata {
             //if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);
             return null;
         }
+        //添加一个扩展函数
+        public void AddExtensionMethod(MethodInfo method) {
+            var name = method.Name;
+            var userdataMethod = GetMethod(name);
+            if (userdataMethod == null) {
+                userdataMethod = (m_Functions[name] = new UserdataMethodReflect(m_Type, name));
+            }
+            ((UserdataMethodReflect)userdataMethod).AddExtensionMethod(method);
+        }
         /// <summary> 创建一个实例 </summary>
         public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
             return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
@@ -80,7 +89,7 @@ namespace Scorpio.Userdata {
         }
         /// <summary> 获得一个类变量 </summary>
         public override object GetValue(object obj, string name) {
-            UserdataMethod userdataMethod;
+            UserdataMethodReflect userdataMethod;
             if (m_Functions.TryGetValue(name, out userdataMethod)) return userdataMethod;
             ScriptValue nestedType;
             if (m_NestedTypes.TryGetValue(name, out nestedType)) return nestedType;

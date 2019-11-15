@@ -40,27 +40,30 @@ namespace ScorpioExec {
     fast            生成快速反射文件
     version         查询sco版本，并检查最新版本
     [文件路径]       运行sco文本文件或IL文件";
+        static Perform perform;
         static void Main(string[] args) {
-            Launch.AddExecute("register", HelpRegister, Register);
-            Launch.AddExecute("version", HelpVersion, VersionExec);
-            Launch.AddExecute("pack", HelpPack, Pack);
-            Launch.AddExecute("fast", HelpFast, Fast);
-            Launch.AddExecute("delegate", HelpDelegate, DelegateFactory);
-            Launch.AddExecute("sversion", HelpVersion, SVersionExec);
-            Launch.AddExecute("", HelpExecute, Execute);
-            Launch.Start(args, null, null);
+            perform = new Perform();
+            perform.Help = HelpExecute;
+            perform.AddExecute("register", HelpRegister, Register);
+            perform.AddExecute("version", HelpVersion, VersionExec);
+            perform.AddExecute("pack", HelpPack, Pack);
+            perform.AddExecute("fast", HelpFast, Fast);
+            perform.AddExecute("delegate", HelpDelegate, DelegateFactory);
+            perform.AddExecute("sversion", HelpVersion, SVersionExec);
+            perform.AddExecute("", HelpExecute, Execute);
+            perform.Start(args, null, null);
         }
         static void Register(CommandLine command, string[] args) { 
             Util.RegisterApplication($"{Util.BaseDirectory}/{AppDomain.CurrentDomain.FriendlyName}");
         }
         static void Pack(CommandLine command, string[] args) {
-            var source = Launch.GetPath("-source", "-s");
-            var output = Launch.GetPath("-output", "-o");
+            var source = perform.GetPath("-source", "-s");
+            var output = perform.GetPath("-output", "-o");
             File.WriteAllBytes(output, Serializer.Serialize(source, FileUtil.GetFileString(source)).ToArray());
             Logger.info($"生成IL文件  {source} -> {output}");
         }
         static void Fast(CommandLine command, string[] args) {
-            var output = Launch.GetPath("-output", "-o");
+            var output = perform.GetPath("-output", "-o");
             var dll = command.GetValue("-dll");
             var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
             var strClass = command.GetValue("-class");
@@ -96,7 +99,7 @@ namespace ScorpioExec {
             }
         }
         static void DelegateFactory(CommandLine command, string[] args) {
-            var output = Launch.GetPath("-output", "-o");
+            var output = perform.GetPath("-output", "-o");
             var dll = command.GetValue("-dll");
             var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
             var strClass = command.GetValue("-class");

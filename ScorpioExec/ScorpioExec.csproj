@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ScorpioCommons" Version="1.0.11" />
+    <PackageReference Include="ScorpioCommons" Version="1.0.14" />
   </ItemGroup>
 
   <ItemGroup>
