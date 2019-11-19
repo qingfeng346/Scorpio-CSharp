@@ -1,5 +1,26 @@
-var a = 100
-print (null ?? false)
+function t() {
+    print("111111111111")
+    return 100
+}
+var a = {}
+a?.func?.(t())
+
+// DownloadStatus = {
+//     RequestAssets : 100
+// }
+// class DownloadAssets {
+//     SetStatus(status) {
+//         print("setstatus : ", this)
+//     }
+//     Exe() {
+//         this.SetStatus(DownloadStatus.RequestAssets)
+//     }
+// }
+// var d = DownloadAssets()
+// d.Exe()
+// b = {a = "222"}
+// var a = b?.[test()]
+// print(a)
 // var a = false
 // a |= true
 // print(a)

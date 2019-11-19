@@ -50,6 +50,8 @@ namespace Scorpio.Instruction {
                     case Opcode.TrueTo:
                     case Opcode.TrueLoadTrue:
                     case Opcode.FalseLoadFalse:
+                    case Opcode.NotNullTo:
+                    case Opcode.NullTo:
                         value = instruction.opvalue.ToString("D5");
                         break;
                     case Opcode.CallUnfold:

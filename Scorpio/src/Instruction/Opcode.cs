@@ -32,8 +32,6 @@
         LoadValueObjectDup,     //push a value by object
         CopyStackTop,           //复制栈顶的数据
         CopyStackTopIndex,      //复制栈顶的数据
-        LoadValueStringNull,    //push a value by string
-        LoadValueObjectNull,    //push a value by object
         LoadEnd,
 
 
@@ -111,8 +109,7 @@
         RetNone,                //return
         Ret,                    //return a value
         NotNullTo,              //如果栈顶不为null则跳转
-        NullTo,                 //栈顶如果是null则跳转
-        NullLoadNull,           //栈顶如果是null则压入一个null,并跳转
+        NullTo,                 //栈顶如果是null则跳转并且不取出栈顶
         JumpEnd,
     }
 }

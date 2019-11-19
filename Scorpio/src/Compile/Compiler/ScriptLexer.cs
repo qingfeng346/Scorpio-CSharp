@@ -232,11 +232,10 @@ namespace Scorpio.Compile.Compiler {
             }
         }
         void ReadQuestionMark() {
-            if (ReadChar() == '?') {
-                AddToken(TokenType.EmptyRet, "??");
-            } else {
-                AddToken(TokenType.QuestionMark, "?");
-                UndoChar();
+            switch (ReadChar()) {
+                case '?': AddToken(TokenType.EmptyRet, "??"); return;
+                case '.': AddToken(TokenType.QuestionMarkDot, "?."); return;
+                default: AddToken(TokenType.QuestionMark, "?"); UndoChar(); return;
             }
         }
         /// <summary> 读取 }  </summary>

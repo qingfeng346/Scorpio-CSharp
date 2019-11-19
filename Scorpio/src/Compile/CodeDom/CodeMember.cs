@@ -5,7 +5,7 @@
         public int index;               //索引
         public string key;              //字符串
         public CodeObject codeKey;      //变量
-        public bool nullRet = false;    //父级为null的时候返回null
+        public bool nullTo = false;     ///?. 获取变量
         public CodeMember(int line) : base(line) { }
     }
     //根据索引获取变量
