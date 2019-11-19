@@ -1112,8 +1112,22 @@ namespace Scorpio.Runtime {
                                         }
                                     }
                                 }
-                                case Opcode.TrueLoadTrue: if (stackObjects[stackIndex].valueType == ScriptValue.trueValueType) { iInstruction = opvalue; } else { --stackIndex; } continue;
-                                case Opcode.FalseLoadFalse:
+                                case Opcode.TrueLoadTrue: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.trueValueType:
+                                            iInstruction = opvalue;
+                                            continue;
+                                        case ScriptValue.falseValueType:
+                                        case ScriptValue.nullValueType:
+                                            --stackIndex;
+                                            continue;
+                                        default:
+                                            stackObjects[stackIndex].valueType = ScriptValue.trueValueType;
+                                            iInstruction = opvalue;
+                                            continue;
+                                    }
+                                }
+                                case Opcode.FalseLoadFalse: {
                                     switch (stackObjects[stackIndex].valueType) {
                                         case ScriptValue.falseValueType:
                                             iInstruction = opvalue;
@@ -1126,6 +1140,7 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                     }
+                                }
                                 case Opcode.RetNone: return ScriptValue.Null;
                                 case Opcode.Ret: return stackObjects[stackIndex--];
                                 case Opcode.CallUnfold: {
@@ -1202,17 +1217,30 @@ namespace Scorpio.Runtime {
 #endif
                                     continue;
                                 }
-                                case Opcode.ExistTo: {
-                                    switch (stackObjects[stackIndex].valueType) {
-                                        case ScriptValue.nullValueType: {
-                                            --stackIndex;
-                                            continue;
-                                        }
-                                        default: {
-                                            iInstruction = opvalue;
-                                            continue;
-                                        }
+                                case Opcode.NotNullTo: {
+                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) { 
+                                        --stackIndex; 
+                                    } else { 
+                                        iInstruction = opvalue; 
                                     }
+                                    continue;
+                                }
+                                case Opcode.NullTo: {
+                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) { 
+                                        iInstruction = opvalue;
+                                        --stackIndex; 
+                                    } else {
+                                        --stackIndex;
+                                    }
+                                    continue;
+                                }
+                                case Opcode.NullLoadNull: {
+                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) { 
+                                        iInstruction = opvalue; 
+                                    } else { 
+                                        --stackIndex; 
+                                    }
+                                    continue;
                                 }
                             }
                             continue;

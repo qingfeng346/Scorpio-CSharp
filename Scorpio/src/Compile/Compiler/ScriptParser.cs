@@ -667,7 +667,7 @@ namespace Scorpio.Compile.Compiler {
                 }
                 case CodeEmptyRet emptyRet: {
                     PushObject(emptyRet.Emtpy);
-                    var emptyTo = AddScriptInstructionWithoutValue(Opcode.ExistTo, obj.Line);
+                    var emptyTo = AddScriptInstructionWithoutValue(Opcode.NotNullTo, obj.Line);
                     PushObject(emptyRet.Ret);
                     emptyTo.SetValue(Index);
                     break;

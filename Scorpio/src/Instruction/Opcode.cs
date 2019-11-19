@@ -101,8 +101,8 @@
         PopNumber,              //弹出一定数量的栈顶的值
         FalseTo,                //栈顶如果是false则跳转
         TrueTo,                 //栈顶如果是true则跳转
-        FalseLoadFalse,         //如果是false则压入一个false
-        TrueLoadTrue,           //如果是true则压入一个true
+        FalseLoadFalse,         //如果是false则压入一个false,并跳转
+        TrueLoadTrue,           //如果是true则压入一个true,并跳转
         CallEach,               //call a function when in foreach
         Call,                   //调用一个函数
         CallVi,                 //调用内部函数
@@ -110,7 +110,9 @@
         CallViUnfold,           //调用内部函数 有参数需要展开
         RetNone,                //return
         Ret,                    //return a value
-        ExistTo,                //如果栈顶不为null则跳转
+        NotNullTo,              //如果栈顶不为null则跳转
+        NullTo,                 //栈顶如果是null则跳转
+        NullLoadNull,           //栈顶如果是null则压入一个null,并跳转
         JumpEnd,
     }
 }

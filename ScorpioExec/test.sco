@@ -1,15 +1,17 @@
+var a = 100
+print (null ?? false)
 // var a = false
 // a |= true
 // print(a)
 // print(a)
-TestClass = import_type("ScorpioExec.TestClass")
-importExtension("ScorpioExec.TestClassEx")
-importExtension("ScorpioExec.TestClassEx")
-var a = TestClass(200)
-// a.TestFuncEx(1111, 2222, 1, 2, 3)
-var ref = {value = 11111}
-a.TestFuncEx(ref)
-print(ref)
+// TestClass = import_type("ScorpioExec.TestClass")
+// importExtension("ScorpioExec.TestClassEx")
+// importExtension("ScorpioExec.TestClassEx")
+// var a = TestClass(200)
+// // a.TestFuncEx(1111, 2222, 1, 2, 3)
+// var ref = {value = 11111}
+// a.TestFuncEx(ref)
+// print(ref)
 // a.TestArgs(1111, 1, 2, 3)
 // class Cl {
 
