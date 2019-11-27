@@ -1,9 +1,5 @@
-function t() {
-    print("111111111111")
-    return 100
-}
-var a = {}
-a?.func?.(t())
+var a = "AAA"
+print(a.toOneLower())
 
 // DownloadStatus = {
 //     RequestAssets : 100
