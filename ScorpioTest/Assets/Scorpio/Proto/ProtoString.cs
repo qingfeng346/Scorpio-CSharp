@@ -16,6 +16,8 @@ namespace Scorpio.Proto {
             ret.SetValue("remove", script.CreateFunction(new remove()));
             ret.SetValue("toLower", script.CreateFunction(new toLower()));
             ret.SetValue("toUpper", script.CreateFunction(new toUpper()));
+            ret.SetValue("toOneLower", script.CreateFunction(new toOneLower()));
+            ret.SetValue("toOneUpper", script.CreateFunction(new toOneUpper()));
             ret.SetValue("trim", script.CreateFunction(new trim()));
             ret.SetValue("trimStart", script.CreateFunction(new trimStart()));
             ret.SetValue("trimEnd", script.CreateFunction(new trimEnd()));
@@ -65,6 +67,20 @@ namespace Scorpio.Proto {
         private class toUpper : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(thisObject.stringValue.ToUpper());
+            }
+        }
+        private class toOneLower : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var str = thisObject.stringValue;
+                if (str.Length <= 1) return new ScriptValue(thisObject.stringValue.ToLower());
+                return new ScriptValue(char.ToLower(str[0]) + str.Substring(1));
+            }
+        }
+        private class toOneUpper : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var str = thisObject.stringValue;
+                if (str.Length <= 1) return new ScriptValue(thisObject.stringValue.ToUpper());
+                return new ScriptValue(char.ToUpper(str[0]) + str.Substring(1));
             }
         }
         private class trim : ScorpioHandle {

@@ -540,22 +540,16 @@ namespace Scorpio.Compile.Compiler {
                         }
                     } else {
                         PushObject(member.Parent);
+                        var nullTo = member.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
                         if (obj is CodeMemberIndex) {
                             AddScriptInstruction(Opcode.LoadValue, member.index, obj.Line);
                         } else if (obj is CodeMemberString) {
-                            if (member.nullRet) {
-                                AddScriptInstruction(Opcode.LoadValueStringNull, GetConstString(member.key), obj.Line);
-                            } else {
-                                AddScriptInstruction(Opcode.LoadValueString, GetConstString(member.key), obj.Line);
-                            }
+                            AddScriptInstruction(Opcode.LoadValueString, GetConstString(member.key), obj.Line);
                         } else if (obj is CodeMemberObject) {
                             PushObject(member.codeKey);
-                            if (member.nullRet) {
-                                AddScriptInstructionWithoutValue(Opcode.LoadValueObjectNull, obj.Line);
-                            } else {
-                                AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
-                            }
+                            AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
                         }
+                        nullTo?.SetValue(Index);
                     }
                     break;
                 }
@@ -599,6 +593,7 @@ namespace Scorpio.Compile.Compiler {
                         }
                     }
                     PushObject(func.Member);
+					var nullTo = func.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
                     if (unfold == 0L) {
                         AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Count, obj.Line);
                     } else {
@@ -614,6 +609,7 @@ namespace Scorpio.Compile.Compiler {
                             }
                         }
                     }
+                    nullTo?.SetValue(Index);
                     break;
                 }
                 case CodeClass cl: {
@@ -667,7 +663,7 @@ namespace Scorpio.Compile.Compiler {
                 }
                 case CodeEmptyRet emptyRet: {
                     PushObject(emptyRet.Emtpy);
-                    var emptyTo = AddScriptInstructionWithoutValue(Opcode.ExistTo, obj.Line);
+                    var emptyTo = AddScriptInstructionWithoutValue(Opcode.NotNullTo, obj.Line);
                     PushObject(emptyRet.Ret);
                     emptyTo.SetValue(Index);
                     break;
@@ -961,47 +957,53 @@ namespace Scorpio.Compile.Compiler {
         //返回变量数据
         CodeObject GetVariable(CodeObject parent) {
             CodeObject ret = parent;
-            object nativeObj;
             for (; ; ) {
                 Token token = ReadToken();
                 if (token.Type == TokenType.Period) {
-                    ret = new CodeMemberString(ReadIdentifier(), ret, token.SourceLine);
+                    ret = ReadMember(TokenType.Period, ret, token.SourceLine, false);
                 } else if (token.Type == TokenType.LeftBracket) {
-                    var member = GetObject();
-                    ReadRightBracket();
-                    if (member is CodeNativeObject && (nativeObj = ((CodeNativeObject)member).obj) is string) {
-                        ret = new CodeMemberString(nativeObj.ToString(), ret, token.SourceLine);
-                    } else {
-                        ret = new CodeMemberObject(member, ret, token.SourceLine);
-                    }
+                    ret = ReadMember(TokenType.LeftBracket, ret, token.SourceLine, false);
                 } else if (token.Type == TokenType.LeftPar) {
                     UndoToken();
-                    ret = GetCallFunction(ret);
-                    if (PeekToken().Type == TokenType.LeftBrace) {
-                        (ret as CodeCallFunction).Variables = GetMap();
-                    }
-                } else if (token.Type == TokenType.QuestionMark) {
-                    if (PeekToken().Type == TokenType.Period) {
+                    ret = ReadCallFunction(ret, false);
+                } else if (token.Type == TokenType.QuestionMarkDot) {
+                    var next = PeekToken();
+                    if (next.Type == TokenType.LeftBracket) {
                         ReadToken();
-                        ret = new CodeMemberString(ReadIdentifier(), ret, token.SourceLine) { nullRet = true };
-                    //} else if (PeekToken().Type == TokenType.LeftBracket) {
-                    //    ReadToken();
-                    //    var member = GetObject();
-                    //    ReadRightBracket();
-                    //    if (member is CodeNativeObject && (nativeObj = ((CodeNativeObject)member).obj) is string) {
-                    //        ret = new CodeMemberString(nativeObj.ToString(), ret, token.SourceLine) { nullRet = true };
-                    //    } else {
-                    //        ret = new CodeMemberObject(member, ret, token.SourceLine) { nullRet = true };
-                    //    }
+                        ret = ReadMember(TokenType.LeftBracket, ret, token.SourceLine, true);
+                    } else if (next.Type == TokenType.LeftPar) {
+                        ret = ReadCallFunction(ret, true);
                     } else {
-                        UndoToken();
-                        break;
+                        ret = ReadMember(TokenType.Period, ret, token.SourceLine, true);
                     }
                 } else {
                     UndoToken();
                     break;
                 }
                 ret.line = token.SourceLine;
+            }
+            return ret;
+        }
+        CodeMember ReadMember(TokenType type, CodeObject parent, int line, bool nullTo) {
+            if (type == TokenType.Period) {
+                return new CodeMemberString(ReadIdentifier(), parent, line) { nullTo = nullTo };
+            } else if (type == TokenType.LeftBracket) {
+                var member = GetObject();
+                ReadRightBracket();
+                var stringKey = (member as CodeNativeObject)?.obj as string;
+                if (stringKey != null) {
+                    return new CodeMemberString(stringKey, parent, line) { nullTo = nullTo };
+                } else {
+                    return new CodeMemberObject(member, parent, line) { nullTo = nullTo };
+                }
+            }
+            return null;
+        }
+        CodeCallFunction ReadCallFunction(CodeObject parent, bool nullTo) {
+            var ret = GetCallFunction(parent);
+            ret.nullTo = nullTo;
+            if (PeekToken().Type == TokenType.LeftBrace) {
+                ret.Variables = GetMap();
             }
             return ret;
         }

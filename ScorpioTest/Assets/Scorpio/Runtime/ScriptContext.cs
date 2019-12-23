@@ -55,7 +55,7 @@ namespace Scorpio.Runtime {
         }
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
 #if SCORPIO_DEBUG
-            // Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
+            //Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
 #endif
             var variableObjects = VariableValues[VariableValueIndex];   //局部变量
             var stackObjects = StackValues[VariableValueIndex++];       //堆栈数据
@@ -231,32 +231,6 @@ namespace Scorpio.Runtime {
                                 }
                                 case Opcode.CopyStackTopIndex: {
                                     stackObjects[++stackIndex] = stackObjects[stackIndex - opvalue - 1];
-                                    continue;
-                                }
-                                case Opcode.LoadValueStringNull: {
-                                    parent = stackObjects[stackIndex];
-                                    if (parent.valueType == ScriptValue.nullValueType) {
-                                        stackObjects[stackIndex].valueType = ScriptValue.nullValueType;
-                                    } else {
-                                        stackObjects[stackIndex] = parent.GetValue(constString[opvalue], m_script);
-                                    }
-                                    continue;
-                                }
-                                case Opcode.LoadValueObjectNull: {
-                                    parent = stackObjects[stackIndex - 1];
-                                    if (parent.valueType == ScriptValue.nullValueType) {
-                                        stackObjects[stackIndex - 1].valueType = ScriptValue.nullValueType;
-                                    } else {
-                                        switch (stackObjects[stackIndex].valueType) {
-                                            case ScriptValue.stringValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].stringValue, m_script); break;
-                                            case ScriptValue.doubleValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].doubleValue); break;
-                                            case ScriptValue.longValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].longValue); break;
-                                            case ScriptValue.scriptValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].scriptValue); break;
-                                            case ScriptValue.objectValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].objectValue); break;
-                                            default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObject : {stackObjects[stackIndex].ValueTypeName}");
-                                        }
-                                    }
-                                    --stackIndex;
                                     continue;
                                 }
                             }
@@ -1112,8 +1086,22 @@ namespace Scorpio.Runtime {
                                         }
                                     }
                                 }
-                                case Opcode.TrueLoadTrue: if (stackObjects[stackIndex].valueType == ScriptValue.trueValueType) { iInstruction = opvalue; } else { --stackIndex; } continue;
-                                case Opcode.FalseLoadFalse:
+                                case Opcode.TrueLoadTrue: {
+                                    switch (stackObjects[stackIndex].valueType) {
+                                        case ScriptValue.trueValueType:
+                                            iInstruction = opvalue;
+                                            continue;
+                                        case ScriptValue.falseValueType:
+                                        case ScriptValue.nullValueType:
+                                            --stackIndex;
+                                            continue;
+                                        default:
+                                            stackObjects[stackIndex].valueType = ScriptValue.trueValueType;
+                                            iInstruction = opvalue;
+                                            continue;
+                                    }
+                                }
+                                case Opcode.FalseLoadFalse: {
                                     switch (stackObjects[stackIndex].valueType) {
                                         case ScriptValue.falseValueType:
                                             iInstruction = opvalue;
@@ -1126,6 +1114,7 @@ namespace Scorpio.Runtime {
                                             --stackIndex;
                                             continue;
                                     }
+                                }
                                 case Opcode.RetNone: return ScriptValue.Null;
                                 case Opcode.Ret: return stackObjects[stackIndex--];
                                 case Opcode.CallUnfold: {
@@ -1202,17 +1191,19 @@ namespace Scorpio.Runtime {
 #endif
                                     continue;
                                 }
-                                case Opcode.ExistTo: {
-                                    switch (stackObjects[stackIndex].valueType) {
-                                        case ScriptValue.nullValueType: {
-                                            --stackIndex;
-                                            continue;
-                                        }
-                                        default: {
-                                            iInstruction = opvalue;
-                                            continue;
-                                        }
+                                case Opcode.NotNullTo: {
+                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) { 
+                                        --stackIndex; 
+                                    } else { 
+                                        iInstruction = opvalue; 
                                     }
+                                    continue;
+                                }
+                                case Opcode.NullTo: {
+                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) { 
+                                        iInstruction = opvalue;
+                                    }
+                                    continue;
                                 }
                             }
                             continue;

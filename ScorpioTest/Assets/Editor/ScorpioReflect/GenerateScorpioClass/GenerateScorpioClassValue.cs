@@ -37,7 +37,7 @@ namespace Scorpio.ScorpioReflect {
             }
             //所有属性
             foreach (var property in m_Propertys) {
-                if (property.CanRead && property.GetSetMethod(false) != null) {
+                if (property.CanWrite && property.GetSetMethod(false) != null) {
                     builder.AppendFormat(fieldStr, property.Name, GetScorpioVariable(property.GetSetMethod(false).IsStatic, property.Name), ScorpioReflectUtil.GetFullName(property.PropertyType));
                 }
             }
