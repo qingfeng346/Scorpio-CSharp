@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using System.Collections;
 using Scorpio;
+using Scorpio.Userdata;
+using System.IO;
 public class Example1 : MonoBehaviour {
     public ScrollRect Scroll;
     public GameObject Grid;
@@ -9,25 +11,44 @@ public class Example1 : MonoBehaviour {
 	public InputField Input;
 	public Text Output;
 	void Awake() {
+#if UNITY_EDITOR
+		if (Directory.Exists("../ExampleScripts")) {
+			var resources = Directory.GetFiles("Assets/Resources");
+			foreach (var resource in resources) {
+				File.Delete(resource);
+			}
+			var examples = System.IO.Directory.GetFiles("../ExampleScripts");
+			foreach (var file in examples) {
+				var fileName = Path.GetFileNameWithoutExtension(file);
+				File.Copy(file, $"Assets/Resources/sco_{fileName}.txt");
+			}
+			UnityEditor.AssetDatabase.Refresh();
+		}
+
+#endif
         var files = Resources.LoadAll("", typeof(TextAsset));
         foreach (var file in files) {
             var textAsset = file as TextAsset;
-            var obj = Instantiate(Button);
-            obj.transform.SetParent(Grid.transform, false);
-            obj.SetActive(true);
-            var text = obj.transform.Find("Text").GetComponent<Text>();
-            text.text = textAsset.name;
-            var button = obj.GetComponent<Button>();
-            var str = textAsset.text;
-            button.onClick.AddListener(() => {
-                Input.text = str;
-            });
-            Resources.UnloadAsset(textAsset);
+            var name = textAsset.name;
+        	if (name.StartsWith("sco_")) {
+                name = name.Substring(4);
+                var obj = Instantiate(Button);
+        		obj.transform.SetParent(Grid.transform, false);
+        		obj.SetActive(true);
+        		var text = obj.transform.Find("Text").GetComponent<Text>();
+        		text.text = name;
+        		var button = obj.GetComponent<Button>();
+        		var str = textAsset.text;
+        		button.onClick.AddListener(() => {
+        			Input.text = str;
+        		});
+        		Resources.UnloadAsset(textAsset);
+        	}
         }
         Scroll.normalizedPosition = new Vector2(0, 1);
         Resources.UnloadUnusedAssets();
         Application.logMessageReceived += OnLogCallback;
-	}
+    }
 	private void OnLogCallback(string condition, string stackTrace, LogType type) {
 		OutPut (condition);
 	}
@@ -38,13 +59,12 @@ public class Example1 : MonoBehaviour {
         Output.text = "";
 		Script script = new Script();
 		try {
-			script.LoadLibrary();
-			script.PushAssembly(GetType().Assembly);
-			script.PushAssembly(typeof(GameObject).Assembly);
-			script.SetObject("print", script.CreateFunction(new ScriptPrint()));
-			ScriptObject ret = script.LoadString(Input.text);
+			script.LoadLibraryV1();
+			TypeManager.PushAssembly(GetType().Assembly);
+			TypeManager.PushAssembly(typeof(GameObject).Assembly);
+			script.SetGlobal("print", script.CreateFunction(new ScriptPrint()));
 			OutPut("=====================");
-			OutPut("ReturnValue : " + ret);
+			OutPut("ReturnValue : " + script.LoadString(Input.text));
 		} catch (System.Exception e) {
 			OutPut("=====================");
 			OutPut("StackInfo : " + script.GetStackInfo());

@@ -2,10 +2,10 @@
 using System.Collections;
 using Scorpio;
 public class ScriptPrint : ScorpioHandle {
-	public object Call(ScriptObject[] args) {
-		for (int i = 0; i < args.Length; ++i) {
-			Debug.Log(args[i].ToString());
+	public ScriptValue Call(ScriptValue thisObject, ScriptValue[] Parameters, int length) {
+		for (int i = 0; i < length; ++i) {
+			Debug.Log(Parameters[i].ToString());
 		}
-		return null;
+		return ScriptValue.Null;
 	}
 }

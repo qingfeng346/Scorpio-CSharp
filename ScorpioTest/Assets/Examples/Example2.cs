@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Scorpio;
-
+using Scorpio.Userdata;
 public class Example2 : MonoBehaviour {
 	private static string output = "";
 	private class ScriptPrint : ScorpioHandle {
-		public object Call(ScriptObject[] args) {
-			for (int i = 0; i < args.Length; ++i) {
-				output += args[i].ToString() + "\n";
+		public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
+			for (int i = 0; i < length; ++i) {
+				output += Parameters[i].ToString() + "\n";
 			}
-			return null;
+			return ScriptValue.Null;
 		}
 	}
 	private string text;
@@ -33,13 +33,13 @@ public class Example2 : MonoBehaviour {
 			Script script = new Script();
 			try {
 				script.LoadLibrary();
-                script.PushAssembly(GetType().Assembly);
-                script.PushAssembly(typeof(GameObject).Assembly);
-				script.PushAssembly(typeof(UnityEngine.UI.SpriteState).Assembly);
-				script.SetObject("print", script.CreateFunction(new ScriptPrint()));
+                script.LoadLibraryV1();
+                TypeManager.PushAssembly(GetType().Assembly);
+                TypeManager.PushAssembly(typeof(GameObject).Assembly);
+				TypeManager.PushAssembly(typeof(UnityEngine.UI.SpriteState).Assembly);
+				script.SetGlobal("print", script.CreateFunction(new ScriptPrint()));
 				ScorpioClassManager.Initialize(script);
-				ScriptObject ret = script.LoadString(text);
-                OutPut("ReturnValue : " + ret);
+                OutPut("ReturnValue : " + script.LoadString(text));
 			} catch (System.Exception e) {
                 OutPut("StackInfo : " + script.GetStackInfo());
                 OutPut(e.ToString());

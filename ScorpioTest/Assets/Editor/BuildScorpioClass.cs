@@ -74,14 +74,15 @@ public class BuildScorpioClass {
 
         };
         StringBuilder builder = new StringBuilder();
-        builder.Append(@"public class ScorpioClassManager {
+        builder.Append(@"using Scorpio.Userdata;
+public class ScorpioClassManager {
     public static void Initialize(Scorpio.Script script) {
 ");
 		foreach (var type in types) {
 			var generate = new Scorpio.ScorpioReflect.GenerateScorpioClass(type);
 			generate.SetClassFilter(new Filter());
             System.IO.File.WriteAllBytes(Application.dataPath + "/Scripts/ScorpioClass/" + generate.ScorpioClassName + ".cs", System.Text.Encoding.UTF8.GetBytes(generate.Generate()));
-            builder.AppendFormat("        script.PushFastReflectClass(typeof({0}), new {1}(script));\n", GetTypeFullName(type), generate.ScorpioClassName);
+            builder.AppendFormat("        TypeManager.PushFastReflectClass(typeof({0}), new {1}(script));\n", GetTypeFullName(type), generate.ScorpioClassName);
         }
         builder.Append(@"    }
 }
