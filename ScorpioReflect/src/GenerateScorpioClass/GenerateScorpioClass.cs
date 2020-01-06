@@ -33,6 +33,7 @@ namespace Scorpio.ScorpioReflect {
             }
         }
         private Type m_Type;                        					            //类型
+        private bool m_IsStruct;                                                    //是否是struct
         private string m_ScorpioClassName;          					            //最终生成的类的名字
         private string m_FullName;                  					            //类的全名
         private ClassFilter m_ClassFilter;                                          //生成类过滤
@@ -55,6 +56,7 @@ namespace Scorpio.ScorpioReflect {
         public string ScorpioClassName { get { return m_ScorpioClassName; } }
         public GenerateScorpioClass(Type type) {
             m_Type = type;
+            m_IsStruct = !type.IsClass;
             m_ScorpioClassName = "ScorpioClass_" + GetClassName(type);
             m_FullName = ScorpioReflectUtil.GetFullName(m_Type);
             m_AllFields.AddRange(m_Type.GetFields(ScorpioReflectUtil.BindingFlag));
@@ -112,24 +114,27 @@ namespace Scorpio.ScorpioReflect {
                 foreach (var method in m_AllMethods) {
                     if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, method)) { continue; }
                     bool check = true;
-
-                    //判断函数是不是 get set 函数
-                    foreach (var property in m_AllPropertys) {
-                        if (property.GetGetMethod() == method || property.GetSetMethod() == method) {
-                            if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, property)) {
+                    var methodHandle = method.MethodHandle;
+                    //判断函数是不是 event add remove 函数
+                    foreach (var eve in m_AllEvents) {
+                        if (eve.AddMethod.MethodHandle == methodHandle || eve.RemoveMethod.MethodHandle == methodHandle) {
+                            if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, eve)) {
                                 check = false;
-                                break;
                             }
+                            break;
                         }
                     }
-                    //判断函数是不是 event add remove 函数
                     if (check) {
-                        foreach (var eve in m_AllEvents) {
-                            if (eve.GetAddMethod() == method || eve.GetRemoveMethod() == method) {
-                                if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, eve)) {
+                        //判断函数是不是 get set 函数
+                        foreach (var property in m_AllPropertys) {
+                            if (m_IsStruct && property.GetSetMethod()?.MethodHandle == methodHandle) {
+                                check = false;
+                                break;
+                            } else if (property.GetGetMethod()?.MethodHandle == methodHandle || property.GetSetMethod()?.MethodHandle == methodHandle) {
+                                if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, property)) {
                                     check = false;
-                                    break;
                                 }
+                                break;
                             }
                         }
                     }

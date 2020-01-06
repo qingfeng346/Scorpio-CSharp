@@ -27,6 +27,7 @@ namespace Scorpio.ScorpioReflect {
         }
         //生成SetValue函数
         private string GenerateSetValue() {
+            if (m_IsStruct) { return ""; }
             var fieldStr = @"
             case ""{0}"": {{ {1} = ({2})(Util.ChangeType(value, typeof({2}))); return; }}";
             var builder = new StringBuilder();

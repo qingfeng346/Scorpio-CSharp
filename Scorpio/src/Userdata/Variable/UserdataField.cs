@@ -4,7 +4,6 @@ namespace Scorpio.Userdata {
         private FieldInfo m_Field;
         public UserdataField(FieldInfo info) {
             m_Field = info;
-            Name = info.Name;
             FieldType = info.FieldType;
         }
         public override object GetValue(object obj) {

@@ -67,9 +67,9 @@ namespace Scorpio.ScorpioReflect {
         }
         private string GetEventMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
             foreach (var eve in m_AllEvents) {
-                if (eve.GetAddMethod() == method) {
+                if (eve.AddMethod.MethodHandle == method.MethodHandle) {
                     return string.Format("{0}.{1} += {2}; return null;", variable, eve.Name, GetScorpioMethodArgs(pars, 0));
-                } else if (eve.GetRemoveMethod() == method) {
+                } else if (eve.RemoveMethod.MethodHandle == method.MethodHandle) {
                     return string.Format("{0}.{1} -= {2}; return null;", variable, eve.Name, GetScorpioMethodArgs(pars, 0));
                 }
             }
@@ -77,9 +77,9 @@ namespace Scorpio.ScorpioReflect {
         }
         private string GetPropertyMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
             foreach (var property in m_AllPropertys) {
-                if (property.GetGetMethod() == method) {
+                if (property.GetGetMethod()?.MethodHandle == method.MethodHandle) {
                     return string.Format("return {0}.{1};", variable, property.Name);
-                } else if (property.GetSetMethod() == method) {
+                } else if (property.GetSetMethod()?.MethodHandle == method.MethodHandle) {
                     return string.Format("{0}.{1} = {2}; return null;", variable, property.Name, GetScorpioMethodArgs(pars, 0));
                 }
             }

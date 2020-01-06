@@ -59,7 +59,7 @@ namespace Scorpio.Userdata {
             FieldInfo fInfo = m_Type.GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
             PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
-            if (pInfo != null) return m_Variables[name] = new UserdataProperty(pInfo);
+            if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Type, pInfo);
             //EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name, Script.BindingFlag);
             //if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);
             return null;
@@ -99,12 +99,12 @@ namespace Scorpio.Userdata {
             if (userdataMethod != null) return userdataMethod;
             nestedType = GetNestedType(name);
             if (nestedType.valueType != ScriptValue.nullValueType) return nestedType;
-            throw new ExecutionException("GetValue 类[" + m_Type.ToString() + "] 变量 [" + name + "] 不存在");
+            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}]  Name:[{name}] not exist");
         }
         /// <summary> 设置一个类变量 </summary>
         public override void SetValue(object obj, string name, ScriptValue value) {
             var variable = GetVariable(name);
-            if (variable == null) throw new ExecutionException("SetValue 类[" + m_Type + "] 变量 [" + name + "] 不存在");
+            if (variable == null) throw new ExecutionException($"SetValue Type:[{m_Type.FullName}]  Name:[{name}] not exist");
             try {
                 variable.SetValue(obj, Util.ChangeType(value, variable.FieldType));
             } catch (System.Exception e) {
