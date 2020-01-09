@@ -38,15 +38,15 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 * xamarin
 
 ### 支持的Unity版本
-* Unity2018及以上
+* **Unity2018**及以上
 * 请设置 **PlayerSetting** 内 **Api Compatibility Level** 为 **.NET Standard 2.0**
 
 ### Unity支持的平台:
-- [x] PC, Mac & Linux Standalone(包括IL2CPP)
-- [x] iOS(包括IL2CPP)
-- [x] Android(包括IL2CPP)
-- [x] UWP(仅支持IL2CPP)
-- [x] WebGL
+- PC, Mac & Linux Standalone(包括IL2CPP)
+- iOS(包括IL2CPP)
+- Android(包括IL2CPP)
+- UWP(仅支持IL2CPP)
+- WebGL
 
 
 
