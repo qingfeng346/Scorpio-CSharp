@@ -11,9 +11,9 @@
     <Language>zh-CN</Language>
     <Title>sco</Title>
     <PackageTags>javascript,script,sco,scorpio,scorpio-csharp</PackageTags>
-    <PackageDescription>* 纯c#解析脚本,基于.net framework 3.5 或 .net standard 2.0 , 脚本语法类似 javascript
+    <PackageDescription>* 纯c#解析脚本,基于.net framework 4.0 或 .net standard 2.0 , 脚本语法类似 javascript
 * 无任何依赖库</PackageDescription>
-    <Description>* 纯c#解析脚本,基于.net framework 3.5 或 .net standard 2.0 , 脚本语法类似 javascript
+    <Description>* 纯c#解析脚本,基于.net framework 4.0 或 .net standard 2.0 , 脚本语法类似 javascript
 * 无任何依赖库</Description>
     <PackageProjectUrl>https://github.com/qingfeng346/Scorpio-CSharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/qingfeng346/Scorpio-CSharp</RepositoryUrl>

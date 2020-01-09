@@ -2,7 +2,7 @@
 * author : while
 * QQ群 : 245199668 [加入QQ群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 
-### 此脚本为纯c#实现的脚本系统,最低支持 .net framework 3.5和 .net standard 2.0, 语法类似 javascript
+### 此脚本为纯c#实现的脚本系统,最低支持 .net framework 4.0 和 .net standard 2.0, 语法类似 javascript
 
 * **脚本示例** [ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/v2.0/ExampleScripts)
 * **脚本教程** http://www.fengyuezhu.com/readme/
@@ -28,7 +28,7 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 ```
 
 ### 兼容大部分 **.net** 平台
-* .net framework 3.5 及以上
+* .net framework 4.0 及以上
 * .net standard 2.0 及以上
 * .net core 2.0 及以上
 * unity3d
@@ -37,11 +37,17 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 * mono
 * xamarin
 
-### Unity3d平台支持:
+### 支持的Unity版本
+* Unity2018及以上
+* 请设置 **PlayerSetting** 内 **Api Compatibility Level** 为 **.NET Standard 2.0**
+
+### Unity支持的平台:
 - [x] PC, Mac & Linux Standalone(包括IL2CPP)
 - [x] iOS(包括IL2CPP)
 - [x] Android(包括IL2CPP)
+- [x] UWP(仅支持IL2CPP)
 - [x] WebGL
+
 
 
 ### 注意事项 ##
@@ -55,11 +61,11 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 
 * **event** 对象 **+= -=** 操作可以使用函数 **add_[event变量名] remove_[event变量名]** 代替
 
-* c# 扩展函数, 请使用静态函数方式调用
+* c# 扩展函数, 请先调用 **importExtension("类型")** 引用
 
-* **Unity3d** 使用 **IL2CPP** 后, 部分**Unity3D**的类或函数不能反射获取,请自行包一层函数,或者使用快速反射功能
+* **Unity3d** 使用 **IL2CPP** 后, 部分**Unity3D**的类或函数不能反射获取,请配置**link.xml**或者使用**快速反射功能**
 
-* UWP平台master配置下 **genericMethod, genericType** 函数会出问题, 其他平台均无问题 **(android&il2cpp ios&il2cpp webgl等)**, 报错: PlatformNotSupported_NoTypeHandleForOpenTypes. For more information, visit http://go.microsoft.com/fwlink/?LinkId=623485
+* **genericMethod, genericType** 函数在**IL2CPP**下生成未声明过的类型会报错.
 
 
 
