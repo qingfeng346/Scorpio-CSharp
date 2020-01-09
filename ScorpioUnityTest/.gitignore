@@ -1,0 +1,7 @@
+/.vs
+/*.csproj
+/Logs
+/obj
+/Library
+/ScorpioTest.sln
+/Temp

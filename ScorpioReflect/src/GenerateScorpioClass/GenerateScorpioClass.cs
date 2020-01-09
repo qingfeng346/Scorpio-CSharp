@@ -117,7 +117,7 @@ namespace Scorpio.ScorpioReflect {
                     var methodHandle = method.MethodHandle;
                     //判断函数是不是 event add remove 函数
                     foreach (var eve in m_AllEvents) {
-                        if (eve.AddMethod.MethodHandle == methodHandle || eve.RemoveMethod.MethodHandle == methodHandle) {
+                        if (eve.GetAddMethod().MethodHandle == methodHandle || eve.GetRemoveMethod().MethodHandle == methodHandle) {
                             if (m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, eve)) {
                                 check = false;
                             }

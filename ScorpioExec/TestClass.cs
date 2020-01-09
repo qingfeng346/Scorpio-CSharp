@@ -9,9 +9,8 @@ namespace ScorpioExec {
     public delegate TestClass TestDelegate4(int a1, int a2);
     //public delegate string TestDelegate3(int a1, int a2);
     public static class TestClassEx {
-        public static void TestFuncEx(this TestClass cl, ref int a) {
-            Console.WriteLine(a);
-            a = 200;
+        public static void TestFuncEx(this BaseClass cl, int a) {
+            cl.TestNumber = a;
         }
     }
     public class BaseClass {
@@ -38,7 +37,6 @@ namespace ScorpioExec {
                 Console.WriteLine(arg);
             }
         }
-        public new int TestNumber { get; set; }
         public void TestFunc() {
 
         }

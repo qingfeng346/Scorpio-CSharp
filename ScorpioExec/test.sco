@@ -1,5 +1,10 @@
-var a = "AAA"
-print(a.toOneLower())
+importExtension("ScorpioExec.TestClassEx")
+TestClass = import_type("ScorpioExec.TestClass")
+var a = TestClass(100);
+a.TestFuncEx(500)
+print(a.TestNumber)
+// var a = "AAA"
+// print(a.toOneLower())
 
 // DownloadStatus = {
 //     RequestAssets : 100

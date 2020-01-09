@@ -36,10 +36,10 @@ Compress-Archive ../bin/sco-win-x64 ../bin/$name-$version-win-x64.zip -Force
 Compress-Archive ../bin/sco-osx-x64 ../bin/$name-$version-osx-x64.zip -Force
 Compress-Archive ../bin/sco-linux-x64 ../bin/$name-$version-linux-x64.zip -Force
 
-Remove-Item ../ScorpioTest/Assets/Scorpio/ -Force -Recurse
-Remove-Item ../ScorpioTest/Assets/Editor/ScorpioReflect -Force -Recurse
-Copy-Item ../Scorpio/src/ ../ScorpioTest/Assets/Scorpio/ -Recurse -Force 
-Copy-Item ../ScorpioReflect/src/ ../ScorpioTest/Assets/Editor/ScorpioReflect/ -Recurse -Force
+Remove-Item ../ScorpioUnityTest/Assets/Scorpio/ -Force -Recurse
+Remove-Item ../ScorpioUnityTest/Assets/Editor/ScorpioReflect -Force -Recurse
+Copy-Item ../Scorpio/src/ ../ScorpioUnityTest/Assets/Scorpio/ -Recurse -Force 
+Copy-Item ../ScorpioReflect/src/ ../ScorpioUnityTest/Assets/Editor/ScorpioReflect/ -Recurse -Force
 
 Set-Location $cur
 

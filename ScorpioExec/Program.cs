@@ -152,12 +152,6 @@ Build Date : {Scorpio.Version.date}");
                     var url = data["html_url"].ToString();
                     Logger.info($"发现新版本 : {name}");
                     Logger.info($"下载地址 : {url}");
-                    //Logger.info($"是否立刻去下载  是(Y)√  否(N)");
-                    //var str = Console.ReadLine();
-                    //if (string.IsNullOrWhiteSpace(str) || str.ToUpper() == "Y") {
-                    //    var url = data["html_url"].ToString().Replace("https://", "http://");
-                    //    Logger.info("打开网页 : " + url);
-                    //}
                     return;
                 }
             }
