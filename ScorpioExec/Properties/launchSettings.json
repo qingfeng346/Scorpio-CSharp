@@ -6,7 +6,7 @@
     },
     "fast": {
       "commandName": "Project",
-      "commandLineArgs": "fast -class ScorpioExec.TestClass -extension ScorpioExec.TestClassEx -output ../../../ "
+      "commandLineArgs": "fast --class ScorpioExec.TestClass -extension ScorpioExec.TestClassEx -o ../../../ "
     },
     "run": {
       "commandName": "Project",
@@ -18,7 +18,7 @@
     },
     "delegate": {
       "commandName": "Project",
-      "commandLineArgs": "delegate -output ../../../DelegateFactory.cs -class ScorpioExec.TestDelegate1;ScorpioExec.TestDelegate2;ScorpioExec.TestDelegate3;ScorpioExec.TestDelegate4"
+      "commandLineArgs": "delegate -o ../../../DelegateFactory.cs --class ScorpioExec.TestDelegate1;ScorpioExec.TestDelegate2;ScorpioExec.TestDelegate3;ScorpioExec.TestDelegate4"
     },
     "help": {
       "commandName": "Project",

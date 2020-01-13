@@ -43,15 +43,15 @@ namespace ScorpioExec {
     fast             生成快速反射文件
     version          当前sco版本,检查最新版本
     [文件路径]       运行sco文本文件或IL文件";
-        private readonly static string[] ParameterSource    = new[] { "--source", "-s" };
-        private readonly static string[] ParameterOutput    = new[] { "--output", "-o" };
-        private readonly static string[] ParameterClass     = new[] { "--class", "-c" };
-        private readonly static string[] ParameterDll       = new[] { "--dll", "-d" };
-        private readonly static string[] ParameterIgnore    = new[] { "--ignore", "-g" };
-        private readonly static string[] ParameterFilter    = new[] { "--filter", "-f" };
-        private readonly static string[] ParameterExtension = new[] { "--extension", "-e" };
-        private readonly static string[] ParameterCheck     = new[] { "--check", "-c" };
-        private readonly static string[] ParameterPreview   = new[] { "--preview", "-p" };
+        private readonly static string[] ParameterSource    = new[] { "-s", "--source",       "-source" };
+        private readonly static string[] ParameterOutput    = new[] { "-o", "--output",       "-output" };
+        private readonly static string[] ParameterClass     = new[] { "-c", "--class",        "-class" };
+        private readonly static string[] ParameterDll       = new[] { "-d", "--dll",          "-dll" };
+        private readonly static string[] ParameterIgnore    = new[] { "-i", "--ignore",       "-ignore" };
+        private readonly static string[] ParameterFilter    = new[] { "-f", "--filter",       "-filter" };
+        private readonly static string[] ParameterExtension = new[] { "-e", "--extension",    "-extension" };
+        private readonly static string[] ParameterCheck     = new[] { "-c", "--check",        "-check" };
+        private readonly static string[] ParameterPreview   = new[] { "-p", "--preview",      "-preview" };
         static Perform perform;
         static void Main(string[] args) {
             perform = new Perform();
