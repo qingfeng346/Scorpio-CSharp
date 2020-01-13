@@ -17,29 +17,41 @@ namespace ScorpioExec {
 注册运行程序到环境变量";
         private const string HelpPack = @"
 编译生成sco的IL文件
-    -source|-s      脚本文本文件
-    -output|-o      IL输出文件";
+    --source|-s      (必填)脚本文本文件
+    --output|-o      (必填)IL输出文件
+    --ignore|-g      (选填)忽略的全局函数列表,多函数使用分号;隔开";
         private const string HelpFast = @"
 生成快速反射文件
-    -dll            dll文件路径
-    -class          class完整名称,多class使用分号;隔开
-    -filter         过滤器,多过滤器使用分号;隔开
-    -output|-o      快速反射文件输出目录";
+    --class|-c       (必填)class完整名称,多class使用分号;隔开
+    --output|-o      (必填)快速反射文件输出目录
+    --dll|-d         (选填)dll文件路径,不填则找当前程序集
+    --filter|-f      (选填)过滤器完整名称,多过滤器使用分号;隔开
+    --extension|-e   (选填)扩展函数类完整名称,多扩展函数类使用分号;隔开";
         private const string HelpDelegate = @"
 生成Delegate仓库
-    -dll            dll文件路径
-    -class          class完整名称,多class使用分号;隔开
-    -output|-o      Delegate仓库输出文件";
+    --class|-c       (必填)class完整名称,多class使用分号;隔开
+    --output|-o      (必填)Delegate仓库输出文件
+    --dll|-d         (选填)dll文件路径,不填则找当前程序集";
         private const string HelpVersion = @"
 查询sco版本，并检查最新版本
-    -preview|-p     是否检查preview版本";
+    --check|-c       (选填)是否检查最新版本
+    --preview|-p     (选填)是否检查preview版本";
         private const string HelpExecute = @"
 命令列表
-    register        注册运行程序到环境变量
-    pack            编译生成sco的IL文件
-    fast            生成快速反射文件
-    version         查询sco版本，并检查最新版本
+    register         注册运行程序到环境变量
+    pack             编译生成sco的IL文件
+    fast             生成快速反射文件
+    version          当前sco版本,检查最新版本
     [文件路径]       运行sco文本文件或IL文件";
+        private readonly static string[] ParameterSource    = new[] { "--source", "-s" };
+        private readonly static string[] ParameterOutput    = new[] { "--output", "-o" };
+        private readonly static string[] ParameterClass     = new[] { "--class", "-c" };
+        private readonly static string[] ParameterDll       = new[] { "--dll", "-d" };
+        private readonly static string[] ParameterIgnore    = new[] { "--ignore", "-g" };
+        private readonly static string[] ParameterFilter    = new[] { "--filter", "-f" };
+        private readonly static string[] ParameterExtension = new[] { "--extension", "-e" };
+        private readonly static string[] ParameterCheck     = new[] { "--check", "-c" };
+        private readonly static string[] ParameterPreview   = new[] { "--preview", "-p" };
         static Perform perform;
         static void Main(string[] args) {
             perform = new Perform();
@@ -49,7 +61,6 @@ namespace ScorpioExec {
             perform.AddExecute("pack", HelpPack, Pack);
             perform.AddExecute("fast", HelpFast, Fast);
             perform.AddExecute("delegate", HelpDelegate, DelegateFactory);
-            perform.AddExecute("sversion", HelpVersion, SVersionExec);
             perform.AddExecute("", HelpExecute, Execute);
             perform.Start(args, null, null);
         }
@@ -57,21 +68,22 @@ namespace ScorpioExec {
             Util.RegisterApplication($"{Util.BaseDirectory}/{AppDomain.CurrentDomain.FriendlyName}");
         }
         static void Pack(CommandLine command, string[] args) {
-            var source = perform.GetPath("-source", "-s");
-            var output = perform.GetPath("-output", "-o");
-            File.WriteAllBytes(output, Serializer.Serialize(source, FileUtil.GetFileString(source)).ToArray());
+            var source = perform.GetPath(ParameterSource);
+            var output = perform.GetPath(ParameterOutput);
+            var ignore = command.GetValueDefault(ParameterIgnore, "");
+            File.WriteAllBytes(output, Serializer.Serialize(source, FileUtil.GetFileString(source), ignore.Split(";")).ToArray());
             Logger.info($"生成IL文件  {source} -> {output}");
         }
         static void Fast(CommandLine command, string[] args) {
-            var output = perform.GetPath("-output", "-o");
-            var dll = command.GetValue("-dll");
-            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
-            var strClass = command.GetValue("-class");
+            var output = perform.GetPath(ParameterOutput);
+            var strClass = command.GetValue(ParameterClass);
             if (strClass.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
-            var strExtension = command.GetValue("-extension");
+            var dll = command.GetValue(ParameterDll);
+            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
+            var strExtension = command.GetValue(ParameterExtension);
 
             ClassFilter filter = null;
-            var strFilter = command.GetValue("-filter");
+            var strFilter = command.GetValue(ParameterFilter);
             if (!strFilter.isNullOrWhiteSpace()) {
                 var filterType = GetType(assembly, strFilter, typeof(ClassFilter));
                 if (filterType != null) {
@@ -99,11 +111,12 @@ namespace ScorpioExec {
             }
         }
         static void DelegateFactory(CommandLine command, string[] args) {
-            var output = perform.GetPath("-output", "-o");
-            var dll = command.GetValue("-dll");
-            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
-            var strClass = command.GetValue("-class");
+            var output = perform.GetPath(ParameterOutput);
+            var strClass = command.GetValue(ParameterClass);
             if (strClass.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
+
+            var dll = command.GetValue(ParameterDll);
+            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
             var generate = new GenerateScorpioDelegate();
             var classNames = strClass.Split(";");
             foreach (var className in classNames) {
@@ -114,27 +127,14 @@ namespace ScorpioExec {
             FileUtil.CreateFile(output, generate.Generate(0));
             Logger.info($"生成Delegate仓库 {output}");
         }
-        static Type GetType(Assembly assembly, string typeName, Type parent) {
-            var type = assembly?.GetType(typeName, false, false);
-            if (type == null) { type = Type.GetType(typeName, false, false); }
-            if (parent != null) {
-                if (type != null && type.IsSubclassOf(parent)) {
-                    return type;
-                }
-                return null;
-            }
-            return type;
-        }
         static void VersionExec(CommandLine command, string[] args) {
             Logger.info(Scorpio.Version.version);
-        }
-        static void SVersionExec(CommandLine command, string[] args) {
-            Logger.info($@"Sco Version : {Scorpio.Version.version}
-Build Date : {Scorpio.Version.date}");
+            if (!command.HadValue(ParameterCheck)) { return; }
+            Logger.info("正在检查最新版本...");
             var result = Util.RequestString("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
                 request.Headers.Add("Authorization", "token e5ff670eb105f044273f4c81276a67cd1341e649");
             });
-            var isPreview = command.HadValue("-preview", "-p");
+            var isPreview = command.HadValue(ParameterPreview);
             var datas = Json.Deserialize(result, true) as List<object>;
             foreach (Dictionary<string, object> data in datas) {
                 var name = data["name"] as string;
@@ -208,6 +208,17 @@ Build Date : {Scorpio.Version.date}");
                     Logger.error("load dll file [" + file + "] fail : " + ex.ToString());
                 }
             }
+        }
+        static Type GetType(Assembly assembly, string typeName, Type parent) {
+            var type = assembly?.GetType(typeName, false, false);
+            if (type == null) { type = Type.GetType(typeName, false, false); }
+            if (parent != null) {
+                if (type != null && type.IsSubclassOf(parent)) {
+                    return type;
+                }
+                return null;
+            }
+            return type;
         }
     }
 }

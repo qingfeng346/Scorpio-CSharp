@@ -3,21 +3,22 @@ using Scorpio.Compile.Exception;
 using Scorpio.Compile.CodeDom;
 using Scorpio.Compile.CodeDom.Temp;
 using Scorpio.Instruction;
+using Scorpio.Tools;
 namespace Scorpio.Compile.Compiler {
     
     /// <summary> 编译脚本 </summary>
     public partial class ScriptParser {
-        public List<double> ConstDouble { get; private set; } = new List<double>();
-        public List<long> ConstLong { get; private set; } = new List<long>();
-        public List<string> ConstString { get; private set; } = new List<string>();
+        public List<double> ConstDouble { get; private set; } = new List<double>();                                         //所有的常量 double
+        public List<long> ConstLong { get; private set; } = new List<long>();                                               //所有的常量 long
+        public List<string> ConstString { get; private set; } = new List<string>();                                         //所有的常量 string
         public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>();                   //定义的所有 function
         public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>();                           //定义的所有 class
         private Stack<List<ScriptInstructionCompiler>> m_Breaks = new Stack<List<ScriptInstructionCompiler>>();             //breaks
         private Stack<List<ScriptInstructionCompiler>> m_Continues = new Stack<List<ScriptInstructionCompiler>>();          //continues
-        private Stack<List<ScriptInstructionCompiler>> m_Cases = new Stack<List<ScriptInstructionCompiler>>();               //cases
+        private Stack<List<ScriptInstructionCompiler>> m_Cases = new Stack<List<ScriptInstructionCompiler>>();              //cases
         private List<ScriptInstructionCompiler> m_Break = new List<ScriptInstructionCompiler>();                            //break
         private List<ScriptInstructionCompiler> m_Continue = new List<ScriptInstructionCompiler>();                         //continue
-        private List<ScriptInstructionCompiler> m_Case = new List<ScriptInstructionCompiler>();                                 //case
+        private List<ScriptInstructionCompiler> m_Case = new List<ScriptInstructionCompiler>();                             //case
         private List<ScriptExecutable> m_Executables = new List<ScriptExecutable>();                                        //指令栈
         private ScriptExecutable m_scriptExecutable;                                                                        //当前指令栈
         public int Index { get { return m_scriptExecutable.Count(); } }
@@ -771,15 +772,26 @@ namespace Scorpio.Compile.Compiler {
         //解析表达式
         void ParseExpression() {
             UndoToken();
-            var member = GetObject();
-            if (member is CodeAssign) {
-                PushAssign(member as CodeAssign);
-                AddScriptInstructionWithoutValue(Opcode.Pop);                   //弹出赋值的返回值
-            } else if (member is CodeCallFunction) {
-                PushObject(member);
-                AddScriptInstructionWithoutValue(Opcode.Pop, member.line);      //弹出call的返回值
-            } else {
-                throw new ParserException(this, "语法错误 " + member.GetType(), PeekToken());
+            var obj = GetObject();
+            switch (obj) {
+                case CodeAssign codeAssign: {
+                    PushAssign(codeAssign);
+                    AddScriptInstructionWithoutValue(Opcode.Pop);                   //弹出赋值的返回值
+                    break;
+                }
+                case CodeCallFunction codeCallFunction: {
+                    if (ignoreFunctions != null) {
+                        var member = codeCallFunction.Member as CodeMemberString;
+                        if (member != null && member.Parent == null && System.Array.Exists(ignoreFunctions, (func) => func == member.key)) {
+                            //Logger.debug("排除全局调用函数 : " + member.key);
+                            return;
+                        }
+                    }
+                    PushObject(obj);
+                    AddScriptInstructionWithoutValue(Opcode.Pop);                   //弹出call的返回值
+                    break;
+                }
+                default: throw new ParserException(this, "语法错误 " + obj.GetType(), PeekToken());
             }
         }
         //获取一个Object

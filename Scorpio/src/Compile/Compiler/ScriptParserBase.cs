@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using Scorpio.Compile.Exception;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
     public partial class ScriptParser {         
         private Token[] m_listTokens;           //token列表
         private int m_indexToken;               //当前读到token
-        public ScriptParser(List<Token> listTokens, string strBreviary) {
-            Breviary = strBreviary;
-            m_listTokens = listTokens.ToArray();
+        private string[] ignoreFunctions;       //编译忽略的全局函数
+        public ScriptParser(Token[] listTokens, string strBreviary, string[] ignoreFunctions) {
+            this.Breviary = strBreviary;
+            this.m_listTokens = listTokens;
+            this.ignoreFunctions = ignoreFunctions;
         }
         //当前解析的脚本摘要
         public string Breviary { get; private set; }

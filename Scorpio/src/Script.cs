@@ -154,7 +154,7 @@ namespace Scorpio {
         }
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(breviary, Serializer.Serialize(breviary, buffer));
+            return Execute(breviary, Serializer.Serialize(breviary, buffer, null));
         }
         public ScriptValue LoadBuffer(byte[] buffer) {
             return LoadBuffer(Undefined, buffer, UTF8);
@@ -167,7 +167,7 @@ namespace Scorpio {
             if (buffer[0] == 0)
                 return Execute(breviary, Deserializer.Deserialize(buffer));
             else
-                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length)));
+                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null));
         }
 
 

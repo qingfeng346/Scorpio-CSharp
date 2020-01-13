@@ -1,8 +1,13 @@
-importExtension("ScorpioExec.TestClassEx")
-TestClass = import_type("ScorpioExec.TestClass")
-var a = TestClass(100);
-a.TestFuncEx(500)
-print(a.TestNumber)
+// importExtension("ScorpioExec.TestClassEx")
+// TestClass = import_type("ScorpioExec.TestClass")
+// var a = TestClass(100);
+// a.TestFuncEx(500)
+// print(a.TestNumber)
+function hello() {
+    print("hello")
+}
+hello(123123123213123123)
+print(123.toString())
 // var a = "AAA"
 // print(a.toOneLower())
 
