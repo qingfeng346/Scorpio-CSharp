@@ -221,7 +221,7 @@ namespace Scorpio.Compile.Compiler {
                     }
                     return;
                 case TokenType.Switch:
-                    ParseSwtich();
+                    ParseSwitch();
                     return;
                 case TokenType.Case:
                     ParseCase();
@@ -415,7 +415,7 @@ namespace Scorpio.Compile.Compiler {
             m_Break.SetValue(endIndex);
         }
         //解析swtich语句
-        void ParseSwtich() {
+        void ParseSwitch() {
             ReadLeftParenthesis();
             PushObject(GetObject());
             PushObject(new CodeNativeObject(false, PeekToken().SourceLine));
@@ -425,9 +425,6 @@ namespace Scorpio.Compile.Compiler {
             AddScriptInstruction(Opcode.PopNumber, 2);       //弹出switch值 和 false 值
             m_Break.SetValue(endIndex);
             m_Case.SetValue(endIndex);
-            //foreach (var instruction in m_Case) {
-            //    instruction.SetValue(endIndex);
-            //}
         }
         //解析case
         void ParseCase() {
