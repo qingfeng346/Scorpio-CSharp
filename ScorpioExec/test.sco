@@ -3,20 +3,39 @@
 // var a = TestClass(100);
 // a.TestFuncEx(500)
 // print(a.TestNumber)
-function hello() {
-    print("hello")
-}
-hello(123123123213123123)
-print(hello())
-var a = hello()
-print(a)
-function wwww() {
-    var hello = function() {
-        print("hello")
+// StoreTabType = {
+//     Coin : 2,
+//     Heart : 3,
+//     Energy : 4,
+//     Dragon : 21,
+//     Building : 22,
+//     Crop : 23,
+//     Factory : 25,
+//     Decoration : 40,
+//     GetString : function(id) {
+//         switch (id) {
+//             case 2: return 'Coin'; 
+//             case 3: return 'Heart'; 
+//             case 4: return 'Energy'; 
+//             case 21: return 'Dragon'; 
+//             case 22: return 'Building'; 
+//             case 23: return 'Crop'; 
+//             case 25: return 'Factory'; 
+//             case 40: return 'Decoration'; 
+//         }
+//     }
+// }
+// ReddotType = {
+
+// }
+function hello(a) {
+    switch (a) {
+        case 0: return;
+        case 1: return;
     }
-    hello()
 }
-wwww()
+hello(0)
+
 // var a = "AAA"
 // print(a.toOneLower())
 
