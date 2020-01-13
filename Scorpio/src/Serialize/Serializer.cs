@@ -5,7 +5,7 @@ namespace Scorpio.Serialize {
         public static SerializeData Serialize(string breviary, string buffer, string[] ignoreFunctions) {
             var lexer = new ScriptLexer(buffer, breviary);
             breviary = lexer.Breviary;
-            var parser = new ScriptParser(lexer.GetTokens().ToArray(), breviary, new string[] { "hello"});
+            var parser = new ScriptParser(lexer.GetTokens().ToArray(), breviary, ignoreFunctions);
             var context = parser.Parse();
             return new SerializeData(parser.ConstDouble.ToArray(),
                                         parser.ConstLong.ToArray(),

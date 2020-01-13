@@ -584,25 +584,33 @@ namespace Scorpio.Compile.Compiler {
                     }
                     break;
                 }
-                case CodeCallFunction func: {
+                case CodeCallFunction codeCallFunction: {
+                    if (ignoreFunctions != null) {
+                        var member = codeCallFunction.Member as CodeMemberString;
+                        if (member != null && member.Parent == null && System.Array.Exists(ignoreFunctions, (func) => func == member.key)) {
+                            PushObject(new CodeNativeObject(null, -1));
+                            break;
+                        }
+                    }
+
                     var unfold = 0L;
-                    for (var i = 0; i < func.Parameters.Count; ++i) {
-                        var parameter = func.Parameters[i];
+                    for (var i = 0; i < codeCallFunction.Parameters.Count; ++i) {
+                        var parameter = codeCallFunction.Parameters[i];
                         PushObject(parameter.obj);
                         if (parameter.unfold) {
                             unfold |= 1L << i;
                         }
                     }
-                    PushObject(func.Member);
-					var nullTo = func.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
+                    PushObject(codeCallFunction.Member);
+					var nullTo = codeCallFunction.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
                     if (unfold == 0L) {
-                        AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallVi : Opcode.Call, func.Parameters.Count, obj.Line);
+                        AddScriptInstruction(IsVariableFunction(codeCallFunction.Member) != null ? Opcode.CallVi : Opcode.Call, codeCallFunction.Parameters.Count, obj.Line);
                     } else {
-                        var index = System.Convert.ToInt64(func.Parameters.Count) << 8 | unfold;
-                        AddScriptInstruction(IsVariableFunction(func.Member) != null ? Opcode.CallViUnfold : Opcode.CallUnfold, GetConstLong(index), obj.Line);
+                        var index = System.Convert.ToInt64(codeCallFunction.Parameters.Count) << 8 | unfold;
+                        AddScriptInstruction(IsVariableFunction(codeCallFunction.Member) != null ? Opcode.CallViUnfold : Opcode.CallUnfold, GetConstLong(index), obj.Line);
                     }
-                    if (func.Variables != null) {
-                        foreach (var variable in func.Variables.Variables) {
+                    if (codeCallFunction.Variables != null) {
+                        foreach (var variable in codeCallFunction.Variables.Variables) {
                             if (variable.key is string) {
                                 AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
                                 PushObject(variable.value);
@@ -780,14 +788,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeCallFunction codeCallFunction: {
-                    if (ignoreFunctions != null) {
-                        var member = codeCallFunction.Member as CodeMemberString;
-                        if (member != null && member.Parent == null && System.Array.Exists(ignoreFunctions, (func) => func == member.key)) {
-                            //Logger.debug("排除全局调用函数 : " + member.key);
-                            return;
-                        }
-                    }
-                    PushObject(obj);
+                    PushObject(codeCallFunction);
                     AddScriptInstructionWithoutValue(Opcode.Pop);                   //弹出call的返回值
                     break;
                 }

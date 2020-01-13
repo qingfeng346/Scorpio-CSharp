@@ -7,7 +7,16 @@ function hello() {
     print("hello")
 }
 hello(123123123213123123)
-print(123.toString())
+print(hello())
+var a = hello()
+print(a)
+function wwww() {
+    var hello = function() {
+        print("hello")
+    }
+    hello()
+}
+wwww()
 // var a = "AAA"
 // print(a.toOneLower())
 
