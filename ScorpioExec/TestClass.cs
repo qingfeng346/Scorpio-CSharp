@@ -32,6 +32,10 @@ namespace ScorpioExec {
             str = "test";
             return 100;
         }
+        public static void TestStaticFunc() {
+            string a = null;
+            Console.WriteLine(a.ToString());
+        }
         public void TestArgs(int a, params object[] args) {
             foreach (var arg in args) {
                 Console.WriteLine(arg);

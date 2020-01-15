@@ -1,10 +1,13 @@
-﻿namespace Scorpio.Exception
-{
+﻿namespace Scorpio.Exception {
     //执行代码异常
     public class ExecutionException : System.Exception {
-        public ExecutionException(string strMessage) : base(strMessage) { }
-    }
-    public class ExecutionStackException : System.Exception {
-        public ExecutionStackException(string strMessage) : base(strMessage) { }
+        public string message;
+        public ExecutionException(string message) {
+            this.message = message;
+        }
+        public ExecutionException(string message, System.Exception innerException) : base(message, innerException) {
+            this.message = message;
+        }
+        public override string Message => message;
     }
 }

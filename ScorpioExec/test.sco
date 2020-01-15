@@ -1,3 +1,19 @@
+TestClass = import_type("ScorpioExec.TestClass")
+var t = new TestClass(111)
+function aaa() {
+    t.num = "1232131"
+    // TestClass.TestStaticFunc()
+}
+function bbb() {
+    aaa()
+}
+function ccc() {
+    bbb()
+}
+ccc()
+
+
+
 // importExtension("ScorpioExec.TestClassEx")
 // TestClass = import_type("ScorpioExec.TestClass")
 // var a = TestClass(100);
@@ -28,13 +44,13 @@
 // ReddotType = {
 
 // }
-function hello(a) {
-    switch (a) {
-        case 0: return;
-        case 1: return;
-    }
-}
-hello(0)
+// function hello(a) {
+//     switch (a) {
+//         case 0: return;
+//         case 1: return;
+//     }
+// }
+// hello(0)
 
 // var a = "AAA"
 // print(a.toOneLower())

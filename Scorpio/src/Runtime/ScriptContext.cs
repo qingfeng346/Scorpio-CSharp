@@ -110,7 +110,7 @@ namespace Scorpio.Runtime {
                                     stackObjects[++stackIndex].doubleValue = constDouble[opvalue];
                                     stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
                                     continue;
-                                } 
+                                }
                                 case Opcode.LoadConstString: {
                                     stackObjects[++stackIndex].stringValue = constString[opvalue];
                                     stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
@@ -177,7 +177,7 @@ namespace Scorpio.Runtime {
                                             stackObjects[++stackIndex].objectValue = internalObjects[opvalue].value.objectValue;
                                             stackObjects[stackIndex].valueType = ScriptValue.objectValueType;
                                             continue;
-                                        default: throw new ExecutionException("LoadInternal : 未知错误数据类型 : " + internalObjects[opvalue].value.valueType);
+                                        default: throw new ExecutionException($"LoadInternal : 未知错误数据类型 : {internalObjects[opvalue].value.valueType}");
                                     }
                                 }
                                 case Opcode.LoadValue: {
@@ -716,12 +716,12 @@ namespace Scorpio.Runtime {
                                 }
                                 case Opcode.FlagNot: {
                                     switch (stackObjects[stackIndex].valueType) {
-                                        case ScriptValue.trueValueType: 
-                                            stackObjects[stackIndex].valueType = ScriptValue.falseValueType; 
+                                        case ScriptValue.trueValueType:
+                                            stackObjects[stackIndex].valueType = ScriptValue.falseValueType;
                                             continue;
                                         case ScriptValue.falseValueType:
                                         case ScriptValue.nullValueType:
-                                            stackObjects[stackIndex].valueType = ScriptValue.trueValueType; 
+                                            stackObjects[stackIndex].valueType = ScriptValue.trueValueType;
                                             continue;
                                         default: throw new ExecutionException($"当前数据类型不支持取反操作 : {stackObjects[stackIndex].ValueTypeName}");
                                     }
@@ -1198,15 +1198,15 @@ namespace Scorpio.Runtime {
                                     continue;
                                 }
                                 case Opcode.NotNullTo: {
-                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) { 
-                                        --stackIndex; 
-                                    } else { 
-                                        iInstruction = opvalue; 
+                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) {
+                                        --stackIndex;
+                                    } else {
+                                        iInstruction = opvalue;
                                     }
                                     continue;
                                 }
                                 case Opcode.NullTo: {
-                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) { 
+                                    if (stackObjects[stackIndex].valueType == ScriptValue.nullValueType) {
                                         iInstruction = opvalue;
                                     }
                                     continue;
@@ -1295,11 +1295,10 @@ namespace Scorpio.Runtime {
                     }
                 }
             } catch (ExecutionException e) {
-                throw new ExecutionStackException($"{m_Breviary}:{instruction.line}({iInstruction})\n    {e.ToString()}");
-            } catch (ExecutionStackException e) {
-                throw new ExecutionStackException($"{m_Breviary}:{instruction.line}({iInstruction})\n    {e.ToString()}");
+                e.message = $"{m_Breviary}:{instruction.line}({iInstruction})\n  {e.message}";
+                throw;
             } catch (System.Exception e) {
-                throw new ExecutionException($"{m_Breviary}:{instruction.line}({iInstruction}) : {e.ToString()}");
+                throw new ExecutionException($"{m_Breviary}:{instruction.line}({iInstruction})", e);
             } finally {
                 --VariableValueIndex;
 #if DEBUG

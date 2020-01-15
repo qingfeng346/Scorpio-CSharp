@@ -90,7 +90,7 @@ namespace Scorpio {
             if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
                 var i = Convert.ToInt32(index);
                 if (i >= m_Length) return ScriptValue.Null;
-                if (i < 0) throw new ExecutionException("数组获取变量索引小于0 index : " + i);
+                if (i < 0) throw new ExecutionException($"数组获取变量索引小于0 index : {i}");
                 return m_Objects[i];
             }
             return base.GetValue(index);
@@ -102,7 +102,7 @@ namespace Scorpio {
                     EnsureCapacity(i + 1);
                     m_Length = i + 1;
                 } else if (i < 0) {
-                    throw new ExecutionException("数组设置变量索引小于0 index : " + i);
+                    throw new ExecutionException($"数组设置变量索引小于0 index : {i}");
                 }
                 m_Objects[i] = value;
             } else {
@@ -113,7 +113,7 @@ namespace Scorpio {
         public virtual ScriptValue this[int i] {
             get {
                 if (i >= m_Length) return ScriptValue.Null;
-                if (i < 0) throw new ExecutionException("数组获取变量索引小于0 index : " + i);
+                if (i < 0) throw new ExecutionException($"数组获取变量索引小于0 index : {i}");
                 return m_Objects[i];
             }
             set {
@@ -121,7 +121,7 @@ namespace Scorpio {
                     EnsureCapacity(i + 1);
                     m_Length = i + 1;
                 } else if (i < 0) {
-                    throw new ExecutionException("数组设置变量索引小于0 index : " + i);
+                    throw new ExecutionException($"数组设置变量索引小于0 index : {i}");
                 }
                 m_Objects[i] = value;
             }
@@ -145,7 +145,7 @@ namespace Scorpio {
         }
         public void Insert(int index, ScriptValue value) {
             if (index < 0 || index >= m_Length)
-                throw new ExecutionException("Insert 索引小于0或超过最大值 index : " + index);
+                throw new ExecutionException($"Insert 索引小于0或超过最大值 index:{index}   length:{m_Length}");
             if (m_Length == m_Objects.Length) {
                 EnsureCapacity(m_Length + 1);
             }
@@ -163,7 +163,7 @@ namespace Scorpio {
         }
         public void RemoveAt(int index) {
             if (index < 0 || index >= m_Length)
-                throw new ExecutionException("RemoveAt 索引小于0或超过最大值 index : " + index);
+                throw new ExecutionException($"RemoveAt 索引小于0或超过最大值 index:{index}  length:{m_Length}");
             m_Length--;
             Array.Copy(m_Objects, index + 1, m_Objects, index, m_Length - index);
             m_Objects[m_Length].valueType = ScriptValue.nullValueType;
@@ -194,7 +194,7 @@ namespace Scorpio {
         }
         public void Resize(int length) {
             if (length < 0)
-                throw new ExecutionException("Resize长度小于0 length:" + length);
+                throw new ExecutionException($"Resize长度小于0 length:{length}");
             if (length > m_Length) {
                 EnsureCapacity(length);
                 m_Length = length;
@@ -223,7 +223,7 @@ namespace Scorpio {
         }
         public ScriptValue PopFirst() {
             if (m_Length == 0)
-                throw new ExecutionException("Array PopFirst 数组长度为0");
+                throw new ExecutionException("Array PopFirst 数组长度为 0");
             var value = m_Objects[0];
             RemoveAt(0);
             return value;

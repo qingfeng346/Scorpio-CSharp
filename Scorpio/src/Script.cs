@@ -116,7 +116,7 @@ namespace Scorpio {
                 if (File.Exists(file))
                     return LoadFile(file);
             }
-            throw new ExecutionException("require 找不到文件 : " + fileName);
+            throw new ExecutionException($"require 找不到文件 : {fileName}");
         }
         public void SetGlobal(string key, ScriptValue value) {
             Global.SetValue(key, value);
