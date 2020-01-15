@@ -1115,14 +1115,8 @@ namespace Scorpio.Runtime {
                                             continue;
                                     }
                                 }
-                                //return 直接清空堆栈
-#if DEBUG
-                                case Opcode.RetNone: { stackIndex = -1; return ScriptValue.Null; }
-                                case Opcode.Ret: { index = stackIndex; stackIndex = -1; return stackObjects[index]; }
-#else
                                 case Opcode.RetNone: return ScriptValue.Null;
                                 case Opcode.Ret: return stackObjects[stackIndex];
-#endif
                                 case Opcode.CallUnfold: {
                                     var func = stackObjects[stackIndex--];      //函数对象
                                     var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
@@ -1294,6 +1288,8 @@ namespace Scorpio.Runtime {
                             continue;
                     }
                 }
+                //正常执行命令到最后,判断堆栈是否清空 return 或 exception 不判断
+                Logger.debug(stackIndex != -1, "堆栈数据未清空，有泄露情况 : " + stackIndex);
             } catch (ExecutionException e) {
                 e.message = $"{m_Breviary}:{instruction.line}({iInstruction})\n  {e.message}";
                 throw;
@@ -1301,9 +1297,6 @@ namespace Scorpio.Runtime {
                 throw new ExecutionException($"{m_Breviary}:{instruction.line}({iInstruction})", e);
             } finally {
                 --VariableValueIndex;
-#if DEBUG
-                Logger.debug(stackIndex != -1, "堆栈数据未清空，有泄露情况 : " + stackIndex);
-#endif
             }
             return ScriptValue.Null;
         }
