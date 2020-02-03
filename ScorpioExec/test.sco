@@ -1,16 +1,29 @@
-TestClass = import_type("ScorpioExec.TestClass")
-var t = new TestClass(111)
-function aaa() {
-    t.num = "1232131"
-    // TestClass.TestStaticFunc()
+function www() {
+
 }
-function bbb() {
-    aaa()
-}
-function ccc() {
-    bbb()
-}
-ccc()
+var tab = {}
+var tab1 = {}
+var a = print.bind(tab)
+var b = print.bind(tab)
+a("111111111")
+// var arr = []
+// arr.add(a)
+// print(arr.length())
+// arr.remove(print.bind(tab))
+// print(arr.length())
+// TestClass = import_type("ScorpioExec.TestClass")
+// var t = new TestClass(111)
+// function aaa() {
+//     t.num = "1232131"
+//     // TestClass.TestStaticFunc()
+// }
+// function bbb() {
+//     aaa()
+// }
+// function ccc() {
+//     bbb()
+// }
+// ccc()
 
 
 
