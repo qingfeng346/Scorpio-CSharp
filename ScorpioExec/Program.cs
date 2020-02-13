@@ -158,7 +158,7 @@ namespace ScorpioExec {
         }
         static void Execute(CommandLine command, string[] args) {
             Util.PrintSystemInfo();
-            Logger.info("Sco Version : " + Scorpio.Version.version);
+            Logger.info("sco Version : " + Scorpio.Version.version);
             Logger.info("Build Date : " + Scorpio.Version.date);
             Logger.info("Application Name : " + AppDomain.CurrentDomain.FriendlyName);
             TypeManager.PushAssembly(typeof(Program).Assembly);

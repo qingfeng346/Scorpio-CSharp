@@ -110,6 +110,9 @@
         Ret,                    //return a value
         NotNullTo,              //如果栈顶不为null则跳转
         NullTo,                 //栈顶如果是null则跳转并且不取出栈顶
+        TryTo,                  //异常跳转
+        TryEnd,                 //try结束
+        Throw,                  //throw
         JumpEnd,
     }
 }

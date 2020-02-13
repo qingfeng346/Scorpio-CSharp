@@ -1,6 +1,10 @@
 {
     "files.exclude": {
         "**/bin": true,
-        "**/obj": true
+        "**/obj": true,
+        "**/*.user": true,
+        "**/*.sln": true,
+        ".vs": true,
+        "LICENSE": true
     }
 }

@@ -36,6 +36,17 @@
             "cwd": "${workspaceFolder}/ScorpioExec",
             "console": "internalConsole",
             "stopAtEntry": false
+        },
+        {
+            "name": "version",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ScorpioExec/bin/Debug/netcoreapp3.0/sco.dll",
+            "args": ["version"],
+            "cwd": "${workspaceFolder}/ScorpioExec",
+            "console": "internalConsole",
+            "stopAtEntry": false
         }
     ]
 }

@@ -11,7 +11,7 @@ namespace Scorpio.Compile.Compiler {
             this.m_listTokens = listTokens;
             this.ignoreFunctions = ignoreFunctions;
         }
-        //当前解析的脚本摘要
+        /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }
         /// <summary> 是否还有更多需要解析的语法 </summary>
         bool HasMoreTokens() {
@@ -51,61 +51,61 @@ namespace Scorpio.Compile.Compiler {
                 throw new ParserException(this, "Identifier expected.", token);
             return token.Lexeme.ToString();
         }
-        /// <summary> 读取{ </summary>
+        /// <summary> 读取 { </summary>
         void ReadLeftBrace() {
             Token token = ReadToken();
             if (token.Type != TokenType.LeftBrace)
                 throw new ParserException(this, "Left brace '{' expected.", token);
         }
-        /// <summary> 读取} </summary>
+        /// <summary> 读取 } </summary>
         void ReadRightBrace() {
             Token token = ReadToken();
             if (token.Type != TokenType.RightBrace)
                 throw new ParserException(this, "Right brace '}' expected.", token);
         }
-        /// <summary> 读取[ </summary>
+        /// <summary> 读取 [ </summary>
         void ReadLeftBracket() {
             Token token = ReadToken();
             if (token.Type != TokenType.LeftBracket)
                 throw new ParserException(this, "Left bracket '[' expected for array indexing expression.", token);
         }
-        /// <summary> 读取] </summary>
+        /// <summary> 读取 ] </summary>
         void ReadRightBracket() {
             Token token = ReadToken();
             if (token.Type != TokenType.RightBracket)
                 throw new ParserException(this, "Right bracket ']' expected for array indexing expression.", token);
         }
-        /// <summary> 读取( </summary>
+        /// <summary> 读取 ( </summary>
         void ReadLeftParenthesis() {
             Token token = ReadToken();
             if (token.Type != TokenType.LeftPar)
                 throw new ParserException(this, "Left parenthesis '(' expected.", token);
         }
-        /// <summary> 读取) </summary>
+        /// <summary> 读取 ) </summary>
         void ReadRightParenthesis() {
             Token token = ReadToken();
             if (token.Type != TokenType.RightPar)
                 throw new ParserException(this, "Right parenthesis ')' expected.", token);
         }
-        /// <summary> 读取; </summary>
+        /// <summary> 读取 ; </summary>
         void ReadSemiColon() {
             Token token = ReadToken();
             if (token.Type != TokenType.SemiColon)
                 throw new ParserException(this, "SemiColon ';' expected.", token);
         }
-        /// <summary> 读取in </summary>
+        /// <summary> 读取 in </summary>
         void ReadIn() {
             Token token = ReadToken();
             if (token.Type != TokenType.In)
                 throw new ParserException(this, "In 'in' expected.", token);
         }
-        /// <summary> 读取: </summary>
+        /// <summary> 读取 : </summary>
         void ReadColon() {
             Token token = ReadToken();
             if (token.Type != TokenType.Colon)
                 throw new ParserException(this, "Colon ':' expected.", token);
         }
-        /// <summary> 读取catch </summary>
+        /// <summary> 读取 catch </summary>
         void ReadCatch() {
             Token token = ReadToken();
             if (token.Type != TokenType.Catch)
