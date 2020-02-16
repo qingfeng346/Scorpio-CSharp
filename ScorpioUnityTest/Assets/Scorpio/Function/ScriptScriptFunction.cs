@@ -26,5 +26,9 @@ namespace Scorpio.Function {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return m_Context.Execute(m_BindObject, parameters, length, m_internalValues);
         }
+        public override bool Equals(ScriptValue obj) {
+            var func = obj.Get<ScriptScriptBindFunction>();
+            return func != null && (m_Context == func.m_Context && m_BindObject.Equals(func.m_BindObject));
+        }
     }
 }

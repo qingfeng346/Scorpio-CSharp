@@ -33,7 +33,7 @@ namespace Scorpio.Userdata {
                     }
                 }
             }
-            throw new ExecutionException("没有找到合适的泛型函数 " + MethodName);
+            throw new ExecutionException($"没有找到合适的泛型函数 : {MethodName}");
         }
         public object Call(bool isStatic, object obj, ScriptValue[] parameters, int length) {
             try {

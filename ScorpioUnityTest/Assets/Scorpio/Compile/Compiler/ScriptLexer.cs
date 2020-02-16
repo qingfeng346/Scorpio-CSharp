@@ -406,6 +406,15 @@ namespace Scorpio.Compile.Compiler {
                 case "return":
                     tokenType = TokenType.Return;
                     break;
+                case "try":
+                    tokenType = TokenType.Try;
+                    break;
+                case "catch":
+                    tokenType = TokenType.Catch;
+                    break;
+                case "throw":
+                    tokenType = TokenType.Throw;
+                    break;
                 case "null":
                 case "nil":
                     tokenType = TokenType.Null;
