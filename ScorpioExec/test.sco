@@ -1,11 +1,50 @@
-function www() {
+// print(io.unixNow() / 1000 / 86400)
+print(io.unixNow())
+// TestClass = import_type("ScorpioExec.TestClass")
+// function test() {
+//     TestClass.TestStaticFunc("test1")
+// }
+// function test1() {
+//     TestClass.TestStaticFunc("test2")
+// }
+// function test2() {
+//     throw "fewafwaefwaf"
+// }
+// test()
+// function test() {
+//     throw "12312312312312213"
+// }
+// function test1() {
+//     test()
+// }
+// test1()
+// function test() {
+//     try {
+//         print("try1")
+//         try {
+//             print("try2")
+//             throw "fewafwaefwa"
+//         } catch (e) {
+//             print("catch2 : " + e)
+//         }
+//         print("12312312")
+//     } catch (e) {
+//         print("catch1")
+//     }
+// }
+// test()
+// print("hello")
 
-}
-var tab = {}
-var tab1 = {}
-var a = print.bind(tab)
-var b = print.bind(tab)
-a("111111111")
+// function www() {
+
+// }
+
+// var tab = {}
+// var tab1 = {}
+// var a = print.bind(tab)
+// var b = print.bind(tab)
+// a("111111111")
+
 // var arr = []
 // arr.add(a)
 // print(arr.length())

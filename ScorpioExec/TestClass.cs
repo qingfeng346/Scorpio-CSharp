@@ -17,6 +17,10 @@ namespace ScorpioExec {
         public int TestNumber { get; set; }
     }
     public class TestClass : BaseClass {
+        public static Scorpio.Script script;
+        public static void TestStaticFunc(string name) {
+            script.call(name);
+        }
         public int num;
         public TestClass(int num, ref int tNum) {
             tNum = 0;

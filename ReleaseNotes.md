@@ -1,3 +1,13 @@
+### v2.0.4
+*2020-02-28*
+### 新增功能
+* 增加 try catch throw 语法 [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/trycatch.sco)
+* 增加编译时排除某个全局函数的接口, 命令行参数 --ignore(-g)
+### 优化修改
+* importExtension 引入扩展函数, **this**类型的的子类没有引入的问题
+* 优化脚本报错堆栈信息
+* bind后的函数相等判断,只要函数主体和bind类型一致则相等
+
 ### v2.0.3
 *2019-12-23*
 
