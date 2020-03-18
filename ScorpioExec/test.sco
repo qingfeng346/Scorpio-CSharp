@@ -1,5 +1,86 @@
+// CSharpSingle = {
+//     PositiveInfinity : 1
+// }
+// class Color {
+// }
+// class Vector2 {
+
+// }
+// Screen = {
+//     width = 1,
+//     height = 1,
+// }
+LayerMask = {
+    NameToLayer() {
+        return 1
+    }
+}
+// FileUtil = {
+//     GetMD5FromString() {
+//         return "123123"
+//     }
+// }
+
+// CONFIG_CUSTOM_ACCOUNT = "CONFIG_CUSTOM_ACCOUNT"
+// CONFIG_CUSTOM_ENTRY_URL = "CONFIG_CUSTOM_ENTRY_URL"
+
+// SinglePositiveInfinity = CSharpSingle.PositiveInfinity      //float 正无穷
+
+// ColorRed = Color(1, 0, 0, 1)        //红色
+// ColorWhite = Color.white            //白色
+// ColorGreen = Color(0, 1, 0, 1)      //绿色
+// ColorGray = Color(0.65, 0.65, 0.65) //灰色
+
+// TileEdgeColor = Color(1, 1, 1, 0.5)             //格子在云边缘颜色
+// TileNormalColor = Color.white                   //正常格子颜色
+// TileActiveColor = Color(0.7, 0.7, 0.7, 1)       //格子被选中后闪烁颜色
+// TileFieldActiveClour = Color(0.7, 0.7, 0.7, 1)  //田地被选择后的颜色
+
+// ScreenWidth = Screen.width                           //屏幕宽度
+// ScreenHeight = Screen.height                         //屏幕高度
+// ScreenCenter = new Vector2(ScreenWidth / 2, ScreenHeight / 2)   //屏幕中心点
+
+// UIHeight = 750                                       //UI虚拟屏幕高度
+// UIWidth = ScreenWidth / ScreenHeight * UIHeight      //UI虚拟屏幕宽度
+// UIVirtualHeight = 750                                //UI虚拟高度
+// UIVirtualWidth = 1334                                //UI虚拟宽度
+
+LayerTerrain = 1L << LayerMask.NameToLayer("Terrain")       // Terrain 层
+
+// ITEM_DIAMOND = 100000       //钻石ID
+// ITEM_EXP = 101111           //经验
+// ITEM_COIN = 102222          //金币
+// ITEM_HEART = 103333         //爱心
+// ITEM_ENERGY = 104444        //体力
+
+// STORE_TAB_DIAMOND = 0       //商店 钻石 tab页
+// STORE_TAB_HEART = 1         //商店 爱心 tab页
+// STORE_TAB_COIN = 2          //商店 金币 tab页
+// STORE_TAB_ENERGY = 3        //商店 体力 tab页
+
+// SHOP_TAB_FACTORY = 0        //商店 工厂 tab页
+// SHOP_TAB_BUILDING = 1       //商店 建筑 tab页
+// SHOP_TAB_CROP = 2           //商店 作物 tab页
+// SHOP_TAB_DECORATION = 3     //商店 装饰 tab页
+// SHOP_TAB_RECOVERED = 4      //商店 回收 tab页
+
+//GM 密钥
+// GM_SECRET_KEY = FileUtil.GetMD5FromString("${Application.identifier}_${Application.platform}_${Application.version}_${SystemInfo.deviceModel}_${SystemInfo.deviceName}_${SystemInfo.systemMemorySize}_${math.floor(io.unixNow() / 1000 / 86400)}")
+
+// PAUSE_DRAGON_AI = false
+
+// CloudClickEffectID = 3      //点击云雾特效ID
+// HillClickEffectID = 4       //点击石头特效ID
+
+
+// bbb()
+// function ccc(a,b,c) {
+//     print(a,b,c)
+// }
+// ccc?.(aaa()...)
+// print("over")
 // print(io.unixNow() / 1000 / 86400)
-print(io.unixNow())
+// print(io.unixNow())
 // TestClass = import_type("ScorpioExec.TestClass")
 // function test() {
 //     TestClass.TestStaticFunc("test1")

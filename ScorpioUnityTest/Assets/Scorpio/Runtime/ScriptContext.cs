@@ -60,7 +60,7 @@ namespace Scorpio.Runtime {
         }
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
 #if SCORPIO_DEBUG
-            // Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
+            //Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
 #endif
             var variableObjects = VariableValues[VariableValueIndex];   //局部变量
             var tryStack = TryStackValues[VariableValueIndex];          //try catch
@@ -98,7 +98,6 @@ namespace Scorpio.Runtime {
                     stackObjects[++stackIndex] = i >= length ? ScriptValue.Null : args[i];
                 }
             }
-            var parent = ScriptValue.Null;
             var parameters = Parameters;                                //传递参数
             var iInstruction = 0;                                       //当前执行命令索引
             var iInstructionCount = m_scriptInstructions.Length;        //指令数量
@@ -189,36 +188,32 @@ KeepOn:
                                     }
                                 }
                                 case Opcode.LoadValue: {
-                                    parent = stackObjects[stackIndex];
-                                    stackObjects[stackIndex] = parent.GetValueByIndex(opvalue, m_script);
+                                    stackObjects[stackIndex] = stackObjects[stackIndex].GetValueByIndex(opvalue, m_script);
                                     continue;
                                 }
                                 case Opcode.LoadValueString: {
-                                    parent = stackObjects[stackIndex];
-                                    stackObjects[stackIndex] = parent.GetValue(constString[opvalue], m_script);
+                                    stackObjects[stackIndex] = stackObjects[stackIndex].GetValue(constString[opvalue], m_script);
                                     continue;
                                 }
                                 case Opcode.LoadValueObject: {
-                                    parent = stackObjects[stackIndex - 1];
                                     switch (stackObjects[stackIndex].valueType) {
-                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].stringValue, m_script); break;
-                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].doubleValue); break;
-                                        case ScriptValue.longValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].longValue); break;
-                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].scriptValue); break;
-                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 1] = parent.GetValue(stackObjects[stackIndex].objectValue); break;
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue, m_script); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].doubleValue); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].longValue); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].scriptValue); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].objectValue); break;
                                         default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObject : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                     --stackIndex;
                                     continue;
                                 }
                                 case Opcode.LoadValueObjectDup: {
-                                    parent = stackObjects[stackIndex - 1];
                                     switch (stackObjects[stackIndex].valueType) {
-                                        case ScriptValue.stringValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].stringValue, m_script); break;
-                                        case ScriptValue.doubleValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].doubleValue); break;
-                                        case ScriptValue.longValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].longValue); break;
-                                        case ScriptValue.scriptValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].scriptValue); break;
-                                        case ScriptValue.objectValueType: stackObjects[stackIndex + 1] = parent.GetValue(stackObjects[stackIndex].objectValue); break;
+                                        case ScriptValue.stringValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue, m_script); break;
+                                        case ScriptValue.doubleValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].doubleValue); break;
+                                        case ScriptValue.longValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].longValue); break;
+                                        case ScriptValue.scriptValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].scriptValue); break;
+                                        case ScriptValue.objectValueType: stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].objectValue); break;
                                         default: throw new ExecutionException($"不支持当前类型获取变量 LoadValueObjectDup : {stackObjects[stackIndex].ValueTypeName}");
                                     }
                                     ++stackIndex;
@@ -1027,10 +1022,10 @@ KeepOn:
                                 case Opcode.Pop: --stackIndex; continue;
                                 case Opcode.PopNumber: stackIndex -= opvalue; continue;
                                 case Opcode.Call: {
-                                    var func = stackObjects[stackIndex--];
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
+                                    var func = stackObjects[stackIndex--];
 #if SCORPIO_DEBUG
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
@@ -1044,10 +1039,11 @@ KeepOn:
                                     continue;
                                 }
                                 case Opcode.CallVi: {
-                                    var func = stackObjects[stackIndex--];
                                     for (var i = opvalue - 1; i >= 0; --i) {
                                         parameters[i] = stackObjects[stackIndex--];
                                     }
+                                    var func = stackObjects[stackIndex--];
+                                    var parent = stackObjects[stackIndex--];
 #if SCORPIO_DEBUG
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
@@ -1126,7 +1122,6 @@ KeepOn:
                                 case Opcode.RetNone: return ScriptValue.Null;
                                 case Opcode.Ret: return stackObjects[stackIndex];
                                 case Opcode.CallUnfold: {
-                                    var func = stackObjects[stackIndex--];      //函数对象
                                     var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
                                     var unfold = value & 0xff;                  //折叠标志位
                                     var funcParameterCount = (int)(value >> 8); //参数个数
@@ -1150,6 +1145,7 @@ KeepOn:
                                         }
                                     }
                                     stackIndex -= funcParameterCount;
+                                    var func = stackObjects[stackIndex--];      //函数对象
 #if SCORPIO_DEBUG
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
@@ -1163,7 +1159,6 @@ KeepOn:
                                     continue;
                                 }
                                 case Opcode.CallViUnfold: {
-                                    var func = stackObjects[stackIndex--];      //函数对象
                                     var value = constLong[opvalue];             //值 前8位为 参数个数  后56位标识 哪个参数需要展开
                                     var unfold = value & 0xff;                  //折叠标志位
                                     var funcParameterCount = (int)(value >> 8); //参数个数
@@ -1187,6 +1182,8 @@ KeepOn:
                                         }
                                     }
                                     stackIndex -= funcParameterCount;
+                                    var func = stackObjects[stackIndex--];        //函数对象
+                                    var parent = stackObjects[stackIndex--];      //函数父级
 #if SCORPIO_DEBUG
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {

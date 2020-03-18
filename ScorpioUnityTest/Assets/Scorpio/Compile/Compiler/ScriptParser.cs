@@ -3,7 +3,6 @@ using Scorpio.Compile.Exception;
 using Scorpio.Compile.CodeDom;
 using Scorpio.Compile.CodeDom.Temp;
 using Scorpio.Instruction;
-using Scorpio.Tools;
 namespace Scorpio.Compile.Compiler {
     
     /// <summary> 编译脚本 </summary>
@@ -735,33 +734,60 @@ namespace Scorpio.Compile.Compiler {
                             break;
                         }
                     }
-
-                    var unfold = 0L;
-                    for (var i = 0; i < codeCallFunction.Parameters.Count; ++i) {
-                        var parameter = codeCallFunction.Parameters[i];
-                        PushObject(parameter.obj);
-                        if (parameter.unfold) {
-                            unfold |= 1L << i;
+                    {
+                        var parameters = codeCallFunction.Parameters;
+                        var unfold = 0L;        //展开参数索引
+                        for (var i = 0; i < parameters.Count; ++i) {
+                            if (parameters[i].unfold) { unfold |= 1L << i; }
                         }
-                    }
-                    PushObject(codeCallFunction.Member);
-					var nullTo = codeCallFunction.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
-                    if (unfold == 0L) {
-                        AddScriptInstruction(IsVariableFunction(codeCallFunction.Member) != null ? Opcode.CallVi : Opcode.Call, codeCallFunction.Parameters.Count, obj.Line);
-                    } else {
-                        var index = System.Convert.ToInt64(codeCallFunction.Parameters.Count) << 8 | unfold;
-                        AddScriptInstruction(IsVariableFunction(codeCallFunction.Member) != null ? Opcode.CallViUnfold : Opcode.CallUnfold, GetConstLong(index), obj.Line);
-                    }
-                    if (codeCallFunction.Variables != null) {
-                        foreach (var variable in codeCallFunction.Variables.Variables) {
-                            if (variable.key is string) {
-                                AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
-                                PushObject(variable.value);
-                                AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), obj.Line);
+                        var member = codeCallFunction.Member as CodeMember;     //函数对象
+                        var isCallVi = (member?.Parent != null);                //是否有函数父级
+                        if (isCallVi) {
+                            PushObject(member.Parent);
+                            AddScriptInstructionWithoutValue(Opcode.CopyStackTop);
+                            var memberNullTo = member.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
+                            if (member is CodeMemberIndex) {
+                                AddScriptInstruction(Opcode.LoadValue, member.index, obj.Line);
+                            } else if (member is CodeMemberString) {
+                                AddScriptInstruction(Opcode.LoadValueString, GetConstString(member.key), obj.Line);
+                            } else if (member is CodeMemberObject) {
+                                PushObject(member.codeKey);
+                                AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
+                            }
+                            memberNullTo?.SetValue(Index);
+                        } else {
+                            PushObject(codeCallFunction.Member);
+                        }
+                        var nullTo = codeCallFunction.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
+                        for (var i = 0; i < parameters.Count; ++i) {
+                            PushObject(parameters[i].obj);
+                        }
+                        //没有展开参数
+                        if (unfold == 0L) {
+                            AddScriptInstruction(isCallVi ? Opcode.CallVi : Opcode.Call, parameters.Count, obj.Line);
+                        } else {
+                            var value = System.Convert.ToInt64(parameters.Count) << 8 | unfold;
+                            AddScriptInstruction(isCallVi ? Opcode.CallViUnfold : Opcode.CallUnfold, GetConstLong(value), obj.Line);
+                        }
+                        if (codeCallFunction.Variables != null) {
+                            foreach (var variable in codeCallFunction.Variables.Variables) {
+                                if (variable.key is string) {
+                                    AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
+                                    PushObject(variable.value);
+                                    AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), obj.Line);
+                                }
                             }
                         }
+                        if (isCallVi) {
+                            var jump = AddScriptInstructionWithoutValue(Opcode.Jump);
+                            nullTo?.SetValue(Index);
+                            AddScriptInstructionWithoutValue(Opcode.PopNumber, 2);
+                            PushObject(new CodeNativeObject(null, GetSourceLine()));
+                            jump.SetValue(Index);
+                        } else {
+                            nullTo?.SetValue(Index);
+                        }
                     }
-                    nullTo?.SetValue(Index);
                     break;
                 }
                 case CodeClass cl: {
