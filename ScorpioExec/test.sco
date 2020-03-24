@@ -1,3 +1,11 @@
+function test() {
+    try {
+        throw "fewafwaef"
+    } catch (e) {
+        print("fewafawefwea")
+    }
+}
+test()
 // CSharpSingle = {
 //     PositiveInfinity : 1
 // }
@@ -10,11 +18,11 @@
 //     width = 1,
 //     height = 1,
 // }
-LayerMask = {
-    NameToLayer() {
-        return 1
-    }
-}
+// LayerMask = {
+//     NameToLayer() {
+//         return 1
+//     }
+// }
 // FileUtil = {
 //     GetMD5FromString() {
 //         return "123123"
@@ -45,7 +53,7 @@ LayerMask = {
 // UIVirtualHeight = 750                                //UI虚拟高度
 // UIVirtualWidth = 1334                                //UI虚拟宽度
 
-LayerTerrain = 1L << LayerMask.NameToLayer("Terrain")       // Terrain 层
+// LayerTerrain = 1L << LayerMask.NameToLayer("Terrain")       // Terrain 层
 
 // ITEM_DIAMOND = 100000       //钻石ID
 // ITEM_EXP = 101111           //经验
