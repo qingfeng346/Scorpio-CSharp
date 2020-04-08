@@ -781,7 +781,7 @@ namespace Scorpio.Compile.Compiler {
                         if (isCallVi) {
                             var jump = AddScriptInstructionWithoutValue(Opcode.Jump);
                             nullTo?.SetValue(Index);
-                            AddScriptInstructionWithoutValue(Opcode.PopNumber, 2);
+                            AddScriptInstruction(Opcode.PopNumber, 2);
                             PushObject(new CodeNativeObject(null, GetSourceLine()));
                             jump.SetValue(Index);
                         } else {

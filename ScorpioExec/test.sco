@@ -1,11 +1,21 @@
-function test() {
-    try {
-        throw "fewafwaef"
-    } catch (e) {
-        print("fewafawefwea")
+tab = {
+    test() {
+        this.testfun?.()
+        print("fewafawefawefaewf")
+    }
+    testfun() {
+        print("tetwt")
     }
 }
-test()
+tab.test()
+// function test() {
+//     try {
+//         throw "fewafwaef"
+//     } catch (e) {
+//         print("fewafawefwea")
+//     }
+// }
+// test()
 // CSharpSingle = {
 //     PositiveInfinity : 1
 // }
