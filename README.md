@@ -1,4 +1,5 @@
-# Scorpio-CSharp #
+### Scorpio-CSharp
+---
 * author : while
 * QQ群 : 245199668 [加入QQ群](http://shang.qq.com/wpa/qunwpa?idkey=8ef904955c52f7b3764403ab81602b9c08b856f040d284f7e2c1d05ed3428de8)
 
@@ -54,13 +55,11 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 
 * **Unity3d** 使用 **IL2CPP** 后, 部分**Unity3D**的类或函数不能反射获取,请配置**link.xml**或者使用**快速反射功能**
 
-* **genericMethod, genericType** 函数在**IL2CPP**下生成未声明过的类型会报错.
-
-
+* **genericMethod, genericType** 函数在**IL2CPP**下生成未声明过的类型会报错
 
 
 ### 反射调用c#运算符重载函数
-
+---
 运算符号 | 反射名称                       | 脚本是否支持直接调用
 -----   |  ----                         | ----
 \+      |  op_Addition                  | 支持
@@ -79,6 +78,7 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 !=      |  op_Inequality                | 不支持, 脚本 != 会直接取反 ==
 []      |  get_Item(获取变量)            | 支持 **key** 不为**string**的情况
 []      |  set_Item(设置变量)            | 支持 **key** 不为**string**的情况
+
 
 ### 快速反射
 ---
@@ -119,6 +119,7 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 
 
 ### Scorpio脚本Hello World函数 (c# console项目):
+---
 ```csharp
 using System;
 using Scorpio;
@@ -187,7 +188,7 @@ print(TestEnum.Test1)                               //直接使用枚举
 
 
 
-## 捐助作者
+### 捐助作者
 ---
 ![](https://github.com/qingfeng346/qingfeng346.github.io/raw/master/img/wx.jpg)
 ![](https://github.com/qingfeng346/qingfeng346.github.io/raw/master/img/zfb.jpg)
