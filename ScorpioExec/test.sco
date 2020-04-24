@@ -1,13 +1,15 @@
-tab = {
-    test() {
-        this.testfun?.()
-        print("fewafawefawefaewf")
-    }
-    testfun() {
-        print("tetwt")
-    }
-}
-tab.test()
+print(String.fromCharCode(65,66,67))
+print(String.toCharCode("a")[0])
+// tab = {
+//     test() {
+//         this.testfun?.()
+//         print("fewafawefawefaewf")
+//     }
+//     testfun() {
+//         print("tetwt")
+//     }
+// }
+// tab.test()
 // function test() {
 //     try {
 //         throw "fewafwaef"

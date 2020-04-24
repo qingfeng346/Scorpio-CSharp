@@ -8,6 +8,8 @@ namespace Scorpio.Proto {
             ret.SetValue("csFormat", script.CreateFunction(new csFormat()));
             ret.SetValue("isNullOrEmpty", script.CreateFunction(new isNullOrEmpty()));
             ret.SetValue("join", script.CreateFunction(new join()));
+            ret.SetValue("fromCharCode", script.CreateFunction(new fromCharCode()));
+            ret.SetValue("toCharCode", script.CreateFunction(new toCharCode()));
 
             ret.SetValue("length", script.CreateFunction(new length()));
             ret.SetValue("count", script.CreateFunction(new length()));
@@ -29,6 +31,7 @@ namespace Scorpio.Proto {
             ret.SetValue("contains", script.CreateFunction(new contains()));
             ret.SetValue("sub", script.CreateFunction(new sub()));
             ret.SetValue("split", script.CreateFunction(new split(script)));
+            
             return ret;
         }
         private class length : ScorpioHandle {
@@ -216,6 +219,18 @@ namespace Scorpio.Proto {
                 var values = new string[count];
                 for (int i = 0; i < count; ++i) { values[i] = value[i].ToString(); }
                 return new ScriptValue(string.Join(separator, values));
+            }
+        }
+        private class fromCharCode : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var values = new char[length];
+                for (int i = 0; i < length; ++i) { values[i] = Convert.ToChar(args[i].ToInt32()); }
+                return new ScriptValue(new string(values));
+            }
+        }
+        private class toCharCode : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return ScriptValue.CreateValue(args[0].ToString().ToCharArray());
             }
         }
     }
