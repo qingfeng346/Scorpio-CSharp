@@ -322,29 +322,37 @@ namespace Scorpio.Compile.Compiler {
             var line = GetSourceLine();
             m_scriptExecutable.BeginStack();
             var index = m_scriptExecutable.AddIndex(identifier);
+            //初始化变量
             PushObject(obj);
             AddScriptInstruction(Opcode.StoreLocal, index, line);
+            //保存max值
+            var maxIndex = m_scriptExecutable.AddTempIndex();
             PushObject(GetObject());
+            AddScriptInstruction(Opcode.StoreLocal, maxIndex, line);
+            //保存step值
+            var stepIndex = m_scriptExecutable.AddTempIndex();
             if (ReadToken().Type == TokenType.Comma) {
                 PushObject(GetObject());
             } else {
                 UndoToken();
                 AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble(1), line);
             }
-            var startIndex = AddScriptInstruction(Opcode.CopyStackTopIndex, 1, line);
+            AddScriptInstruction(Opcode.StoreLocal, stepIndex, line);
+
+            //正式操作
+            var startIndex = AddScriptInstruction(Opcode.LoadLocal, maxIndex, line);
             AddScriptInstruction(Opcode.LoadLocal, index, line);
             AddScriptInstructionWithoutValue(Opcode.GreaterOrEqual, line);
             var falseTo = AddScriptInstruction(Opcode.FalseTo, 0, line);
             ReadRightParenthesis();
             ParseStatementBlock(ExecutableBlock.For);
-            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
+            AddScriptInstruction(Opcode.LoadLocal, stepIndex, line);
             AddScriptInstruction(Opcode.LoadLocal, index, line);
             AddScriptInstructionWithoutValue(Opcode.Plus, line);
             AddScriptInstruction(Opcode.StoreLocal, index, line);
             AddScriptInstruction(Opcode.Jump, startIndex.index, line);
             m_scriptExecutable.EndStack();
             var endIndex = Index;
-            AddScriptInstruction(Opcode.PopNumber, 2, line);     //弹出栈顶的 end 和 step
             falseTo.SetValue(endIndex);
             m_Continue.SetValue(startIndex);
             m_Break.SetValue(endIndex);
@@ -456,22 +464,33 @@ namespace Scorpio.Compile.Compiler {
             var line = PeekToken().SourceLine;
             if (PeekToken().Type == TokenType.Var) ReadToken();
             m_scriptExecutable.BeginStack();
+
+            //变量索引
             var varIndex = m_scriptExecutable.AddIndex(ReadIdentifier());
+
+            //pairs Table 索引
+            var pairIndex = m_scriptExecutable.AddTempIndex();
             ReadIn();
             PushObject(GetObject());
+            AddScriptInstruction(Opcode.StoreLocal, pairIndex);
+
+            //next 函数索引
+            var nextIndex = m_scriptExecutable.AddTempIndex();
+            AddScriptInstruction(Opcode.LoadLocal, pairIndex);
+            AddScriptInstruction(Opcode.LoadValueString, GetConstString(ScriptConst.IteratorNext));
+            AddScriptInstruction(Opcode.StoreLocal, nextIndex);
             ReadRightParenthesis();
-            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
-            AddScriptInstructionWithoutValue(Opcode.CopyStackTop, line);
-            AddScriptInstruction(Opcode.StoreLocal, varIndex, line);
-            AddScriptInstruction(Opcode.LoadValueString, GetConstString(ScriptConst.IteratorNext), line);
-            var beginIndex = AddScriptInstruction(Opcode.CallEach, 0, line);
-            var falseTo = AddScriptInstruction(Opcode.FalseTo, 0, line);
+
+            var beginIndex = AddScriptInstruction(Opcode.LoadLocal, pairIndex);
+            AddScriptInstruction(Opcode.LoadLocal, nextIndex);
+            AddScriptInstruction(Opcode.CallEmpty, 0);
+            var falseTo = AddScriptInstruction(Opcode.FalseTo, 0);
+            AddScriptInstruction(Opcode.LoadLocal, pairIndex);
+            AddScriptInstruction(Opcode.StoreLocal, varIndex);
             ParseStatementBlock(ExecutableBlock.Foreach);
             AddScriptInstruction(Opcode.Jump, beginIndex.index, line);
-            falseTo.SetValue(Index);                                //如果是循环完毕跳出的话要先弹出栈顶的null值           
             var endIndex = Index;
-            AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的foreach 函数
-            AddScriptInstructionWithoutValue(Opcode.Pop, line);     //弹出栈顶的foreach map
+            falseTo.SetValue(endIndex);
             m_Continue.SetValue(beginIndex);
             m_Break.SetValue(endIndex);
             m_scriptExecutable.EndStack();

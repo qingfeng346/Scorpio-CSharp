@@ -1,5 +1,11 @@
-print(String.fromCharCode(65,66,67))
-print(String.toCharCode("a")[0])
+var a = [100,200]
+foreach (var pair in pairs(a)) {
+    try {
+        b()
+    } catch (e) {
+        print(pair)
+    }
+}
 // tab = {
 //     test() {
 //         this.testfun?.()

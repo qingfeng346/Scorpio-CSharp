@@ -1057,10 +1057,10 @@ KeepOn:
 #endif
                                             continue;
                                         }
-                                    case Opcode.CallEach: {
-                                            tempIndex = stackIndex - 1;
-                                            var value = stackObjects[stackIndex];
-                                            stackObjects[++stackIndex] = value.Call(stackObjects[tempIndex]);
+                                    case Opcode.CallEmpty: {
+                                            var func = stackObjects[stackIndex--];
+                                            var parent = stackObjects[stackIndex--];
+                                            stackObjects[++stackIndex] = func.Call(parent);
                                             continue;
                                         }
                                     case Opcode.TrueTo: {

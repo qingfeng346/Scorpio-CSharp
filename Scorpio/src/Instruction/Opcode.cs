@@ -101,7 +101,7 @@
         TrueTo,                 //栈顶如果是true则跳转
         FalseLoadFalse,         //如果是false则压入一个false,并跳转
         TrueLoadTrue,           //如果是true则压入一个true,并跳转
-        CallEach,               //call a function when in foreach
+        CallEmpty,              //调用内部函数,没有参数
         Call,                   //调用一个函数
         CallVi,                 //调用内部函数
         CallUnfold,             //调用一个函数 有参数需要展开
