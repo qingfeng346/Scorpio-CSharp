@@ -109,6 +109,9 @@ namespace Scorpio.Compile.Compiler {
             int count = m_Stacks[m_StackIndex];
             return m_VariableIndexs.AddIndex($"{m_StackIndex}_{count}_{str}");
         }
+        public int AddTempIndex() {
+            return AddIndex(System.Guid.NewGuid().ToString());
+        }
         public bool HasIndex(string str) {
             return GetIndex(str) > -1;
         }

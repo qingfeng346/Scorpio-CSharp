@@ -1,3 +1,12 @@
+### v2.0.6
+*2020-05-19*
+### 新增功能
+* **String** 库增加 **fromCharCode toCharCode** 函数
+### 优化修改
+* 优化**foreach,forsimple**运行效率
+### BUG修复
+* 修复**foreach,forsimple**内发生**catch**会报错的问题
+
 ### v2.0.5
 *2020-04-16*
 ### 优化修改
