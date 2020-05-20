@@ -27,7 +27,6 @@
 
 ### v2.0.3
 *2019-12-23*
-
 ### 新增功能
 * 增加 ?. 语法, 自动判断前置变量是否为 null , 如果为 null 则直接返回 null
     * [] 语法 ?.[] 
@@ -42,7 +41,6 @@
 
 ### v2.0.2
 *2019-11-01*
-
 ### 新增功能
 * 添加 **SCORPIO_DEBUG** 宏定义, 可以使用 Script.GetStackInfo GetStackInfos 获取脚本堆栈信息
 * print printf 输出增加 文件:行 信息
@@ -60,7 +58,6 @@
 
 ### v2.0.1
 *2019-10-09*
-
 ### 新增功能
 * 新增 **??** 表达式, 返回值为 **null** 则返回 **??** 后的值
 ### 其他修改
@@ -68,7 +65,6 @@
 
 ### v2.0.0
 *2019-09-06*
-
 ### 主要内容
 * 运行方式改为**IL**执行,执行效率大幅提升
 * 增加原表操作
@@ -76,7 +72,6 @@
 
 ### v2.0.0_preview11
 *2019-08-08*
-
 ### 新增功能
 * 增加 赋值操作返回值(重要) [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.sco)
 * 增加 函数参数展开传递(重要) [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/%E5%87%BD%E6%95%B0.sco)
@@ -90,7 +85,6 @@
 
 ### v2.0.0-preview10
 *2019-07-09*
-
 ### 修改内容
 * 增加switch语法 [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/switch.sco)
 * 支持 long 和 double 之间直接运算比较
@@ -111,7 +105,6 @@
 
 ### v2.0.0-preview9
 *2019-06-26*
-
 * 支持 **long** 和 **double** 类型之间直接运算比较
 * **Array** 原表增加函数 **join** 
 * **Map** 原表增加函数 **forEach forEachValue**
@@ -125,7 +118,6 @@
 
 ### v2.0.0_preview8
 *2019-06-17*
-
 ### 新增功能
 * 增加原表操作, 基础原表目录 Scorpio/src/Proto [脚本示例](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/class%E8%AF%AD%E6%B3%95.sco)
 * 原表支持运算符重载 基础类型(number,string,bool,null)除外 [脚本示例](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD.sco)
@@ -157,13 +149,11 @@
 
 ### v1.0.11
 *2019-05-28*
-
 * 修复一个去反射函数调用的BUG
 * 支持自动关联 c# delegate，省去 DelegateFactory 的设置
 
 ### v1.0.10
 *2019-03-19*
-
 * 添加 **io** 库
 * **table** 库添加 **define_function** 函数, 可以动态申请内部函数,例如
 ```javascript
@@ -182,12 +172,10 @@ function test() { }
 
 ### v1.0.9
 *2019-03-15*
-
 * 支持 **`** 符号申请字符串, 用法同 单引号 双引号一致, 支持 **@** 符号
 
 ### v1.0.8
 *2019-03-14*
-
 * 申请**array**时分隔符支持 分号 **;**  示例;
 ```javascript
 var a = [100;200;300]
@@ -217,7 +205,6 @@ var a = [100,200,300]
 
 ### v1.0.7
 *2019-03-11*
-
 * 可以访问 c# 类私有变量和函数（去反射不支持）
 * 增加 **let** 关键字,用法同 **var local**
 * 增加 **string.cs_format** 函数,格式化c#字符串, 示例 : 
@@ -249,28 +236,23 @@ var t2 = userdata.typeof(TestClass, "b")
 
 ### v1.0.5
 *2019-02-15*
-
 * 修复临时作用域变量自运算的BUG（多谢**avatarANDY**同学的反馈）
 
 ### v1.0.4
 *2018-12-20*
-
 * 修复脚本长度小于10字符时, 解析出错的问题
 
 ### v1.0.3
 *2018-11-28*
-
 * 修复新脚本解析格式化字符串的问题
 
 ### v1.0.2
 *2018-11-27*
-
 * 修复struct无参构造函数调用失败
 * 全新的脚本解析,速度更快,增加语法更容易
 
 ### v1.0.0
 *2017-11-08*
-
 * 第一个发行版
 * linux运行需要先安装 libunwind 和 icu，可以使用 yum install libunwind 和 yum install icu 安装
 
