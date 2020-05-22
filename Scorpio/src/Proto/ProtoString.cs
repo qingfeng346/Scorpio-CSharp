@@ -14,6 +14,7 @@ namespace Scorpio.Proto {
             ret.SetValue("length", script.CreateFunction(new length()));
             ret.SetValue("count", script.CreateFunction(new length()));
             ret.SetValue("at", script.CreateFunction(new at()));
+            ret.SetValue("charCodeAt", script.CreateFunction(new at()));
             ret.SetValue("insert", script.CreateFunction(new insert()));
             ret.SetValue("remove", script.CreateFunction(new remove()));
             ret.SetValue("toLower", script.CreateFunction(new toLower()));
@@ -29,6 +30,9 @@ namespace Scorpio.Proto {
             ret.SetValue("startsWith", script.CreateFunction(new startsWith()));
             ret.SetValue("endsWith", script.CreateFunction(new endsWith()));
             ret.SetValue("contains", script.CreateFunction(new contains()));
+            ret.SetValue("padLeft", script.CreateFunction(new padLeft()));
+            ret.SetValue("padRight", script.CreateFunction(new padRight()));
+            ret.SetValue("compareTo", script.CreateFunction(new compareTo()));
             ret.SetValue("sub", script.CreateFunction(new sub()));
             ret.SetValue("split", script.CreateFunction(new split(script)));
             
@@ -143,6 +147,29 @@ namespace Scorpio.Proto {
                 return thisObject.stringValue.Contains(args[0].ToString()) ? ScriptValue.True : ScriptValue.False;
             }
         }
+        private class padLeft : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (length == 2) {
+                    return new ScriptValue(thisObject.stringValue.PadLeft(args[0].ToInt32(), args[1].ToChar()));
+                } else {
+                    return new ScriptValue(thisObject.stringValue.PadLeft(args[0].ToInt32()));
+                }
+            }
+        }
+        private class padRight : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (length == 2) {
+                    return new ScriptValue(thisObject.stringValue.PadRight(args[0].ToInt32(), args[1].ToChar()));
+                } else {
+                    return new ScriptValue(thisObject.stringValue.PadRight(args[0].ToInt32()));
+                }
+            }
+        }
+        private class compareTo : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue((double)thisObject.stringValue.CompareTo(args[0].Value));
+            }
+        }
         private class sub : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (length == 0)
@@ -224,7 +251,7 @@ namespace Scorpio.Proto {
         private class fromCharCode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var values = new char[length];
-                for (int i = 0; i < length; ++i) { values[i] = Convert.ToChar(args[i].ToInt32()); }
+                for (int i = 0; i < length; ++i) { values[i] = args[i].ToChar(); }
                 return new ScriptValue(new string(values));
             }
         }

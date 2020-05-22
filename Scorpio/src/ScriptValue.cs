@@ -210,6 +210,14 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");
             }
         }
+        public char ToChar() {
+            switch (valueType) {
+                case doubleValueType: return Convert.ToChar(doubleValue);
+                case longValueType: return Convert.ToChar(longValue);
+                case objectValueType: return Convert.ToChar(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
+            }
+        }
         public T Get<T>() where T : ScriptObject {
             return valueType == scriptValueType ? (scriptValue as T) : null;
         }
@@ -277,6 +285,14 @@ namespace Scorpio {
             this.doubleValue = 0;
             this.longValue = 0;
             this.stringValue = null; 
+            this.objectValue = value;
+        }
+        public ScriptValue(char value) {
+            this.valueType = objectValueType;
+            this.scriptValue = null;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null;
             this.objectValue = value;
         }
         public ScriptValue(object value) {
