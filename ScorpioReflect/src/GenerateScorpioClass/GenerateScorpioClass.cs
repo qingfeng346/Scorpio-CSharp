@@ -151,9 +151,9 @@ namespace Scorpio.ScorpioReflect {
                         if (!Util.IsExtensionMethod(method)) { continue; }
                         var paramterType = method.GetParameters()[0].ParameterType;
                         //判断是模板函数
-                        if (paramterType.IsGenericParameter && paramterType.BaseType != null && (m_Type == paramterType.BaseType || m_Type.IsSubclassOf(paramterType.BaseType))) {
+                        if (paramterType.IsGenericParameter && paramterType.BaseType != null && paramterType.BaseType.IsAssignableFrom(m_Type)) {
                             m_ExtensionMethods.Add(method);
-                        } else if (ScorpioReflectUtil.CheckGenericMethod(method) && (m_Type == paramterType  || m_Type.IsSubclassOf(paramterType))) {
+                        } else if (ScorpioReflectUtil.CheckGenericMethod(method) && paramterType.IsAssignableFrom(m_Type)) {
                             m_ExtensionMethods.Add(method);
                         } else {
                             continue;

@@ -24,8 +24,7 @@ namespace Scorpio.Userdata {
                 foreach (var method in methods) {
                     if (!Util.IsExtensionMethod(method)) { continue; }
                     //第1个参数就是 this 类
-                    var thisType = method.GetParameters()[0].ParameterType;
-                    if (type.IsSubclassOf(thisType)) {
+                    if (method.GetParameters()[0].ParameterType.IsAssignableFrom(type)) {
                         userdataType.AddExtensionMethod(method);
                     }
                 }
@@ -93,7 +92,7 @@ namespace Scorpio.Userdata {
                 var thisType = method.GetParameters()[0].ParameterType;
                 foreach (var pair in m_Types) {
                     //thisType 是类型的基类
-                    if (pair.Value is UserdataTypeReflect && pair.Key.IsSubclassOf(thisType)) {
+                    if (pair.Value is UserdataTypeReflect && thisType.IsAssignableFrom(pair.Key)) {
                         ((UserdataTypeReflect)pair.Value).AddExtensionMethod(method);
                     }
                 }
