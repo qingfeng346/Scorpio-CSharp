@@ -42,7 +42,7 @@ namespace ScorpioExec {
     pack             编译生成sco的IL文件
     fast             生成快速反射文件
     version          当前sco版本,检查最新版本
-    [文件路径]       运行sco文本文件或IL文件";
+    [文件路径]        运行sco文本文件或IL文件";
         private readonly static string[] ParameterSource    = new[] { "-s", "--source",       "-source" };
         private readonly static string[] ParameterOutput    = new[] { "-o", "--output",       "-output" };
         private readonly static string[] ParameterClass     = new[] { "-c", "--class",        "-class" };

@@ -32,7 +32,6 @@ public class Example2 : MonoBehaviour {
 			output = "";
 			Script script = new Script();
 			try {
-				script.LoadLibrary();
                 script.LoadLibraryV1();
                 TypeManager.PushAssembly(GetType().Assembly);
                 TypeManager.PushAssembly(typeof(GameObject).Assembly);

@@ -147,6 +147,8 @@ namespace Scorpio.Library {
             script.SetGlobal("toLong", script.CreateFunction(new toInt64()));
             script.SetGlobal("toUlong", script.CreateFunction(new toUint64()));
 
+            script.SetGlobal("toChar", script.CreateFunction(new toChar()));
+
             script.SetGlobal("toFloat", script.CreateFunction(new toFloat()));
             script.SetGlobal("toNumber", script.CreateFunction(new toDouble()));
             script.SetGlobal("toDouble", script.CreateFunction(new toDouble()));
@@ -351,6 +353,12 @@ namespace Scorpio.Library {
                 return new ScriptValue(System.Convert.ToUInt64(args[0].Value));
             }
         }
+        private class toChar : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(System.Convert.ToChar(args[0].Value));
+            }
+        }
+
         private class toFloat : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(System.Convert.ToSingle(args[0].Value));

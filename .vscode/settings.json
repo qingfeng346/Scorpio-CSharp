@@ -4,7 +4,7 @@
         "**/obj": true,
         "**/*.user": true,
         "**/*.sln": true,
-        ".vs": true,
+        "**/*.vs": true,
         "LICENSE": true
     }
 }
