@@ -317,6 +317,14 @@ namespace Scorpio.Compile.Compiler {
                         case 'v': m_Builder.Append('\v'); break;
                         case '0': m_Builder.Append('\0'); break;
                         case '/': m_Builder.Append("/"); break;
+                        case 'u': {
+                            var hex = new System.Text.StringBuilder();
+                            for (int i = 0; i < 4; i++) {
+                                hex.Append(ReadChar());
+                            }
+                            m_Builder.Append((char)System.Convert.ToUInt16(hex.ToString(), 16));
+                            break;
+                        }
                         default: ThrowInvalidCharacterException(ch); break;
                     }
                 } else if (ch == '\n') {

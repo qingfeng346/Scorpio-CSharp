@@ -212,9 +212,9 @@ namespace Scorpio {
         }
         public char ToChar() {
             switch (valueType) {
-                case doubleValueType: return Convert.ToChar(doubleValue);
+                case doubleValueType: return Convert.ToChar(Convert.ToInt64(doubleValue));
                 case longValueType: return Convert.ToChar(longValue);
-                case objectValueType: return Convert.ToChar(objectValue);
+                case objectValueType: return Convert.ToChar(Convert.ToInt64(objectValue));
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
             }
         }
