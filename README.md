@@ -18,6 +18,10 @@
 
 ### 安装 **sco** 命令行
 ---
+#### 方式一 手动安装
+* 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)对应版本,解压添加到环境变量
+
+#### 方式二 自动安装
 * windows 7, windows 8, MacOS, Linux 需要预先安装 [PowerShell Core](https://github.com/PowerShell/PowerShell/releases), 然后运行命令行
 ```powershellcore
 pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
