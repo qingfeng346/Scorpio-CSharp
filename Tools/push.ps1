@@ -1,4 +1,6 @@
 $files = [System.IO.Directory]::GetFiles("../bin", "*.nupkg")
+$apiKey = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("b3kyZWJucXlkc3R1MmF5MnFkNXFobHNna29odDNqbnVuZnBhd3A0cGc2cTZuZQ=="))
+Write-Host $apiKey
 foreach ($file in $files) {
-    dotnet nuget push $file -k oy2ftfeca4445cphia7aumdzgm63ndoupeeehtmxlibioe -s https://api.nuget.org/v3/index.json
+    dotnet nuget push $file -k "$apiKey" -s https://api.nuget.org/v3/index.json
 }
