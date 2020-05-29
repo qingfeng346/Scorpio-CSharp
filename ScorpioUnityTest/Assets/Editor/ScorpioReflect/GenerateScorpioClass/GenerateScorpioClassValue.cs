@@ -21,7 +21,7 @@ namespace Scorpio.ScorpioReflect {
             }
             //所有的函数
             foreach (var name in m_MethodNames) {
-                builder.AppendFormat(methodStr, name, m_ScorpioClassName + "_" + name);
+                builder.AppendFormat(methodStr, name, ScorpioClassName + "_" + name);
             }
             return builder.ToString();
         }

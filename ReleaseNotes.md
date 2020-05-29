@@ -1,3 +1,14 @@
+### v2.0.7
+*2020-05-29*
+### 新增功能
+* 增加**toChar**函数
+* **String**库增加**charCodeAt padLeft padRight compareTo**函数
+* 增加**ScorpioUnGenerateAttribute**属性类,可以过滤快速反射生成
+* 支持解析\u字符串
+### BUG修复
+* 修复某些类的构造函数调用失败的问题
+* 修复扩展函数引入会失效的问题
+
 ### v2.0.6
 *2020-05-19*
 ### 新增功能
