@@ -257,7 +257,8 @@ namespace Scorpio.Proto {
         }
         private class toCharCode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScriptValue.CreateValue(args[0].ToString().ToCharArray());
+                var str = args[0].ToString();
+                return ScriptValue.CreateValue(Convert.ToInt64(str[0]));
             }
         }
     }

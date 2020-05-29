@@ -34,7 +34,7 @@ namespace Scorpio.ScorpioReflect {
             }
             string str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(Constructors));
-            str = str.Replace("__name", m_ScorpioClassName + "_Constructor");
+            str = str.Replace("__name", ScorpioClassName + "_Constructor");
             str = str.Replace("__methodname", "Constructor");
             str = str.Replace("__execute", builder.ToString());
             return str;
@@ -66,7 +66,7 @@ namespace Scorpio.ScorpioReflect {
             return "";
         }
         private string GetEventMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
-            foreach (var eve in m_AllEvents) {
+            foreach (var eve in AllEvents) {
                 if (eve.GetAddMethod().MethodHandle == method.MethodHandle) {
                     return string.Format("{0}.{1} += {2}; return null;", variable, eve.Name, GetScorpioMethodArgs(pars, 0));
                 } else if (eve.GetRemoveMethod().MethodHandle == method.MethodHandle) {
@@ -76,7 +76,7 @@ namespace Scorpio.ScorpioReflect {
             return "";
         }
         private string GetPropertyMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
-            foreach (var property in m_AllPropertys) {
+            foreach (var property in AllPropertys) {
                 if (property.GetGetMethod()?.MethodHandle == method.MethodHandle) {
                     return string.Format("return {0}.{1};", variable, property.Name);
                 } else if (property.GetSetMethod()?.MethodHandle == method.MethodHandle) {
@@ -134,7 +134,7 @@ namespace Scorpio.ScorpioReflect {
             }
             var str = MethodTemplate;
             str = str.Replace("__getallmethod", allMethodBuilder.ToString());
-            str = str.Replace("__name", m_ScorpioClassName + "_" + name);
+            str = str.Replace("__name", ScorpioClassName + "_" + name);
             str = str.Replace("__methodname", name);
             str = str.Replace("__execute", builder.ToString());
             return str;
@@ -164,7 +164,7 @@ namespace Scorpio.ScorpioReflect {
             case ""{0}"": return {1}.GetInstance();";
             var builder = new StringBuilder();
             foreach (var name in m_MethodNames) {
-                builder.AppendFormat(methodStr, name, m_ScorpioClassName + "_" + name);
+                builder.AppendFormat(methodStr, name, ScorpioClassName + "_" + name);
             }
             return builder.ToString();
         }

@@ -28,7 +28,8 @@ namespace Scorpio.Userdata {
         private void InitializeConstructor() {
             if (m_InitializeConstructor == true) return;
             m_InitializeConstructor = true;
-            m_Constructor = new UserdataMethodReflect(m_Type, m_Type.ToString(), m_Type.GetConstructors(Script.BindingFlag));
+            //GetConstructors 去掉 NonPublic 标识, 否则取函数会取出一些错误的函数例如类 System.Diagnostics.Process
+            m_Constructor = new UserdataMethodReflect(m_Type, m_Type.ToString(), m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
         }
         //初始化所有函数
         private void InitializeFunctions() {
