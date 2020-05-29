@@ -83,16 +83,16 @@ namespace Scorpio.ScorpioReflect {
             m_Extensions.Add(type);
         }
         bool Check(FieldInfo fieldInfo) {
-            return !fieldInfo.IsDefined(ScorpioUnGenerate, true) && m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, fieldInfo);
+            return !fieldInfo.IsDefined(ScorpioUnGenerate, true) && (m_ClassFilter == null || m_ClassFilter.Check(this, m_Type, fieldInfo));
         }
         bool Check(EventInfo eventInfo) {
-            return !eventInfo.IsDefined(ScorpioUnGenerate, true) && m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, eventInfo);
+            return !eventInfo.IsDefined(ScorpioUnGenerate, true) && (m_ClassFilter == null || m_ClassFilter.Check(this, m_Type, eventInfo));
         }
         bool Check(PropertyInfo propertyInfo) {
-            return !propertyInfo.IsDefined(ScorpioUnGenerate, true) && m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, propertyInfo);
+            return !propertyInfo.IsDefined(ScorpioUnGenerate, true) && (m_ClassFilter == null || m_ClassFilter.Check(this, m_Type, propertyInfo));
         }
         bool Check(MethodInfo methodInfo) {
-            return !methodInfo.IsDefined(ScorpioUnGenerate, true) && m_ClassFilter != null && !m_ClassFilter.Check(this, m_Type, methodInfo);
+            return !methodInfo.IsDefined(ScorpioUnGenerate, true) && (m_ClassFilter == null || m_ClassFilter.Check(this, m_Type, methodInfo));
         }
         void Init() {
             (m_Fields = new List<FieldInfo>(AllFields.Where(_ => Check(_)))).Sort(new ComparerFieldInfo());
