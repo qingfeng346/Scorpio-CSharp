@@ -9,10 +9,7 @@ namespace Scorpio.ScorpioReflect {
         public const string ClassTemplate = @"using System;
 using Scorpio;
 public class __class : __interface {
-    public ScriptValue Value { get; private set; }
-    public __class(ScriptInstance value) {
-        Value = new ScriptValue(value);
-    }
+    public ScriptValue Value { get; set; }
     public ScriptValue __Call(string functionName, params object[] args) {
         var func = Value.GetValue(functionName);
         if (func.valueType == ScriptValue.scriptValueType) {
