@@ -23,5 +23,6 @@
 /Scorpio/Scorpio.csproj.user
 /ScorpioExec/*.user
 /ScorpioExec/ScorpioClass_ScorpioExec_TestClass.cs
+/ScorpioExec/ScorpioClass_ScorpioExec_TestStruct.cs
 /ScorpioExec/test.il
 /ScorpioExec/DelegateFactory.cs
