@@ -23,6 +23,10 @@
     "help": {
       "commandName": "Project",
       "commandLineArgs": "help"
+    },
+    "interface": {
+      "commandName": "Project",
+      "commandLineArgs": "interface --class ScorpioExec.TestInterface -o ../../../ "
     }
   }
 }

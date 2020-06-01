@@ -1,3 +1,4 @@
-﻿using System;
-public class ScorpioUnGenerateAttribute : Attribute {
+﻿namespace Scorpio.ScorpioReflect {
+    public class ScorpioUnGenerateAttribute : System.Attribute {
+    }
 }

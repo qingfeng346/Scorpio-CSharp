@@ -15,29 +15,7 @@ namespace Scorpio.ScorpioReflect {
     }
     public partial class GenerateScorpioClass {
         private readonly static Type ScorpioUnGenerate = typeof(ScorpioUnGenerateAttribute);
-        struct ComparerFieldInfo : IComparer<FieldInfo> {
-            public int Compare(FieldInfo x, FieldInfo y) {
-                return x.Name.CompareTo(y.Name);
-            }
-        }
-        struct ComparerEventInfo : IComparer<EventInfo> {
-            public int Compare(EventInfo x, EventInfo y) {
-                return x.Name.CompareTo(y.Name);
-            }
-        }
-        struct ComparerPropertyInfo : IComparer<PropertyInfo> {
-            public int Compare(PropertyInfo x, PropertyInfo y) {
-                return x.Name.CompareTo(y.Name);
-            }
-        }
-        struct ComparerMethodInfo : IComparer<MethodInfo> {
-            public int Compare(MethodInfo x, MethodInfo y) {
-                return x.Name.CompareTo(y.Name);
-            }
-        }
-        private Type m_Type;                        					            //类型
-        private bool m_IsStruct;                                                    //是否是struct
-        private string m_FullName;                  					            //类的全名
+        private Type m_Type;                                                        //类型
         private ClassFilter m_ClassFilter;                                          //生成类过滤
         private List<Type> m_Extensions = new List<Type>();                         //所有扩展类
         private List<MethodInfo> m_ExtensionMethods = new List<MethodInfo>();       //类型的所有扩展函数
@@ -51,12 +29,14 @@ namespace Scorpio.ScorpioReflect {
         public List<EventInfo> AllEvents { get; } = new List<EventInfo>();
         public List<PropertyInfo> AllPropertys { get; } = new List<PropertyInfo>();
         public List<MethodInfo> AllMethods { get; } = new List<MethodInfo>();
-        public string ScorpioClassName { get; }
+        public string ScorpioClassName { get; }         //生成的最终类名字
+        public string FullName { get; }                 //要生成的类名字
+        public bool IsStruct { get; }                   //是否是结构体
         public GenerateScorpioClass(Type type) {
             m_Type = type;
-            m_IsStruct = !type.IsClass;
-            ScorpioClassName = "ScorpioClass_" + GetClassName(type);
-            m_FullName = ScorpioReflectUtil.GetFullName(m_Type);
+            IsStruct = !type.IsClass;
+            FullName = ScorpioReflectUtil.GetFullName(m_Type);
+            ScorpioClassName = "ScorpioClass_" + ScorpioReflectUtil.GetGenerateClassName(type);
             AllFields.AddRange(m_Type.GetFields(ScorpioReflectUtil.BindingFlag));
             AllEvents.AddRange(m_Type.GetEvents(ScorpioReflectUtil.BindingFlag));
             var propertys = m_Type.GetProperties(ScorpioReflectUtil.BindingFlag);
@@ -95,9 +75,9 @@ namespace Scorpio.ScorpioReflect {
             return !methodInfo.IsDefined(ScorpioUnGenerate, true) && (m_ClassFilter == null || m_ClassFilter.Check(this, m_Type, methodInfo));
         }
         void Init() {
-            (m_Fields = new List<FieldInfo>(AllFields.Where(_ => Check(_)))).Sort(new ComparerFieldInfo());
-            (m_Events = new List<EventInfo>(AllEvents.Where(_ => Check(_)))).Sort(new ComparerEventInfo());
-            (m_Propertys = new List<PropertyInfo>(AllPropertys.Where(_ => Check(_)))).Sort(new ComparerPropertyInfo());
+            (m_Fields = new List<FieldInfo>(AllFields.Where(_ => Check(_)))).SortField();
+            (m_Events = new List<EventInfo>(AllEvents.Where(_ => Check(_)))).SortEvent();
+            (m_Propertys = new List<PropertyInfo>(AllPropertys.Where(_ => Check(_)))).SortProperty();
             m_Methods.Clear();
             foreach (var method in AllMethods) {
                 if (!Check(method)) { continue; }
@@ -114,7 +94,7 @@ namespace Scorpio.ScorpioReflect {
                     //判断函数是不是 get set 函数
                     foreach (var propertyInfo in AllPropertys) {
                         //如果是struct 并且是 set 属性则屏蔽,强转结构体的set会报错
-                        if (m_IsStruct && propertyInfo.GetSetMethod()?.MethodHandle == methodHandle) {
+                        if (IsStruct && propertyInfo.GetSetMethod()?.MethodHandle == methodHandle) {
                             valid = false;
                             break;
                         } else if (propertyInfo.GetGetMethod()?.MethodHandle == methodHandle || propertyInfo.GetSetMethod()?.MethodHandle == methodHandle) {
@@ -125,7 +105,7 @@ namespace Scorpio.ScorpioReflect {
                 }
                 if (valid) m_Methods.Add(method);
             }
-            m_Methods.Sort(new ComparerMethodInfo());
+            m_Methods.SortMethod();
             m_ExtensionMethods.Clear();
             foreach (var extensionInfo in m_Extensions) {
                 var nameSpace = extensionInfo.Namespace;
@@ -145,7 +125,7 @@ namespace Scorpio.ScorpioReflect {
                     if (!string.IsNullOrWhiteSpace(nameSpace)) m_ExtensionUsing.Add(nameSpace);
                 }
             }
-            m_ExtensionMethods.Sort(new ComparerMethodInfo());
+            m_ExtensionMethods.SortMethod();
             m_Methods.ForEach(_ => m_MethodNames.Add(_.Name));
             m_ExtensionMethods.ForEach(_ => m_MethodNames.Add(_.Name));
         }
@@ -168,7 +148,7 @@ using {name};");
                     .Replace("__constructor_content", GenerateConstructor())
                     .Replace("__methods_content", GenerateMethod())
                     .Replace("__class", ScorpioClassName)
-                    .Replace("__fullname", m_FullName);
+                    .Replace("__fullname", FullName);
         }
     }
 }

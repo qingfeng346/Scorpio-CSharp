@@ -7,17 +7,17 @@ namespace Scorpio.ScorpioReflect {
     public partial class GenerateScorpioClass {
         //反射列表,struct的value会使用反射
         string GenerateReflectList() {
-            if (!m_IsStruct) { return ""; }
+            if (!IsStruct) { return ""; }
             var builder = new StringBuilder();
             foreach (var field in m_Fields) {
                 if (field.IsStatic) { continue; }
                 builder.Append($@"
-    readonly FieldInfo _field_{field.Name} = typeof({m_FullName}).GetField(""{field.Name}"");");
+    readonly FieldInfo _field_{field.Name} = typeof({FullName}).GetField(""{field.Name}"");");
             }
             foreach (var property in m_Propertys) {
                 if (!property.CanWrite || property.GetSetMethod(false) == null || property.GetSetMethod(false).IsStatic) { continue; }
                 builder.Append($@"
-    readonly PropertyInfo _property_{property.Name} = typeof({m_FullName}).GetProperty(""{property.Name}"");");
+    readonly PropertyInfo _property_{property.Name} = typeof({FullName}).GetProperty(""{property.Name}"");");
             }
             return builder.ToString();
         }
@@ -53,7 +53,7 @@ namespace Scorpio.ScorpioReflect {
             foreach (var field in m_Fields) {
                 if (field.IsInitOnly /*readonly 属性*/ || field.IsLiteral /*const 属性*/) { continue; }
                 var fieldFullName = ScorpioReflectUtil.GetFullName(field.FieldType);
-                if (m_IsStruct && !field.IsStatic) {
+                if (IsStruct && !field.IsStatic) {
                     builder.AppendFormat(reflectFormat, field.Name, $"_field_{field.Name}", fieldFullName);
                 } else {
                     builder.AppendFormat(normalFormat, field.Name, GetScorpioVariable(field.IsStatic, field.Name), fieldFullName);
@@ -64,7 +64,7 @@ namespace Scorpio.ScorpioReflect {
                 MethodInfo setMethod;
                 if (!property.CanWrite || (setMethod = property.GetSetMethod(false)) == null) { continue; }
                 var propertyFullName = ScorpioReflectUtil.GetFullName(property.PropertyType);
-                if (m_IsStruct && !setMethod.IsStatic) {
+                if (IsStruct && !setMethod.IsStatic) {
                     builder.AppendFormat(reflectFormat, property.Name, $"_property_{property.Name}", propertyFullName);
                 } else {
                     builder.AppendFormat(normalFormat, property.Name, GetScorpioVariable(setMethod.IsStatic, property.Name), propertyFullName);

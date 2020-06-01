@@ -15,6 +15,10 @@ namespace ScorpioExec {
         
         private const string HelpRegister = @"
 注册运行程序到环境变量";
+        private const string HelpVersion = @"
+查询sco版本，并检查最新版本
+    --check|-c       (选填)是否检查最新版本
+    --preview|-p     (选填)是否检查preview版本";
         private const string HelpPack = @"
 编译生成sco的IL文件
     --source|-s      (必填)脚本文本文件
@@ -32,10 +36,11 @@ namespace ScorpioExec {
     --class|-c       (必填)class完整名称,多class使用分号;隔开
     --output|-o      (必填)Delegate仓库输出文件
     --dll|-d         (选填)dll文件路径,不填则找当前程序集";
-        private const string HelpVersion = @"
-查询sco版本，并检查最新版本
-    --check|-c       (选填)是否检查最新版本
-    --preview|-p     (选填)是否检查preview版本";
+        private const string HelpInterface = @"
+生成Interface类
+    --class|-c       (必填)class完整名称,多class使用分号;隔开
+    --output|-o      (必填)Interface输出目录
+    --dll|-d         (选填)dll文件路径,不填则找当前程序集";
         private const string HelpExecute = @"
 命令列表
     register         注册运行程序到环境变量
@@ -61,11 +66,41 @@ namespace ScorpioExec {
             perform.AddExecute("pack", HelpPack, Pack);
             perform.AddExecute("fast", HelpFast, Fast);
             perform.AddExecute("delegate", HelpDelegate, DelegateFactory);
+            perform.AddExecute("interface", HelpInterface, Interface);
             perform.AddExecute("", HelpExecute, Execute);
             perform.Start(args, null, null);
         }
         static void Register(CommandLine command, string[] args) { 
             Util.RegisterApplication($"{Util.BaseDirectory}/{AppDomain.CurrentDomain.FriendlyName}");
+        }
+        static void VersionExec(CommandLine command, string[] args) {
+            Logger.info(Scorpio.Version.version);
+            if (!command.HadValue(ParameterCheck)) { return; }
+            Logger.info("正在检查最新版本...");
+            var result = Util.RequestString("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
+                request.Headers.Add("Authorization", "token e5ff670eb105f044273f4c81276a67cd1341e649");
+            });
+            var isPreview = command.HadValue(ParameterPreview);
+            var datas = Json.Deserialize(result, true) as List<object>;
+            foreach (Dictionary<string, object> data in datas) {
+                var name = data["name"] as string;
+                if (name.Contains(Scorpio.Version.version)) {
+                    Logger.info($"当前已经是最新版本 : {name}");
+                    return;
+                }
+                bool newVersion = false;
+                if ((bool)data["prerelease"]) {
+                    if (isPreview) { newVersion = true; }
+                } else {
+                    newVersion = true;
+                }
+                if (newVersion) {
+                    var url = data["html_url"].ToString();
+                    Logger.info($"发现新版本 : {name}");
+                    Logger.info($"下载地址 : {url}");
+                    return;
+                }
+            }
         }
         static void Pack(CommandLine command, string[] args) {
             var source = perform.GetPath(ParameterSource);
@@ -127,35 +162,24 @@ namespace ScorpioExec {
             FileUtil.CreateFile(output, generate.Generate(0));
             Logger.info($"生成Delegate仓库 {output}");
         }
-        static void VersionExec(CommandLine command, string[] args) {
-            Logger.info(Scorpio.Version.version);
-            if (!command.HadValue(ParameterCheck)) { return; }
-            Logger.info("正在检查最新版本...");
-            var result = Util.RequestString("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
-                request.Headers.Add("Authorization", "token e5ff670eb105f044273f4c81276a67cd1341e649");
-            });
-            var isPreview = command.HadValue(ParameterPreview);
-            var datas = Json.Deserialize(result, true) as List<object>;
-            foreach (Dictionary<string, object> data in datas) {
-                var name = data["name"] as string;
-                if (name.Contains(Scorpio.Version.version)) {
-                    Logger.info($"当前已经是最新版本 : {name}");
-                    return;
-                }
-                bool newVersion = false;
-                if ((bool)data["prerelease"]) {
-                    if (isPreview) { newVersion = true; }
-                } else {
-                    newVersion = true;
-                }
-                if (newVersion) {
-                    var url = data["html_url"].ToString();
-                    Logger.info($"发现新版本 : {name}");
-                    Logger.info($"下载地址 : {url}");
-                    return;
-                }
+        static void Interface(CommandLine command, string[] args) {
+            var output = perform.GetPath(ParameterOutput);
+            var strClass = command.GetValue(ParameterClass);
+            if (strClass.isNullOrWhiteSpace()) { throw new Exception("找不到 -class 参数"); }
+
+            var dll = command.GetValue(ParameterDll);
+            var assembly = dll.isNullOrWhiteSpace() ? null : Assembly.LoadFile(Path.Combine(CurrentDirectory, dll));
+            var classNames = strClass.Split(";");
+            foreach (var className in classNames) {
+                var clazz = GetType(assembly, className, null);
+                if (clazz == null) { throw new Exception($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
+                var generate = new GenerateScorpioInterface(clazz);
+                var outputFile = Path.Combine(output, generate.ScorpioClassName + ".cs");
+                FileUtil.CreateFile(outputFile, generate.Generate());
+                Logger.info($"生成Interface类 {className} -> {outputFile}");
             }
         }
+        
         static void Execute(CommandLine command, string[] args) {
             Util.PrintSystemInfo();
             Logger.info("sco Version : " + Scorpio.Version.version);

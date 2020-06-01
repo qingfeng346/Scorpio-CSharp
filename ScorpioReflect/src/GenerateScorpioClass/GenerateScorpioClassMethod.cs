@@ -32,7 +32,7 @@ namespace Scorpio.ScorpioReflect {
                 builder.AppendFormat(@"
                 case {0}: {{ {1} }}", i, GetExecuteMethod(pars, true, call));
             }
-            if (m_IsStruct) {
+            if (IsStruct) {
                 var pars = new ParameterInfo[0];
                 var call = $"new __fullname({GetScorpioMethodCall(pars)})";
                 builder.AppendFormat(@"
@@ -105,7 +105,7 @@ namespace Scorpio.ScorpioReflect {
             var methods = m_Methods.Where(_ => _.Name == name).ToArray();
             for (var i = 0; i < methods.Length; ++i) {
                 var method = methods[i];
-                var variable = method.IsStatic ? m_FullName : $"(({m_FullName})obj)";
+                var variable = method.IsStatic ? FullName : $"(({FullName})obj)";
                 var pars = method.GetParameters();
                 //运算符重载函数 + - * / [] 等
                 string execute = GetSpeciaMethodExecute(method, variable, pars);
@@ -127,7 +127,7 @@ namespace Scorpio.ScorpioReflect {
             for (var i = 0; i < extensionMethods.Length; ++i) {
                 var index = methods.Length + i;
                 var method = extensionMethods[i];
-                var variable = $"(({m_FullName})obj)";
+                var variable = $"(({FullName})obj)";
                 var pars = method.GetParameters();
                 var fPars = new ParameterInfo[pars.Length - 1];
                 for (var j = 1; j < pars.Length; ++j) { fPars[j - 1] = pars[j]; }

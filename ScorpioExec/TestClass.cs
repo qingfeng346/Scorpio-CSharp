@@ -61,4 +61,10 @@ namespace ScorpioExec {
         public int value1;
         public int value2 { get; set; }
     }
+    public interface TestInterface {
+        void Func1(int a, int b);
+        void Func2();
+        int Func3();
+        string Func4(int aaa, int bbb);
+    }
 }

@@ -40,7 +40,7 @@ public class DelegateFactory : IDelegateFactory {
             m_Delegates.Add(type);
         }
         public string Generate(int buildType) {
-            ScorpioReflectUtil.SortType(m_Delegates);
+            m_Delegates.SortType();
             return (buildType == 0 ? Template : TemplateIf).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate(buildType));
         }
         string DelegateList() {
@@ -64,26 +64,7 @@ public class DelegateFactory : IDelegateFactory {
                     pars += $"arg{i}";
                 }
                 var invoke = parameters.Length == 0 ? $"scriptObject.call(ScriptValue.Null)" : $"scriptObject.call(ScriptValue.Null,{pars})";
-                var returnType = InvokeMethod.ReturnType;
-                var returnFullName = ScorpioReflectUtil.GetFullName(returnType);
-                var call = "";
-                if (returnType == typeof(void)) {
-                    call = $"{invoke}";
-                } else if (returnType == typeof(ScriptValue)) {
-                    call = $"return {invoke}";
-                } else if (returnType == typeof(bool)) {
-                    call = $"return {invoke}.IsTrue";
-                } else if (returnType == typeof(string)) {
-                    call = $"return {invoke}.ToString()";
-                } else if (returnType == typeof(sbyte) || returnType == typeof(byte) ||
-                            returnType == typeof(short) || returnType == typeof(ushort) ||
-                            returnType == typeof(int) || returnType == typeof(uint) ||
-                            returnType == typeof(long) || returnType == typeof(ulong) ||
-                            returnType == typeof(float) || returnType == typeof(double) || returnType == typeof(decimal)) {
-                    call = $"return ({returnFullName})Convert.ChangeType({invoke}.Value, typeof({returnFullName}))";
-                } else {
-                    call = $"return ({returnFullName}){invoke}.Value";
-                }
+                var call = ScorpioReflectUtil.ReturnString(invoke, InvokeMethod.ReturnType);
                 var func = $"return new {fullName}( ({pars}) => {{ {call}; }} );";
                 if (buildType == 0) {
                     builder.Append($@"

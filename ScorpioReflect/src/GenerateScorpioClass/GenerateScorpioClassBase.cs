@@ -54,24 +54,6 @@ __methods_content
             }
         }
     }";
-        //获得最后生成的类的名字 把+和.都换成_
-        public string GetClassName(Type type) {
-            var fullName = type.FullName;
-            if (type.IsGenericType) {
-                var index = fullName.IndexOf("`");
-                fullName = fullName.Substring(0, index);
-                fullName += "_";
-                var types = type.GetGenericArguments();
-                bool first = true;
-                foreach (var t in types) {
-                    if (first == false) { fullName += "_"; } else { first = false; }
-                    fullName += GetClassName(t);
-                }
-            }
-            fullName = fullName.Replace("+", "_");
-            fullName = fullName.Replace(".", "_");
-            return fullName;
-        }
         //根据MethodInfo生成一个ScorpioMethodInfo对象
         private string GetScorpioMethod(bool isStatic, ParameterInfo[] pars, int index) {
             var paramType = "null";
@@ -159,7 +141,7 @@ __methods_content
             return "(" + ScorpioReflectUtil.GetFullName(pars[index].ParameterType) + ")args[" + index + "]";
         }
         private string GetScorpioVariable(bool IsStatic, string name) {
-            return (IsStatic ? m_FullName : $"(({m_FullName})obj)") + "." + name;
+            return (IsStatic ? FullName : $"(({FullName})obj)") + "." + name;
         }
         private string GetAllMethod(MethodBase[] methods) {
             var builder = new StringBuilder();
@@ -168,7 +150,7 @@ __methods_content
                 builder.Append($@"
             methodInfos.Add({GetScorpioMethod(method.IsStatic, method.GetParameters(), i)});");
             }
-            if (m_IsStruct) {
+            if (IsStruct) {
                 builder.Append($@"
             methodInfos.Add({GetScorpioMethod(false, new ParameterInfo[0], methods.Length)});");
             }
