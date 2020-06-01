@@ -56,4 +56,9 @@ namespace ScorpioExec {
             return new TestClass(value + 100, ref refOut);
         }
     }
+    public struct TestStruct {
+        public static int staticNumber { get; set; }
+        public int value1;
+        public int value2 { get; set; }
+    }
 }

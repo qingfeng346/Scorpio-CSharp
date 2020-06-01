@@ -12,7 +12,7 @@ using Scorpio;
 using Scorpio.Userdata;
 using Scorpio.Tools;
 using Scorpio.Exception;__extensions_using
-public class __class : ScorpioFastReflectClass {
+public class __class : ScorpioFastReflectClass {__reflect_content
     public UserdataMethodFastReflect GetConstructor() {
         return __class_Constructor.GetInstance();
     }
@@ -167,6 +167,10 @@ __methods_content
                 var method = methods[i];
                 builder.Append($@"
             methodInfos.Add({GetScorpioMethod(method.IsStatic, method.GetParameters(), i)});");
+            }
+            if (m_IsStruct) {
+                builder.Append($@"
+            methodInfos.Add({GetScorpioMethod(false, new ParameterInfo[0], methods.Length)});");
             }
             return builder.ToString();
         }

@@ -32,6 +32,12 @@ namespace Scorpio.ScorpioReflect {
                 builder.AppendFormat(@"
                 case {0}: {{ {1} }}", i, GetExecuteMethod(pars, true, call));
             }
+            if (m_IsStruct) {
+                var pars = new ParameterInfo[0];
+                var call = $"new __fullname({GetScorpioMethodCall(pars)})";
+                builder.AppendFormat(@"
+                case {0}: {{ {1} }}", Constructors.Length, GetExecuteMethod(pars, true, call));
+            }
             string str = MethodTemplate;
             str = str.Replace("__getallmethod", GetAllMethod(Constructors));
             str = str.Replace("__name", ScorpioClassName + "_Constructor");

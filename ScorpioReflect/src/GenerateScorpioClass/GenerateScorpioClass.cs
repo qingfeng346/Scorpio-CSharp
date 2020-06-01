@@ -160,6 +160,7 @@ using {name};");
         public string Generate() {
             Init();
             return ClassTemplate.Replace("__extensions_using", GetExtensionsUsing())
+                    .Replace("__reflect_content", GenerateReflectList())
                     .Replace("__getvariabletype_content", GenerateGetVariableType())
                     .Replace("__method_content", GenerateGetMethod())
                     .Replace("__getvalue_content", GenerateGetValue())

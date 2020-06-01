@@ -1,11 +1,18 @@
-var a = [100,200]
-foreach (var pair in pairs(a)) {
-    try {
-        b()
-    } catch (e) {
-        print(pair)
-    }
-}
+var TestStruct = import_type("ScorpioExec.TestStruct")
+var t = TestStruct()
+t.value1 = 200
+t.value2 = 300
+t.staticNumber = 500
+TestStruct.staticNumber = 1000
+print(t.value1, t.value2, t.staticNumber)
+// var a = [100,200]
+// foreach (var pair in pairs(a)) {
+//     try {
+//         b()
+//     } catch (e) {
+//         print(pair)
+//     }
+// }
 // tab = {
 //     test() {
 //         this.testfun?.()
