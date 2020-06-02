@@ -11,7 +11,6 @@ using System.Collections.Generic;
 namespace ScorpioExec {
     public class Program {
         private static readonly string CurrentDirectory = Util.CurrentDirectory;
-        private static readonly string BaseDirectory = Util.BaseDirectory;
         
         private const string HelpRegister = @"
 注册运行程序到环境变量";
