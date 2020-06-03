@@ -73,7 +73,9 @@ namespace Scorpio.Userdata {
             if (func != null) {
                 CommonParameters[0] = ThisValue;
                 CommonParameters[1] = obj;
-                return (bool)func.Call(true, null, CommonParameters, 2);
+                if (func.CallNoThrow(true, null, CommonParameters, 2, out var result)) {
+                    return (bool)result;
+                }
             }
             switch (obj.valueType) {
                 case ScriptValue.nullValueType: return false;
