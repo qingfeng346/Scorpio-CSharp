@@ -237,11 +237,9 @@
                 var func = args[0].Get<ScriptFunction>();
                 if (func != null) {
                     var array = thisObject.Get<ScriptArray>();
-                    var index = 0;
                     for (var i = 0; i < array.Length(); ++i) {
-                        ++index;
                         if (func.Call(array[i], new ScriptValue((double)i)).valueType == ScriptValue.falseValueType) {
-                            return new ScriptValue((double)index);
+                            return new ScriptValue((double)i);
                         }
                     }
                 }
@@ -253,11 +251,9 @@
                 var func = args[0].Get<ScriptFunction>();
                 if (func != null) {
                     var array = thisObject.Get<ScriptArray>();
-                    var index = 0;
-                    for (var i = array.Length(); i >= 0; --i) {
-                        ++index;
+                    for (var i = array.Length() - 1; i >= 0; --i) {
                         if (func.Call(array[i], new ScriptValue((double)i)).valueType == ScriptValue.falseValueType) {
-                            return new ScriptValue((double)index);
+                            return new ScriptValue((double)i);
                         }
                     }
                 }
