@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text;
 using Scorpio;
 using Scorpio.Exception;
-using Scorpio.Variable;
 namespace Scorpio.Userdata {
     /// <summary> 一个c#类的所有数据 </summary>
     public abstract class UserdataType {

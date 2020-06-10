@@ -45,7 +45,7 @@ namespace Scorpio.Proto {
         }
         private class at : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue((double)thisObject.stringValue[args[0].ToInt32()]);
+                return new ScriptValue(Convert.ToInt64(thisObject.stringValue[args[0].ToInt32()]));
             }
         }
         private class insert : ScorpioHandle {

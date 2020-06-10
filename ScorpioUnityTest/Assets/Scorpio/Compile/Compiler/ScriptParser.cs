@@ -179,6 +179,7 @@ namespace Scorpio.Compile.Compiler {
                 case TokenType.String:
                 case TokenType.Boolean: 
                 case TokenType.Number:
+                case TokenType.LeftPar:
                     ParseExpression();
                     return;
                 case TokenType.LeftBrace:
@@ -204,7 +205,7 @@ namespace Scorpio.Compile.Compiler {
                     ParseFunction();
                     return;
                 case TokenType.Return:
-                    ParseReturn();
+                    ParseReturn(token);
                     return;
                 case TokenType.Break:
                     if (BlockSupportBreak) {
@@ -638,9 +639,9 @@ namespace Scorpio.Compile.Compiler {
             return index;
         }
         /// <summary> 解析return </summary>
-        void ParseReturn() {
+        void ParseReturn(Token token) {
             var peek = PeekToken();
-            if (peek.Type == TokenType.RightBrace || peek.Type == TokenType.SemiColon || peek.Type == TokenType.Finished) {
+            if (peek.Type == TokenType.RightBrace || peek.Type == TokenType.SemiColon || peek.Type == TokenType.Finished || peek.SourceLine != token.SourceLine) {
                 AddScriptInstructionWithoutValue(Opcode.RetNone, peek.SourceLine);
             } else {
                 PushObject(GetObject());
@@ -1120,7 +1121,7 @@ namespace Scorpio.Compile.Compiler {
                 default: throw new ParserException(this, "Object起始关键字错误 ", token);
             }
             ret.line = token.SourceLine;
-            ret = GetVariable(ret);
+            ret = GetVariable(LastToken(), ret);
             if ((ret is CodeNativeObject || (ret is CodeRegion && (ret as CodeRegion).Context is CodeNativeObject)) && flag != 0) {
                 var scriptObject = ret is CodeNativeObject ? (ret as CodeNativeObject) : (ret as CodeRegion).Context as CodeNativeObject;
                 var obj = scriptObject.obj;
@@ -1156,15 +1157,15 @@ namespace Scorpio.Compile.Compiler {
             return ret;
         }
         //返回变量数据
-        CodeObject GetVariable(CodeObject parent) {
+        CodeObject GetVariable(Token lastToken, CodeObject parent) {
             CodeObject ret = parent;
             for (; ; ) {
                 Token token = ReadToken();
                 if (token.Type == TokenType.Period) {
                     ret = ReadMember(TokenType.Period, ret, token.SourceLine, false);
-                } else if (token.Type == TokenType.LeftBracket) {
+                } else if (token.Type == TokenType.LeftBracket && lastToken.SourceLine == token.SourceLine) {
                     ret = ReadMember(TokenType.LeftBracket, ret, token.SourceLine, false);
-                } else if (token.Type == TokenType.LeftPar) {
+                } else if (token.Type == TokenType.LeftPar && lastToken.SourceLine == token.SourceLine) {
                     UndoToken();
                     ret = ReadCallFunction(ret, false);
                 } else if (token.Type == TokenType.QuestionMarkDot) {
@@ -1182,6 +1183,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 ret.line = token.SourceLine;
+                lastToken = LastToken();
             }
             return ret;
         }

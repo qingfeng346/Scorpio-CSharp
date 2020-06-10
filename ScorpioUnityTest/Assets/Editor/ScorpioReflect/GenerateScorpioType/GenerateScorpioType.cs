@@ -18,7 +18,7 @@ namespace __Namespace {
             if (!m_Types.Contains(type)) m_Types.Add(type);
         }
         public string Generate() {
-            ScorpioReflectUtil.SortType(m_Types);
+            m_Types.SortType();
             string str = Template;
             str = str.Replace("__Namespace", string.IsNullOrEmpty(Namespace) ? "ScorpioType" : Namespace);
             str = str.Replace("__ClassName", string.IsNullOrEmpty(ClassName) ? "ScorpioTypeFactory" : ClassName);

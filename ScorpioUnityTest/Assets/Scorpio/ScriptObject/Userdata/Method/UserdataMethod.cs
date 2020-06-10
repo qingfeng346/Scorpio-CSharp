@@ -63,5 +63,37 @@ namespace Scorpio.Userdata {
                 throw new ExecutionException($"类[{m_Type.ToString()}] 调用函数出错 [{MethodName}] : {e.ToString()}");
             }
         }
+        public bool CallNoThrow(bool isStatic, object obj, ScriptValue[] parameters, int length, out object result) {
+            try {
+                //如果obj为null 则调用静态函数
+                var methods = isStatic ? m_StaticMethods : m_Methods;
+                var methodLength = methods.Length;
+                for (var i = 0; i < methodLength; ++i) {
+                    var method = methods[i];
+                    if (method.CheckNormalType(parameters, length)) {
+                        result = method.Invoke(obj, parameters);
+                        return true;
+                    }
+                }
+                for (int i = 0; i < methodLength; ++i) {
+                    var method = methods[i];
+                    if (method.CheckDefaultType(parameters, length)) {
+                        result = method.Invoke(obj, parameters);
+                        return true;
+                    }
+                }
+                for (int i = 0; i < methodLength; ++i) {
+                    var method = methods[i];
+                    if (method.CheckArgsType(parameters, length)) {
+                        result = method.Invoke(obj, parameters);
+                        return true;
+                    }
+                }
+                result = null;
+                return false;
+            } catch (System.Exception e) {
+                throw new ExecutionException($"类[{m_Type.ToString()}] 调用函数出错 [{MethodName}] : {e.ToString()}");
+            }
+        }
     }
 }

@@ -14,12 +14,10 @@ namespace Scorpio {
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
 
         public override ScriptValue GetValue(string key) {
-            ScriptValue value;
-            return m_Objects.TryGetValue(key, out value) ? value : m_Prototype.GetValue(key);
+            return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
         public override ScriptValue GetValue(object key) {
-            ScriptValue value;
-            return m_Objects.TryGetValue(key, out value) ? value : ScriptValue.Null;
+            return m_Objects.TryGetValue(key, out var value) ? value : ScriptValue.Null;
         }
         public override void SetValue(string key, ScriptValue value) {
             m_Objects[key] = value;

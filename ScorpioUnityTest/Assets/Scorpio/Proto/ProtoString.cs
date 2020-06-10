@@ -9,7 +9,7 @@ namespace Scorpio.Proto {
             ret.SetValue("isNullOrEmpty", script.CreateFunction(new isNullOrEmpty()));
             ret.SetValue("join", script.CreateFunction(new join()));
             ret.SetValue("fromCharCode", script.CreateFunction(new fromCharCode()));
-            ret.SetValue("toCharCode", script.CreateFunction(new toCharCode()));
+            ret.SetValue("toCharCode", script.CreateFunction(new toCharCode(script)));
 
             ret.SetValue("length", script.CreateFunction(new length()));
             ret.SetValue("count", script.CreateFunction(new length()));
@@ -256,9 +256,22 @@ namespace Scorpio.Proto {
             }
         }
         private class toCharCode : ScorpioHandle {
+            private Script m_script;
+            public toCharCode(Script script) {
+                this.m_script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var str = args[0].ToString();
-                return ScriptValue.CreateValue(Convert.ToInt64(str[0]));
+                var isArray = length > 1 ? args[1].IsTrue : false;
+                if (isArray) {
+                    var ret = new ScriptArray(m_script);
+                    foreach (var c in args[0].ToString()) {
+                        ret.Add(new ScriptValue(Convert.ToInt64(c)));
+                    }
+                    return new ScriptValue(ret);
+                } else {
+                    return new ScriptValue(Convert.ToInt64(str[0]));
+                }
             }
         }
     }
