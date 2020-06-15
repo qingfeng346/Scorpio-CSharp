@@ -18,12 +18,11 @@ namespace Scorpio {
                 args[0] = o1;
                 args[1] = o2;
                 var ret = func.Call(ScriptValue.Null, args, 2);
-                if (ret.valueType == ScriptValue.doubleValueType) {
-                    return (int)ret.doubleValue;
-                } else if (ret.valueType == ScriptValue.longValueType) {
-                    return (int)ret.longValue;
+                switch (ret.valueType) {
+                    case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
+                    case ScriptValue.longValueType: return Convert.ToInt32(ret.longValue);
+                    default: throw new ExecutionException("数组排序返回值必须是Number类型");
                 }
-                throw new ExecutionException("数组排序返回值必须是Number类型");
             }
         }
         //数组迭代器
