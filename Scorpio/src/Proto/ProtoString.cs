@@ -45,7 +45,12 @@ namespace Scorpio.Proto {
         }
         private class at : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Convert.ToInt64(thisObject.stringValue[args[0].ToInt32()]));
+                var isCode = length > 1 ? args[1].IsTrue : true;
+                if (isCode) {
+                    return new ScriptValue(Convert.ToInt64(thisObject.stringValue[args[0].ToInt32()]));
+                } else {
+                    return new ScriptValue(thisObject.stringValue[args[0].ToInt32()].ToString());
+                }
             }
         }
         private class insert : ScorpioHandle {
