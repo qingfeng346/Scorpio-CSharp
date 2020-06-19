@@ -109,10 +109,11 @@ namespace Scorpio {
         }
         public ScriptValue GetValue(object key) {
             if (key is ScriptFunction) { return new ScriptValue(key as ScriptFunction); }
-            if (valueType == scriptValueType) {
-                return scriptValue.GetValue(key);
+            switch (valueType) {
+                case scriptValueType: return scriptValue.GetValue(key);
+                case stringValueType: return new ScriptValue(stringValue[Convert.ToInt32(key)].ToString());
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
             }
-            throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
         }
         public void SetValueByIndex(int key, ScriptValue value) {
             if (valueType == scriptValueType) {
