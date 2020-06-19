@@ -35,7 +35,7 @@ namespace Scorpio.Proto {
             ret.SetValue("compareTo", script.CreateFunction(new compareTo()));
             ret.SetValue("sub", script.CreateFunction(new sub()));
             ret.SetValue("split", script.CreateFunction(new split(script)));
-            
+
             return ret;
         }
         private class length : ScorpioHandle {
@@ -47,7 +47,7 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var isCode = length > 1 ? args[1].IsTrue : true;
                 if (isCode) {
-                    return new ScriptValue(Convert.ToInt64(thisObject.stringValue[args[0].ToInt32()]));
+                    return new ScriptValue(thisObject.stringValue[args[0].ToInt32()]);
                 } else {
                     return new ScriptValue(thisObject.stringValue[args[0].ToInt32()].ToString());
                 }

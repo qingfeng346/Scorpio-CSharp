@@ -111,7 +111,7 @@ namespace Scorpio {
             if (key is ScriptFunction) { return new ScriptValue(key as ScriptFunction); }
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);
-                case stringValueType: return new ScriptValue(stringValue[Convert.ToInt32(key)].ToString());
+                case stringValueType: return new ScriptValue(stringValue[Convert.ToInt32(key)]);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
             }
         }
@@ -212,10 +212,11 @@ namespace Scorpio {
             }
         }
         public char ToChar() {
+            //Convert.ToChar  bool float decimal double 类型会直接报错 InvalidCastException, objectValueType 都是数字类型,只有float会报错, 要使用float需提前转换成 long
             switch (valueType) {
-                case doubleValueType: return Convert.ToChar(Convert.ToInt64(doubleValue));
+                case doubleValueType: return Convert.ToChar(Convert.ToInt32(doubleValue));
                 case longValueType: return Convert.ToChar(longValue);
-                case objectValueType: return Convert.ToChar(Convert.ToInt64(objectValue));
+                case objectValueType: return Convert.ToChar(objectValue);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
             }
         }

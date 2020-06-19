@@ -3,9 +3,18 @@
 // print(aaa, b)
 // var a = aaa[b] ?? (aaa[b] = [])
 // a.add(100)
-a = []
-(b ?? a).add(100)
+var a = createStringBuilder()
+// for (var i = 0, 100) {
+//     a.append('0')
+// }
+a.setLength(100)
+a[10]= 97
 print(a)
+// a[50] = 98
+// print(a)
+// a = []
+// (b ?? a).add(100)
+// print(a)
 
 // var TestStruct = import_type("ScorpioExec.TestStruct")
 // var t = TestStruct()

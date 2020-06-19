@@ -24,38 +24,38 @@ namespace Scorpio {
 
         /// <summary> 所有类型的基类 </summary>
         public ScriptType TypeObject { get; private set; }
-        /// <summary> 所有类型的基类 </summary>
         public ScriptValue TypeObjectValue { get; private set; }
 
+        /// <summary> 所有基础类型数据 </summary>
+        private ScriptType m_TypeBool, m_TypeNumber, m_TypeString, m_TypeArray, m_TypeMap, m_TypeFunction, m_TypeStringBuilder;
+        private ScriptValue m_TypeValueBool, m_TypeValueNumber, m_TypeValueString, m_TypeValueArray, m_TypeValueMap, m_TypeValueFunction, m_TypeValueStringBuilder;
         /// <summary> bool类型的原表 </summary>
-        public ScriptType TypeBoolean { get; private set; }
-        /// <summary> bool类型的原表 </summary>
-        public ScriptValue TypeBooleanValue { get; private set; }
+        public ScriptType TypeBoolean => m_TypeBool;
+        public ScriptValue TypeBooleanValue => m_TypeValueBool;
 
         /// <summary> number类型的原表 </summary>
-        public ScriptType TypeNumber { get; private set; }
-        /// <summary> number类型的原表 </summary>
-        public ScriptValue TypeNumberValue { get; private set; }
+        public ScriptType TypeNumber => m_TypeNumber;
+        public ScriptValue TypeNumberValue => m_TypeValueNumber;
 
         /// <summary> string类型的原表 </summary>
-        public ScriptType TypeString { get; private set; }
-        /// <summary> string类型的原表 </summary>
-        public ScriptValue TypeStringValue { get; private set; }
+        public ScriptType TypeString => m_TypeString;
+        public ScriptValue TypeStringValue => m_TypeValueString;
 
         /// <summary> array类型的原表 </summary>
-        public ScriptType TypeArray { get; private set; }
-        /// <summary> array类型的原表 </summary>
-        public ScriptValue TypeArrayValue { get; private set; }
+        public ScriptType TypeArray => m_TypeArray;
+        public ScriptValue TypeArrayValue => m_TypeValueArray;
 
         /// <summary> map类型的原表 </summary>
-        public ScriptType TypeMap { get; private set; }
-        /// <summary> map类型的原表 </summary>
-        public ScriptValue TypeMapValue { get; private set; }
+        public ScriptType TypeMap => m_TypeMap;
+        public ScriptValue TypeMapValue => m_TypeValueMap;
 
         /// <summary> function类型的原表 </summary>
-        public ScriptType TypeFunction { get; private set; }
-        /// <summary> function类型的原表 </summary>
-        public ScriptValue TypeFunctionValue { get; private set; }
+        public ScriptType TypeFunction => m_TypeFunction;
+        public ScriptValue TypeFunctionValue => m_TypeValueFunction;
+
+        /// <summary> stringBuilder类型的原表 </summary>
+        public ScriptType TypeStringBuilder => m_TypeStringBuilder;
+        public ScriptValue TypeStringBuilderValue => m_TypeValueStringBuilder;
 
         /// <summary> 全局变量 </summary>
         public ScriptGlobal Global { get; private set; }
@@ -68,29 +68,14 @@ namespace Scorpio {
             TypeObjectValue = new ScriptValue(TypeObject);
             Global.SetValue(TypeObject.TypeName, TypeObjectValue);
 
-            TypeBoolean = new ScriptBasicType("Bool", TypeObjectValue);
-            TypeBooleanValue = new ScriptValue(TypeBoolean);
-            Global.SetValue(TypeBoolean.TypeName, TypeBooleanValue);
+            AddPrimitivePrototype("Bool", ref m_TypeBool, ref m_TypeValueBool);
+            AddPrimitivePrototype("Number", ref m_TypeNumber, ref m_TypeValueNumber);
+            AddPrimitivePrototype("String", ref m_TypeString, ref m_TypeValueString);
 
-            TypeNumber = new ScriptBasicType("Number", TypeObjectValue);
-            TypeNumberValue = new ScriptValue(TypeNumber);
-            Global.SetValue(TypeNumber.TypeName, TypeNumberValue);
-
-            TypeString = new ScriptBasicType("String", TypeObjectValue);
-            TypeStringValue = new ScriptValue(TypeString);
-            Global.SetValue(TypeString.TypeName, TypeStringValue);
-
-            TypeArray = new ScriptBasicType("Array", TypeObjectValue);
-            TypeArrayValue = new ScriptValue(TypeArray);
-            Global.SetValue(TypeArray.TypeName, TypeArrayValue);
-
-            TypeMap = new ScriptBasicType("Map", TypeObjectValue);
-            TypeMapValue = new ScriptValue(TypeMap);
-            Global.SetValue(TypeMap.TypeName, TypeMapValue);
-
-            TypeFunction = new ScriptBasicType("Function", TypeObjectValue);
-            TypeFunctionValue = new ScriptValue(TypeFunction);
-            Global.SetValue(TypeFunction.TypeName, TypeFunctionValue);
+            AddBasicPrototype("Array", ref m_TypeArray, ref m_TypeValueArray);
+            AddBasicPrototype("Map", ref m_TypeMap, ref m_TypeValueMap);
+            AddBasicPrototype("Function", ref m_TypeFunction, ref m_TypeValueFunction);
+            AddBasicPrototype("StringBuilder", ref m_TypeStringBuilder, ref m_TypeValueStringBuilder);
 
             Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
             Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateValue(this));
@@ -103,6 +88,7 @@ namespace Scorpio {
             ProtoArray.Load(this, TypeArray);
             ProtoMap.Load(this, TypeMap);
             ProtoFunction.Load(this, TypeFunction);
+            ProtoStringBuilder.Load(this, TypeStringBuilder);
 
             TypeManager.PushAssembly(typeof(object).Assembly);                        //mscorlib.dll
             TypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).Assembly);     //System.dll
@@ -113,6 +99,16 @@ namespace Scorpio {
             LibraryMath.Load(this);
             LibraryUserdata.Load(this);
             LibraryIO.Load(this);
+        }
+        void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
+            type = new ScriptTypePrimitive(name, TypeObjectValue);
+            typeValue = new ScriptValue(type);
+            Global.SetValue(name, typeValue);
+        }
+        void AddBasicPrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
+            type = new ScriptTypeBasic(name, TypeObjectValue);
+            typeValue = new ScriptValue(type);
+            Global.SetValue(name, typeValue);
         }
         ScriptValue Execute(string breviary, SerializeData data) {
             var contexts = new ScriptContext[data.Functions.Length];

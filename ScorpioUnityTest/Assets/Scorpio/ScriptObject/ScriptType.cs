@@ -1,5 +1,5 @@
-﻿using Scorpio.Tools;
-using Scorpio.Exception;
+﻿using Scorpio.Exception;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
@@ -20,8 +20,7 @@ namespace Scorpio {
             }
         }
         public override ScriptValue GetValue(string key) {
-            ScriptValue value;
-            return m_Values.TryGetValue(key, out value) ? value : m_Prototype.GetValue(key);
+            return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             var ret = new ScriptValue(new ScriptInstance(ObjectType.Instance, ThisValue));
@@ -35,20 +34,30 @@ namespace Scorpio {
         IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
         public override string ToString() { return $"Class<{TypeName}>"; }
     }
-    //自带类型的原表,不支持动态申请,只能已特定形式申请变量
-    public class ScriptBasicType : ScriptType {
-        public ScriptBasicType(string typeName, ScriptValue parentType) : base(typeName, parentType) { }
-        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            throw new ExecutionException($"Class<{TypeName}>不支持自定义构造");
-        }
-    }
-    //Object原表
-    public class ScriptTypeObject : ScriptBasicType {
+    //Object原表, GetValue 找不到就返回 null
+    public class ScriptTypeObject : ScriptType {
         public ScriptTypeObject(string typeName) : base(typeName, ScriptValue.Null) { }
         public override ScriptValue Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            throw new ExecutionException($"Class<{TypeName}>不支持构造");
+        }
         public override ScriptValue GetValue(string key) {
-            ScriptValue value;
-            return m_Values.TryGetValue(key, out value) ? value : ScriptValue.Null;
+            return m_Values.TryGetValue(key, out var value) ? value : ScriptValue.Null;
         }
     }
+    //自带基础类型的原表,不支持动态申请,只能已特定形式申请变量, number, string, bool 等
+    public class ScriptTypePrimitive : ScriptType {
+        public ScriptTypePrimitive(string typeName, ScriptValue parentType) : base(typeName, parentType) { }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            throw new ExecutionException($"Class<{TypeName}>不支持构造");
+        }
+    }
+    //自带类型的原表
+    public class ScriptTypeBasic : ScriptType {
+        public ScriptTypeBasic(string typeName, ScriptValue parentType) : base(typeName, parentType) { }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            throw new ExecutionException($"Class<{TypeName}>不支持构造");
+        }
+    }
+
 }
