@@ -27,6 +27,8 @@ namespace Scorpio.Proto {
             ret.SetValue("replace", script.CreateFunction(new replace()));
             ret.SetValue("indexOf", script.CreateFunction(new indexOf()));
             ret.SetValue("lastIndexOf", script.CreateFunction(new lastIndexOf()));
+            ret.SetValue("indexOfChar", script.CreateFunction(new indexOfChar()));
+            ret.SetValue("lastIndexOfChar", script.CreateFunction(new lastIndexOfChar()));
             ret.SetValue("startsWith", script.CreateFunction(new startsWith()));
             ret.SetValue("endsWith", script.CreateFunction(new endsWith()));
             ret.SetValue("contains", script.CreateFunction(new contains()));
@@ -134,6 +136,28 @@ namespace Scorpio.Proto {
                     return new ScriptValue((double)thisObject.stringValue.LastIndexOf(args[0].ToString(), args[1].ToInt32()));
                 } else {
                     return new ScriptValue((double)thisObject.stringValue.LastIndexOf(args[0].ToString()));
+                }
+            }
+        }
+        private class indexOfChar : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (length == 3) {
+                    return new ScriptValue((double)thisObject.stringValue.IndexOf(args[0].ToChar(), args[1].ToInt32(), args[2].ToInt32()));
+                } else if (length == 2) {
+                    return new ScriptValue((double)thisObject.stringValue.IndexOf(args[0].ToChar(), args[1].ToInt32()));
+                } else {
+                    return new ScriptValue((double)thisObject.stringValue.IndexOf(args[0].ToChar()));
+                }
+            }
+        }
+        private class lastIndexOfChar : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (length == 3) {
+                    return new ScriptValue((double)thisObject.stringValue.LastIndexOf(args[0].ToChar(), args[1].ToInt32(), args[2].ToInt32()));
+                } else if (length == 2) {
+                    return new ScriptValue((double)thisObject.stringValue.LastIndexOf(args[0].ToChar(), args[1].ToInt32()));
+                } else {
+                    return new ScriptValue((double)thisObject.stringValue.LastIndexOf(args[0].ToChar()));
                 }
             }
         }
