@@ -294,12 +294,12 @@ namespace Scorpio.Proto {
                 var isArray = length > 1 ? args[1].IsTrue : false;
                 if (isArray) {
                     var ret = new ScriptArray(m_script);
-                    foreach (var c in args[0].ToString()) {
-                        ret.Add(new ScriptValue(Convert.ToInt64(c)));
+                    foreach (var c in str) {
+                        ret.Add(new ScriptValue(c));
                     }
                     return new ScriptValue(ret);
                 } else {
-                    return new ScriptValue(Convert.ToInt64(str[0]));
+                    return new ScriptValue(str[0]);
                 }
             }
         }
