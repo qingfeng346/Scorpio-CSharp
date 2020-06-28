@@ -60,21 +60,18 @@ namespace Scorpio {
         }
 
         public int GetIndex(string key) {
-            int value;
-            if (m_Indexs.TryGetValue(key, out value)) {
+            if (m_Indexs.TryGetValue(key, out var value)) {
                 return value;
             }
             SetValue(key, ScriptValue.Null);
             return m_Indexs[key];
         }
         public override ScriptValue GetValue(string key) {
-            int index;
-            return m_Indexs.TryGetValue(key, out index) ? GetValueByIndex(index) : ScriptValue.Null;
+            return m_Indexs.TryGetValue(key, out var index) ? GetValueByIndex(index) : ScriptValue.Null;
         }
         public override ScriptValue GetValueByIndex(int key) { return m_Objects[key]; }
         public override void SetValue(string key, ScriptValue value) {
-            int index;
-            if (m_Indexs.TryGetValue(key, out index)) {
+            if (m_Indexs.TryGetValue(key, out var index)) {
                 SetValueByIndex(index, value);
                 return;
             }

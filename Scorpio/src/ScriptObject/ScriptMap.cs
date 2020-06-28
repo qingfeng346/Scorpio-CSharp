@@ -6,9 +6,11 @@ namespace Scorpio {
     public class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
         private Script m_Script;
         private Dictionary<object, ScriptValue> m_Objects = new Dictionary<object, ScriptValue>();  //所有的数据(函数和数据都在一个数组)
+        
         public ScriptMap(Script script) : base(ObjectType.Map, script.TypeMapValue) {
             m_Script = script;
         }
+        internal ScriptMap(Script script, ScriptValue[] parameters, int length) : this(script) { }
         public Script getScript() { return m_Script; }
         public new IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }

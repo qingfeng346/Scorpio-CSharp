@@ -133,8 +133,7 @@ namespace Scorpio.Compile.Compiler {
         public void Finished() {
             //计算局部变量是否是内部引用变量，并修改为 内部变量赋值 Opcode
             foreach (var instruction in m_listScriptInstructions) {
-                var internalValue = 0;
-                if (m_VariableToInternal.TryGetValue(instruction.opvalue, out internalValue)) {
+                if (m_VariableToInternal.TryGetValue(instruction.opvalue, out var internalValue)) {
                     if (instruction.opcode == Opcode.LoadLocal) {
                         instruction.SetOpcode(Opcode.LoadInternal, internalValue);
                     } else if (instruction.opcode == Opcode.StoreLocal) {

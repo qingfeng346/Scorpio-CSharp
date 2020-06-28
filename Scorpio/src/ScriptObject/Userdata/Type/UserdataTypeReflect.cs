@@ -54,8 +54,7 @@ namespace Scorpio.Userdata {
         }
         //获取一个变量
         private UserdataVariable GetVariable(string name) {
-            UserdataVariable value;
-            if (m_Variables.TryGetValue(name, out value))
+            if (m_Variables.TryGetValue(name, out var value))
                 return value;
             FieldInfo fInfo = m_Type.GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
@@ -85,15 +84,16 @@ namespace Scorpio.Userdata {
         }
         /// <summary> 获得函数 </summary>
         public override UserdataMethod GetMethod(string name) {
-            if (m_Functions.TryGetValue(name, out var userdataMethod)) return userdataMethod;
+            if (m_Functions.TryGetValue(name, out var userdataMethod))
+                return userdataMethod;
             return GetFunction(name);
         }
         /// <summary> 获得一个类变量 </summary>
         public override object GetValue(object obj, string name) {
-            UserdataMethodReflect userdataMethod;
-            if (m_Functions.TryGetValue(name, out userdataMethod)) return userdataMethod;
-            ScriptValue nestedType;
-            if (m_NestedTypes.TryGetValue(name, out nestedType)) return nestedType;
+            if (m_Functions.TryGetValue(name, out var userdataMethod)) 
+                return userdataMethod;
+            if (m_NestedTypes.TryGetValue(name, out var nestedType)) 
+                return nestedType;
             var variable = GetVariable(name);
             if (variable != null) return variable.GetValue(obj);
             userdataMethod = GetFunction(name);

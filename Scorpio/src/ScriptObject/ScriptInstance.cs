@@ -6,6 +6,7 @@ namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         protected Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptValue m_Prototype = ScriptValue.Null;
+        protected ScriptInstance(ObjectType objectType) : base(objectType) { }
         public ScriptInstance(ObjectType objectType, ScriptValue type) : base(objectType) {
             m_Prototype = type;
         }

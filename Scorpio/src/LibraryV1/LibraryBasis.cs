@@ -29,6 +29,14 @@
             script.NewNameGlobal("toEnum", "toenum");
 
             script.NewNameGlobal("typeOf", "typeof");
+
+            script.NewNameGlobal("pushSearch", "push_search");
+            script.NewNameGlobal("pushAssembly", "push_assembly");
+            script.NewNameGlobal("importType", "import_type");
+            script.NewNameGlobal("importNamespace", "import_namespace");
+            script.NewNameGlobal("importExtension", "import_extension");
+            script.NewNameGlobal("genericType", "generic_type");
+            script.NewNameGlobal("genericMethod", "generic_method");
         }
     }
 }

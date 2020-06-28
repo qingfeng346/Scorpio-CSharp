@@ -71,11 +71,11 @@ namespace Scorpio {
             AddPrimitivePrototype("Bool", ref m_TypeBool, ref m_TypeValueBool);
             AddPrimitivePrototype("Number", ref m_TypeNumber, ref m_TypeValueNumber);
             AddPrimitivePrototype("String", ref m_TypeString, ref m_TypeValueString);
+            AddPrimitivePrototype("Function", ref m_TypeFunction, ref m_TypeValueFunction);
 
-            AddBasicPrototype("Array", ref m_TypeArray, ref m_TypeValueArray);
-            AddBasicPrototype("Map", ref m_TypeMap, ref m_TypeValueMap);
-            AddBasicPrototype("Function", ref m_TypeFunction, ref m_TypeValueFunction);
-            AddBasicPrototype("StringBuilder", ref m_TypeStringBuilder, ref m_TypeValueStringBuilder);
+            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", TypeObjectValue), ref m_TypeValueArray);
+            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", TypeObjectValue), ref m_TypeValueMap);
+            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObjectValue), ref m_TypeValueStringBuilder);
 
             Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
             Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateValue(this));
@@ -105,10 +105,9 @@ namespace Scorpio {
             typeValue = new ScriptValue(type);
             Global.SetValue(name, typeValue);
         }
-        void AddBasicPrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
-            type = new ScriptTypeBasic(name, TypeObjectValue);
+        void AddBasicPrototype(ScriptType type, ref ScriptValue typeValue) {
             typeValue = new ScriptValue(type);
-            Global.SetValue(name, typeValue);
+            Global.SetValue(type.TypeName, typeValue);
         }
         ScriptValue Execute(string breviary, SerializeData data) {
             var contexts = new ScriptContext[data.Functions.Length];

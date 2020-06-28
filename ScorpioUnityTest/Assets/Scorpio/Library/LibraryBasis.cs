@@ -162,29 +162,20 @@ namespace Scorpio.Library {
             script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype(script)));
             script.SetGlobal("setPropertys", script.CreateFunction(new setPropertys()));
             script.SetGlobal("createArray", script.CreateFunction(new createArray()));
-            script.SetGlobal("createStringBuilder", script.CreateFunction(new createStringBuilder(script)));
             script.SetGlobal("base", script.CreateFunction(new @base()));
             script.SetGlobal("clone", script.CreateFunction(new clone()));
 
             script.SetGlobal("require", script.CreateFunction(new require(script)));
-            script.SetGlobal("pushSearch", script.CreateFunction(new pushSearch(script)));
-            script.SetGlobal("push_search", script.CreateFunction(new pushSearch(script)));
+            script.SetGlobal("setFastReflectClass", script.CreateFunction(new setFastReflectClass()));
+            script.SetGlobal("isFastReflectClass", script.CreateFunction(new isFastReflectClass()));
 
+            script.SetGlobal("pushSearch", script.CreateFunction(new pushSearch(script)));
             script.SetGlobal("pushAssembly", script.CreateFunction(new pushAssembly()));
             script.SetGlobal("importType", script.CreateFunction(new importType()));
             script.SetGlobal("importNamespace", script.CreateFunction(new importNamespace()));
+            script.SetGlobal("importExtension", script.CreateFunction(new importExtension()));
             script.SetGlobal("genericType", script.CreateFunction(new genericType()));
             script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod()));
-            script.SetGlobal("setFastReflectClass", script.CreateFunction(new setFastReflectClass()));
-            script.SetGlobal("isFastReflectClass", script.CreateFunction(new isFastReflectClass()));
-            script.SetGlobal("importExtension", script.CreateFunction(new importExtension()));
-
-            script.SetGlobal("push_assembly", script.CreateFunction(new pushAssembly()));
-            script.SetGlobal("import_type", script.CreateFunction(new importType()));
-            script.SetGlobal("import_namespace", script.CreateFunction(new importNamespace()));
-            script.SetGlobal("import_extension", script.CreateFunction(new importExtension()));
-            script.SetGlobal("generic_type", script.CreateFunction(new genericType()));
-            script.SetGlobal("generic_method", script.CreateFunction(new genericMethod()));
         }
         private class print : ScorpioHandle {
             private Script script;
@@ -487,15 +478,6 @@ namespace Scorpio.Library {
         private class createArray : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return ScriptValue.CreateValue(Array.CreateInstance(args[0].Get<ScriptUserdata>().Type, args[1].ToInt32()));
-            }
-        }
-        private class createStringBuilder : ScorpioHandle {
-            private Script m_Script;
-            public createStringBuilder(Script script) {
-                m_Script = script;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(new ScriptStringBuilder(m_Script));
             }
         }
         private class @base : ScorpioHandle {

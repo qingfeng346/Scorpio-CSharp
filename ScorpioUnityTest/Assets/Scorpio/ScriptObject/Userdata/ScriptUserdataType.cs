@@ -17,8 +17,7 @@ namespace Scorpio.Userdata {
             return new ScriptValue(m_UserdataType.CreateInstance(parameters, length));
         }
         public override ScriptValue GetValue(string key) {
-            ScriptValue value;
-            if (m_Methods.TryGetValue(key, out value)) {
+            if (m_Methods.TryGetValue(key, out var value)) {
                 return value;
             }
             var ret = m_UserdataType.GetValue(null, key);

@@ -13,8 +13,7 @@ public class DelegateFactory : IDelegateFactory {
         ScorpioDelegateFactory.SetFactory(new DelegateFactory());__DelegateList__CreateDelegate
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
-        Func<ScriptObject, Delegate> func;
-        if (delegates.TryGetValue(delegateType, out func)) {
+        if (delegates.TryGetValue(delegateType, out var func)) {
             return func(scriptObject);
         }
         throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);

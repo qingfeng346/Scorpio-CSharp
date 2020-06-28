@@ -35,7 +35,7 @@ namespace Scorpio {
         public override string ToString() { return $"Class<{TypeName}>"; }
     }
     //Object原表, GetValue 找不到就返回 null
-    public class ScriptTypeObject : ScriptType {
+    internal class ScriptTypeObject : ScriptType {
         public ScriptTypeObject(string typeName) : base(typeName, ScriptValue.Null) { }
         public override ScriptValue Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
@@ -45,19 +45,41 @@ namespace Scorpio {
             return m_Values.TryGetValue(key, out var value) ? value : ScriptValue.Null;
         }
     }
-    //自带基础类型的原表,不支持动态申请,只能已特定形式申请变量, number, string, bool 等
-    public class ScriptTypePrimitive : ScriptType {
+    //自带基础类型的原表,不支持动态申请,只能已特定形式申请变量, number, string, bool, function 等
+    internal class ScriptTypePrimitive : ScriptType {
         public ScriptTypePrimitive(string typeName, ScriptValue parentType) : base(typeName, parentType) { }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             throw new ExecutionException($"Class<{TypeName}>不支持构造");
         }
     }
-    //自带类型的原表
-    public class ScriptTypeBasic : ScriptType {
-        public ScriptTypeBasic(string typeName, ScriptValue parentType) : base(typeName, parentType) { }
+    //Array类型原表
+    internal class ScriptTypeBasicArray : ScriptType {
+        private Script m_Script;
+        internal ScriptTypeBasicArray(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
+            m_Script = script;
+        }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            throw new ExecutionException($"Class<{TypeName}>不支持构造");
+            return new ScriptValue(new ScriptArray(m_Script, parameters, length));
         }
     }
-
+    //Map原表
+    internal class ScriptTypeBasicMap : ScriptType {
+        private Script m_Script;
+        internal ScriptTypeBasicMap(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
+            m_Script = script;
+        }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            return new ScriptValue(new ScriptMap(m_Script, parameters, length));
+        }
+    }
+    //StringBuilding原表
+    internal class ScriptTypeBasicStringBuilder : ScriptType {
+        private Script m_Script;
+        internal ScriptTypeBasicStringBuilder(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
+            m_Script = script;
+        }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            return new ScriptValue(new ScriptStringBuilder(m_Script, parameters, length));
+        }
+    }
 }

@@ -17,8 +17,7 @@ namespace Scorpio.Userdata {
         public override Type ValueType { get { return Util.TYPE_TYPE; } }
         public override string ToString() { return m_ValueType.Name; }
         public override ScriptValue GetValue(string key) {
-            ScriptValue value;
-            if (m_Enums.TryGetValue(key, out value))
+            if (m_Enums.TryGetValue(key, out var value))
                 return value;
             throw new ExecutionException("枚举[" + m_ValueType.ToString() + "] 元素[" + key + "] 不存在");
         }

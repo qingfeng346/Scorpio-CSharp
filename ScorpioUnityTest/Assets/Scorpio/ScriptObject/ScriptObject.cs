@@ -6,6 +6,7 @@ namespace Scorpio {
         Array,          //数组
         Map,            //MAP
         Function,       //函数
+        StringBuilder,  //StringBuilder
         Instance,       //原表实例
         Enum,           //枚举
         Namespace,      //namespace
@@ -82,5 +83,6 @@ namespace Scorpio {
         public bool IsInstance => ObjectType == ObjectType.Instance;
         public bool IsEnum => ObjectType == ObjectType.Enum;
         public bool IsUserData => ObjectType == ObjectType.UserData;
+        public bool IsStringBuilder => ObjectType == ObjectType.StringBuilder;
     }
 }

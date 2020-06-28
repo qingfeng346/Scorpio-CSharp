@@ -13,8 +13,7 @@ namespace Scorpio.Userdata {
             this.m_UserdataType = type;
         }
         public override ScriptValue GetValue(string key) {
-            ScriptValue value;
-            if (m_Methods.TryGetValue(key, out value)) {
+            if (m_Methods.TryGetValue(key, out var value)) {
                 return value;
             }
             var ret = m_UserdataType.GetValue(m_Value, key);

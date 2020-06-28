@@ -56,10 +56,16 @@ namespace Scorpio {
         private Script m_Script;
         internal ScriptValue[] m_Objects;
         internal int m_Length;
+        
         public ScriptArray(Script script) : base(ObjectType.Array, script.TypeArrayValue) {
             m_Script = script;
             m_Objects = ScriptValue.EMPTY;
             m_Length = 0;
+        }
+        internal ScriptArray(Script script, ScriptValue[] parameters, int length) : this(script) {
+            for (var i = 0; i < length;++i) {
+                Add(parameters[i]);
+            }
         }
         public Script getScript() { return m_Script; }
         internal ScriptValue[] getObjects() { return m_Objects; }
