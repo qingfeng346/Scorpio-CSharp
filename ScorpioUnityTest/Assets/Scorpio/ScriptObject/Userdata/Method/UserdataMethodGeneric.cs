@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 namespace Scorpio.Userdata {
     //实例化过后的模板函数

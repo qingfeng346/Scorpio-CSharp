@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using Scorpio;
 public class ScriptPrint : ScorpioHandle {

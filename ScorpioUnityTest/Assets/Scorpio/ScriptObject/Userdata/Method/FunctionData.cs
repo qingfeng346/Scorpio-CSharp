@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Scorpio.Tools;
 namespace Scorpio.Userdata {
     //单个函数的所有数据

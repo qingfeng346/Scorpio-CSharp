@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Compile.CodeDom {
+namespace Scorpio.Compile.CodeDom {
     //成员类型  a.b["c"].d[1]
     public abstract class CodeMember : CodeObject {
         public CodeObject Parent;       //父级

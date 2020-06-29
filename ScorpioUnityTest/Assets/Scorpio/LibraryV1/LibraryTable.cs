@@ -1,4 +1,4 @@
-﻿
+
 namespace Scorpio.LibraryV1 {
     public class LibraryTable {
         public static void Load(Script script) {

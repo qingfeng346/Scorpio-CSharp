@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Scorpio.Compile.Compiler {
     //脚本的表征类型
     public enum TokenType {

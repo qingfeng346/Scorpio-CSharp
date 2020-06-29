@@ -1,4 +1,4 @@
-﻿using Scorpio.Userdata;
+using Scorpio.Userdata;
 namespace Scorpio.Library {
     public partial class LibraryUserdata {
         public static void Load(Script script) {

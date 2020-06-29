@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Scorpio.Tools;
 namespace Scorpio.Userdata {
     /// <summary> 委托 Delegate Type </summary>

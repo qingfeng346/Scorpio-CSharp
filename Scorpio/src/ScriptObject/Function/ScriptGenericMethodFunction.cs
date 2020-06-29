@@ -1,4 +1,4 @@
-﻿using Scorpio.Userdata;
+using Scorpio.Userdata;
 using System;
 namespace Scorpio.Function {
     //生成后的模板实例函数,第一个参数为对象

@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Exception {
+namespace Scorpio.Exception {
     /// <summary> 执行代码抛出异常 </summary>
     public class ExecutionException : System.Exception {
         public string message;

@@ -1,4 +1,4 @@
-﻿using Scorpio.Instruction;
+using Scorpio.Instruction;
 namespace Scorpio.Compile.Compiler {
     public class ScriptInstructionCompiler {
         public ScriptInstruction instruction;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Scorpio.Compile.CodeDom {
     public class CodeNativeObject : CodeObject {
         public object obj;

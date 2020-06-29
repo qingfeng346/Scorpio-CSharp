@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Proto {
+namespace Scorpio.Proto {
     public class ProtoFunction {
         public static ScriptType Load(Script script, ScriptType ret) {
             ret.SetValue("bind", script.CreateFunction(new bind()));

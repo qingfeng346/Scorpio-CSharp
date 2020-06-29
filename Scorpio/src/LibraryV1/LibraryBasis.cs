@@ -1,4 +1,4 @@
-﻿namespace Scorpio.LibraryV1 {
+namespace Scorpio.LibraryV1 {
     public partial class LibraryBasis {
         public static void Load(Script script) {
             script.NewNameGlobal("isBoolean", "is_bool");

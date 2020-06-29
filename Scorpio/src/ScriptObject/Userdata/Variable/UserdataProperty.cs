@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Scorpio.Exception;
 using System;
 namespace Scorpio.Userdata {

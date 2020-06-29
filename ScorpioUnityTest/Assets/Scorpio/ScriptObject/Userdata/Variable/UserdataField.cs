@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 namespace Scorpio.Userdata {
     public class UserdataField : UserdataVariable {
         private FieldInfo m_Field;

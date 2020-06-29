@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Scorpio.Exception;
 namespace Scorpio.Function {
     public class ScriptHandleFunction : ScriptFunction {

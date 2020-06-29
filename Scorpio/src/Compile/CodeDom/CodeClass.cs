@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Compile.CodeDom {
+namespace Scorpio.Compile.CodeDom {
     //返回一个类
     public class CodeClass : CodeObject {
         public int index;

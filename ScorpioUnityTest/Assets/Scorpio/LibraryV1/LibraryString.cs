@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Scorpio.LibraryV1 {
     public class LibraryString {

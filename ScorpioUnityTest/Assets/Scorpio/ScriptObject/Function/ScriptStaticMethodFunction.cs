@@ -1,4 +1,4 @@
-﻿using Scorpio.Userdata;
+using Scorpio.Userdata;
 namespace Scorpio.Function {
     public class ScriptStaticMethodFunction : ScriptMethodFunction {
         public ScriptStaticMethodFunction(UserdataMethod method):base(method) { }

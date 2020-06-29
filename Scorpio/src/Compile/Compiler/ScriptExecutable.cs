@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Scorpio.Instruction;
 namespace Scorpio.Compile.Compiler {
     //指令块

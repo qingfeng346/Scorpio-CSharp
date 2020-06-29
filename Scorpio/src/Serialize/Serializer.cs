@@ -1,4 +1,4 @@
-﻿using Scorpio.Instruction;
+using Scorpio.Instruction;
 using Scorpio.Compile.Compiler;
 namespace Scorpio.Serialize {
     public class Serializer {

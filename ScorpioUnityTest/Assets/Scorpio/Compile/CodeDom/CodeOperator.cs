@@ -1,4 +1,4 @@
-﻿using Scorpio.Compile.Compiler;
+using Scorpio.Compile.Compiler;
 namespace Scorpio.Compile.CodeDom {
     //运算符号
     public class CodeOperator : CodeObject {

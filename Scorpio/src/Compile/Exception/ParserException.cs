@@ -1,4 +1,4 @@
-﻿using Scorpio.Compile.Compiler;
+using Scorpio.Compile.Compiler;
 namespace Scorpio.Compile.Exception {
     //解析语法异常
     public class ParserException : System.Exception {

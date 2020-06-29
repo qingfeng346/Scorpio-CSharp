@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 脚本语法解析 </summary>
     public partial class ScriptLexer {

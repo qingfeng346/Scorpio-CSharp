@@ -1,4 +1,4 @@
-﻿using Scorpio.Userdata;
+using Scorpio.Userdata;
 namespace Scorpio.Proto {
     public class ProtoObject {
         public static ScriptType Load(Script script, ScriptType ret) {

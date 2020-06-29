@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Compile.CodeDom {
+namespace Scorpio.Compile.CodeDom {
     //空返回 null ?? xxx
     public class CodeEmptyRet : CodeObject {
         public CodeObject Emtpy;    //判断条件

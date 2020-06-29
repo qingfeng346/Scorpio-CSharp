@@ -1,4 +1,4 @@
-﻿//#define SCORPIO_DYNAMIC_DELEGATE
+//#define SCORPIO_DYNAMIC_DELEGATE
 using System;
 using System.Collections.Generic;
 using System.Reflection;

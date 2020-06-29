@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Instruction {
+namespace Scorpio.Instruction {
     //单个类的信息
     public class ScriptClassData {
         public int name;            //类名

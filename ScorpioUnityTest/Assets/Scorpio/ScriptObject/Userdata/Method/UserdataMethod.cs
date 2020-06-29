@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Scorpio.Exception;
 namespace Scorpio.Userdata {
     public abstract class UserdataMethod {

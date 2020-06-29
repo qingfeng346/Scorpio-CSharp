@@ -1,4 +1,4 @@
-﻿using Scorpio.Runtime;
+using Scorpio.Runtime;
 namespace Scorpio.Function {
     public class ScriptScriptFunction : ScriptFunction {
         protected ScriptContext m_Context;

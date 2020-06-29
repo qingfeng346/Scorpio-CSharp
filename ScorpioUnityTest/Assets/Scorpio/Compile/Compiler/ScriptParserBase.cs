@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Scorpio.Compile.Exception;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>

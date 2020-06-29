@@ -1,4 +1,4 @@
-﻿using Scorpio.Exception;
+using Scorpio.Exception;
 using System;
 using System.Collections;
 using System.Collections.Generic;

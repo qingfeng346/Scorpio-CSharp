@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 namespace Scorpio.Tools {
     public static class Logger {
         [Conditional("DEBUG")]

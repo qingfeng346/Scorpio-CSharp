@@ -1,4 +1,4 @@
-﻿using Scorpio.Compile.Compiler;
+using Scorpio.Compile.Compiler;
 namespace Scorpio.Compile.Exception {
     //词法分析程序
     public class LexerException : System.Exception {

@@ -1,4 +1,4 @@
-﻿namespace Scorpio.LibraryV1 {
+namespace Scorpio.LibraryV1 {
     public class LibraryArray {
         public static void Load(Script script) {
             var map = new ScriptMap(script);

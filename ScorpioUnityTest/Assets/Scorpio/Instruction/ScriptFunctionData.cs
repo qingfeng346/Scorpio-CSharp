@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 namespace Scorpio.Instruction {
     //单个函数的信息
     public class ScriptFunctionData {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Scorpio.Library {
     public partial class LibraryMath {
         public const double PI = 3.1415926535897931;            //PI 三角函数

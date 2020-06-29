@@ -1,4 +1,4 @@
-﻿using Scorpio.LibraryV1;
+using Scorpio.LibraryV1;
 namespace Scorpio {
     public partial class Script {
         public void LoadLibraryV1() {

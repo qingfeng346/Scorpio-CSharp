@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 namespace Scorpio.Tools {
     public class ScorpioValue<TKey, TValue> {

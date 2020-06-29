@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Scorpio.Compile.Compiler;
 using Scorpio.Instruction;
 namespace Scorpio.Compile.CodeDom.Temp {

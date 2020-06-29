@@ -1,4 +1,4 @@
-﻿using Scorpio.Userdata;
+using Scorpio.Userdata;
 namespace Scorpio.Function {
     public class ScriptInstanceMethodFunction : ScriptMethodFunction {
         private object m_Object;

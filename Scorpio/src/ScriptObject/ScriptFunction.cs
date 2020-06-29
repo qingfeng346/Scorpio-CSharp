@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Scorpio
 {
     //C#类执行

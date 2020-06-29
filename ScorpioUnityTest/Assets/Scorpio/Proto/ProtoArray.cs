@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Proto {
+namespace Scorpio.Proto {
     public class ProtoArray {
         public static ScriptType Load(Script script, ScriptType ret) {
             ret.SetValue("length", script.CreateFunction(new length()));

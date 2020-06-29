@@ -1,4 +1,4 @@
-﻿//using Scorpio.Compiler;
+//using Scorpio.Compiler;
 //namespace Scorpio.Compile.CodeDom
 //{
 //    //try catch 语句

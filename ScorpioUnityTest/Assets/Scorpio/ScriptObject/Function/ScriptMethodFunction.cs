@@ -1,4 +1,4 @@
-﻿using Scorpio.Userdata;
+using Scorpio.Userdata;
 namespace Scorpio.Function {
     public abstract class ScriptMethodFunction : ScriptObject {
         public UserdataMethod Method;

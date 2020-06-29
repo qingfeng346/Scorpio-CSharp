@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Instruction {
+namespace Scorpio.Instruction {
     //指令集大类型
     public enum OpcodeType : byte {
         None,       //无效类型

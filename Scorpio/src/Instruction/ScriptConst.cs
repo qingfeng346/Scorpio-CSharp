@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Instruction {
+namespace Scorpio.Instruction {
     public class ScriptConst {
         public const string IteratorNext = "next";
     }

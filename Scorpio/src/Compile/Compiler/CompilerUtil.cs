@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 namespace Scorpio.Compile.Compiler {
     public static class CompilerUtil {
         public static void SetValue(this List<ScriptInstructionCompiler> instructionCompilers, int value) {

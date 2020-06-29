@@ -1,4 +1,4 @@
-﻿//using System.Collections.Generic;
+//using System.Collections.Generic;
 //using Scorpio;
 //using Scorpio.CodeDom;
 //using Scorpio.Compiler;

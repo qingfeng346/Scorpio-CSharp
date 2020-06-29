@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Scorpio.Exception;
 namespace Scorpio.Library {
     public partial class LibraryJson {

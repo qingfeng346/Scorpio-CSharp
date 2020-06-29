@@ -1,4 +1,4 @@
-﻿using Scorpio.Compile.Compiler;
+using Scorpio.Compile.Compiler;
 namespace Scorpio.Compile.CodeDom {
     //赋值变量 = += -= /= *= %= |= &= ^= >>= <<=
     public class CodeAssign : CodeObject {

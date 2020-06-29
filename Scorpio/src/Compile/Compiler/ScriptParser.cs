@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Scorpio.Compile.Exception;
 using Scorpio.Compile.CodeDom;
 using Scorpio.Compile.CodeDom.Temp;

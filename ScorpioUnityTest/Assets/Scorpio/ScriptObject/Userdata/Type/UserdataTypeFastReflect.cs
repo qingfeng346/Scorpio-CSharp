@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Scorpio.Userdata {
     //去反射类

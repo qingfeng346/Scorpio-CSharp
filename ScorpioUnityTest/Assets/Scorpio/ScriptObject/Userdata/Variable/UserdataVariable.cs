@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Scorpio.Userdata {
     //一个类的变量
     public abstract class UserdataVariable {

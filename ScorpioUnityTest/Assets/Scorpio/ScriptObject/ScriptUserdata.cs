@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Scorpio {
     //语言数据
     public abstract class ScriptUserdata : ScriptObject {

@@ -1,4 +1,4 @@
-﻿namespace Scorpio.Runtime {
+namespace Scorpio.Runtime {
     public class InternalValue {
         public ScriptValue value;
     }

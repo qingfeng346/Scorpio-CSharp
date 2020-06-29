@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Tools;
