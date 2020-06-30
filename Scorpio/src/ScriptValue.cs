@@ -333,7 +333,16 @@ namespace Scorpio {
             }
         }
         public override int GetHashCode() {
-            return base.GetHashCode();
+            switch (valueType) {
+                case nullValueType: return 0;
+                case trueValueType: return true.GetHashCode();
+                case falseValueType: return false.GetHashCode();
+                case doubleValueType: return doubleValue.GetHashCode();
+                case longValueType: return longValue.GetHashCode();
+                case stringValueType: return stringValue.GetHashCode();
+                case objectValueType: return objectValue.GetHashCode();
+                default: return scriptValue.GetHashCode();
+            }
         }
         public override bool Equals(object obj) {
             if (obj == null) { return valueType == nullValueType; }
@@ -364,8 +373,6 @@ namespace Scorpio {
                 default: return true;
             }
         }
-
-
 
         //public static bool operator ==(ScriptValue a1, ScriptValue a2) {
         //    return a1.Equals(a2);
@@ -400,7 +407,9 @@ namespace Scorpio {
             else if (value is double)
                 return new ScriptValue((double)value);
             else if (value is sbyte || value is byte || value is short || value is ushort || value is int || value is uint || value is float || value is decimal)
-                return new ScriptValue(System.Convert.ToDouble(value));
+                return new ScriptValue(Convert.ToDouble(value));
+            else if (value is ulong)
+                return new ScriptValue((ulong)value);
             else if (value is ScriptObject)
                 return new ScriptValue((ScriptObject)value);
             else if (value is Type)
@@ -416,27 +425,20 @@ namespace Scorpio {
 
 
         public bool Less(ScriptValue value) {
-            if (valueType == ScriptValue.scriptValueType) {
-                return scriptValue.Less(value);
-            } else if (valueType == value.valueType) {
-                switch (valueType) {
-                    case ScriptValue.doubleValueType: return doubleValue < value.doubleValue;
-                    case ScriptValue.longValueType: return longValue < value.longValue;
-                }
+            switch (valueType) {
+                case scriptValueType: return scriptValue.Less(value);
+                case doubleValueType: return value.valueType == doubleValueType && doubleValue < value.doubleValue;
+                case longValueType: return value.valueType == longValueType && longValue < value.longValue;
+                default: throw new ExecutionException("【<】运算符不支持当前类型 : " + ValueTypeName);
             }
-            throw new ExecutionException("【<】运算符不支持当前类型 : " + ValueTypeName);
         }
         public bool Greater(ScriptValue value) {
-            if (valueType == ScriptValue.scriptValueType) {
-                return scriptValue.Greater(value);
-            } else if (valueType == value.valueType) {
-                switch (valueType) {
-                    case ScriptValue.doubleValueType: return doubleValue > value.doubleValue;
-                    case ScriptValue.longValueType: return longValue > value.longValue;
-                }
+            switch (valueType) {
+                case scriptValueType: return scriptValue.Greater(value);
+                case doubleValueType: return value.valueType == doubleValueType && doubleValue > value.doubleValue;
+                case longValueType: return value.valueType == longValueType && longValue > value.longValue;
+                default: throw new ExecutionException("【>】运算符不支持当前类型 : " + ValueTypeName);
             }
-            throw new ExecutionException("【>】运算符不支持当前类型 : " + ValueTypeName);
         }
-
     }
 }
