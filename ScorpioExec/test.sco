@@ -1,5 +1,11 @@
-class Test1 {
+class Test {
+    // constructor() {
+    //     print("0000000")
+    // }
+}
+class Test1 : Test {
     constructor() {
+        // base.constructor()
         this.a = 100
         print("11111 : " + this)
     }
@@ -32,9 +38,10 @@ class Test3 : Test1 {
     }
 }
 var t2 = new Test2()
-var t3 = new Test3()
-t2.hello()
-t3.hello()
+// var t3 = new Test3()
+// t2.hello()
+// t3.hello()
+print(getPrototype(getPrototype(t2)))
 // aaa = {}
 // b = 100
 // print(aaa, b)
