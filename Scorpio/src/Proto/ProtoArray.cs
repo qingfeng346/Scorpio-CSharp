@@ -243,7 +243,7 @@ namespace Scorpio.Proto {
                         }
                     }
                 }
-                return ScriptValue.Zero;
+                return ScriptValue.InvalidIndex;
             }
         }
         private class forEachLast : ScorpioHandle {
@@ -257,7 +257,7 @@ namespace Scorpio.Proto {
                         }
                     }
                 }
-                return ScriptValue.Zero;
+                return ScriptValue.InvalidIndex;
             }
         }
         private class map : ScorpioHandle {

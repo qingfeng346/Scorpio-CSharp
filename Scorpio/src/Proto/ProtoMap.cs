@@ -59,15 +59,14 @@ namespace Scorpio.Proto {
                 var func = args[0].Get<ScriptFunction>();
                 if (func != null) {
                     var map = thisObject.Get<ScriptMap>();
-                    var index = 0;
                     foreach (var pair in map) {
-                        ++index;
-                        if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).valueType == ScriptValue.falseValueType) {
-                            return new ScriptValue((double)index);
+                        var key = ScriptValue.CreateValue(pair.Key);
+                        if (func.Call(key, pair.Value).valueType == ScriptValue.falseValueType) {
+                            return key;
                         }
                     }
                 }
-                return ScriptValue.Zero;
+                return ScriptValue.Null;
             }
         }
         private class forEachValue : ScorpioHandle {
@@ -75,15 +74,14 @@ namespace Scorpio.Proto {
                 var func = args[0].Get<ScriptFunction>();
                 if (func != null) {
                     var map = thisObject.Get<ScriptMap>();
-                    var index = 0;
                     foreach (var pair in map) {
-                        ++index;
-                        if (func.Call(pair.Value, ScriptValue.CreateValue(pair.Key)).valueType == ScriptValue.falseValueType) {
-                            return new ScriptValue((double)index);
+                        var key = ScriptValue.CreateValue(pair.Key);
+                        if (func.Call(pair.Value, key).valueType == ScriptValue.falseValueType) {
+                            return key;
                         }
                     }
                 }
-                return ScriptValue.Zero;
+                return ScriptValue.Null;
             }
         }
         private class plus : ScorpioHandle {
