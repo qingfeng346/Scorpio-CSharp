@@ -234,7 +234,7 @@ namespace Scorpio {
         }
 
 
-#if SCORPIO_DEBUG
+#if SCORPIO_DEBUG || SCORPIO_STACK
         private Stack<StackInfo> m_StackInfos = new Stack<StackInfo>(); //堆栈信息
         internal void PushStackInfo(string breviary, int line) {
             m_StackInfos.Push(new StackInfo() { Breviary = breviary, Line = line });
