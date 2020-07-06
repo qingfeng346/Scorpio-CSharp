@@ -699,7 +699,11 @@ namespace Scorpio.Compile.Compiler {
                         } else if (obj is CodeMemberInternal) {
                             AddScriptInstruction(Opcode.LoadInternal, member.index, obj.Line);
                         } else if (obj is CodeMemberString) {
-                            AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(member.key), obj.Line);
+                            if ((obj as CodeMemberString).key == "base") {
+                                AddScriptInstructionWithoutValue(Opcode.LoadBase, obj.Line);
+                            } else {
+                                AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(member.key), obj.Line);
+                            }
                         }
                     } else {
                         PushObject(member.Parent);
@@ -762,8 +766,10 @@ namespace Scorpio.Compile.Compiler {
                         }
                         var member = codeCallFunction.Member as CodeMember;     //函数对象
                         var isCallVi = (member?.Parent != null);                //是否有函数父级
+                        var isBase = false;                                     //base调用
                         if (isCallVi) {
                             PushObject(member.Parent);
+                            isBase = (member.Parent as CodeMemberString)?.key == "base";
                             AddScriptInstructionWithoutValue(Opcode.CopyStackTop);
                             var memberNullTo = member.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
                             if (member is CodeMemberIndex) {
@@ -784,10 +790,22 @@ namespace Scorpio.Compile.Compiler {
                         }
                         //没有展开参数
                         if (unfold == 0L) {
-                            AddScriptInstruction(isCallVi ? Opcode.CallVi : Opcode.Call, parameters.Count, obj.Line);
+                            if (isBase) {
+                                AddScriptInstruction(Opcode.CallBase, parameters.Count, obj.Line);
+                            } else if (isCallVi) {
+                                AddScriptInstruction(Opcode.CallVi, parameters.Count, obj.Line);
+                            } else {
+                                AddScriptInstruction(Opcode.Call, parameters.Count, obj.Line);
+                            }
                         } else {
                             var value = System.Convert.ToInt64(parameters.Count) << 8 | unfold;
-                            AddScriptInstruction(isCallVi ? Opcode.CallViUnfold : Opcode.CallUnfold, GetConstLong(value), obj.Line);
+                            if (isBase) {
+                                AddScriptInstruction(Opcode.CallBaseUnfold, GetConstLong(value), obj.Line);
+                            } else if (isCallVi) {
+                                AddScriptInstruction(Opcode.CallViUnfold, GetConstLong(value), obj.Line);
+                            } else {
+                                AddScriptInstruction(Opcode.CallUnfold, GetConstLong(value), obj.Line);
+                            }
                         }
                         if (codeCallFunction.Variables != null) {
                             foreach (var variable in codeCallFunction.Variables.Variables) {

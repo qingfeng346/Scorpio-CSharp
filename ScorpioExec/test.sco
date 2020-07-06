@@ -1,15 +1,52 @@
+class Test1 {
+    constructor() {
+        this.a = 100
+        print("11111 : " + this)
+    }
+    hello() {
+        print("hello1")
+    }
+}
+class Test2 : Test1 {
+    constructor() {
+        base.constructor()
+        this.b = 200
+        print("22222 : " + this)
+        print(this.a, this.b)
+    }
+    hello() {
+        print("hello2")
+    }
+}
+class Test3 : Test1 {
+    constructor() {
+        this.a = 500
+        base.constructor()
+        this.b = 300
+        print("33333 : " + this)
+        print(this.a, this.b)
+        print(base.a)
+    }
+    hello() {
+        print("hello3")
+    }
+}
+var t2 = new Test2()
+var t3 = new Test3()
+t2.hello()
+t3.hello()
 // aaa = {}
 // b = 100
 // print(aaa, b)
 // var a = aaa[b] ?? (aaa[b] = [])
 // a.add(100)
-var a = createStringBuilder()
+// var a = createStringBuilder()
 // for (var i = 0, 100) {
 //     a.append('0')
 // }
-a.setLength(100)
-a[10]= 97
-print(a)
+// a.setLength(100)
+// a[10]= 97
+// print(a)
 // a[50] = 98
 // print(a)
 // a = []

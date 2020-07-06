@@ -30,6 +30,7 @@ namespace Scorpio.Instruction {
         LoadValueString,        //push a value by string
         LoadValueObject,        //push a value by object
         LoadValueObjectDup,     //push a value by object
+        LoadBase,               //push base value
         CopyStackTop,           //复制栈顶的数据
         CopyStackTopIndex,      //复制栈顶的数据
         LoadEnd,
@@ -106,6 +107,8 @@ namespace Scorpio.Instruction {
         CallVi,                 //调用内部函数
         CallUnfold,             //调用一个函数 有参数需要展开
         CallViUnfold,           //调用内部函数 有参数需要展开
+        CallBase,               //调用父级函数
+        CallBaseUnfold,         //调用父级函数 有参数需要展开
         RetNone,                //return
         Ret,                    //return a value
         NotNullTo,              //如果栈顶不为null则跳转

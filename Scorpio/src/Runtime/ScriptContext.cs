@@ -127,15 +127,18 @@ namespace Scorpio.Runtime {
                                         stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
                                         continue;
                                     }
-                                    case Opcode.LoadConstNull:
+                                    case Opcode.LoadConstNull: {
                                         stackObjects[++stackIndex].valueType = ScriptValue.nullValueType;
                                         continue;
-                                    case Opcode.LoadConstTrue:
+                                    }
+                                    case Opcode.LoadConstTrue: {
                                         stackObjects[++stackIndex].valueType = ScriptValue.trueValueType;
                                         continue;
-                                    case Opcode.LoadConstFalse:
+                                    }
+                                    case Opcode.LoadConstFalse: {
                                         stackObjects[++stackIndex].valueType = ScriptValue.falseValueType;
                                         continue;
+                                    }
                                     case Opcode.LoadConstLong: {
                                         stackObjects[++stackIndex].longValue = constLong[opvalue];
                                         stackObjects[stackIndex].valueType = ScriptValue.longValueType;
@@ -282,8 +285,12 @@ namespace Scorpio.Runtime {
                                         stackObjects[++stackIndex] = stackObjects[stackIndex - opvalue - 1];
                                         continue;
                                     }
+                                    case Opcode.LoadBase: {
+                                        stackObjects[++stackIndex] = thisObject.Get<ScriptInstance>().Prototype.Get<ScriptType>().Prototype;
+                                        continue;
+                                    }
+                                    default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
-                                continue;
                             case OpcodeType.Store:
                                 switch (opcode) {
                                     //-------------下面为 = *= -= 等赋值操作, 压入计算结果
@@ -387,9 +394,10 @@ namespace Scorpio.Runtime {
                                         stackObjects[stackIndex -= 2] = stackObjects[tempIndex];
                                         continue;
                                     }
-                                    case Opcode.StoreGlobalAssign:
+                                    case Opcode.StoreGlobalAssign: {
                                         m_global.SetValueByIndex(opvalue, stackObjects[stackIndex]);
                                         continue;
+                                    }
                                     case Opcode.StoreGlobalStringAssign: {
                                         m_global.SetValue(constString[opvalue], stackObjects[stackIndex]);
                                         instruction.SetOpcode(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]));
@@ -480,16 +488,17 @@ namespace Scorpio.Runtime {
                                         stackIndex -= 2;
                                         continue;
                                     }
-                                    case Opcode.StoreGlobal:
+                                    case Opcode.StoreGlobal: {
                                         m_global.SetValueByIndex(opvalue, stackObjects[stackIndex--]);
                                         continue;
+                                    }
                                     case Opcode.StoreGlobalString: {
                                         m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
                                         instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
                                         continue;
                                     }
+                                    default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
-                                continue;
                             case OpcodeType.Compute:
                                 switch (opcode) {
                                     case Opcode.Plus: {
@@ -847,8 +856,8 @@ namespace Scorpio.Runtime {
                                             throw new ExecutionException($"当前数据类型不支持取非操作 : {stackObjects[stackIndex].ValueTypeName}");
                                         }
                                     }
+                                    default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
-                                continue;
                             case OpcodeType.Compare:
                                 switch (opcode) {
                                     case Opcode.Less: {
@@ -1123,19 +1132,22 @@ namespace Scorpio.Runtime {
                                                 throw new ExecutionException($"【!=】未知的数据类型 {stackObjects[tempIndex].ValueTypeName}");
                                         }
                                     }
+                                    default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
-                                continue;
                             case OpcodeType.Jump:
                                 switch (opcode) {
-                                    case Opcode.Jump:
+                                    case Opcode.Jump: {
                                         iInstruction = opvalue;
                                         continue;
-                                    case Opcode.Pop:
+                                    }
+                                    case Opcode.Pop: {
                                         --stackIndex;
                                         continue;
-                                    case Opcode.PopNumber:
+                                    }
+                                    case Opcode.PopNumber: {
                                         stackIndex -= opvalue;
                                         continue;
+                                    }
                                     case Opcode.Call: {
                                         for (var i = opvalue - 1; i >= 0; --i) {
                                             parameters[i] = stackObjects[stackIndex--];
@@ -1234,10 +1246,12 @@ namespace Scorpio.Runtime {
                                                 continue;
                                         }
                                     }
-                                    case Opcode.RetNone:
+                                    case Opcode.RetNone: {
                                         return ScriptValue.Null;
-                                    case Opcode.Ret:
+                                    }
+                                    case Opcode.Ret: {
                                         return stackObjects[stackIndex];
+                                    }
                                     case Opcode.CallUnfold: {
                                         var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
                                         var unfold = value & 0xff; //折叠标志位
@@ -1339,8 +1353,64 @@ namespace Scorpio.Runtime {
                                     case Opcode.Throw: {
                                         throw new ScriptException(stackObjects[stackIndex]);
                                     }
+                                    case Opcode.CallBase: {
+                                        for (var i = opvalue - 1; i >= 0; --i) {
+                                            parameters[i] = stackObjects[stackIndex--];
+                                        }
+                                        var func = stackObjects[stackIndex--];
+                                        --stackIndex;
+#if SCORPIO_DEBUG || SCORPIO_STACK
+                                        m_script.PushStackInfo(m_Breviary, instruction.line);
+                                        try {
+                                            stackObjects[++stackIndex] = func.Call(thisObject, parameters, opvalue);
+                                        } finally {
+                                            m_script.PopStackInfo();
+                                        }
+#else
+                                        stackObjects[++stackIndex] = func.Call (thisObject, parameters, opvalue);
+#endif
+                                        continue;
+                                    }
+                                    case Opcode.CallBaseUnfold: {
+                                        var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                                        var unfold = value & 0xff; //折叠标志位
+                                        var funcParameterCount = (int)(value >> 8); //参数个数
+                                        var startIndex = stackIndex - funcParameterCount + 1;
+                                        var parameterIndex = 0;
+                                        for (var i = 0; i < funcParameterCount; ++i) {
+                                            var parameter = stackObjects[startIndex + i];
+                                            if ((unfold & (1L << i)) != 0) {
+                                                var array = parameter.Get<ScriptArray>();
+                                                if (array != null) {
+                                                    var values = array.getObjects();
+                                                    var valueLength = array.Length();
+                                                    for (var j = 0; j < valueLength; ++j) {
+                                                        parameters[parameterIndex++] = values[j];
+                                                    }
+                                                } else {
+                                                    parameters[parameterIndex++] = parameter;
+                                                }
+                                            } else {
+                                                parameters[parameterIndex++] = parameter;
+                                            }
+                                        }
+                                        stackIndex -= funcParameterCount;
+                                        var func = stackObjects[stackIndex--]; //函数对象
+                                        --stackIndex;
+#if SCORPIO_DEBUG || SCORPIO_STACK
+                                        m_script.PushStackInfo(m_Breviary, instruction.line);
+                                        try {
+                                            stackObjects[++stackIndex] = func.Call(thisObject, parameters, parameterIndex);
+                                        } finally {
+                                            m_script.PopStackInfo();
+                                        }
+#else
+                                        stackObjects[++stackIndex] = func.Call (thisObject, parameters, parameterIndex);
+#endif
+                                        continue;
+                                    }
+                                    default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
-                                continue;
                             case OpcodeType.New:
                                 switch (opcode) {
                                     case Opcode.NewMap: {
@@ -1418,8 +1488,8 @@ namespace Scorpio.Runtime {
                                         stackObjects[stackIndex].scriptValue = type;
                                         continue;
                                     }
+                                    default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
-                                continue;
                         }
                     }
                     //正常执行命令到最后,判断堆栈是否清空 return 或 exception 不判断
