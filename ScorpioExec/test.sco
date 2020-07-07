@@ -1,11 +1,12 @@
 class Test {
-    // constructor() {
-    //     print("0000000")
-    // }
+    constructor() {
+        print("0000000 : " + this)
+    }
 }
 class Test1 : Test {
     constructor() {
-        // base.constructor()
+        print(base)
+        base.constructor()
         this.a = 100
         print("11111 : " + this)
     }
@@ -15,6 +16,7 @@ class Test1 : Test {
 }
 class Test2 : Test1 {
     constructor() {
+        print(base)
         base.constructor()
         this.b = 200
         print("22222 : " + this)
