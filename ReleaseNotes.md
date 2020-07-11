@@ -1,3 +1,19 @@
+### v2.0.9
+*2020-07-11*
+### 新增功能
+* 增加 StringBuilder 原型类
+* String 支持 []
+* String 函数 at 第二个参数支持返回 code 或 String
+* String 增加 indexOfChar  lastIndexOfChar 函数
+* Array Map StringBuilder 支持 new
+* 支持 base 语法, 原 base 函数改为 getBase
+* Array 增加 convertAll 函数
+* Map 增加 find findValue 函数
+### 优化修改
+* 整理 GetHashCode
+* Array forEach 返回值改为索引值
+* Map forEach 返回值改为Key值
+
 ### v2.0.8
 *2020-06-10*
 ### 新增功能

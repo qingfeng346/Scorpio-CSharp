@@ -11,6 +11,8 @@ namespace Scorpio.Proto {
             ret.SetValue("values", script.CreateFunction(new values()));
             ret.SetValue("forEach", script.CreateFunction(new forEach()));
             ret.SetValue("forEachValue", script.CreateFunction(new forEachValue()));
+            ret.SetValue("find", script.CreateFunction(new find()));
+            ret.SetValue("findValue", script.CreateFunction(new findValue()));
             ret.SetValue("+", script.CreateFunction(new plus()));
             ret.SetValue("-", script.CreateFunction(new minus()));
             return ret;
@@ -57,33 +59,45 @@ namespace Scorpio.Proto {
         private class forEach : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var map = thisObject.Get<ScriptMap>();
-                    var index = 0;
-                    foreach (var pair in map) {
-                        ++index;
-                        if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).valueType == ScriptValue.falseValueType) {
-                            return new ScriptValue((double)index);
-                        }
+                foreach (var pair in thisObject.Get<ScriptMap>()) {
+                    if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).valueType == ScriptValue.falseValueType) {
+                        return ScriptValue.CreateValue(pair.Key);
                     }
                 }
-                return ScriptValue.Zero;
+                return ScriptValue.Null;
             }
         }
         private class forEachValue : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var map = thisObject.Get<ScriptMap>();
-                    var index = 0;
-                    foreach (var pair in map) {
-                        ++index;
-                        if (func.Call(pair.Value, ScriptValue.CreateValue(pair.Key)).valueType == ScriptValue.falseValueType) {
-                            return new ScriptValue((double)index);
-                        }
+                foreach (var pair in thisObject.Get<ScriptMap>()) {
+                    if (func.Call(pair.Value, ScriptValue.CreateValue(pair.Key)).valueType == ScriptValue.falseValueType) {
+                        return ScriptValue.CreateValue(pair.Key);
                     }
                 }
-                return ScriptValue.Zero;
+                return ScriptValue.Null;
+            }
+        }
+        private class find : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var func = args[0].Get<ScriptFunction>();
+                foreach (var pair in thisObject.Get<ScriptMap>()) {
+                    if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).IsTrue) {
+                        return ScriptValue.CreateValue(pair.Key);
+                    }
+                }
+                return ScriptValue.Null;
+            }
+        }
+        private class findValue : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var func = args[0].Get<ScriptFunction>();
+                foreach (var pair in thisObject.Get<ScriptMap>()) {
+                    if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).IsTrue) {
+                        return pair.Value;
+                    }
+                }
+                return ScriptValue.Null;
             }
         }
         private class plus : ScorpioHandle {

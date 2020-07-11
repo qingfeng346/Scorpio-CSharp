@@ -24,6 +24,7 @@ namespace Scorpio.Proto {
             ret.SetValue("findAllLastIndex", script.CreateFunction(new findAllLastIndex()));
             ret.SetValue("forEach", script.CreateFunction(new forEach()));
             ret.SetValue("forEachLast", script.CreateFunction(new forEachLast()));
+            ret.SetValue("convertAll", script.CreateFunction(new map()));
             ret.SetValue("map", script.CreateFunction(new map()));
             ret.SetValue("reverse", script.CreateFunction(new reverse()));
             ret.SetValue("first", script.CreateFunction(new first()));
@@ -116,13 +117,11 @@ namespace Scorpio.Proto {
         }
         private class find : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptArray>();
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var array = thisObject.Get<ScriptArray>();
-                    foreach (var value in array) {
-                        if (func.Call(value).IsTrue) {
-                            return value;
-                        }
+                for (int i = 0, count = array.Length(); i < count; ++i) {
+                    if (func.Call(array[i]).IsTrue) {
+                        return array[i];
                     }
                 }
                 return ScriptValue.Null;
@@ -130,14 +129,11 @@ namespace Scorpio.Proto {
         }
         private class findIndex : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptArray>();
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var array = thisObject.Get<ScriptArray>();
-                    var count = array.Length();
-                    for (var i = 0; i < count; ++i) {
-                        if (func.Call(array[i]).IsTrue) {
-                            return new ScriptValue((double)i);
-                        }
+                for (int i = 0, count = array.Length(); i < count; ++i) {
+                    if (func.Call(array[i]).IsTrue) {
+                        return new ScriptValue((double)i);
                     }
                 }
                 return ScriptValue.InvalidIndex;
@@ -145,13 +141,11 @@ namespace Scorpio.Proto {
         }
         private class findLast : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptArray>();
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var array = thisObject.Get<ScriptArray>();
-                    for (var i = array.Length() - 1; i >= 0; --i) {
-                        if (func.Call(array[i]).IsTrue) {
-                            return array[i];
-                        }
+                for (int i = array.Length() - 1; i >= 0; --i) {
+                    if (func.Call(array[i]).IsTrue) {
+                        return array[i];
                     }
                 }
                 return ScriptValue.Null;
@@ -159,13 +153,11 @@ namespace Scorpio.Proto {
         }
         private class findLastIndex : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptArray>();
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var array = thisObject.Get<ScriptArray>();
-                    for (var i = array.Length() - 1; i >= 0; --i) {
-                        if (func.Call(array[i]).IsTrue) {
-                            return new ScriptValue((double)i);
-                        }
+                for (int i = array.Length() - 1; i >= 0; --i) {
+                    if (func.Call(array[i]).IsTrue) {
+                        return new ScriptValue((double)i);
                     }
                 }
                 return ScriptValue.InvalidIndex;
@@ -176,11 +168,9 @@ namespace Scorpio.Proto {
                 var array = thisObject.Get<ScriptArray>();
                 var ret = new ScriptArray(array.getScript());
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    foreach (var value in array) {
-                        if (func.Call(value).IsTrue) {
-                            ret.Add(value);
-                        }
+                for (int i = 0, count = array.Length(); i < count; ++i) {
+                    if (func.Call(array[i]).IsTrue) {
+                        ret.Add(array[i]);
                     }
                 }
                 return new ScriptValue(ret);
@@ -191,12 +181,9 @@ namespace Scorpio.Proto {
                 var array = thisObject.Get<ScriptArray>();
                 var ret = new ScriptArray(array.getScript());
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var count = array.Length();
-                    for (var i = 0; i < count; ++i) {
-                        if (func.Call(array[i]).IsTrue) {
-                            ret.Add(new ScriptValue((double)i));
-                        }
+                for (int i = 0, count = array.Length(); i < count; ++i) {
+                    if (func.Call(array[i]).IsTrue) {
+                        ret.Add(new ScriptValue((double)i));
                     }
                 }
                 return new ScriptValue(ret);
@@ -207,11 +194,9 @@ namespace Scorpio.Proto {
                 var array = thisObject.Get<ScriptArray>();
                 var ret = new ScriptArray(array.getScript());
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    for (var i = array.Length(); i >= 0; --i) {
-                        if (func.Call(array[i]).IsTrue) {
-                            ret.Add(array[i]);
-                        }
+                for (var i = array.Length() - 1; i >= 0; --i) {
+                    if (func.Call(array[i]).IsTrue) {
+                        ret.Add(array[i]);
                     }
                 }
                 return new ScriptValue(ret);
@@ -222,11 +207,9 @@ namespace Scorpio.Proto {
                 var array = thisObject.Get<ScriptArray>();
                 var ret = new ScriptArray(array.getScript());
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    for (var i = array.Length(); i >= 0; --i) {
-                        if (func.Call(array[i]).IsTrue) {
-                            ret.Add(new ScriptValue((double)i));
-                        }
+                for (var i = array.Length() - 1; i >= 0; --i) {
+                    if (func.Call(array[i]).IsTrue) {
+                        ret.Add(new ScriptValue((double)i));
                     }
                 }
                 return new ScriptValue(ret);
@@ -235,29 +218,25 @@ namespace Scorpio.Proto {
         private class forEach : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var array = thisObject.Get<ScriptArray>();
-                    for (var i = 0; i < array.Length(); ++i) {
-                        if (func.Call(array[i], new ScriptValue((double)i)).valueType == ScriptValue.falseValueType) {
-                            return new ScriptValue((double)i);
-                        }
+                var array = thisObject.Get<ScriptArray>();
+                for (int i = 0, count = array.Length(); i < count; ++i) {
+                    if (func.Call(array[i], new ScriptValue((double)i)).valueType == ScriptValue.falseValueType) {
+                        return new ScriptValue((double)i);
                     }
                 }
-                return ScriptValue.Zero;
+                return ScriptValue.InvalidIndex;
             }
         }
         private class forEachLast : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptArray>();
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    var array = thisObject.Get<ScriptArray>();
-                    for (var i = array.Length() - 1; i >= 0; --i) {
-                        if (func.Call(array[i], new ScriptValue((double)i)).valueType == ScriptValue.falseValueType) {
-                            return new ScriptValue((double)i);
-                        }
+                for (var i = array.Length() - 1; i >= 0; --i) {
+                    if (func.Call(array[i], new ScriptValue((double)i)).valueType == ScriptValue.falseValueType) {
+                        return new ScriptValue((double)i);
                     }
                 }
-                return ScriptValue.Zero;
+                return ScriptValue.InvalidIndex;
             }
         }
         private class map : ScorpioHandle {
@@ -265,10 +244,8 @@ namespace Scorpio.Proto {
                 var array = thisObject.Get<ScriptArray>();
                 var ret = new ScriptArray(array.getScript());
                 var func = args[0].Get<ScriptFunction>();
-                if (func != null) {
-                    foreach (var value in array) {
-                        ret.Add(func.Call(value));
-                    }
+                for (int i = 0, count = array.Length(); i < count; ++i) {
+                    ret.Add(func.Call(array[i]));
                 }
                 return new ScriptValue(ret);
             }

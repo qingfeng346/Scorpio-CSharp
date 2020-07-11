@@ -162,7 +162,7 @@ namespace Scorpio.Library {
             script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype(script)));
             script.SetGlobal("setPropertys", script.CreateFunction(new setPropertys()));
             script.SetGlobal("createArray", script.CreateFunction(new createArray()));
-            script.SetGlobal("base", script.CreateFunction(new @base()));
+            script.SetGlobal("getBase", script.CreateFunction(new getBase()));
             script.SetGlobal("clone", script.CreateFunction(new clone()));
 
             script.SetGlobal("require", script.CreateFunction(new require(script)));
@@ -480,7 +480,7 @@ namespace Scorpio.Library {
                 return ScriptValue.CreateValue(Array.CreateInstance(args[0].Get<ScriptUserdata>().Type, args[1].ToInt32()));
             }
         }
-        private class @base : ScorpioHandle {
+        private class getBase : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var value = args[0];
                 if (value.valueType == ScriptValue.scriptValueType) {
