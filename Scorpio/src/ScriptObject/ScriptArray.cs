@@ -21,7 +21,9 @@ namespace Scorpio {
                 switch (ret.valueType) {
                     case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
                     case ScriptValue.longValueType: return Convert.ToInt32(ret.longValue);
-                    default: throw new ExecutionException("数组排序返回值必须是Number类型");
+                    case ScriptValue.trueValueType: return 1;
+                    case ScriptValue.falseValueType: return -1;
+                    default: throw new ExecutionException("数组排序返回值必须是Number或Bool类型");
                 }
             }
         }
