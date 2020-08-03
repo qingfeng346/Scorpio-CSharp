@@ -9,15 +9,13 @@ namespace Scorpio {
         //排序
         public struct Comparer : IComparer<ScriptValue> {
             ScriptFunction func;
-            ScriptValue[] args;
             public Comparer(ScriptFunction func) {
                 this.func = func;
-                this.args = new ScriptValue[2];
             }
             public int Compare(ScriptValue o1, ScriptValue o2) {
-                args[0] = o1;
-                args[1] = o2;
-                var ret = func.Call(ScriptValue.Null, args, 2);
+                ScriptValue.Parameters[0] = o1;
+                ScriptValue.Parameters[1] = o2;
+                var ret = func.Call(ScriptValue.Null, ScriptValue.Parameters, 2);
                 switch (ret.valueType) {
                     case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
                     case ScriptValue.longValueType: return Convert.ToInt32(ret.longValue);

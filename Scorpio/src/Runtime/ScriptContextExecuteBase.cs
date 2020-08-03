@@ -2,6 +2,8 @@ using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Instruction;
 using Scorpio.Tools;
+using System;
+
 namespace Scorpio.Runtime {
     //执行命令
     //注意事项:
@@ -51,7 +53,7 @@ namespace Scorpio.Runtime {
                     stackObjects[++stackIndex] = i >= length ? ScriptValue.Null : args[i];
                 }
             }
-            var parameters = Parameters; //传递参数
+            var parameters = ScriptValue.Parameters; //传递参数
             var iInstruction = 0; //当前执行命令索引
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
             byte tempValueType; //临时存储
@@ -1475,6 +1477,8 @@ namespace Scorpio.Runtime {
                     }
                 }
             } finally {
+                Array.Clear(stackObjects, 0, StackValueLength);
+                Array.Clear(variableObjects, 0, VariableValueLength);
                 --VariableValueIndex;
             }
             return ScriptValue.Null;
