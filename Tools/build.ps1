@@ -19,14 +19,17 @@ namespace Scorpio {
 "@
 $fileData | Out-File -Encoding utf8 ./src/Version.cs
 
+$contextExcute = Get-Content -Path ./src/Runtime/ScriptContextExecute.cs -Encoding utf8
+$contextExcute = $contextExcute.Replace("InternalValue[] internalValues", "InternalValue[] internalValues, ScriptType baseType")
+$contextExcute = $contextExcute.Replace("thisObject.Get<ScriptInstance>().Prototype.Get<ScriptType>().Prototype", "baseType.Prototype")
+$contextExcute | Out-File -Encoding utf8 ./src/Runtime/ScriptContextExecuteBase.cs
+
 Remove-Item ../bin/* -Force -Recurse
 Write-Host "正在生成nupkg..."
 dotnet pack -p:PackageVersion=$version -o ../bin/ | Out-Null
 
 Set-Location ../ScorpioExec
-# dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true
-# dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true
-# dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true
+
 Write-Host "正在打包win版本..."
 dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:DefineConstants="SCORPIO_DEBUG" | Out-Null
 Write-Host "正在打包osx版本..."

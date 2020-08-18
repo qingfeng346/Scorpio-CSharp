@@ -840,31 +840,55 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeMap map: {
+                    AddScriptInstructionWithoutValue(Opcode.NewMap);
                     foreach (var ele in map.Variables) {
+                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop);
+                        if (ele.key is double) {
+                            AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)ele.key), obj.Line);
+                        } else if (ele.key is long) {
+                            AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)ele.key), obj.Line);
+                        } else if (ele.key is bool) {
+                            AddScriptInstructionWithoutValue(((bool)ele.key) ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
+                        } else if (!(ele.key is string)) {
+                            throw new ParserException(this, "未知的map key 类型 : " + ele.key.GetType());
+                        }
                         if (ele.value == null) {
                             AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
                         } else {
                             PushObject(ele.value);
                         }
-                    }
-                    var hadObjectKey = false;
-                    foreach (var ele in map.Variables) {
                         if (ele.key is string) {
-                            AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.key.ToString()), obj.Line);
-                        } else if (ele.key is double) {
-                            hadObjectKey = true;
-                            AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)ele.key), obj.Line);
-                        } else if (ele.key is long) {
-                            hadObjectKey = true;
-                            AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)ele.key), obj.Line);
-                        } else if (ele.key is bool) {
-                            hadObjectKey = true;
-                            AddScriptInstructionWithoutValue(((bool)ele.key) ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
+                            AddScriptInstruction(Opcode.StoreValueString, GetConstString(ele.key.ToString()));
                         } else {
-                            throw new ParserException(this, "未知的map key 类型 : " + ele.key.GetType());
+                            AddScriptInstructionWithoutValue(Opcode.StoreValueObjectAssign);
+                            AddScriptInstructionWithoutValue(Opcode.Pop);
                         }
                     }
-                    AddScriptInstruction(hadObjectKey ? Opcode.NewMapObject : Opcode.NewMap, map.Variables.Count, obj.Line);
+                    //foreach (var ele in map.Variables) {
+                    //    if (ele.value == null) {
+                    //        AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
+                    //    } else {
+                    //        PushObject(ele.value);
+                    //    }
+                    //}
+                    //var hadObjectKey = false;
+                    //foreach (var ele in map.Variables) {
+                    //    if (ele.key is string) {
+                    //        AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.key.ToString()), obj.Line);
+                    //    } else if (ele.key is double) {
+                    //        hadObjectKey = true;
+                    //        AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)ele.key), obj.Line);
+                    //    } else if (ele.key is long) {
+                    //        hadObjectKey = true;
+                    //        AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)ele.key), obj.Line);
+                    //    } else if (ele.key is bool) {
+                    //        hadObjectKey = true;
+                    //        AddScriptInstructionWithoutValue(((bool)ele.key) ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
+                    //    } else {
+                    //        throw new ParserException(this, "未知的map key 类型 : " + ele.key.GetType());
+                    //    }
+                    //}
+                    //AddScriptInstruction(hadObjectKey ? Opcode.NewMapObject : Opcode.NewMap, map.Variables.Count, obj.Line);
                     break;
                 }
                 case CodeTernary ternary: {

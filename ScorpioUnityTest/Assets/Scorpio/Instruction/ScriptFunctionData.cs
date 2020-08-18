@@ -34,6 +34,7 @@ namespace Scorpio.Instruction {
                     case Opcode.StoreGlobalStringAssign:
                     case Opcode.LoadValueString:
                     case Opcode.StoreValueString:
+                    case Opcode.StoreValueStringAssign:
                         value = constString[instruction.opvalue].ToString();
                         break;
                     case Opcode.LoadInternal:

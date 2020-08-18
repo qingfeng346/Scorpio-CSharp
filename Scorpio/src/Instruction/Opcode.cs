@@ -62,6 +62,7 @@ namespace Scorpio.Instruction {
         StoreGlobal,            //store global value by index
         StoreGlobalString,      //store global value by string
         StoreValueString,       //store a value by string
+        StoreValueObject,       //store a value by object
         StoreEnd,
 
         //运算指令

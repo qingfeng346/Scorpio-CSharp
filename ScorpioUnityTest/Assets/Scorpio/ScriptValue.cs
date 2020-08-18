@@ -4,6 +4,12 @@ using Scorpio.Userdata;
 using Scorpio.Tools;
 namespace Scorpio {
     public struct ScriptValue {
+        private const int ParameterLength = 128; //函数参数最大数量
+        public static ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
+        public static void GC() {
+            Array.Clear(Parameters, 0, ParameterLength);
+        }
+
         public const byte nullValueType = 0;        //null
         public const byte scriptValueType = 1;      //脚本变量
         public const byte doubleValueType = 2;      //double
@@ -139,7 +145,7 @@ namespace Scorpio {
         //调用函数
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
-            var parameters = new ScriptValue[length];
+            var parameters = Parameters;
             for (var i = 0; i < length; ++i) parameters[i] = CreateValue(args[i]);
             return Call(thisObject, parameters, length);
         }

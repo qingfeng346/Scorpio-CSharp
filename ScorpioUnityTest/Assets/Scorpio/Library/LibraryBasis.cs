@@ -116,6 +116,7 @@ namespace Scorpio.Library {
             script.SetGlobal("print", script.CreateFunction(new print(script)));
             script.SetGlobal("printf", script.CreateFunction(new printf(script)));
             script.SetGlobal("pairs", script.CreateFunction(new pairs(script)));
+            script.SetGlobal("gc", script.CreateFunction(new gc()));
 
             script.SetGlobal("isNull", script.CreateFunction(new isNull()));
             script.SetGlobal("isBoolean", script.CreateFunction(new isBoolean()));
@@ -245,6 +246,12 @@ namespace Scorpio.Library {
                     throw new ExecutionException("pairs 必须用于 array, map, type, global 或者 继承 IEnumerable 的 userdata 类型");
                 }
                 return new ScriptValue(map);
+            }
+        }
+        private class gc : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                Script.GC();
+                return ScriptValue.Null;
             }
         }
         private class isNull : ScorpioHandle {
@@ -399,7 +406,8 @@ namespace Scorpio.Library {
                 m_script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return m_script.LoadSearchPathFile(args[0].ToString());
+                //return m_script.LoadSearchPathFile(args[0].ToString());
+                return ScriptValue.Null;
             }
         }
         private class pushSearch : ScorpioHandle {
