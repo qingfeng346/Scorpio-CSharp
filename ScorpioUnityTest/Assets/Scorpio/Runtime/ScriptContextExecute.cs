@@ -1220,9 +1220,11 @@ namespace Scorpio.Runtime {
                                         }
                                     }
                                     case Opcode.RetNone: {
+                                        --VariableValueIndex;
                                         return ScriptValue.Null;
                                     }
                                     case Opcode.Ret: {
+                                        --VariableValueIndex;
                                         return stackObjects[stackIndex];
                                     }
                                     case Opcode.CallUnfold: {
@@ -1460,6 +1462,7 @@ namespace Scorpio.Runtime {
                                 }
                         }
                     }
+                    --VariableValueIndex;
                     //正常执行命令到最后,判断堆栈是否清空 return 或 exception 不判断
                     Logger.debug(stackIndex != -1, "堆栈数据未清空，有泄露情况 : " + stackIndex);
                 //主动throw的情况
@@ -1492,8 +1495,9 @@ namespace Scorpio.Runtime {
                         throw new ExecutionException($"{m_Breviary}:{instruction.line}({iInstruction})", e);
                     }
                 }
-            } finally {
+            } catch(System.Exception) {
                 --VariableValueIndex;
+                throw;
             }
             return ScriptValue.Null;
         }
