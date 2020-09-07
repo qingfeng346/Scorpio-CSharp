@@ -14,7 +14,7 @@
     },
     "version": {
       "commandName": "Project",
-      "commandLineArgs": "version"
+      "commandLineArgs": "version -c"
     },
     "delegate": {
       "commandName": "Project",

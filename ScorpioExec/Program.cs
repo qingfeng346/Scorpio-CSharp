@@ -95,8 +95,12 @@ namespace ScorpioExec {
                 }
                 if (newVersion) {
                     var url = data["html_url"].ToString();
-                    Logger.info($"发现新版本 : {name}");
-                    Logger.info($"下载地址 : {url}");
+                    var published_at = data["published_at"].ToString();
+                    Logger.info($"发现新版本:{name}  发布时间:{published_at}");
+                    Logger.info("==========更新内容==========");
+                    Logger.info(data["body"].ToString());
+                    Logger.info($"新版本下载地址 : {url}");
+                    Logger.info("安装新版本命令 : pwsh -Command \"Invoke - Expression((New - Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))\"");
                     return;
                 }
             }
