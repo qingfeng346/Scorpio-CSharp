@@ -359,6 +359,7 @@ namespace Scorpio.Compile.Compiler {
             m_scriptExecutable.EndStack();
             var endIndex = Index;
             falseTo.SetValue(endIndex);
+            //continue跳转到 i += step
             m_Continue.SetValue(stepPlusIndex);
             m_Break.SetValue(endIndex);
         }
