@@ -323,7 +323,7 @@ namespace Scorpio.Compile.Compiler {
             var line = GetSourceLine();
             m_scriptExecutable.BeginStack();
             var index = m_scriptExecutable.AddIndex(identifier);
-            //初始化变量
+            //初始化变量,例如 i
             PushObject(obj);
             AddScriptInstruction(Opcode.StoreLocal, index, line);
             //保存max值
@@ -340,22 +340,26 @@ namespace Scorpio.Compile.Compiler {
             }
             AddScriptInstruction(Opcode.StoreLocal, stepIndex, line);
 
-            //正式操作
+            //比较 i <= max
             var startIndex = AddScriptInstruction(Opcode.LoadLocal, maxIndex, line);
             AddScriptInstruction(Opcode.LoadLocal, index, line);
             AddScriptInstructionWithoutValue(Opcode.GreaterOrEqual, line);
             var falseTo = AddScriptInstruction(Opcode.FalseTo, 0, line);
             ReadRightParenthesis();
+            //for内容
             ParseStatementBlock(ExecutableBlock.For);
-            AddScriptInstruction(Opcode.LoadLocal, stepIndex, line);
+
+            // i += step
+            var stepPlusIndex = AddScriptInstruction(Opcode.LoadLocal, stepIndex, line);
             AddScriptInstruction(Opcode.LoadLocal, index, line);
             AddScriptInstructionWithoutValue(Opcode.Plus, line);
             AddScriptInstruction(Opcode.StoreLocal, index, line);
+            //跳转到 比较 i <= max
             AddScriptInstruction(Opcode.Jump, startIndex.index, line);
             m_scriptExecutable.EndStack();
             var endIndex = Index;
             falseTo.SetValue(endIndex);
-            m_Continue.SetValue(startIndex);
+            m_Continue.SetValue(stepPlusIndex);
             m_Break.SetValue(endIndex);
         }
         /// <summary> 正常for循环  for(;;) </summary>

@@ -1,10 +1,10 @@
-TableManager = {
-    aaa = 100,
-    bbb = 200,
-    100 = "123",
-    200 = "feawfaewf",
+for (var i = 0, 2) {
+    if (i == 1) {
+        continue
+    }
+    print("==== " + i)
 }
-print(TableManager[100])
+print(i)
 // TableManager = {}
 // TableManager.getAchievement = function(ID) {
     
