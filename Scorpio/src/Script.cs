@@ -22,8 +22,8 @@ namespace Scorpio {
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
         private List<string> m_SearchPath = new List<string>();         //request所有文件的路径集合
 
-        public static void GC() {
-            ScriptValue.GC();
+        public static void GarbageCollection() {
+            ScriptValue.GarbageCollection();
         }
 
         /// <summary> 所有类型的基类 </summary>
