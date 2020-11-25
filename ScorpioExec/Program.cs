@@ -7,6 +7,7 @@ using Scorpio.Commons;
 using Scorpio.ScorpioReflect;
 using Scorpio.Serialize;
 using Scorpio.Userdata;
+using ScorpioLibrary;
 
 namespace ScorpioExec {
     public class Program {
@@ -186,10 +187,10 @@ namespace ScorpioExec {
         static void Execute (CommandLine command, string[] args) {
             Util.PrintSystemInfo ();
             Logger.info ($"Version : {Scorpio.Version.version}[{Scorpio.Version.date}]");
-            // Logger.info("Application Name : " + AppDomain.CurrentDomain.FriendlyName);
             TypeManager.PushAssembly (typeof (Program).Assembly);
             var script = new Scorpio.Script ();
             script.LoadLibraryV1 ();
+            script.LoadLibraryExtend();
             LoadLibrary (Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 var file = Path.Combine (CurrentDirectory, args[0]);
@@ -200,6 +201,9 @@ namespace ScorpioExec {
                 var path = Path.GetDirectoryName (file);
                 script.PushSearchPath (path);
                 script.PushSearchPath (CurrentDirectory);
+                var sArgs = new string[args.Length - 1];
+                Array.Copy(args, 1, sArgs, 0, sArgs.Length);
+                script.SetArgs(sArgs);
                 Logger.info ("=============================");
                 var watch = Stopwatch.StartNew ();
                 var value = script.LoadFile (file);

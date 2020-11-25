@@ -6,9 +6,6 @@ namespace Scorpio {
     public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量
         public static ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
-        public static void GarbageCollection() {
-            Array.Clear(Parameters, 0, ParameterLength);
-        }
 
         public const byte nullValueType = 0;        //null
         public const byte scriptValueType = 1;      //脚本变量

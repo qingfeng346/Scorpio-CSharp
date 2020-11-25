@@ -20,11 +20,9 @@ namespace Scorpio {
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
+        private const string GLOBAL_ARGS = "_ARGS";                     //命令行参数
         private List<string> m_SearchPath = new List<string>();         //request所有文件的路径集合
 
-        public static void GarbageCollection() {
-            ScriptValue.GarbageCollection();
-        }
 
         /// <summary> 所有类型的基类 </summary>
         public ScriptType TypeObject { get; private set; }
@@ -151,6 +149,13 @@ namespace Scorpio {
         /// <returns>是否包含</returns>
         public bool HasGlobal(string key) {
             return Global.HasValue(key);
+        }
+        public void SetArgs(string[] args) {
+            var array = CreateArray();
+            for (var i = 0; i < args.Length; ++i) {
+                array.Add(new ScriptValue(args[i]));
+            }
+            Global.SetValue(GLOBAL_ARGS, new ScriptValue(array));
         }
         /// <summary> 创建一个空的array </summary>
         public ScriptArray CreateArray() { return new ScriptArray(this); }
