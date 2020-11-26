@@ -20,90 +20,82 @@ namespace ScorpioLibrary {
             map.SetValue("qpdecode", script.CreateFunction(new qpdecode()));
             script.SetGlobal("net", new ScriptValue(map));
         }
+        static HttpWebRequest CreateRequest(string url, string method) {
+            //创建 SL/TLS 安全通道
+            try {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+                                | (SecurityProtocolType)0x300 //Tls11
+                                | (SecurityProtocolType)0xC00; //Tls12
+            } catch (Exception) { }
+            var request = (HttpWebRequest)HttpWebRequest.Create(url);
+            request.Method = method;
+            request.ProtocolVersion = HttpVersion.Version10;
+            request.UserAgent = DefaultUserAgent;
+            request.Credentials = CredentialCache.DefaultCredentials;
+            request.Timeout = 30000;                    //设定超时时间30秒
+            return request;
+        }
+        static void ReadStream(HttpWebRequest request, Stream writer) {
+            using (var response = request.GetResponse()) {
+                using (var stream = response.GetResponseStream()) {
+                    while (true) {
+                        var readSize = stream.Read(READ_BYTES, 0, READ_LENGTH);
+                        if (readSize <= 0) { break; }
+                        writer.Write(READ_BYTES, 0, readSize);
+                    }
+                }
+            }
+        }
         private class get : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
-                //创建 SL/TLS 安全通道
-                try {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
-                                    | (SecurityProtocolType)0x300 //Tls11
-                                    | (SecurityProtocolType)0xC00; //Tls12
-                } catch (Exception) { }
-                var request = (HttpWebRequest)HttpWebRequest.Create(Parameters[0].ToString());
-                request.Method = "GET";
-                request.ProtocolVersion = HttpVersion.Version10;
-                request.UserAgent = DefaultUserAgent;
-                request.Credentials = CredentialCache.DefaultCredentials;
-                request.Timeout = 30000;                    //设定超时时间30秒
-                var post = Parameters.Length > 1 ? Parameters[1].Get<ScriptFunction>() : null;
-                if (post != null) post.call(ScriptValue.Null, request);
-                using (var response = request.GetResponse()) {
-                    using (var stream = response.GetResponseStream()) {
-                        using (var memoryStream = new MemoryStream()) {
-                            while (true) {
-                                var readSize = stream.Read(READ_BYTES, 0, READ_LENGTH);
-                                if (readSize <= 0) { break; }
-                                memoryStream.Write(READ_BYTES, 0, readSize);
-                            }
-                            return new ScriptValue(memoryStream.ToArray());
-                        }
+                var request = CreateRequest(Parameters[0].ToString(), "GET");
+                if (length > 1) Parameters[1].Get<ScriptFunction>().call(ScriptValue.Null, request);
+                if (length > 2) {
+                    ReadStream(request, Parameters[2].Value as Stream);
+                    return ScriptValue.Null;
+                } else {
+                    using (var stream = new MemoryStream()) {
+                        ReadStream(request, stream);
+                        return new ScriptValue(stream.ToArray());
                     }
                 }
             }
         }
         private class post : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
-                //创建 SL/TLS 安全通道
-                try {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
-                                    | (SecurityProtocolType)0x300 //Tls11
-                                    | (SecurityProtocolType)0xC00; //Tls12
-                } catch (Exception) { }
-                var request = (HttpWebRequest)HttpWebRequest.Create(Parameters[0].ToString());
-                request.Method = "POST";
-                request.ProtocolVersion = HttpVersion.Version10;
-                request.UserAgent = DefaultUserAgent;
-                request.Credentials = CredentialCache.DefaultCredentials;
-                request.Timeout = 30000;                    //设定超时时间30秒
-                var buffer = Parameters.Length > 1 ? Parameters[1].Value as byte[] : null;
-                if (buffer != null) {
+                var request = CreateRequest(Parameters[0].ToString(), "POST");
+                if (length > 1) {
                     using (var stream = request.GetRequestStream()) {
+                        var value = Parameters[1];
+                        var buffer = value.valueType == ScriptValue.stringValueType ? DEFAULT_ENCODING.GetBytes(value.ToString()) : value.Value as byte[];
                         stream.Write(buffer, 0, buffer.Length);
                     }
                 }
-                var post = Parameters.Length > 2 ? Parameters[2].Get<ScriptFunction>() : null;
-                if (post != null) post.call(ScriptValue.Null, request);
-                using (var response = request.GetResponse()) {
-                    using (var stream = response.GetResponseStream()) {
-                        using (var memoryStream = new MemoryStream()) {
-                            while (true) {
-                                var readSize = stream.Read(READ_BYTES, 0, READ_LENGTH);
-                                if (readSize <= 0) { break; }
-                                memoryStream.Write(READ_BYTES, 0, readSize);
-                            }
-                            return new ScriptValue(memoryStream.ToArray());
-                        }
-                    }
+                if (length > 2 ) Parameters[2].Get<ScriptFunction>().call(ScriptValue.Null, request);
+                using (var stream = new MemoryStream()) {
+                    ReadStream(request, stream);
+                    return new ScriptValue(stream.ToArray());
                 }
             }
         }
         private class urlencode : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
-                return new ScriptValue(UriTranscoder.URLEncode(Parameters[0].ToString(), Parameters.Length > 1 ? Encoding.GetEncoding(Parameters[1].ToString()) : DEFAULT_ENCODING));
+                return new ScriptValue(UriTranscoder.URLEncode(Parameters[0].ToString(), length > 1 ? Encoding.GetEncoding(Parameters[1].ToString()) : DEFAULT_ENCODING));
             }
         }
         private class urldecode : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
-                return new ScriptValue(UriTranscoder.URLDecode(Parameters[0].ToString(), Parameters.Length > 1 ? Encoding.GetEncoding(Parameters[1].ToString()) : DEFAULT_ENCODING));
+                return new ScriptValue(UriTranscoder.URLDecode(Parameters[0].ToString(), length > 1 ? Encoding.GetEncoding(Parameters[1].ToString()) : DEFAULT_ENCODING));
             }
         }
         private class qpencode : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
-                return new ScriptValue(UriTranscoder.QPEncode(Parameters[0].ToString(), Parameters.Length > 1 ? Encoding.GetEncoding(Parameters[1].ToString()) : DEFAULT_ENCODING));
+                return new ScriptValue(UriTranscoder.QPEncode(Parameters[0].ToString(), length > 1 ? Encoding.GetEncoding(Parameters[1].ToString()) : DEFAULT_ENCODING));
             }
         }
         private class qpdecode : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
-                return new ScriptValue(UriTranscoder.QPDecode(Parameters[0].ToString(), Parameters.Length > 1 ? Encoding.GetEncoding(Parameters[1].ToString()) : DEFAULT_ENCODING));
+                return new ScriptValue(UriTranscoder.QPDecode(Parameters[0].ToString(), length > 1 ? Encoding.GetEncoding(Parameters[1].ToString()) : DEFAULT_ENCODING));
             }
         }
     }

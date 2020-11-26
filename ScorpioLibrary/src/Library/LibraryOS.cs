@@ -14,7 +14,7 @@ namespace ScorpioLibrary {
             map.SetValue("machineName", script.CreateFunction(new machineName()));
             map.SetValue("userName", script.CreateFunction(new userName()));
             map.SetValue("dotnetVersion", script.CreateFunction(new dotnetVersion()));
-            map.SetValue("osVersion", script.CreateFunction(new osVersion()));
+            map.SetValue("version", script.CreateFunction(new version()));
             map.SetValue("getEnvironmentVariable", script.CreateFunction(new getEnvironmentVariable()));
             map.SetValue("setEnvironmentVariable", script.CreateFunction(new setEnvironmentVariable()));
             map.SetValue("getFolderPath", script.CreateFunction(new getFolderPath()));
@@ -64,7 +64,7 @@ namespace ScorpioLibrary {
                 return new ScriptValue(RuntimeInformation.FrameworkDescription);
             }
         }
-        private class osVersion : ScorpioHandle {
+        private class version : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
                 return new ScriptValue(RuntimeInformation.OSDescription);
             }
@@ -93,14 +93,14 @@ namespace ScorpioLibrary {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
                 using (var process = new Process()) {
                     process.StartInfo.FileName = Parameters[0].ToString();
-                    if (Parameters.Length > 1) process.StartInfo.Arguments = Parameters[1].ToString();
-                    if (Parameters.Length > 2) process.StartInfo.WorkingDirectory = Parameters[2].ToString();
+                    if (length > 1) process.StartInfo.Arguments = Parameters[1].ToString();
+                    if (length > 2) process.StartInfo.WorkingDirectory = Parameters[2].ToString();
                     process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
                     process.StartInfo.CreateNoWindow = true;
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.EnableRaisingEvents = true;
-                    if (Parameters.Length > 3) Parameters[3].Get<ScriptFunction>().call(ScriptValue.Null, process);
+                    if (length > 3) Parameters[3].Get<ScriptFunction>().call(ScriptValue.Null, process);
                     process.Start();
                     var result = script.CreateMap();
                     result.SetValue("output", new ScriptValue(process.StandardOutput.ReadToEnd()));

@@ -250,7 +250,7 @@ namespace Scorpio.Library {
         }
         private class gc : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                Script.GC();
+                Array.Clear(ScriptValue.Parameters, 0, ScriptValue.Parameters.Length);
                 return ScriptValue.Null;
             }
         }
