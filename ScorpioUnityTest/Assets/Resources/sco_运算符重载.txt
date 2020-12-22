@@ -8,15 +8,16 @@ class TestClass {
         return TestClass() { num = this.num + num}
     }
     "-"(num) {
-        return TestClass() { num = this.num - num}
+        this.num -= num
+        return this
     }
     "()" {
         print("call : " + this.num)
     }
 }
 var t1 = TestClass(100)
-var t2 = t1 + 100   //TestClass 重载 + 运算符
-var t3 = t1 - 50    //TestClass 重载 - 运算符
-t1()                //TestClass 重载 () 运算符
+t1 -= 10            //TestClass - 运算符操作本身数据
+var t2 = t1 + 100   //TestClass + 运算符
+t1()                //TestClass () 运算符
+print(t1.num)
 print(t2.num)
-print(t3.num)

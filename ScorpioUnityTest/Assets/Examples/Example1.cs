@@ -4,6 +4,19 @@ using System.Collections;
 using Scorpio;
 using Scorpio.Userdata;
 using System.IO;
+namespace ScorpioExec {
+	public class TestClass {
+		public static void TestFunc(ref int refNum, out string outNum) {
+			if (refNum == 100) {
+				outNum = "out1";
+			} else {
+				outNum = "out2";
+			}
+			refNum = refNum + 500;
+		}
+	}
+}
+
 public class Example1 : MonoBehaviour {
     public ScrollRect Scroll;
     public GameObject Grid;
