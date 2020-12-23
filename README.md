@@ -11,8 +11,9 @@ sco是c#实现的解释型脚本,是一种高效,轻量,可嵌入的脚本语言
 * **脚本示例** [ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/ExampleScripts)
 * VSCode 基础语法提示插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio
 * nuget地址 https://www.nuget.org/packages/Scorpio-CSharp/
-* 脚本实现Space Shooter 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/unitysample/
-* 脚本实现Space Shooter 源码地址 https://github.com/qingfeng346/ScorpioUnitySample
+* 脚本语法 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
+* 脚本实现 Space Shooter 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/unitysample/
+* 脚本实现 Space Shooter 源码地址 https://github.com/qingfeng346/ScorpioUnitySample
 * 码云地址 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
 
 
