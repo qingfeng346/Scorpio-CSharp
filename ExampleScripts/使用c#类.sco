@@ -19,7 +19,7 @@ print(intArray[0])
 
 // c# 重载 [] 的类 可以直接使用 [] 操作
 Dictionary = import_type("System.Collections.Generic.Dictionary`2")
-DicIntStr = generic_type(Dictionary,Int32, SystemString)
+DicIntStr = generic_type(Dictionary, Int32, SystemString)
 var d = DicIntStr()
 d[100] = "feawfaew"
 print(d[100])
