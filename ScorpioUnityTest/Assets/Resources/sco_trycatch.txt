@@ -5,7 +5,6 @@ try {
 } catch (e) {
     print(e)
 }
-
 //主动抛出error，可以抛出任意类型
 try {
     throw "exception"

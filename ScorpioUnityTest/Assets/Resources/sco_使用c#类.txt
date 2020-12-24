@@ -16,16 +16,3 @@ SystemArray = import_type("System.Array")
 var intArray = SystemArray.CreateInstance(Int32, 10)
 intArray[0] = 98989
 print(intArray[0])
-
-// c# 重载 [] 的类 可以直接使用 [] 操作
-Dictionary = import_type("System.Collections.Generic.Dictionary`2")
-DicIntStr = generic_type(Dictionary, Int32, SystemString)
-var d = DicIntStr()
-d[100] = "feawfaew"
-print(d[100])
-
-// 如果重载 [] 的 key 为 string, 则必须使用 get_Item set_Item 设置获取值
-DicStrInt = generic_type(Dictionary, SystemString, Int32)
-var d2 = DicStrInt()
-d2.set_Item("123", 100)
-print(d2.get_Item("123"))

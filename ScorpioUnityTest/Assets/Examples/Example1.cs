@@ -5,8 +5,9 @@ using Scorpio;
 using Scorpio.Userdata;
 using System.IO;
 namespace ScorpioExec {
-	public class TestClass {
-		public static void TestFunc(ref int refNum, out string outNum) {
+    public class TestClass {
+        public int num = 0;
+        public void TestFunc(ref int refNum, out string outNum) {
 			if (refNum == 100) {
 				outNum = "out1";
 			} else {
@@ -14,6 +15,11 @@ namespace ScorpioExec {
 			}
 			refNum = refNum + 500;
 		}
+	}
+    public static class ClassEx {
+		public static void TestFunc1(this TestClass t, int num1) {
+            t.num += num1;
+        }
 	}
 }
 
