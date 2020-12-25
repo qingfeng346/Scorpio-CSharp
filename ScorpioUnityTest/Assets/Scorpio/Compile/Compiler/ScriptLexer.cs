@@ -440,6 +440,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 case "new":
                 case "gvar":
+                case "global":
                     m_Builder.Length = 0;
                     return;
                 default:

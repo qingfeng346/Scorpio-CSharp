@@ -187,6 +187,7 @@ namespace ScorpioExec {
         static void Execute (CommandLine command, string[] args) {
             Util.PrintSystemInfo ();
             Logger.info ($"Version : {Scorpio.Version.version}[{Scorpio.Version.date}]");
+            TypeManager.PushAssembly(typeof(Program).Assembly);
             foreach (var assemblyName in typeof(Program).Assembly.GetReferencedAssemblies()) {
                 TypeManager.PushAssembly(Assembly.Load(assemblyName));
             }

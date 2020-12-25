@@ -12,11 +12,11 @@ namespace Scorpio.Userdata {
             var functionStaticMethod = new List<FunctionData>();    //静态函数
             var genericMethods = new List<FunctionDataGeneric>();   //模板函数
             foreach (var method in methods) {
-                var hasRefOut = Array.IndexOf(method.RefOut, true) != -1;
-                var functionData = hasRefOut ?
-                                    new FunctionDataFastMethodWithRefOut(fastMethod, method.ParameterType, method.RefOut, method.ParamType, method.MethodIndex) :
-                                    new FunctionDataFastMethod(fastMethod, method.ParameterType, method.RefOut, method.ParamType, method.MethodIndex);
-                (method.IsStatic ? functionStaticMethod : functionMethod).Add(functionData);
+                if (Array.IndexOf(method.RefOut, true) != -1) {
+                    (method.IsStatic ? functionStaticMethod : functionMethod).Add(new FunctionDataFastMethodWithRefOut(fastMethod, method.ParameterType, method.RefOut, method.ParamType, method.MethodIndex));
+                } else {
+                    (method.IsStatic ? functionStaticMethod : functionMethod).Add(new FunctionDataFastMethod(fastMethod, method.ParameterType, method.RefOut, method.ParamType, method.MethodIndex));
+                }
             }
             var methodInfos = m_Type.GetMethods(Script.BindingFlag);
             Array.ForEach(methodInfos, (methodInfo) => {
@@ -24,6 +24,8 @@ namespace Scorpio.Userdata {
                     genericMethods.Add(new FunctionDataGeneric(methodInfo));
                 }
             });
+            functionMethod.Sort((a, b) => { return a.Priority - b.Priority; });
+            functionStaticMethod.Sort((a, b) => { return a.Priority - b.Priority; });
             m_Methods = functionMethod.ToArray();
             m_StaticMethods = functionStaticMethod.ToArray();
             m_GenericMethods = genericMethods.ToArray();

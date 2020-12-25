@@ -15,9 +15,13 @@ namespace Scorpio.Userdata {
         }
     }
     //带ref out 的快速反射函数
-    public class FunctionDataFastMethodWithRefOut : FunctionDataFastMethod {
+    public class FunctionDataFastMethodWithRefOut : FunctionDataWithRefOut {
+        protected ScorpioFastReflectMethod FastMethod;
+        protected int MethodIndex;                     //函数索引(去反射使用)
         public FunctionDataFastMethodWithRefOut(ScorpioFastReflectMethod method, Type[] parameterType, bool[] refOut, Type paramType, int methodIndex) :
-            base(method, parameterType, refOut, paramType, methodIndex) {
+            base(parameterType, null, refOut, parameterType.Length, paramType) {
+            FastMethod = method;
+            MethodIndex = methodIndex;
         }
         public override object Invoke(object obj, ScriptValue[] parameters) {
             var ret = FastMethod.Call(obj, MethodIndex, Args);

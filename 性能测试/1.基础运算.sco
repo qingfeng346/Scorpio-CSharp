@@ -1,5 +1,5 @@
 var eee = 0
-for (var i = 0, 10000000) {
+for (var i = 0, 1000000) {
     var a = i + 1
     var b = 2.3
     if(a < b) {

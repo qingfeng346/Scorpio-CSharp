@@ -29,6 +29,9 @@ namespace ScorpioExec {
         public TestClass(int num) {
             this.num = num;
         }
+        public TestClass() {
+
+        }
         public void TestOut(int[] results, ref int num, out string str) {
             str = "test";
         }

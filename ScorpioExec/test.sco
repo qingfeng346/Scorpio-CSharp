@@ -1,10 +1,9 @@
-for (var i = 0, 2) {
-    if (i == 1) {
-        continue
-    }
-    print("==== " + i)
+var TestClass = importType("ScorpioExec.TestClass")
+print(TestClass)
+var t = new TestClass()
+for (var i = 0, 50000) {
+    t.TestFunc()
 }
-print(i)
 // TableManager = {}
 // TableManager.getAchievement = function(ID) {
     

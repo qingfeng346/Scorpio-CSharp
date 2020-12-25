@@ -157,8 +157,8 @@ namespace Scorpio.Library {
                 var length = number.Length - 1;
                 if (number.IndexOf('.') >= 0) {
                     return new ScriptValue(double.Parse(number));
-                } else if (number[number.Length - 1] == 'L') {
-                    return new ScriptValue(long.Parse(number.Substring(0, number.Length - 1)));
+                } else if (number[length] == 'L' || number[length] == 'N') {
+                    return new ScriptValue(long.Parse(number.Substring(0, length)));
                 } else {
                     var parsedLong = long.Parse(number);
                     if (m_SupportLong || parsedLong < MinInt || parsedLong > MaxInt) {

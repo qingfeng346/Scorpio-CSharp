@@ -14,9 +14,11 @@ namespace Scorpio.Userdata {
         }
     }
     //包含 ref out 参数的构造函数
-    public class FunctionDataConstructorWithRefOut : FunctionDataConstructor {
+    public class FunctionDataConstructorWithRefOut : FunctionDataWithRefOut {
+        public ConstructorInfo Constructor;         //构造函数对象
         public FunctionDataConstructorWithRefOut(ConstructorInfo constructor, Type[] parameterType, object[] defaultParameter, bool[] refOut, int requiredNumber, Type paramType) :
-            base(constructor, parameterType, defaultParameter, refOut, requiredNumber, paramType) {
+            base(parameterType, defaultParameter, refOut, requiredNumber, paramType) {
+            this.Constructor = constructor;
         }
         public override object Invoke(object obj, ScriptValue[] parameters) {
             var ret = Constructor.Invoke(Args);

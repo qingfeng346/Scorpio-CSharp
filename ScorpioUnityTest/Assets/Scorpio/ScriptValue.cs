@@ -192,8 +192,8 @@ namespace Scorpio {
         }
         public int ToInt32() {
             switch (valueType) {
-                case doubleValueType: return Convert.ToInt32(doubleValue);
-                case longValueType: return Convert.ToInt32(longValue);
+                case doubleValueType: return ((IConvertible)doubleValue).ToInt32(null);
+                case longValueType: return ((IConvertible)longValue).ToInt32(null);
                 case objectValueType: return Convert.ToInt32(objectValue);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
             }
@@ -201,14 +201,14 @@ namespace Scorpio {
         public double ToDouble() {
             switch (valueType) {
                 case doubleValueType: return doubleValue;
-                case longValueType: return Convert.ToDouble(longValue);
+                case longValueType: return (double)longValue;
                 case objectValueType: return Convert.ToDouble(objectValue);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
             }
         }
         public long ToLong() {
             switch (valueType) {
-                case doubleValueType: return Convert.ToInt64(doubleValue);
+                case doubleValueType: return (long)doubleValue;
                 case longValueType: return longValue;
                 case objectValueType: return Convert.ToInt64(objectValue);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");

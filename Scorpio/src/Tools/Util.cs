@@ -1,61 +1,80 @@
 using System;
-using System.Reflection;
-using System.Text;
 using System.IO;
-using Scorpio.Exception;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
+using Scorpio.Exception;
 namespace Scorpio.Tools {
     public static class Util {
-        public static readonly Type TYPE_VOID = typeof(void);
-        public static readonly Type TYPE_OBJECT = typeof(object);
-        public static readonly Type TYPE_VALUE = typeof(ScriptValue);
-        public static readonly Type TYPE_TYPE = typeof(Type);
-        public static readonly Type TYPE_DELEGATE = typeof(Delegate);
-        public static readonly Type TYPE_BOOL = typeof(bool);
-        public static readonly Type TYPE_STRING = typeof(string);
-        public static readonly Type TYPE_SBYTE = typeof(sbyte);
-        public static readonly Type TYPE_BYTE = typeof(byte);
-        public static readonly Type TYPE_SHORT = typeof(short);
-        public static readonly Type TYPE_USHORT = typeof(ushort);
-        public static readonly Type TYPE_INT = typeof(int);
-        public static readonly Type TYPE_UINT = typeof(uint);
-        public static readonly Type TYPE_LONG = typeof(long);
-        public static readonly Type TYPE_FLOAT = typeof(float);
-        public static readonly Type TYPE_DOUBLE = typeof(double);
-        public static readonly Type TYPE_DECIMAL = typeof(decimal);
-        public static readonly Type TYPE_PARAMATTRIBUTE = typeof(ParamArrayAttribute);         //不定参属性
-        public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof(ExtensionAttribute);      //扩展函数属性
+        public static readonly Type TYPE_VOID = typeof (void);
+        public static readonly Type TYPE_OBJECT = typeof (object);
+        public static readonly Type TYPE_VALUE = typeof (ScriptValue);
+        public static readonly Type TYPE_TYPE = typeof (Type);
+        public static readonly Type TYPE_DELEGATE = typeof (Delegate);
+        public static readonly Type TYPE_BOOL = typeof (bool);
+        public static readonly Type TYPE_STRING = typeof (string);
+        public static readonly Type TYPE_SBYTE = typeof (sbyte);
+        public static readonly Type TYPE_BYTE = typeof (byte);
+        public static readonly Type TYPE_SHORT = typeof (short);
+        public static readonly Type TYPE_USHORT = typeof (ushort);
+        public static readonly Type TYPE_INT = typeof (int);
+        public static readonly Type TYPE_UINT = typeof (uint);
+        public static readonly Type TYPE_LONG = typeof (long);
+        public static readonly Type TYPE_ULONG = typeof (ulong);
+        public static readonly Type TYPE_FLOAT = typeof (float);
+        public static readonly Type TYPE_DOUBLE = typeof (double);
+        public static readonly Type TYPE_DECIMAL = typeof (decimal);
+        public static readonly Type TYPE_PARAMATTRIBUTE = typeof (ParamArrayAttribute); //不定参属性
+        public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof (ExtensionAttribute); //扩展函数属性
 
         //是否是委托
-        public static bool IsDelegate(Type type) { return TYPE_DELEGATE.IsAssignableFrom(type); }
+        public static bool IsDelegate (Type type) { return TYPE_DELEGATE.IsAssignableFrom (type); }
         //是否是void
-        public static bool IsVoid(Type type) { return type == TYPE_VOID; }
+        public static bool IsVoid (Type type) { return type == TYPE_VOID; }
         //是否是不定参
-        public static bool IsParams(ParameterInfo info) { return info.IsDefined(TYPE_PARAMATTRIBUTE, false); }
+        public static bool IsParams (ParameterInfo info) { return info.IsDefined (TYPE_PARAMATTRIBUTE, false); }
         //是否是扩展函数
-        public static bool IsExtensionMethod(MemberInfo method) { return method.IsDefined(TYPE_EXTENSIONATTRIBUTE, false); }
+        public static bool IsExtensionMethod (MemberInfo method) { return method.IsDefined (TYPE_EXTENSIONATTRIBUTE, false); }
         //是否是包含扩展函数类
-        public static bool IsExtensionType(Type type) { return type.IsDefined(TYPE_EXTENSIONATTRIBUTE, false); }
+        public static bool IsExtensionType (Type type) { return type.IsDefined (TYPE_EXTENSIONATTRIBUTE, false); }
         //是否是还没有定义的模板函数
-        public static bool IsGenericMethod(MethodBase method) { return method.IsGenericMethod && method.ContainsGenericParameters; }
+        public static bool IsGenericMethod (MethodBase method) { return method.IsGenericMethod && method.ContainsGenericParameters; }
         //判断参数是否是 ref out 参数
-        public static bool IsRetvalOrOut(ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
-        public static object ChangeType(ScriptValue value, Type type) {
+        public static bool IsRetvalOrOut (ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
+        public static object ChangeType (ScriptValue value, Type type) {
             if (type == TYPE_VALUE) { return value; }
             switch (value.valueType) {
                 case ScriptValue.doubleValueType:
+                    if (type == TYPE_DOUBLE) { return value.Value; }
+                    if (type == TYPE_LONG) { return (long) value.Value; }
+                    if (type == TYPE_ULONG) { return (ulong) value.Value; }
+            goto ToNumber;
                 case ScriptValue.longValueType:
-                    return type.IsEnum ? Enum.ToObject(type, value.ToInt32()) : Convert.ChangeType(value.Value, type);
-                case ScriptValue.scriptValueType: {
-                    if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom(type)) {
-                        return ScorpioDelegateFactory.CreateDelegate(type, value.scriptValue);
+                    if (type == TYPE_LONG) { return value.Value; }
+                    if (type == TYPE_DOUBLE) { return (double) value.Value; }
+                    if (type == TYPE_ULONG) { return (ulong) value.Value; }
+            ToNumber:
+                    if (type == TYPE_INT) {
+                        return ((IConvertible) value.Value).ToInt32 (null);
+                    } else if (type == TYPE_FLOAT) {
+                        return ((IConvertible) value.Value).ToSingle (null);
+                    } else if (type.IsEnum) {
+                        return Enum.ToObject(type, value.ToInt32());
+                    } else {
+                        throw new System.Exception("其他数字类型请先转换再传入");
                     }
-                    return value.scriptValue.Value;
-                }
-                default: return value.Value;
+                case ScriptValue.scriptValueType:
+                    {
+                        if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom (type)) {
+                            return ScorpioDelegateFactory.CreateDelegate (type, value.scriptValue);
+                        }
+                        return value.scriptValue.Value;
+                    }
+                default:
+                    return value.Value;
             }
         }
-        public static bool CanChangeTypeRefOut(ScriptValue value, Type type) {
+        public static bool CanChangeTypeRefOut (ScriptValue value, Type type) {
             if (type == TYPE_OBJECT || type == TYPE_VALUE) return true;
             switch (value.valueType) {
                 case ScriptValue.nullValueType:
@@ -69,13 +88,14 @@ namespace Scorpio.Tools {
                 case ScriptValue.stringValueType:
                     return type == TYPE_STRING;
                 case ScriptValue.objectValueType:
-                    return type.IsAssignableFrom(value.objectValue.GetType());
-                default: {
-                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom(value.scriptValue.ValueType);
-                }
+                    return type.IsAssignableFrom (value.objectValue.GetType ());
+                default:
+                    {
+                        return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
+                    }
             }
         }
-        public static bool CanChangeType(ScriptValue value, Type type) {
+        public static bool CanChangeType (ScriptValue value, Type type) {
             if (type == TYPE_OBJECT || type == TYPE_VALUE) return true;
             switch (value.valueType) {
                 case ScriptValue.trueValueType:
@@ -89,50 +109,51 @@ namespace Scorpio.Tools {
                 case ScriptValue.nullValueType:
                     return !type.IsValueType;
                 case ScriptValue.objectValueType:
-                    return type.IsAssignableFrom(value.objectValue.GetType());
-                default: {
-                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom(value.scriptValue.ValueType);
-                }
+                    return type.IsAssignableFrom (value.objectValue.GetType ());
+                default:
+                    {
+                        return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
+                    }
             }
         }
-        public static string ParseJsonString(string value) {
-            var builder = new StringBuilder();
-            builder.Append('\"');
-            foreach (var c in value.ToCharArray()) {
+        public static string ParseJsonString (string value) {
+            var builder = new StringBuilder ();
+            builder.Append ('\"');
+            foreach (var c in value.ToCharArray ()) {
                 switch (c) {
-                case '"':
-                    builder.Append("\\\"");
-                    break;
-                case '\\':
-                    builder.Append("\\\\");
-                    break;
-                case '\b':
-                    builder.Append("\\b");
-                    break;
-                case '\f':
-                    builder.Append("\\f");
-                    break;
-                case '\n':
-                    builder.Append("\\n");
-                    break;
-                case '\r':
-                    builder.Append("\\r");
-                    break;
-                case '\t':
-                    builder.Append("\\t");
-                    break;
-                default:
-                    int codepoint = Convert.ToInt32(c);
-                    if ((codepoint >= 32) && (codepoint <= 126)) {
-                        builder.Append(c);
-                    } else {
-                        builder.Append("\\u" + Convert.ToString(codepoint, 16).PadLeft(4, '0'));
-                    }
-                    break;
+                    case '"':
+                        builder.Append ("\\\"");
+                        break;
+                    case '\\':
+                        builder.Append ("\\\\");
+                        break;
+                    case '\b':
+                        builder.Append ("\\b");
+                        break;
+                    case '\f':
+                        builder.Append ("\\f");
+                        break;
+                    case '\n':
+                        builder.Append ("\\n");
+                        break;
+                    case '\r':
+                        builder.Append ("\\r");
+                        break;
+                    case '\t':
+                        builder.Append ("\\t");
+                        break;
+                    default:
+                        int codepoint = Convert.ToInt32 (c);
+                        if ((codepoint >= 32) && (codepoint <= 126)) {
+                            builder.Append (c);
+                        } else {
+                            builder.Append ("\\u" + Convert.ToString (codepoint, 16).PadLeft (4, '0'));
+                        }
+                        break;
                 }
             }
-            builder.Append('\"');
-            return builder.ToString();
+            builder.Append ('\"');
+            return builder.ToString ();
         }
     }
 }

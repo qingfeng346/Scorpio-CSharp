@@ -59,6 +59,8 @@ namespace Scorpio.Userdata {
             if (isConstructor && m_Type.IsValueType) {
                 functionMethod.Add(new FunctionDataStructConstructor(m_Type));
             }
+            functionMethod.Sort((a, b) => { return a.Priority - b.Priority; });
+            functionStaticMethod.Sort((a, b) => { return a.Priority - b.Priority; });
             m_Methods = functionMethod.ToArray();
             m_StaticMethods = functionStaticMethod.ToArray();
             m_GenericMethods = genericMethods.ToArray();

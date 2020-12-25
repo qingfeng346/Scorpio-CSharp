@@ -16,9 +16,11 @@ namespace Scorpio.Userdata {
         }
     }
     //带 ref out 参数的 普通反射函数
-    public class FunctionDataReflectMethodWithRefOut : FunctionDataReflectMethod {
+    public class FunctionDataReflectMethodWithRefOut : FunctionDataWithRefOut {
+        public MethodInfo Method;                   //普通函数对象
         public FunctionDataReflectMethodWithRefOut(MethodInfo method, Type[] parameterType, object[] defaultParameter, bool[] refOut, int requiredNumber, Type paramType) :
-            base(method, parameterType, defaultParameter, refOut, requiredNumber, paramType) {
+            base(parameterType, defaultParameter, refOut, requiredNumber, paramType) {
+            this.Method = method;
         }
         public override object Invoke(object obj, ScriptValue[] parameters) {
             var ret = Method.Invoke(obj, Args);
