@@ -15,7 +15,7 @@ namespace Scorpio {
             m_Factory = factory;
         }
         public static Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
-            return m_Factory != null ? m_Factory.CreateDelegate(delegateType, scriptObject) : null;
+            return m_Factory.CreateDelegate(delegateType, scriptObject);
         }
 #else
         class DelegateData {

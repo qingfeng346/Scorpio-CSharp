@@ -11,15 +11,16 @@ namespace Scorpio.Userdata {
             FieldType = info.PropertyType;
         }
         public override object GetValue(object obj) {
-            if (m_Property.CanRead)
-                return m_Property.GetValue(obj, null);
-            throw new ExecutionException($"Type:[{m_Type.FullName}]  Property:[{m_Property.Name}] 不支持 GetValue");
+#if SCORPIO_DEBUG
+            if (!m_Property.CanRead) throw new ExecutionException($"Type:[{m_Type.FullName}]  Property:[{m_Property.Name}] 不支持 GetValue");
+#endif
+            return m_Property.GetValue(obj, null);
         }
         public override void SetValue(object obj, object val) {
-            if (m_Property.CanWrite)
-                m_Property.SetValue(obj, val, null);
-            else
-                throw new ExecutionException($"Type:[{m_Type.FullName}]  Property:[{m_Property.Name}] 不支持 SetValue");
+#if SCORPIO_DEBUG
+            if (!m_Property.CanWrite) throw new ExecutionException($"Type:[{m_Type.FullName}]  Property:[{m_Property.Name}] 不支持 SetValue");
+#endif
+            m_Property.SetValue(obj, val, null);
         }
     }
 }

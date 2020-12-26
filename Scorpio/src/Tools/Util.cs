@@ -44,7 +44,7 @@ namespace Scorpio.Tools {
         public static object ChangeType (ScriptValue value, Type type) {
             if (type == TYPE_VALUE) { return value; }
             switch (value.valueType) {
-                case ScriptValue.doubleValueType:
+                case ScriptValue.doubleValueType: {
                     unchecked {
                         if (type == TYPE_DOUBLE || type == TYPE_OBJECT) { return value.doubleValue; }
                         if (type == TYPE_LONG) { return (long)value.doubleValue; }
@@ -55,10 +55,11 @@ namespace Scorpio.Tools {
                         if (type == TYPE_STRING) { return value.doubleValue.ToString(); }
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:DoubleNumber  target:{type.ToString()}");
-                case ScriptValue.longValueType:
+                }
+                case ScriptValue.longValueType: {
                     unchecked {
-                        if (type == TYPE_LONG  || type == TYPE_OBJECT) { return value.longValue; }
-                        if (type == TYPE_DOUBLE) { return (double) value.longValue; }
+                        if (type == TYPE_LONG || type == TYPE_OBJECT) { return value.longValue; }
+                        if (type == TYPE_DOUBLE) { return (double)value.longValue; }
                         if (type == TYPE_ULONG) { return (ulong)value.longValue; }
                         if (type == TYPE_INT) { return (int)value.longValue; }
                         if (type == TYPE_FLOAT) { return (float)value.longValue; }
@@ -66,13 +67,18 @@ namespace Scorpio.Tools {
                         if (type == TYPE_STRING) { return value.longValue.ToString(); }
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:LongNumber  target:{type.ToString()}");
-                case ScriptValue.scriptValueType:
-                    {
-                        if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom (type)) {
-                            return ScorpioDelegateFactory.CreateDelegate (type, value.scriptValue);
-                        }
-                        return value.scriptValue.Value;
+                }
+                case ScriptValue.nullValueType: return null;
+                case ScriptValue.trueValueType: return true;
+                case ScriptValue.falseValueType: return false;
+                case ScriptValue.stringValueType: return value.stringValue;
+                case ScriptValue.objectValueType: return value.objectValue;
+                case ScriptValue.scriptValueType: {
+                    if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom (type)) {
+                        return ScorpioDelegateFactory.CreateDelegate (type, value.scriptValue);
                     }
+                    return value.scriptValue.Value;
+                }
                 default:
                     return value.Value;
             }
