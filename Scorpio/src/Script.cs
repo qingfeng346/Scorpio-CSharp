@@ -244,20 +244,26 @@ namespace Scorpio {
 
 
 #if SCORPIO_DEBUG || SCORPIO_STACK
-        private Stack<StackInfo> m_StackInfos = new Stack<StackInfo>(); //堆栈信息
+        private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
+        private int m_StackLength = 0;
         internal void PushStackInfo(string breviary, int line) {
-            m_StackInfos.Push(new StackInfo() { Breviary = breviary, Line = line });
+            m_StackInfos[m_StackLength].Breviary = breviary;
+            m_StackInfos[m_StackLength++].Line = line;
         }
         internal void PopStackInfo() {
-            m_StackInfos.Pop();
+            --m_StackLength;
         }
         /// <summary> 最近的堆栈调用 </summary>
         public StackInfo GetStackInfo() {
-            return m_StackInfos.Count > 0 ? m_StackInfos.Peek() : default;
+            return m_StackLength > 0 ? m_StackInfos[m_StackLength - 1] : default;
         }
         /// <summary> 调用堆栈 </summary>
         public StackInfo[] GetStackInfos() {
-            return m_StackInfos.ToArray();
+            var stackInfos = new StackInfo[m_StackLength];
+            for (var i = m_StackLength - 1; i >= 0; --i) {
+                stackInfos[i] = m_StackInfos[i];
+            }
+            return stackInfos;
         }
 #else
         private readonly static StackInfo[] EmptyStackInfos = new StackInfo[0];

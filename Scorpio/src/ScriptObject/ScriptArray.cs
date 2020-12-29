@@ -149,7 +149,7 @@ namespace Scorpio {
             m_Objects[m_Length++] = value;
         }
         public void Insert(int index, ScriptValue value) {
-            if (index < 0 || index >= m_Length)
+            if (index < 0 || index > m_Length)
                 throw new ExecutionException($"Insert 索引小于0或超过最大值 index:{index}   length:{m_Length}");
             if (m_Length == m_Objects.Length) {
                 EnsureCapacity(m_Length + 1);
