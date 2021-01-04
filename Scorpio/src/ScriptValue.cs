@@ -315,16 +315,16 @@ namespace Scorpio {
             this.objectValue = value;
         }
 
-        public string ToJson(bool supportKeyNumber) {
+        public string ToJson(bool supportKeyNumber, bool ucode) {
             switch (valueType) {
-                case scriptValueType: return scriptValue.ToJson(supportKeyNumber);
+                case scriptValueType: return scriptValue.ToJson(supportKeyNumber, ucode);
                 case doubleValueType: return doubleValue.ToString();
                 case longValueType: return longValue.ToString();
                 case trueValueType: return "true";
                 case falseValueType: return "false";
-                case stringValueType: return Util.ParseJsonString(stringValue);
+                case stringValueType: return Util.ParseJsonString(stringValue, ucode);
                 case nullValueType: return "null";
-                case objectValueType: return Util.ParseJsonString(objectValue.ToString());
+                case objectValueType: return Util.ParseJsonString(objectValue.ToString(), ucode);
                 default: return "";
             }
         }

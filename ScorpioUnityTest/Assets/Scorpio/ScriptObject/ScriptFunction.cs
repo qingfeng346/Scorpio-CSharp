@@ -16,6 +16,6 @@ namespace Scorpio
         public virtual ScriptValue BindObject { get { return ScriptValue.Null; } }
         public abstract ScriptFunction SetBindObject(ScriptValue obj);
         public override string ToString() { return $"Function<{FunctionName}>"; }
-        public override string ToJson(bool supportKeyNumber) { return ToString(); }
+        public override string ToJson(bool supportKeyNumber, bool ucode) { return ToString(); }
     }
 }

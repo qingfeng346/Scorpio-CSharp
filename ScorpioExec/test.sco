@@ -1,12 +1,52 @@
-var TestClass = importType("ScorpioExec.TestClass")
-print(TestClass)
-var t = new TestClass()
-for (var i = 0, 50000) {
-    t.TestFunc()
+class VersionData {
+    constructor(version) {
+        this.version = version
+        this.versionNumer = this.GetVersionNumber(version)
+    }
+    GetVersionNumber(version) {
+        var versions = version.split ('.');
+        return toNumber(versions[0]) * 1000000 + toNumber(versions[1]) * 10000 + toNumber (versions[2]);
+    }
+    ">"(version) {
+        if (isNumber(version)) {
+            return this.versionNumer > version
+        } else {
+            return this.versionNumer > this.GetVersionNumber(version)
+        }
+    }
+    ">="(version) {
+        if (isNumber(version)) {
+            return this.versionNumer >= version
+        } else {
+            return this.versionNumer >= this.GetVersionNumber(version)
+        }
+    }
+    "<"(version) {
+        if (isNumber(version)) {
+            return this.versionNumer < version
+        } else {
+            return this.versionNumer < this.GetVersionNumber(version)
+        }
+    }
+    "<="(version) {
+        if (isNumber(version)) {
+            return this.versionNumer <= version
+        } else {
+            return this.versionNumer <= this.GetVersionNumber(version)
+        }
+    }
+    "=="(version) {
+        if (isNumber(version)) {
+            return this.versionNumer == version
+        } else {
+            return this.version == version
+        }
+    }
 }
+var t = new VersionData("1.0.13")
+print(t > "0.1.20")
 // TableManager = {}
 // TableManager.getAchievement = function(ID) {
-    
 // }
 // TableManager = {
 //     getAchievement(ID) {

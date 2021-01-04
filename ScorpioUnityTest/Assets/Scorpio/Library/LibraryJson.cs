@@ -10,7 +10,7 @@ namespace Scorpio.Library {
         }
         private class encode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(args[0].ToJson(length > 1 ? args[1].IsTrue : false));
+                return new ScriptValue(args[0].ToJson(length > 1 ? args[1].IsTrue : false, length > 2 ? args[2].IsTrue : true));
             }
         }
         private class decode : ScorpioHandle {

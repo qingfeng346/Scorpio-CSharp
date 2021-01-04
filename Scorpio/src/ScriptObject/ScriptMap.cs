@@ -92,8 +92,8 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return ToJson(false); }
-        public override string ToJson(bool supportKeyNumber) {
+        public override string ToString() { return ToJson(false, true); }
+        public override string ToJson(bool supportKeyNumber, bool ucode) {
             var builder = new StringBuilder();
             builder.Append("{");
             var first = true;
@@ -103,9 +103,9 @@ namespace Scorpio {
                     if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
                     if (first) { first = false; } else { builder.Append(","); }
                     if (pair.Key is string) {
-                        builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber)}");
+                        builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber, ucode)}");
                     } else {
-                        builder.Append($"{pair.Key}:{value.ToJson(supportKeyNumber)}");
+                        builder.Append($"{pair.Key}:{value.ToJson(supportKeyNumber, ucode)}");
                     }
                 }
             } else {
@@ -113,9 +113,9 @@ namespace Scorpio {
                     var value = pair.Value;
                     if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
                     if (first) { first = false; } else { builder.Append(","); }
-                    builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber)}");
+                    builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber, ucode)}");
                 }
-            } 
+            }
             builder.Append("}");
             return builder.ToString();
         }

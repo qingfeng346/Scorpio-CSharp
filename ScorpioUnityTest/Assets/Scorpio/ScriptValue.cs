@@ -191,27 +191,33 @@ namespace Scorpio {
             }
         }
         public int ToInt32() {
-            switch (valueType) {
-                case doubleValueType: return ((IConvertible)doubleValue).ToInt32(null);
-                case longValueType: return ((IConvertible)longValue).ToInt32(null);
-                case objectValueType: return Convert.ToInt32(objectValue);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
+            unchecked {
+                switch (valueType) {
+                    case doubleValueType: return (int)doubleValue;
+                    case longValueType: return (int)longValue;
+                    case objectValueType: return Convert.ToInt32(objectValue);
+                    default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
+                }
             }
         }
         public double ToDouble() {
-            switch (valueType) {
-                case doubleValueType: return doubleValue;
-                case longValueType: return (double)longValue;
-                case objectValueType: return Convert.ToDouble(objectValue);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
+            unchecked {
+                switch (valueType) {
+                    case doubleValueType: return doubleValue;
+                    case longValueType: return (double)longValue;
+                    case objectValueType: return Convert.ToDouble(objectValue);
+                    default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
+                }
             }
         }
         public long ToLong() {
-            switch (valueType) {
-                case doubleValueType: return (long)doubleValue;
-                case longValueType: return longValue;
-                case objectValueType: return Convert.ToInt64(objectValue);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");
+            unchecked {
+                switch (valueType) {
+                    case doubleValueType: return (long)doubleValue;
+                    case longValueType: return longValue;
+                    case objectValueType: return Convert.ToInt64(objectValue);
+                    default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");
+                }
             }
         }
         public char ToChar() {
@@ -309,16 +315,16 @@ namespace Scorpio {
             this.objectValue = value;
         }
 
-        public string ToJson(bool supportKeyNumber) {
+        public string ToJson(bool supportKeyNumber, bool ucode) {
             switch (valueType) {
-                case scriptValueType: return scriptValue.ToJson(supportKeyNumber);
+                case scriptValueType: return scriptValue.ToJson(supportKeyNumber, ucode);
                 case doubleValueType: return doubleValue.ToString();
                 case longValueType: return longValue.ToString();
                 case trueValueType: return "true";
                 case falseValueType: return "false";
-                case stringValueType: return Util.ParseJsonString(stringValue);
+                case stringValueType: return Util.ParseJsonString(stringValue, ucode);
                 case nullValueType: return "null";
-                case objectValueType: return Util.ParseJsonString(objectValue.ToString());
+                case objectValueType: return Util.ParseJsonString(objectValue.ToString(), ucode);
                 default: return "";
             }
         }

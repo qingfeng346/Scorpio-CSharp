@@ -184,7 +184,7 @@ namespace Scorpio {
             return base.Call(thisObject, parameters, length);
         }
         public override string ToString() { return $"Object<{m_Prototype}>"; }
-        public override string ToJson(bool supportKeyNumber) {
+        public override string ToJson(bool supportKeyNumber, bool ucode) {
             var builder = new StringBuilder();
             builder.Append("{");
             var first = true;
@@ -192,7 +192,7 @@ namespace Scorpio {
                 var value = pair.Value;
                 if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
                 if (first) { first = false; } else { builder.Append(","); }
-                builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber)}");
+                builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber, ucode)}");
             }
             builder.Append("}");
             return builder.ToString();
