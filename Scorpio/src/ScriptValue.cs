@@ -221,12 +221,13 @@ namespace Scorpio {
             }
         }
         public char ToChar() {
-            //Convert.ToChar  bool float decimal double 类型会直接报错 InvalidCastException, objectValueType 都是数字类型,只有float会报错, 要使用float需提前转换成 long
-            switch (valueType) {
-                case doubleValueType: return Convert.ToChar(Convert.ToInt32(doubleValue));
-                case longValueType: return Convert.ToChar(longValue);
-                case objectValueType: return Convert.ToChar(objectValue);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
+            unchecked {
+                switch (valueType) {
+                    case doubleValueType: return (char)doubleValue;
+                    case longValueType: return (char)longValue;
+                    case objectValueType: return Convert.ToChar(objectValue);
+                    default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
+                }
             }
         }
         public T Get<T>() where T : ScriptObject {
@@ -438,7 +439,7 @@ namespace Scorpio {
                 case scriptValueType: return scriptValue.Less(value);
                 case doubleValueType: return value.valueType == doubleValueType && doubleValue < value.doubleValue;
                 case longValueType: return value.valueType == longValueType && longValue < value.longValue;
-                default: throw new ExecutionException("【<】运算符不支持当前类型 : " + ValueTypeName);
+                default: throw new ExecutionException($"【<】运算符不支持当前类型 : {ValueTypeName}");
             }
         }
         public bool Greater(ScriptValue value) {
@@ -446,7 +447,7 @@ namespace Scorpio {
                 case scriptValueType: return scriptValue.Greater(value);
                 case doubleValueType: return value.valueType == doubleValueType && doubleValue > value.doubleValue;
                 case longValueType: return value.valueType == longValueType && longValue > value.longValue;
-                default: throw new ExecutionException("【>】运算符不支持当前类型 : " + ValueTypeName);
+                default: throw new ExecutionException($"【>】运算符不支持当前类型 : {ValueTypeName}");
             }
         }
     }

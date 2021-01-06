@@ -56,9 +56,9 @@ namespace Scorpio.Userdata {
                         }
                     }
                 }
-                throw new ExecutionException ($"类[{m_Type.ToString()}] 找不到合适的函数 [{MethodName}]");
+                throw new ExecutionException ($"类[{m_Type}] 找不到合适的函数 [{MethodName}]");
             } catch (System.Exception e) {
-                throw new ExecutionException ($"类[{m_Type.ToString()}] 调用函数出错 [{MethodName}] : {e.ToString()}");
+                throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] : {e}");
             }
         }
         public bool CallNoThrow (bool isStatic, object obj, ScriptValue[] parameters, int length, out object result) {
@@ -89,7 +89,7 @@ namespace Scorpio.Userdata {
                 result = null;
                 return false;
             } catch (System.Exception e) {
-                throw new ExecutionException ($"类[{m_Type.ToString()}] 调用函数出错 [{MethodName}] : {e.ToString()}");
+                throw new ExecutionException($"类[{m_Type}] 调用函数出错 [{MethodName}] : {e}");
             }
         }
     }
