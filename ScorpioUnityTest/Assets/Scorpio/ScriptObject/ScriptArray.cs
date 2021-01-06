@@ -92,41 +92,30 @@ namespace Scorpio {
         public IEnumerator<ScriptValue> GetIterator() { return new Enumerator(this); }
 
         public override ScriptValue GetValue(object index) {
-            if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
-                var i = Convert.ToInt32(index);
-                if (i >= m_Length) return ScriptValue.Null;
-                if (i < 0) throw new ExecutionException($"数组获取变量索引小于0 index : {i}");
-                return m_Objects[i];
-            }
-            return base.GetValue(index);
+            var i = Convert.ToInt32(index);
+            Util.Assert(i >= 0, $"Array.GetValue 索引小于0:{i}");
+            return i < m_Length ? m_Objects[i] : ScriptValue.Null;
         }
         public override void SetValue(object index, ScriptValue value) {
-            if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
-                var i = Convert.ToInt32(index);
-                if (i >= m_Length) {
-                    EnsureCapacity(i + 1);
-                    m_Length = i + 1;
-                } else if (i < 0) {
-                    throw new ExecutionException($"数组设置变量索引小于0 index : {i}");
-                }
-                m_Objects[i] = value;
-            } else {
-                base.SetValue(index, value);
+            var i = Convert.ToInt32(index);
+            Util.Assert(i >= 0, $"Array.SetValue 索引小于0:{i}");
+            if (i >= m_Length) {
+                EnsureCapacity(i + 1);
+                m_Length = i + 1;
             }
+            m_Objects[i] = value;
         }
 
         public virtual ScriptValue this[int i] {
             get {
-                if (i >= m_Length) return ScriptValue.Null;
-                if (i < 0) throw new ExecutionException($"数组获取变量索引小于0 index : {i}");
-                return m_Objects[i];
+                Util.Assert(i >= 0, $"Array.get[] 索引小于0:{i}");
+                return i < m_Length ? m_Objects[i] : ScriptValue.Null;
             }
             set {
+                Util.Assert(i >= 0, $"Array.set[] 索引小于0:{i}");
                 if (i >= m_Length) {
                     EnsureCapacity(i + 1);
                     m_Length = i + 1;
-                } else if (i < 0) {
-                    throw new ExecutionException($"数组设置变量索引小于0 index : {i}");
                 }
                 m_Objects[i] = value;
             }
@@ -149,7 +138,7 @@ namespace Scorpio {
             m_Objects[m_Length++] = value;
         }
         public void Insert(int index, ScriptValue value) {
-            Util.Assert(index < 0 || index > m_Length, $"Insert 索引小于0或超过最大值 index:{index} length:{m_Length}");
+            Util.Assert(index >= 0 && index <= m_Length, $"Array.Insert 索引小于0或超过最大值 index:{index} length:{m_Length}");
             if (m_Length == m_Objects.Length) {
                 EnsureCapacity(m_Length + 1);
             }
@@ -166,7 +155,7 @@ namespace Scorpio {
             return false;
         }
         public void RemoveAt(int index) {
-            Util.Assert(index < 0 || index >= m_Length, $"RemoveAt 索引小于0或超过最大值 index:{index} length:{m_Length}");
+            Util.Assert(index >= 0 && index < m_Length, $"Array.RemoveAt 索引小于0或超过最大值 index:{index} length:{m_Length}");
             m_Length--;
             Array.Copy(m_Objects, index + 1, m_Objects, index, m_Length - index);
             m_Objects[m_Length].valueType = ScriptValue.nullValueType;
@@ -196,7 +185,7 @@ namespace Scorpio {
             return -1;
         }
         public void Resize(int length) {
-            Util.Assert(length < 0, $"Resize长度小于0 length:{length}");
+            Util.Assert(length >= 0, $"Array.Resize长度小于0:{length}");
             if (length > m_Length) {
                 EnsureCapacity(length);
                 m_Length = length;
@@ -224,7 +213,7 @@ namespace Scorpio {
             return m_Length > 0 ? m_Objects[m_Length - 1] : ScriptValue.Null;
         }
         public ScriptValue PopFirst() {
-            Util.Assert(m_Length == 0, "Array.PopFirst 数组长度为 0");
+            Util.Assert(m_Length > 0, "Array.PopFirst 数组长度为0");
             var value = m_Objects[0];
             RemoveAt(0);
             return value;
@@ -237,13 +226,11 @@ namespace Scorpio {
             return value;
         }
         public ScriptValue PopLast() {
-            Util.Assert(m_Length == 0, "Array.PopLast 数组长度为 0");
+            Util.Assert(m_Length > 0, "Array.PopLast 数组长度为0");
             return m_Objects[--m_Length];
         }
         public ScriptValue SafePopLast() {
-            if (m_Length == 0)
-                return ScriptValue.Null;
-            return m_Objects[--m_Length];
+            return m_Length == 0 ? ScriptValue.Null : m_Objects[--m_Length];
         }
         //仅限于number和string
         public T[] ToArray<T>() {

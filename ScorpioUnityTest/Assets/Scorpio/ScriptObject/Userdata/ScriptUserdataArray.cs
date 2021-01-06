@@ -11,17 +11,10 @@ namespace Scorpio.Userdata {
             m_ElementType = type.Type.GetElementType();
         }
         public override ScriptValue GetValue(object index) {
-            if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
-                return ScriptValue.CreateValue(m_Array.GetValue(Convert.ToInt32(index)));
-            }
-            return base.GetValue(index);
+            return ScriptValue.CreateValue(m_Array.GetValue(Convert.ToInt32(index)));
         }
         public override void SetValue(object index, ScriptValue value) {
-            if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
-                m_Array.SetValue(Util.ChangeType(value, m_ElementType), Convert.ToInt32(index));
-            } else {
-                base.SetValue(index, value);
-            }
+            m_Array.SetValue(Util.ChangeType(value, m_ElementType), Convert.ToInt32(index));
         }
     }
 }

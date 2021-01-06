@@ -100,16 +100,16 @@ namespace Scorpio.Userdata {
             if (userdataMethod != null) return userdataMethod;
             nestedType = GetNestedType(name);
             if (nestedType.valueType != ScriptValue.nullValueType) return nestedType;
-            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}]  Name:[{name}] not exist");
+            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
         }
         /// <summary> 设置一个类变量 </summary>
         public override void SetValue(object obj, string name, ScriptValue value) {
             var variable = GetVariable(name);
-            if (variable == null) throw new ExecutionException($"SetValue Type:[{m_Type.FullName}]  Name:[{name}] not exist");
+            Util.Assert(variable != null, $"SetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
             try {
                 variable.SetValue(obj, Util.ChangeType(value, variable.FieldType));
             } catch (System.Exception e) {
-                throw new ExecutionException($"SetValue 出错 源类型:{value.ValueTypeName}  目标类型:{variable.FieldType.Name}: {e.ToString()}");
+                throw new ExecutionException($"SetValue 出错 源类型:{value.ValueTypeName}  目标类型:{variable?.FieldType?.Name}: {e}");
             }
         }
     }

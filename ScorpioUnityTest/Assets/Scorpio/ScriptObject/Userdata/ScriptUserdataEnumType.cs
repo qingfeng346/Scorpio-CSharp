@@ -19,7 +19,7 @@ namespace Scorpio.Userdata {
         public override ScriptValue GetValue(string key) {
             if (m_Enums.TryGetValue(key, out var value))
                 return value;
-            throw new ExecutionException("枚举[" + m_ValueType.ToString() + "] 元素[" + key + "] 不存在");
+            throw new ExecutionException($"枚举[{m_ValueType}]不存在[{key}");
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             if (parameters[0].valueType == ScriptValue.stringValueType) {
