@@ -118,6 +118,9 @@ namespace Scorpio.Userdata {
                     Args[i] = DefaultParameter[i];
                 }
             } else {
+                for (var i = 0; i < ParameterCount; ++i) {
+                    Args[i] = i < length ? (Util.ChangeType (parameters[i], ParameterType[i])) : DefaultParameter[i];
+                }
                 if (length > ParameterCount) {
                     var array = Array.CreateInstance(ParamType, length - ParameterCount);
                     for (int i = ParameterCount; i < length; ++i)
