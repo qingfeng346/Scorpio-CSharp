@@ -25,7 +25,7 @@ namespace Scorpio.ScorpioReflect {
             foreach (var property in m_Propertys) {
                 if (!property.CanWrite || property.GetSetMethod(false) == null || property.GetSetMethod(false).IsStatic) { continue; }
                 builder.Append($@"
-    static readonly PropertyInfo {GetStructFieldName(property.Name)} = typeof({FullName}).GetProperty(""{property.Name}"");");
+    static readonly PropertyInfo {GetStructPropertyName(property.Name)} = typeof({FullName}).GetProperty(""{property.Name}"");");
             }
             return builder.ToString();
         }
