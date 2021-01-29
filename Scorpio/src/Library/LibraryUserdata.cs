@@ -1,4 +1,5 @@
 using Scorpio.Userdata;
+using Scorpio.Tools;
 namespace Scorpio.Library {
     public partial class LibraryUserdata {
         public static void Load(Script script) {
@@ -9,7 +10,7 @@ namespace Scorpio.Library {
         }
         private class fieldTypeOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return TypeManager.GetUserdataType(TypeManager.GetType(args[0].scriptValue.Type).GetVariableType(args[1].ToString()));
+                return TypeManager.GetUserdataType(TypeManager.GetType(args[0].scriptValue.Type).GetVariableType(args[1].ToString().GetCodeByString()));
             }
         }
         private class isType : ScorpioHandle {

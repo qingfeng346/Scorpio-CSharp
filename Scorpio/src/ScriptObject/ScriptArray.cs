@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Exception;
@@ -46,7 +47,7 @@ namespace Scorpio {
                 return false;
             }
             public ScriptValue Current { get { return current; } }
-            object System.Collections.IEnumerator.Current { get { return current; } }
+            object IEnumerator.Current { get { return current; } }
             public void Reset() {
                 index = 0;
                 current = ScriptValue.Null;
@@ -88,8 +89,7 @@ namespace Scorpio {
             }
         }
         public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
-        public IEnumerator<ScriptValue> GetIterator() { return new Enumerator(this); }
+        IEnumerator IEnumerable.GetEnumerator() { return new Enumerator(this); }
 
         public override ScriptValue GetValue(object index) {
             var i = Convert.ToInt32(index);

@@ -1,24 +1,24 @@
 namespace Scorpio {
     //运算符重载
     public class ScriptOperator {
-        public const string Plus = "+";
-        public const string Minus = "-";
-        public const string Multiply = "*";
-        public const string Divide = "/";
-        public const string Modulo = "%";
-        public const string InclusiveOr = "|";
-        public const string Combine = "&";
-        public const string XOR = "^";
-        public const string Shi = "<<";
-        public const string Shr = ">>";
-        public const string Greater = ">";
-        public const string GreaterOrEqual = ">=";
-        public const string Less = "<";
-        public const string LessOrEqual = "<=";
-        public const string Equal = "==";
-        public const string NotEqual = "!=";
-        public const string Invoke = "()";
-        public const string Constructor = "constructor";       //构造函数
+        public const int Plus = 0;                  //+
+        public const int Minus = 1;                 //-
+        public const int Multiply = 2;              //*
+        public const int Divide = 3;                ///
+        public const int Modulo = 4;                //%
+        public const int InclusiveOr = 5;           //|
+        public const int Combine = 6;               //&
+        public const int XOR = 7;                   //^
+        public const int Shi = 8;                   //<<
+        public const int Shr = 9;                   //>>
+        public const int Greater = 10;              //>
+        public const int GreaterOrEqual = 11;       //>=
+        public const int Less = 12;                 //<
+        public const int LessOrEqual = 13;          //>=
+        public const int Equal = 14;                //==
+        public const int NotEqual = 15;             //!=
+        public const int Invoke = 16;               //()
+        public const int Constructor = 17;          //构造函数
     }
     //c#运算符重载
     public class UserdataOperator {

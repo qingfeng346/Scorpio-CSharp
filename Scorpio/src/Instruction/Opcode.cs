@@ -33,6 +33,7 @@ namespace Scorpio.Instruction {
         LoadBase,               //push base value
         CopyStackTop,           //复制栈顶的数据
         CopyStackTopIndex,      //复制栈顶的数据
+        LoadValueCode,          //push a value by stringcode
         LoadEnd,
 
 
@@ -63,6 +64,8 @@ namespace Scorpio.Instruction {
         StoreGlobalString,      //store global value by string
         StoreValueString,       //store a value by string
         StoreValueObject,       //store a value by object
+
+        StoreValueAssignCode,   //store a value by 
         StoreEnd,
 
         //运算指令

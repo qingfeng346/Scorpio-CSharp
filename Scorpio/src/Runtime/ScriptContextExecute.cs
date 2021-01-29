@@ -169,13 +169,19 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case Opcode.LoadValueString: {
-                                        stackObjects[stackIndex] = stackObjects[stackIndex].GetValue(constString[opvalue], m_script);
+                                        var code = constString[opvalue].GetCodeByString();
+                                        stackObjects[stackIndex] = stackObjects[stackIndex].GetValue(code, m_script);
+                                        instruction.SetOpcode(Opcode.LoadValueCode, code);
+                                        continue;
+                                    }
+                                    case Opcode.LoadValueCode: {
+                                        stackObjects[stackIndex] = stackObjects[stackIndex].GetValue(opvalue, m_script);
                                         continue;
                                     }
                                     case Opcode.LoadValueObject: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.stringValueType:
-                                                stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue, m_script);
+                                                stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue.GetCodeByString(), m_script);
                                                 break;
                                             case ScriptValue.doubleValueType:
                                                 stackObjects[stackIndex - 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].doubleValue);
@@ -198,7 +204,7 @@ namespace Scorpio.Runtime {
                                     case Opcode.LoadValueObjectDup: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.stringValueType:
-                                                stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue, m_script);
+                                                stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].stringValue.GetCodeByString(), m_script);
                                                 break;
                                             case ScriptValue.doubleValueType:
                                                 stackObjects[stackIndex + 1] = stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex].doubleValue);
@@ -224,7 +230,7 @@ namespace Scorpio.Runtime {
                                     }
                                     case Opcode.LoadGlobalString: {
                                         stackObjects[++stackIndex] = m_global.GetValue(constString[opvalue]);
-                                        instruction.SetOpcode(Opcode.LoadGlobal, m_global.GetIndex(constString[opvalue]));
+                                        instruction.SetOpcode(Opcode.LoadGlobal, m_global.GetIndex(constString[opvalue].GetCodeByString()));
                                         continue;
                                     }
                                     case Opcode.CopyStackTop: {
@@ -349,8 +355,9 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case Opcode.StoreGlobalStringAssign: {
-                                        m_global.SetValue(constString[opvalue], stackObjects[stackIndex]);
-                                        instruction.SetOpcode(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]));
+                                        var code = constString[opvalue].GetCodeByString();
+                                        m_global.SetValue(code, stackObjects[stackIndex]);
+                                        instruction.SetOpcode(Opcode.StoreGlobalAssign, m_global.GetIndex(code));
                                         continue;
                                     }
                                     case Opcode.StoreValueAssign: {
@@ -466,8 +473,9 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case Opcode.StoreGlobalString: {
-                                        m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
-                                        instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
+                                        var code = constString[opvalue].GetCodeByString();
+                                        m_global.SetValue(code, stackObjects[stackIndex--]);
+                                        instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(code));
                                         continue;
                                     }
                                     default: throw new ExecutionException("unknown opcode : " + opcode);

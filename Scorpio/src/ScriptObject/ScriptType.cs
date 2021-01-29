@@ -3,8 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
-    public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
-        protected Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();   //所有的函数
+    public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<int, ScriptValue>> {
+        protected Dictionary<int, ScriptValue> m_Values = new Dictionary<int, ScriptValue>();   //所有的函数
         protected ScriptValue m_Prototype = ScriptValue.Null;
         public ScriptType(string typeName, ScriptValue parentType) : base(ObjectType.Type) {
             TypeName = typeName;
@@ -12,14 +12,14 @@ namespace Scorpio {
         }
         public string TypeName { get; private set; }        //Type名称
         public virtual ScriptValue Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
-        public override void SetValue(string key, ScriptValue value) {
+        public override void SetValue(int key, ScriptValue value) {
             if (value.valueType == ScriptValue.nullValueType) {
                 m_Values.Remove(key);
             } else {
                 m_Values[key] = value;
             }
         }
-        public override ScriptValue GetValue(string key) {
+        public override ScriptValue GetValue(int key) {
             return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
@@ -30,7 +30,7 @@ namespace Scorpio {
             }
             return ret;
         }
-        public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
+        public IEnumerator<KeyValuePair<int, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
         public override string ToString() { return $"Class<{TypeName}>"; }
     }
@@ -41,7 +41,7 @@ namespace Scorpio {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             throw new ExecutionException($"Class<{TypeName}>不支持构造");
         }
-        public override ScriptValue GetValue(string key) {
+        public override ScriptValue GetValue(int key) {
             return m_Values.TryGetValue(key, out var value) ? value : ScriptValue.Null;
         }
     }

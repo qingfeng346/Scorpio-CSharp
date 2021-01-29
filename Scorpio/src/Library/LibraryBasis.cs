@@ -29,7 +29,7 @@ namespace Scorpio.Library {
         }
         private class MapPairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
-            readonly IEnumerator<KeyValuePair<object, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<MapValue> m_Enumerator;
             public MapPairs(ScriptMap map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -46,7 +46,7 @@ namespace Scorpio.Library {
         }
         private class InstancePairs : ScorpioHandle {
             readonly ScriptInstance m_ItorResult;
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<KeyValuePair<int, ScriptValue>> m_Enumerator;
             public InstancePairs(ScriptInstance map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -54,7 +54,7 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key));
+                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key.GetStringByCode()));
                     m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
@@ -63,7 +63,7 @@ namespace Scorpio.Library {
         }
         private class TypePairs : ScorpioHandle {
             readonly ScriptInstance m_ItorResult;
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<KeyValuePair<int, ScriptValue>> m_Enumerator;
             public TypePairs(ScriptType map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -71,7 +71,7 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key));
+                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key.GetStringByCode()));
                     m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }

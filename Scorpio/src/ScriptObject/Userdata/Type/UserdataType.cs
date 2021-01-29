@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Scorpio;
 using Scorpio.Exception;
+using Scorpio.Tools;
 namespace Scorpio.Userdata {
     /// <summary> 一个c#类的所有数据 </summary>
     public abstract class UserdataType {
@@ -52,17 +49,17 @@ namespace Scorpio.Userdata {
                 case UserdataOperator.GetItemIndex: operatorName = UserdataOperator.GetItem; break;
                 case UserdataOperator.SetItemIndex: operatorName = UserdataOperator.SetItem; break;
             }
-            return m_Operators[operate] = GetMethod(operatorName);
+            return m_Operators[operate] = GetMethod(operatorName.GetCodeByString());
         }
         /// <summary> 创建一个实例 </summary>
         public abstract ScriptUserdata CreateInstance(ScriptValue[] parameters, int length);
         /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
-        public abstract Type GetVariableType(string name);
+        public abstract Type GetVariableType(int name);
         /// <summary> 获取函数 </summary>
-        public abstract UserdataMethod GetMethod(string name);
+        public abstract UserdataMethod GetMethod(int name);
         /// <summary> 获得一个类变量 </summary>
-        public abstract object GetValue(object obj, string name);
+        public abstract object GetValue(object obj, int name);
         /// <summary> 设置一个类变量 </summary>
-        public abstract void SetValue(object obj, string name, ScriptValue value);
+        public abstract void SetValue(object obj, int name, ScriptValue value);
     }
 }

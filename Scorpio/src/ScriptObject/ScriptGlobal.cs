@@ -5,23 +5,18 @@ using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
         public struct Enumerator : IEnumerator<ScorpioValue<string, ScriptValue>> {
-            private string[] keys;
-            private int[] values;
             private ScriptValue[] objects;
-            private int index;
+            private IEnumerator<KeyValuePair<int, int>> enumerator;
             private ScorpioValue<string, ScriptValue> current;
             internal Enumerator(ScriptGlobal global) {
-                this.keys = global.m_Indexs.Keys;
-                this.values = global.m_Indexs.Values;
+                this.enumerator = global.m_Indexs.GetEnumerator();
                 this.objects = global.m_Objects;
                 this.current = new ScorpioValue<string, ScriptValue>();
-                this.index = 0;
             }
             public bool MoveNext() {
-                if (index < values.Length) {
-                    current.Key = keys[index];
-                    current.Value = objects[values[index]];
-                    index++;
+                if (enumerator.MoveNext()) {
+                    current.Key = enumerator.Current.Key.GetStringByCode();
+                    current.Value = objects[enumerator.Current.Value];
                     return true;
                 }
                 return false;
@@ -29,16 +24,16 @@ namespace Scorpio {
             public ScorpioValue<string, ScriptValue> Current { get { return current; } }
             object System.Collections.IEnumerator.Current { get { return current; } }
             public void Reset() {
-                index = 0;
+                enumerator.Reset();
             }
             public void Dispose() {
+                enumerator.Dispose();
             }
         }
-        private ScriptValue[] m_Objects = ScriptValue.EMPTY;                                //数据
-        private int m_Size = 0;                                                             //有效数据数量
-        private ScorpioDictionaryString<int> m_Indexs = new ScorpioDictionaryString<int>(); //名字到索引的映射
+        private ScriptValue[] m_Objects = ScriptValue.EMPTY;                        //数据
+        private int m_Size = 0;                                                     //有效数据数量
+        private Dictionary<int, int> m_Indexs = new Dictionary<int, int>();         //名字到索引的映射
         public ScriptGlobal() : base(ObjectType.Global) { }
-
         void SetCapacity(int value) {
             if (value > 0) {
                 var array = new ScriptValue[value];
@@ -58,19 +53,18 @@ namespace Scorpio {
                 SetCapacity(num);
             }
         }
-
-        public int GetIndex(string key) {
+        public int GetIndex(int key) {
             if (m_Indexs.TryGetValue(key, out var value)) {
                 return value;
             }
             SetValue(key, ScriptValue.Null);
             return m_Indexs[key];
         }
-        public override ScriptValue GetValue(string key) {
+        public override ScriptValue GetValueByIndex(int index) { return m_Objects[index]; }
+        public override ScriptValue GetValue(int key) {
             return m_Indexs.TryGetValue(key, out var index) ? GetValueByIndex(index) : ScriptValue.Null;
         }
-        public override ScriptValue GetValueByIndex(int key) { return m_Objects[key]; }
-        public override void SetValue(string key, ScriptValue value) {
+        public override void SetValue(int key, ScriptValue value) {
             if (m_Indexs.TryGetValue(key, out var index)) {
                 SetValueByIndex(index, value);
                 return;
@@ -83,10 +77,8 @@ namespace Scorpio {
             m_Objects[key] = value;
         }
         public bool HasValue(string key) {
-            return m_Indexs.ContainsKey(key);
+            return m_Indexs.ContainsKey(key.GetCodeByString());
         }
-        public string[] GetKeys() { return m_Indexs.Keys; }
-
         public IEnumerator<ScorpioValue<string, ScriptValue>> GetEnumerator() {
             return new Enumerator(this);
         }

@@ -1,5 +1,6 @@
 using System;
 using Scorpio.Exception;
+using Scorpio.Tools;
 namespace Scorpio {
     public enum ObjectType {
         Type,           //原表
@@ -32,13 +33,15 @@ namespace Scorpio {
             }
         }
         //获取变量
-        public virtual ScriptValue GetValueByIndex(int key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : [{key}]"); }
-        public virtual ScriptValue GetValue(string key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]"); }
+        public virtual ScriptValue GetValueByIndex(int index) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : [{index}]"); }
+        public virtual ScriptValue GetValue(string key) { return GetValue(key.GetCodeByString()); }
+        public virtual ScriptValue GetValue(int key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]"); }
         public virtual ScriptValue GetValue(object key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]"); }
 
         //设置变量
-        public virtual void SetValueByIndex(int key, ScriptValue value) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : [{key}]"); }
-        public virtual void SetValue(string key, ScriptValue value) { throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 String : [{key}]"); }
+        public virtual void SetValueByIndex(int index, ScriptValue value) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : [{index}]"); }
+        public virtual void SetValue(string key, ScriptValue value) { SetValue(key.GetCodeByString(), value); }
+        public virtual void SetValue(int key, ScriptValue value) { throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 String : [{key}]"); }
         public virtual void SetValue(object key, ScriptValue value) { throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : [{key}]"); }
 
         //比较运算符比较

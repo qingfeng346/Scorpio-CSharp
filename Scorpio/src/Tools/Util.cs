@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Scorpio.Exception;
 using System.Diagnostics;
+using System.Collections.Generic;
 namespace Scorpio.Tools {
     public static class Util {
         public static readonly Type TYPE_VOID = typeof (void);
@@ -26,6 +27,30 @@ namespace Scorpio.Tools {
         public static readonly Type TYPE_DECIMAL = typeof (decimal);
         public static readonly Type TYPE_PARAMATTRIBUTE = typeof (ParamArrayAttribute); //不定参属性
         public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof (ExtensionAttribute); //扩展函数属性
+
+        private static Dictionary<string, int> StringToCode = new Dictionary<string, int>();
+        private static Dictionary<int, string> CodeToString = new Dictionary<int, string>();
+        static Util() {
+            GetCodeByString("+");
+            GetCodeByString("-");
+            GetCodeByString("*");
+            GetCodeByString("/");
+            GetCodeByString("%");
+            GetCodeByString("|");
+            GetCodeByString("&");
+            GetCodeByString("^");
+            GetCodeByString("<<");
+            GetCodeByString(">>");
+            GetCodeByString(">");
+            GetCodeByString(">=");
+            GetCodeByString("<");
+            GetCodeByString("<=");
+            GetCodeByString("==");
+            GetCodeByString("!=");
+            GetCodeByString("()");
+            GetCodeByString("constructor");
+        }
+        private static int CodeIndex = 0;
         [Conditional("SCORPIO_DEBUG")]
         public static void Assert(bool condition, string message) {
             if (!condition) throw new ExecutionException(message);
@@ -33,6 +58,20 @@ namespace Scorpio.Tools {
         [Conditional("SCORPIO_DEBUG")]
         public static void Assert(bool condition, string message, params object[] args) {
             if (!condition) throw new ExecutionException(string.Format(message, args));
+        }
+        public static int GetCodeByString(this string str) {
+            if (StringToCode.TryGetValue(str, out var value)) {
+                return value;
+            }
+            StringToCode[str] = CodeIndex;
+            CodeToString[CodeIndex] = str;
+            return CodeIndex++;
+        }
+        public static string GetStringByCode(this int code) {
+            if (CodeToString.TryGetValue(code, out var value)) {
+                return value;
+            }
+            throw new ExecutionException($"找不到对应的String, code:{code}");
         }
         //是否是不定参
         public static bool IsParams (ParameterInfo info) { return info.IsDefined (TYPE_PARAMATTRIBUTE, false); }

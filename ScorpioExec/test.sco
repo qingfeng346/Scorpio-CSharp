@@ -1,50 +1,59 @@
-class VersionData {
-    constructor(version) {
-        this.version = version
-        this.versionNumer = this.GetVersionNumber(version)
-    }
-    GetVersionNumber(version) {
-        var versions = version.split ('.');
-        return toNumber(versions[0]) * 1000000 + toNumber(versions[1]) * 10000 + toNumber (versions[2]);
-    }
-    ">"(version) {
-        if (isNumber(version)) {
-            return this.versionNumer > version
-        } else {
-            return this.versionNumer > this.GetVersionNumber(version)
-        }
-    }
-    ">="(version) {
-        if (isNumber(version)) {
-            return this.versionNumer >= version
-        } else {
-            return this.versionNumer >= this.GetVersionNumber(version)
-        }
-    }
-    "<"(version) {
-        if (isNumber(version)) {
-            return this.versionNumer < version
-        } else {
-            return this.versionNumer < this.GetVersionNumber(version)
-        }
-    }
-    "<="(version) {
-        if (isNumber(version)) {
-            return this.versionNumer <= version
-        } else {
-            return this.versionNumer <= this.GetVersionNumber(version)
-        }
-    }
-    "=="(version) {
-        if (isNumber(version)) {
-            return this.versionNumer == version
-        } else {
-            return this.version == version
-        }
+class test {
+    "+"(value) {
+        print("plus " + value)
     }
 }
-var t = new VersionData("1.0.13")
-print(t > "0.1.20")
+var t = new test()
+t += 100
+// var a = "123"
+// print(a)
+// class VersionData {
+//     constructor(version) {
+//         this.version = version
+//         this.versionNumer = this.GetVersionNumber(version)
+//     }
+//     GetVersionNumber(version) {
+//         var versions = version.split ('.');
+//         return toNumber(versions[0]) * 1000000 + toNumber(versions[1]) * 10000 + toNumber (versions[2]);
+//     }
+//     ">"(version) {
+//         if (isNumber(version)) {
+//             return this.versionNumer > version
+//         } else {
+//             return this.versionNumer > this.GetVersionNumber(version)
+//         }
+//     }
+//     ">="(version) {
+//         if (isNumber(version)) {
+//             return this.versionNumer >= version
+//         } else {
+//             return this.versionNumer >= this.GetVersionNumber(version)
+//         }
+//     }
+//     "<"(version) {
+//         if (isNumber(version)) {
+//             return this.versionNumer < version
+//         } else {
+//             return this.versionNumer < this.GetVersionNumber(version)
+//         }
+//     }
+//     "<="(version) {
+//         if (isNumber(version)) {
+//             return this.versionNumer <= version
+//         } else {
+//             return this.versionNumer <= this.GetVersionNumber(version)
+//         }
+//     }
+//     "=="(version) {
+//         if (isNumber(version)) {
+//             return this.versionNumer == version
+//         } else {
+//             return this.version == version
+//         }
+//     }
+// }
+// var t = new VersionData("1.0.13")
+// print(t > "0.1.20")
 // TableManager = {}
 // TableManager.getAchievement = function(ID) {
 // }

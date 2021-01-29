@@ -86,14 +86,14 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : [{key}]");
             }
         }
-        public ScriptValue GetValue(string key) {
+        public ScriptValue GetValue(int key) {
             if (valueType == scriptValueType) {
                 return scriptValue.GetValue(key);
             }
             throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]");
         }
         //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
-        public ScriptValue GetValue(string key, Script script) {
+        public ScriptValue GetValue(int key, Script script) {
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);
                 case doubleValueType:

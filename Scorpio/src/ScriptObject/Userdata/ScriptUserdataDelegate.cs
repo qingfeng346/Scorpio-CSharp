@@ -48,12 +48,6 @@ namespace Scorpio.Userdata {
             }
             return base.Minus(obj); 
         }
-        public override ScriptValue GetValue(string key) {
-            if (key == "Type") {
-                return TypeManager.GetUserdataType(m_ValueType);
-            }
-            return base.GetValue(key);
-        }
         public override string ToString() { return m_Value.ToString(); }
     }
 }
