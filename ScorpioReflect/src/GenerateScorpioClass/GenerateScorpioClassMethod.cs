@@ -148,29 +148,28 @@ namespace Scorpio.ScorpioReflect {
         //获取变量类型
         string GenerateGetVariableType() {
             var templateStr = @"
-            case ""{0}"": return typeof({1});";
-            var builder = new StringBuilder();
+        if (name == {0}) return typeof({1});";
+            var variable = new Dictionary<string, Type>();
             //所有类变量
-            m_Fields.ForEach((field) => builder.AppendFormat(templateStr, field.Name, ScorpioReflectUtil.GetFullName(field.FieldType)) );
+            m_Fields.ForEach((field) => variable[field.Name] = field.FieldType);
             //所有属性
-            m_Propertys.ForEach((property) => builder.AppendFormat(templateStr, property.Name, ScorpioReflectUtil.GetFullName(property.PropertyType)) );
+            m_Propertys.ForEach((property) => variable[property.Name] = property.PropertyType);
             //所有的函数
-            var methods = new List<string>();
-            foreach (var method in m_Methods) {
-                string name = method.Name;
-                if (methods.Contains(name) || method.ReturnType == typeof(void)) { continue; }
-                methods.Add(name);
-                builder.AppendFormat(templateStr, method.Name, ScorpioReflectUtil.GetFullName(method.ReturnType));
+            m_Methods.ForEach((method) => { variable[method.Name] = method.ReturnType; });
+            var builder = new StringBuilder();
+            foreach (var pair in variable) {
+                if (pair.Value == typeof(void)) continue;
+                builder.AppendFormat(templateStr, GetIndexName(pair.Key), ScorpioReflectUtil.GetFullName(pair.Value));
             }
             return builder.ToString();
         }
         //获取函数
         string GenerateGetMethod() {
             var methodStr = @"
-            case ""{0}"": return {1}.GetInstance();";
+        if (name == {0}) return {1}.GetInstance();";
             var builder = new StringBuilder();
             foreach (var name in m_MethodNames) {
-                builder.AppendFormat(methodStr, name, ScorpioClassName + "_" + name);
+                builder.AppendFormat(methodStr, GetIndexName(name), ScorpioClassName + "_" + name);
             }
             return builder.ToString();
         }

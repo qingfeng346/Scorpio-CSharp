@@ -16,25 +16,17 @@ public class __class : ScorpioFastReflectClass {__reflect_content
     public UserdataMethodFastReflect GetConstructor() {
         return __class_Constructor.GetInstance();
     }
-    public Type GetVariableType(string name) {
-        switch (name) {__getvariabletype_content
-            default: throw new ExecutionException(""__fullname [GetVariableType] 找不到变量 : "" + name);
-        }
+    public Type GetVariableType(int name) {__getvariabletype_content
+        throw new ExecutionException($""__fullname [GetVariableType] 找不到变量 : {name.GetStringByCode()}"");
     }
-    public UserdataMethod GetMethod(string name) {
-        switch (name) {__method_content
-            default: return null;
-        }
+    public UserdataMethod GetMethod(int name) {__method_content
+        return null;
     }
-    public object GetValue(object obj, string name) {
-        switch (name) {__getvalue_content
-            default: throw new ExecutionException(""__fullname [GetValue] 找不到变量 : "" + name);
-        }
+    public object GetValue(object obj, int name) {__getvalue_content
+        throw new ExecutionException($""__fullname [GetValue] 找不到变量 : {name.GetStringByCode()}"");
     }
-    public void SetValue(object obj, string name, ScriptValue value) {
-        switch (name) {__setvalue_content
-            default: throw new ExecutionException(""__fullname [SetValue] 找不到变量 : "" + name);
-        }
+    public void SetValue(object obj, int name, ScriptValue value) {__setvalue_content
+        throw new ExecutionException($""__fullname [SetValue] 找不到变量 : {name.GetStringByCode()}"");
     }
 __constructor_content
 __methods_content
@@ -142,6 +134,15 @@ __methods_content
         }
         private string GetScorpioVariable(bool IsStatic, string name) {
             return (IsStatic ? FullName : $"(({FullName})obj)") + "." + name;
+        }
+        private string GetIndexName(string name) {
+            return $"NameIndex_{name}";
+        }
+        private string GetStructFieldName(string name) {
+            return $"_field_{name}";
+        }
+        private string GetStructPropertyName(string name) {
+            return $"_property_{name}";
         }
         private string GetAllMethod(MethodBase[] methods) {
             var builder = new StringBuilder();
