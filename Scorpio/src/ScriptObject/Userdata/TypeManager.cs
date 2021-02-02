@@ -41,7 +41,7 @@ namespace Scorpio.Userdata {
             }
             if (type.IsEnum)
                 return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataEnumType(type));
-            else if (typeof(Delegate).IsAssignableFrom(type))
+            else if (Util.TYPE_DELEGATE.IsAssignableFrom(type))
                 return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(type));
             else
                 return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataType(type, GetType(type)));
