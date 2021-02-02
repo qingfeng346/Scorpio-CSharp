@@ -125,7 +125,7 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Index : [{key}]");
             }
         }
-        public void SetValue(string key, ScriptValue value) {
+        public void SetValue(int key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
             } else {

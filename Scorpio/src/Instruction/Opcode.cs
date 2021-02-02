@@ -34,7 +34,6 @@ namespace Scorpio.Instruction {
         CopyStackTop,           //复制栈顶的数据
         CopyStackTopIndex,      //复制栈顶的数据
         LoadValueCode,          //push a value by stringcode
-        LoadEnd,
 
 
         //New操作
@@ -46,7 +45,6 @@ namespace Scorpio.Instruction {
         NewMapObject,           //new map with key contain object
         NewType,                //new class
         NewTypeParent,          //new class with parent
-        NewEnd,
 
         //取栈操作
         StoreBegin = NewBegin + 20,
@@ -65,8 +63,8 @@ namespace Scorpio.Instruction {
         StoreValueString,       //store a value by string
         StoreValueObject,       //store a value by object
 
-        StoreValueAssignCode,   //store a value by 
-        StoreEnd,
+        StoreValueCodeAssign,   //store a value by code and assign
+        StoreValueCode,         //store a value by code
 
         //运算指令
         ComputeBegin = StoreBegin + 30,
@@ -83,7 +81,6 @@ namespace Scorpio.Instruction {
         FlagNot,                //取反操作
         FlagMinus,              //取负操作
         FlagNegative,           //取非操作
-        ComputeEnd,
 
         //比较指令
         CompareBegin = ComputeBegin + 20,
@@ -95,7 +92,6 @@ namespace Scorpio.Instruction {
         NotEqual,
         And,
         Or,
-        CompareEnd,
 
         //跳转指令
         JumpBegin = CompareBegin + 20,
@@ -120,6 +116,8 @@ namespace Scorpio.Instruction {
         TryTo,                  //异常跳转
         TryEnd,                 //try结束
         Throw,                  //throw
-        JumpEnd,
+
+
+        OpcodeEnd,
     }
 }

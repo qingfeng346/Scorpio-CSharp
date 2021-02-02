@@ -6,7 +6,7 @@ namespace Scorpio {
     public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
         public struct Enumerator : IEnumerator<ScorpioValue<string, ScriptValue>> {
             private ScriptValue[] objects;
-            private IEnumerator<KeyValuePair<int, int>> enumerator;
+            private IEnumerator<KeyValuePair<string, int>> enumerator;
             private ScorpioValue<string, ScriptValue> current;
             internal Enumerator(ScriptGlobal global) {
                 this.enumerator = global.m_Indexs.GetEnumerator();
@@ -15,7 +15,7 @@ namespace Scorpio {
             }
             public bool MoveNext() {
                 if (enumerator.MoveNext()) {
-                    current.Key = enumerator.Current.Key.GetStringByCode();
+                    current.Key = enumerator.Current.Key;
                     current.Value = objects[enumerator.Current.Value];
                     return true;
                 }
@@ -32,7 +32,7 @@ namespace Scorpio {
         }
         private ScriptValue[] m_Objects = ScriptValue.EMPTY;                        //数据
         private int m_Size = 0;                                                     //有效数据数量
-        private Dictionary<int, int> m_Indexs = new Dictionary<int, int>();         //名字到索引的映射
+        private Dictionary<string, int> m_Indexs = new Dictionary<string, int>();   //名字到索引的映射
         public ScriptGlobal() : base(ObjectType.Global) { }
         void SetCapacity(int value) {
             if (value > 0) {
@@ -53,31 +53,35 @@ namespace Scorpio {
                 SetCapacity(num);
             }
         }
-        public int GetIndex(int key) {
+        public int GetIndex(string key) {
             if (m_Indexs.TryGetValue(key, out var value)) {
                 return value;
             }
-            SetValue(key, ScriptValue.Null);
-            return m_Indexs[key];
-        }
-        public override ScriptValue GetValueByIndex(int index) { return m_Objects[index]; }
-        public override ScriptValue GetValue(int key) {
-            return m_Indexs.TryGetValue(key, out var index) ? GetValueByIndex(index) : ScriptValue.Null;
-        }
-        public override void SetValue(int key, ScriptValue value) {
-            if (m_Indexs.TryGetValue(key, out var index)) {
-                SetValueByIndex(index, value);
-                return;
-            }
             m_Indexs[key] = m_Size;
             EnsureCapacity(m_Size + 1);
-            m_Objects[m_Size++] = value;
+            m_Objects[m_Size++] = ScriptValue.Null;
+            return m_Indexs[key];
         }
-        public override void SetValueByIndex(int key, ScriptValue value) {
-            m_Objects[key] = value;
+        public override void SetValueByIndex(int index, ScriptValue value) {
+            m_Objects[index] = value;
+        }
+        public override ScriptValue GetValueByIndex(int index) { 
+            return m_Objects[index]; 
+        }
+        public override void SetValue(string key, ScriptValue value) {
+            SetValueByIndex(GetIndex(key), value);
+        }
+        public override ScriptValue GetValue(string key) {
+            return GetValueByIndex(GetIndex(key));
+        }
+        public override void SetValue(int key, ScriptValue value) {
+            SetValueByIndex(GetIndex(key.GetStringByCode()), value);
+        }
+        public override ScriptValue GetValue(int key) {
+            return GetValueByIndex(GetIndex(key.GetStringByCode()));
         }
         public bool HasValue(string key) {
-            return m_Indexs.ContainsKey(key.GetCodeByString());
+            return m_Indexs.ContainsKey(key);
         }
         public IEnumerator<ScorpioValue<string, ScriptValue>> GetEnumerator() {
             return new Enumerator(this);

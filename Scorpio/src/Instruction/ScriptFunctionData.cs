@@ -1,4 +1,5 @@
 using System.Text;
+using Scorpio.Tools;
 namespace Scorpio.Instruction {
     //单个函数的信息
     public class ScriptFunctionData {
@@ -36,6 +37,11 @@ namespace Scorpio.Instruction {
                     case Opcode.StoreValueString:
                     case Opcode.StoreValueStringAssign:
                         value = constString[instruction.opvalue].ToString();
+                        break;
+                    case Opcode.LoadValueCode:
+                    case Opcode.StoreValueCode:
+                    case Opcode.StoreValueCodeAssign:
+                        value = instruction.opvalue.GetStringByCode();
                         break;
                     case Opcode.LoadInternal:
                     case Opcode.LoadLocal:

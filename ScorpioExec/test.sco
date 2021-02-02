@@ -1,10 +1,9 @@
-class test {
-    "+"(value) {
-        print("plus " + value)
-    }
+a = {}
+function func2() {
+    a.b = 10
 }
-var t = new test()
-t += 100
+func2()
+func2()
 // var a = "123"
 // print(a)
 // class VersionData {
