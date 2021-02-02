@@ -17,10 +17,17 @@
     <RepositoryUrl>https://github.com/qingfeng346/Scorpio-CSharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;SCORPIO_DEBUG</DefineConstants>
+    <DefineConstants>TRACE;SCORPIO_DEBUG;SCORPIO_UNSAFE;SCORPIO_DYNAMIC_DELEGATE</DefineConstants>
     <GenerateSerializationAssemblies></GenerateSerializationAssemblies>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>false</Optimize>
   </PropertyGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="pwsh prebuild.ps1" />
+  </Target>
 </Project>

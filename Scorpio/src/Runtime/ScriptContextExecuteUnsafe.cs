@@ -1,10 +1,9 @@
-#if !SCORPIO_UNSAFE
+#if SCORPIO_UNSAFE
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Instruction;
 using Scorpio.Tools;
 namespace Scorpio.Runtime {
-
     //执行命令
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
@@ -1531,4 +1530,5 @@ namespace Scorpio.Runtime {
         }
     }
 }
+
 #endif

@@ -1,15 +1,14 @@
-#if !SCORPIO_UNSAFE
+#if SCORPIO_UNSAFE
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Instruction;
 using Scorpio.Tools;
 namespace Scorpio.Runtime {
-
     //执行命令
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public partial class ScriptContext {
-        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
+        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, ScriptType baseType) {
 #if SCORPIO_DEBUG
             Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
             if (VariableValueIndex < 0 || VariableValueIndex >= ValueCacheLength) {
@@ -247,7 +246,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case Opcode.LoadBase: {
-                                        stackObjects[++stackIndex] = thisObject.Get<ScriptInstance>().Prototype.Get<ScriptType>().Prototype;
+                                        stackObjects[++stackIndex] = baseType.Prototype;
                                         continue;
                                     }
                                     default: throw new ExecutionException("unknown opcode : " + opcode);
@@ -1531,4 +1530,5 @@ namespace Scorpio.Runtime {
         }
     }
 }
+
 #endif
