@@ -29,7 +29,7 @@ namespace Scorpio.Tools {
         public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof (ExtensionAttribute); //扩展函数属性
 
         private static Dictionary<string, int> StringToCode = new Dictionary<string, int>();
-        private static Dictionary<int, string> CodeToString = new Dictionary<int, string>();
+        private static string[] CodeToString = new string[4];
         static Util() {
             GetCodeByString("+");
             GetCodeByString("-");
@@ -64,14 +64,16 @@ namespace Scorpio.Tools {
                 return value;
             }
             StringToCode[str] = CodeIndex;
+            if (CodeIndex >= CodeToString.Length) {
+                var newArray = new string[CodeToString.Length * 2];
+                Array.Copy(CodeToString, newArray, CodeToString.Length);
+                CodeToString = newArray;
+            }
             CodeToString[CodeIndex] = str;
             return CodeIndex++;
         }
         public static string GetStringByCode(this int code) {
-            if (CodeToString.TryGetValue(code, out var value)) {
-                return value;
-            }
-            throw new ExecutionException($"找不到对应的String, code:{code}");
+            return CodeToString[code];
         }
         //是否是不定参
         public static bool IsParams (ParameterInfo info) { return info.IsDefined (TYPE_PARAMATTRIBUTE, false); }
