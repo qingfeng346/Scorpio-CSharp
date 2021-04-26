@@ -507,6 +507,7 @@ namespace Scorpio.Compile.Compiler {
             var index = ParseClassContent(ref className);
             var sourceLine = PeekToken().SourceLine;
             AddScriptInstruction(Opcode.NewType, index, sourceLine);
+            if (string.IsNullOrWhiteSpace(className)) { return; }
             if (m_scriptExecutable.Block == ExecutableBlock.Context) {
                 AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(className), sourceLine);
             } else {
@@ -519,8 +520,6 @@ namespace Scorpio.Compile.Compiler {
         int ParseClassContent(ref string className) {
             if (PeekToken().Type == TokenType.Identifier || PeekToken().Type == TokenType.String) {
                 className = ReadToken().Lexeme.ToString();  //类名
-            } else {
-                className = $"{Breviary}:{PeekToken().SourceLine}";
             }
             var parent = "";
             if (PeekToken().Type == TokenType.Colon) {

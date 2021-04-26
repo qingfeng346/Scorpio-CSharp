@@ -36,10 +36,13 @@ namespace Scorpio {
     }
     //Object原表, GetValue 找不到就返回 null
     internal class ScriptTypeObject : ScriptType {
-        public ScriptTypeObject(string typeName) : base(typeName, ScriptValue.Null) { }
+        private Script m_Script;
+        internal ScriptTypeObject(Script script, string typeName) : base(typeName, ScriptValue.Null) {
+            m_Script = script;
+        }
         public override ScriptValue Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            throw new ExecutionException($"Class<{TypeName}>不支持构造");
+            return new ScriptValue(new ScriptInstance(ObjectType.Type, m_Script.TypeObjectValue));
         }
         public override ScriptValue GetValue(string key) {
             return m_Values.TryGetValue(key, out var value) ? value : ScriptValue.Null;
