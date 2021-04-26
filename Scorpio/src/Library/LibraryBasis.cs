@@ -7,6 +7,7 @@ using Scorpio.Userdata;
 using Scorpio.Tools;
 using System.Reflection;
 using Scorpio.Instruction;
+using Scorpio.Runtime;
 namespace Scorpio.Library {
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
@@ -251,6 +252,10 @@ namespace Scorpio.Library {
         private class gc : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 Array.Clear(ScriptValue.Parameters, 0, ScriptValue.Parameters.Length);
+                for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
+                    Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
+                    Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
+                }
                 return ScriptValue.Null;
             }
         }

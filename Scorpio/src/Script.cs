@@ -102,6 +102,11 @@ namespace Scorpio {
             LibraryUserdata.Load(this);
             LibraryIO.Load(this);
         }
+        public void Shutdown() {
+            Global.Shutdown();
+            TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = null;
+            TypeObjectValue = m_TypeValueBool = m_TypeValueNumber = m_TypeValueString = m_TypeValueArray = m_TypeValueMap = m_TypeValueFunction = m_TypeValueStringBuilder = default;
+        }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
             type = new ScriptTypePrimitive(name, TypeObjectValue);
             typeValue = new ScriptValue(type);
