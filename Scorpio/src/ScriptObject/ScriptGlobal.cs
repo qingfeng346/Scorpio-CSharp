@@ -75,7 +75,7 @@ namespace Scorpio {
                 SetValueByIndex(index, value);
                 return;
             }
-            m_Indexs[key] = m_Size;
+            m_Indexs[string.Intern(key)] = m_Size;
             EnsureCapacity(m_Size + 1);
             m_Objects[m_Size++] = value;
         }

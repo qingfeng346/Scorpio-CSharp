@@ -11,7 +11,7 @@ namespace Scorpio.Userdata {
             this.m_ValueType = value;
             var names = Enum.GetNames(value);
             foreach (var name in names) {
-                m_Enums[name] = new ScriptValue(Enum.Parse(m_ValueType, name));
+                m_Enums[string.Intern(name)] = new ScriptValue(Enum.Parse(m_ValueType, name));
             }
         }
         public override Type ValueType { get { return Util.TYPE_TYPE; } }

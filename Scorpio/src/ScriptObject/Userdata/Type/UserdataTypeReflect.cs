@@ -29,7 +29,8 @@ namespace Scorpio.Userdata {
             if (m_InitializeConstructor == true) return;
             m_InitializeConstructor = true;
             //GetConstructors 去掉 NonPublic 标识, 否则取函数会取出一些错误的函数例如类 System.Diagnostics.Process
-            m_Constructor = new UserdataMethodReflect(m_Type, m_Type.ToString(), m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
+            var name = string.Intern(m_Type.ToString());
+            m_Constructor = new UserdataMethodReflect(m_Type, name, m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
         }
         //初始化所有函数
         private void InitializeFunctions() {
@@ -40,15 +41,17 @@ namespace Scorpio.Userdata {
         //获取一个函数，名字相同返回值相同
         private UserdataMethodReflect GetFunction(string name) {
             var methods = m_Methods.FindAll((method) => method.Name == name);
-            if (methods.Count > 0)
+            if (methods.Count > 0) {
+                name = string.Intern(name);
                 return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods.ToArray());
+            }
             return null;
         }
         //获取一个内部类
         private ScriptValue GetNestedType(string name) {
             var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
             if (nestedType != null) {
-                return m_NestedTypes[name] = TypeManager.GetUserdataType(nestedType);
+                return m_NestedTypes[string.Intern(name)] = TypeManager.GetUserdataType(nestedType);
             }
             return ScriptValue.Null;
         }
@@ -56,6 +59,7 @@ namespace Scorpio.Userdata {
         private UserdataVariable GetVariable(string name) {
             if (m_Variables.TryGetValue(name, out var value))
                 return value;
+            name = string.Intern(name);
             FieldInfo fInfo = m_Type.GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
             PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
@@ -69,6 +73,7 @@ namespace Scorpio.Userdata {
             var name = method.Name;
             var userdataMethod = GetMethod(name);
             if (userdataMethod == null) {
+                name = string.Intern(name);
                 userdataMethod = (m_Functions[name] = new UserdataMethodReflect(m_Type, name));
             }
             ((UserdataMethodReflect)userdataMethod).AddExtensionMethod(method);

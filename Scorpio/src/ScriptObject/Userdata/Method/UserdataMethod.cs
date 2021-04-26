@@ -12,7 +12,7 @@ namespace Scorpio.Userdata {
 
         public UserdataMethod (Type type, string methodName) {
             m_Type = type;
-            MethodName = type.FullName + "." + methodName;
+            MethodName = methodName;
         }
         //创建一个模板函数
         public UserdataMethodGeneric MakeGenericMethod (Type[] parameters) {
