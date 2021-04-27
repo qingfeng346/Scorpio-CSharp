@@ -339,7 +339,7 @@ namespace Scorpio.Runtime {
                                                 stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]);
                                                 break;
                                             default:
-                                                throw new ExecutionException($"不支持当前类型设置变量 : {stackObjects[stackIndex - 1].ValueTypeName}");
+                                                throw new ExecutionException($"类型[{stackObjects[stackIndex-2].ValueTypeName}]不支持设置变量:{stackObjects[stackIndex-1].ValueTypeName}");
                                         }
                                         stackObjects[stackIndex -= 2] = stackObjects[tempIndex];
                                         continue;
@@ -456,7 +456,7 @@ namespace Scorpio.Runtime {
                                                 stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]);
                                                 break;
                                             default:
-                                                throw new ExecutionException($"不支持当前类型设置变量 : {stackObjects[stackIndex - 1].ValueTypeName}");
+                                                throw new ExecutionException($"类型[{stackObjects[stackIndex-2].ValueTypeName}]不支持设置变量:{stackObjects[stackIndex-1].ValueTypeName}");
                                         }
                                         stackIndex -= 3;
                                         continue;
@@ -1390,7 +1390,16 @@ namespace Scorpio.Runtime {
                                 switch (opcode) {
                                     case Opcode.NewMap: {
                                         stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                        stackObjects[stackIndex].scriptValue = new ScriptMap(m_script);
+                                        if (opvalue == 0) {
+                                            stackObjects[stackIndex].scriptValue = new ScriptMapObject(m_script);
+                                        } else {
+                                            stackObjects[stackIndex].scriptValue = new ScriptMapString(m_script);
+                                        }
+                                        continue;
+                                    }
+                                    case Opcode.NewMapString: {
+                                        stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                        stackObjects[stackIndex].scriptValue = new ScriptMapString(m_script);
                                         continue;
                                     }
                                     case Opcode.NewArray: {
@@ -1404,7 +1413,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case Opcode.NewMapObject: {
-                                        var map = new ScriptMap(m_script);
+                                        var map = new ScriptMapObject(m_script);
                                         for (var i = opvalue - 1; i >= 0; --i) {
                                             map.SetValue(stackObjects[stackIndex - i].Value, stackObjects[stackIndex - i - opvalue]);
                                         }

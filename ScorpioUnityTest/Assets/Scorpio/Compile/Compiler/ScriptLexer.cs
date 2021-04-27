@@ -238,6 +238,16 @@ namespace Scorpio.Compile.Compiler {
                 default: AddToken(TokenType.QuestionMark, "?"); UndoChar(); return;
             }
         }
+        /// <summary> 读取 @ </summary>
+        void ReadAt() {
+            var ch = PeekChar();
+            if (ch == '\'' || ch == '\"' || ch == '`') {
+                ReadSimpleString(true);
+            } else if (ch == '{') {
+                ReadChar();
+                AddToken(TokenType.LeftBraceAt);
+            }
+        }
         /// <summary> 读取 }  </summary>
         void ReadRightBrace() {
             if (m_FormatString == FormatString.None) {
@@ -551,7 +561,7 @@ namespace Scorpio.Compile.Compiler {
                         ReadXor();
                         break;
                     case '@':
-                        ReadSimpleString(true);
+                        ReadAt();
                         break;
                     case '\"':
                     case '\'':

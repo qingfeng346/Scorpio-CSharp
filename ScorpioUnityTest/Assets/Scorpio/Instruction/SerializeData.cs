@@ -51,7 +51,8 @@ namespace Scorpio.Instruction {
                     }
                     ConstString = new string[reader.ReadInt32()];
                     for (var i = 0; i < ConstString.Length; ++i) {
-                        ConstString[i] = ReadString(reader);
+                        //string.Intern 减少内存
+                        ConstString[i] = string.Intern(ReadString(reader));
                     }
                     Context = ReadFunction(reader);
                     Functions = new ScriptFunctionData[reader.ReadInt32()];

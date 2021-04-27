@@ -1,6 +1,27 @@
 
-var a = new Object()
-print(a)
+var a = @{
+    aaa : 100,
+    bbb :200,
+}
+var b = {
+    aaa : 100,
+    bbb : 200,
+    222 : 300
+}
+foreach (var pair in pairs(a)) {
+    print(pair.key, pair.value)
+}
+foreach (var pair in pairs(b)) {
+    print(pair.key, pair.value)
+}
+a.forEach((key, value) => {
+    print("------------ " + key + "    " + value)
+})
+b.forEach((key, value) => {
+    print("------------ " + key + "    " + value)
+})
+print(io.unixNow())
+
 // var a = class {
 
 // }

@@ -11,7 +11,7 @@ namespace ScorpioLibrary {
         static byte[] READ_BYTES = new byte[READ_LENGTH];
         static Encoding DEFAULT_ENCODING = Encoding.UTF8;
         public static void Load(Script script) {
-            var map = new ScriptMap(script);
+            var map = new ScriptMapString(script);
             map.SetValue("get", script.CreateFunction(new get()));
             map.SetValue("post", script.CreateFunction(new post()));
             map.SetValue("urlencode", script.CreateFunction(new urlencode()));

@@ -45,6 +45,7 @@ namespace Scorpio.Instruction {
         NewMapObject,           //new map with key contain object
         NewType,                //new class
         NewTypeParent,          //new class with parent
+        NewMapString,           //new map only string key
         NewEnd,
 
         //取栈操作

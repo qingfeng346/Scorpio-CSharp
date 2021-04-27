@@ -66,7 +66,7 @@ namespace Scorpio {
         public Script() {
             Global = new ScriptGlobal();
             
-            TypeObject = new ScriptTypeObject("Object");
+            TypeObject = new ScriptTypeObject(this, "Object");
             TypeObjectValue = new ScriptValue(TypeObject);
             Global.SetValue(TypeObject.TypeName, TypeObjectValue);
 
@@ -101,6 +101,11 @@ namespace Scorpio {
             LibraryMath.Load(this);
             LibraryUserdata.Load(this);
             LibraryIO.Load(this);
+        }
+        public void Shutdown() {
+            Global.Shutdown();
+            TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = null;
+            TypeObjectValue = m_TypeValueBool = m_TypeValueNumber = m_TypeValueString = m_TypeValueArray = m_TypeValueMap = m_TypeValueFunction = m_TypeValueStringBuilder = default;
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
             type = new ScriptTypePrimitive(name, TypeObjectValue);
@@ -160,7 +165,7 @@ namespace Scorpio {
         /// <summary> 创建一个空的array </summary>
         public ScriptArray CreateArray() { return new ScriptArray(this); }
         /// <summary> 创建一个空的map </summary>
-        public ScriptMap CreateMap() { return new ScriptMap(this); }
+        public ScriptMap CreateMap() { return new ScriptMapObject(this); }
         /// <summary> 创建一个类 </summary>
         /// <param name="typeName">类名</param>
         /// <param name="parentType">类数据</param>
@@ -169,6 +174,9 @@ namespace Scorpio {
         /// <param name="value">ScorpioHandle</param>
         public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }
 
+        public ScriptInstance CreateInstance() {
+            return new ScriptInstance(ObjectType.Type, TypeObjectValue);
+        }
         /// <summary> 调用一个全局函数 </summary>
         /// <param name="name">函数名</param>
         /// <param name="args">参数</param>
@@ -214,7 +222,7 @@ namespace Scorpio {
         /// <returns>返回值</returns>
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(breviary, Serializer.Serialize(breviary, buffer, null));
+            return Execute(breviary, Serializer.Serialize(breviary, buffer, null, true));
         }
         /// <summary> 加载一段数据 </summary>
         /// <param name="buffer">数据内容</param>
@@ -239,7 +247,7 @@ namespace Scorpio {
             if (buffer[0] == 0)
                 return Execute(breviary, Deserializer.Deserialize(buffer));
             else
-                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null));
+                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null, true));
         }
 
 

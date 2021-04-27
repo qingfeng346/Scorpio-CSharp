@@ -5,40 +5,44 @@ using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
         public struct Enumerator : IEnumerator<ScorpioValue<string, ScriptValue>> {
-            private string[] keys;
-            private int[] values;
+            private IEnumerator<string> keys;
+            private IEnumerator<int> values;
             private ScriptValue[] objects;
-            private int index;
             private ScorpioValue<string, ScriptValue> current;
             internal Enumerator(ScriptGlobal global) {
-                this.keys = global.m_Indexs.Keys;
-                this.values = global.m_Indexs.Values;
+                this.keys = global.m_Indexs.Keys.GetEnumerator();
+                this.values = global.m_Indexs.Values.GetEnumerator();
                 this.objects = global.m_Objects;
                 this.current = new ScorpioValue<string, ScriptValue>();
-                this.index = 0;
             }
             public bool MoveNext() {
-                if (index < values.Length) {
-                    current.Key = keys[index];
-                    current.Value = objects[values[index]];
-                    index++;
-                    return true;
+                if (keys.MoveNext()) {
+                    values.MoveNext();
+                    current.Key = keys.Current;
+                    current.Value = objects[values.Current];
                 }
                 return false;
             }
             public ScorpioValue<string, ScriptValue> Current { get { return current; } }
             object System.Collections.IEnumerator.Current { get { return current; } }
             public void Reset() {
-                index = 0;
+                keys.Reset();
+                values.Reset();
             }
             public void Dispose() {
+                keys.Dispose();
+                values.Dispose();
             }
         }
         private ScriptValue[] m_Objects = ScriptValue.EMPTY;                                //数据
         private int m_Size = 0;                                                             //有效数据数量
-        private ScorpioDictionaryString<int> m_Indexs = new ScorpioDictionaryString<int>(); //名字到索引的映射
+        private Dictionary<string, int> m_Indexs = new Dictionary<string, int>();           //名字到索引的映射
         public ScriptGlobal() : base(ObjectType.Global) { }
-
+        public void Shutdown() {
+            m_Objects = ScriptValue.EMPTY;
+            m_Indexs.Clear();
+            m_Size = 0;
+        }
         void SetCapacity(int value) {
             if (value > 0) {
                 var array = new ScriptValue[value];
@@ -75,7 +79,7 @@ namespace Scorpio {
                 SetValueByIndex(index, value);
                 return;
             }
-            m_Indexs[key] = m_Size;
+            m_Indexs[string.Intern(key)] = m_Size;
             EnsureCapacity(m_Size + 1);
             m_Objects[m_Size++] = value;
         }
@@ -85,7 +89,7 @@ namespace Scorpio {
         public bool HasValue(string key) {
             return m_Indexs.ContainsKey(key);
         }
-        public string[] GetKeys() { return m_Indexs.Keys; }
+        public IEnumerable<string> GetKeys() { return m_Indexs.Keys; }
 
         public IEnumerator<ScorpioValue<string, ScriptValue>> GetEnumerator() {
             return new Enumerator(this);

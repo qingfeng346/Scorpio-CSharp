@@ -72,7 +72,7 @@ namespace Scorpio {
             m_Script = script;
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return new ScriptValue(new ScriptMap(m_Script, parameters, length));
+            return new ScriptValue(new ScriptMapObject(m_Script, parameters, length));
         }
     }
     //StringBuilding原表

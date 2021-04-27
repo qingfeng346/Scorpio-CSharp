@@ -15,6 +15,10 @@ namespace Scorpio.Compile.Compiler {
         /// </summary>
         LeftBrace,
         /// <summary>
+        /// @{
+        /// </summary>
+        LeftBraceAt,
+        /// <summary>
         /// }
         /// </summary>
         RightBrace,

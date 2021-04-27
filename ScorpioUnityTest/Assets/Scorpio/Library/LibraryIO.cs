@@ -6,7 +6,7 @@ namespace Scorpio.Library {
         public static readonly Encoding DefaultEncoding = Encoding.UTF8;
         public const long BaseTime = 621355968000000000;                        //1970, 1, 1, 0, 0, 0, DateTimeKind.Utc
         public static void Load(Script script) {
-            var map = new ScriptMap(script);
+            var map = new ScriptMapString(script);
             map.SetValue("unixNow", script.CreateFunction(new unixNow()));
             map.SetValue("toString", script.CreateFunction(new toString()));
             map.SetValue("toBytes", script.CreateFunction(new toBytes()));

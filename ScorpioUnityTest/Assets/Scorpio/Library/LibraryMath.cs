@@ -6,7 +6,7 @@ namespace Scorpio.Library {
         public const double Rad2Deg = 57.29578;                 //弧度转角度
         public const double Epsilon = 1.401298E-45;             //一个很小的浮点数
         public static void Load(Script script) {
-            var map = new ScriptMap(script);
+            var map = new ScriptMapString(script);
             map.SetValue("PI", new ScriptValue(PI));
             map.SetValue("Deg2Rad", new ScriptValue(Deg2Rad));              //角度转弧度 角度*此值=弧度
             map.SetValue("Rad2Deg", new ScriptValue(Rad2Deg));              //弧度转角度 弧度*此值=角度

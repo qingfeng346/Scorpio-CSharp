@@ -165,7 +165,7 @@ namespace Scorpio {
         /// <summary> 创建一个空的array </summary>
         public ScriptArray CreateArray() { return new ScriptArray(this); }
         /// <summary> 创建一个空的map </summary>
-        public ScriptMap CreateMap() { return new ScriptMap(this); }
+        public ScriptMap CreateMap() { return new ScriptMapObject(this); }
         /// <summary> 创建一个类 </summary>
         /// <param name="typeName">类名</param>
         /// <param name="parentType">类数据</param>

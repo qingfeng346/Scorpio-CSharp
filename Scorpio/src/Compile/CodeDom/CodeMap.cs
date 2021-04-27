@@ -10,7 +10,10 @@ namespace Scorpio.Compile.CodeDom {
                 this.value = value;
             }
         }
+        public bool onlyString;
         public List<MapVariable> Variables = new List<MapVariable>();
-        public CodeMap(int line) : base(line) { }
+        public CodeMap(int line, bool onlyString) : base(line) {
+            this.onlyString = onlyString;
+        }
     }
 }

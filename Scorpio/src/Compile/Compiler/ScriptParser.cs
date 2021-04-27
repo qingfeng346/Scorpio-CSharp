@@ -813,11 +813,9 @@ namespace Scorpio.Compile.Compiler {
                         }
                         if (codeCallFunction.Variables != null) {
                             foreach (var variable in codeCallFunction.Variables.Variables) {
-                                if (variable.key is string) {
-                                    AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
-                                    PushObject(variable.value);
-                                    AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), obj.Line);
-                                }
+                                AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
+                                PushObject(variable.value);
+                                AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), obj.Line);
                             }
                         }
                         if (isCallVi) {
@@ -844,7 +842,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeMap map: {
-                    AddScriptInstructionWithoutValue(Opcode.NewMap);
+                    AddScriptInstruction(Opcode.NewMap, map.onlyString ? 1 : 0);
                     foreach (var ele in map.Variables) {
                         AddScriptInstructionWithoutValue(Opcode.CopyStackTop);
                         if (ele.key is double) {
@@ -864,35 +862,11 @@ namespace Scorpio.Compile.Compiler {
                         if (ele.key is string) {
                             AddScriptInstruction(Opcode.StoreValueString, GetConstString(ele.key.ToString()));
                         } else {
-                            AddScriptInstructionWithoutValue(Opcode.StoreValueObjectAssign);
-                            AddScriptInstructionWithoutValue(Opcode.Pop);
+                            AddScriptInstructionWithoutValue(Opcode.StoreValueObject);
+                            //AddScriptInstructionWithoutValue(Opcode.StoreValueObjectAssign);
+                            //AddScriptInstructionWithoutValue(Opcode.Pop);
                         }
                     }
-                    //foreach (var ele in map.Variables) {
-                    //    if (ele.value == null) {
-                    //        AddScriptInstructionWithoutValue(Opcode.LoadConstNull, obj.Line);
-                    //    } else {
-                    //        PushObject(ele.value);
-                    //    }
-                    //}
-                    //var hadObjectKey = false;
-                    //foreach (var ele in map.Variables) {
-                    //    if (ele.key is string) {
-                    //        AddScriptInstruction(Opcode.LoadConstString, GetConstString(ele.key.ToString()), obj.Line);
-                    //    } else if (ele.key is double) {
-                    //        hadObjectKey = true;
-                    //        AddScriptInstruction(Opcode.LoadConstDouble, GetConstDouble((double)ele.key), obj.Line);
-                    //    } else if (ele.key is long) {
-                    //        hadObjectKey = true;
-                    //        AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)ele.key), obj.Line);
-                    //    } else if (ele.key is bool) {
-                    //        hadObjectKey = true;
-                    //        AddScriptInstructionWithoutValue(((bool)ele.key) ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
-                    //    } else {
-                    //        throw new ParserException(this, "未知的map key 类型 : " + ele.key.GetType());
-                    //    }
-                    //}
-                    //AddScriptInstruction(hadObjectKey ? Opcode.NewMapObject : Opcode.NewMap, map.Variables.Count, obj.Line);
                     break;
                 }
                 case CodeTernary ternary: {
@@ -924,17 +898,6 @@ namespace Scorpio.Compile.Compiler {
                 AddScriptInstructionWithoutValue(Opcode.FlagMinus, obj.Line);
             } else if (obj.Negative) {
                 AddScriptInstructionWithoutValue(Opcode.FlagNegative, obj.Line);
-            }
-        }
-        CodeObject IsVariableFunction(CodeObject member) {
-            while (true) {
-                if (member is CodeMember) {
-                    return (member as CodeMember).Parent;
-                } else if (member is CodeCallFunction) {
-                    member = (member as CodeCallFunction).Member;
-                } else {
-                    return null;
-                }
             }
         }
         //压入一个无返回值的赋值公式
@@ -1161,7 +1124,12 @@ namespace Scorpio.Compile.Compiler {
                 }
                 case TokenType.LeftBrace: {
                     UndoToken();
-                    ret = GetMap();
+                    ret = GetMap(false);
+                    break;
+                }
+                case TokenType.LeftBraceAt: {
+                    UndoToken();
+                    ret = GetMap(true);
                     break;
                 }
                 default: throw new ParserException(this, "Object起始关键字错误 ", token);
@@ -1252,7 +1220,7 @@ namespace Scorpio.Compile.Compiler {
             var ret = GetCallFunction(parent);
             ret.nullTo = nullTo;
             if (PeekToken().Type == TokenType.LeftBrace) {
-                ret.Variables = GetMap();
+                ret.Variables = GetMap(true);
             }
             return ret;
         }
@@ -1326,9 +1294,13 @@ namespace Scorpio.Compile.Compiler {
             return ret;
         }
         //返回map数据
-        CodeMap GetMap() {
-            var ret = new CodeMap(GetSourceLine());
-            ReadLeftBrace();
+        CodeMap GetMap(bool onlyString) {
+            var ret = new CodeMap(GetSourceLine(), onlyString);
+            if (PeekToken().Type == TokenType.LeftBraceAt) {
+                ReadToken();
+            } else {
+                ReadLeftBrace();
+            }
             while (PeekToken().Type != TokenType.RightBrace) {
                 var token = ReadToken();
                 switch (token.Type) {
@@ -1339,6 +1311,11 @@ namespace Scorpio.Compile.Compiler {
                     case TokenType.String:
                     case TokenType.Number:
                     case TokenType.Boolean: {
+                        if (onlyString) {
+                            if (token.Type != TokenType.Identifier && token.Type != TokenType.String) {
+                                throw new ParserException(this, "当前Map只支持Key为String类型", token);
+                            }
+                        }
                         var next = ReadToken();
                         if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
                             ret.Variables.Add(new CodeMap.MapVariable(token.Lexeme, GetObject()));
