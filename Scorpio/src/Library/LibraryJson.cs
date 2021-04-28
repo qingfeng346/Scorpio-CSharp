@@ -1,5 +1,6 @@
 using System.Text;
 using Scorpio.Exception;
+using Scorpio.Tools;
 namespace Scorpio.Library {
     public partial class LibraryJson {
         public static void Load(Script script) {
@@ -10,7 +11,8 @@ namespace Scorpio.Library {
         }
         private class encode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(args[0].ToJson(length > 1 ? args[1].IsTrue : false, length > 2 ? args[2].IsTrue : true));
+                return new ScriptValue(Util.ToJson(args[0]));
+                //return new ScriptValue(args[0].ToJson(length > 1 ? args[1].IsTrue : false, length > 2 ? args[2].IsTrue : true));
             }
         }
         private class decode : ScorpioHandle {

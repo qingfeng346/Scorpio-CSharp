@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Scorpio.Exception;
@@ -125,75 +126,91 @@ namespace Scorpio.Tools {
                     return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
             }
         }
-        public static string ParseJsonString (string value, bool ucode) {
-            var builder = new StringBuilder ();
-            builder.Append ('\"');
-            if (ucode) {
-                foreach (var c in value.ToCharArray()) {
-                    switch (c) {
-                        case '"':
-                            builder.Append("\\\"");
-                            break;
-                        case '\\':
-                            builder.Append("\\\\");
-                            break;
-                        case '\b':
-                            builder.Append("\\b");
-                            break;
-                        case '\f':
-                            builder.Append("\\f");
-                            break;
-                        case '\n':
-                            builder.Append("\\n");
-                            break;
-                        case '\r':
-                            builder.Append("\\r");
-                            break;
-                        case '\t':
-                            builder.Append("\\t");
-                            break;
-                        default:
-                            int codepoint = Convert.ToInt32(c);
-                            if ((codepoint >= 32) && (codepoint <= 126)) {
-                                builder.Append(c);
-                            } else {
-                                builder.Append("\\u" + Convert.ToString(codepoint, 16).PadLeft(4, '0'));
-                            }
-                            break;
-                    }
+        //ScriptValue 转成 String
+        public static string ToJson(ScriptValue value) {
+            var builder = new StringBuilder();
+            var hash = new HashSet<ScriptObject>();
+            ToJson(builder, hash, value);
+            return builder.ToString();
+        }
+        //ScriptObject 转成 String
+        public static string ToJson(ScriptObject scriptObject) {
+            var builder = new StringBuilder();
+            var hash = new HashSet<ScriptObject>();
+            ToJson(builder, hash, scriptObject);
+            return builder.ToString();
+        }
+        public static void ToJson(StringBuilder builder, HashSet<ScriptObject> hash, ScriptValue value) {
+            switch (value.valueType) {
+                case ScriptValue.nullValueType:
+                    builder.Append("null");
+                    break;
+                case ScriptValue.trueValueType:
+                    builder.Append("true");
+                    break;
+                case ScriptValue.falseValueType: 
+                    builder.Append("false");
+                    break;
+                case ScriptValue.stringValueType:
+                    ToJson(builder, value.stringValue);
+                    break;
+                case ScriptValue.doubleValueType:
+                    builder.Append(value.doubleValue);
+                    break;
+                case ScriptValue.longValueType:
+                    builder.Append(value.longValue);
+                    break;
+                case ScriptValue.objectValueType:
+                    ToJson(builder, value.objectValue.ToString());
+                    break;
+                case ScriptValue.scriptValueType:
+                    ToJson(builder, hash, value.scriptValue);
+                    break;
+            }
+        }
+        public static void ToJson(StringBuilder builder, HashSet<ScriptObject> hash, ScriptObject scriptObject) {
+            if (scriptObject is ScriptInstance) {
+                if (!hash.Contains(scriptObject)) {
+                    hash.Add(scriptObject);
+                    ((ScriptInstance)scriptObject).ToJson(builder, hash);
+                } else {
+                    builder.Append("\"Inline\"");
                 }
             } else {
-                foreach (var c in value.ToCharArray()) {
-                    switch (c) {
-                        case '"':
-                            builder.Append("\\\"");
-                            break;
-                        case '\\':
-                            builder.Append("\\\\");
-                            break;
-                        case '\b':
-                            builder.Append("\\b");
-                            break;
-                        case '\f':
-                            builder.Append("\\f");
-                            break;
-                        case '\n':
-                            builder.Append("\\n");
-                            break;
-                        case '\r':
-                            builder.Append("\\r");
-                            break;
-                        case '\t':
-                            builder.Append("\\t");
-                            break;
-                        default:
-                            builder.Append(c);
-                            break;
-                    }
+                ToJson(builder, scriptObject.ToString());
+            }
+        }
+        public static void ToJson(StringBuilder builder, string value) {
+            builder.Append('\"');
+            foreach (var c in value.ToCharArray()) {
+                switch (c) {
+                    case '"':
+                        builder.Append("\\\"");
+                        break;
+                    case '\\':
+                        builder.Append("\\\\");
+                        break;
+                    case '\b':
+                        builder.Append("\\b");
+                        break;
+                    case '\f':
+                        builder.Append("\\f");
+                        break;
+                    case '\n':
+                        builder.Append("\\n");
+                        break;
+                    case '\r':
+                        builder.Append("\\r");
+                        break;
+                    case '\t':
+                        builder.Append("\\t");
+                        break;
+                    default:
+                        builder.Append(c);
+                        break;
                 }
             }
-            builder.Append ('\"');
-            return builder.ToString ();
+            builder.Append('\"');
         }
     }
 }

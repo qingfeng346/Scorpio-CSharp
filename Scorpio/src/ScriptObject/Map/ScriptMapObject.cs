@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Scorpio.Tools;
 namespace Scorpio {
     //脚本map类型
     public class ScriptMapObject : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
@@ -86,31 +87,16 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToJson(bool supportKeyNumber, bool ucode) {
-            var builder = new StringBuilder();
+        public override void ToJson(StringBuilder builder, HashSet<ScriptObject> hash) {
             builder.Append("{");
             var first = true;
-            if (supportKeyNumber) {
-                foreach (var pair in m_Objects) {
-                    var value = pair.Value;
-                    if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
-                    if (first) { first = false; } else { builder.Append(","); }
-                    if (pair.Key is string) {
-                        builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber, ucode)}");
-                    } else {
-                        builder.Append($"{pair.Key}:{value.ToJson(supportKeyNumber, ucode)}");
-                    }
-                }
-            } else {
-                foreach (var pair in m_Objects) {
-                    var value = pair.Value;
-                    if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
-                    if (first) { first = false; } else { builder.Append(","); }
-                    builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber, ucode)}");
-                }
+            foreach (var pair in m_Objects) {
+                if (first) { first = false; } else { builder.Append(","); }
+                Util.ToJson(builder, pair.Key.ToString());
+                builder.Append(":");
+                Util.ToJson(builder, hash, pair.Value);
             }
             builder.Append("}");
-            return builder.ToString();
         }
     }
 }

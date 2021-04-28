@@ -184,18 +184,16 @@ namespace Scorpio {
             return base.Call(thisObject, parameters, length);
         }
         public override string ToString() { return $"Object<{m_Prototype}>"; }
-        public override string ToJson(bool supportKeyNumber, bool ucode) {
-            var builder = new StringBuilder();
+        public virtual void ToJson(StringBuilder builder, HashSet<ScriptObject> hash) {
             builder.Append("{");
             var first = true;
             foreach (var pair in m_Values) {
-                var value = pair.Value;
-                if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
                 if (first) { first = false; } else { builder.Append(","); }
-                builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber, ucode)}");
+                Util.ToJson(builder, pair.Key);
+                builder.Append(":");
+                Util.ToJson(builder, hash, pair.Value);
             }
             builder.Append("}");
-            return builder.ToString();
         }
     }
 }
