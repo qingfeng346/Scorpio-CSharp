@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Scorpio.Exception;
@@ -124,76 +125,6 @@ namespace Scorpio.Tools {
                 default:
                     return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
             }
-        }
-        public static string ParseJsonString (string value, bool ucode) {
-            var builder = new StringBuilder ();
-            builder.Append ('\"');
-            if (ucode) {
-                foreach (var c in value.ToCharArray()) {
-                    switch (c) {
-                        case '"':
-                            builder.Append("\\\"");
-                            break;
-                        case '\\':
-                            builder.Append("\\\\");
-                            break;
-                        case '\b':
-                            builder.Append("\\b");
-                            break;
-                        case '\f':
-                            builder.Append("\\f");
-                            break;
-                        case '\n':
-                            builder.Append("\\n");
-                            break;
-                        case '\r':
-                            builder.Append("\\r");
-                            break;
-                        case '\t':
-                            builder.Append("\\t");
-                            break;
-                        default:
-                            int codepoint = Convert.ToInt32(c);
-                            if ((codepoint >= 32) && (codepoint <= 126)) {
-                                builder.Append(c);
-                            } else {
-                                builder.Append("\\u" + Convert.ToString(codepoint, 16).PadLeft(4, '0'));
-                            }
-                            break;
-                    }
-                }
-            } else {
-                foreach (var c in value.ToCharArray()) {
-                    switch (c) {
-                        case '"':
-                            builder.Append("\\\"");
-                            break;
-                        case '\\':
-                            builder.Append("\\\\");
-                            break;
-                        case '\b':
-                            builder.Append("\\b");
-                            break;
-                        case '\f':
-                            builder.Append("\\f");
-                            break;
-                        case '\n':
-                            builder.Append("\\n");
-                            break;
-                        case '\r':
-                            builder.Append("\\r");
-                            break;
-                        case '\t':
-                            builder.Append("\\t");
-                            break;
-                        default:
-                            builder.Append(c);
-                            break;
-                    }
-                }
-            }
-            builder.Append ('\"');
-            return builder.ToString ();
         }
     }
 }

@@ -281,16 +281,15 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return ToJson(false, true); }
-        public override string ToJson(bool supportKeyNumber, bool ucode) {
-            var builder = new StringBuilder();
+        public override string ToString() { return new JsonSerializer().ToJson(this); }
+        internal override void ToJson(JsonSerializer jsonSerializer) {
+            var builder = jsonSerializer.m_Builder;
             builder.Append("[");
             for (int i = 0; i < m_Length; ++i) {
                 if (i != 0) builder.Append(",");
-                builder.Append(m_Objects[i].ToJson(supportKeyNumber, ucode));
+                jsonSerializer.Serializer(m_Objects[i]);
             }
             builder.Append("]");
-            return builder.ToString();
         }
     }
 }

@@ -1,7 +1,6 @@
 using Scorpio.Exception;
 using System;
 using Scorpio.Userdata;
-using Scorpio.Tools;
 namespace Scorpio {
     public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量

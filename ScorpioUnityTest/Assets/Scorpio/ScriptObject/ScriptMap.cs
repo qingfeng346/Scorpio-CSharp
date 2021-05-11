@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
+using Scorpio.Tools;
 namespace Scorpio {
     //脚本map类型
     public abstract class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
@@ -17,7 +17,6 @@ namespace Scorpio {
         public abstract ScriptArray GetKeys();
         public abstract ScriptArray GetValues();
         public abstract ScriptMap NewCopy();
-
-        public override string ToString() { return ToJson(false, true); }
+        public override string ToString() { return new JsonSerializer().ToJson(this); }
     }
 }

@@ -1,6 +1,7 @@
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using Scorpio.Tools;
 namespace Scorpio {
     //脚本map类型
     public class ScriptMapString : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
@@ -84,19 +85,6 @@ namespace Scorpio {
                 }
             }
             return ret;
-        }
-        public override string ToJson(bool supportKeyNumber, bool ucode) {
-            var builder = new StringBuilder();
-            builder.Append("{");
-            var first = true;
-            foreach (var pair in m_Values) {
-                var value = pair.Value;
-                if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
-                if (first) { first = false; } else { builder.Append(","); }
-                builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber, ucode)}");
-            }
-            builder.Append("}");
-            return builder.ToString();
         }
     }
 }

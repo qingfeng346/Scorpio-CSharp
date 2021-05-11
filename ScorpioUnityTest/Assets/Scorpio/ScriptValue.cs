@@ -1,7 +1,6 @@
 using Scorpio.Exception;
 using System;
 using Scorpio.Userdata;
-using Scorpio.Tools;
 namespace Scorpio {
     public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量
@@ -314,20 +313,6 @@ namespace Scorpio {
             this.longValue = 0;
             this.stringValue = null; 
             this.objectValue = value;
-        }
-
-        public string ToJson(bool supportKeyNumber, bool ucode) {
-            switch (valueType) {
-                case scriptValueType: return scriptValue.ToJson(supportKeyNumber, ucode);
-                case doubleValueType: return doubleValue.ToString();
-                case longValueType: return longValue.ToString();
-                case trueValueType: return "true";
-                case falseValueType: return "false";
-                case stringValueType: return Util.ParseJsonString(stringValue, ucode);
-                case nullValueType: return "null";
-                case objectValueType: return Util.ParseJsonString(objectValue.ToString(), ucode);
-                default: return "";
-            }
         }
         public override string ToString() {
             switch (valueType) {

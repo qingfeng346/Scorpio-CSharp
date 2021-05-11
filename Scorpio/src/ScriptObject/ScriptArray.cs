@@ -281,12 +281,13 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return Util.ToJson(this); }
-        public override void ToJson(StringBuilder builder, HashSet<ScriptObject> hash) {
+        public override string ToString() { return new JsonSerializer().ToJson(this); }
+        internal override void ToJson(JsonSerializer jsonSerializer) {
+            var builder = jsonSerializer.m_Builder;
             builder.Append("[");
             for (int i = 0; i < m_Length; ++i) {
                 if (i != 0) builder.Append(",");
-                Util.ToJson(builder, hash, m_Objects[i]);
+                jsonSerializer.Serializer(m_Objects[i]);
             }
             builder.Append("]");
         }

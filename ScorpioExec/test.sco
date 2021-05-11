@@ -1,16 +1,8 @@
-class a {
-    constructor() {
-        this.bbb = true
-        this.ccc = true
-    }
-    t1() {
-
-    }
-    t2() {
-
-    }
-}
-print(json.encode(new a()))
+var a = {}
+var b = {}
+a["b"] = b
+b["a"] = a
+print(json.encode(a))
 
 // var a = class {
 

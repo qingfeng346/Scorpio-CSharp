@@ -87,14 +87,15 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override void ToJson(StringBuilder builder, HashSet<ScriptObject> hash) {
+        internal override void ToJson(JsonSerializer jsonSerializer) {
+            var builder = jsonSerializer.m_Builder;
             builder.Append("{");
             var first = true;
             foreach (var pair in m_Objects) {
                 if (first) { first = false; } else { builder.Append(","); }
-                Util.ToJson(builder, pair.Key.ToString());
+                jsonSerializer.Serializer(pair.Key.ToString());
                 builder.Append(":");
-                Util.ToJson(builder, hash, pair.Value);
+                jsonSerializer.Serializer(pair.Value);
             }
             builder.Append("}");
         }

@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Tools;
-using System.Text;
 namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
-        protected Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();         //所有的数据(函数和数据都在一个数组)
+        internal Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptValue m_Prototype = ScriptValue.Null;
         protected ScriptInstance(ObjectType objectType) : base(objectType) { }
         public ScriptInstance(ObjectType objectType, ScriptValue prototype) : base(objectType) {
@@ -184,18 +183,17 @@ namespace Scorpio {
             return base.Call(thisObject, parameters, length);
         }
         public override string ToString() { return $"Object<{m_Prototype}>"; }
-        public override string ToJson(bool supportKeyNumber, bool ucode) {
-            var builder = new StringBuilder();
+        internal virtual void ToJson(JsonSerializer jsonSerializer) {
+            var builder = jsonSerializer.m_Builder;
             builder.Append("{");
             var first = true;
             foreach (var pair in m_Values) {
-                var value = pair.Value;
-                if (value.valueType == ScriptValue.scriptValueType && (value.scriptValue is ScriptFunction || value.scriptValue == this)) { continue; }
                 if (first) { first = false; } else { builder.Append(","); }
-                builder.Append($"\"{pair.Key}\":{value.ToJson(supportKeyNumber, ucode)}");
+                jsonSerializer.Serializer(pair.Key);
+                builder.Append(":");
+                jsonSerializer.Serializer(pair.Value);
             }
             builder.Append("}");
-            return builder.ToString();
         }
     }
 }
