@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Scorpio.Compile.Exception;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
@@ -6,10 +7,13 @@ namespace Scorpio.Compile.Compiler {
         private Token[] m_listTokens;           //token列表
         private int m_indexToken;               //当前读到token
         private string[] ignoreFunctions;       //编译忽略的全局函数
-        public ScriptParser(Token[] listTokens, string strBreviary, string[] ignoreFunctions) {
+        private HashSet<string> defines;        //define
+        public ScriptParser(Token[] listTokens, string strBreviary, string[] ignoreFunctions, string[] defines) {
             this.Breviary = strBreviary;
             this.m_listTokens = listTokens;
             this.ignoreFunctions = ignoreFunctions;
+            this.defines = new HashSet<string>();
+            if (defines != null) { this.defines.UnionWith(defines); }
         }
         /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }

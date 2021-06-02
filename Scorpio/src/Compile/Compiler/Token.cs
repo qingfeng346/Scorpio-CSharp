@@ -2,329 +2,165 @@ using System;
 namespace Scorpio.Compile.Compiler {
     //脚本的表征类型
     public enum TokenType {
-        /// <summary>
-        /// 空类型（没有实际用途）
-        /// </summary>
+        /// <summary> 空类型（没有实际用途） </summary>
         None = 0,
-        /// <summary>
-        /// var
-        /// </summary>
+        /// <summary> var </summary>
         Var,
-        /// <summary>
-        /// {
-        /// </summary>
+        /// <summary> { </summary>
         LeftBrace,
-        /// <summary>
-        /// @{
-        /// </summary>
+        /// <summary> @{ </summary>
         LeftBraceAt,
-        /// <summary>
-        /// }
-        /// </summary>
+        /// <summary> } </summary>
         RightBrace,
-        /// <summary>
-        /// (
-        /// </summary>
+        /// <summary> ( </summary>
         LeftPar,
-        /// <summary>
-        /// )
-        /// </summary>
+        /// <summary> ) </summary>
         RightPar,
-        /// <summary>
-        /// [
-        /// </summary>
+        /// <summary> [ </summary>
         LeftBracket,
-        /// <summary>
-        /// ]
-        /// </summary>
+        /// <summary> ] </summary>
         RightBracket,
-        /// <summary>
-        /// .
-        /// </summary>
+        /// <summary> . </summary>
         Period,
-        /// <summary>
-        /// ,
-        /// </summary>
+        /// <summary> , </summary>
         Comma,
-        /// <summary>
-        /// :
-        /// </summary>
+        /// <summary> : </summary>
         Colon,
-        /// <summary>
-        /// ;
-        /// </summary>
+        /// <summary> ; </summary>
         SemiColon,
-        /// <summary>
-        /// ?
-        /// </summary>
+        /// <summary> ? </summary>
         QuestionMark,
-        /// <summary>
-        /// ??
-        /// </summary>
+        /// <summary> ?? </summary>
         EmptyRet,
-        /// <summary>
-        /// ?.
-        /// </summary>
+        /// <summary> ?. </summary>
         QuestionMarkDot,
-        /// <summary>
-        /// #
-        /// </summary>
-        Sharp,
-        /// <summary>
-        /// +
-        /// </summary>
+        /// <summary> + </summary>
         Plus,
-        /// <summary>
-        /// +=
-        /// </summary>
+        /// <summary> += </summary>
         PlusAssign,
-        /// <summary>
-        /// -
-        /// </summary>
+        /// <summary> - </summary>
         Minus,
-        /// <summary>
-        /// -=
-        /// </summary>
+        /// <summary> -= </summary>
         MinusAssign,
-        /// <summary>
-        /// *
-        /// </summary>
+        /// <summary> * </summary>
         Multiply,
-        /// <summary>
-        /// *=
-        /// </summary>
+        /// <summary> *= </summary>
         MultiplyAssign,
-        /// <summary>
-        /// /
-        /// </summary>
+        /// <summary> / </summary>
         Divide,
-        /// <summary>
-        /// /=
-        /// </summary>
+        /// <summary> /= </summary>
         DivideAssign,
-        /// <summary>
-        /// % 模运算
-        /// </summary>
+        /// <summary> % 模运算 </summary>
         Modulo,
-        /// <summary>
-        /// %=
-        /// </summary>
+        /// <summary> %= </summary>
         ModuloAssign,
-        /// <summary>
-        /// | 或运算
-        /// </summary>
+        /// <summary> | 或运算 </summary>
         InclusiveOr,
-        /// <summary>
-        /// |=
-        /// </summary>
+        /// <summary> |= </summary>
         InclusiveOrAssign,
-        /// <summary>
-        /// ||
-        /// </summary>
+        /// <summary> || </summary>
         Or,
-        /// <summary>
-        /// & 并运算
-        /// </summary>
+        /// <summary> & 并运算 </summary>
         Combine,
-        /// <summary>
-        /// &=
-        /// </summary>
+        /// <summary> &= </summary>
         CombineAssign,
-        /// <summary>
-        /// &&
-        /// </summary>
+        /// <summary> && </summary>
         And,
-        /// <summary>
-        /// ^ 异或
-        /// </summary>
+        /// <summary> ^ 异或 </summary>
         XOR,
-        /// <summary>
-        /// ^=
-        /// </summary>
+        /// <summary> ^= </summary>
         XORAssign,
-        /// <summary> 
-        /// ~ 取反操作
-        /// </summary>
+        /// <summary>  ~ 取反操作 </summary>
         Negative,
-        /// <summary>
-        /// <<左移
-        /// </summary>
+        /// <summary> << 左移 </summary>
         Shi,
-        /// <summary>
-        /// <<=
-        /// </summary>
+        /// <summary> <<= </summary>
         ShiAssign,
-        /// <summary>
-        /// >> 右移
-        /// </summary>
+        /// <summary> >> 右移 </summary>
         Shr,
-        /// <summary>
-        /// >>=
-        /// </summary>
+        /// <summary> >>= </summary>
         ShrAssign,
-        /// <summary>
-        /// !
-        /// </summary>
+        /// <summary> ! </summary>
         Not,
-        /// <summary>
-        /// =
-        /// </summary>
+        /// <summary> = </summary>
         Assign,
-        /// <summary>
-        /// ==
-        /// </summary>
+        /// <summary> == </summary>
         Equal,
-        /// <summary>
-        /// !=
-        /// </summary>
+        /// <summary> != </summary>
         NotEqual,
-        /// <summary>
-        /// >
-        /// </summary>
+        /// <summary> > </summary>
         Greater,
-        /// <summary>
-        /// >=
-        /// </summary>
+        /// <summary> >= </summary>
         GreaterOrEqual,
-        /// <summary>
-        ///  <
-        /// </summary>
+        /// <summary>  < </summary>
         Less,
-        /// <summary>
-        /// <=
-        /// </summary>
+        /// <summary> <= </summary>
         LessOrEqual,
-        /// <summary>
-        /// ...
-        /// </summary>
+        /// <summary> ... </summary>
         Params,
-        /// <summary>
-        /// =>
-        /// </summary>
+        /// <summary> => </summary>
         Lambda,
-        /// <summary>
-        /// if
-        /// </summary>
+        /// <summary> if </summary>
         If,
-        /// <summary>
-        /// else
-        /// </summary>
+        /// <summary> else </summary>
         Else,
-        /// <summary>
-        /// elif
-        /// </summary>
+        /// <summary> elif </summary>
         ElseIf,
-        /// <summary>
-        /// ifndef
-        /// </summary>
-        Ifndef,
-        /// <summary>
-        /// endif
-        /// </summary>
-        Endif,
-        /// <summary>
-        /// for
-        /// </summary>
+
+        /// <summary> #define </summary>
+        MacroDefine,
+        /// <summary> #if </summary>
+        MacroIf,
+        /// <summary> #ifndef </summary>
+        MacroIfndef,
+        /// <summary> #else </summary>
+        MacroElse,
+        /// <summary> #elif </summary>
+        MacroElif,
+        /// <summary> #endif </summary>
+        MacroEndif,
+
+        /// <summary> for </summary>
         For,
-        /// <summary>
-        /// foreach
-        /// </summary>
+        /// <summary> foreach </summary>
         Foreach,
-        /// <summary>
-        /// in
-        /// </summary>
+        /// <summary> in </summary>
         In,
-        /// <summary>
-        /// switch
-        /// </summary>
+        /// <summary> switch </summary>
         Switch,
-        /// <summary>
-        /// case
-        /// </summary>
+        /// <summary> case </summary>
         Case,
-        /// <summary>
-        /// default
-        /// </summary>
+        /// <summary> default </summary>
         Default,
-        /// <summary>
-        /// break
-        /// </summary>
+        /// <summary> break </summary>
         Break,
-        /// <summary>
-        /// continue
-        /// </summary>
+        /// <summary> continue </summary>
         Continue,
-        /// <summary>
-        /// return
-        /// </summary>
+        /// <summary> return </summary>
         Return,
-        /// <summary>
-        /// while
-        /// </summary>
+        /// <summary> while </summary>
         While,
-        /// <summary>
-        /// function
-        /// </summary>
+        /// <summary> function </summary>
         Function,
-        /// <summary>
-        /// try
-        /// </summary>
+        /// <summary> try </summary>
         Try,
-        /// <summary>
-        /// catch
-        /// </summary>
+        /// <summary> catch </summary>
         Catch,
-        /// <summary>
-        /// throw
-        /// </summary>
+        /// <summary> throw </summary>
         Throw,
-        /// <summary>
-        /// finally
-        /// </summary>
-        Finally,
-        /// <summary>
-        /// define
-        /// </summary>
-        Define,
-        /// <summary>
-        /// bool true false
-        /// </summary>
+        /// <summary> bool true false </summary>
         Boolean,
-        /// <summary>
-        /// int float
-        /// </summary>
+        /// <summary> double </summary>
         Number,
-        /// <summary>
-        /// string
-        /// </summary>
+        /// <summary> string </summary>
         String,
-        /// <summary>
-        /// @"" @'' string
-        /// </summary>
-        //SimpleString,
-        /// <summary>
-        /// null
-        /// </summary>
+        /// <summary> null </summary>
         Null,
-        /// <summary>
-        /// eval
-        /// </summary>
-        Eval,
-        /// <summary>
-        /// class
-        /// </summary>
+        /// <summary> class </summary>
         Class,
-        /// <summary>
-        /// const
-        /// </summary>
-        Const,
-        /// <summary>
-        /// 说明符
-        /// </summary>
+        /// <summary> 标识符 </summary>
         Identifier,
-        /// <summary>
-        /// 结束
-        /// </summary>
+        /// <summary> 结束 </summary>
         Finished,
     }
 

@@ -73,7 +73,6 @@ namespace Scorpio.Compile.Compiler {
             return executable;
         }
         /// <summary> 获取一个double常量的索引 </summary>
-        /// <param name="value">double常量</param>
         int GetConstDouble(double value) {
             var index = ConstDouble.IndexOf(value);
             if (index < 0) {
@@ -131,7 +130,6 @@ namespace Scorpio.Compile.Compiler {
         /// <summary> 解析一个代码块 </summary>
         ScriptExecutable ParseStatementBlock(ExecutableBlock block) { return ParseStatementBlock(block, true, true, TokenType.RightBrace); }
         /// <summary> 是否是父域的变量 </summary>
-        /// <param name="str">变量名</param>
         int IsParentVariable(string str) {
             int index = m_scriptExecutable.GetInternalIndex(str);
             if (index >= 0) { return index; }
@@ -168,6 +166,7 @@ namespace Scorpio.Compile.Compiler {
             }
             return EndExecutable(block);
         }
+        #region 解析块内容
         /// <summary> 解析单句代码内容 </summary>
         void ParseStatement() {
             var token = ReadToken();
@@ -201,7 +200,6 @@ namespace Scorpio.Compile.Compiler {
                     ParseClass();
                     return;
                 case TokenType.Function:
-                case TokenType.Sharp:
                     ParseFunction();
                     return;
                 case TokenType.Return:
@@ -236,9 +234,47 @@ namespace Scorpio.Compile.Compiler {
                 case TokenType.Throw:
                     ParseThrow();
                     return;
-                case TokenType.SemiColon: return;
+                case TokenType.MacroDefine:
+                    ParseMacroDefine();
+                    return;
+                case TokenType.MacroIf:
+                    ParseMacroIf();
+                    return;
+                case TokenType.MacroIfndef:
+                    ParseMacroIfndef();
+                    break;
+                case TokenType.MacroElse:
+                case TokenType.MacroElif:
+                    ParseMacroElse();
+                    break;
+                case TokenType.MacroEndif:
+                    ParseMacroEndif();
+                    break;
+                case TokenType.SemiColon: 
+                    return;
                 default: throw new ParserException(this, "不支持的语法 ", token);
             }
+        }
+        void ParseMacroIf() {
+            if (!IsDefine()) {
+                FindNextMacro();
+            }
+        }
+        void ParseMacroIfndef() {
+            if (IsDefine()) {
+                FindNextMacro();
+            }
+        }
+        void ParseMacroEndif() {
+            
+        }
+        void ParseMacroElse() {
+            FindMacroEndif();
+        }
+        void ParseMacroDefine() {
+            if (m_scriptExecutable.Block != ExecutableBlock.Context)
+                throw new ParserException(this, "#define只能在上下文使用", PeekToken());
+            defines.Add(ReadIdentifier());
         }
         /// <summary> 解析var关键字 </summary>
         void ParseVar() {
@@ -534,20 +570,19 @@ namespace Scorpio.Compile.Compiler {
                     continue;
                 }
                 long nameIndex, funcIndex;
-                var functionName = "";
                 if (token.Type == TokenType.Identifier || token.Type == TokenType.String) {
                     var next = ReadToken();
                     if (next.Type == TokenType.LeftPar || next.Type == TokenType.LeftBrace) {
                         UndoToken();
                         UndoToken();
                         nameIndex = GetConstString(token.Lexeme.ToString());
-                        funcIndex = ParseFunctionContent(false, ref functionName);
+                        funcIndex = ParseFunctionContent(false, out _);
                     } else {
                         throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
                     }
-                } else if (token.Type == TokenType.Function || token.Type == TokenType.Sharp) {
+                } else if (token.Type == TokenType.Function) {
                     UndoToken();
-                    funcIndex = ParseFunctionContent(true, ref functionName);
+                    funcIndex = ParseFunctionContent(true, out var functionName);
                     nameIndex = GetConstString(functionName);
                 } else {
                     throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
@@ -566,8 +601,7 @@ namespace Scorpio.Compile.Compiler {
         /// <summary> 解析函数（全局函数或类函数） </summary>
         void ParseFunction() {
             UndoToken();
-            var functionName = "";
-            var index = ParseFunctionContent(true, ref functionName);
+            var index = ParseFunctionContent(true, out var functionName);
             var sourceLine = PeekToken().SourceLine;
             AddScriptInstruction(Opcode.NewFunction, index, sourceLine);
             if (m_scriptExecutable.Block == ExecutableBlock.Context) {
@@ -580,9 +614,9 @@ namespace Scorpio.Compile.Compiler {
         /// <param name="needKeyword">是否需要function,#关键字</param>
         /// <param name="functionName">返回函数的名字</param>
         /// <returns></returns>
-        int ParseFunctionContent(bool needKeyword, ref string functionName) {
+        int ParseFunctionContent(bool needKeyword, out string functionName) {
             var token = ReadToken();
-            if (token.Type != TokenType.Function && token.Type != TokenType.Sharp) {
+            if (token.Type != TokenType.Function) {
                 if (needKeyword) {
                     throw new ParserException(this, "Function declaration must start with the 'function' or '#' keyword.", token);
                 } else {
@@ -674,10 +708,10 @@ namespace Scorpio.Compile.Compiler {
             PushObject(GetObject());
             AddScriptInstructionWithoutValue(Opcode.Throw, line);
         }
-        
-        
-        
-        
+        #endregion
+
+
+
         /// <summary> 压入一个值 </summary>
         void PushObject(CodeObject obj) {
             switch (obj) {
@@ -1094,11 +1128,9 @@ namespace Scorpio.Compile.Compiler {
                     }
                     break;
                 }
-                case TokenType.Function:
-                case TokenType.Sharp: {
+                case TokenType.Function: {
                     UndoToken();
-                    var functionName = "";
-                    ret = new CodeFunction(ParseFunctionContent(true, ref functionName), token.SourceLine);
+                    ret = new CodeFunction(ParseFunctionContent(true, out _), token.SourceLine);
                     break;
                 }
                 case TokenType.Class: {
@@ -1107,7 +1139,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case TokenType.LeftPar: {
-                    ret = GetRegionOrFunction();
+                    ret = GetRegionOrLambda();
                     break;
                 }
                 case TokenType.Null:
@@ -1249,7 +1281,8 @@ namespace Scorpio.Compile.Compiler {
             ReadRightParenthesis();
             return new CodeCallFunction(member, paramters, token.SourceLine);
         }
-        CodeObject GetRegionOrFunction() {
+        //返回块内容或者Lambda函数
+        CodeObject GetRegionOrLambda() {
             UndoToken();
             var index = m_indexToken;
             ReadLeftParenthesis();
@@ -1263,8 +1296,7 @@ namespace Scorpio.Compile.Compiler {
             }
             if (PeekToken().Type == TokenType.Lambda) {
                 m_indexToken = index;
-                var functionName = "";
-                return new CodeFunction(ParseFunctionContent(false, ref functionName), true, token.SourceLine);
+                return new CodeFunction(ParseFunctionContent(false, out _), true, token.SourceLine);
             } else {
                 m_indexToken = index;
                 ReadLeftParenthesis();
@@ -1324,19 +1356,16 @@ namespace Scorpio.Compile.Compiler {
                         } else if ((token.Type == TokenType.Identifier || token.Type == TokenType.String) && next.Type == TokenType.LeftPar) {
                             UndoToken();
                             UndoToken();
-                            string functionName = "";
-                            var index = ParseFunctionContent(false, ref functionName);
+                            var index = ParseFunctionContent(false, out var functionName);
                             ret.Variables.Add(new CodeMap.MapVariable(functionName, new CodeFunction(index, token.SourceLine)));
                         } else {
                             throw new ParserException(this, "Map变量赋值符号为[=]或者[:]", token);
                         }
                         continue;
                     }
-                    case TokenType.Function:
-                    case TokenType.Sharp: {
+                    case TokenType.Function: {
                         UndoToken();
-                        string functionName = "";
-                        var index = ParseFunctionContent(true, ref functionName);
+                        var index = ParseFunctionContent(true, out var functionName);
                         ret.Variables.Add(new CodeMap.MapVariable(functionName, new CodeFunction(index, token.SourceLine)));
                         break;
                     }
@@ -1346,7 +1375,5 @@ namespace Scorpio.Compile.Compiler {
             ReadRightBrace();
             return ret;
         }
-        
-
     }
 }

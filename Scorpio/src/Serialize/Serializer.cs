@@ -2,19 +2,14 @@ using Scorpio.Instruction;
 using Scorpio.Compile.Compiler;
 namespace Scorpio.Serialize {
     public class Serializer {
-        public static SerializeData Serialize(string breviary, string buffer, string[] ignoreFunctions, bool intern = false) {
+        public static SerializeData Serialize(string breviary, string buffer, string[] ignoreFunctions) {
             var lexer = new ScriptLexer(buffer, breviary);
             breviary = lexer.Breviary;
-            var parser = new ScriptParser(lexer.GetTokens().ToArray(), breviary, ignoreFunctions);
+            var parser = new ScriptParser(lexer.GetTokens().ToArray(), breviary, ignoreFunctions, null);
             var context = parser.Parse();
-            string[] constString;
-            if (intern) {
-                constString = new string[parser.ConstString.Count];
-                for (var i = 0; i < parser.ConstString.Count; ++i) {
-                    constString[i] = string.Intern(parser.ConstString[i]);
-                }
-            } else {
-                constString = parser.ConstString.ToArray();
+            var constString = new string[parser.ConstString.Count];
+            for (var i = 0; i < parser.ConstString.Count; ++i) {
+                constString[i] = string.Intern(parser.ConstString[i]);
             }
             return new SerializeData(parser.ConstDouble.ToArray(),
                                         parser.ConstLong.ToArray(),

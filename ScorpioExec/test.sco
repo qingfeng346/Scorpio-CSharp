@@ -1,8 +1,18 @@
-var a = {}
-var b = {}
-a["b"] = b
-b["a"] = a
-print(json.encode(a))
+#define TEST
+
+#if TEST && TEST2
+
+#if TEST
+#else
+#endif
+
+#elif TTTTT
+
+print("22222222222222222222")
+
+#endif
+print("444444444444444")
+
 
 // var a = class {
 

@@ -116,13 +116,6 @@ namespace Scorpio {
             typeValue = new ScriptValue(type);
             Global.SetValue(type.TypeName, typeValue);
         }
-        ScriptValue Execute(string breviary, SerializeData data) {
-            var contexts = new ScriptContext[data.Functions.Length];
-            for (int i = 0; i < data.Functions.Length; ++i) {
-                contexts[i] = new ScriptContext(this, breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
-            }
-            return new ScriptContext(this, breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
-        }
         /// <summary> 压入一个搜索路径,使用 require 时会搜索此路径 </summary>
         /// <param name="path">绝对路径</param>
         public void PushSearchPath(string path) {
@@ -222,7 +215,7 @@ namespace Scorpio {
         /// <returns>返回值</returns>
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(breviary, Serializer.Serialize(breviary, buffer, null, true));
+            return Execute(breviary, Serializer.Serialize(breviary, buffer, null));
         }
         /// <summary> 加载一段数据 </summary>
         /// <param name="buffer">数据内容</param>
@@ -247,7 +240,14 @@ namespace Scorpio {
             if (buffer[0] == 0)
                 return Execute(breviary, Deserializer.Deserialize(buffer));
             else
-                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null, true));
+                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null));
+        }
+        public ScriptValue Execute(string breviary, SerializeData data) {
+            var contexts = new ScriptContext[data.Functions.Length];
+            for (int i = 0; i < data.Functions.Length; ++i) {
+                contexts[i] = new ScriptContext(this, breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+            }
+            return new ScriptContext(this, breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
         }
 
 
