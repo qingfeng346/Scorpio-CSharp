@@ -237,40 +237,16 @@ namespace Scorpio.Compile.Compiler {
                 case TokenType.MacroDefine:
                     ParseMacroDefine();
                     return;
-                case TokenType.MacroIf:
-                    ParseMacroIf();
-                    return;
-                case TokenType.MacroIfndef:
-                    ParseMacroIfndef();
-                    break;
-                case TokenType.MacroElse:
-                case TokenType.MacroElif:
-                    ParseMacroElse();
-                    break;
-                case TokenType.MacroEndif:
-                    ParseMacroEndif();
-                    break;
                 case TokenType.SemiColon: 
                     return;
-                default: throw new ParserException(this, "不支持的语法 ", token);
+                default:
+                    if (!ParseMacro(token)) {
+                        throw new ParserException(this, "不支持的语法 ", token);
+                    }
+                    return;
             }
         }
-        void ParseMacroIf() {
-            if (!IsDefine()) {
-                FindNextMacro();
-            }
-        }
-        void ParseMacroIfndef() {
-            if (IsDefine()) {
-                FindNextMacro();
-            }
-        }
-        void ParseMacroEndif() {
-            
-        }
-        void ParseMacroElse() {
-            FindMacroEndif();
-        }
+        /// <summary> #define </summary>
         void ParseMacroDefine() {
             if (m_scriptExecutable.Block != ExecutableBlock.Context)
                 throw new ParserException(this, "#define只能在上下文使用", PeekToken());
@@ -1262,6 +1238,11 @@ namespace Scorpio.Compile.Compiler {
             var paramters = new List<CodeFunctionParameter>();
             var token = PeekToken();
             while (token.Type != TokenType.RightPar) {
+                token = PeekToken();
+                if (ParseMacro(token, true))
+                    continue;
+                if (token.Type == TokenType.RightPar)
+                    break;
                 var obj = GetObject();
                 token = PeekToken();
                 var spread = false;
@@ -1311,7 +1292,10 @@ namespace Scorpio.Compile.Compiler {
             var token = PeekToken();
             var ret = new CodeArray(token.SourceLine);
             while (token.Type != TokenType.RightBracket) {
-                if (PeekToken().Type == TokenType.RightBracket)
+                token = PeekToken();
+                if (ParseMacro(token, true))
+                    continue;
+                if (token.Type == TokenType.RightBracket)
                     break;
                 ret.Elements.Add(GetObject());
                 token = PeekToken();
@@ -1319,8 +1303,9 @@ namespace Scorpio.Compile.Compiler {
                     ReadToken();
                 } else if (token.Type == TokenType.RightBracket) {
                     break;
-                } else
+                } else {
                     throw new ParserException(this, "Comma ',' or SemiColon ';' or right parenthesis ']' expected in array object.", token);
+                }
             }
             ReadRightBracket();
             return ret;
@@ -1335,6 +1320,7 @@ namespace Scorpio.Compile.Compiler {
             }
             while (PeekToken().Type != TokenType.RightBrace) {
                 var token = ReadToken();
+                if (ParseMacro(token)) { continue; }
                 switch (token.Type) {
                     case TokenType.Comma:
                     case TokenType.SemiColon:

@@ -1,17 +1,16 @@
 #define TEST
-
-#if TEST && TEST2
-
 #if TEST
-#else
+#define TEST2
 #endif
-
-#elif TTTTT
-
-print("22222222222222222222")
-
+print("100",
+#if TEST
+200,
 #endif
-print("444444444444444")
+#if TEST1
+300,
+#endif
+)
+
 
 
 // var a = class {

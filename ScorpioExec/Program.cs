@@ -53,6 +53,7 @@ namespace ScorpioExec {
         private readonly static string[] ParameterClass = new [] { "-c", "--class", "-class" };
         private readonly static string[] ParameterDll = new [] { "-d", "--dll", "-dll" };
         private readonly static string[] ParameterIgnore = new [] { "-i", "--ignore", "-ignore" };
+        private readonly static string[] ParameterDefine = new[] { "--define", "-define" };
         private readonly static string[] ParameterFilter = new [] { "-f", "--filter", "-filter" };
         private readonly static string[] ParameterExtension = new [] { "-e", "--extension", "-extension" };
         private readonly static string[] ParameterCheck = new [] { "-c", "--check", "-check" };
@@ -110,7 +111,12 @@ namespace ScorpioExec {
             var source = perform.GetPath (ParameterSource);
             var output = perform.GetPath (ParameterOutput);
             var ignore = command.GetValueDefault (ParameterIgnore, "");
-            File.WriteAllBytes (output, Serializer.Serialize (source, FileUtil.GetFileString (source), ignore.Split (";")).ToArray ());
+            var define = command.GetValueDefault (ParameterDefine, "");
+            File.WriteAllBytes (output, Serializer.Serialize (
+                source, 
+                FileUtil.GetFileString (source), 
+                ignore.Split (";"), 
+                define.Split(";")).ToArray ());
             Logger.info ($"生成IL文件  {source} -> {output}");
         }
         static void Fast (CommandLine command, string[] args) {

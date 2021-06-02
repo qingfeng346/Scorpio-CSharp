@@ -215,7 +215,7 @@ namespace Scorpio {
         /// <returns>返回值</returns>
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(breviary, Serializer.Serialize(breviary, buffer, null));
+            return Execute(breviary, Serializer.Serialize(breviary, buffer, null, null));
         }
         /// <summary> 加载一段数据 </summary>
         /// <param name="buffer">数据内容</param>
@@ -240,7 +240,7 @@ namespace Scorpio {
             if (buffer[0] == 0)
                 return Execute(breviary, Deserializer.Deserialize(buffer));
             else
-                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null));
+                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null, null));
         }
         public ScriptValue Execute(string breviary, SerializeData data) {
             var contexts = new ScriptContext[data.Functions.Length];
