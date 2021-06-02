@@ -2,18 +2,6 @@
 using Scorpio.Compile.Exception;
 namespace Scorpio.Compile.Compiler {
     public partial class ScriptParser {
-        private enum DefineType {
-            None,       //没有进入#if
-            Already,    //已经进入条件了
-            Being,      //还没找到合适的 正在处理
-            Break,      //跳过
-        }
-        private class DefineState {
-            public DefineType State;
-            public DefineState(DefineType state) {
-                State = state;
-            }
-        }
         private class DefineObject {
             public bool Not;
         }
