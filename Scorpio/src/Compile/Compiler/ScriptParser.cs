@@ -111,6 +111,34 @@ namespace Scorpio.Compile.Compiler {
         /// <summary> 解析脚本 </summary>
         public ScriptFunctionData Parse() {
             m_indexToken = 0;
+            var tokens = new List<Token>();
+            while (HasMoreTokens()) {
+                var token = ReadToken();
+                switch (token.Type) {
+                    case TokenType.MacroDefine:
+                        ParseMacroDefine();
+                        break;
+                    case TokenType.MacroIf:
+                        ParseMacroIf();
+                        break;
+                    case TokenType.MacroIfndef:
+                        ParseMacroIfndef();
+                        break;
+                    case TokenType.MacroElse:
+                    case TokenType.MacroElif:
+                        ParseMacroElse();
+                        break;
+                    case TokenType.MacroEndif:
+                        break;
+                    default:
+                        tokens.Add(token);
+                        break;
+                }
+            }
+            if (m_listTokens.Length != tokens.Count) {
+                m_listTokens = tokens.ToArray();
+            }
+            m_indexToken = 0;
             var executable = ParseStatementContext();
             return new ScriptFunctionData() {
                 scriptInstructions = executable.ScriptInstructions,
@@ -234,22 +262,14 @@ namespace Scorpio.Compile.Compiler {
                 case TokenType.Throw:
                     ParseThrow();
                     return;
-                case TokenType.MacroDefine:
-                    ParseMacroDefine();
-                    return;
                 case TokenType.SemiColon: 
                     return;
                 default:
-                    if (!ParseMacro(token)) {
-                        throw new ParserException(this, "不支持的语法 ", token);
-                    }
-                    return;
+                    throw new ParserException(this, "不支持的语法 ", token);
             }
         }
         /// <summary> #define </summary>
         void ParseMacroDefine() {
-            if (m_scriptExecutable.Block != ExecutableBlock.Context)
-                throw new ParserException(this, "#define只能在上下文使用", PeekToken());
             defines.Add(ReadIdentifier());
         }
         /// <summary> 解析var关键字 </summary>
@@ -1238,10 +1258,7 @@ namespace Scorpio.Compile.Compiler {
             var paramters = new List<CodeFunctionParameter>();
             var token = PeekToken();
             while (token.Type != TokenType.RightPar) {
-                token = PeekToken();
-                if (ParseMacro(token, true))
-                    continue;
-                if (token.Type == TokenType.RightPar)
+                if (PeekToken().Type == TokenType.RightPar)
                     break;
                 var obj = GetObject();
                 token = PeekToken();
@@ -1292,10 +1309,7 @@ namespace Scorpio.Compile.Compiler {
             var token = PeekToken();
             var ret = new CodeArray(token.SourceLine);
             while (token.Type != TokenType.RightBracket) {
-                token = PeekToken();
-                if (ParseMacro(token, true))
-                    continue;
-                if (token.Type == TokenType.RightBracket)
+                if (PeekToken().Type == TokenType.RightBracket)
                     break;
                 ret.Elements.Add(GetObject());
                 token = PeekToken();
@@ -1320,7 +1334,6 @@ namespace Scorpio.Compile.Compiler {
             }
             while (PeekToken().Type != TokenType.RightBrace) {
                 var token = ReadToken();
-                if (ParseMacro(token)) { continue; }
                 switch (token.Type) {
                     case TokenType.Comma:
                     case TokenType.SemiColon:

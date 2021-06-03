@@ -1,15 +1,7 @@
-#define TEST
 #if TEST
-#define TEST2
-#endif
 print("100",
-#if TEST
-200,
-#endif
-#if TEST1
-300,
-#endif
 )
+#endif
 
 
 

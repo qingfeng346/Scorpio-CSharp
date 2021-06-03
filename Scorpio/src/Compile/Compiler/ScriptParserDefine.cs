@@ -21,29 +21,6 @@ namespace Scorpio.Compile.Compiler {
                 And = and;
             }
         }
-        private bool ParseMacro(Token token, bool needRead = false) {
-            switch (token.Type) {
-                case TokenType.MacroIf:
-                    if (needRead) ReadToken();
-                    ParseMacroIf();
-                    return true;
-                case TokenType.MacroIfndef:
-                    if (needRead) ReadToken();
-                    ParseMacroIfndef();
-                    return true;
-                case TokenType.MacroElse:
-                case TokenType.MacroElif:
-                    if (needRead) ReadToken();
-                    ParseMacroElse();
-                    return true;
-                case TokenType.MacroEndif:
-                    if (needRead) ReadToken();
-                    ParseMacroEndif();
-                    return true;
-                default:
-                    return false;
-            }
-        }
         void ParseMacroIf() {
             if (!IsDefine()) {
                 FindNextMacro();
@@ -53,9 +30,6 @@ namespace Scorpio.Compile.Compiler {
             if (IsDefine()) {
                 FindNextMacro();
             }
-        }
-        void ParseMacroEndif() {
-
         }
         void ParseMacroElse() {
             FindMacroEndif();
