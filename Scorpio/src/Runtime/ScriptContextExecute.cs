@@ -15,6 +15,12 @@ namespace Scorpio.Runtime {
                 throw new ExecutionException("Stack overflow : " + VariableValueIndex);
             }
 #endif
+#if SCORPIO_THREAD
+            var currentThread = System.Threading.Thread.CurrentThread;
+            if (currentThread.ManagedThreadId != m_script.MainThreadId) {
+                throw new ExecutionException($"only run script on mainthread : {m_script.MainThreadId} - {currentThread.ManagedThreadId}({currentThread.Name})");
+            }
+#endif
             var variableObjects = VariableValues[VariableValueIndex]; //局部变量
             var tryStack = TryStackValues[VariableValueIndex]; //try catch
             var stackObjects = StackValues[VariableValueIndex++]; //堆栈数据

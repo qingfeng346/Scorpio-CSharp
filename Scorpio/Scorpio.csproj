@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;SCORPIO_DEBUG</DefineConstants>
+    <DefineConstants>TRACE;SCORPIO_DEBUG;SCORPIO_THREAD</DefineConstants>
     <GenerateSerializationAssemblies></GenerateSerializationAssemblies>
   </PropertyGroup>
 </Project>

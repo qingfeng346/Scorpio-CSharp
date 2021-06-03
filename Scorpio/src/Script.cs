@@ -62,6 +62,7 @@ namespace Scorpio {
         /// <summary> 全局变量 </summary>
         public ScriptGlobal Global { get; private set; }
 
+        public int MainThreadId { get; private set; }
 
         public Script() {
             Global = new ScriptGlobal();
@@ -101,6 +102,7 @@ namespace Scorpio {
             LibraryMath.Load(this);
             LibraryUserdata.Load(this);
             LibraryIO.Load(this);
+            MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
         public void Shutdown() {
             Global.Shutdown();
