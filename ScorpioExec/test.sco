@@ -1,6 +1,6 @@
+#define TEST
 #if TEST
-print("100",
-)
+print("100")
 #endif
 
 
