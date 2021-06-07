@@ -17,12 +17,12 @@ namespace Scorpio {
     }
 }
 "@
-$fileData | Out-File -Encoding utf8 ./src/Version.cs
+Set-Content -Path ./src/Version.cs -Value $fileData -Encoding utf8
 
-$contextExcute = Get-Content -Path ./src/Runtime/ScriptContextExecute.cs -Encoding utf8
-$contextExcute = $contextExcute.Replace("InternalValue[] internalValues", "InternalValue[] internalValues, ScriptType baseType")
-$contextExcute = $contextExcute.Replace("thisObject.Get<ScriptInstance>().Prototype.Get<ScriptType>().Prototype", "baseType.Prototype")
-$contextExcute | Out-File -Encoding utf8 ./src/Runtime/ScriptContextExecuteBase.cs
+$contextExcute = Get-Content -Path ./src/Runtime/ScriptContextExecute.cs
+Set-Content -Path ./src/Runtime/ScriptContextExecuteBase.cs -Value "#define EXECUTE_BASE",$contextExcute
+Set-Content -Path ./src/Runtime/ScriptContextExecuteCoroutine.cs -Value "#define EXECUTE_COROUTINE",$contextExcute
+Set-Content -Path ./src/Runtime/ScriptContextExecuteCoroutineBase.cs -Value "#define EXECUTE_COROUTINE","#define EXECUTE_BASE",$contextExcute
 
 Remove-Item ../bin/* -Force -Recurse
 Write-Host "正在生成nupkg..."

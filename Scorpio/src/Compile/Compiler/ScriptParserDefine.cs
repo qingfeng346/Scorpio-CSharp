@@ -21,6 +21,10 @@ namespace Scorpio.Compile.Compiler {
                 And = and;
             }
         }
+        /// <summary> #define </summary>
+        void ParseMacroDefine() {
+            defines.Add(ReadIdentifier());
+        }
         void ParseMacroIf() {
             if (!IsDefine()) {
                 FindNextMacro();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Scorpio.Compile.Exception;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
-    public partial class ScriptParser {         
+    public partial class ScriptParser {
         private Token[] m_listTokens;           //token列表
         private int m_indexToken;               //当前读到token
         private string[] ignoreFunctions;       //编译忽略的全局函数
@@ -54,7 +54,7 @@ namespace Scorpio.Compile.Compiler {
                 throw new ParserException(this, "Comma ',' expected.", token);
         }
         /// <summary> 读取 变量字符 </summary>
-        String ReadIdentifier() {
+        string ReadIdentifier() {
             Token token = ReadToken();
             if (token.Type != TokenType.Identifier)
                 throw new ParserException(this, "Identifier expected.", token);

@@ -216,6 +216,7 @@ namespace ScorpioExec {
                 Logger.info ("=============================");
                 var watch = Stopwatch.StartNew ();
                 var value = script.LoadFile (file);
+                while (script.UpdateCoroutine()) { }
                 Logger.info ("=============================");
                 Logger.info ("return value : " + value);
                 Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");

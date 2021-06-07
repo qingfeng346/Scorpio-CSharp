@@ -1,9 +1,25 @@
-#define TEST
-#if TEST
-print("100")
-#endif
-
-
+function sleep(seconds) {
+    var end = io.unixNow() + seconds * 1000
+    return coroutine.poll(function() {
+        return io.unixNow() > end
+    })
+}
+function sleep2(seconds) {
+    var ret = coroutine.callBack()
+    tttt(ret, seconds)
+    return ret 
+}
+async function tttt(ret, seconds) {
+    await sleep(seconds)
+    coroutine.done(ret)
+}
+async function main() {
+    var now = io.unixNow()
+    print(now)
+    await sleep2(5)
+    print(io.unixNow() - now)
+}
+main()
 
 // var a = class {
 

@@ -102,6 +102,7 @@ namespace Scorpio {
             LibraryMath.Load(this);
             LibraryUserdata.Load(this);
             LibraryIO.Load(this);
+            LibraryCoroutine.Load(this);
             MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
         public void Shutdown() {

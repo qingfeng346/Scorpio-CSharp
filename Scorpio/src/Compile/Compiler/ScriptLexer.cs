@@ -487,6 +487,12 @@ namespace Scorpio.Compile.Compiler {
                 case "class":
                     tokenType = TokenType.Class;
                     break;
+                case "async":
+                    tokenType = TokenType.Async;
+                    break;
+                case "await":
+                    tokenType = TokenType.Await;
+                    break;
                 case "new":
                 case "gvar":
                 case "global":

@@ -158,6 +158,10 @@ namespace Scorpio.Compile.Compiler {
         Null,
         /// <summary> class </summary>
         Class,
+        /// <summary> async </summary>
+        Async,
+        /// <summary> await </summary>
+        Await,
         /// <summary> 标识符 </summary>
         Identifier,
         /// <summary> 结束 </summary>
