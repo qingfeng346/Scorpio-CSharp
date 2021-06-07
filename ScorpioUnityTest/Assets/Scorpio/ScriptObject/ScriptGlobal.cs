@@ -20,6 +20,7 @@ namespace Scorpio {
                     values.MoveNext();
                     current.Key = keys.Current;
                     current.Value = objects[values.Current];
+                    return true;
                 }
                 return false;
             }
