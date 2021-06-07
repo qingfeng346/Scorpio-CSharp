@@ -202,24 +202,29 @@ namespace ScorpioExec {
             script.LoadLibraryExtend();
             LoadLibrary (Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
-                var file = Path.Combine (CurrentDirectory, args[0]);
-                if (!File.Exists (file)) {
-                    Logger.info ($"文件 : {file} 不存在");
-                    return;
+                try {
+                    var file = Path.Combine (CurrentDirectory, args[0]);
+                    if (!File.Exists (file)) {
+                        Logger.info ($"文件 : {file} 不存在");
+                        return;
+                    }
+                    var path = Path.GetDirectoryName (file);
+                    script.PushSearchPath (path);
+                    script.PushSearchPath (CurrentDirectory);
+                    var sArgs = new string[args.Length - 1];
+                    Array.Copy(args, 1, sArgs, 0, sArgs.Length);
+                    script.SetArgs(sArgs);
+                    Logger.info ("=============================");
+                    var watch = Stopwatch.StartNew ();
+                    var value = script.LoadFile (file);
+                    while (script.UpdateCoroutine()) { }
+                    Logger.info ("=============================");
+                    Logger.info ("return value : " + value);
+                    Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");
+                } catch (Exception e) {
+                    var stackInfo = script.GetStackInfo ();
+                    Logger.info($"{stackInfo.Breviary}:{stackInfo.Line} {e}");
                 }
-                var path = Path.GetDirectoryName (file);
-                script.PushSearchPath (path);
-                script.PushSearchPath (CurrentDirectory);
-                var sArgs = new string[args.Length - 1];
-                Array.Copy(args, 1, sArgs, 0, sArgs.Length);
-                script.SetArgs(sArgs);
-                Logger.info ("=============================");
-                var watch = Stopwatch.StartNew ();
-                var value = script.LoadFile (file);
-                while (script.UpdateCoroutine()) { }
-                Logger.info ("=============================");
-                Logger.info ("return value : " + value);
-                Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");
             } else {
                 while (true) {
                     try {

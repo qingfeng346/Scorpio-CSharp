@@ -256,17 +256,20 @@ namespace Scorpio {
 
 #if SCORPIO_DEBUG || SCORPIO_STACK
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
+        private StackInfo m_Stack = new StackInfo();
         private int m_StackLength = 0;
         internal void PushStackInfo(string breviary, int line) {
             m_StackInfos[m_StackLength].Breviary = breviary;
             m_StackInfos[m_StackLength++].Line = line;
+            m_Stack.Breviary = breviary;
+            m_Stack.Line = line;
         }
         internal void PopStackInfo() {
             --m_StackLength;
         }
         /// <summary> 最近的堆栈调用 </summary>
         public StackInfo GetStackInfo() {
-            return m_StackLength > 0 ? m_StackInfos[m_StackLength - 1] : default;
+            return m_Stack;
         }
         /// <summary> 调用堆栈 </summary>
         public StackInfo[] GetStackInfos() {
