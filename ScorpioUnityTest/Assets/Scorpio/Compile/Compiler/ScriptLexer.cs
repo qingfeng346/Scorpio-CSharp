@@ -266,6 +266,7 @@ namespace Scorpio.Compile.Compiler {
                 }
             }
         }
+        /// <summary> 读取字符串 </summary>
         void ReadSimpleString(bool symbol) {
             if (symbol) {
                 m_ch = ReadChar();
@@ -309,6 +310,7 @@ namespace Scorpio.Compile.Compiler {
                 }
             } while (true);
         }
+        /// <summary> 读取字符串 </summary>
         void ReadString() {
             do {
                 ch = ReadChar();
@@ -364,6 +366,43 @@ namespace Scorpio.Compile.Compiler {
             }
             while (true);
         }
+        
+        void ReadSharp() {
+            m_Builder.Append(m_ch);
+            do {
+                ch = ReadChar();
+                if (IsIdentifier(ch)) {
+                    m_Builder.Append(ch);
+                } else {
+                    UndoChar();
+                    break;
+                }
+            } while (true);
+            switch (m_Builder.ToString()) {
+                case "#define":
+                    AddToken(TokenType.MacroDefine);
+                    break;
+                case "#if":
+                    AddToken(TokenType.MacroIf);
+                    break;
+                case "#ifndef":
+                    AddToken(TokenType.MacroIfndef);
+                    break;
+                case "#else":
+                    AddToken(TokenType.MacroElse);
+                    break;
+                case "#elif":
+                    AddToken(TokenType.MacroElif);
+                    break;
+                case "#endif":
+                    AddToken(TokenType.MacroEndif);
+                    break;
+                default:
+                    ThrowInvalidCharacterException($"无法识别的宏命令 : {m_Builder}");
+                    break;
+            }
+        }
+        /// <summary> 读取关键字 </summary>
         void ReadIdentifier() {
             m_Builder.Append(m_ch);
             do {
@@ -448,6 +487,12 @@ namespace Scorpio.Compile.Compiler {
                 case "class":
                     tokenType = TokenType.Class;
                     break;
+                case "async":
+                    tokenType = TokenType.Async;
+                    break;
+                case "await":
+                    tokenType = TokenType.Await;
+                    break;
                 case "new":
                 case "gvar":
                 case "global":
@@ -509,11 +554,11 @@ namespace Scorpio.Compile.Compiler {
                     case ';':
                         AddToken(TokenType.SemiColon);
                         break;
-                    case '#':
-                        AddToken(TokenType.Sharp);
-                        break;
                     case '~':
                         AddToken(TokenType.Negative);
+                        break;
+                    case '#':
+                        ReadSharp();
                         break;
                     case '?':
                         ReadQuestionMark();

@@ -62,6 +62,7 @@ namespace Scorpio {
         /// <summary> 全局变量 </summary>
         public ScriptGlobal Global { get; private set; }
 
+        public int MainThreadId { get; private set; }
 
         public Script() {
             Global = new ScriptGlobal();
@@ -101,6 +102,8 @@ namespace Scorpio {
             LibraryMath.Load(this);
             LibraryUserdata.Load(this);
             LibraryIO.Load(this);
+            LibraryCoroutine.Load(this);
+            MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
         public void Shutdown() {
             Global.Shutdown();
@@ -115,13 +118,6 @@ namespace Scorpio {
         void AddBasicPrototype(ScriptType type, ref ScriptValue typeValue) {
             typeValue = new ScriptValue(type);
             Global.SetValue(type.TypeName, typeValue);
-        }
-        ScriptValue Execute(string breviary, SerializeData data) {
-            var contexts = new ScriptContext[data.Functions.Length];
-            for (int i = 0; i < data.Functions.Length; ++i) {
-                contexts[i] = new ScriptContext(this, breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
-            }
-            return new ScriptContext(this, breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
         }
         /// <summary> 压入一个搜索路径,使用 require 时会搜索此路径 </summary>
         /// <param name="path">绝对路径</param>
@@ -222,7 +218,7 @@ namespace Scorpio {
         /// <returns>返回值</returns>
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(breviary, Serializer.Serialize(breviary, buffer, null, true));
+            return Execute(breviary, Serializer.Serialize(breviary, buffer, null, null));
         }
         /// <summary> 加载一段数据 </summary>
         /// <param name="buffer">数据内容</param>
@@ -247,23 +243,33 @@ namespace Scorpio {
             if (buffer[0] == 0)
                 return Execute(breviary, Deserializer.Deserialize(buffer));
             else
-                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null, true));
+                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null, null));
+        }
+        public ScriptValue Execute(string breviary, SerializeData data) {
+            var contexts = new ScriptContext[data.Functions.Length];
+            for (int i = 0; i < data.Functions.Length; ++i) {
+                contexts[i] = new ScriptContext(this, breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+            }
+            return new ScriptContext(this, breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
         }
 
 
 #if SCORPIO_DEBUG || SCORPIO_STACK
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
+        private StackInfo m_Stack = new StackInfo();
         private int m_StackLength = 0;
         internal void PushStackInfo(string breviary, int line) {
             m_StackInfos[m_StackLength].Breviary = breviary;
             m_StackInfos[m_StackLength++].Line = line;
+            m_Stack.Breviary = breviary;
+            m_Stack.Line = line;
         }
         internal void PopStackInfo() {
             --m_StackLength;
         }
         /// <summary> 最近的堆栈调用 </summary>
         public StackInfo GetStackInfo() {
-            return m_StackLength > 0 ? m_StackInfos[m_StackLength - 1] : default;
+            return m_Stack;
         }
         /// <summary> 调用堆栈 </summary>
         public StackInfo[] GetStackInfos() {

@@ -2,6 +2,6 @@
 namespace Scorpio {
     public static class Version {
         public const string version = "2.0.14";
-        public const string date = "2021-05-11";
+        public const string date = "2021-06-07";
     }
 }

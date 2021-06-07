@@ -38,14 +38,17 @@ namespace Scorpio.Instruction {
 
         //New操作
         NewBegin = LoadBegin + 40,
-        NewFunction,            //load a new function
-        NewLambadaFunction,     //load a new lambada function
+        NewFunction,            //new function
+        NewLambdaFunction,      //new lambda function
         NewArray,               //new array
         NewMap,                 //new map
         NewMapObject,           //new map with key contain object
         NewType,                //new class
-        NewTypeParent,          //new class with parent
-        NewMapString,           //new map only string key
+        //NewTypeParent,          //new class with parent, 已弃用deprecated
+        NewMapString = 49,      //new map only string key
+        NewAsyncFunction,       //new async function
+        NewAsyncLambdaFunction, //new async lambda function
+        NewAsyncType,           //new async type
         NewEnd,
 
         //取栈操作
@@ -118,6 +121,7 @@ namespace Scorpio.Instruction {
         TryTo,                  //异常跳转
         TryEnd,                 //try结束
         Throw,                  //throw
+        Await,                  //await
         JumpEnd,
     }
 }

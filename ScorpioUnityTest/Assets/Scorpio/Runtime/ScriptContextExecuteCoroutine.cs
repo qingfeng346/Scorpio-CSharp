@@ -1,4 +1,4 @@
-#define EXECUTE_BASE
+#define EXECUTE_COROUTINE
 using System.Collections;
 using Scorpio.Exception;
 using Scorpio.Function;

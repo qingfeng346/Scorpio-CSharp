@@ -1,18 +1,33 @@
+using System.Collections;
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Instruction;
 using Scorpio.Tools;
 namespace Scorpio.Runtime {
-
     //执行命令
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public partial class ScriptContext {
+#if EXECUTE_COROUTINE && EXECUTE_BASE
+        public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, ScriptType baseType) {
+#elif EXECUTE_COROUTINE
+        public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
+#elif EXECUTE_BASE
+        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, ScriptType baseType) {
+#else
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
+#endif
+
 #if SCORPIO_DEBUG
             //Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
             if (VariableValueIndex < 0 || VariableValueIndex >= ValueCacheLength) {
                 throw new ExecutionException("Stack overflow : " + VariableValueIndex);
+            }
+#endif
+#if SCORPIO_THREAD
+            var currentThread = System.Threading.Thread.CurrentThread;
+            if (currentThread.ManagedThreadId != m_script.MainThreadId) {
+                throw new ExecutionException($"only run script on mainthread : {m_script.MainThreadId} - {currentThread.ManagedThreadId}({currentThread.Name})");
             }
 #endif
             var variableObjects = VariableValues[VariableValueIndex]; //局部变量
@@ -33,7 +48,9 @@ namespace Scorpio.Runtime {
                 }
             }
             var stackIndex = -1; //堆栈索引
+#if !EXECUTE_COROUTINE
             var tryIndex = -1; //try索引
+#endif
             var parameterCount = m_FunctionData.parameterCount; //参数数量
             //是否是变长参数
             if (m_FunctionData.param) {
@@ -58,8 +75,10 @@ namespace Scorpio.Runtime {
             int tempIndex; //临时存储
             ScriptInstruction instruction = null;
             try {
+#if !EXECUTE_COROUTINE
             KeepOn: 
                 try {
+#endif
                     while (iInstruction < iInstructionCount) {
                         instruction = m_scriptInstructions[iInstruction++];
                         var opvalue = instruction.opvalue;
@@ -236,7 +255,11 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case Opcode.LoadBase: {
+#if EXECUTE_BASE
+                                        stackObjects[++stackIndex] = baseType.Prototype;
+#else
                                         stackObjects[++stackIndex] = thisObject.Get<ScriptInstance>().Prototype.Get<ScriptType>().Prototype;
+#endif
                                         continue;
                                     }
                                     default: throw new ExecutionException("unknown opcode : " + opcode);
@@ -1220,12 +1243,20 @@ namespace Scorpio.Runtime {
                                         }
                                     }
                                     case Opcode.RetNone: {
+#if EXECUTE_COROUTINE
+                                        yield break;
+#else
                                         --VariableValueIndex;
                                         return ScriptValue.Null;
+#endif
                                     }
                                     case Opcode.Ret: {
+#if EXECUTE_COROUTINE
+                                        yield break;
+#else
                                         --VariableValueIndex;
                                         return stackObjects[stackIndex];
+#endif
                                     }
                                     case Opcode.CallUnfold: {
                                         var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
@@ -1316,6 +1347,7 @@ namespace Scorpio.Runtime {
                                         }
                                         continue;
                                     }
+#if !EXECUTE_COROUTINE
                                     case Opcode.TryTo: {
                                         tryStack[++tryIndex] = opvalue;
                                         continue;
@@ -1325,6 +1357,7 @@ namespace Scorpio.Runtime {
                                         --tryIndex;
                                         continue;
                                     }
+#endif
                                     case Opcode.Throw: {
                                         throw new ScriptException(stackObjects[stackIndex]);
                                     }
@@ -1384,6 +1417,12 @@ namespace Scorpio.Runtime {
 #endif
                                         continue;
                                     }
+#if EXECUTE_COROUTINE
+                                    case Opcode.Await: {
+                                        yield return stackObjects[stackIndex--].Value;
+                                        continue;
+                                    }
+#endif
                                     default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
                             case OpcodeType.New:
@@ -1434,7 +1473,7 @@ namespace Scorpio.Runtime {
                                         stackObjects[stackIndex].scriptValue = function;
                                         continue;
                                     }
-                                    case Opcode.NewLambadaFunction: {
+                                    case Opcode.NewLambdaFunction: {
                                         var functionData = constContexts[opvalue];
                                         var internals = functionData.m_FunctionData.internals;
                                         var function = new ScriptScriptBindFunction(functionData, thisObject);
@@ -1467,14 +1506,72 @@ namespace Scorpio.Runtime {
                                         stackObjects[stackIndex].scriptValue = type;
                                         continue;
                                     }
+                                    case Opcode.NewAsyncFunction: {
+                                        var functionData = constContexts[opvalue];
+                                        var internals = functionData.m_FunctionData.internals;
+                                        var function = new ScriptScriptAsyncFunction(functionData);
+                                        for (var i = 0; i < internals.Length; ++i) {
+                                            var internalIndex = internals[i];
+                                            function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                        }
+                                        stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                        stackObjects[stackIndex].scriptValue = function;
+                                        continue;
+                                    }
+                                    case Opcode.NewAsyncLambdaFunction: {
+                                        var functionData = constContexts[opvalue];
+                                        var internals = functionData.m_FunctionData.internals;
+                                        var function = new ScriptScriptAsyncBindFunction(functionData, thisObject);
+                                        for (var i = 0; i < internals.Length; ++i) {
+                                            var internalIndex = internals[i];
+                                            function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                        }
+                                        stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                        stackObjects[stackIndex].scriptValue = function;
+                                        continue;
+                                    }
+                                    case Opcode.NewAsyncType: {
+                                        var classData = constClasses[opvalue];
+                                        var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
+                                        var className = constString[classData.name];
+                                        var type = new ScriptType(className, parentType.valueType == ScriptValue.nullValueType ? m_script.TypeObjectValue : parentType);
+                                        var functions = classData.functions;
+                                        for (var j = 0; j < functions.Length; ++j) {
+                                            var func = functions[j];
+                                            var functionData = constContexts[func & 0xffffffff >> 1];
+                                            var async = (func & 1) == 1;
+                                            var internals = functionData.m_FunctionData.internals;
+                                            if ((func & 1) == 1) {
+                                                var function = new ScriptScriptAsyncFunction(functionData);
+                                                for (var i = 0; i < internals.Length; ++i) {
+                                                    var internalIndex = internals[i];
+                                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                                }
+                                                type.SetValue(constString[func >> 32], new ScriptValue(function));
+                                            } else {
+                                                var function = new ScriptScriptFunction(functionData);
+                                                for (var i = 0; i < internals.Length; ++i) {
+                                                    var internalIndex = internals[i];
+                                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                                }
+                                                type.SetValue(constString[func >> 32], new ScriptValue(function));
+                                            }
+                                        }
+                                        stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                        stackObjects[stackIndex].scriptValue = type;
+                                        continue;
+                                    }
                                     default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
                         }
                     }
+#if !EXECUTE_COROUTINE
                     --VariableValueIndex;
+#endif
                     //正常执行命令到最后,判断堆栈是否清空 return 或 exception 不判断
                     Logger.debug(stackIndex != -1, "堆栈数据未清空，有泄露情况 : " + stackIndex);
-                //主动throw的情况
+#if !EXECUTE_COROUTINE
+                    //主动throw的情况
                 } catch (ScriptException e) {
                     if (tryIndex > -1) {
                         stackObjects[stackIndex = 0] = e.value;
@@ -1509,6 +1606,11 @@ namespace Scorpio.Runtime {
                 throw;
             }
             return ScriptValue.Null;
+#else
+            } finally {
+                --VariableValueIndex;
+            }
+#endif
         }
     }
 }
