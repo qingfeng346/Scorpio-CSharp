@@ -6,8 +6,8 @@ function sleep1(seconds) {
     })
 }
 function sleep2(seconds) {
-    //coroutine.callBack 回调, 调用 coroutine.done 时跳出
-    var ret = coroutine.callBack()
+    //coroutine.epoll 回调, 调用 coroutine.done 时跳出
+    var ret = coroutine.epoll()
     done(ret, seconds)
     return ret 
 }
