@@ -16,6 +16,7 @@ public class Example2 : MonoBehaviour {
     private int width;
     private int height;
     private int windowHeight;
+	private Script script;
     void Awake()
     {
         width = Screen.width;
@@ -30,9 +31,10 @@ public class Example2 : MonoBehaviour {
         PlayerPrefs.SetString("__Text", text);
         if (GUI.Button(new Rect(0, windowHeight, width, 90), "RunScript (" + Version.version + ")")) {
 			output = "";
-			Script script = new Script();
+			script = new Script();
 			try {
                 script.LoadLibraryV1();
+				script.CoroutineProcessor = new CoroutineProcessor();
                 TypeManager.PushAssembly(GetType().Assembly);
                 TypeManager.PushAssembly(typeof(GameObject).Assembly);
 				TypeManager.PushAssembly(typeof(UnityEngine.UI.SpriteState).Assembly);
@@ -45,6 +47,11 @@ public class Example2 : MonoBehaviour {
 			}
 		}
         GUI.TextArea(new Rect(0, windowHeight + 90, width, windowHeight), output);
+	}
+	void Update() {
+		if (script != null) {
+			script.UpdateCoroutine();
+		}
 	}
 	private void OnLogCallback(string condition, string stackTrace, LogType type) {
 		OutPut (condition);

@@ -2,7 +2,7 @@ function sleep1(seconds) {
     var end = io.unixNow() + seconds * 1000
     //coroutine.poll 轮询,返回true时跳出
     return coroutine.poll(function() {
-        return io.unixNow() > end
+        return io.unixNow() >= end
     })
 }
 function sleep2(seconds) {

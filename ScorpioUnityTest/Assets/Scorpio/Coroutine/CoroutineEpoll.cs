@@ -1,5 +1,5 @@
 ﻿namespace Scorpio.Coroutine {
-    internal class CoroutineCallback : ICoroutine {
+    internal class CoroutineEpoll : ICoroutine {
         public void Done() {
             IsDone = true;
         }

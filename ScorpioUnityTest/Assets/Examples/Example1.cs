@@ -29,6 +29,7 @@ public class Example1 : MonoBehaviour {
     public GameObject Button;
 	public InputField Input;
 	public Text Output;
+	private Script script;
 	void Awake() {
 #if UNITY_EDITOR
 		if (Directory.Exists("../ExampleScripts")) {
@@ -76,9 +77,10 @@ public class Example1 : MonoBehaviour {
 	}
 	public void OnClickRunScript() {
         Output.text = "";
-		Script script = new Script();
+		script = new Script();
 		try {
 			script.LoadLibraryV1();
+			script.CoroutineProcessor = new CoroutineProcessor();
 			TypeManager.PushAssembly(GetType().Assembly);
 			TypeManager.PushAssembly(typeof(GameObject).Assembly);
 			script.SetGlobal("print", script.CreateFunction(new ScriptPrint()));
@@ -88,6 +90,11 @@ public class Example1 : MonoBehaviour {
 			OutPut("=====================");
 			OutPut("StackInfo : " + script.GetStackInfo());
 			OutPut(e.ToString());
+		}
+	}
+	void Update() {
+		if (script != null) {
+			script.UpdateCoroutine();
 		}
 	}
     public void OnClickClear() {

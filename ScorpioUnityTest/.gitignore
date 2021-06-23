@@ -5,3 +5,5 @@
 /Library
 /ScorpioTest.sln
 /Temp
+/*.sln
+/Packages/packages-lock.json

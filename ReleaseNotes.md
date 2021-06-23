@@ -1,3 +1,13 @@
+### v2.1.0
+*2021-06-23*
+### 新增功能
+* 支持宏定义语法
+* 支持协程 [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/%E5%8D%8F%E7%A8%8B.sco)
+    * 需在主线程调用 script.UpdateCoroutine()
+    * 扩展协程类型请重载 ICoroutineProcessor [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/tree/v2.0/ScorpioUnityTest/Assets/Scripts/CoroutineProcessor.cs)
+### BUG修复
+* 修复 _G foreach 问题
+
 ### v2.0.14
 *2021-05-11*
 ### 优化修改
@@ -94,7 +104,7 @@
 ### v2.0.4
 *2020-02-28*
 ### 新增功能
-* 增加 try catch throw 语法 [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/trycatch.sco)
+* 增加 try catch throw 语法 [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/trycatch.sco)
 * 增加编译时排除某个全局函数的接口, 命令行参数 --ignore(-g)
 ### 优化修改
 * importExtension 引入扩展函数, **this**类型的的子类没有引入的问题
@@ -149,8 +159,8 @@
 ### v2.0.0_preview11
 *2019-08-08*
 ### 新增功能
-* 增加 赋值操作返回值(重要) [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.sco)
-* 增加 函数参数展开传递(重要) [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/%E5%87%BD%E6%95%B0.sco)
+* 增加 赋值操作返回值(重要) [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95.sco)
+* 增加 函数参数展开传递(重要) [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/%E5%87%BD%E6%95%B0.sco)
 * 增加 同时申请多个局部变量 例如 : var a,b,c,d
 * 增加 createArray 函数, 快速创建一个 c# 数组
 * Array 类增加 push 函数, 功能同 add
@@ -186,7 +196,7 @@
 * **Map** 原表增加函数 **forEach forEachValue**
 * **Array Map** **forEach** 函数, 返回 **false** 则停止循环
 * **math** 库增加三角函数 **sin sinh asin cos cosh acos tan tanh atan**
-* **lambada**表达式申请的funstion, this继承父级 [脚本示例](https://github.com/qingfeng346/Scorpio-CSharp/blob/master/ExampleScripts/%E5%87%BD%E6%95%B0.sco)
+* **lambada**表达式申请的funstion, this继承父级 [脚本示例](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/%E5%87%BD%E6%95%B0.sco)
 * 快速反射 支持 **op_Implicit** 函数
 * 快速反射 修复构造函数 有 **ref out** 时 生成出错
 * 修改 **class** 定义方式，支持动态定义 **class** [脚本示例](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/class%E8%AF%AD%E6%B3%95.sco)

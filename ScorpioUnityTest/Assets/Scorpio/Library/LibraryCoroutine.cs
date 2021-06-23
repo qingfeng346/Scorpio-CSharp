@@ -8,7 +8,7 @@ namespace Scorpio.Library {
             map.SetValue("stop", script.CreateFunction(new stop()));
             map.SetValue("stopAll", script.CreateFunction(new stopAll(script)));
             map.SetValue("poll", script.CreateFunction(new poll()));
-            map.SetValue("callBack", script.CreateFunction(new callBack()));
+            map.SetValue("epoll", script.CreateFunction(new epoll()));
             map.SetValue("done", script.CreateFunction(new done()));
             script.SetGlobal("coroutine", new ScriptValue(map));
         }
@@ -49,14 +49,14 @@ namespace Scorpio.Library {
                 return new ScriptValue(new CoroutinePoll(args[0]));
             }
         }
-        private class callBack : ScorpioHandle {
+        private class epoll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(new CoroutineCallback());
+                return new ScriptValue(new CoroutineEpoll());
             }
         }
         private class done : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var coroutineCallback = args[0].Value as CoroutineCallback;
+                var coroutineCallback = args[0].Value as CoroutineEpoll;
                 if (coroutineCallback != null) {
                     coroutineCallback.Done();
                 }
