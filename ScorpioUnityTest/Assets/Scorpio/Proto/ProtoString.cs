@@ -10,6 +10,8 @@ namespace Scorpio.Proto {
             ret.SetValue("join", script.CreateFunction(new join()));
             ret.SetValue("fromCharCode", script.CreateFunction(new fromCharCode()));
             ret.SetValue("toCharCode", script.CreateFunction(new toCharCode(script)));
+            ret.SetValue("isInterned", script.CreateFunction(new isInterned()));
+            ret.SetValue("intern", script.CreateFunction(new intern()));
 
             ret.SetValue("length", script.CreateFunction(new length()));
             ret.SetValue("count", script.CreateFunction(new length()));
@@ -37,7 +39,6 @@ namespace Scorpio.Proto {
             ret.SetValue("compareTo", script.CreateFunction(new compareTo()));
             ret.SetValue("sub", script.CreateFunction(new sub()));
             ret.SetValue("split", script.CreateFunction(new split(script)));
-
             return ret;
         }
         private class length : ScorpioHandle {
@@ -301,6 +302,16 @@ namespace Scorpio.Proto {
                 } else {
                     return new ScriptValue(str[0]);
                 }
+            }
+        }
+        private class isInterned : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(string.IsInterned(args[0].ToString()));
+            }
+        }
+        private class intern : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(string.Intern(args[0].ToString()));
             }
         }
     }

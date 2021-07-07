@@ -3,12 +3,24 @@ namespace Scorpio.Proto {
     public class ProtoObject {
         public static ScriptType Load(Script script, ScriptType ret) {
             ret.SetValue("toString", script.CreateFunction(new toString()));
+            ret.SetValue("getHashCode", script.CreateFunction(new getHashCode()));
+            ret.SetValue("referenceEquals", script.CreateFunction(new referenceEquals()));
             ret.SetValue("instanceOf", script.CreateFunction(new instanceOf(script)));
             return ret;
         }
         private class toString : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(thisObject.ToString());
+            }
+        }
+        private class getHashCode : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(thisObject.GetHashCode());
+            }
+        }
+        private class referenceEquals : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return object.ReferenceEquals(thisObject.Value, args[0].Value) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class instanceOf : ScorpioHandle {
