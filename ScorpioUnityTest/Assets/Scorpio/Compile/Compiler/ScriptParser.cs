@@ -280,19 +280,34 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 解析var关键字 </summary>
         void ParseVar() {
-            m_scriptExecutable.AddIndex(ReadIdentifier());
-            while (true) {
-                switch (PeekToken().Type) {
-                    case TokenType.Comma: {
-                        ReadToken();
-                        m_scriptExecutable.AddIndex(ReadIdentifier());
-                        break;
+            //多返回值
+            if (PeekToken().Type == TokenType.LeftBrace) {
+                ReadToken();
+                var Returns = new List<string>();
+                Returns.Add(ReadIdentifier());
+                while (PeekToken().Type == TokenType.Comma) {
+                    ReadToken();
+                    Returns.Add(ReadIdentifier());
+                }
+                ReadRightBrace();
+                Returns.ForEach((value) => { m_scriptExecutable.AddIndex(value); });
+                ReadAssign();
+                PushObject(new CodeMultipleReturn(GetSourceLine()) { Returns = Returns, Value = GetOneObject() });
+            } else {
+                m_scriptExecutable.AddIndex(ReadIdentifier());
+                while (true) {
+                    switch (PeekToken().Type) {
+                        case TokenType.Comma: {
+                            ReadToken();
+                            m_scriptExecutable.AddIndex(ReadIdentifier());
+                            break;
+                        }
+                        case TokenType.Assign: {
+                            UndoToken();
+                            return;
+                        }
+                        default: return;
                     }
-                    case TokenType.Assign: {
-                        UndoToken();
-                        return;
-                    }
-                    default: return;
                 }
             }
         }
@@ -961,6 +976,15 @@ namespace Scorpio.Compile.Compiler {
                 }
                 case CodeAssign assign: {
                     PushAssign(assign);
+                    break;
+                }
+                case CodeMultipleReturn multipleReturn: {
+                    PushObject(multipleReturn.Value);
+                    foreach (var key in multipleReturn.Returns) {
+                        AddScriptInstructionWithoutValue(Opcode.CopyStackTop);
+                        AddScriptInstruction(Opcode.LoadValueString, GetConstString(key));
+                        AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.GetIndex(key));
+                    }
                     break;
                 }
                 default: throw new ParserException(this, "不支持的语法 : " + obj);

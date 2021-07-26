@@ -120,5 +120,10 @@ namespace Scorpio.Compile.Compiler {
             if (token.Type != TokenType.Catch)
                 throw new ParserException(this, "Catch 'catch' expected.", token);
         }
+        void ReadAssign() {
+            Token token = ReadToken();
+            if (token.Type != TokenType.Assign)
+                throw new ParserException(this, "Catch '=' expected.", token);
+        }
     }
 }
