@@ -1,3 +1,11 @@
+### v2.2.0
+*2021-07-27*
+## 新增功能
+* 支持多变量赋值 [示例参考](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/%E5%A4%9A%E8%BF%94%E5%9B%9E%E5%80%BC.sco)
+    * 暂不支持全局变量
+* Object 增加类函数 getHashCode
+* Object 增加静态函数 referenceEquals
+
 ### v2.1.0
 *2021-06-23*
 ### 新增功能
