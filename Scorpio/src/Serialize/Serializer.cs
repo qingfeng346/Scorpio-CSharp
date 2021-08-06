@@ -11,7 +11,8 @@ namespace Scorpio.Serialize {
             for (var i = 0; i < parser.ConstString.Count; ++i) {
                 constString[i] = string.Intern(parser.ConstString[i]);
             }
-            return new SerializeData(parser.ConstDouble.ToArray(),
+            return new SerializeData(breviary, 
+                                        parser.ConstDouble.ToArray(),
                                         parser.ConstLong.ToArray(),
                                         constString,
                                         context,

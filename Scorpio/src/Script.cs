@@ -14,15 +14,17 @@ namespace Scorpio {
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
-        /// <summary> 文本默认编码格式 </summary>
-        public static readonly Encoding UTF8 = Encoding.UTF8;
         private const string Undefined = "Undefined";                   //Undefined
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
         private const string GLOBAL_ARGS = "_ARGS";                     //命令行参数
-        private List<string> m_SearchPath = new List<string>();         //request所有文件的路径集合
 
+
+        /// <summary> 按文本读取时,文本文件的编码 </summary>
+        public Encoding Encoding { get; set; }
+        /// <summary> request文件的搜索路径集合 </summary>
+        private List<string> m_SearchPath = new List<string>();
 
         /// <summary> 所有类型的基类 </summary>
         public ScriptType TypeObject { get; private set; }
@@ -65,6 +67,7 @@ namespace Scorpio {
         public int MainThreadId { get; private set; }
 
         public Script() {
+            Encoding = Encoding.UTF8;
             Global = new ScriptGlobal();
             
             TypeObject = new ScriptTypeObject(this, "Object");
@@ -169,7 +172,7 @@ namespace Scorpio {
         /// <summary> 创建一个Function </summary>
         /// <param name="value">ScorpioHandle</param>
         public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }
-
+        /// <summary> 创建一个 Instance </summary>
         public ScriptInstance CreateInstance() {
             return new ScriptInstance(ObjectType.Type, TypeObjectValue);
         }
@@ -188,29 +191,64 @@ namespace Scorpio {
         public ScriptValue Call(string name, ScriptValue[] args, int length) {
             return Global.GetValue(name).Call(ScriptValue.Null, args, length);
         }
+
+
+        /// <summary> 使用字符串方式加载文件 </summary>
+        public ScriptValue LoadFileByString(string fileName) {
+            using (var stream = File.OpenRead(fileName)) {
+                return LoadStreamByString(fileName, stream, (int)stream.Length);
+            }
+        }
+        /// <summary> 使用字节码方式加载文件 </summary>
+        public ScriptValue LoadFileByIL(string fileName) {
+            using (var stream = File.OpenRead(fileName)) {
+                return LoadStreamByIL(stream);
+            }
+        }
+        /// <summary> 使用字符串方式二进制 </summary>
+        public ScriptValue LoadBufferByString(string breviary, byte[] buffer) {
+            return LoadBufferByString(breviary, buffer, 0, buffer.Length);
+        }
+        /// <summary> 使用字符串方式二进制 </summary>
+        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int offset, int count) {
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, offset, count), null, null));
+        }
+        /// <summary> 使用字节码方式二进制 </summary>
+        public ScriptValue LoadBufferByIL(byte[] buffer) {
+            return LoadBufferByIL(buffer, 0, buffer.Length);
+        }
+        /// <summary> 使用字节码方式二进制 </summary>
+        public ScriptValue LoadBufferByIL(byte[] buffer, int offset, int count) {
+            using (var stream = new MemoryStream(buffer, offset, count)) {
+                return LoadStreamByIL(stream);
+            }
+        }
+        /// <summary> 使用字符串方式加载流 </summary>
+        public ScriptValue LoadStreamByString(string breviary, Stream stream, int count) {
+            var buffer = new byte[count];
+            stream.Read(buffer, 0, count);
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null));
+        }
+        /// <summary> 使用字节码方式加载流 </summary>
+        public ScriptValue LoadStreamByIL(Stream stream) {
+            return Execute(Deserializer.Deserialize(stream));
+        }
+
+
         /// <summary> 加载一个文件 </summary>
         /// <param name="fileName">文件路径</param>
         /// <returns>返回值</returns>
         public ScriptValue LoadFile(string fileName) {
-            return LoadFile(fileName, UTF8);
-        }
-        /// <summary> 加载一个文件 </summary>
-        /// <param name="fileName">文件路径</param>
-        /// <param name="encoding">文件编码</param>
-        /// <returns>返回值</returns>
-        public ScriptValue LoadFile(string fileName, Encoding encoding) {
             using (var stream = File.OpenRead(fileName)) {
-                var length = stream.Length;
-                var buffer = new byte[length];
-                stream.Read(buffer, 0, buffer.Length);
-                return LoadBuffer(fileName, buffer, encoding);
+                return LoadStreamAuto(fileName, stream, (int)stream.Length);
             }
         }
         /// <summary> 加载一段文本 </summary>
+        /// <param name="breviary">摘要</param>
         /// <param name="buffer">文本内容</param>
         /// <returns>返回值</returns>
         public ScriptValue LoadString(string buffer) {
-            return LoadString(Undefined, buffer);
+            return LoadString(null, buffer);
         }
         /// <summary> 加载一段文本 </summary>
         /// <param name="breviary">摘要</param>
@@ -218,41 +256,89 @@ namespace Scorpio {
         /// <returns>返回值</returns>
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(breviary, Serializer.Serialize(breviary, buffer, null, null));
+            return Execute(Serializer.Serialize(breviary, buffer, null, null));
         }
         /// <summary> 加载一段数据 </summary>
+        /// <param name="breviary">摘要</param>
         /// <param name="buffer">数据内容</param>
-        /// <returns>返回值</returns>
         public ScriptValue LoadBuffer(byte[] buffer) {
-            return LoadBuffer(Undefined, buffer, UTF8);
+            return LoadBuffer(null, buffer);
         }
         /// <summary> 加载一段数据 </summary>
         /// <param name="breviary">摘要</param>
         /// <param name="buffer">数据内容</param>
-        /// <returns>返回值</returns>
         public ScriptValue LoadBuffer(string breviary, byte[] buffer) {
-            return LoadBuffer(breviary, buffer, UTF8);
+            return LoadBufferAuto(breviary, buffer);
         }
         /// <summary> 加载一段数据 </summary>
         /// <param name="breviary">摘要</param>
         /// <param name="buffer">数据内容</param>
-        /// <param name="encoding">如果数据内容时文本时,文本的编码类型</param>
-        /// <returns>返回值</returns>
-        public ScriptValue LoadBuffer(string breviary, byte[] buffer, Encoding encoding) {
-            if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            if (buffer[0] == 0)
-                return Execute(breviary, Deserializer.Deserialize(buffer));
-            else
-                return Execute(breviary, Serializer.Serialize(breviary, encoding.GetString(buffer, 0, buffer.Length), null, null));
+        public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count) {
+            return LoadBufferAuto(breviary, buffer, index, count);
         }
-        public ScriptValue Execute(string breviary, SerializeData data) {
+        /// <summary> 加载一段数据,自动判断数据类型 </summary>
+        /// <param name="breviary">摘要</param>
+        /// <param name="buffer">数据内容</param>
+        public ScriptValue LoadBufferAuto(string breviary, byte[] buffer) {
+            return LoadBufferAuto(breviary, buffer, 0, buffer.Length);
+        }
+        /// <summary> 加载一段数据,自动判断数据类型 </summary>
+        /// <param name="breviary">摘要</param>
+        /// <param name="buffer">数据内容</param>
+        public ScriptValue LoadBufferAuto(string breviary, byte[] buffer, int index, int count) {
+            if (count - index < 2) { return ScriptValue.Null; }
+            if (buffer[index] == 0 && buffer[index + 1] == 0) {
+                using (var stream = new MemoryStream(buffer, index, count)) {
+                    return Execute(Deserializer.Deserialize(stream));
+                }
+            } else if (buffer[index] == 0) {
+                using (var stream = new MemoryStream(buffer, index, count)) {
+                    return Execute(Deserializer.DeserializeV1(breviary, stream));
+                }
+            } else {
+                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null));
+            }
+        }
+        /// <summary> 加载一段数据,自动判断数据类型 </summary>
+        /// <param name="breviary">摘要</param>
+        /// <param name="buffer">数据内容</param>
+        public ScriptValue LoadStreamAuto(string breviary, Stream stream, int count) {
+            var position = stream.Position;
+            var buffer = new byte[2];
+            stream.Read(buffer, 0, 2);
+            stream.Position = position;
+            if (buffer[0] == 0 && buffer[1] == 0) {
+                return Execute(Deserializer.Deserialize(stream));
+            } else if (buffer[0] == 0) {
+                return Execute(Deserializer.DeserializeV1(breviary, stream));
+            } else {
+                buffer = new byte[count];
+                stream.Read(buffer, 0, count);
+                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null));
+            }
+        }
+        /// <summary> 执行IL </summary>
+        public ScriptValue Execute(SerializeData data) {
             var contexts = new ScriptContext[data.Functions.Length];
             for (int i = 0; i < data.Functions.Length; ++i) {
-                contexts[i] = new ScriptContext(this, breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+                contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
             }
-            return new ScriptContext(this, breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
+            return new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
         }
-
+        /// <summary> 执行IL </summary>
+        public ScriptValue Execute(SerializeData[] datas) {
+            ScriptValue result = ScriptValue.Null;
+            int length = datas.Length;
+            for (var j = 0; j < length; ++j) {
+                SerializeData data = datas[j];
+                var contexts = new ScriptContext[data.Functions.Length];
+                for (int i = 0; i < data.Functions.Length; ++i) {
+                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+                }
+                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
+            }
+            return result;
+        }
 
 #if SCORPIO_DEBUG || SCORPIO_STACK
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息

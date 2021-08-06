@@ -112,11 +112,11 @@ namespace ScorpioExec {
             var output = perform.GetPath (ParameterOutput);
             var ignore = command.GetValueDefault (ParameterIgnore, "");
             var define = command.GetValueDefault (ParameterDefine, "");
-            File.WriteAllBytes (output, Serializer.Serialize (
-                source, 
-                FileUtil.GetFileString (source), 
-                ignore.Split (";"), 
-                define.Split(";")).ToArray ());
+            //File.WriteAllBytes (output, Serializer.Serialize (
+            //    source, 
+            //    FileUtil.GetFileString (source), 
+            //    ignore.Split (";"), 
+            //    define.Split(";")).ToArray ());
             Logger.info ($"生成IL文件  {source} -> {output}");
         }
         static void Fast (CommandLine command, string[] args) {
