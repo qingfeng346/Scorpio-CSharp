@@ -428,7 +428,7 @@ namespace Scorpio.Library {
                 m_script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return m_script.LoadSearchPathFile(args[0].ToString());
+                return m_script.LoadFile(args[0].ToString());
             }
         }
         private class pushSearch : ScorpioHandle {

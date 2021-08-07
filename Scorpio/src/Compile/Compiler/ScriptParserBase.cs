@@ -1,22 +1,40 @@
-using System;
+using System.IO;
 using System.Collections.Generic;
 using Scorpio.Compile.Exception;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
     public partial class ScriptParser {
+        private readonly string[] EmptyArrayString = new string[0];
         private Token[] m_listTokens;           //token列表
         private int m_indexToken;               //当前读到token
         private string[] ignoreFunctions;       //编译忽略的全局函数
-        private HashSet<string> defines;        //define
-        public ScriptParser(Token[] listTokens, string strBreviary, string[] ignoreFunctions, string[] defines) {
-            this.Breviary = strBreviary;
-            this.m_listTokens = listTokens;
-            this.ignoreFunctions = ignoreFunctions;
-            this.defines = new HashSet<string>();
-            if (defines != null) { this.defines.UnionWith(defines); }
+        private string[] defines;               //defines
+        private string[] searchPaths;           //searchPaths
+        private HashSet<string> allDefines;     //本文件的所有define
+        public List<ScriptParser> parsers;
+        public ScriptParser(ScriptLexer lexer, string[] ignoreFunctions, string[] defines, string[] searchPaths, List<ScriptParser> parsers) {
+            this.m_listTokens = lexer.GetTokens().ToArray();
+            this.Breviary = lexer.Breviary;
+            this.ignoreFunctions = ignoreFunctions ?? EmptyArrayString;
+            this.defines = defines ?? EmptyArrayString;
+            this.searchPaths = searchPaths ?? EmptyArrayString;
+            this.parsers = parsers;
+            this.allDefines = new HashSet<string>(this.defines);
         }
         /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }
+        string SearchFile(string fileName) {
+            if (File.Exists(fileName)) {
+                return fileName;
+            }
+            for (int i = 0; i < searchPaths.Length; ++i) {
+                string file = Path.Combine(searchPaths[i], fileName);
+                if (File.Exists(file)) {
+                    return file;
+                }
+            }
+            return null;
+        }
         /// <summary> 是否还有更多需要解析的语法 </summary>
         bool HasMoreTokens() {
             return m_indexToken < m_listTokens.Length;
@@ -58,6 +76,13 @@ namespace Scorpio.Compile.Compiler {
             Token token = ReadToken();
             if (token.Type != TokenType.Identifier)
                 throw new ParserException(this, "Identifier expected.", token);
+            return token.Lexeme.ToString();
+        }
+        /// <summary> 读取 字符串 </summary>
+        string ReadString() {
+            Token token = ReadToken();
+            if (token.Type != TokenType.String)
+                throw new ParserException(this, "String expected.", token);
             return token.Lexeme.ToString();
         }
         /// <summary> 读取 { </summary>
@@ -120,6 +145,7 @@ namespace Scorpio.Compile.Compiler {
             if (token.Type != TokenType.Catch)
                 throw new ParserException(this, "Catch 'catch' expected.", token);
         }
+        /// <summary> 读取 = </summary>
         void ReadAssign() {
             Token token = ReadToken();
             if (token.Type != TokenType.Assign)

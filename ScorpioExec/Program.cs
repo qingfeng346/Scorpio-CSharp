@@ -23,7 +23,8 @@ namespace ScorpioExec {
 编译生成sco的IL文件
     --source|-s      (必填)脚本文本文件
     --output|-o      (必填)IL输出文件
-    --ignore|-g      (选填)忽略的全局函数列表,多函数使用分号;隔开";
+    --ignore|-g      (选填)忽略的全局函数列表,多函数使用分号;隔开
+    --search|-search (选填)#import 搜索路径列表,分号;隔开";
         private const string HelpFast = @"
 生成快速反射文件
     --class|-c       (必填)class完整名称,多class使用分号;隔开
@@ -54,6 +55,7 @@ namespace ScorpioExec {
         private readonly static string[] ParameterDll = new [] { "-d", "--dll", "-dll" };
         private readonly static string[] ParameterIgnore = new [] { "-i", "--ignore", "-ignore" };
         private readonly static string[] ParameterDefine = new[] { "--define", "-define" };
+        private readonly static string[] ParameterSearch = new[] { "--search", "-search" };
         private readonly static string[] ParameterFilter = new [] { "-f", "--filter", "-filter" };
         private readonly static string[] ParameterExtension = new [] { "-e", "--extension", "-extension" };
         private readonly static string[] ParameterCheck = new [] { "-c", "--check", "-check" };
@@ -112,11 +114,16 @@ namespace ScorpioExec {
             var output = perform.GetPath (ParameterOutput);
             var ignore = command.GetValueDefault (ParameterIgnore, "");
             var define = command.GetValueDefault (ParameterDefine, "");
-            //File.WriteAllBytes (output, Serializer.Serialize (
-            //    source, 
-            //    FileUtil.GetFileString (source), 
-            //    ignore.Split (";"), 
-            //    define.Split(";")).ToArray ());
+            var search = command.GetValueDefault (ParameterSearch, "");
+            var searchPaths = new List<string>(search.Split(";"));
+            searchPaths.Add(CurrentDirectory);
+            searchPaths.Add(Path.GetDirectoryName(source));
+            File.WriteAllBytes(output, Serializer.SerializeBytes(
+                source,
+                FileUtil.GetFileString(source),
+                ignore.Split(";"),
+                define.Split(";"),
+                searchPaths.ToArray()));
             Logger.info ($"生成IL文件  {source} -> {output}");
         }
         static void Fast (CommandLine command, string[] args) {
@@ -208,8 +215,7 @@ namespace ScorpioExec {
                         Logger.info ($"文件 : {file} 不存在");
                         return;
                     }
-                    var path = Path.GetDirectoryName (file);
-                    script.PushSearchPath (path);
+                    script.PushSearchPath (Path.GetDirectoryName(file));
                     script.PushSearchPath (CurrentDirectory);
                     var sArgs = new string[args.Length - 1];
                     Array.Copy(args, 1, sArgs, 0, sArgs.Length);

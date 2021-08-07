@@ -119,6 +119,9 @@ namespace Scorpio.Compile.Compiler {
         MacroElif,
         /// <summary> #endif </summary>
         MacroEndif,
+        /// <summary> #import </summary>
+        Import,
+
 
         /// <summary> for </summary>
         For,

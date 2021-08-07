@@ -5,9 +5,9 @@ using Scorpio.Instruction;
 namespace Scorpio.Tools {
     public class ScorpioWriter : BinaryWriter {
 #if NETSTANDARD
-        public ScorpioWriter(Stream stream) : base(stream, Encoding.UTF8, true) { }
+        public ScorpioWriter(Stream stream) : base(stream, Script.Encoding, true) { }
 #else
-        public ScorpioWriter(Stream stream) : base(stream) { }
+        public ScorpioWriter(Stream stream) : base(stream, Script.Encoding) { }
 #endif
         //public ScorpioWriter(Stream output) {
         //    m_stream = output;
@@ -45,7 +45,7 @@ namespace Scorpio.Tools {
             if (string.IsNullOrEmpty(value)) {
                 Write(0);
             } else {
-                var bytes = Encoding.UTF8.GetBytes(value);
+                var bytes = Script.Encoding.GetBytes(value);
                 Write(bytes.Length);
                 Write(bytes);
             }

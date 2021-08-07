@@ -5,9 +5,9 @@ using Scorpio.Instruction;
 namespace Scorpio.Tools {
     public class ScorpioReader : BinaryReader {
 #if NETSTANDARD
-        public ScorpioReader(Stream stream) : base(stream, Encoding.UTF8, true) { }
+        public ScorpioReader(Stream stream) : base(stream, Script.Encoding, true) { }
 #else
-        public ScorpioReader(Stream stream) : base(stream) { }
+        public ScorpioReader(Stream stream) : base(stream, Script.Encoding) { }
 #endif
         //private Stream m_stream;
         //private byte[] m_buffer;
@@ -74,7 +74,7 @@ namespace Scorpio.Tools {
         public override string ReadString() {
             var length = ReadInt32();
             if (length == 0) { return ""; }
-            return Encoding.UTF8.GetString(ReadBytes(length));
+            return Script.Encoding.GetString(ReadBytes(length));
         }
         public ScriptFunctionData ReadFunction() {
             var parameterCount = ReadInt32();

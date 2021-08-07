@@ -397,6 +397,9 @@ namespace Scorpio.Compile.Compiler {
                 case "#endif":
                     AddToken(TokenType.MacroEndif);
                     break;
+                case "#import":
+                    AddToken(TokenType.Import);
+                    break;
                 default:
                     ThrowInvalidCharacterException($"无法识别的宏命令 : {m_Builder}");
                     break;

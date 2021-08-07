@@ -1,31 +1,30 @@
+using System;
 using System.IO;
 using System.Text;
 using System.Reflection;
 using Scorpio.Instruction;
 using Scorpio.Exception;
-using System.Collections.Generic;
 using Scorpio.Function;
 using Scorpio.Library;
 using Scorpio.Runtime;
 using Scorpio.Proto;
 using Scorpio.Userdata;
 using Scorpio.Serialize;
+using Scorpio.Tools;
 namespace Scorpio {
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
-        private const string Undefined = "Undefined";                   //Undefined
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
         private const string GLOBAL_ARGS = "_ARGS";                     //命令行参数
-
-
         /// <summary> 按文本读取时,文本文件的编码 </summary>
-        public Encoding Encoding { get; set; }
-        /// <summary> request文件的搜索路径集合 </summary>
-        private List<string> m_SearchPath = new List<string>();
+        public static Encoding Encoding { get; set; } = Encoding.UTF8;
 
+
+        /// <summary> request文件的搜索路径集合 </summary>
+        private string[] m_SearchPaths;
         /// <summary> 所有类型的基类 </summary>
         public ScriptType TypeObject { get; private set; }
         public ScriptValue TypeObjectValue { get; private set; }
@@ -67,7 +66,7 @@ namespace Scorpio {
         public int MainThreadId { get; private set; }
 
         public Script() {
-            Encoding = Encoding.UTF8;
+            m_SearchPaths = new string[0];
             Global = new ScriptGlobal();
             
             TypeObject = new ScriptTypeObject(this, "Object");
@@ -125,16 +124,24 @@ namespace Scorpio {
         /// <summary> 压入一个搜索路径,使用 require 时会搜索此路径 </summary>
         /// <param name="path">绝对路径</param>
         public void PushSearchPath(string path) {
-            if (!m_SearchPath.Contains(path))
-                m_SearchPath.Add(path);
-        }
-        public ScriptValue LoadSearchPathFile(string fileName) {
-            for (int i = 0; i < m_SearchPath.Count; ++i) {
-                string file = m_SearchPath[i] + "/" + fileName;
-                if (File.Exists(file))
-                    return LoadFile(file);
+            if (!Array.Exists(m_SearchPaths, _ => _ == path)) {
+                var old = m_SearchPaths;
+                m_SearchPaths = new string[old.Length + 1];
+                Array.Copy(old, 0, m_SearchPaths, 0, old.Length);
+                m_SearchPaths[old.Length] = path;
             }
-            throw new ExecutionException($"require 找不到文件 : {fileName}");
+        }
+        public string SearchFile(string fileName) {
+            if (File.Exists(fileName)) { 
+                return fileName;
+            }
+            for (int i = 0; i < m_SearchPaths.Length; ++i) {
+                string file = Path.Combine(m_SearchPaths[i], fileName);
+                if (File.Exists(file)) {
+                    return file;
+                }
+            }
+            return null;
         }
         /// <summary> 设置一个全局变量 </summary>
         /// <param name="key">名字</param>
@@ -195,13 +202,21 @@ namespace Scorpio {
 
         /// <summary> 使用字符串方式加载文件 </summary>
         public ScriptValue LoadFileByString(string fileName) {
-            using (var stream = File.OpenRead(fileName)) {
+            var fullFileName = SearchFile(fileName);
+            if (fullFileName == null) {
+                throw new System.Exception($"can't found file : {fileName}");
+            }
+            using (var stream = File.OpenRead(fullFileName)) {
                 return LoadStreamByString(fileName, stream, (int)stream.Length);
             }
         }
         /// <summary> 使用字节码方式加载文件 </summary>
         public ScriptValue LoadFileByIL(string fileName) {
-            using (var stream = File.OpenRead(fileName)) {
+            var fullFileName = SearchFile(fileName);
+            if (fullFileName == null) {
+                throw new System.Exception($"can't found file : {fileName}");
+            }
+            using (var stream = File.OpenRead(fullFileName)) {
                 return LoadStreamByIL(stream);
             }
         }
@@ -211,7 +226,7 @@ namespace Scorpio {
         }
         /// <summary> 使用字符串方式二进制 </summary>
         public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int offset, int count) {
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, offset, count), null, null));
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, offset, count), null, null, m_SearchPaths));
         }
         /// <summary> 使用字节码方式二进制 </summary>
         public ScriptValue LoadBufferByIL(byte[] buffer) {
@@ -226,8 +241,8 @@ namespace Scorpio {
         /// <summary> 使用字符串方式加载流 </summary>
         public ScriptValue LoadStreamByString(string breviary, Stream stream, int count) {
             var buffer = new byte[count];
-            stream.Read(buffer, 0, count);
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null));
+            Util.ReadBytes(stream, buffer);
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null, m_SearchPaths));
         }
         /// <summary> 使用字节码方式加载流 </summary>
         public ScriptValue LoadStreamByIL(Stream stream) {
@@ -239,7 +254,11 @@ namespace Scorpio {
         /// <param name="fileName">文件路径</param>
         /// <returns>返回值</returns>
         public ScriptValue LoadFile(string fileName) {
-            using (var stream = File.OpenRead(fileName)) {
+            var fullFileName = SearchFile(fileName);
+            if (fullFileName == null) {
+                throw new System.Exception($"can't found file : {fileName}");
+            }
+            using (var stream = File.OpenRead(fullFileName)) {
                 return LoadStreamAuto(fileName, stream, (int)stream.Length);
             }
         }
@@ -256,7 +275,7 @@ namespace Scorpio {
         /// <returns>返回值</returns>
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(Serializer.Serialize(breviary, buffer, null, null));
+            return Execute(Serializer.Serialize(breviary, buffer, null, null, m_SearchPaths));
         }
         /// <summary> 加载一段数据 </summary>
         /// <param name="breviary">摘要</param>
@@ -296,7 +315,7 @@ namespace Scorpio {
                     return Execute(Deserializer.DeserializeV1(breviary, stream));
                 }
             } else {
-                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null));
+                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths));
             }
         }
         /// <summary> 加载一段数据,自动判断数据类型 </summary>
@@ -305,7 +324,7 @@ namespace Scorpio {
         public ScriptValue LoadStreamAuto(string breviary, Stream stream, int count) {
             var position = stream.Position;
             var buffer = new byte[2];
-            stream.Read(buffer, 0, 2);
+            Util.ReadBytes(stream, buffer);
             stream.Position = position;
             if (buffer[0] == 0 && buffer[1] == 0) {
                 return Execute(Deserializer.Deserialize(stream));
@@ -313,8 +332,8 @@ namespace Scorpio {
                 return Execute(Deserializer.DeserializeV1(breviary, stream));
             } else {
                 buffer = new byte[count];
-                stream.Read(buffer, 0, count);
-                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null));
+                Util.ReadBytes(stream, buffer);
+                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null, m_SearchPaths));
             }
         }
         /// <summary> 执行IL </summary>

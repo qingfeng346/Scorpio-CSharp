@@ -3,15 +3,22 @@ using Scorpio.Instruction;
 using Scorpio.Tools;
 namespace Scorpio.Serialize {
     public static class Deserializer {
-        public static SerializeData DeserializeV1(string breviary, byte[] data) {
+        [System.Obsolete]
+        public static SerializeData[] DeserializeV1(string breviary, byte[] data) {
             using (var stream = new MemoryStream(data)) {
                 return DeserializeV1(breviary, stream);
             }
         }
-        public static SerializeData DeserializeV1(string breviary, Stream stream) {
+        [System.Obsolete]
+        public static SerializeData[] DeserializeV1(string breviary, Stream stream) {
             using (var reader = new ScorpioReader(stream)) {
                 reader.ReadByte();
-                return new SerializeData(breviary).Deserialize(reader);
+                return new SerializeData[1] { new SerializeData(breviary).Deserialize(reader) };
+            }
+        }
+        public static SerializeData[] Deserialize(byte[] data) {
+            using (var stream = new MemoryStream(data)) {
+                return Deserialize(stream);
             }
         }
         public static SerializeData[] Deserialize(Stream stream) {

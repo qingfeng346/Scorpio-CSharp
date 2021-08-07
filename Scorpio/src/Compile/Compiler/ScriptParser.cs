@@ -1,8 +1,11 @@
+using System.IO;
+using System.Text;
 using System.Collections.Generic;
 using Scorpio.Compile.Exception;
 using Scorpio.Compile.CodeDom;
 using Scorpio.Compile.CodeDom.Temp;
 using Scorpio.Instruction;
+using Scorpio.Tools;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
     public partial class ScriptParser {
@@ -14,6 +17,7 @@ namespace Scorpio.Compile.Compiler {
         public List<double> ConstDouble { get; private set; } = new List<double>();                                         //所有的常量 double
         public List<long> ConstLong { get; private set; } = new List<long>();                                               //所有的常量 long
         public List<string> ConstString { get; private set; } = new List<string>();                                         //所有的常量 string
+        public ScriptFunctionData Context { get; private set; }                                                             //解析后主执行
         public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>();                   //定义的所有 function
         public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>();                           //定义的所有 class
         private Stack<List<ScriptInstructionCompiler>> m_Breaks = new Stack<List<ScriptInstructionCompiler>>();             //breaks
@@ -113,7 +117,22 @@ namespace Scorpio.Compile.Compiler {
             return m_scriptExecutable.AddScriptInstruction(opcode, 0, line == -1 ? PeekToken().SourceLine : line);
         }
         /// <summary> 解析脚本 </summary>
-        public ScriptFunctionData Parse() {
+        public ScriptParser Parse() {
+            ParseMacro();
+            ParseImport();
+            m_indexToken = 0;
+            var executable = ParseStatementContext();
+            Context = new ScriptFunctionData() {
+                                scriptInstructions = executable.ScriptInstructions,
+                                variableCount = executable.VariableCount,
+                                internalCount = executable.InternalCount,
+                                parameterCount = 0,
+                                param = false,
+                                internals = new int[0]};
+            return this;
+        }
+        /// <summary> 解析宏定义 </summary>
+        void ParseMacro() {
             m_indexToken = 0;
             var tokens = new List<Token>();
             while (HasMoreTokens()) {
@@ -142,16 +161,31 @@ namespace Scorpio.Compile.Compiler {
             if (m_listTokens.Length != tokens.Count) {
                 m_listTokens = tokens.ToArray();
             }
+        }
+        /// <summary> 解析 #import </summary>
+        void ParseImport() {
             m_indexToken = 0;
-            var executable = ParseStatementContext();
-            return new ScriptFunctionData() {
-                scriptInstructions = executable.ScriptInstructions,
-                variableCount = executable.VariableCount,
-                internalCount = executable.InternalCount,
-                parameterCount = 0,
-                param = false,
-                internals = new int[0],
-            };
+            var tokens = new List<Token>();
+            while (HasMoreTokens()) {
+                if (PeekToken().Type == TokenType.Import) {
+                    ReadToken();
+                    var fileName = ReadString();
+                    var fullFileName = SearchFile(fileName);
+                    if (fullFileName == null) {
+                        throw new ParserException(this, $"import not found file : {fileName}", PeekToken());
+                    }
+                    using (var stream = File.OpenRead(fullFileName)) {
+                        var buffer = new byte[stream.Length];
+                        Util.ReadBytes(stream, buffer);
+                        parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), ignoreFunctions, defines, searchPaths, parsers).Parse());
+                    }
+                } else {
+                    tokens.Add(ReadToken());
+                }
+            }
+            if (m_listTokens.Length != tokens.Count) {
+                m_listTokens = tokens.ToArray();
+            }
         }
         /// <summary> 解析整个文件 </summary>
         ScriptExecutable ParseStatementContext() { return ParseStatementBlock(ExecutableBlock.Context, false, true, TokenType.Finished); }
@@ -843,7 +877,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeCallFunction codeCallFunction: {
-                    if (ignoreFunctions != null) {
+                    {
                         var member = codeCallFunction.Member as CodeMemberString;
                         if (member != null && member.Parent == null && System.Array.Exists(ignoreFunctions, (func) => func == member.key)) {
                             PushObject(new CodeNativeObject(null, -1));
