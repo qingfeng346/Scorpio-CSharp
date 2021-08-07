@@ -1,5 +1,13 @@
 {
   "profiles": {
+    "run": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../test.sco"
+    },
+    "runil": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../test.il"
+    },
     "pack": {
       "commandName": "Project",
       "commandLineArgs": "pack -s ../../../test.sco -o ../../../test.il"
@@ -7,10 +15,6 @@
     "fast": {
       "commandName": "Project",
       "commandLineArgs": "fast --class ScorpioExec.TestStruct -extension ScorpioExec.TestClassEx -o ../../../ "
-    },
-    "run": {
-      "commandName": "Project",
-      "commandLineArgs": "../../../test.sco"
     },
     "version": {
       "commandName": "Project",
@@ -27,10 +31,6 @@
     "interface": {
       "commandName": "Project",
       "commandLineArgs": "interface --class ScorpioExec.TestInterface -o ../../../ "
-    },
-    "runil": {
-      "commandName": "Project",
-      "commandLineArgs": "../../../test.il"
     }
   }
 }

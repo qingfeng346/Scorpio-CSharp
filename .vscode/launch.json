@@ -16,6 +16,17 @@
             "stopAtEntry": false
         },
         {
+            "name": "runil",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/ScorpioExec/bin/Debug/net5.0/sco.dll",
+            "args": ["./test.il"],
+            "cwd": "${workspaceFolder}/ScorpioExec",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": "fast",
             "type": "coreclr",
             "request": "launch",
