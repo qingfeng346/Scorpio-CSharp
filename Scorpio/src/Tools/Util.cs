@@ -34,7 +34,7 @@ namespace Scorpio.Tools {
         public static void Assert(bool condition, string message, params object[] args) {
             if (!condition) throw new ExecutionException(string.Format(message, args));
         }
-        public static void ReadBytes(Stream stream, byte[] buffer) {
+        public static int ReadBytes(Stream stream, byte[] buffer) {
             int count = buffer.Length;
             int numRead = 0;
             do {
@@ -44,6 +44,7 @@ namespace Scorpio.Tools {
                 numRead += n;
                 count -= n;
             } while (count > 0);
+            return numRead;
         }
         //是否是不定参
         public static bool IsParams (ParameterInfo info) { return info.IsDefined (TYPE_PARAMATTRIBUTE, false); }
