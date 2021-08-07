@@ -259,7 +259,9 @@ namespace Scorpio {
                 throw new System.Exception($"can't found file : {fileName}");
             }
             using (var stream = File.OpenRead(fullFileName)) {
-                return LoadStreamAuto(fileName, stream, (int)stream.Length);
+                var buffer = new byte[stream.Length];
+                Util.ReadBytes(stream, buffer);
+                return LoadBufferAuto(fileName, buffer);
             }
         }
         /// <summary> 加载一段文本 </summary>
@@ -305,8 +307,7 @@ namespace Scorpio {
         /// <param name="breviary">摘要</param>
         /// <param name="buffer">数据内容</param>
         public ScriptValue LoadBufferAuto(string breviary, byte[] buffer, int index, int count) {
-            if (count - index < 2) { return ScriptValue.Null; }
-            if (buffer[index] == 0 && buffer[index + 1] == 0) {
+            if (count > 6 && buffer[index] == 0 && BitConverter.ToInt32(buffer, index + 1) == int.MaxValue) {
                 using (var stream = new MemoryStream(buffer, index, count)) {
                     return Execute(Deserializer.Deserialize(stream));
                 }
@@ -316,24 +317,6 @@ namespace Scorpio {
                 }
             } else {
                 return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths));
-            }
-        }
-        /// <summary> 加载一段数据,自动判断数据类型 </summary>
-        /// <param name="breviary">摘要</param>
-        /// <param name="buffer">数据内容</param>
-        public ScriptValue LoadStreamAuto(string breviary, Stream stream, int count) {
-            var position = stream.Position;
-            var buffer = new byte[2];
-            Util.ReadBytes(stream, buffer);
-            stream.Position = position;
-            if (buffer[0] == 0 && buffer[1] == 0) {
-                return Execute(Deserializer.Deserialize(stream));
-            } else if (buffer[0] == 0) {
-                return Execute(Deserializer.DeserializeV1(breviary, stream));
-            } else {
-                buffer = new byte[count];
-                Util.ReadBytes(stream, buffer);
-                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null, m_SearchPaths));
             }
         }
         /// <summary> 执行IL </summary>

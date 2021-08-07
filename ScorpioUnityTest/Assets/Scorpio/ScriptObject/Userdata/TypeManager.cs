@@ -98,6 +98,5 @@ namespace Scorpio.Userdata {
                 }
             }
         }
-        
     }
 }

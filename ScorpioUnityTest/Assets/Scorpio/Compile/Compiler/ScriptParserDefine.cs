@@ -23,7 +23,7 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> #define </summary>
         void ParseMacroDefine() {
-            defines.Add(ReadIdentifier());
+            allDefines.Add(ReadIdentifier());
         }
         void ParseMacroIf() {
             if (!IsDefine()) {
@@ -82,7 +82,7 @@ namespace Scorpio.Compile.Compiler {
         private bool IsDefine_impl(DefineObject define) {
             bool ret;
             if (define is DefineString) {
-                ret = defines.Contains((define as DefineString).Define);
+                ret = allDefines.Contains((define as DefineString).Define);
             } else {
                 DefineOperate oper = (DefineOperate)define;
                 bool left = IsDefine_impl(oper.Left);

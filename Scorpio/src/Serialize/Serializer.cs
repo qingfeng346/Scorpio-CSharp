@@ -40,8 +40,8 @@ namespace Scorpio.Serialize {
         public static byte[] SerializeBytes(string breviary, string buffer, string[] ignoreFunctions, string[] defines, string[] searchPaths) {
             using (var stream = new MemoryStream()) {
                 using (var writer = new ScorpioWriter(stream)) {
-                    writer.Write((byte)0);
-                    writer.Write((byte)0);
+                    writer.Write((byte)0);      //占位符
+                    writer.Write(int.MaxValue); //占位符
                     writer.Write((short)2);     //版本号
                     var datas = Serialize(breviary, buffer, ignoreFunctions, defines, searchPaths);
                     int length = datas.Length;

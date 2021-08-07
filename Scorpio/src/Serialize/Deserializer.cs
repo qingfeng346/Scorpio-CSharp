@@ -23,7 +23,8 @@ namespace Scorpio.Serialize {
         }
         public static SerializeData[] Deserialize(Stream stream) {
             using (var reader = new ScorpioReader(stream)) {
-                reader.ReadBytes(2);    //占位符
+                reader.ReadByte();      //占位符
+                reader.ReadInt32();     //占位符
                 reader.ReadInt16();     //version 解析版本号
                 var number = reader.ReadInt32();
                 var datas = new SerializeData[number];
