@@ -225,16 +225,16 @@ namespace Scorpio {
             return LoadBufferByString(breviary, buffer, 0, buffer.Length);
         }
         /// <summary> 使用字符串方式二进制 </summary>
-        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int offset, int count) {
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, offset, count), null, null, m_SearchPaths));
+        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int index, int count) {
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths));
         }
         /// <summary> 使用字节码方式二进制 </summary>
         public ScriptValue LoadBufferByIL(byte[] buffer) {
             return LoadBufferByIL(buffer, 0, buffer.Length);
         }
         /// <summary> 使用字节码方式二进制 </summary>
-        public ScriptValue LoadBufferByIL(byte[] buffer, int offset, int count) {
-            using (var stream = new MemoryStream(buffer, offset, count)) {
+        public ScriptValue LoadBufferByIL(byte[] buffer, int index, int count) {
+            using (var stream = new MemoryStream(buffer, index, count)) {
                 return LoadStreamByIL(stream);
             }
         }
@@ -249,10 +249,7 @@ namespace Scorpio {
             return Execute(Deserializer.Deserialize(stream));
         }
 
-
         /// <summary> 加载一个文件 </summary>
-        /// <param name="fileName">文件路径</param>
-        /// <returns>返回值</returns>
         public ScriptValue LoadFile(string fileName) {
             var fullFileName = SearchFile(fileName);
             if (fullFileName == null) {
@@ -261,52 +258,28 @@ namespace Scorpio {
             using (var stream = File.OpenRead(fullFileName)) {
                 var buffer = new byte[stream.Length];
                 Util.ReadBytes(stream, buffer);
-                return LoadBufferAuto(fileName, buffer);
+                return LoadBuffer(fileName, buffer);
             }
         }
         /// <summary> 加载一段文本 </summary>
-        /// <param name="breviary">摘要</param>
-        /// <param name="buffer">文本内容</param>
-        /// <returns>返回值</returns>
         public ScriptValue LoadString(string buffer) {
             return LoadString(null, buffer);
         }
         /// <summary> 加载一段文本 </summary>
-        /// <param name="breviary">摘要</param>
-        /// <param name="buffer">文本内容</param>
-        /// <returns>返回值</returns>
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
             return Execute(Serializer.Serialize(breviary, buffer, null, null, m_SearchPaths));
         }
         /// <summary> 加载一段数据 </summary>
-        /// <param name="breviary">摘要</param>
-        /// <param name="buffer">数据内容</param>
         public ScriptValue LoadBuffer(byte[] buffer) {
             return LoadBuffer(null, buffer);
         }
         /// <summary> 加载一段数据 </summary>
-        /// <param name="breviary">摘要</param>
-        /// <param name="buffer">数据内容</param>
         public ScriptValue LoadBuffer(string breviary, byte[] buffer) {
-            return LoadBufferAuto(breviary, buffer);
+            return LoadBuffer(breviary, buffer, 0, buffer.Length);
         }
         /// <summary> 加载一段数据 </summary>
-        /// <param name="breviary">摘要</param>
-        /// <param name="buffer">数据内容</param>
         public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count) {
-            return LoadBufferAuto(breviary, buffer, index, count);
-        }
-        /// <summary> 加载一段数据,自动判断数据类型 </summary>
-        /// <param name="breviary">摘要</param>
-        /// <param name="buffer">数据内容</param>
-        public ScriptValue LoadBufferAuto(string breviary, byte[] buffer) {
-            return LoadBufferAuto(breviary, buffer, 0, buffer.Length);
-        }
-        /// <summary> 加载一段数据,自动判断数据类型 </summary>
-        /// <param name="breviary">摘要</param>
-        /// <param name="buffer">数据内容</param>
-        public ScriptValue LoadBufferAuto(string breviary, byte[] buffer, int index, int count) {
             if (count > 6 && buffer[index] == 0 && BitConverter.ToInt32(buffer, index + 1) == int.MaxValue) {
                 using (var stream = new MemoryStream(buffer, index, count)) {
                     return Execute(Deserializer.Deserialize(stream));
