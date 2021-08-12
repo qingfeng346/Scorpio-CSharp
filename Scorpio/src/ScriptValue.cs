@@ -188,14 +188,14 @@ namespace Scorpio {
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);
                 case stringValueType: return new ScriptValue(stringValue[(int)key]);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Double : [{key}]");
             }
         }
         public ScriptValue GetValue(long key) {
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);
                 case stringValueType: return new ScriptValue(stringValue[(int)key]);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Long : [{key}]");
             }
         }
         public ScriptValue GetValue(object key) {
@@ -223,14 +223,14 @@ namespace Scorpio {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
             } else {
-                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 String : [{key}]");
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Double : [{key}]");
             }
         }
         public void SetValue(long key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
             } else {
-                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 String : [{key}]");
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Long : [{key}]");
             }
         }
         public void SetValue(object key, ScriptValue value) {
