@@ -14,10 +14,22 @@ namespace Scorpio {
         public override ScriptValue GetValue(string key) {
             return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
+        public override ScriptValue GetValue(double key) {
+            return m_Objects.TryGetValue(key, out var value) ? value : ScriptValue.Null;
+        }
+        public override ScriptValue GetValue(long key) {
+            return m_Objects.TryGetValue(key, out var value) ? value : ScriptValue.Null;
+        }
         public override ScriptValue GetValue(object key) {
             return m_Objects.TryGetValue(key, out var value) ? value : ScriptValue.Null;
         }
         public override void SetValue(string key, ScriptValue value) {
+            m_Objects[key] = value;
+        }
+        public override void SetValue(double key, ScriptValue value) {
+            m_Objects[key] = value;
+        }
+        public override void SetValue(long key, ScriptValue value) {
             m_Objects[key] = value;
         }
         public override void SetValue(object key, ScriptValue value) {

@@ -57,7 +57,7 @@ namespace ScorpioLibrary {
                 } else {
                     using (var stream = new MemoryStream()) {
                         ReadStream(request, stream);
-                        return new ScriptValue(stream.ToArray());
+                        return ScriptValue.CreateValue(stream.ToArray());
                     }
                 }
             }
@@ -75,7 +75,7 @@ namespace ScorpioLibrary {
                 if (length > 2 ) Parameters[2].Get<ScriptFunction>().call(ScriptValue.Null, request);
                 using (var stream = new MemoryStream()) {
                     ReadStream(request, stream);
-                    return new ScriptValue(stream.ToArray());
+                    return ScriptValue.CreateValue(stream.ToArray());
                 }
             }
         }

@@ -20,7 +20,7 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var enumerator = args[0].Value as IEnumerator;
                 if (enumerator != null) {
-                    return new ScriptValue(m_Script.StartCoroutine(enumerator));
+                    return ScriptValue.CreateValue(m_Script.StartCoroutine(enumerator));
                 }
                 return ScriptValue.Null;
             }
@@ -46,12 +46,12 @@ namespace Scorpio.Library {
         }
         private class poll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(new CoroutinePoll(args[0]));
+                return ScriptValue.CreateValue(new CoroutinePoll(args[0]));
             }
         }
         private class epoll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(new CoroutineEpoll());
+                return ScriptValue.CreateValue(new CoroutineEpoll());
             }
         }
         private class done : ScorpioHandle {

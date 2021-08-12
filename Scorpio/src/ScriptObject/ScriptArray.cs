@@ -91,19 +91,23 @@ namespace Scorpio {
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
         public IEnumerator<ScriptValue> GetIterator() { return new Enumerator(this); }
 
+        public override ScriptValue GetValue(double index) {
+            return this[(int)index];
+        }
+        public override ScriptValue GetValue(long index) {
+            return this[(int)index];
+        }
         public override ScriptValue GetValue(object index) {
-            var i = Convert.ToInt32(index);
-            if (i < 0) throw new ExecutionException($"Array.GetValue 索引小于0:{i}");
-            return i < m_Length ? m_Objects[i] : ScriptValue.Null;
+            return this[Convert.ToInt32(index)];
+        }
+        public override void SetValue(double index, ScriptValue value) {
+            this[(int)index] = value;
+        }
+        public override void SetValue(long index, ScriptValue value) {
+            this[(int)index] = value;
         }
         public override void SetValue(object index, ScriptValue value) {
-            var i = Convert.ToInt32(index);
-            if (i < 0) throw new ExecutionException($"Array.SetValue 索引小于0:{i}");
-            if (i >= m_Length) {
-                EnsureCapacity(i + 1);
-                m_Length = i + 1;
-            }
-            m_Objects[i] = value;
+            this[Convert.ToInt32(index)] = value;
         }
 
         public virtual ScriptValue this[int i] {
