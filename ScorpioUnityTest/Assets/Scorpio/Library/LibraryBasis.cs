@@ -401,9 +401,9 @@ namespace Scorpio.Library {
                 var type = args[0].Get<ScriptUserdataEnumType>();
                 if (args[1].valueType == ScriptValue.stringValueType) {
                     var ignoreCase = length > 2 ? args[2].valueType == ScriptValue.trueValueType : false;
-                    return new ScriptValue(Enum.Parse(type.Type, args[1].stringValue, ignoreCase));
+                    return ScriptValue.CreateValue(Enum.Parse(type.Type, args[1].stringValue, ignoreCase));
                 } else {
-                    return new ScriptValue(Enum.ToObject(type.Type, args[1].ToInt32()));
+                    return ScriptValue.CreateValue(Enum.ToObject(type.Type, args[1].ToInt32()));
                 }
             }
         }

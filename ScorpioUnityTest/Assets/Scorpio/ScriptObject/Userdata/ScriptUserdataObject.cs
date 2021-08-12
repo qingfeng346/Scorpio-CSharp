@@ -26,11 +26,37 @@ namespace Scorpio.Userdata {
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(m_Value, key, value);
         }
+        public override ScriptValue GetValue(double index) {
+            var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
+            if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
+            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
+            return ScriptValue.CreateValue(func.Call(false, m_Value, ScriptValue.Parameters, 1));
+        }
+        public override ScriptValue GetValue(long index) {
+            var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
+            if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
+            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
+            return ScriptValue.CreateValue(func.Call(false, m_Value, ScriptValue.Parameters, 1));
+        }
         public override ScriptValue GetValue(object index) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
             ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
             return ScriptValue.CreateValue(func.Call(false, m_Value, ScriptValue.Parameters, 1));
+        }
+        public override void SetValue(double index, ScriptValue value) {
+            var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);
+            if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] set ]运算符重载");
+            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
+            ScriptValue.Parameters[1] = value;
+            func.Call(false, m_Value, ScriptValue.Parameters, 2);
+        }
+        public override void SetValue(long index, ScriptValue value) {
+            var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);
+            if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] set ]运算符重载");
+            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
+            ScriptValue.Parameters[1] = value;
+            func.Call(false, m_Value, ScriptValue.Parameters, 2);
         }
         public override void SetValue(object index, ScriptValue value) {
             var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);

@@ -44,7 +44,7 @@ namespace Scorpio.Library {
         }
         private class readAll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(File.ReadAllBytes(args[0].ToString()));
+                return ScriptValue.CreateValue(File.ReadAllBytes(args[0].ToString()));
             }
         }
         private class writeAll : ScorpioHandle {
@@ -102,7 +102,7 @@ namespace Scorpio.Library {
                 var path = args[0].ToString();
                 var searchPattern = length > 1 ? args[1].ToString() : "*";
                 var searchOption = length > 2 ? (args[1].IsTrue ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly) : SearchOption.TopDirectoryOnly;
-                return new ScriptValue(Directory.GetFiles(path, searchPattern, searchOption));
+                return ScriptValue.CreateValue(Directory.GetFiles(path, searchPattern, searchOption));
             }
         }
         private class getPaths : ScorpioHandle {
@@ -110,7 +110,7 @@ namespace Scorpio.Library {
                 var path = args[0].ToString();
                 var searchPattern = length > 1 ? args[1].ToString() : "*";
                 var searchOption = length > 2 ? (args[1].IsTrue ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly) : SearchOption.TopDirectoryOnly;
-                return new ScriptValue(Directory.GetDirectories(path, searchPattern, searchOption));
+                return ScriptValue.CreateValue(Directory.GetDirectories(path, searchPattern, searchOption));
             }
         }
         private class workPath : ScorpioHandle {

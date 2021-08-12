@@ -9,18 +9,23 @@ namespace Scorpio {
                 Builder.Append(parameters[i]);
             }
         }
+        public override ScriptValue GetValue(double index) {
+            return new ScriptValue(Builder[(int)index]);
+        }
+        public override ScriptValue GetValue(long index) {
+            return new ScriptValue(Builder[(int)index]);
+        }
         public override ScriptValue GetValue(object index) {
-            if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
-                return new ScriptValue(Builder[Convert.ToInt32(index)]);
-            }
-            return base.GetValue(index);
+            return new ScriptValue(Builder[Convert.ToInt32(index)]);
+        }
+        public override void SetValue(double index, ScriptValue value) {
+            Builder[(int)index] = value.ToChar();
+        }
+        public override void SetValue(long index, ScriptValue value) {
+            Builder[(int)index] = value.ToChar();
         }
         public override void SetValue(object index, ScriptValue value) {
-            if (index is double || index is long || index is sbyte || index is byte || index is short || index is ushort || index is int || index is uint || index is float) {
-                Builder[Convert.ToInt32(index)] = value.ToChar();
-            } else {
-                base.SetValue(index, value);
-            }
+            Builder[Convert.ToInt32(index)] = value.ToChar();
         }
         public override string ToString() {
             return Builder.ToString();

@@ -1,4 +1,4 @@
-var tab = {
+var tab = @{
     function hello() {
 
     }

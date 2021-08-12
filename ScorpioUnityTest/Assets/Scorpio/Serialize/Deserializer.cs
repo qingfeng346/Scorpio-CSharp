@@ -23,8 +23,9 @@ namespace Scorpio.Serialize {
         }
         public static SerializeData[] Deserialize(Stream stream) {
             using (var reader = new ScorpioReader(stream)) {
-                reader.ReadBytes(2);    //Õ¼Î»·û
-                reader.ReadInt16();     //version ½âÎö°æ±¾ºÅ
+                reader.ReadByte();      //å ä½ç¬¦
+                reader.ReadInt32();     //å ä½ç¬¦
+                reader.ReadInt16();     //version è§£æç‰ˆæœ¬å·
                 var number = reader.ReadInt32();
                 var datas = new SerializeData[number];
                 for (var i = 0; i < number; ++i) {

@@ -66,9 +66,14 @@ namespace Scorpio.Tools {
                         if (type == TYPE_FLOAT) { return (float)value.doubleValue; }
                         if (type == TYPE_DOUBLE || type == TYPE_OBJECT) { return value.doubleValue; }
                         if (type == TYPE_LONG) { return (long)value.doubleValue; }
-                        if (type == TYPE_ULONG) { return (ulong)value.doubleValue; }
                         if (type.IsEnum) { return Enum.ToObject(type, (int)value.doubleValue); }
                         if (type == TYPE_STRING) { return value.doubleValue.ToString(); }
+                        if (type == TYPE_SBYTE) { return (sbyte)value.doubleValue; }
+                        if (type == TYPE_BYTE) { return (byte)value.doubleValue; }
+                        if (type == TYPE_SHORT) { return (short)value.doubleValue; }
+                        if (type == TYPE_USHORT) { return (ushort)value.doubleValue; }
+                        if (type == TYPE_UINT) { return (uint)value.doubleValue; }
+                        if (type == TYPE_ULONG) { return (ulong)value.doubleValue; }
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:DoubleNumber  target:{type}");
                 }
@@ -78,9 +83,14 @@ namespace Scorpio.Tools {
                         if (type == TYPE_FLOAT) { return (float)value.longValue; }
                         if (type == TYPE_LONG || type == TYPE_OBJECT) { return value.longValue; }
                         if (type == TYPE_DOUBLE) { return (double)value.longValue; }
-                        if (type == TYPE_ULONG) { return (ulong)value.longValue; }
                         if (type.IsEnum) { return Enum.ToObject(type, (int)value.longValue); }
                         if (type == TYPE_STRING) { return value.longValue.ToString(); }
+                        if (type == TYPE_SBYTE) { return (sbyte)value.longValue; }
+                        if (type == TYPE_BYTE) { return (byte)value.longValue; }
+                        if (type == TYPE_SHORT) { return (short)value.longValue; }
+                        if (type == TYPE_USHORT) { return (ushort)value.longValue; }
+                        if (type == TYPE_UINT) { return (uint)value.longValue; }
+                        if (type == TYPE_ULONG) { return (ulong)value.longValue; }
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:LongNumber  target:{type}");
                 }
