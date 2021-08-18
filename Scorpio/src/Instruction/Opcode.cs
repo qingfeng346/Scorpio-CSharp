@@ -44,6 +44,7 @@ namespace Scorpio.Instruction {
         NewMap,                 //new map
         NewMapObject,           //new map with key contain object
         NewType,                //new class
+        [System.Obsolete]
         NewTypeParent,          //new class with parent, 已弃用deprecated,兼容旧版本,暂时不能删除
         NewMapString,           //new map only string key
         NewAsyncFunction,       //new async function

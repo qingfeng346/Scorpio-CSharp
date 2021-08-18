@@ -30,8 +30,8 @@ namespace Scorpio {
         public ScriptValue TypeObjectValue { get; private set; }
 
         /// <summary> 所有基础类型数据 </summary>
-        private ScriptType m_TypeBool, m_TypeNumber, m_TypeString, m_TypeArray, m_TypeMap, m_TypeFunction, m_TypeStringBuilder;
-        private ScriptValue m_TypeValueBool, m_TypeValueNumber, m_TypeValueString, m_TypeValueArray, m_TypeValueMap, m_TypeValueFunction, m_TypeValueStringBuilder;
+        private ScriptType m_TypeBool, m_TypeNumber, m_TypeString, m_TypeArray, m_TypeMap, m_TypeFunction, m_TypeStringBuilder, m_TypeHashSet;
+        private ScriptValue m_TypeValueBool, m_TypeValueNumber, m_TypeValueString, m_TypeValueArray, m_TypeValueMap, m_TypeValueFunction, m_TypeValueStringBuilder, m_TypeValueHashSet;
         /// <summary> bool类型的原表 </summary>
         public ScriptType TypeBoolean => m_TypeBool;
         public ScriptValue TypeBooleanValue => m_TypeValueBool;
@@ -51,6 +51,10 @@ namespace Scorpio {
         /// <summary> map类型的原表 </summary>
         public ScriptType TypeMap => m_TypeMap;
         public ScriptValue TypeMapValue => m_TypeValueMap;
+
+        /// <summary>  </summary>
+        public ScriptType TypeHashSet => m_TypeHashSet;
+        public ScriptValue TypeHashSetValue => m_TypeValueHashSet;
 
         /// <summary> function类型的原表 </summary>
         public ScriptType TypeFunction => m_TypeFunction;
@@ -81,6 +85,7 @@ namespace Scorpio {
             AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", TypeObjectValue), ref m_TypeValueArray);
             AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", TypeObjectValue), ref m_TypeValueMap);
             AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObjectValue), ref m_TypeValueStringBuilder);
+            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObjectValue), ref m_TypeValueHashSet);
 
             Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
             Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateValue(this));
@@ -94,6 +99,7 @@ namespace Scorpio {
             ProtoMap.Load(this, TypeMap);
             ProtoFunction.Load(this, TypeFunction);
             ProtoStringBuilder.Load(this, TypeStringBuilder);
+            ProtoHashSet.Load(this, TypeHashSet);
 
             TypeManager.PushAssembly(typeof(object).Assembly);                        //mscorlib.dll
             TypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).Assembly);     //System.dll

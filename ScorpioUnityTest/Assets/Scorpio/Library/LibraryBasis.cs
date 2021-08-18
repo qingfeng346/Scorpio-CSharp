@@ -60,6 +60,21 @@ namespace Scorpio.Library {
                 return ScriptValue.False;
             }
         }
+        private class HashSetPairs : ScorpioHandle {
+            readonly ScriptMap m_ItorResult;
+            readonly IEnumerator<ScriptValue> m_Enumerator;
+            public HashSetPairs(ScriptHashSet hashSet, ScriptMap itorResult) {
+                m_Enumerator = hashSet.GetEnumerator();
+                m_ItorResult = itorResult;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (m_Enumerator.MoveNext()) {
+                    m_ItorResult.SetValue("value", m_Enumerator.Current);
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
+            }
+        }
         private class InstancePairs : ScorpioHandle {
             readonly ScriptInstance m_ItorResult;
             readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
@@ -254,6 +269,8 @@ namespace Scorpio.Library {
                     map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new MapObjectPairs((ScriptMapObject)obj, map)));
                 } else if (obj is ScriptMapString) {
                     map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new MapStringPairs((ScriptMapString)obj, map)));
+                } else if (obj is ScriptHashSet) {
+                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new HashSetPairs((ScriptHashSet)obj, map)));
                 } else if (obj is ScriptUserdata) {
                     map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj, map)));
                 } else if (obj is ScriptInstance) {

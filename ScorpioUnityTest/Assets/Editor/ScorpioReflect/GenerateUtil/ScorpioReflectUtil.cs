@@ -48,7 +48,9 @@ namespace Scorpio.ScorpioReflect {
         }
         //获得一个类的完整名字
         public static string GetFullName(this Type type) {
-            if (type.IsGenericParameter) {
+            if (type.IsArray) {
+                return GetFullName(type.GetElementType()) + "[]";
+            } else if (type.IsGenericParameter) {
                 return GetFullName(type.BaseType);
             } else if (type == typeof(void)) {
                 return "void";
@@ -123,7 +125,7 @@ namespace Scorpio.ScorpioReflect {
                 return $"return ({returnFullName})Convert.ChangeType({invoke}.Value, typeof({returnFullName}))";
             } else {
                 return $"return ({returnFullName}){invoke}.Value";
-            }        
+            }
         }
     }
 }

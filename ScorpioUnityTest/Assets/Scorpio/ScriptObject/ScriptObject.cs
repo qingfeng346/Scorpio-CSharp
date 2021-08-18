@@ -7,6 +7,7 @@ namespace Scorpio {
         Map,            //MAP
         Function,       //函数
         StringBuilder,  //StringBuilder
+        HashSet,        //HashSet
         Instance,       //原表实例
         Enum,           //枚举
         Namespace,      //namespace

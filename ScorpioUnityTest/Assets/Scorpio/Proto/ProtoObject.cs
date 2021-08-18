@@ -16,7 +16,7 @@ namespace Scorpio.Proto {
         }
         private class getHashCode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(thisObject.GetHashCode());
+                return new ScriptValue((double)thisObject.GetHashCode());
             }
         }
         private class instanceOf : ScorpioHandle {
