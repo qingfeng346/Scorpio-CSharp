@@ -75,6 +75,15 @@ namespace Scorpio {
             return new ScriptValue(new ScriptMapObject(m_Script, parameters, length));
         }
     }
+    internal class ScriptTypeBasicHashSet : ScriptType {
+        private Script m_Script;
+        internal ScriptTypeBasicHashSet(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
+            m_Script = script;
+        }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            return new ScriptValue(new ScriptHashSet(m_Script, parameters, length));
+        }
+    }
     //StringBuilding原表
     internal class ScriptTypeBasicStringBuilder : ScriptType {
         private Script m_Script;

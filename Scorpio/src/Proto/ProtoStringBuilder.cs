@@ -13,7 +13,7 @@ namespace Scorpio.Proto {
         }
         private class length : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(thisObject.Get<ScriptStringBuilder>().Builder.Length);
+                return new ScriptValue((double)thisObject.Get<ScriptStringBuilder>().Builder.Length);
             }
         }
         private class setLength : ScorpioHandle {
