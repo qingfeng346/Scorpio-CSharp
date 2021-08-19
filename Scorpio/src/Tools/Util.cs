@@ -66,7 +66,7 @@ namespace Scorpio.Tools {
                         if (type == TYPE_FLOAT) { return (float)value.doubleValue; }
                         if (type == TYPE_DOUBLE || type == TYPE_OBJECT) { return value.doubleValue; }
                         if (type == TYPE_LONG) { return (long)value.doubleValue; }
-                        if (type.IsEnum) { return Enum.ToObject(type, (int)value.doubleValue); }
+                        if (type.IsEnum) { return Enum.ToObject(type, (long)value.doubleValue); }
                         if (type == TYPE_STRING) { return value.doubleValue.ToString(); }
                         if (type == TYPE_SBYTE) { return (sbyte)value.doubleValue; }
                         if (type == TYPE_BYTE) { return (byte)value.doubleValue; }
@@ -74,6 +74,7 @@ namespace Scorpio.Tools {
                         if (type == TYPE_USHORT) { return (ushort)value.doubleValue; }
                         if (type == TYPE_UINT) { return (uint)value.doubleValue; }
                         if (type == TYPE_ULONG) { return (ulong)value.doubleValue; }
+                        if (type == TYPE_BOOL) { return value.doubleValue != 0; }
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:DoubleNumber  target:{type}");
                 }
@@ -83,7 +84,7 @@ namespace Scorpio.Tools {
                         if (type == TYPE_FLOAT) { return (float)value.longValue; }
                         if (type == TYPE_LONG || type == TYPE_OBJECT) { return value.longValue; }
                         if (type == TYPE_DOUBLE) { return (double)value.longValue; }
-                        if (type.IsEnum) { return Enum.ToObject(type, (int)value.longValue); }
+                        if (type.IsEnum) { return Enum.ToObject(type, value.longValue); }
                         if (type == TYPE_STRING) { return value.longValue.ToString(); }
                         if (type == TYPE_SBYTE) { return (sbyte)value.longValue; }
                         if (type == TYPE_BYTE) { return (byte)value.longValue; }
@@ -91,6 +92,7 @@ namespace Scorpio.Tools {
                         if (type == TYPE_USHORT) { return (ushort)value.longValue; }
                         if (type == TYPE_UINT) { return (uint)value.longValue; }
                         if (type == TYPE_ULONG) { return (ulong)value.longValue; }
+                        if (type == TYPE_BOOL) { return value.longValue != 0; }
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:LongNumber  target:{type}");
                 }
@@ -119,7 +121,7 @@ namespace Scorpio.Tools {
                     return type == TYPE_BOOL;
                 case ScriptValue.doubleValueType:
                 case ScriptValue.longValueType:
-                    return type.IsPrimitive && type != TYPE_BOOL;
+                    return type.IsPrimitive;
                 case ScriptValue.stringValueType:
                     return type == TYPE_STRING;
                 case ScriptValue.objectValueType:
@@ -136,7 +138,7 @@ namespace Scorpio.Tools {
                     return type == TYPE_BOOL;
                 case ScriptValue.doubleValueType:
                 case ScriptValue.longValueType:
-                    return type.IsPrimitive && type != TYPE_BOOL;
+                    return type.IsPrimitive;
                 case ScriptValue.stringValueType:
                     return type == TYPE_STRING;
                 case ScriptValue.nullValueType:
