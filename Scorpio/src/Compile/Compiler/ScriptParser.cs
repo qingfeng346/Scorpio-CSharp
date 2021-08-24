@@ -1019,6 +1019,7 @@ namespace Scorpio.Compile.Compiler {
                         AddScriptInstruction(Opcode.LoadValueString, GetConstString(key));
                         AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.GetIndex(key));
                     }
+                    AddScriptInstructionWithoutValue(Opcode.Pop);
                     break;
                 }
                 default: throw new ParserException(this, "不支持的语法 : " + obj);
