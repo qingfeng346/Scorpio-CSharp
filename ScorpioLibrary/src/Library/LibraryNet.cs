@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using Scorpio.Tools;
 
 namespace ScorpioLibrary {
     public class LibraryNet {
@@ -40,7 +39,7 @@ namespace ScorpioLibrary {
             using (var response = request.GetResponse()) {
                 using (var stream = response.GetResponseStream()) {
                     while (true) {
-                        var readSize = Util.ReadBytes(stream, READ_BYTES);
+                        var readSize = stream.Read(READ_BYTES, 0, READ_LENGTH);
                         if (readSize <= 0) { break; }
                         writer.Write(READ_BYTES, 0, readSize);
                     }
