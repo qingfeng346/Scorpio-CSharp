@@ -1,3 +1,12 @@
+## v2.2.1 (*2021-08-27*)
+* `[新增]`支持 #import 预编译, 多文件可以编译成单文件
+* `[新增]`支持 decimal 类型
+* `[新增]`支持枚举为long类型转换
+* `[新增]`新增原生HashSet类型
+* `[优化]`整理Script Load相关函数
+* `[优化]`加速Array，IList取值速度
+* `[修复]`修复快速反射数组类型问题
+
 ## v2.2.0 (*2021-07-27*)
 * `[新增]`支持多变量赋值 [`示例参考`](https://github.com/qingfeng346/Scorpio-CSharp/blob/v2.0/ExampleScripts/%E5%A4%9A%E8%BF%94%E5%9B%9E%E5%80%BC.sco)
     * 暂不支持全局变量
