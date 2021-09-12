@@ -17,7 +17,7 @@ namespace Scorpio.Function {
             return ScriptValue.CreateValue(m_Script.StartCoroutine(m_Context.ExecuteCoroutine(thisObject, parameters, length, m_internalValues, baseType)));
         }
         public override ScriptFunction SetBindObject(ScriptValue obj) {
-            return new ScriptScriptBindFunction(m_Context, obj);
+            return new ScriptScriptAsyncBindFunction(m_Context, obj);
         }
     }
     public class ScriptScriptAsyncBindFunction : ScriptScriptAsyncFunction {
