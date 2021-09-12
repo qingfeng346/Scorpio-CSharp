@@ -16,16 +16,70 @@ namespace Scorpio.Function {
         public virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return ScriptValue.CreateValue(m_Script.StartCoroutine(m_Context.ExecuteCoroutine(thisObject, parameters, length, m_internalValues, baseType)));
         }
+#if SCORPIO_DEBUG
+        public ScriptContext Context {
+            get { return m_Context; }
+            set {
+                m_Context = value;
+                m_internalValues = new InternalValue[value.internalCount];
+            }
+        }
+        public override ScriptFunction SetBindObject(ScriptValue obj) {
+            return new ScriptScriptAsyncBindFunction(this, obj);
+        }
+#else
         public override ScriptFunction SetBindObject(ScriptValue obj) {
             return new ScriptScriptAsyncBindFunction(m_Context, obj);
         }
+#endif
     }
+    public class ScriptScriptAsyncLambdaFunction : ScriptScriptAsyncFunction {
+        private ScriptValue m_BindObject = ScriptValue.Null;
+        public ScriptScriptAsyncLambdaFunction(ScriptContext context, ScriptValue bindObject) : base(context) {
+            m_BindObject = bindObject;
+        }
+        public override ScriptValue BindObject => m_BindObject;
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            return ScriptValue.CreateValue(m_Script.StartCoroutine(m_Context.ExecuteCoroutine(m_BindObject, parameters, length, m_internalValues)));
+        }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+            return ScriptValue.CreateValue(m_Script.StartCoroutine(m_Context.ExecuteCoroutine(m_BindObject, parameters, length, m_internalValues, baseType)));
+        }
+        public override bool Equals(ScriptValue obj) {
+            var func = obj.Get<ScriptScriptAsyncLambdaFunction>();
+            return func != null && (m_Context == func.m_Context && m_BindObject.Equals(func.m_BindObject));
+        }
+    }
+#if SCORPIO_DEBUG
+    public class ScriptScriptAsyncBindFunction : ScriptScriptAsyncFunction {
+        private ScriptScriptAsyncFunction m_Function;
+        private ScriptValue m_BindObject = ScriptValue.Null;
+        public ScriptScriptAsyncBindFunction(ScriptScriptAsyncFunction function, ScriptValue bindObject) : base(function.Context) {
+            m_Function = function;
+            m_BindObject = bindObject;
+        }
+        public override ScriptValue BindObject => m_BindObject;
+        public new void SetInternal(int index, InternalValue value) {
+            m_Function.SetInternal(index, value);
+        }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            return m_Function.Call(m_BindObject, parameters, length);
+        }
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+            return m_Function.Call(m_BindObject, parameters, length, baseType);
+        }
+        public override bool Equals(ScriptValue obj) {
+            var func = obj.Get<ScriptScriptAsyncBindFunction>();
+            return func != null && (m_Function.Context == func.m_Context && m_BindObject.Equals(func.m_BindObject));
+        }
+    }
+#else
     public class ScriptScriptAsyncBindFunction : ScriptScriptAsyncFunction {
         private ScriptValue m_BindObject = ScriptValue.Null;
         public ScriptScriptAsyncBindFunction(ScriptContext context, ScriptValue bindObject) : base(context) {
             m_BindObject = bindObject;
         }
-        public override ScriptValue BindObject { get { return m_BindObject; } }
+        public override ScriptValue BindObject => m_BindObject;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return ScriptValue.CreateValue(m_Script.StartCoroutine(m_Context.ExecuteCoroutine(m_BindObject, parameters, length, m_internalValues)));
         }
@@ -37,4 +91,5 @@ namespace Scorpio.Function {
             return func != null && (m_Context == func.m_Context && m_BindObject.Equals(func.m_BindObject));
         }
     }
+#endif
 }

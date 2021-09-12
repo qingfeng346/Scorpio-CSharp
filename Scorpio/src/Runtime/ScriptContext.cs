@@ -28,8 +28,8 @@ namespace Scorpio.Runtime {
             }
         }
 
-        public readonly Script m_script; //脚本类
-        private readonly ScriptGlobal m_global; //global
+        public Script m_script; //脚本类
+        private ScriptGlobal m_global; //global
 
         private readonly double[] constDouble; //double常量
         private readonly long[] constLong; //long常量
@@ -55,6 +55,10 @@ namespace Scorpio.Runtime {
             m_Breviary = breviary;
             m_FunctionData = functionData;
             m_scriptInstructions = functionData.scriptInstructions;
+        }
+        public void SetScript(Script script) {
+            m_script = script;
+            m_global = script.Global;
         }
     }
 }

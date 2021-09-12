@@ -1476,7 +1476,7 @@ namespace Scorpio.Runtime {
                                     case Opcode.NewLambdaFunction: {
                                         var functionData = constContexts[opvalue];
                                         var internals = functionData.m_FunctionData.internals;
-                                        var function = new ScriptScriptBindFunction(functionData, thisObject);
+                                        var function = new ScriptScriptLambdaFunction(functionData, thisObject);
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
                                             function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
@@ -1521,7 +1521,7 @@ namespace Scorpio.Runtime {
                                     case Opcode.NewAsyncLambdaFunction: {
                                         var functionData = constContexts[opvalue];
                                         var internals = functionData.m_FunctionData.internals;
-                                        var function = new ScriptScriptAsyncBindFunction(functionData, thisObject);
+                                        var function = new ScriptScriptAsyncLambdaFunction(functionData, thisObject);
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
                                             function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
