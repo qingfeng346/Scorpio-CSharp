@@ -21,7 +21,7 @@ namespace Scorpio.Runtime {
 #if SCORPIO_DEBUG
             //Logger.debug($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
             if (VariableValueIndex < 0 || VariableValueIndex >= ValueCacheLength) {
-                throw new ExecutionException("Stack overflow : " + VariableValueIndex);
+                throw new ExecutionException($"Stack overflow : {VariableValueIndex}");
             }
 #endif
 #if SCORPIO_THREAD
@@ -1569,7 +1569,11 @@ namespace Scorpio.Runtime {
                     --VariableValueIndex;
 #endif
                     //正常执行命令到最后,判断堆栈是否清空 return 或 exception 不判断
-                    Logger.debug(stackIndex != -1, "堆栈数据未清空，有泄露情况 : " + stackIndex);
+#if SCORPIO_DEBUG
+                    if (stackIndex != -1) {
+                        throw new ExecutionException($"堆栈数据未清空,有泄露情况,需要检查指令 : {stackIndex}");
+                    }
+#endif
 #if !EXECUTE_COROUTINE
                     //主动throw的情况
                 } catch (ScriptException e) {
