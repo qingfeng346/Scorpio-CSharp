@@ -47,7 +47,7 @@ namespace Scorpio.Function {
         }
         public override bool Equals(ScriptValue obj) {
             var func = obj.Get<ScriptScriptAsyncLambdaFunction>();
-            return func != null && (m_Context == func.m_Context && m_BindObject.Equals(func.m_BindObject));
+            return func != null && ReferenceEquals(m_Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);
         }
     }
 #if SCORPIO_DEBUG
@@ -70,7 +70,7 @@ namespace Scorpio.Function {
         }
         public override bool Equals(ScriptValue obj) {
             var func = obj.Get<ScriptScriptAsyncBindFunction>();
-            return func != null && (m_Function.Context == func.m_Context && m_BindObject.Equals(func.m_BindObject));
+            return func != null && ReferenceEquals(m_Function.Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);
         }
     }
 #else
@@ -88,7 +88,7 @@ namespace Scorpio.Function {
         }
         public override bool Equals(ScriptValue obj) {
             var func = obj.Get<ScriptScriptAsyncBindFunction>();
-            return func != null && (m_Context == func.m_Context && m_BindObject.Equals(func.m_BindObject));
+            return func != null && ReferenceEquals(m_Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);
         }
     }
 #endif
