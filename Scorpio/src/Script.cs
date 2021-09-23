@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Reflection;
+using System.Collections.Generic;
 using Scorpio.Instruction;
 using Scorpio.Exception;
 using Scorpio.Function;
@@ -320,6 +321,22 @@ namespace Scorpio {
             }
             return result;
         }
+#if SCORPIO_DEBUG
+        public ScriptValue Execute(SerializeData[] datas, ref List<ScriptContext[]> refContexts) {
+            ScriptValue result = ScriptValue.Null;
+            int length = datas.Length;
+            for (var j = 0; j < length; ++j) {
+                SerializeData data = datas[j];
+                var contexts = new ScriptContext[data.Functions.Length];
+                for (int i = 0; i < data.Functions.Length; ++i) {
+                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+                }
+                refContexts.Add(contexts);
+                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
+            }
+            return result;
+        }
+#endif
 
 #if SCORPIO_DEBUG || SCORPIO_STACK
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
