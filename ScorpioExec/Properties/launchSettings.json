@@ -10,7 +10,7 @@
     },
     "pack": {
       "commandName": "Project",
-      "commandLineArgs": "pack -s ../../../test.sco -o ../../../test.il"
+      "commandLineArgs": "pack -s ../../../test.sco -c ../../../const.sco -o ../../../test.il"
     },
     "fast": {
       "commandName": "Project",

@@ -58,41 +58,41 @@ namespace Scorpio.Tools {
         public static bool IsRetvalOrOut (ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
         //
         public static object ChangeType (ScriptValue value, Type type) {
-            if (type == TYPE_VALUE) { return value; }
+            if (ReferenceEquals(type, TYPE_VALUE)) { return value; }
             switch (value.valueType) {
                 case ScriptValue.doubleValueType: {
                     unchecked {
-                        if (type == TYPE_INT) { return (int)value.doubleValue; }
-                        if (type == TYPE_FLOAT) { return (float)value.doubleValue; }
-                        if (type == TYPE_DOUBLE || type == TYPE_OBJECT) { return value.doubleValue; }
-                        if (type == TYPE_LONG) { return (long)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_INT)) { return (int)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_FLOAT)) { return (float)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_DOUBLE) || ReferenceEquals(type, TYPE_OBJECT)) { return value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_LONG)) { return (long)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_STRING)) { return value.doubleValue.ToString(); }
                         if (type.IsEnum) { return Enum.ToObject(type, (long)value.doubleValue); }
-                        if (type == TYPE_STRING) { return value.doubleValue.ToString(); }
-                        if (type == TYPE_SBYTE) { return (sbyte)value.doubleValue; }
-                        if (type == TYPE_BYTE) { return (byte)value.doubleValue; }
-                        if (type == TYPE_SHORT) { return (short)value.doubleValue; }
-                        if (type == TYPE_USHORT) { return (ushort)value.doubleValue; }
-                        if (type == TYPE_UINT) { return (uint)value.doubleValue; }
-                        if (type == TYPE_ULONG) { return (ulong)value.doubleValue; }
-                        if (type == TYPE_BOOL) { return value.doubleValue != 0; }
+                        if (ReferenceEquals(type, TYPE_SBYTE)) { return (sbyte)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_BYTE)) { return (byte)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_SHORT)) { return (short)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_USHORT)) { return (ushort)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_UINT)) { return (uint)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_ULONG)) { return (ulong)value.doubleValue; }
+                        if (ReferenceEquals(type, TYPE_BOOL)) { return value.doubleValue != 0; }
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:DoubleNumber  target:{type}");
                 }
                 case ScriptValue.longValueType: {
                     unchecked {
-                        if (type == TYPE_INT) { return (int)value.longValue; }
-                        if (type == TYPE_FLOAT) { return (float)value.longValue; }
-                        if (type == TYPE_LONG || type == TYPE_OBJECT) { return value.longValue; }
-                        if (type == TYPE_DOUBLE) { return (double)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_INT)) { return (int)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_FLOAT)) { return (float)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_LONG) || ReferenceEquals(type, TYPE_OBJECT)) { return value.longValue; }
+                        if (ReferenceEquals(type, TYPE_DOUBLE)) { return (double)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_STRING)) { return value.longValue.ToString(); }
                         if (type.IsEnum) { return Enum.ToObject(type, value.longValue); }
-                        if (type == TYPE_STRING) { return value.longValue.ToString(); }
-                        if (type == TYPE_SBYTE) { return (sbyte)value.longValue; }
-                        if (type == TYPE_BYTE) { return (byte)value.longValue; }
-                        if (type == TYPE_SHORT) { return (short)value.longValue; }
-                        if (type == TYPE_USHORT) { return (ushort)value.longValue; }
-                        if (type == TYPE_UINT) { return (uint)value.longValue; }
-                        if (type == TYPE_ULONG) { return (ulong)value.longValue; }
-                        if (type == TYPE_BOOL) { return value.longValue != 0; }
+                        if (ReferenceEquals(type, TYPE_SBYTE)) { return (sbyte)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_BYTE)) { return (byte)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_SHORT)) { return (short)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_USHORT)) { return (ushort)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_UINT)) { return (uint)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_ULONG)) { return (ulong)value.longValue; }
+                        if (ReferenceEquals(type, TYPE_BOOL)) { return value.longValue != 0; }
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:LongNumber  target:{type}");
                 }
@@ -112,18 +112,18 @@ namespace Scorpio.Tools {
             }
         }
         public static bool CanChangeTypeRefOut (ScriptValue value, Type type) {
-            if (type == TYPE_OBJECT || type == TYPE_VALUE) return true;
+            if (ReferenceEquals(type, TYPE_OBJECT) || ReferenceEquals(type, TYPE_VALUE)) return true;
             switch (value.valueType) {
                 case ScriptValue.nullValueType:
                     return true;
                 case ScriptValue.trueValueType:
                 case ScriptValue.falseValueType:
-                    return type == TYPE_BOOL;
+                    return ReferenceEquals(type, TYPE_BOOL);
                 case ScriptValue.doubleValueType:
                 case ScriptValue.longValueType:
                     return type.IsPrimitive;
                 case ScriptValue.stringValueType:
-                    return type == TYPE_STRING;
+                    return ReferenceEquals(type, TYPE_STRING);
                 case ScriptValue.objectValueType:
                     return type.IsAssignableFrom (value.objectValue.GetType ());
                 default:
@@ -131,16 +131,16 @@ namespace Scorpio.Tools {
             }
         }
         public static bool CanChangeType (ScriptValue value, Type type) {
-            if (type == TYPE_OBJECT || type == TYPE_VALUE) return true;
+            if (ReferenceEquals(type, TYPE_OBJECT) || ReferenceEquals(type, TYPE_VALUE)) return true;
             switch (value.valueType) {
                 case ScriptValue.trueValueType:
                 case ScriptValue.falseValueType:
-                    return type == TYPE_BOOL;
+                    return ReferenceEquals(type, TYPE_BOOL);
                 case ScriptValue.doubleValueType:
                 case ScriptValue.longValueType:
                     return type.IsPrimitive;
                 case ScriptValue.stringValueType:
-                    return type == TYPE_STRING;
+                    return ReferenceEquals(type, TYPE_STRING);
                 case ScriptValue.nullValueType:
                     return !type.IsValueType;
                 case ScriptValue.objectValueType:

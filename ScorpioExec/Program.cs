@@ -24,7 +24,8 @@ namespace ScorpioExec {
     --source|-s      (必填)脚本文本文件
     --output|-o      (必填)IL输出文件
     --ignore|-g      (选填)忽略的全局函数列表,多函数使用分号;隔开
-    --search|-search (选填)#import 搜索路径列表,分号;隔开";
+    --search|-search (选填)#import 搜索路径列表,分号;隔开
+    --const|-c       (选填)Const脚本";
         private const string HelpFast = @"
 生成快速反射文件
     --class|-c       (必填)class完整名称,多class使用分号;隔开
@@ -56,6 +57,7 @@ namespace ScorpioExec {
         private readonly static string[] ParameterIgnore = new [] { "-i", "--ignore", "-ignore" };
         private readonly static string[] ParameterDefine = new[] { "--define", "-define" };
         private readonly static string[] ParameterSearch = new[] { "--search", "-search" };
+        private readonly static string[] ParameterConst = new[] { "--const", "-c" };
         private readonly static string[] ParameterFilter = new [] { "-f", "--filter", "-filter" };
         private readonly static string[] ParameterExtension = new [] { "-e", "--extension", "-extension" };
         private readonly static string[] ParameterCheck = new [] { "-c", "--check", "-check" };
@@ -115,15 +117,18 @@ namespace ScorpioExec {
             var ignore = command.GetValueDefault (ParameterIgnore, "");
             var define = command.GetValueDefault (ParameterDefine, "");
             var search = command.GetValueDefault (ParameterSearch, "");
+            var constFile = command.GetValueDefault(ParameterConst, "");
             var searchPaths = new List<string>(search.Split(";"));
             searchPaths.Add(CurrentDirectory);
             searchPaths.Add(Path.GetDirectoryName(source));
+            var scriptConst = string.IsNullOrEmpty(constFile) ? null : new Scorpio.Script().LoadConst(constFile);
             File.WriteAllBytes(output, Serializer.SerializeBytes(
                 source,
                 FileUtil.GetFileString(source),
                 ignore.Split(";"),
                 define.Split(";"),
-                searchPaths.ToArray()));
+                searchPaths.ToArray(), 
+                scriptConst));
             Logger.info ($"生成IL文件  {source} -> {output}");
         }
         static void Fast (CommandLine command, string[] args) {

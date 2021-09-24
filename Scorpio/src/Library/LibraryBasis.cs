@@ -264,21 +264,21 @@ namespace Scorpio.Library {
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
                 var map = new ScriptMapString(m_script);
                 if (obj is ScriptArray) {
-                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new ArrayPairs((ScriptArray)obj, map)));
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs((ScriptArray)obj, map)));
                 } else if (obj is ScriptMapObject) {
-                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new MapObjectPairs((ScriptMapObject)obj, map)));
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapObjectPairs((ScriptMapObject)obj, map)));
                 } else if (obj is ScriptMapString) {
-                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new MapStringPairs((ScriptMapString)obj, map)));
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapStringPairs((ScriptMapString)obj, map)));
                 } else if (obj is ScriptHashSet) {
-                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new HashSetPairs((ScriptHashSet)obj, map)));
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new HashSetPairs((ScriptHashSet)obj, map)));
                 } else if (obj is ScriptUserdata) {
-                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj, map)));
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj, map)));
                 } else if (obj is ScriptInstance) {
-                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new InstancePairs((ScriptInstance)obj, map)));
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new InstancePairs((ScriptInstance)obj, map)));
                 } else if (obj is ScriptType) {
-                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new TypePairs((ScriptType)obj, map)));
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new TypePairs((ScriptType)obj, map)));
                 } else if (obj is ScriptGlobal) {
-                    map.SetValue(ScriptConst.IteratorNext, m_script.CreateFunction(new GlobalPairs((ScriptGlobal)obj, map)));
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new GlobalPairs((ScriptGlobal)obj, map)));
                 } else {
                     throw new ExecutionException("pairs 必须用于 array, map, type, global 或者 继承 IEnumerable 的 userdata 类型");
                 }

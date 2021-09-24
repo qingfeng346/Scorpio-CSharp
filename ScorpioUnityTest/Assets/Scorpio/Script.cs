@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Reflection;
+using System.Collections.Generic;
 using Scorpio.Instruction;
 using Scorpio.Exception;
 using Scorpio.Function;
@@ -11,6 +12,7 @@ using Scorpio.Proto;
 using Scorpio.Userdata;
 using Scorpio.Serialize;
 using Scorpio.Tools;
+using Scorpio.Compile.Compiler;
 namespace Scorpio {
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
@@ -232,7 +234,7 @@ namespace Scorpio {
         }
         /// <summary> 使用字符串方式二进制 </summary>
         public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int index, int count) {
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths));
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths, null));
         }
         /// <summary> 使用字节码方式二进制 </summary>
         public ScriptValue LoadBufferByIL(byte[] buffer) {
@@ -248,7 +250,7 @@ namespace Scorpio {
         public ScriptValue LoadStreamByString(string breviary, Stream stream, int count) {
             var buffer = new byte[count];
             Util.ReadBytes(stream, buffer);
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null, m_SearchPaths));
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null, m_SearchPaths, null));
         }
         /// <summary> 使用字节码方式加载流 </summary>
         public ScriptValue LoadStreamByIL(Stream stream) {
@@ -274,7 +276,7 @@ namespace Scorpio {
         /// <summary> 加载一段文本 </summary>
         public ScriptValue LoadString(string breviary, string buffer) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(Serializer.Serialize(breviary, buffer, null, null, m_SearchPaths));
+            return Execute(Serializer.Serialize(breviary, buffer, null, null, m_SearchPaths, null));
         }
         /// <summary> 加载一段数据 </summary>
         public ScriptValue LoadBuffer(byte[] buffer) {
@@ -295,7 +297,7 @@ namespace Scorpio {
                     return Execute(Deserializer.DeserializeV1(breviary, stream));
                 }
             } else {
-                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths));
+                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths, null));
             }
         }
         /// <summary> 执行IL </summary>
@@ -320,8 +322,69 @@ namespace Scorpio {
             }
             return result;
         }
-
-#if SCORPIO_DEBUG || SCORPIO_STACK
+        #if SCORPIO_DEBUG
+        public ScriptValue Execute(SerializeData[] datas, ref List<ScriptContext[]> refContexts) {
+            ScriptValue result = ScriptValue.Null;
+            int length = datas.Length;
+            for (var j = 0; j < length; ++j) {
+                SerializeData data = datas[j];
+                var contexts = new ScriptContext[data.Functions.Length];
+                for (int i = 0; i < data.Functions.Length; ++i) {
+                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+                }
+                refContexts.Add(contexts);
+                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
+            }
+            return result;
+        }
+        #endif
+        public ScriptConst LoadConst(string fileName) {
+            var keys = new HashSet<string>(Global.GetKeys());
+            LoadFile(fileName);
+            var scriptConst = new ScriptConst();
+            foreach (var pair in Global) {
+                if (keys.Contains(pair.Key)) { continue; }
+                AddConst(scriptConst, pair.Key, pair.Value);
+            }
+            return scriptConst;
+        }
+        void AddConst(ScriptConst scriptConst, string key, ScriptValue value) {
+            switch (value.valueType) {
+                case ScriptValue.nullValueType:
+                    scriptConst.Add(key, null);
+                    break;
+                case ScriptValue.trueValueType:
+                    scriptConst.Add(key, true);
+                    break;
+                case ScriptValue.falseValueType:
+                    scriptConst.Add(key, false);
+                    break;
+                case ScriptValue.doubleValueType:
+                    scriptConst.Add(key, value.doubleValue);
+                    break;
+                case ScriptValue.longValueType:
+                    scriptConst.Add(key, value.longValue);
+                    break;
+                case ScriptValue.stringValueType:
+                    scriptConst.Add(key, value.stringValue);
+                    break;
+                case ScriptValue.scriptValueType:
+                    var map = value.Get<ScriptMap>();
+                    if (map != null) {
+                        var con = new ScriptConst();
+                        foreach (var pair in map) {
+                            AddConst(con, pair.Key.ToString(), pair.Value);
+                        }
+                        scriptConst.Add(key, con);
+                    } else {
+                        throw new ExecutionException($"变量{key}不是基础常量:{value.ValueTypeName}");
+                    }
+                    break;
+                default:
+                    throw new ExecutionException($"变量{key}不是基础常量:{value.ValueTypeName}");
+            }
+        }
+        #if SCORPIO_DEBUG || SCORPIO_STACK
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
         private StackInfo m_Stack = new StackInfo();
         private int m_StackLength = 0;
@@ -346,7 +409,7 @@ namespace Scorpio {
             }
             return stackInfos;
         }
-#else
+        #else
         private readonly static StackInfo[] EmptyStackInfos = new StackInfo[0];
         /// <summary> 最近的堆栈调用 </summary>
         public StackInfo GetStackInfo() {
@@ -356,6 +419,6 @@ namespace Scorpio {
         public StackInfo[] GetStackInfos() {
             return EmptyStackInfos;
         }
-#endif
+        #endif
     }
 }

@@ -7,7 +7,7 @@ namespace Scorpio.Serialize {
     public class Serializer {
         [System.Obsolete]
         public static SerializeData SerializeV1(string breviary, string buffer, string[] ignoreFunctions, string[] defines) {
-            var datas = Serialize(breviary, buffer, ignoreFunctions, defines, null);
+            var datas = Serialize(breviary, buffer, ignoreFunctions, defines, null, null);
             return datas[datas.Length - 1];
         }
         [System.Obsolete]
@@ -20,9 +20,9 @@ namespace Scorpio.Serialize {
                 }
             }
         }
-        public static SerializeData[] Serialize(string breviary, string buffer, string[] ignoreFunctions, string[] defines, string[] searchPaths) {
+        public static SerializeData[] Serialize(string breviary, string buffer, string[] ignoreFunctions, string[] defines, string[] searchPaths, ScriptConst scriptConst) {
             var parsers = new List<ScriptParser>();
-            parsers.Add(new ScriptParser(new ScriptLexer(buffer, breviary), ignoreFunctions, defines, searchPaths, parsers).Parse());
+            parsers.Add(new ScriptParser(new ScriptLexer(buffer, breviary), ignoreFunctions, defines, searchPaths, scriptConst, parsers).Parse());
             var datas = new SerializeData[parsers.Count];
             for (var i = 0; i < datas.Length; ++i) {
                 var parser = parsers[i];
@@ -37,13 +37,13 @@ namespace Scorpio.Serialize {
             }
             return datas;
         }
-        public static byte[] SerializeBytes(string breviary, string buffer, string[] ignoreFunctions, string[] defines, string[] searchPaths) {
+        public static byte[] SerializeBytes(string breviary, string buffer, string[] ignoreFunctions, string[] defines, string[] searchPaths, ScriptConst scriptConst) {
             using (var stream = new MemoryStream()) {
                 using (var writer = new ScorpioWriter(stream)) {
                     writer.Write((byte)0);      //占位符
                     writer.Write(int.MaxValue); //占位符
                     writer.Write((short)2);     //版本号
-                    var datas = Serialize(breviary, buffer, ignoreFunctions, defines, searchPaths);
+                    var datas = Serialize(breviary, buffer, ignoreFunctions, defines, searchPaths, scriptConst);
                     int length = datas.Length;
                     writer.Write(length);
                     for (var i = 0; i < length; ++i) {

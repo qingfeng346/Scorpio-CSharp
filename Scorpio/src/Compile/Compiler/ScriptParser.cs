@@ -177,7 +177,7 @@ namespace Scorpio.Compile.Compiler {
                     using (var stream = File.OpenRead(fullFileName)) {
                         var buffer = new byte[stream.Length];
                         Util.ReadBytes(stream, buffer);
-                        parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), ignoreFunctions, defines, searchPaths, parsers).Parse());
+                        parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), ignoreFunctions, defines, searchPaths, scriptConst, parsers).Parse());
                     }
                 } else {
                     tokens.Add(ReadToken());
@@ -570,7 +570,7 @@ namespace Scorpio.Compile.Compiler {
             //next 函数索引
             var nextIndex = m_scriptExecutable.AddTempIndex();
             AddScriptInstruction(Opcode.LoadLocal, pairIndex);
-            AddScriptInstruction(Opcode.LoadValueString, GetConstString(ScriptConst.IteratorNext));
+            AddScriptInstruction(Opcode.LoadValueString, GetConstString(ScriptConstValue.IteratorNext));
             AddScriptInstruction(Opcode.StoreLocal, nextIndex);
             ReadRightParenthesis();
 
@@ -815,6 +815,8 @@ namespace Scorpio.Compile.Compiler {
                         AddScriptInstruction(Opcode.LoadConstLong, GetConstLong((long)value), obj.Line);
                     } else if (value is string) {
                         AddScriptInstruction(Opcode.LoadConstString, GetConstString((string)value), obj.Line);
+                    } else {
+                        throw new ParserException(this, "未知的常量 " + value.GetType() + ":" + value);
                     }
                     break;
                 }
@@ -828,10 +830,56 @@ namespace Scorpio.Compile.Compiler {
                             if ((obj as CodeMemberString).key == "base") {
                                 AddScriptInstructionWithoutValue(Opcode.LoadBase, obj.Line);
                             } else {
-                                AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(member.key), obj.Line);
+                                var constValue = scriptConst.Get(member.key, out var contains);
+                                if (contains) {
+                                    if (constValue is ScriptConst) {
+                                        throw new ParserException(this, "常量不是基础变量:" + member.key);
+                                    } else {
+                                        PushObject(new CodeNativeObject(constValue, 0));
+                                    }
+                                } else {
+                                    AddScriptInstruction(Opcode.LoadGlobalString, GetConstString(member.key), obj.Line);
+                                }
                             }
                         }
                     } else {
+                        if (obj is CodeMemberString) {
+                            var isConst = true;
+                            var stack = new Stack<CodeMemberString>();
+                            var memberString = obj as CodeMemberString;
+                            while (true) {
+                                stack.Push(memberString);
+                                if (memberString.Parent == null) {
+                                    break;
+                                }
+                                memberString = memberString.Parent as CodeMemberString;
+                                if (memberString == null) {
+                                    isConst = false;
+                                    break;
+                                }
+                            }
+                            if (isConst) {
+                                var contains = false;
+                                var constValue = scriptConst.Get(stack.Pop().key, out contains);
+                                if (contains) {
+                                    while (stack.Count > 0) {
+                                        if (constValue is ScriptConst) {
+                                            constValue = (constValue as ScriptConst).Get(stack.Pop().key, out contains);
+                                        } else {
+                                            throw new ParserException(this, "常量已经是基础变量,不能再往下取值:" + member.key);
+                                        }
+                                    }
+                                    if (contains == false) {
+                                        throw new ParserException(this, "未知的常量:" + member.key);
+                                    } else if (constValue is ScriptConst) {
+                                        throw new ParserException(this, "常量不是基础变量:" + member.key);
+                                    } else {
+                                        PushObject(new CodeNativeObject(constValue, 0));
+                                        return;
+                                    }
+                                }
+                            }
+                        }
                         PushObject(member.Parent);
                         var nullTo = member.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
                         if (obj is CodeMemberIndex) {
@@ -881,7 +929,7 @@ namespace Scorpio.Compile.Compiler {
                         var member = codeCallFunction.Member as CodeMemberString;
                         if (member != null && member.Parent == null && System.Array.Exists(ignoreFunctions, (func) => func == member.key)) {
                             PushObject(new CodeNativeObject(null, -1));
-                            break;
+                            return;
                         }
                     }
                     {

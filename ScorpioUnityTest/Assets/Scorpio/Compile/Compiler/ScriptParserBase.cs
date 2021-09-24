@@ -8,11 +8,12 @@ namespace Scorpio.Compile.Compiler {
         private Token[] m_listTokens;           //token列表
         private int m_indexToken;               //当前读到token
         private string[] ignoreFunctions;       //编译忽略的全局函数
-        private string[] defines;               //defines
-        private string[] searchPaths;           //searchPaths
-        private HashSet<string> allDefines;     //本文件的所有define
+        private string[] defines;               //全局defines
+        private string[] searchPaths;           //import文件搜索目录searchPaths
+        private ScriptConst scriptConst;        //全局const
+        private HashSet<string> allDefines;     //全局defines+本文件定义的define
         public List<ScriptParser> parsers;
-        public ScriptParser(ScriptLexer lexer, string[] ignoreFunctions, string[] defines, string[] searchPaths, List<ScriptParser> parsers) {
+        public ScriptParser(ScriptLexer lexer, string[] ignoreFunctions, string[] defines, string[] searchPaths, ScriptConst scriptConst, List<ScriptParser> parsers) {
             this.m_listTokens = lexer.GetTokens().ToArray();
             this.Breviary = lexer.Breviary;
             this.ignoreFunctions = ignoreFunctions ?? EmptyArrayString;
@@ -20,6 +21,7 @@ namespace Scorpio.Compile.Compiler {
             this.searchPaths = searchPaths ?? EmptyArrayString;
             this.parsers = parsers;
             this.allDefines = new HashSet<string>(this.defines);
+            this.scriptConst = scriptConst ?? new ScriptConst();
         }
         /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }
@@ -42,17 +44,17 @@ namespace Scorpio.Compile.Compiler {
         int GetSourceLine() {
             return PeekToken().SourceLine;
         }
+        /// <summary> 返回第一个Token </summary>
+        public Token PeekToken() {
+            if (!HasMoreTokens())
+                throw new ParserException(this, "PeekToken - 没有更多的Token");
+            return m_listTokens[m_indexToken];
+        }
         /// <summary> 获得第一个Token </summary>
         Token ReadToken() {
             if (!HasMoreTokens())
                 throw new ParserException(this, "ReadToken - 没有更多的Token");
             return m_listTokens[m_indexToken++];
-        }
-        /// <summary> 返回第一个Token </summary>
-        Token PeekToken() {
-            if (!HasMoreTokens())
-                throw new ParserException(this, "PeekToken - 没有更多的Token");
-            return m_listTokens[m_indexToken];
         }
         Token LastToken() {
             if (m_indexToken <= 0)

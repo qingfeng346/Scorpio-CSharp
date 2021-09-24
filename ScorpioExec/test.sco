@@ -1,4 +1,4 @@
-#import "test1.sco"
+//#import "test1.sco"
 // function main1() {
 //     return  { a : 100, b: 200}
 // }
@@ -10,6 +10,5 @@
 //     // }
 // }
 // main()
-test1()
-test2()
-return 1111
+//test1()
+//test2()
