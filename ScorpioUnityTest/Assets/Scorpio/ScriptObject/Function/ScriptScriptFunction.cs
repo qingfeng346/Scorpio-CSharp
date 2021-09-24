@@ -13,7 +13,7 @@ namespace Scorpio.Function {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return m_Context.Execute(thisObject, parameters, length, m_internalValues);
         }
-        public virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return m_Context.Execute(thisObject, parameters, length, m_internalValues, baseType);
         }
 #if SCORPIO_DEBUG

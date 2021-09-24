@@ -276,6 +276,14 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用");
             }
         }
+        //调用base函数
+        public ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+            if (valueType == scriptValueType) {
+                return scriptValue.Call(thisObject, parameters, length, baseType);
+            } else {
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用");
+            }
+        }
         //传入参数
         public object Value {
             get {

@@ -12,3 +12,7 @@
 // main()
 //test1()
 //test2()
+var a = {
+	
+}
+print(a.b)

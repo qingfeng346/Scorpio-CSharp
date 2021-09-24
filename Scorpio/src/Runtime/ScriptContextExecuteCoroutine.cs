@@ -1366,7 +1366,7 @@ namespace Scorpio.Runtime {
                                         for (var i = opvalue - 1; i >= 0; --i) {
                                             parameters[i] = stackObjects[stackIndex--];
                                         }
-                                        var func = stackObjects[stackIndex--].Get<ScriptScriptFunction>(); //函数对象
+                                        var func = stackObjects[stackIndex--];              //函数对象
                                         var prototype = stackObjects[stackIndex--];
 #if SCORPIO_DEBUG || SCORPIO_STACK
                                         m_script.PushStackInfo(m_Breviary, instruction.line);
@@ -1404,7 +1404,7 @@ namespace Scorpio.Runtime {
                                             }
                                         }
                                         stackIndex -= funcParameterCount;
-                                        var func = stackObjects[stackIndex--].Get<ScriptScriptFunction>(); //函数对象
+                                        var func = stackObjects[stackIndex--]; //函数对象
                                         var prototype = stackObjects[stackIndex--];
 #if SCORPIO_DEBUG || SCORPIO_STACK
                                         m_script.PushStackInfo(m_Breviary, instruction.line);
