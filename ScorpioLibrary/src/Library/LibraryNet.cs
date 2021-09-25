@@ -49,7 +49,7 @@ namespace ScorpioLibrary {
         private class get : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
                 var request = CreateRequest(Parameters[0].ToString(), "GET");
-                if (length > 1) Parameters[1].Get<ScriptFunction>().call(ScriptValue.Null, request);
+                if (length > 1) Parameters[1].call(ScriptValue.Null, request);
                 if (length > 2) {
                     ReadStream(request, Parameters[2].Value as Stream);
                     return ScriptValue.Null;
@@ -71,7 +71,7 @@ namespace ScorpioLibrary {
                         stream.Write(buffer, 0, buffer.Length);
                     }
                 }
-                if (length > 2 ) Parameters[2].Get<ScriptFunction>().call(ScriptValue.Null, request);
+                if (length > 2 ) Parameters[2].call(ScriptValue.Null, request);
                 using (var stream = new MemoryStream()) {
                     ReadStream(request, stream);
                     return ScriptValue.CreateValue(stream.ToArray());

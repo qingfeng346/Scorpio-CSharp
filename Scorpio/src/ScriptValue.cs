@@ -33,14 +33,6 @@ namespace Scorpio {
         [FieldOffset(16)] public ScriptObject scriptValue;
         [FieldOffset(16)] public object objectValue;
 
-        public ScriptValue(ScriptObject value) {
-            this.valueType = value == null ? nullValueType : scriptValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.objectValue = null;
-            this.scriptValue = value;
-        }
         public ScriptValue(bool value) {
             this.valueType = value ? trueValueType : falseValueType;
             this.doubleValue = 0;
@@ -73,7 +65,15 @@ namespace Scorpio {
             this.objectValue = null;
             this.stringValue = value;
         }
-        public ScriptValue(sbyte value) {
+        public ScriptValue(ScriptObject value) {
+            this.valueType = value == null ? nullValueType : scriptValueType;
+            this.doubleValue = 0;
+            this.longValue = 0;
+            this.stringValue = null;
+            this.objectValue = null;
+            this.scriptValue = value;
+        }
+        internal ScriptValue(sbyte value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -81,7 +81,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(byte value) {
+        internal ScriptValue(byte value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -89,7 +89,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(short value) {
+        internal ScriptValue(short value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -97,7 +97,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(ushort value) {
+        internal ScriptValue(ushort value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -105,7 +105,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(int value) {
+        internal ScriptValue(int value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -113,7 +113,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(uint value) {
+        internal ScriptValue(uint value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -121,7 +121,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(ulong value) {
+        internal ScriptValue(ulong value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -129,7 +129,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(char value) {
+        internal ScriptValue(char value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -137,7 +137,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(float value) {
+        internal ScriptValue(float value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -145,7 +145,7 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        public ScriptValue(decimal value) {
+        internal ScriptValue(decimal value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
             this.longValue = 0;
@@ -162,8 +162,9 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-        
-        public ScriptValue GetValueByIndex(int key, Script script) {
+
+        //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
+        internal ScriptValue GetValueByIndex(int key, Script script) {
             switch (valueType) {
                 case scriptValueType:
                     return scriptValue.GetValueByIndex(key);
@@ -178,14 +179,8 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : [{key}]");
             }
         }
-        public ScriptValue GetValue(string key) {
-            if (valueType == scriptValueType) {
-                return scriptValue.GetValue(key);
-            }
-            throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]");
-        }
         //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
-        public ScriptValue GetValue(string key, Script script) {
+        internal ScriptValue GetValue(string key, Script script) {
             switch (valueType) {
                 case scriptValueType:
                     return scriptValue.GetValue(key);
@@ -202,6 +197,12 @@ namespace Scorpio {
                 default:
                     return script.TypeObject.GetValue(key);
             }
+        }
+        public ScriptValue GetValue(string key) {
+            if (valueType == scriptValueType) {
+                return scriptValue.GetValue(key);
+            }
+            throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]");
         }
         public ScriptValue GetValue(double key) {
             switch (valueType) {
@@ -277,7 +278,7 @@ namespace Scorpio {
             }
         }
         //调用base函数
-        public ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+        internal ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             if (valueType == scriptValueType) {
                 return scriptValue.Call(thisObject, parameters, length, baseType);
             } else {

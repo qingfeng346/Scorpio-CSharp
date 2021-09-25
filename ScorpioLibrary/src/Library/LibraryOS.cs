@@ -100,7 +100,7 @@ namespace ScorpioLibrary {
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.EnableRaisingEvents = true;
-                    if (length > 3) Parameters[3].Get<ScriptFunction>().call(ScriptValue.Null, process);
+                    if (length > 3) Parameters[3].call(ScriptValue.Null, process);
                     process.Start();
                     var result = script.CreateMap();
                     result.SetValue("output", new ScriptValue(process.StandardOutput.ReadToEnd()));
