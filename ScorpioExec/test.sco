@@ -15,4 +15,22 @@
 var a = {
 	
 }
-print(a.b)
+function testfunc(a, b) {
+    print(a, b)
+}
+testfunc(100,200,300)
+testfunc(200,300,400)
+// var a = "111"
+// var b = "111"
+// var c = "11" + toString(1)
+// print(a === c)
+// var now = io.unixNow()
+// for (var i = 0, 10000000) {
+//     testfunc()
+// }
+// print(io.unixNow() - now)
+// var now = io.unixNow()
+// for (var i = 0, 10000000) {
+//     var b = a === null
+// }
+// print(io.unixNow() - now)

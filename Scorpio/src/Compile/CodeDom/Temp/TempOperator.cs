@@ -22,6 +22,8 @@ namespace Scorpio.Compile.CodeDom.Temp {
 
             Operators[TokenType.Equal] = new TempOperator(TokenType.Equal, Compare);
             Operators[TokenType.NotEqual] = new TempOperator(TokenType.NotEqual, Compare);
+            Operators[TokenType.EqualReference] = new TempOperator(TokenType.Equal, Compare);
+            Operators[TokenType.NotEqualReference] = new TempOperator(TokenType.NotEqual, Compare);
             Operators[TokenType.Greater] = new TempOperator(TokenType.Greater, Compare);
             Operators[TokenType.GreaterOrEqual] = new TempOperator(TokenType.GreaterOrEqual, Compare);
             Operators[TokenType.Less] = new TempOperator(TokenType.Less, Compare);
@@ -79,12 +81,22 @@ namespace Scorpio.Compile.CodeDom.Temp {
                 case TokenType.Shr:
                 case TokenType.ShrAssign:
                     return Opcode.Shr;
-                case TokenType.Greater: return Opcode.Greater;
-                case TokenType.GreaterOrEqual: return Opcode.GreaterOrEqual;
-                case TokenType.Less: return Opcode.Less;
-                case TokenType.LessOrEqual: return Opcode.LessOrEqual;
-                case TokenType.Equal: return Opcode.Equal;
-                case TokenType.NotEqual: return Opcode.NotEqual;
+                case TokenType.Greater:
+                    return Opcode.Greater;
+                case TokenType.GreaterOrEqual:
+                    return Opcode.GreaterOrEqual;
+                case TokenType.Less:
+                    return Opcode.Less;
+                case TokenType.LessOrEqual:
+                    return Opcode.LessOrEqual;
+                case TokenType.Equal:
+                    return Opcode.Equal;
+                case TokenType.NotEqual:
+                    return Opcode.NotEqual;
+                case TokenType.EqualReference:
+                    return Opcode.EqualReference;
+                case TokenType.NotEqualReference:
+                    return Opcode.NotEqualReference;
                 default: return Opcode.None;
             }
         }

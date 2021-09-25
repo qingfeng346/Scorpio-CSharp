@@ -62,8 +62,8 @@ namespace Scorpio {
             return base.GreaterOrEqual(obj);
         }
         public override bool Equals(ScriptValue obj) {
-            var func = GetValue(ScriptOperator.Equal).Get<ScriptFunction>();
-            if (func != null) {
+            var func = GetValue(ScriptOperator.Equal);
+            if (func.valueType != ScriptValue.nullValueType) {
                 ScriptValue.Parameters[0] = obj;
                 return func.Call(ThisValue, ScriptValue.Parameters, 1).valueType == ScriptValue.trueValueType;
             }

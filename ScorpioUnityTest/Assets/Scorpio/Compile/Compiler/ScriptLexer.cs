@@ -94,18 +94,6 @@ namespace Scorpio.Compile.Compiler {
                 UndoChar();
             }
         }
-        /// <summary> = </summary>
-        void ReadAssign() {
-            ch = ReadChar();
-            if (ch == '=') {
-                AddToken(TokenType.Equal, "==");
-            } else if (ch == '>') {
-                AddToken(TokenType.Lambda, "=>");
-            } else {
-                AddToken(TokenType.Assign, "=");
-                UndoChar();
-            }
-        }
         /// <summary> & </summary>
         void ReadAnd() {
             ch = ReadChar();
@@ -134,9 +122,31 @@ namespace Scorpio.Compile.Compiler {
         void ReadNot() {
             ch = ReadChar();
             if (ch == '=') {
-                AddToken(TokenType.NotEqual, "!=");
+                if (ReadChar() == '=') {
+                    AddToken(TokenType.NotEqualReference, "!==");
+                } else {
+                    AddToken(TokenType.NotEqual, "!=");
+                    UndoChar();
+                }
             } else {
                 AddToken(TokenType.Not, "!");
+                UndoChar();
+            }
+        }
+        /// <summary> = </summary>
+        void ReadAssign() {
+            ch = ReadChar();
+            if (ch == '=') {
+                if (ReadChar() == '=') {
+                    AddToken(TokenType.EqualReference, "===");
+                } else {
+                    AddToken(TokenType.Equal, "==");
+                    UndoChar();
+                }
+            } else if (ch == '>') {
+                AddToken(TokenType.Lambda, "=>");
+            } else {
+                AddToken(TokenType.Assign, "=");
                 UndoChar();
             }
         }
@@ -146,8 +156,7 @@ namespace Scorpio.Compile.Compiler {
             if (ch == '=') {
                 AddToken(TokenType.GreaterOrEqual, ">=");
             } else if (ch == '>') {
-                ch = ReadChar();
-                if (ch == '=') {
+                if (ReadChar() == '=') {
                     AddToken(TokenType.ShrAssign, ">>=");
                 } else {
                     AddToken(TokenType.Shr, ">>");
@@ -164,8 +173,7 @@ namespace Scorpio.Compile.Compiler {
             if (ch == '=') {
                 AddToken(TokenType.LessOrEqual, "<=");
             } else if (ch == '<') {
-                ch = ReadChar();
-                if (ch == '=') {
+                if (ReadChar() == '=') {
                     AddToken(TokenType.ShiAssign, "<<=");
                 } else {
                     AddToken(TokenType.Shi, "<<");
@@ -178,8 +186,7 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> ^ </summary>
         void ReadXor() {
-            ch = ReadChar();
-            if (ch == '=') {
+            if (ReadChar() == '=') {
                 AddToken(TokenType.XORAssign, "^=");
             } else {
                 AddToken(TokenType.XOR, "^");

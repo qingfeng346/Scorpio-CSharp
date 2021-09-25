@@ -72,16 +72,16 @@ namespace Scorpio.Instruction {
 
         //运算指令
         ComputeBegin = StoreBegin + 30,
-        Plus,
-        Minus,
-        Multiply,
-        Divide,
-        Modulo,
-        InclusiveOr,
-        Combine,
-        XOR,
-        Shr,
-        Shi,
+        Plus,                   // +
+        Minus,                  // -
+        Multiply,               // *
+        Divide,                 // /
+        Modulo,                 // %
+        InclusiveOr,            // |
+        Combine,                // &
+        XOR,                    // ^
+        Shr,                    // >>
+        Shi,                    // <<
         FlagNot,                //取反操作
         FlagMinus,              //取负操作
         FlagNegative,           //取非操作
@@ -89,14 +89,16 @@ namespace Scorpio.Instruction {
 
         //比较指令
         CompareBegin = ComputeBegin + 20,
-        Greater,
-        GreaterOrEqual,
-        Less,
-        LessOrEqual,
-        Equal,
-        NotEqual,
-        And,
-        Or,
+        Greater,                //>
+        GreaterOrEqual,         //>=
+        Less,                   //<
+        LessOrEqual,            //<=
+        Equal,                  //==
+        NotEqual,               //!=
+        And,                    //&&
+        Or,                     //||
+        EqualReference,         //===
+        NotEqualReference,      //!==
         CompareEnd,
 
         //跳转指令

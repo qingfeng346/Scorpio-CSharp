@@ -88,6 +88,10 @@ namespace Scorpio.Compile.Compiler {
         Equal,
         /// <summary> != </summary>
         NotEqual,
+        /// <summary> === </summary>
+        EqualReference,
+        /// <summary> !== </summary>
+        NotEqualReference,
         /// <summary> > </summary>
         Greater,
         /// <summary> >= </summary>

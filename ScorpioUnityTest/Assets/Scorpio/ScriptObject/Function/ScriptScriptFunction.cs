@@ -13,7 +13,7 @@ namespace Scorpio.Function {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return m_Context.Execute(thisObject, parameters, length, m_internalValues);
         }
-        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+        internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return m_Context.Execute(thisObject, parameters, length, m_internalValues, baseType);
         }
 #if SCORPIO_DEBUG
@@ -42,7 +42,7 @@ namespace Scorpio.Function {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return m_Context.Execute(m_BindObject, parameters, length, m_internalValues);
         }
-        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+        internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return m_Context.Execute(m_BindObject, parameters, length, m_internalValues, baseType);
         }
         public override bool Equals(ScriptValue obj) {
@@ -65,7 +65,7 @@ namespace Scorpio.Function {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return m_Function.Call(m_BindObject, parameters, length);
         }
-        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+        internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return m_Function.Call(m_BindObject, parameters, length, baseType);
         }
         public override bool Equals(ScriptValue obj) {
@@ -83,7 +83,7 @@ namespace Scorpio.Function {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return m_Context.Execute(m_BindObject, parameters, length, m_internalValues);
         }
-        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+        internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return m_Context.Execute(m_BindObject, parameters, length, m_internalValues, baseType);
         }
         public override bool Equals(ScriptValue obj) {

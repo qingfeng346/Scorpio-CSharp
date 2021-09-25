@@ -368,11 +368,11 @@ namespace Scorpio {
         
         public override string ToString() {
             switch (valueType) {
+                case stringValueType: return stringValue;
                 case doubleValueType: return doubleValue.ToString();
                 case longValueType: return longValue.ToString();
                 case trueValueType: return "true";
                 case falseValueType: return "false";
-                case stringValueType: return stringValue;
                 case nullValueType: return "null";
                 case scriptValueType: return scriptValue.ToString();
                 case objectValueType: return objectValue.ToString();
