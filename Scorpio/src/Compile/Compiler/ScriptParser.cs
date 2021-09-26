@@ -799,7 +799,25 @@ namespace Scorpio.Compile.Compiler {
         #endregion
 
 
-
+        bool IsConstMember(CodeObject obj, out Stack<CodeMemberString> stack, out string name) {
+            stack = new Stack<CodeMemberString>();
+            name = "";
+            if (!(obj is CodeMemberString)) { return false; }
+            var memberString = obj as CodeMemberString;
+            name = memberString.key;
+            while (true) {
+                stack.Push(memberString);
+                if (memberString.Parent == null) {
+                    break;
+                }
+                memberString = memberString.Parent as CodeMemberString;
+                if (memberString == null) {
+                    return false;
+                }
+                name = memberString.key + "." + name;
+            }
+            return true;
+        }
         /// <summary> 压入一个值 </summary>
         void PushObject(CodeObject obj) {
             switch (obj) {
@@ -843,40 +861,24 @@ namespace Scorpio.Compile.Compiler {
                             }
                         }
                     } else {
-                        if (obj is CodeMemberString) {
-                            var isConst = true;
-                            var stack = new Stack<CodeMemberString>();
-                            var memberString = obj as CodeMemberString;
-                            while (true) {
-                                stack.Push(memberString);
-                                if (memberString.Parent == null) {
-                                    break;
-                                }
-                                memberString = memberString.Parent as CodeMemberString;
-                                if (memberString == null) {
-                                    isConst = false;
-                                    break;
-                                }
-                            }
-                            if (isConst) {
-                                var contains = false;
-                                var constValue = scriptConst.Get(stack.Pop().key, out contains);
-                                if (contains) {
-                                    while (stack.Count > 0) {
-                                        if (constValue is ScriptConst) {
-                                            constValue = (constValue as ScriptConst).Get(stack.Pop().key, out contains);
-                                        } else {
-                                            throw new ParserException(this, "常量已经是基础变量,不能再往下取值:" + member.key);
-                                        }
-                                    }
-                                    if (contains == false) {
-                                        throw new ParserException(this, "未知的常量:" + member.key);
-                                    } else if (constValue is ScriptConst) {
-                                        throw new ParserException(this, "常量不是基础变量:" + member.key);
+                        if (IsConstMember(member, out var stack, out var memberName)) {
+                            var contains = false;
+                            var constValue = scriptConst.Get(stack.Pop().key, out contains);
+                            if (contains) {
+                                while (stack.Count > 0) {
+                                    if (constValue is ScriptConst) {
+                                        constValue = (constValue as ScriptConst).Get(stack.Pop().key, out contains);
                                     } else {
-                                        PushObject(new CodeNativeObject(constValue, 0));
-                                        return;
+                                        throw new ParserException(this, "常量已经是基础变量,不能再往下取值:" + member.key);
                                     }
+                                }
+                                if (contains == false) {
+                                    throw new ParserException(this, "未知的常量:" + member.key);
+                                } else if (constValue is ScriptConst) {
+                                    throw new ParserException(this, "常量不是基础变量:" + member.key);
+                                } else {
+                                    PushObject(new CodeNativeObject(constValue, 0));
+                                    return;
                                 }
                             }
                         }
