@@ -1690,6 +1690,8 @@ namespace Scorpio.Runtime {
                                     }
                                     default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
+                            case OpcodeType.Nop:
+                                continue;
                         }
                     }
 #if !EXECUTE_COROUTINE

@@ -8,7 +8,7 @@ namespace Scorpio.Instruction {
         public int line;            //代码在多少行
         public ScriptInstruction(int opcode, int opvalue, int line) : this((Opcode)opcode, opvalue, line) { }
         public ScriptInstruction(Opcode opcode, int opvalue, int line) {
-            this.optype = OpcodeType.None;
+            this.optype = OpcodeType.Nop;
             this.opcode = opcode;
             this.opvalue = opvalue;
             this.line = line;

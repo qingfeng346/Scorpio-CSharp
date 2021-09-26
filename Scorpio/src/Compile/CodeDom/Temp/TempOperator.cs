@@ -97,7 +97,8 @@ namespace Scorpio.Compile.CodeDom.Temp {
                     return Opcode.EqualReference;
                 case TokenType.NotEqualReference:
                     return Opcode.NotEqualReference;
-                default: return Opcode.None;
+                default:
+                    throw new System.Exception("无效计算符 : " + type);
             }
         }
     }
