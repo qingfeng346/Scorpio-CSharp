@@ -2,7 +2,7 @@
   "profiles": {
     "run": {
       "commandName": "Project",
-      "commandLineArgs": "../../../test.sco"
+      "commandLineArgs": "../../../test.sco --option ../../../CompileOption.json"
     },
     "runil": {
       "commandName": "Project",
@@ -10,7 +10,7 @@
     },
     "pack": {
       "commandName": "Project",
-      "commandLineArgs": "pack -s ../../../test.sco -c ../../../const.sco -o ../../../test.il"
+      "commandLineArgs": "pack -s ../../../test.sco -o ../../../test.il"
     },
     "fast": {
       "commandName": "Project",

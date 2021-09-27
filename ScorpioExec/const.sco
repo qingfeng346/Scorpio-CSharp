@@ -1,7 +1,4 @@
 ConstString = {
-    A = {
-        B = {
-            C = 100
-        }
-    }
+    A = 22222
 }
+ConstInt = 1111

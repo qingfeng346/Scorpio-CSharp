@@ -124,10 +124,10 @@ namespace ScorpioExec {
             var source = perform.GetPath (ParameterSource);
             var output = perform.GetPath (ParameterOutput);
             var search = command.GetValueDefault (ParameterSearch, "");
-            var compileOption = ParseOption(command.GetValueDefault(ParameterOption, ""));
             var searchPaths = new List<string>(search.Split(";"));
             searchPaths.Add(CurrentDirectory);
             searchPaths.Add(Path.GetDirectoryName(source));
+            var compileOption = ParseOption(command.GetValueDefault(ParameterOption, ""), searchPaths);
             File.WriteAllBytes(output, Serializer.SerializeBytes(
                 source,
                 FileUtil.GetFileString(source),
@@ -231,7 +231,7 @@ namespace ScorpioExec {
                     script.SetArgs(sArgs);
                     Logger.info ("=============================");
                     var watch = Stopwatch.StartNew ();
-                    var value = script.LoadFile (file, ParseOption(command.GetValueDefault(ParameterOption, "")));
+                    var value = script.LoadFile (file, ParseOption(command.GetValueDefault(ParameterOption, ""), script.SearchPaths));
                     while (script.UpdateCoroutine()) { }
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
@@ -280,7 +280,7 @@ namespace ScorpioExec {
             }
             return type;
         }
-        static CompileOption ParseOption(string str) {
+        static CompileOption ParseOption(string str, IEnumerable<string> searchPaths) {
             try {
                 if (string.IsNullOrWhiteSpace(str)) { return null; }
                 var option = Json.Deserialize(File.Exists(str) ? System.Text.Encoding.UTF8.GetString(File.ReadAllBytes(str)) : str) as Dictionary<string, object>;
@@ -319,6 +319,9 @@ namespace ScorpioExec {
                         if (File.Exists(file)) {
                             var script = new Scorpio.Script();
                             script.LoadLibraryV1();
+                            foreach (var searchPath in searchPaths) {
+                                script.PushSearchPath(searchPath);
+                            }
                             compileOption.scriptConst = script.LoadConst(file);
                         }
                     }

@@ -13,15 +13,36 @@
 //test1()
 //test2()
 // print(ConstString.A.B.C)
-a = {
-    b = 100
+// a = {
+// 	b : function() {
+
+// 	}
+// 	c : function() {
+
+// 	}
+// }
+// ConstString1 = {
+//     A = 22222
+// }
+var now = io.unixNow()
+for (var i = 0, 10000000) {
+	String.csFormat("aaaaaaa")
 }
-function main() {
-    print(a.b)
-    print("200")
-}
-main()
-main()
+print(io.unixNow() - now)
+// var now = io.unixNow()
+// for (var i = 0, 10000000) {
+// 	var a = ConstString1.A
+// }
+// print(io.unixNow() - now)
+// a = {
+// 	b : 100
+// }
+// function main() {
+//     print(ConstString.A.B.C)
+// 	print(a.b)
+// }
+// main()
+// main()
 // function main() {
 //     a = { 
 //         b : {
