@@ -262,6 +262,28 @@ namespace Scorpio.Runtime {
                                         #endif
                                         continue;
                                     }
+                                    case Opcode.ToGlobal: {
+                                        tempIndex = m_global.GetIndex(stackObjects[stackIndex--].stringValue);
+                                        m_global.SetValueByIndex(tempIndex, stackObjects[stackIndex]);
+                                        instruction.SetOpcode(Opcode.LoadGlobal, tempIndex);
+                                        for (var i = 0; i < opvalue; ++i) {
+                                            m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.Nop);
+                                        }
+                                        continue;
+                                    }
+                                    case Opcode.ToGlobalFunction: {
+                                        tempIndex = m_global.GetIndex(stackObjects[stackIndex--].stringValue);
+                                        m_global.SetValueByIndex(tempIndex, stackObjects[stackIndex]);
+                                        instruction.SetOpcode(Opcode.LoadGlobal, tempIndex);
+                                        for (var i = 0; i < opvalue; ++i) {
+                                            if (i == 0) {
+                                                m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.LoadConstNull);
+                                            } else {
+                                                m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.Nop);
+                                            }
+                                        }
+                                        continue;
+                                    }
                                     default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
                             case OpcodeType.Store:

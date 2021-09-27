@@ -1,7 +1,7 @@
 namespace Scorpio.Instruction {
     //指令集大类型
     public enum OpcodeType : byte {
-        None,       //无效类型
+        Nop,        //空操作
         Load,       //压栈
         New,        //new
         Store,      //取栈
@@ -11,7 +11,7 @@ namespace Scorpio.Instruction {
     }
     //指令类型, 枚举使用byte 类型 switch 会比int 稍快一丢丢
     public enum Opcode : byte {
-        None,
+        Nop,
 
         //压栈操作
         LoadBegin = 1,
@@ -33,6 +33,8 @@ namespace Scorpio.Instruction {
         LoadBase,               //push base value
         CopyStackTop,           //复制栈顶的数据
         CopyStackTopIndex,      //复制栈顶的数据
+        ToGlobal,               //转为Global变量
+        ToGlobalFunction,       //转为Global函数
         LoadEnd,
 
 

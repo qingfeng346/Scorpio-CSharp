@@ -12,14 +12,36 @@
 // main()
 //test1()
 //test2()
-var a = {
+// print(ConstString.A.B.C)
+a = {
+    b = 100
+}
+function main() {
+    print(a.b)
+    print("200")
+}
+main()
+main()
+// function main() {
+//     a = { 
+//         b : {
+//             c : function() {
+
+//             }
+//     }}
+//     a.b.c()
+// //     // print(a.b.c)
+// }
+// main()
+// main()
+// var a = {
 	
-}
-function testfunc(a, b) {
-    print(a, b)
-}
-testfunc(100,200,300)
-testfunc(200,300,400)
+// }
+// function testfunc(a, b) {
+//     print(a, b)
+// }
+// testfunc(100,200,300)
+// testfunc(200,300,400)
 // var a = "111"
 // var b = "111"
 // var c = "11" + toString(1)

@@ -33,6 +33,8 @@ namespace Scorpio.Instruction {
         LoadBase,               //push base value
         CopyStackTop,           //复制栈顶的数据
         CopyStackTopIndex,      //复制栈顶的数据
+        ToGlobal,               //转为Global变量
+        ToGlobalFunction,       //转为Global函数
         LoadEnd,
 
 

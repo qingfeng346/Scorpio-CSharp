@@ -20,7 +20,9 @@ namespace Scorpio.Instruction {
         public void SetOpcode(Opcode opcode, int opvalue) {
             this.opcode = opcode;
             this.opvalue = opvalue;
-            if (opcode > Opcode.LoadBegin && opcode < Opcode.LoadEnd) {
+            if (opcode == Opcode.Nop) {
+                this.optype = OpcodeType.Nop;
+            } else if (opcode > Opcode.LoadBegin && opcode < Opcode.LoadEnd) {
                 this.optype = OpcodeType.Load;
             } else if (opcode > Opcode.NewBegin && opcode < Opcode.NewEnd) {
                 this.optype = OpcodeType.New;

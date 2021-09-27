@@ -207,15 +207,18 @@ namespace Scorpio {
             return Global.GetValue(name).Call(ScriptValue.Null, args, length);
         }
 
-
         /// <summary> 使用字符串方式加载文件 </summary>
         public ScriptValue LoadFileByString(string fileName) {
+            return LoadFileByString(fileName, null);
+        }
+        /// <summary> 使用字符串方式加载文件 </summary>
+        public ScriptValue LoadFileByString(string fileName, CompileOption compileOption) {
             var fullFileName = SearchFile(fileName);
             if (fullFileName == null) {
                 throw new System.Exception($"can't found file : {fileName}");
             }
             using (var stream = File.OpenRead(fullFileName)) {
-                return LoadStreamByString(fileName, stream, (int)stream.Length);
+                return LoadStreamByString(fileName, stream, (int)stream.Length, compileOption);
             }
         }
         /// <summary> 使用字节码方式加载文件 </summary>
@@ -230,11 +233,19 @@ namespace Scorpio {
         }
         /// <summary> 使用字符串方式二进制 </summary>
         public ScriptValue LoadBufferByString(string breviary, byte[] buffer) {
-            return LoadBufferByString(breviary, buffer, 0, buffer.Length);
+            return LoadBufferByString(breviary, buffer, 0, buffer.Length, null);
+        }
+        /// <summary> 使用字符串方式二进制 </summary>
+        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, CompileOption compileOption) {
+            return LoadBufferByString(breviary, buffer, 0, buffer.Length, compileOption);
         }
         /// <summary> 使用字符串方式二进制 </summary>
         public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int index, int count) {
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths, null));
+            return LoadBufferByString(breviary, buffer, index, count, null);
+        }
+        /// <summary> 使用字符串方式二进制 </summary>
+        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int index, int count, CompileOption compileOption) {
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), m_SearchPaths, compileOption));
         }
         /// <summary> 使用字节码方式二进制 </summary>
         public ScriptValue LoadBufferByIL(byte[] buffer) {
@@ -248,17 +259,42 @@ namespace Scorpio {
         }
         /// <summary> 使用字符串方式加载流 </summary>
         public ScriptValue LoadStreamByString(string breviary, Stream stream, int count) {
+            return LoadStreamByString(breviary, stream, count, null);
+        }
+        /// <summary> 使用字符串方式加载流 </summary>
+        public ScriptValue LoadStreamByString(string breviary, Stream stream, int count, CompileOption compileOption) {
             var buffer = new byte[count];
             Util.ReadBytes(stream, buffer);
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), null, null, m_SearchPaths, null));
+            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), m_SearchPaths, compileOption));
         }
         /// <summary> 使用字节码方式加载流 </summary>
         public ScriptValue LoadStreamByIL(Stream stream) {
             return Execute(Deserializer.Deserialize(stream));
         }
+        /// <summary> 加载一段文本 </summary>
+        public ScriptValue LoadString(string buffer) {
+            return LoadString(null, buffer, null);
+        }
+        /// <summary> 加载一段文本 </summary>
+        public ScriptValue LoadString(string buffer, CompileOption compileOption) {
+            return LoadString(null, buffer, compileOption);
+        }
+        /// <summary> 加载一段文本 </summary>
+        public ScriptValue LoadString(string breviary, string buffer) {
+            return LoadString(breviary, buffer, null);
+        }
+        /// <summary> 加载一段文本 </summary>
+        public ScriptValue LoadString(string breviary, string buffer, CompileOption compileOption) {
+            if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
+            return Execute(Serializer.Serialize(breviary, buffer, m_SearchPaths, compileOption));
+        }
 
         /// <summary> 加载一个文件 </summary>
         public ScriptValue LoadFile(string fileName) {
+            return LoadFile(fileName, null);
+        }
+        /// <summary> 加载一个文件 </summary>
+        public ScriptValue LoadFile(string fileName, CompileOption compileOption) {
             var fullFileName = SearchFile(fileName);
             if (fullFileName == null) {
                 throw new System.Exception($"can't found file : {fileName}");
@@ -266,28 +302,31 @@ namespace Scorpio {
             using (var stream = File.OpenRead(fullFileName)) {
                 var buffer = new byte[stream.Length];
                 Util.ReadBytes(stream, buffer);
-                return LoadBuffer(fileName, buffer);
+                return LoadBuffer(fileName, buffer, compileOption);
             }
-        }
-        /// <summary> 加载一段文本 </summary>
-        public ScriptValue LoadString(string buffer) {
-            return LoadString(null, buffer);
-        }
-        /// <summary> 加载一段文本 </summary>
-        public ScriptValue LoadString(string breviary, string buffer) {
-            if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
-            return Execute(Serializer.Serialize(breviary, buffer, null, null, m_SearchPaths, null));
         }
         /// <summary> 加载一段数据 </summary>
         public ScriptValue LoadBuffer(byte[] buffer) {
-            return LoadBuffer(null, buffer);
+            return LoadBuffer(null, buffer, null);
+        }
+        /// <summary> 加载一段数据 </summary>
+        public ScriptValue LoadBuffer(byte[] buffer, CompileOption compileOption) {
+            return LoadBuffer(null, buffer, compileOption);
         }
         /// <summary> 加载一段数据 </summary>
         public ScriptValue LoadBuffer(string breviary, byte[] buffer) {
-            return LoadBuffer(breviary, buffer, 0, buffer.Length);
+            return LoadBuffer(breviary, buffer, 0, buffer.Length, null);
+        }
+        /// <summary> 加载一段数据 </summary>
+        public ScriptValue LoadBuffer(string breviary, byte[] buffer, CompileOption compileOption) {
+            return LoadBuffer(breviary, buffer, 0, buffer.Length, compileOption);
         }
         /// <summary> 加载一段数据 </summary>
         public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count) {
+            return LoadBuffer(breviary, buffer, index, count, null);
+        }
+        /// <summary> 加载一段数据 </summary>
+        public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count, CompileOption compileOption) {
             if (count > 6 && buffer[index] == 0 && BitConverter.ToInt32(buffer, index + 1) == int.MaxValue) {
                 using (var stream = new MemoryStream(buffer, index, count)) {
                     return Execute(Deserializer.Deserialize(stream));
@@ -297,16 +336,8 @@ namespace Scorpio {
                     return Execute(Deserializer.DeserializeV1(breviary, stream));
                 }
             } else {
-                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), null, null, m_SearchPaths, null));
+                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), m_SearchPaths, compileOption));
             }
-        }
-        /// <summary> 执行IL </summary>
-        public ScriptValue Execute(SerializeData data) {
-            var contexts = new ScriptContext[data.Functions.Length];
-            for (int i = 0; i < data.Functions.Length; ++i) {
-                contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
-            }
-            return new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
         }
         /// <summary> 执行IL </summary>
         public ScriptValue Execute(SerializeData[] datas) {

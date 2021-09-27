@@ -1,2 +1,7 @@
-ConstString = "str"
-ConstNumber = "1000"
+ConstString = {
+    A = {
+        B = {
+            C = 100
+        }
+    }
+}

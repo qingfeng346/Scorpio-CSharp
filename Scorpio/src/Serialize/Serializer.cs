@@ -6,23 +6,23 @@ using Scorpio.Tools;
 namespace Scorpio.Serialize {
     public class Serializer {
         [System.Obsolete]
-        public static SerializeData SerializeV1(string breviary, string buffer, string[] ignoreFunctions, string[] defines) {
-            var datas = Serialize(breviary, buffer, ignoreFunctions, defines, null, null);
+        public static SerializeData SerializeV1(string breviary, string buffer, CompileOption compileOption) {
+            var datas = Serialize(breviary, buffer, null, compileOption);
             return datas[datas.Length - 1];
         }
         [System.Obsolete]
-        public static byte[] SerializeV1Bytes(string breviary, string buffer, string[] ignoreFunctions, string[] defines) {
+        public static byte[] SerializeV1Bytes(string breviary, string buffer, CompileOption compileOption) {
             using (var stream = new MemoryStream()) {
                 using (var writer = new ScorpioWriter(stream)) {
                     writer.Write((byte)0);
-                    SerializeV1(breviary, buffer, ignoreFunctions, defines).Serialize(writer);
+                    SerializeV1(breviary, buffer, compileOption).Serialize(writer);
                     return stream.ToArray();
                 }
             }
         }
-        public static SerializeData[] Serialize(string breviary, string buffer, string[] ignoreFunctions, string[] defines, string[] searchPaths, ScriptConst scriptConst) {
+        public static SerializeData[] Serialize(string breviary, string buffer, IEnumerable<string> searchPaths, CompileOption compileOption) {
             var parsers = new List<ScriptParser>();
-            parsers.Add(new ScriptParser(new ScriptLexer(buffer, breviary), ignoreFunctions, defines, searchPaths, scriptConst, parsers).Parse());
+            parsers.Add(new ScriptParser(new ScriptLexer(buffer, breviary), searchPaths, compileOption, parsers).Parse());
             var datas = new SerializeData[parsers.Count];
             for (var i = 0; i < datas.Length; ++i) {
                 var parser = parsers[i];
@@ -37,13 +37,13 @@ namespace Scorpio.Serialize {
             }
             return datas;
         }
-        public static byte[] SerializeBytes(string breviary, string buffer, string[] ignoreFunctions, string[] defines, string[] searchPaths, ScriptConst scriptConst) {
+        public static byte[] SerializeBytes(string breviary, string buffer, IEnumerable<string> searchPaths, CompileOption compileOption) {
             using (var stream = new MemoryStream()) {
                 using (var writer = new ScorpioWriter(stream)) {
                     writer.Write((byte)0);      //占位符
                     writer.Write(int.MaxValue); //占位符
                     writer.Write((short)2);     //版本号
-                    var datas = Serialize(breviary, buffer, ignoreFunctions, defines, searchPaths, scriptConst);
+                    var datas = Serialize(breviary, buffer, searchPaths, compileOption);
                     int length = datas.Length;
                     writer.Write(length);
                     for (var i = 0; i < length; ++i) {

@@ -71,6 +71,7 @@ namespace Scorpio.Instruction {
                     case Opcode.CopyStackTop:
                     case Opcode.Plus:
                     case Opcode.Pop:
+                    case Opcode.Nop:
                         break;
                     default: value = instruction.opvalue.ToString(); break;
                 }

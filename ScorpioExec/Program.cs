@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,11 +9,20 @@ using Scorpio.ScorpioReflect;
 using Scorpio.Serialize;
 using Scorpio.Userdata;
 using ScorpioLibrary;
+using Scorpio.Compile.Compiler;
 
 namespace ScorpioExec {
     public class Program {
         private static readonly string CurrentDirectory = Util.CurrentDirectory;
 
+        private const string OptionDescribe = @"
+编译选项,json格式
+    defines          字符串数据,全局宏定义
+    ignoreFunctions  字符串数据,忽略全局函数
+    staticTypes      字符串数据,静态类
+    staticVariables  字符串数据,静态变量
+    const            文件路径,定义常量文件
+";
         private const string HelpRegister = @"
 注册运行程序到环境变量";
         private const string HelpVersion = @"
@@ -23,9 +33,9 @@ namespace ScorpioExec {
 编译生成sco的IL文件
     --source|-s      (必填)脚本文本文件
     --output|-o      (必填)IL输出文件
-    --ignore|-g      (选填)忽略的全局函数列表,多函数使用分号;隔开
     --search|-search (选填)#import 搜索路径列表,分号;隔开
-    --const|-c       (选填)Const脚本";
+    --option         (选填)编译选项
+" + OptionDescribe;
         private const string HelpFast = @"
 生成快速反射文件
     --class|-c       (必填)class完整名称,多class使用分号;隔开
@@ -50,14 +60,13 @@ namespace ScorpioExec {
     fast             生成快速反射文件
     version          当前sco版本,检查最新版本
     [文件路径]        运行sco文本文件或IL文件";
+
         private readonly static string[] ParameterSource = new [] { "-s", "--source", "-source" };
         private readonly static string[] ParameterOutput = new [] { "-o", "--output", "-output" };
         private readonly static string[] ParameterClass = new [] { "-c", "--class", "-class" };
         private readonly static string[] ParameterDll = new [] { "-d", "--dll", "-dll" };
-        private readonly static string[] ParameterIgnore = new [] { "-i", "--ignore", "-ignore" };
-        private readonly static string[] ParameterDefine = new[] { "--define", "-define" };
         private readonly static string[] ParameterSearch = new[] { "--search", "-search" };
-        private readonly static string[] ParameterConst = new[] { "--const", "-c" };
+        private readonly static string[] ParameterOption = new[] { "--option" };
         private readonly static string[] ParameterFilter = new [] { "-f", "--filter", "-filter" };
         private readonly static string[] ParameterExtension = new [] { "-e", "--extension", "-extension" };
         private readonly static string[] ParameterCheck = new [] { "-c", "--check", "-check" };
@@ -114,21 +123,16 @@ namespace ScorpioExec {
         static void Pack (CommandLine command, string[] args) {
             var source = perform.GetPath (ParameterSource);
             var output = perform.GetPath (ParameterOutput);
-            var ignore = command.GetValueDefault (ParameterIgnore, "");
-            var define = command.GetValueDefault (ParameterDefine, "");
             var search = command.GetValueDefault (ParameterSearch, "");
-            var constFile = command.GetValueDefault(ParameterConst, "");
+            var compileOption = ParseOption(command.GetValueDefault(ParameterOption, ""));
             var searchPaths = new List<string>(search.Split(";"));
             searchPaths.Add(CurrentDirectory);
             searchPaths.Add(Path.GetDirectoryName(source));
-            var scriptConst = string.IsNullOrEmpty(constFile) ? null : new Scorpio.Script().LoadConst(constFile);
             File.WriteAllBytes(output, Serializer.SerializeBytes(
                 source,
                 FileUtil.GetFileString(source),
-                ignore.Split(";"),
-                define.Split(";"),
-                searchPaths.ToArray(), 
-                scriptConst));
+                searchPaths.ToArray(),
+                compileOption));
             Logger.info ($"生成IL文件  {source} -> {output}");
         }
         static void Fast (CommandLine command, string[] args) {
@@ -227,7 +231,7 @@ namespace ScorpioExec {
                     script.SetArgs(sArgs);
                     Logger.info ("=============================");
                     var watch = Stopwatch.StartNew ();
-                    var value = script.LoadFile (file);
+                    var value = script.LoadFile (file, ParseOption(command.GetValueDefault(ParameterOption, "")));
                     while (script.UpdateCoroutine()) { }
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
@@ -275,6 +279,54 @@ namespace ScorpioExec {
                 return null;
             }
             return type;
+        }
+        static CompileOption ParseOption(string str) {
+            try {
+                if (string.IsNullOrWhiteSpace(str)) { return null; }
+                var option = Json.Deserialize(File.Exists(str) ? System.Text.Encoding.UTF8.GetString(File.ReadAllBytes(str)) : str) as Dictionary<string, object>;
+                var compileOption = new CompileOption();
+                if (option.TryGetValue("defines", out var defines)) {
+                    if (defines is IList) {
+                        foreach (string define in defines as IList) {
+                            compileOption.defines.Add(define);
+                        }
+                    }
+                }
+                if (option.TryGetValue("ignoreFunctions", out var ignoreFunctions)) {
+                    if (ignoreFunctions is IList) {
+                        foreach (string ignoreFunction in ignoreFunctions as IList) {
+                            compileOption.ignoreFunctions.Add(ignoreFunction);
+                        }
+                    }
+                }
+                if (option.TryGetValue("staticTypes", out var staticTypes)) {
+                    if (staticTypes is IList) {
+                        foreach (string staticType in staticTypes as IList) {
+                            compileOption.staticTypes.Add(staticType);
+                        }
+                    }
+                }
+                if (option.TryGetValue("staticVariables", out var staticVariables)) {
+                    if (staticVariables is IList) {
+                        foreach (string staticVariable in staticVariables as IList) {
+                            compileOption.staticVariables.Add(staticVariable);
+                        }
+                    }
+                }
+                if (option.TryGetValue("const", out var constFile)) {
+                    if (constFile is string) {
+                        string file = constFile as string;
+                        if (File.Exists(file)) {
+                            var script = new Scorpio.Script();
+                            script.LoadLibraryV1();
+                            compileOption.scriptConst = script.LoadConst(file);
+                        }
+                    }
+                }
+                return compileOption;
+            } catch (Exception e) {
+                throw new Exception("编译选项解析失败 : " + e.ToString());
+            }
         }
     }
 }

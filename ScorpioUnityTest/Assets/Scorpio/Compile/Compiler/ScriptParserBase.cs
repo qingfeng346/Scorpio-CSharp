@@ -5,23 +5,19 @@ namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
     public partial class ScriptParser {
         private readonly string[] EmptyArrayString = new string[0];
-        private Token[] m_listTokens;           //token列表
-        private int m_indexToken;               //当前读到token
-        private string[] ignoreFunctions;       //编译忽略的全局函数
-        private string[] defines;               //全局defines
-        private string[] searchPaths;           //import文件搜索目录searchPaths
-        private ScriptConst scriptConst;        //全局const
-        private HashSet<string> allDefines;     //全局defines+本文件定义的define
-        public List<ScriptParser> parsers;
-        public ScriptParser(ScriptLexer lexer, string[] ignoreFunctions, string[] defines, string[] searchPaths, ScriptConst scriptConst, List<ScriptParser> parsers) {
+        private Token[] m_listTokens;               //token列表
+        private int m_indexToken;                   //当前读到token
+        private List<string> searchPaths;           //import文件搜索目录searchPaths
+        private CompileOption compileOption;        //编译选项
+        private HashSet<string> allDefines;         //全局defines+本文件定义的define
+        public List<ScriptParser> parsers;          //import列表
+        public ScriptParser(ScriptLexer lexer, IEnumerable<string> searchPaths, CompileOption compileOption, List<ScriptParser> parsers) {
             this.m_listTokens = lexer.GetTokens().ToArray();
             this.Breviary = lexer.Breviary;
-            this.ignoreFunctions = ignoreFunctions ?? EmptyArrayString;
-            this.defines = defines ?? EmptyArrayString;
-            this.searchPaths = searchPaths ?? EmptyArrayString;
+            this.searchPaths = new List<string>(searchPaths ?? EmptyArrayString);
+            this.compileOption = compileOption ?? CompileOption.Default;
             this.parsers = parsers;
-            this.allDefines = new HashSet<string>(this.defines);
-            this.scriptConst = scriptConst ?? new ScriptConst();
+            this.allDefines = new HashSet<string>(this.compileOption.defines);
         }
         /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }
@@ -29,8 +25,8 @@ namespace Scorpio.Compile.Compiler {
             if (File.Exists(fileName)) {
                 return fileName;
             }
-            for (int i = 0; i < searchPaths.Length; ++i) {
-                string file = Path.Combine(searchPaths[i], fileName);
+            foreach (var path in searchPaths) {
+                string file = Path.Combine(path, fileName);
                 if (File.Exists(file)) {
                     return file;
                 }

@@ -177,7 +177,7 @@ namespace Scorpio.Compile.Compiler {
                     using (var stream = File.OpenRead(fullFileName)) {
                         var buffer = new byte[stream.Length];
                         Util.ReadBytes(stream, buffer);
-                        parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), ignoreFunctions, defines, searchPaths, scriptConst, parsers).Parse());
+                        parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), searchPaths, compileOption, parsers).Parse());
                     }
                 } else {
                     tokens.Add(ReadToken());
@@ -799,12 +799,12 @@ namespace Scorpio.Compile.Compiler {
         #endregion
 
 
-        bool IsConstMember(CodeObject obj, out Stack<CodeMemberString> stack, out string name) {
+        bool IsConstMember(CodeObject obj, out Stack<CodeMemberString> stack, out string memberName) {
             stack = new Stack<CodeMemberString>();
-            name = "";
+            memberName = "";
             if (!(obj is CodeMemberString)) { return false; }
             var memberString = obj as CodeMemberString;
-            name = memberString.key;
+            memberName = memberString.key;
             while (true) {
                 stack.Push(memberString);
                 if (memberString.Parent == null) {
@@ -814,7 +814,7 @@ namespace Scorpio.Compile.Compiler {
                 if (memberString == null) {
                     return false;
                 }
-                name = memberString.key + "." + name;
+                memberName = memberString.key + "." + memberName;
             }
             return true;
         }
@@ -845,10 +845,10 @@ namespace Scorpio.Compile.Compiler {
                         } else if (obj is CodeMemberInternal) {
                             AddScriptInstruction(Opcode.LoadInternal, member.index, obj.Line);
                         } else if (obj is CodeMemberString) {
-                            if ((obj as CodeMemberString).key == "base") {
+                            if ((obj as CodeMemberString).key == ScriptConstValue.Base) {
                                 AddScriptInstructionWithoutValue(Opcode.LoadBase, obj.Line);
                             } else {
-                                var constValue = scriptConst.Get(member.key, out var contains);
+                                var constValue = compileOption.scriptConst.Get(member.key, out var contains);
                                 if (contains) {
                                     if (constValue is ScriptConst) {
                                         throw new ParserException(this, "常量不是基础变量:" + member.key);
@@ -861,9 +861,8 @@ namespace Scorpio.Compile.Compiler {
                             }
                         }
                     } else {
-                        if (IsConstMember(member, out var stack, out var memberName)) {
-                            var contains = false;
-                            var constValue = scriptConst.Get(stack.Pop().key, out contains);
+                        if (IsConstMember(member, out var stack, out _)) {
+                            var constValue = compileOption.scriptConst.Get(stack.Pop().key, out bool contains);
                             if (contains) {
                                 while (stack.Count > 0) {
                                     if (constValue is ScriptConst) {
@@ -888,6 +887,12 @@ namespace Scorpio.Compile.Compiler {
                             AddScriptInstruction(Opcode.LoadValue, member.index, obj.Line);
                         } else if (obj is CodeMemberString) {
                             AddScriptInstruction(Opcode.LoadValueString, GetConstString(member.key), obj.Line);
+                            if (IsConstMember(member, out stack, out string memberName)) {
+                                if (compileOption.IsStaticVariable(memberName)) {
+                                    AddScriptInstruction(Opcode.LoadConstString, GetConstString(memberName));
+                                    AddScriptInstruction(Opcode.ToGlobal, stack.Count + 1);
+                                }
+                            }
                         } else if (obj is CodeMemberObject) {
                             PushObject(member.codeKey);
                             AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
@@ -929,7 +934,7 @@ namespace Scorpio.Compile.Compiler {
                 case CodeCallFunction codeCallFunction: {
                     {
                         var member = codeCallFunction.Member as CodeMemberString;
-                        if (member != null && member.Parent == null && System.Array.Exists(ignoreFunctions, (func) => func == member.key)) {
+                        if (member != null && member.Parent == null && compileOption.ignoreFunctions.Contains(member.key)) {
                             PushObject(new CodeNativeObject(null, -1));
                             return;
                         }
@@ -945,13 +950,19 @@ namespace Scorpio.Compile.Compiler {
                         var isBase = false;                                     //base调用
                         if (isCallVi) {
                             PushObject(member.Parent);
-                            isBase = (member.Parent as CodeMemberString)?.key == "base";
+                            isBase = (member.Parent as CodeMemberString)?.key == ScriptConstValue.Base;
                             AddScriptInstructionWithoutValue(Opcode.CopyStackTop);
                             var memberNullTo = member.nullTo ? AddScriptInstruction(Opcode.NullTo, 0) : null;
                             if (member is CodeMemberIndex) {
                                 AddScriptInstruction(Opcode.LoadValue, member.index, obj.Line);
                             } else if (member is CodeMemberString) {
                                 AddScriptInstruction(Opcode.LoadValueString, GetConstString(member.key), obj.Line);
+                                if (IsConstMember(member, out var stack, out var memberName)) {
+                                    if (compileOption.IsStaticFunction(memberName)) {
+                                        AddScriptInstruction(Opcode.LoadConstString, GetConstString(memberName));
+                                        AddScriptInstruction(Opcode.ToGlobalFunction, stack.Count + 2);
+                                    }
+                                }
                             } else if (member is CodeMemberObject) {
                                 PushObject(member.codeKey);
                                 AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
