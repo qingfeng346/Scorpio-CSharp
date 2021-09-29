@@ -170,11 +170,7 @@ namespace Scorpio.Compile.Compiler {
                 if (PeekToken().Type == TokenType.Import) {
                     ReadToken();
                     var fileName = ReadString();
-                    var fullFileName = SearchFile(fileName);
-                    if (fullFileName == null) {
-                        throw new ParserException(this, $"import not found file : {fileName}", PeekToken());
-                    }
-                    using (var stream = File.OpenRead(fullFileName)) {
+                    using (var stream = File.OpenRead(SearchImportFile(fileName))) {
                         var buffer = new byte[stream.Length];
                         Util.ReadBytes(stream, buffer);
                         parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), searchPaths, compileOption, parsers).Parse());

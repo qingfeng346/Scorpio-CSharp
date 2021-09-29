@@ -21,7 +21,7 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }
-        string SearchFile(string fileName) {
+        string SearchImportFile(string fileName) {
             if (File.Exists(fileName)) {
                 return fileName;
             }
@@ -31,7 +31,7 @@ namespace Scorpio.Compile.Compiler {
                     return file;
                 }
             }
-            return null;
+            throw new ParserException(this, $"import not found file : {fileName}", PeekToken());
         }
         /// <summary> 是否还有更多需要解析的语法 </summary>
         bool HasMoreTokens() {
