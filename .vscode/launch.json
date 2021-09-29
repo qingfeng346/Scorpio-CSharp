@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/ScorpioExec/bin/Debug/net5.0/sco.dll",
-            "args": ["./test.sco"],
+            "args": ["./test.sco", "--option", "./CompileOption.json"],
             "cwd": "${workspaceFolder}/ScorpioExec",
             "console": "internalConsole",
             "stopAtEntry": false
@@ -43,7 +43,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/ScorpioExec/bin/Debug/net5.0/sco.dll",
-            "args": ["pack", "-source", "./test.sco", "-output", "./test.il"],
+            "args": ["pack", "-source", "./test.sco", "-output", "./test.il", "--option", "./CompileOption.json"],
             "cwd": "${workspaceFolder}/ScorpioExec",
             "console": "internalConsole",
             "stopAtEntry": false

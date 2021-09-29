@@ -286,43 +286,42 @@ namespace ScorpioExec {
                 var option = Json.Deserialize(File.Exists(str) ? System.Text.Encoding.UTF8.GetString(File.ReadAllBytes(str)) : str) as Dictionary<string, object>;
                 var compileOption = new CompileOption();
                 if (option.TryGetValue("defines", out var defines)) {
-                    if (defines is IList) {
-                        foreach (string define in defines as IList) {
-                            compileOption.defines.Add(define);
-                        }
+                    if (!(defines is IList)) { throw new Exception("defines 参数必须是字符串数组"); }
+                    foreach (object define in defines as IList) {
+                        compileOption.defines.Add(define.ToString());
                     }
                 }
                 if (option.TryGetValue("ignoreFunctions", out var ignoreFunctions)) {
-                    if (ignoreFunctions is IList) {
-                        foreach (string ignoreFunction in ignoreFunctions as IList) {
-                            compileOption.ignoreFunctions.Add(ignoreFunction);
-                        }
+                    if (!(ignoreFunctions is IList)) { throw new Exception("ignoreFunctions 参数必须是字符串数组"); }
+                    foreach (object ignoreFunction in ignoreFunctions as IList) {
+                        compileOption.ignoreFunctions.Add(ignoreFunction.ToString());
                     }
                 }
                 if (option.TryGetValue("staticTypes", out var staticTypes)) {
-                    if (staticTypes is IList) {
-                        foreach (string staticType in staticTypes as IList) {
-                            compileOption.staticTypes.Add(staticType);
-                        }
+                    if (!(staticTypes is IList)) { throw new Exception("staticTypes 参数必须是字符串数组"); }
+                    foreach (object staticType in staticTypes as IList) {
+                        compileOption.staticTypes.Add(staticType.ToString());
                     }
                 }
                 if (option.TryGetValue("staticVariables", out var staticVariables)) {
-                    if (staticVariables is IList) {
-                        foreach (string staticVariable in staticVariables as IList) {
-                            compileOption.staticVariables.Add(staticVariable);
-                        }
+                    if (!(staticTypes is IList)) { throw new Exception("staticVariables 参数必须是字符串数组"); }
+                    foreach (object staticVariable in staticVariables as IList) {
+                        compileOption.staticVariables.Add(staticVariable.ToString());
                     }
                 }
                 if (option.TryGetValue("const", out var constFile)) {
-                    if (constFile is string) {
-                        string file = constFile as string;
-                        if (File.Exists(file)) {
+                    if (!(constFile is string)) { throw new Exception("const 参数必须是文件路径"); }
+                    string fileName = constFile as string;
+                    foreach (var searchPath in searchPaths) {
+                        var fullFileName = Path.Combine(searchPath, fileName);
+                        if (File.Exists(fullFileName)) {
                             var script = new Scorpio.Script();
                             script.LoadLibraryV1();
-                            foreach (var searchPath in searchPaths) {
-                                script.PushSearchPath(searchPath);
+                            foreach (var path in searchPaths) {
+                                script.PushSearchPath(path);
                             }
-                            compileOption.scriptConst = script.LoadConst(file);
+                            compileOption.scriptConst = script.LoadConst(fullFileName);
+                            break;
                         }
                     }
                 }

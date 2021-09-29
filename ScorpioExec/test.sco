@@ -1,3 +1,4 @@
+print(ConstString.A)
 //#import "test1.sco"
 // function main1() {
 //     return  { a : 100, b: 200}
@@ -24,11 +25,11 @@
 // ConstString1 = {
 //     A = 22222
 // }
-var now = io.unixNow()
-for (var i = 0, 10000000) {
-	String.csFormat("aaaaaaa")
-}
-print(io.unixNow() - now)
+// var now = io.unixNow()
+// for (var i = 0, 10000000) {
+// 	String.csFormat("aaaaaaa")
+// }
+// print(io.unixNow() - now)
 // var now = io.unixNow()
 // for (var i = 0, 10000000) {
 // 	var a = ConstString1.A
