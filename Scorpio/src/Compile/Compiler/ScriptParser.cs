@@ -930,7 +930,7 @@ namespace Scorpio.Compile.Compiler {
                 case CodeCallFunction codeCallFunction: {
                     {
                         var member = codeCallFunction.Member as CodeMemberString;
-                        if (member != null && member.Parent == null && compileOption.ignoreFunctions.Contains(member.key)) {
+                        if (member != null && member.Parent == null && compileOption.IsIgnoreFunction(member.key)) {
                             PushObject(new CodeNativeObject(null, -1));
                             return;
                         }

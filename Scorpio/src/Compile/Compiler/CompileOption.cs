@@ -4,46 +4,55 @@ namespace Scorpio.Compile.Compiler {
     public class CompileOption {
         public static readonly CompileOption Default = new CompileOption();
         private readonly string[] EmptyArrayString = new string[0];
-        public HashSet<string> ignoreFunctions;    //编译忽略的全局函数
-        public HashSet<string> defines;            //全局defines
-        public HashSet<string> staticTypes;        //静态类,类下所有函数都会把取值变量动态编译成全局索引取值,加快运行效率
-        public HashSet<string> staticVariables;    //静态全局变量和函数,会把取值变量动态编译成全局索引取值,加快运行效率
-        public ScriptConst scriptConst;            //全局const,把变量编译成常量
-        public CompileOption(IEnumerable<string> ignoreFunctions = null, IEnumerable<string> defines = null, IEnumerable<string> staticTypes = null, IEnumerable<string> staticVariables = null, ScriptConst scriptConst = null) {
-            this.ignoreFunctions = new HashSet<string>(ignoreFunctions ?? EmptyArrayString);
-            this.defines = new HashSet<string>(defines ?? EmptyArrayString);
-            this.staticTypes = new HashSet<string>(staticTypes ?? EmptyArrayString);
-            this.staticVariables = new HashSet<string>(staticVariables ?? EmptyArrayString);
-            this.scriptConst = scriptConst ?? new ScriptConst();
+        private HashSet<string> mIgnoreFunctions;    //编译忽略的全局函数
+        private IEnumerable<string> mDefines;            //全局defines
+        private IEnumerable<string> mStaticTypes;       //静态类,类下所有函数都会把取值变量动态编译成全局索引取值,加快运行效率
+        private HashSet<string> mStaticVariables;       //静态全局变量和函数,会把取值变量动态编译成全局索引取值,加快运行效率
+        private IEnumerable<string> mSearchPaths;     //搜索目录
+        private ScriptConst mScriptConst;            //全局const,把变量编译成常量
+        public IEnumerable<string> ignoreFunctions {
+            get { return mIgnoreFunctions; }
+            set { mIgnoreFunctions = new HashSet<string>(value ?? EmptyArrayString); }
         }
-        public CompileOption SetIgnoreFunctions(IEnumerable<string> ignoreFunctions) {
-            this.ignoreFunctions = new HashSet<string>(ignoreFunctions ?? EmptyArrayString);
-            return this;
+        public IEnumerable<string> defines {
+            get { return mDefines; }
+            set { mDefines = value ?? EmptyArrayString; }
         }
-        public CompileOption SetDefines(IEnumerable<string> defines) {
-            this.defines = new HashSet<string>(defines ?? EmptyArrayString);
-            return this;
+        public IEnumerable<string> staticTypes {
+            get { return mStaticTypes; }
+            set { mStaticTypes = value ?? EmptyArrayString; }
         }
-        public CompileOption SetStaticTypes(IEnumerable<string> staticTypes) {
-            this.staticTypes = new HashSet<string>(staticTypes ?? EmptyArrayString);
-            return this;
+        public IEnumerable<string> staticVariables {
+            get { return mStaticVariables; }
+            set { mStaticVariables = new HashSet<string>(value ?? EmptyArrayString); }
         }
-        public CompileOption SetStaticVariables(IEnumerable<string> staticVariables) {
-            this.staticVariables = new HashSet<string>(staticVariables ?? EmptyArrayString);
-            return this;
+        public IEnumerable<string> searchPaths {
+            get { return mSearchPaths; }
+            set { mSearchPaths = value ?? EmptyArrayString; }
         }
-        public CompileOption SetScriptConst(ScriptConst scriptConst) {
-            this.scriptConst = scriptConst ?? new ScriptConst();
-            return this;
+        public ScriptConst scriptConst {
+            get { return mScriptConst; }
+            set { mScriptConst = value ?? new ScriptConst(); }
+        }
+
+        public CompileOption() {
+            this.ignoreFunctions = null;
+            this.defines = null;
+            this.staticTypes = null;
+            this.staticVariables = null;
+            this.scriptConst = null;
+        }
+        internal bool IsIgnoreFunction(string name) {
+            return mIgnoreFunctions.Contains(name);
         }
         internal bool IsStaticVariable(string name) {
-            return staticVariables.Contains(name);
+            return mStaticVariables.Contains(name);
         }
         internal bool IsStaticFunction(string name) {
-            if (staticVariables.Contains(name)) {
+            if (mStaticVariables.Contains(name)) {
                 return true;
             }
-            foreach (var type in staticTypes) {
+            foreach (var type in mStaticTypes) {
                 if (name.StartsWith(type + ".")) {
                     return true;
                 }

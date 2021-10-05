@@ -280,44 +280,60 @@ namespace ScorpioExec {
             }
             return type;
         }
-        static CompileOption ParseOption(string str, IEnumerable<string> searchPaths) {
+        static CompileOption ParseOption(string str, IEnumerable<string> scriptSearchPaths) {
             try {
                 if (string.IsNullOrWhiteSpace(str)) { return null; }
                 var option = Json.Deserialize(File.Exists(str) ? System.Text.Encoding.UTF8.GetString(File.ReadAllBytes(str)) : str) as Dictionary<string, object>;
                 var compileOption = new CompileOption();
                 if (option.TryGetValue("defines", out var defines)) {
                     if (!(defines is IList)) { throw new Exception("defines 参数必须是字符串数组"); }
-                    foreach (object define in defines as IList) {
-                        compileOption.defines.Add(define.ToString());
+                    var values = new List<string>();
+                    foreach (object value in defines as IList) {
+                        values.Add(value.ToString());
                     }
+                    compileOption.defines = values;
                 }
                 if (option.TryGetValue("ignoreFunctions", out var ignoreFunctions)) {
                     if (!(ignoreFunctions is IList)) { throw new Exception("ignoreFunctions 参数必须是字符串数组"); }
-                    foreach (object ignoreFunction in ignoreFunctions as IList) {
-                        compileOption.ignoreFunctions.Add(ignoreFunction.ToString());
+                    var values = new List<string>();
+                    foreach (object value in ignoreFunctions as IList) {
+                        values.Add(value.ToString());
                     }
+                    compileOption.ignoreFunctions = values;
                 }
                 if (option.TryGetValue("staticTypes", out var staticTypes)) {
                     if (!(staticTypes is IList)) { throw new Exception("staticTypes 参数必须是字符串数组"); }
-                    foreach (object staticType in staticTypes as IList) {
-                        compileOption.staticTypes.Add(staticType.ToString());
+                    var values = new List<string>();
+                    foreach (object value in staticTypes as IList) {
+                        values.Add(value.ToString());
                     }
+                    compileOption.staticTypes = values;
                 }
                 if (option.TryGetValue("staticVariables", out var staticVariables)) {
                     if (!(staticTypes is IList)) { throw new Exception("staticVariables 参数必须是字符串数组"); }
-                    foreach (object staticVariable in staticVariables as IList) {
-                        compileOption.staticVariables.Add(staticVariable.ToString());
+                    var values = new List<string>();
+                    foreach (object value in staticVariables as IList) {
+                        values.Add(value.ToString());
                     }
+                    compileOption.staticVariables = values;
+                }
+                if (option.TryGetValue("searchPaths", out var searchPaths)) {
+                    if (!(searchPaths is IList)) { throw new Exception("searchPaths 参数必须是字符串数组"); }
+                    var values = new List<string>();
+                    foreach (object value in searchPaths as IList) {
+                        values.Add(value.ToString());
+                    }
+                    compileOption.searchPaths = values;
                 }
                 if (option.TryGetValue("const", out var constFile)) {
                     if (!(constFile is string)) { throw new Exception("const 参数必须是文件路径"); }
                     string fileName = constFile as string;
-                    foreach (var searchPath in searchPaths) {
+                    foreach (var searchPath in scriptSearchPaths) {
                         var fullFileName = Path.Combine(searchPath, fileName);
                         if (File.Exists(fullFileName)) {
                             var script = new Scorpio.Script();
                             script.LoadLibraryV1();
-                            foreach (var path in searchPaths) {
+                            foreach (var path in scriptSearchPaths) {
                                 script.PushSearchPath(path);
                             }
                             compileOption.scriptConst = script.LoadConst(fullFileName);
