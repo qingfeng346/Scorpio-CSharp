@@ -7,31 +7,34 @@ namespace Scorpio.Compile.Compiler {
         private readonly string[] EmptyArrayString = new string[0];
         private Token[] m_listTokens;               //token列表
         private int m_indexToken;                   //当前读到token
-        private List<string> searchPaths;           //import文件搜索目录searchPaths
         private CompileOption compileOption;        //编译选项
+        private IEnumerable<string> searchPaths;    //searchPaths
+        private List<string> allSearchPaths;        //import文件搜索目录searchPaths
         private HashSet<string> allDefines;         //全局defines+本文件定义的define
         public List<ScriptParser> parsers;          //import列表
         public ScriptParser(ScriptLexer lexer, IEnumerable<string> searchPaths, CompileOption compileOption, List<ScriptParser> parsers) {
             this.m_listTokens = lexer.GetTokens().ToArray();
             this.Breviary = lexer.Breviary;
-            this.searchPaths = new List<string>(searchPaths ?? EmptyArrayString);
             this.compileOption = compileOption ?? CompileOption.Default;
             this.parsers = parsers;
+            this.searchPaths = searchPaths;
+            this.allSearchPaths = new List<string>(searchPaths ?? EmptyArrayString);
+            this.allSearchPaths.AddRange(compileOption.searchPaths);
             this.allDefines = new HashSet<string>(this.compileOption.defines);
         }
         /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }
-        string SearchFile(string fileName) {
+        string SearchImportFile(string fileName) {
             if (File.Exists(fileName)) {
                 return fileName;
             }
-            foreach (var path in searchPaths) {
+            foreach (var path in allSearchPaths) {
                 string file = Path.Combine(path, fileName);
                 if (File.Exists(file)) {
                     return file;
                 }
             }
-            return null;
+            throw new ParserException(this, $"import not found file : {fileName}", PeekToken());
         }
         /// <summary> 是否还有更多需要解析的语法 </summary>
         bool HasMoreTokens() {

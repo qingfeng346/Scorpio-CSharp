@@ -27,6 +27,7 @@ namespace Scorpio {
 
         /// <summary> request文件的搜索路径集合 </summary>
         private string[] m_SearchPaths;
+        public string[] SearchPaths => m_SearchPaths;
         /// <summary> 所有类型的基类 </summary>
         public ScriptType TypeObject { get; private set; }
         public ScriptValue TypeObjectValue { get; private set; }
@@ -133,10 +134,8 @@ namespace Scorpio {
         /// <param name="path">绝对路径</param>
         public void PushSearchPath(string path) {
             if (!Array.Exists(m_SearchPaths, _ => _ == path)) {
-                var old = m_SearchPaths;
-                m_SearchPaths = new string[old.Length + 1];
-                Array.Copy(old, 0, m_SearchPaths, 0, old.Length);
-                m_SearchPaths[old.Length] = path;
+                Array.Resize(ref m_SearchPaths, m_SearchPaths.Length + 1);
+                m_SearchPaths[m_SearchPaths.Length - 1] = path;
             }
         }
         public string SearchFile(string fileName) {

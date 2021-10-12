@@ -70,6 +70,13 @@ namespace Scorpio {
         public virtual ScriptValue Shr(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [>>] 运算"); }
 
         //调用函数
+        public ScriptValue call(ScriptValue thisObject, params object[] args) {
+            var length = args.Length;
+            var parameters = ScriptValue.Parameters;
+            for (var i = 0; i < length; ++i) parameters[i] = ScriptValue.CreateValue(args[i]);
+            return Call(thisObject, parameters, length);
+        }
+        //调用函数
         public virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) { throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用"); }
         internal virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) { throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用"); }
         public virtual ScriptObject Clone(bool deep) { return this; }                   // 复制一个变量 是否深层复制
