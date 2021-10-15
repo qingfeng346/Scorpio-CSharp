@@ -26,9 +26,9 @@ public class __class : ScorpioFastReflectClass {__reflect_content
             default: return null;
         }
     }
-    public object GetValue(object obj, string name) {
+    public bool GetValue(object obj, string name, out object value) {
         switch (name) {__getvalue_content
-            default: throw new ExecutionException(""__fullname [GetValue] 找不到变量 : "" + name);
+            default: value = null; return false;
         }
     }
     public void SetValue(object obj, string name, ScriptValue value) {

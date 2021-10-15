@@ -1,4 +1,11 @@
-print(ConstString.A)
+var testClass = importType("ScorpioExec.TestStruct")
+userdata.extend(testClass, "ttt", function() {
+    print(this.value1)
+})
+var t = new testClass()
+t.value1 = 22222
+// t.TestArgs(100, 200, 300)
+t.ttt()
 //#import "test1.sco"
 // function main1() {
 //     return  { a : 100, b: 200}

@@ -24,9 +24,9 @@ namespace Scorpio.ScorpioReflect {
         //生成GetValue函数
         private string GenerateGetValue() {
             var fieldStr = @"
-            case ""{0}"": return {1};";
+            case ""{0}"": value = {1}; return true;";
             var methodStr = @"
-            case ""{0}"": return {1}.GetInstance();";
+            case ""{0}"": value = {1}.GetInstance(); return true;";
             var builder = new StringBuilder();
             //所有类变量
             m_Fields.ForEach((field) => builder.AppendFormat(fieldStr, field.Name, GetScorpioVariable(field.IsStatic, field.Name)) );

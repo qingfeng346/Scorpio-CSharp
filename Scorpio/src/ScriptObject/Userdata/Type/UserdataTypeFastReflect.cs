@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Scorpio.Exception;
 
 namespace Scorpio.Userdata {
     //去反射类
@@ -6,7 +8,7 @@ namespace Scorpio.Userdata {
         UserdataMethodFastReflect GetConstructor();                     //获取构造函数
         Type GetVariableType(string name);                              //获取变量类型
         UserdataMethod GetMethod(string name);                          //获取类函数
-        object GetValue(object obj, string name);                       //获取变量
+        bool GetValue(object obj, string name, out object value);       //获取变量
         void SetValue(object obj, string name, ScriptValue value);      //设置变量
     }
     //去反射函数
@@ -30,27 +32,31 @@ namespace Scorpio.Userdata {
     }
     //快速反射类管理
     public class UserdataTypeFastReflect : UserdataType {
-        private ScorpioFastReflectClass m_Value;
+        private ScorpioFastReflectClass m_FastReflectClass;
         private UserdataMethodFastReflect m_Constructor;
         public UserdataTypeFastReflect(Type type, ScorpioFastReflectClass value) : base(type) {
-            m_Value = value;
+            m_FastReflectClass = value;
             m_Constructor = value.GetConstructor();
         }
         public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
             return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
         }
         public override Type GetVariableType(string name) {
-            return m_Value.GetVariableType(name);
+            return m_FastReflectClass.GetVariableType(name);
         }
-        public override UserdataMethod GetMethod(string name) {
-            return m_Value.GetMethod(name);
+        protected override UserdataMethod GetMethod(string name) {
+            return m_FastReflectClass.GetMethod(name);
         }
         public override object GetValue(object obj, string name) {
-            return m_Value.GetValue(obj, name);
+            if (m_FastReflectClass.GetValue(obj, name, out var output))
+                return output;
+            if (m_Values.TryGetValue(name, out var value))
+                return value;
+            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
         }
         public override void SetValue(object obj, string name, ScriptValue value) {
-            m_Value.SetValue(obj, name, value);
+            m_FastReflectClass.SetValue(obj, name, value);
         }
-        public ScorpioFastReflectClass FastReflectClass { get { return m_Value; } }
+        public ScorpioFastReflectClass FastReflectClass { get { return m_FastReflectClass; } }
     }
 }
