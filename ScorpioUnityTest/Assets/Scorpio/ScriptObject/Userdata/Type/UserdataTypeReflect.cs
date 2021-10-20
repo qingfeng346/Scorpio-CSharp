@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
 using Scorpio.Exception;
 using Scorpio.Tools;
@@ -12,14 +11,12 @@ namespace Scorpio.Userdata {
         private UserdataMethod m_Constructor;                           //所有构造函数
         private List<MethodInfo> m_Methods;                             //所有函数
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
-        private Dictionary<string, ScriptValue> m_NestedTypes;          //所有的内部类
         private Dictionary<string, UserdataMethodReflect> m_Functions;  //所有的函数
         public UserdataTypeReflect(Type type) : base(type) {
             m_InitializeConstructor = false;
             m_InitializeFunctions = false;
             m_Methods = new List<MethodInfo>();
             m_Variables = new Dictionary<string, UserdataVariable>();
-            m_NestedTypes = new Dictionary<string, ScriptValue>();
             m_Functions = new Dictionary<string, UserdataMethodReflect>();
             InitializeConstructor();
             InitializeFunctions();
@@ -51,7 +48,7 @@ namespace Scorpio.Userdata {
         private ScriptValue GetNestedType(string name) {
             var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
             if (nestedType != null) {
-                return m_NestedTypes[string.Intern(name)] = TypeManager.GetUserdataType(nestedType);
+                return m_Values[string.Intern(name)] = TypeManager.GetUserdataType(nestedType);
             }
             return ScriptValue.Null;
         }
@@ -64,8 +61,6 @@ namespace Scorpio.Userdata {
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
             PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
             if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Type, pInfo);
-            //EventInfo eInfo = m_Type.GetTypeInfo().GetEvent(name, Script.BindingFlag);
-            //if (eInfo != null) return m_Variables[name] = new UserdataEvent(m_Script, eInfo);
             return null;
         }
         //添加一个扩展函数
@@ -82,29 +77,29 @@ namespace Scorpio.Userdata {
         public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
             return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
         }
+        /// <summary> 获得函数 </summary>
+        protected override UserdataMethod GetMethod(string name) {
+            if (m_Functions.TryGetValue(name, out var userdataMethod))
+                return userdataMethod;
+            return GetFunction(name);
+        }
         //获得一个变量的类型
         public override Type GetVariableType(string name) {
             var variable = GetVariable(name);
             return variable != null ? variable.FieldType : null;
         }
-        /// <summary> 获得函数 </summary>
-        public override UserdataMethod GetMethod(string name) {
-            if (m_Functions.TryGetValue(name, out var userdataMethod))
-                return userdataMethod;
-            return GetFunction(name);
-        }
         /// <summary> 获得一个类变量 </summary>
         public override object GetValue(object obj, string name) {
             if (m_Functions.TryGetValue(name, out var userdataMethod)) 
                 return userdataMethod;
-            if (m_NestedTypes.TryGetValue(name, out var nestedType)) 
-                return nestedType;
+            if (m_Values.TryGetValue(name, out var value)) 
+                return value;
             var variable = GetVariable(name);
             if (variable != null) return variable.GetValue(obj);
             userdataMethod = GetFunction(name);
             if (userdataMethod != null) return userdataMethod;
-            nestedType = GetNestedType(name);
-            if (nestedType.valueType != ScriptValue.nullValueType) return nestedType;
+            value = GetNestedType(name);
+            if (value.valueType != ScriptValue.nullValueType) return value;
             throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
         }
         /// <summary> 设置一个类变量 </summary>

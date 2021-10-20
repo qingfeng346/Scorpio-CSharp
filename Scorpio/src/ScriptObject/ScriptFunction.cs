@@ -8,7 +8,7 @@ namespace Scorpio
     /// <summary> 函数类型 </summary>
     public abstract class ScriptFunction : ScriptInstance {
         protected Script m_Script;
-        public ScriptFunction(Script script, String name) : base(ObjectType.Function, script.TypeFunctionValue) {
+        public ScriptFunction(Script script, String name) : base(ObjectType.Function, script.TypeFunction) {
             m_Script = script;
             FunctionName = name;
         }

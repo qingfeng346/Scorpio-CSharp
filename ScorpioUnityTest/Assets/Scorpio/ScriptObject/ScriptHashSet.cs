@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
         public HashSet<ScriptValue> m_Objects = new HashSet<ScriptValue>();
-        public ScriptHashSet(Script script) : base(ObjectType.HashSet, script.TypeHashSetValue) { }
+        public ScriptHashSet(Script script) : base(ObjectType.HashSet, script.TypeHashSet) { }
         internal ScriptHashSet(Script script, ScriptValue[] parameters, int length) : this(script) {
             if (length == 0) { return; }
             var ienumerable = parameters[0].Value as IEnumerable<ScriptValue>;

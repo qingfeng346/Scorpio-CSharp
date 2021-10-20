@@ -515,11 +515,18 @@ namespace Scorpio.Library {
         }
         private class setPrototype : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var scriptValue = args[0].Get();
-                if (scriptValue is ScriptType) {
-                    (scriptValue as ScriptType).Prototype = args[1];
-                } else if (scriptValue is ScriptInstance) {
-                    (scriptValue as ScriptInstance).Prototype = args[1];
+                var scriptObject = args[0].Get();
+                if (scriptObject == null) {
+                    throw new ExecutionException("setPrototype 第1个参数必须是 ScriptObject");
+                }
+                var scriptType = args[1].Get<ScriptType>();
+                if (scriptType == null) {
+                    throw new ExecutionException("setPrototype 第2个参数必须是 ScriptType");
+                }
+                if (scriptObject is ScriptType) {
+                    (scriptObject as ScriptType).Prototype = scriptType;
+                } else if (scriptObject is ScriptInstance) {
+                    (scriptObject as ScriptInstance).Prototype = scriptType;
                 }
                 return ScriptValue.Null;
             }
@@ -548,9 +555,9 @@ namespace Scorpio.Library {
                         } else if (value.scriptValue is ScriptFunction) {
                             return m_Script.TypeFunctionValue;
                         } else if (value.scriptValue is ScriptInstance) {
-                            return (value.scriptValue as ScriptInstance).Prototype;
+                            return new ScriptValue((value.scriptValue as ScriptInstance).Prototype);
                         } else if (value.scriptValue is ScriptType) {
-                            return (value.scriptValue as ScriptType).Prototype;
+                            return new ScriptValue((value.scriptValue as ScriptType).Prototype);
                         } else {
                             return TypeManager.GetUserdataType(value.scriptValue.Type);
                         }
@@ -586,9 +593,9 @@ namespace Scorpio.Library {
                 var value = args[0];
                 if (value.valueType == ScriptValue.scriptValueType) {
                     if (value.scriptValue is ScriptInstance) {
-                        return ((value.scriptValue as ScriptInstance).Prototype.scriptValue as ScriptType).Prototype;
+                        return new ScriptValue((value.scriptValue as ScriptInstance).Prototype.Prototype);
                     } else if (value.scriptValue is ScriptType) {
-                        return (value.scriptValue as ScriptType).Prototype;
+                        return new ScriptValue((value.scriptValue as ScriptType).Prototype);
                     }
                 }
                 return ScriptValue.Null;

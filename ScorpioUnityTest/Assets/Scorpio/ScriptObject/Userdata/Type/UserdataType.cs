@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Scorpio;
 using Scorpio.Exception;
 namespace Scorpio.Userdata {
     /// <summary> 一个c#类的所有数据 </summary>
@@ -11,7 +8,11 @@ namespace Scorpio.Userdata {
         protected UserdataMethod[] m_Operators = new UserdataMethod[UserdataOperator.OperatorCount];    //所有重载函数
         protected bool[] m_InitOperators = new bool[UserdataOperator.OperatorCount];                    //是否初始化过重载函数
         protected bool m_InitializeOperators;                                                           //是否初始化过所有重载函数
-        public UserdataType(Type type) { m_Type = type; }
+        protected Dictionary<string, ScriptValue> m_Values;                                             //所有的内部数据,内部类,脚本扩展函数
+        public UserdataType(Type type) { 
+            m_Type = type;
+            m_Values = new Dictionary<string, ScriptValue>();
+        }
         public Type Type { get { return m_Type; } }
         //创建一个模板类
         public ScriptValue MakeGenericType(Type[] parameters) {
@@ -54,12 +55,19 @@ namespace Scorpio.Userdata {
             }
             return m_Operators[operate] = GetMethod(operatorName);
         }
+        public void SetValue(string name, ScriptValue value) {
+            if (value.valueType == ScriptValue.nullValueType) {
+                m_Values.Remove(name);
+            } else {
+                m_Values[name] = value;
+            }
+        }
         /// <summary> 创建一个实例 </summary>
         public abstract ScriptUserdata CreateInstance(ScriptValue[] parameters, int length);
+        /// <summary> 获取函数 </summary>
+        protected abstract UserdataMethod GetMethod(string name);
         /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
         public abstract Type GetVariableType(string name);
-        /// <summary> 获取函数 </summary>
-        public abstract UserdataMethod GetMethod(string name);
         /// <summary> 获得一个类变量 </summary>
         public abstract object GetValue(object obj, string name);
         /// <summary> 设置一个类变量 </summary>

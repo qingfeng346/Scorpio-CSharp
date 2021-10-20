@@ -57,7 +57,7 @@ namespace Scorpio {
         internal ScriptValue[] m_Objects;
         internal int m_Length;
         
-        public ScriptArray(Script script) : base(ObjectType.Array, script.TypeArrayValue) {
+        public ScriptArray(Script script) : base(ObjectType.Array, script.TypeArray) {
             m_Script = script;
             m_Objects = ScriptValue.EMPTY;
             m_Length = 0;

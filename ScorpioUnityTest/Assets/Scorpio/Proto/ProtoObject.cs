@@ -45,7 +45,7 @@ namespace Scorpio.Proto {
                         } else if (thisObject.scriptValue is ScriptFunction) {
                             type = m_Script.TypeFunctionValue;
                         } else if (thisObject.scriptValue is ScriptInstance) {
-                            type = (thisObject.scriptValue as ScriptInstance).Prototype;
+                            type = new ScriptValue((thisObject.scriptValue as ScriptInstance).Prototype);
                         } else if (thisObject.scriptValue is ScriptType) {
                             type = thisObject;
                         } else {
@@ -64,7 +64,7 @@ namespace Scorpio.Proto {
                         if (scriptType.Equals(parentType)) {
                             return ScriptValue.True;
                         }
-                        if ((scriptType = scriptType.Prototype.Get<ScriptType>()) == null) {
+                        if ((scriptType = scriptType.Prototype) == null) {
                             return ScriptValue.False;
                         }
                     }

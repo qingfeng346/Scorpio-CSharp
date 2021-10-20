@@ -16,9 +16,8 @@ namespace Scorpio {
         public const string Less = "<";
         public const string LessOrEqual = "<=";
         public const string Equal = "==";
-        public const string NotEqual = "!=";
-        public const string Invoke = "()";
         public const string Constructor = "constructor";       //构造函数
+        public const string Invoke = "()";
     }
     //c#运算符重载
     public class UserdataOperator {

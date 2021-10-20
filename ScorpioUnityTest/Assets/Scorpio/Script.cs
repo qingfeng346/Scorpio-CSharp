@@ -85,10 +85,10 @@ namespace Scorpio {
             AddPrimitivePrototype("String", ref m_TypeString, ref m_TypeValueString);
             AddPrimitivePrototype("Function", ref m_TypeFunction, ref m_TypeValueFunction);
 
-            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", TypeObjectValue), ref m_TypeValueArray);
-            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", TypeObjectValue), ref m_TypeValueMap);
-            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObjectValue), ref m_TypeValueStringBuilder);
-            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObjectValue), ref m_TypeValueHashSet);
+            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", TypeObject), ref m_TypeValueArray);
+            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", TypeObject), ref m_TypeValueMap);
+            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObject), ref m_TypeValueStringBuilder);
+            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObject), ref m_TypeValueHashSet);
 
             Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
             Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateValue(this));
@@ -122,7 +122,7 @@ namespace Scorpio {
             TypeObjectValue = m_TypeValueBool = m_TypeValueNumber = m_TypeValueString = m_TypeValueArray = m_TypeValueMap = m_TypeValueFunction = m_TypeValueStringBuilder = default;
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
-            type = new ScriptTypePrimitive(name, TypeObjectValue);
+            type = new ScriptTypePrimitive(name, TypeObject);
             typeValue = new ScriptValue(type);
             Global.SetValue(name, typeValue);
         }
@@ -182,14 +182,12 @@ namespace Scorpio {
         /// <summary> 创建一个类 </summary>
         /// <param name="typeName">类名</param>
         /// <param name="parentType">类数据</param>
-        public ScriptType CreateType(string typeName, ScriptValue parentType) { return new ScriptType(typeName, parentType); }
+        public ScriptType CreateType(string typeName, ScriptType parentType) { return new ScriptType(typeName, parentType); }
         /// <summary> 创建一个Function </summary>
         /// <param name="value">ScorpioHandle</param>
         public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }
         /// <summary> 创建一个 Instance </summary>
-        public ScriptInstance CreateInstance() {
-            return new ScriptInstance(ObjectType.Type, TypeObjectValue);
-        }
+        public ScriptInstance CreateInstance() { return new ScriptInstance(ObjectType.Type, TypeObject); }
         /// <summary> 调用一个全局函数 </summary>
         /// <param name="name">函数名</param>
         /// <param name="args">参数</param>
