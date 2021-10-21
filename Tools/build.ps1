@@ -26,16 +26,16 @@ Set-Content -Path ./src/Runtime/ScriptContextExecuteCoroutineBase.cs -Value "#de
 
 Remove-Item ../bin/* -Force -Recurse
 Write-Host "正在生成nupkg..."
-dotnet pack -p:PackageVersion=$version -o ../bin/ | Out-Null
+dotnet pack -p:PackageVersion=$version -o ../bin/ /p:AssemblyVersion=$version | Out-Null
 
 Set-Location ../ScorpioExec
 
 Write-Host "正在打包win版本..."
-dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:DefineConstants="SCORPIO_STACK" | Out-Null
+dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
 Write-Host "正在打包osx版本..."
-dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64 /p:DefineConstants="SCORPIO_STACK" | Out-Null
+dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
 Write-Host "正在打包linux版本..."
-dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64 /p:DefineConstants="SCORPIO_STACK" | Out-Null
+dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
 
 Write-Host "正在压缩文件夹..."
 Compress-Archive ../bin/sco-win-x64 ../bin/$name-$version-win-x64.zip -Force
