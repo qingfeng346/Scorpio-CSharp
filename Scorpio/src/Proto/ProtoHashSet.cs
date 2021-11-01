@@ -19,6 +19,10 @@ namespace Scorpio.Proto {
             ret.SetValue("setEquals", script.CreateFunction(new setEquals()));
             ret.SetValue("symmetricExceptWith", script.CreateFunction(new symmetricExceptWith()));
             ret.SetValue("trimExcess", script.CreateFunction(new trimExcess()));
+            ret.SetValue("forEach", script.CreateFunction(new forEach()));
+            ret.SetValue("find", script.CreateFunction(new find()));
+            ret.SetValue("toArray", script.CreateFunction(new toArray()));
+            ret.SetValue("convertAll", script.CreateFunction(new convertAll()));
             return ret;
         }
         private class add : ScorpioHandle {
@@ -117,6 +121,47 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptHashSet>().TrimExcess();
                 return thisObject;
+            }
+        }
+        private class forEach : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptHashSet>();
+                var func = args[0].Get<ScriptFunction>();
+                foreach (var value in array) {
+                    if (func.Call(value).valueType == ScriptValue.falseValueType) {
+                        return value;
+                    }
+                }
+                return ScriptValue.Null;
+            }
+        }
+        private class find : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptHashSet>();
+                var func = args[0].Get<ScriptFunction>();
+                foreach (var value in array) {
+                    if (func.Call(value).IsTrue) {
+                        return value;
+                    }
+                }
+                return ScriptValue.Null;
+            }
+        }
+        private class toArray : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var type = args[0].Get<Scorpio.Userdata.ScriptUserdataType>();
+                return type == null ? ScriptValue.Null : ScriptValue.CreateValue(thisObject.Get<ScriptHashSet>().ToArray(type.Type));
+            }
+        }
+        private class convertAll : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var array = thisObject.Get<ScriptHashSet>();
+                var ret = new ScriptHashSet(array.getScript());
+                var func = args[0].Get<ScriptFunction>();
+                foreach (var value in array) {
+                    ret.Add(func.Call(value));
+                }
+                return new ScriptValue(ret);
             }
         }
     }

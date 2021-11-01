@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
+        private Script m_Script;
         public HashSet<ScriptValue> m_Objects = new HashSet<ScriptValue>();
-        public ScriptHashSet(Script script) : base(ObjectType.HashSet, script.TypeHashSet) { }
+        public ScriptHashSet(Script script) : base(ObjectType.HashSet, script.TypeHashSet) { m_Script = script; }
         internal ScriptHashSet(Script script, ScriptValue[] parameters, int length) : this(script) {
             if (length == 0) { return; }
             var ienumerable = parameters[0].Value as IEnumerable<ScriptValue>;
@@ -19,6 +20,7 @@ namespace Scorpio {
         }
         public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
+        public Script getScript() { return m_Script; }
         public void Add(ScriptValue item) {
             m_Objects.Add(item);
         }
@@ -67,6 +69,14 @@ namespace Scorpio {
         }
         public void TrimExcess() {
             m_Objects.TrimExcess();
+        }
+        public Array ToArray(Type type) {
+            var array = Array.CreateInstance(type, m_Objects.Count);
+            var index = 0;
+            foreach (var value in m_Objects) {
+                array.SetValue(Util.ChangeType(value, type), index++);
+            }
+            return array;
         }
     }
 }
