@@ -30,17 +30,25 @@ dotnet pack -p:PackageVersion=$version -o ../bin/ /p:AssemblyVersion=$version | 
 
 Set-Location ../ScorpioExec
 
-Write-Host "正在打包win版本..."
-dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
-Write-Host "正在打包osx版本..."
-dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
-Write-Host "正在打包linux版本..."
-dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
+$platforms = @("win-x86", "win-x64", "win-arm", "win-arm64", "linux-x64", "linux-musl-x64", "linux-arm", "linux-arm64", "osx-x64")
+foreach ($platform in $platforms) {
+    Write-Host "正在打包 $platform 版本..."
+    dotnet publish -c release -o ../bin/$name-$platform -r $platform /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
+    Write-Host "正在压缩 $platform ..."
+    Compress-Archive ../bin/$name-$platform ../bin/$name-$version-$platform.zip -Force
+}
 
-Write-Host "正在压缩文件夹..."
-Compress-Archive ../bin/sco-win-x64 ../bin/$name-$version-win-x64.zip -Force
-Compress-Archive ../bin/sco-osx-x64 ../bin/$name-$version-osx-x64.zip -Force
-Compress-Archive ../bin/sco-linux-x64 ../bin/$name-$version-linux-x64.zip -Force
+
+# dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
+# Write-Host "正在打包osx版本..."
+# dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
+# Write-Host "正在打包linux版本..."
+# dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
+
+# Write-Host "正在压缩文件夹..."
+# Compress-Archive ../bin/sco-win-x64 ../bin/$name-$version-win-x64.zip -Force
+# Compress-Archive ../bin/sco-osx-x64 ../bin/$name-$version-osx-x64.zip -Force
+# Compress-Archive ../bin/sco-linux-x64 ../bin/$name-$version-linux-x64.zip -Force
 
 Write-Host "复制库文件到Unity示例项目"
 Remove-Item ../ScorpioUnityTest/Assets/Scorpio/ -Force -Recurse
