@@ -1,11 +1,11 @@
-$version = "2.3.1"
+$version = "2.3.2"
 $name = "sco"
 $cur = Get-Location
 
 $today = Get-Date
 $date = $today.ToString('yyyy-MM-dd')
 
-Write-Host "开始打包sco  版本号:$version  日期:$date"
+Write-Host "开始打包$name  版本号:$version  日期:$date"
 
 Set-Location ../Scorpio
 $fileData = @"
@@ -31,9 +31,10 @@ dotnet pack -p:PackageVersion=$version -o ../bin/ /p:AssemblyVersion=$version | 
 Set-Location ../ScorpioExec
 
 $platforms = @("win-x86", "win-x64", "win-arm", "win-arm64", "linux-x64", "linux-musl-x64", "linux-arm", "linux-arm64", "osx-x64")
+# $platforms = @("osx-arm64")
 foreach ($platform in $platforms) {
     Write-Host "正在打包 $platform 版本..."
-    dotnet publish -c release -o ../bin/$name-$platform -r $platform /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
+    dotnet publish --self-contained -c release -o ../bin/$name-$platform -r $platform /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
     Write-Host "正在压缩 $platform ..."
     Compress-Archive ../bin/$name-$platform ../bin/$name-$version-$platform.zip -Force
 }
