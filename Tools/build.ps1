@@ -30,7 +30,7 @@ dotnet pack -p:PackageVersion=$version -o ../bin/ /p:AssemblyVersion=$version | 
 
 Set-Location ../ScorpioExec
 
-$platforms = @("win-x86", "win-x64", "win-arm", "win-arm64", "linux-x64", "linux-musl-x64", "linux-arm", "linux-arm64", "osx-x64")
+$platforms = @("win-x86", "win-x64", "win-arm", "win-arm64", "linux-x64", "linux-musl-x64", "linux-arm", "linux-arm64", "osx-x64", "osx-arm64")
 # $platforms = @("osx-arm64")
 foreach ($platform in $platforms) {
     Write-Host "正在打包 $platform 版本..."
