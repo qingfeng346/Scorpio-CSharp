@@ -1,3 +1,7 @@
+## v2.3.3 (*2021-11-11*)
+* `[新增]`增加原生协程sleep函数
+* `[修复]`修复协程解析问题
+
 ## v2.3.2 (*2021-11-09*)
 * `[新增]`新增 **userdata.extend** 函数,c#类扩展函数
 * `[新增]`HashSet新增 **forEach find toArray convertAll** 函数
