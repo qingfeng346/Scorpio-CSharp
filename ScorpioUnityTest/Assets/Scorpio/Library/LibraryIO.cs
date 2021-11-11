@@ -5,6 +5,7 @@ namespace Scorpio.Library {
     public class LibraryIO {
         public static readonly Encoding DefaultEncoding = Encoding.UTF8;
         public const long BaseTime = 621355968000000000;                        //1970, 1, 1, 0, 0, 0, DateTimeKind.Utc
+        public static long UnixNow => (DateTime.UtcNow.Ticks - BaseTime) / 10000;
         public static void Load(Script script) {
             var map = new ScriptMapString(script);
             map.SetValue("unixNow", script.CreateFunction(new unixNow()));
@@ -27,7 +28,7 @@ namespace Scorpio.Library {
         }
         private class unixNow : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue((DateTime.UtcNow.Ticks - BaseTime) / 10000);
+                return new ScriptValue(UnixNow);
             }
         }
         private class toString : ScorpioHandle {
