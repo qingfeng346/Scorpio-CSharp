@@ -651,11 +651,11 @@ namespace Scorpio.Compile.Compiler {
             var funs = new List<long>();
             if (async) {
                 foreach (var func in functions) {
-                    funs.Add(func.nameIndex << 32 | func.funcIndex << 1 | func.async);
+                    funs.Add((func.nameIndex << 32) | (func.funcIndex << 1) | func.async);
                 }
             } else {
                 foreach (var func in functions) {
-                    funs.Add(func.nameIndex << 32 | func.funcIndex);
+                    funs.Add((func.nameIndex << 32) | (func.funcIndex));
                 }
             }
             var index = Classes.Count;
@@ -920,10 +920,10 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeFunction func: {
-                    if (func.lambda) {
-                        AddScriptInstruction(Opcode.NewLambdaFunction, func.func, obj.Line);
+                    if (func.async) {
+                        AddScriptInstruction(func.lambda ? Opcode.NewAsyncLambdaFunction : Opcode.NewAsyncFunction, func.func, obj.Line);
                     } else {
-                        AddScriptInstruction(Opcode.NewFunction, func.func, obj.Line);
+                        AddScriptInstruction(func.lambda ? Opcode.NewLambdaFunction : Opcode.NewFunction, func.func, obj.Line);
                     }
                     break;
                 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net40;</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;</TargetFrameworks>
     <Authors>while</Authors>
     <Product>sco</Product>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
