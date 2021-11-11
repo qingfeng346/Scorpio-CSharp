@@ -10,6 +10,7 @@ namespace Scorpio.Library {
             map.SetValue("poll", script.CreateFunction(new poll()));
             map.SetValue("epoll", script.CreateFunction(new epoll()));
             map.SetValue("done", script.CreateFunction(new done()));
+            script.SetGlobal("sleep", script.CreateFunction(new sleep()));
             script.SetGlobal("coroutine", new ScriptValue(map));
         }
         private class start : ScorpioHandle {
@@ -61,6 +62,15 @@ namespace Scorpio.Library {
                     coroutineCallback.Done();
                 }
                 return ScriptValue.Null;
+            }
+        }
+        private class sleep : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var start = LibraryIO.UnixNow;
+                var milliseconds = args[0].ToDouble() * 1000;
+                return ScriptValue.CreateValue(new CoroutineFuncPoll(() => {
+                    return LibraryIO.UnixNow - start > milliseconds;
+                }));
             }
         }
     }
