@@ -69,7 +69,7 @@ namespace Scorpio.Library {
                 var start = LibraryIO.UnixNow;
                 var milliseconds = args[0].ToDouble() * 1000;
                 return ScriptValue.CreateValue(new CoroutineFuncPoll(() => {
-                    return LibraryIO.UnixNow - start > milliseconds;
+                    return LibraryIO.UnixNow - start >= milliseconds;
                 }));
             }
         }
