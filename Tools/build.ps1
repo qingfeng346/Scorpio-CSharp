@@ -36,7 +36,7 @@ foreach ($platform in $platforms) {
     Write-Host "正在打包 $platform 版本..."
     dotnet publish --self-contained -c release -o ../bin/$name-$platform -r $platform /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
     Write-Host "正在压缩 $platform ..."
-    Compress-Archive ../bin/$name-$platform ../bin/$name-$version-$platform.zip -Force
+    Compress-Archive ../bin/$name-$platform/* ../bin/$name-$version-$platform.zip -Force
 }
 
 
