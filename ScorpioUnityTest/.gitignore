@@ -1,9 +1,0 @@
-/.vs
-/*.csproj
-/Logs
-/obj
-/Library
-/ScorpioTest.sln
-/Temp
-/*.sln
-/Packages/packages-lock.json
