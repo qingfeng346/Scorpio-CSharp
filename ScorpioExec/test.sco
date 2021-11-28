@@ -1,20 +1,9 @@
-
-class Cl {
-    eee() {
-        this.fff()
-        this.wwww()
-    }
-    async wwww() {
-        await null
-        print("eeeeeeeeeeeeee")
-    }
-}
-Cl.fff = async function () {
-    await null
-    print("ffffffffffffff")
-}
-var a = new Cl()
-a.eee()
+TestClass = import_type("ScorpioExec.TestClass")
+var t = new TestClass()
+var refNum = {value : 100}
+var outNum = {}
+t.TestFunc(refNum, outNum)  //ref out 的参数 必须传入map值，然后 ref out 返回的值会设置为 value
+print(refNum.value, outNum.value)
 // var testClass = importType("ScorpioExec.TestStruct")
 // userdata.extend(testClass, "ttt", function() {
 //     print(this.value1)

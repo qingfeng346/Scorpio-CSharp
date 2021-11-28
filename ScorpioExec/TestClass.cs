@@ -8,8 +8,8 @@ namespace ScorpioExec {
     public delegate string TestDelegate3(int a1, int a2);
     public delegate TestClass TestDelegate4(int a1, int a2);
     //public delegate string TestDelegate3(int a1, int a2);
-    public static class TestClassEx {
-        public static void TestFuncEx(this BaseClass cl, int a) {
+    public static class ClassEx {
+        public static void TestFunc1(this BaseClass cl, int a) {
             cl.TestNumber = a;
         }
     }
@@ -38,6 +38,18 @@ namespace ScorpioExec {
         public static int TestOut(ref int num, out string str) {
             str = "test";
             return 100;
+        }
+        public void TestFunc(ref int refNum, out string outNum)
+        {
+            if (refNum == 100)
+            {
+                outNum = "out1";
+            }
+            else
+            {
+                outNum = "out2";
+            }
+            refNum = refNum + 500;
         }
         public static void TestStaticFunc() {
             string a = null;
