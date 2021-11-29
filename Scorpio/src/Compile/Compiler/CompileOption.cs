@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译选项 </summary>
     public class CompileOption {
@@ -34,6 +35,7 @@ namespace Scorpio.Compile.Compiler {
             get { return mScriptConst; }
             set { mScriptConst = value ?? new ScriptConst(); }
         }
+        public Action<string> preprocessImportFile { get; set; }
 
         public CompileOption() {
             this.ignoreFunctions = null;
@@ -41,6 +43,7 @@ namespace Scorpio.Compile.Compiler {
             this.staticTypes = null;
             this.staticVariables = null;
             this.scriptConst = null;
+            this.preprocessImportFile = null;
         }
         internal bool IsIgnoreFunction(string name) {
             return mIgnoreFunctions.Contains(name);

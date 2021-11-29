@@ -25,6 +25,9 @@ namespace Scorpio.Compile.Compiler {
         /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }
         string SearchImportFile(string fileName) {
+            if (this.compileOption.preprocessImportFile != null) {
+                this.compileOption.preprocessImportFile(fileName);
+            }
             if (File.Exists(fileName)) {
                 return fileName;
             }
