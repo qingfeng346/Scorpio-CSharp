@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-namespace Scorpio.ScorpioReflect {
+namespace Scorpio.ScorpioFastReflect {
     public struct ComparerType : IComparer<Type> {
         public int Compare(Type x, Type y) {
             if (x == null || y == null) { return 0; }

@@ -1,4 +1,4 @@
-namespace Scorpio.ScorpioReflect {
+namespace Scorpio.ScorpioFastReflect {
     public class ScorpioUnGenerateAttribute : System.Attribute {
     }
 }

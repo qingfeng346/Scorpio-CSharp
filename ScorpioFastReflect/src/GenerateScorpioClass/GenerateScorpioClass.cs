@@ -5,7 +5,7 @@ using Scorpio.Tools;
 using System.Text;
 using System.Linq;
 
-namespace Scorpio.ScorpioReflect {
+namespace Scorpio.ScorpioFastReflect {
     //过滤不生成的变量 函数 属性 和 事件 
     public interface ClassFilter {
         bool Check(GenerateScorpioClass generate, Type type, FieldInfo fieldInfo);

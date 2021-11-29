@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-namespace Scorpio.ScorpioReflect {
+namespace Scorpio.ScorpioFastReflect {
     public partial class GenerateScorpioType {
         private const string Template = @"using System;
 using Scorpio;

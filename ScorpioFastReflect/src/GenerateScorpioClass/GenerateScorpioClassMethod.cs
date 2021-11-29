@@ -5,7 +5,7 @@ using Scorpio.Tools;
 using System.Linq;
 using System;
 
-namespace Scorpio.ScorpioReflect {
+namespace Scorpio.ScorpioFastReflect {
     public partial class GenerateScorpioClass {
         private static Dictionary<string, string> Operators = new Dictionary<string, string>() {
             {"op_Addition", "+"},
