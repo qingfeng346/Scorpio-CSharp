@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Scorpio.Commons;
-using Scorpio.ScorpioFastReflect;
+using Scorpio.FastReflect;
 using Scorpio.Serialize;
 using Scorpio.Userdata;
 using ScorpioLibrary;

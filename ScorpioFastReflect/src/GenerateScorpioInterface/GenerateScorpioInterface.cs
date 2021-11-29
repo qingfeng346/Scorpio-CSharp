@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Scorpio.ScorpioFastReflect {
+namespace Scorpio.FastReflect {
     public class GenerateScorpioInterface {
         //类模板
         public const string ClassTemplate = @"using System;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Scorpio.ScorpioFastReflect {
+namespace Scorpio.FastReflect {
     public partial class GenerateScorpioClass {
         //反射列表,struct的value会使用反射
         string GenerateReflectList() {

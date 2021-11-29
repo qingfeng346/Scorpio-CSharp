@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using System.Text;
 using Scorpio.Tools;
-namespace Scorpio.ScorpioFastReflect {
+namespace Scorpio.FastReflect {
     public partial class GenerateScorpioClass {
         //类模板
         public const string ClassTemplate = @"using System;

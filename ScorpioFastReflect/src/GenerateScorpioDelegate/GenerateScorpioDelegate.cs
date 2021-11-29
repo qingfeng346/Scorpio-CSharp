@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-namespace Scorpio.ScorpioFastReflect {
+namespace Scorpio.FastReflect {
     public partial class GenerateScorpioDelegate {
         private static readonly Type TYPE_DELEGATE = typeof(Delegate);
         private const string Template = @"using System;
