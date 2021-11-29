@@ -26,7 +26,7 @@ namespace Scorpio.Compile.Compiler {
         public string Breviary { get; private set; }
         string SearchImportFile(string fileName) {
             if (this.compileOption.preprocessImportFile != null) {
-                this.compileOption.preprocessImportFile(fileName);
+                this.compileOption.preprocessImportFile(this, fileName);
             }
             if (File.Exists(fileName)) {
                 return fileName;

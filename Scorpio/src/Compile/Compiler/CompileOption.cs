@@ -35,7 +35,7 @@ namespace Scorpio.Compile.Compiler {
             get { return mScriptConst; }
             set { mScriptConst = value ?? new ScriptConst(); }
         }
-        public Action<string> preprocessImportFile { get; set; }
+        public Action<ScriptParser, string> preprocessImportFile { get; set; }
 
         public CompileOption() {
             this.ignoreFunctions = null;
