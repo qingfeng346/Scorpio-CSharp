@@ -40,22 +40,22 @@ namespace Scorpio.Userdata {
                 //如果obj为null 则调用静态函数
                 var methods = isStatic ? m_StaticMethods : m_Methods;
                 var methodLength = methods.Length;
-                //if (methodLength == 1) {
-                //    var method = methods[0];
-                //    method.SetArgs(parameters, length);
-                //    return method.Invoke(obj, parameters);
-                //} else {
-                for (var i = 0; i < methodLength; ++i) {
-                    var method = methods[i];
-                    if (method.CheckNormalType(parameters, length)) {
-                        return method.Invoke(obj, parameters);
-                    } else if (method.CheckDefaultType(parameters, length)) {
-                        return method.Invoke(obj, parameters);
-                    } else if (method.CheckArgsType(parameters, length)) {
-                        return method.Invoke(obj, parameters);
+                if (methodLength == 1) {
+                    var method = methods[0];
+                    method.SetArgs(parameters, length);
+                    return method.Invoke(obj, parameters);
+                } else {
+                    for (var i = 0; i < methodLength; ++i) {
+                        var method = methods[i];
+                        if (method.CheckNormalType(parameters, length)) {
+                            return method.Invoke(obj, parameters);
+                        } else if (method.CheckDefaultType(parameters, length)) {
+                            return method.Invoke(obj, parameters);
+                        } else if (method.CheckArgsType(parameters, length)) {
+                            return method.Invoke(obj, parameters);
+                        }
                     }
                 }
-                //}
                 throw new ExecutionException ($"类[{m_Type}] 找不到合适的函数 [{MethodName}]");
             } catch (System.Exception e) {
                 throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] : {e}");
@@ -66,26 +66,26 @@ namespace Scorpio.Userdata {
                 //如果obj为null 则调用静态函数
                 var methods = isStatic ? m_StaticMethods : m_Methods;
                 var methodLength = methods.Length;
-                //if (methodLength == 1) {
-                //    var method = methods[0];
-                //    method.SetArgs(parameters, length);
-                //    result = method.Invoke(obj, parameters);
-                //    return true;
-                //} else {
-                for (var i = 0; i < methodLength; ++i) {
-                    var method = methods[i];
-                    if (method.CheckNormalType (parameters, length)) {
-                        result = method.Invoke (obj, parameters);
-                        return true;
-                    } else if (method.CheckDefaultType(parameters, length)) {
-                        result = method.Invoke(obj, parameters);
-                        return true;
-                    } else if (method.CheckArgsType(parameters, length)) {
-                        result = method.Invoke(obj, parameters);
-                        return true;
+                if (methodLength == 1) {
+                    var method = methods[0];
+                    method.SetArgs(parameters, length);
+                    result = method.Invoke(obj, parameters);
+                    return true;
+                } else {
+                    for (var i = 0; i < methodLength; ++i) {
+                        var method = methods[i];
+                        if (method.CheckNormalType (parameters, length)) {
+                            result = method.Invoke (obj, parameters);
+                            return true;
+                        } else if (method.CheckDefaultType(parameters, length)) {
+                            result = method.Invoke(obj, parameters);
+                            return true;
+                        } else if (method.CheckArgsType(parameters, length)) {
+                            result = method.Invoke(obj, parameters);
+                            return true;
+                        }
                     }
                 }
-                //}
                 result = null;
                 return false;
             } catch (System.Exception e) {

@@ -1,9 +1,35 @@
-TestClass = import_type("ScorpioExec.TestClass")
+TestClass = import_type("Scorpio.TestClass")
+importExtension("Scorpio.ClassEx")
+TestClass()
+TestClass(1)
+TestClass("")
+TestClass(100, 200, 1,2,3,4,5)
 var t = new TestClass()
-var refNum = {value : 100}
-var outNum = {}
-t.TestFunc(refNum, outNum)  //ref out µÄ²ÎÊý ±ØÐë´«ÈëmapÖµ£¬È»ºó ref out ·µ»ØµÄÖµ»áÉèÖÃÎª value
-print(refNum.value, outNum.value)
+t.TestFunc(1)
+t.TestDefaultFunc(1)
+t.TestArgsFunc(1)
+var refValue = { value : 100 }
+var outValue = {}
+t.TestRefFunc(refValue, outValue)
+print("ref = " + refValue.value + "  out = " + outValue.value)
+t.TestRefDefaultFunc(refValue, outValue)
+print("ref = " + refValue.value + "  out = " + outValue.value)
+t.TestRefArgsFunc(refValue, outValue)
+print("ref = " + refValue.value + "  out = " + outValue.value)
+t.TestFuncEx(100)
+t.TestDefaultFuncEx("111")
+t.TestArgsFuncEx(100,200)
+t.TestRefFuncEx(refValue, outValue)
+print("ref = " + refValue.value + "  out = " + outValue.value)
+t.TestRefDefaultFuncEx(refValue, outValue)
+print("ref = " + refValue.value + "  out = " + outValue.value)
+t.TestRefArgsFuncEx(refValue, outValue)
+print("ref = " + refValue.value + "  out = " + outValue.value)
+// var refNum = {value : 100}
+// var outNum = {}
+// t.TestFunc(refNum, outNum)  //ref out ï¿½Ä²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ë´«ï¿½ï¿½mapÖµï¿½ï¿½È»ï¿½ï¿½ ref out ï¿½ï¿½ï¿½Øµï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª value
+// print(refNum.value, outNum.value)
+// constructor
 // var testClass = importType("ScorpioExec.TestStruct")
 // userdata.extend(testClass, "ttt", function() {
 //     print(this.value1)

@@ -38,8 +38,8 @@ namespace Scorpio.Userdata {
                         return false;
                     }
                 }
-                for (var i = 0; i < length; ++i) {
-                    Args[i] = Util.ChangeType(parameters[i], ParameterType[i]);
+                for (var i = 1; i < length; ++i) {
+                    Args[i] = Util.ChangeType(parameters[i - 1], ParameterType[i]);
                 }
                 for (var i = length; i < ParameterCount; ++i) {
                     Args[i] = DefaultParameter[i];
@@ -77,6 +77,34 @@ namespace Scorpio.Userdata {
             }
             return false;
         }
+        //函数数量为1时,直接设置参数
+        public override void SetArgs(ScriptValue[] parameters, int length) {
+            ++length;
+            if (IsNormal) {
+                for (var i = 1; i < length; ++i) {
+                    Args[i] = Util.ChangeType(parameters[i - 1], ParameterType[i]);
+                }
+            } else if (IsDefault) {
+                for (var i = 1; i < length; ++i) {
+                    Args[i] = Util.ChangeType(parameters[i - 1], ParameterType[i]);
+                }
+                for (var i = length; i < ParameterCount; ++i) {
+                    Args[i] = DefaultParameter[i];
+                }
+            } else {
+                for (var i = 1; i < ParameterCount; ++i) {
+                    Args[i] = i < length ? (Util.ChangeType(parameters[i - 1], ParameterType[i])) : DefaultParameter[i];
+                }
+                if (length > ParameterCount) {
+                    var array = Array.CreateInstance(ParamType, length - ParameterCount);
+                    for (int i = ParameterCount; i < length; ++i)
+                        array.SetValue(Util.ChangeType(parameters[i - 1], ParamType), i - ParameterCount);
+                    Args[ParameterCount] = array;
+                } else {
+                    Args[ParameterCount] = Array.CreateInstance(ParamType, 0);
+                }
+            }
+        }
     }
     //带 ref out 参数的 普通反射函数
     public class FunctionDataExtensionMethodWithRefOut : FunctionDataExtensionMethod {
@@ -88,8 +116,6 @@ namespace Scorpio.Userdata {
             var ret = Method.Invoke(obj, Args);
             for (var i = 1; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
-                    //var instance = ;
-                    //if (instance == null) throw new ExecutionException($"带 ref out 标识的字段,必须传入 map, Index : {i}");
                     parameters[i - 1].Get<ScriptInstance>().SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
                 }
             }
@@ -153,6 +179,31 @@ namespace Scorpio.Userdata {
                 return true;
             }
             return false;
+        }
+        //函数数量为1时,直接设置参数
+        public override void SetArgs(ScriptValue[] parameters, int length) {
+            ++length;
+            if (IsNormal) {
+                for (var i = 1; i < length; ++i) {
+                    Args[i] = Util.ChangeType(RefOuts[i] ? parameters[i - 1].GetValue(RefOutValue) : parameters[i - 1], ParameterType[i]);
+                }
+            } else if (IsDefault) {
+                for (var i = 1; i < ParameterCount; ++i) {
+                    Args[i] = i < length ? (Util.ChangeType(RefOuts[i] ? parameters[i - 1].GetValue(RefOutValue) : parameters[i - 1], ParameterType[i])) : DefaultParameter[i];
+                }
+            } else {
+                for (var i = 1; i < ParameterCount; ++i) {
+                    Args[i] = i < length ? (Util.ChangeType(RefOuts[i] ? parameters[i - 1].GetValue(RefOutValue) : parameters[i - 1], ParameterType[i])) : DefaultParameter[i];
+                }
+                if (length > ParameterCount) {
+                    var array = Array.CreateInstance(ParamType, length - ParameterCount);
+                    for (int i = ParameterCount; i < length; ++i)
+                        array.SetValue(Util.ChangeType(parameters[i - 1], ParamType), i - ParameterCount);
+                    Args[ParameterCount] = array;
+                } else {
+                    Args[ParameterCount] = Array.CreateInstance(ParamType, 0);
+                }
+            }
         }
     }
 }

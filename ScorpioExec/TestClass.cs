@@ -1,85 +1,62 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ScorpioExec {
-    public delegate void TestDelegate1();
-    public delegate int TestDelegate2(int a1);
-    public delegate string TestDelegate3(int a1, int a2);
-    public delegate TestClass TestDelegate4(int a1, int a2);
-    //public delegate string TestDelegate3(int a1, int a2);
-    public static class ClassEx {
-        public static void TestFunc1(this BaseClass cl, int a) {
-            cl.TestNumber = a;
-        }
-    }
+namespace Scorpio {
     public class BaseClass {
-        public int TestNumber { get; set; }
     }
     public class TestClass : BaseClass {
-        public static Scorpio.Script script;
-        public static void TestStaticFunc(string name) {
-            script.call(name);
+        public TestClass() { }
+        public TestClass(int a) {
+            Console.WriteLine("one constructor " + a);
         }
-        public int num;
-        public TestClass(int num, ref int tNum) {
-            tNum = 0;
-            this.num = num;
+        public TestClass(string a, int b = 100) {
+            Console.WriteLine("default constructor " + a + " b = " + b);
         }
-        public TestClass(int num) {
-            this.num = num;
+        public TestClass(int a, int b, params object[] args) {
+            Console.WriteLine("params constructor " + a + " b = " + b + "  argLength = " + args.Length);
         }
-        public TestClass() {
-
+        public void TestFunc(int a) {
+            Console.WriteLine("TestFunc - " + a);
         }
-        public void TestOut(int[] results, ref int num, out string str) {
-            str = "test";
+        public void TestDefaultFunc(int a, int b = 100) {
+            Console.WriteLine("TestDefaultFunc - " + a + "¡¡b = " + b);
         }
-        public static int TestOut(ref int num, out string str) {
-            str = "test";
-            return 100;
+        public void TestArgsFunc(int a, int b = 100, params object[] args) {
+            Console.WriteLine("TestArgsFunc - " + a + "¡¡b = " + b + "  argLength = " + args.Length);
         }
-        public void TestFunc(ref int refNum, out string outNum)
-        {
-            if (refNum == 100)
-            {
-                outNum = "out1";
-            }
-            else
-            {
-                outNum = "out2";
-            }
-            refNum = refNum + 500;
+        public void TestRefFunc(ref int a, out int b) {
+            a += 100;
+            b = 100;
         }
-        public static void TestStaticFunc() {
-            string a = null;
-            Console.WriteLine(a.ToString());
+        public void TestRefDefaultFunc(ref int a, out int b, int c = 200) {
+            a += 100;
+            b = 100;
         }
-        public void TestArgs(int a, params object[] args) {
-            foreach (var arg in args) {
-                Console.WriteLine(arg);
-            }
-        }
-        public void TestFunc() {
-
-        }
-        public void TestTemplate<T>(T arg) {
-
-        }
-        public static implicit operator TestClass(int value) {
-            int refOut = 0;
-            return new TestClass(value + 100, ref refOut);
+        public void TestRefArgsFunc(ref int a, out int b, params object[] args) {
+            a += 100;
+            b = 100;
         }
     }
-    public struct TestStruct {
-        public static int staticNumber { get; set; }
-        public int value1;
-        public int value2 { get; set; }
-    }
-    public interface TestInterface {
-        void Func1(int a, int b);
-        void Func2();
-        int Func3();
-        string Func4(int aaa, int bbb);
+    public static class ClassEx {
+        public static void TestFuncEx(this BaseClass cl, int a) {
+            Console.WriteLine(a);
+        }
+        public static void TestDefaultFuncEx(this BaseClass cl, string a, int b = 100) {
+            Console.WriteLine(a + "   " + b);
+        }
+        public static void TestArgsFuncEx(this BaseClass cl, params object[] args) {
+            Console.WriteLine(args.Length);
+        }
+        public static void TestRefFuncEx(this BaseClass cl, ref int a, out int b) {
+            a += 100;
+            b = 100;
+        }
+        public static void TestRefDefaultFuncEx(this BaseClass cl, ref int a, out int b, int c = 200) {
+            a += 100;
+            b = 100;
+        }
+        public static void TestRefArgsFuncEx(this BaseClass cl, ref int a, out int b, params object[] args) {
+            a += 100;
+            b = 100;
+        }
     }
 }

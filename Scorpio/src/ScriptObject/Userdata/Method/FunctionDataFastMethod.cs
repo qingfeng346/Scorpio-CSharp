@@ -27,9 +27,7 @@ namespace Scorpio.Userdata {
             var ret = FastMethod.Call(obj, MethodIndex, Args);
             for (var i = 0; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
-                    var instance = parameters[i].Get<ScriptInstance>();
-                    if (instance == null) throw new ExecutionException($"带 ref out 标识的字段,必须传入 map, Index : {i}");
-                    instance.SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
+                    parameters[i].Get<ScriptInstance>().SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
                 }
             }
             return ret;
