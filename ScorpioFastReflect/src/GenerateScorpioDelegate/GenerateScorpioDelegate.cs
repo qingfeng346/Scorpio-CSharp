@@ -39,7 +39,7 @@ public class DelegateFactory : IDelegateFactory {
         public void AddType(Type type) {
             if (type == null || !TYPE_DELEGATE.IsAssignableFrom(type) ||
                 // MulticastDelegate 是 event
-                type == typeof(MulticastDelegate) || string.IsNullOrWhiteSpace(ScorpioReflectUtil.GetFullName(type)) ||
+                type == typeof(MulticastDelegate) || string.IsNullOrWhiteSpace(ScorpioFastReflectUtil.GetFullName(type)) ||
                 m_Delegates.Contains(type)) { return; }
             m_Delegates.Add(type);
         }
@@ -51,7 +51,7 @@ public class DelegateFactory : IDelegateFactory {
             if (!option.generateList) { return ""; }
             var builder = new StringBuilder();
             foreach (var type in m_Delegates) {
-                var fullName = ScorpioReflectUtil.GetFullName(type);
+                var fullName = ScorpioFastReflectUtil.GetFullName(type);
                 builder.Append($@"
         script.SetGlobal(""{fullName}"", ScriptValue.CreateValue(typeof({fullName})));");
             }
@@ -60,7 +60,7 @@ public class DelegateFactory : IDelegateFactory {
         string CreateDelegate() {
             var builder = new StringBuilder();
             foreach (var type in m_Delegates) {
-                var fullName = ScorpioReflectUtil.GetFullName(type);
+                var fullName = ScorpioFastReflectUtil.GetFullName(type);
                 var InvokeMethod = type.GetMethod("Invoke");
                 var parameters = InvokeMethod.GetParameters();
                 var pars = "";
@@ -69,7 +69,7 @@ public class DelegateFactory : IDelegateFactory {
                     pars += $"arg{i}";
                 }
                 var invoke = parameters.Length == 0 ? $"scriptObject.call(ScriptValue.Null)" : $"scriptObject.call(ScriptValue.Null,{pars})";
-                var call = ScorpioReflectUtil.ReturnString(invoke, InvokeMethod.ReturnType);
+                var call = ScorpioFastReflectUtil.ReturnString(invoke, InvokeMethod.ReturnType);
                 var func = $"return new {fullName}( ({pars}) => {{ {call}; }} );";
                 if (option.buildType == 0) {
                     builder.Append($@"

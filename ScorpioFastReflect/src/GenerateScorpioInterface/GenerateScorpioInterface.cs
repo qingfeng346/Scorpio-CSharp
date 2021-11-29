@@ -29,8 +29,8 @@ public class __class : __interface {
         public List<MethodInfo> Methods { get; }
         public GenerateScorpioInterface(Type type) {
             m_Type = type;
-            FullName = ScorpioReflectUtil.GetFullName(m_Type);
-            ScorpioClassName = "ScorpioInterface_" + ScorpioReflectUtil.GetGenerateClassName(type);
+            FullName = ScorpioFastReflectUtil.GetFullName(m_Type);
+            ScorpioClassName = "ScorpioInterface_" + ScorpioFastReflectUtil.GetGenerateClassName(type);
             Methods = new List<MethodInfo>(type.GetMethods());
         }
         public string Generate() {
@@ -49,7 +49,7 @@ public class __class : __interface {
                     parameterStrs += $"{parameters[i].ParameterType.GetFullName()} {parameters[i].Name}";
                     parameterArgs += $", {parameters[i].Name}";
                 }
-                var call = ScorpioReflectUtil.ReturnString($@"__Call(""{method.Name}""{parameterArgs})", method.ReturnType);
+                var call = ScorpioFastReflectUtil.ReturnString($@"__Call(""{method.Name}""{parameterArgs})", method.ReturnType);
                 builder.Append($@"
     public {method.ReturnType.GetFullName()} {method.Name}({parameterStrs}) {{
         {call};

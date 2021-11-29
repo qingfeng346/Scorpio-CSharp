@@ -6,7 +6,7 @@ namespace Scorpio.ScorpioFastReflect {
     public struct ComparerType : IComparer<Type> {
         public int Compare(Type x, Type y) {
             if (x == null || y == null) { return 0; }
-            return ScorpioReflectUtil.GetFullName(x).CompareTo(ScorpioReflectUtil.GetFullName(y));
+            return ScorpioFastReflectUtil.GetFullName(x).CompareTo(ScorpioFastReflectUtil.GetFullName(y));
         }
     }
     public struct ComparerFieldInfo : IComparer<FieldInfo> {
@@ -29,7 +29,7 @@ namespace Scorpio.ScorpioFastReflect {
             return x.Name.CompareTo(y.Name);
         }
     }
-    public static class ScorpioReflectUtil {
+    public static class ScorpioFastReflectUtil {
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy;
         public static void SortType(this List<Type> types) {
             types.Sort(new ComparerType());

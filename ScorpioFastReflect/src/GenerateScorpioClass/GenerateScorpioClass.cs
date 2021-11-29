@@ -35,11 +35,11 @@ namespace Scorpio.ScorpioFastReflect {
         public GenerateScorpioClass(Type type) {
             m_Type = type;
             IsStruct = !type.IsClass;
-            FullName = ScorpioReflectUtil.GetFullName(m_Type);
-            ScorpioClassName = "ScorpioClass_" + ScorpioReflectUtil.GetGenerateClassName(type);
-            AllFields.AddRange(m_Type.GetFields(ScorpioReflectUtil.BindingFlag));
-            AllEvents.AddRange(m_Type.GetEvents(ScorpioReflectUtil.BindingFlag));
-            var propertys = m_Type.GetProperties(ScorpioReflectUtil.BindingFlag);
+            FullName = ScorpioFastReflectUtil.GetFullName(m_Type);
+            ScorpioClassName = "ScorpioClass_" + ScorpioFastReflectUtil.GetGenerateClassName(type);
+            AllFields.AddRange(m_Type.GetFields(ScorpioFastReflectUtil.BindingFlag));
+            AllEvents.AddRange(m_Type.GetEvents(ScorpioFastReflectUtil.BindingFlag));
+            var propertys = m_Type.GetProperties(ScorpioFastReflectUtil.BindingFlag);
             foreach (var property in propertys) {
                 //如果是 get 则参数是0个  set 参数是1个  否则就可能是 [] 的重载
                 if ((property.CanRead && property.GetGetMethod().GetParameters().Length == 0) ||
@@ -47,10 +47,10 @@ namespace Scorpio.ScorpioFastReflect {
                     AllPropertys.Add(property);
                 }
             }
-            var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(ScorpioReflectUtil.BindingFlag);
+            var methods = (m_Type.IsAbstract && m_Type.IsSealed) ? m_Type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy) : m_Type.GetMethods(ScorpioFastReflectUtil.BindingFlag);
             foreach (var method in methods) {
                 //屏蔽掉 模版函数 模板函数只能使用反射
-                if (!ScorpioReflectUtil.CheckGenericMethod(method)) { continue; }
+                if (!ScorpioFastReflectUtil.CheckGenericMethod(method)) { continue; }
                 AllMethods.Add(method);
             }
         }
@@ -117,7 +117,7 @@ namespace Scorpio.ScorpioFastReflect {
                     //判断是模板函数
                     if (paramterType.IsGenericParameter && paramterType.BaseType != null && paramterType.BaseType.IsAssignableFrom(m_Type)) {
                         m_ExtensionMethods.Add(methodInfo);
-                    } else if (ScorpioReflectUtil.CheckGenericMethod(methodInfo) && paramterType.IsAssignableFrom(m_Type)) {
+                    } else if (ScorpioFastReflectUtil.CheckGenericMethod(methodInfo) && paramterType.IsAssignableFrom(m_Type)) {
                         m_ExtensionMethods.Add(methodInfo);
                     } else {
                         continue;

@@ -23,7 +23,7 @@ namespace Scorpio.ScorpioFastReflect {
         };
         //获得构造函数
         private string GenerateConstructor() {
-            var Constructors = m_Type.GetConstructors(ScorpioReflectUtil.BindingFlag);
+            var Constructors = m_Type.GetConstructors(ScorpioFastReflectUtil.BindingFlag);
             var builder = new StringBuilder();
             for (var i = 0; i < Constructors.Length; ++i) {
                 var con = Constructors[i];
@@ -61,7 +61,7 @@ namespace Scorpio.ScorpioFastReflect {
             }
             //重载 =
             if (name == "op_Implicit") {
-                return string.Format("return ({0})({1});", ScorpioReflectUtil.GetFullName(method.ReturnType), GetScorpioMethodArgs(pars, 0));
+                return string.Format("return ({0})({1});", ScorpioFastReflectUtil.GetFullName(method.ReturnType), GetScorpioMethodArgs(pars, 0));
             //如果 get_Item 参数是一个 就是 [] 的重载
             } else if (name == "get_Item" && method.GetParameters().Length == 1) {
                 return string.Format("return {0}[{1}];", variable, GetScorpioMethodArgs(pars, 0));
@@ -151,16 +151,16 @@ namespace Scorpio.ScorpioFastReflect {
             case ""{0}"": return typeof({1});";
             var builder = new StringBuilder();
             //所有类变量
-            m_Fields.ForEach((field) => builder.AppendFormat(templateStr, field.Name, ScorpioReflectUtil.GetFullName(field.FieldType)) );
+            m_Fields.ForEach((field) => builder.AppendFormat(templateStr, field.Name, ScorpioFastReflectUtil.GetFullName(field.FieldType)) );
             //所有属性
-            m_Propertys.ForEach((property) => builder.AppendFormat(templateStr, property.Name, ScorpioReflectUtil.GetFullName(property.PropertyType)) );
+            m_Propertys.ForEach((property) => builder.AppendFormat(templateStr, property.Name, ScorpioFastReflectUtil.GetFullName(property.PropertyType)) );
             //所有的函数
             var methods = new List<string>();
             foreach (var method in m_Methods) {
                 string name = method.Name;
                 if (methods.Contains(name) || method.ReturnType == typeof(void)) { continue; }
                 methods.Add(name);
-                builder.AppendFormat(templateStr, method.Name, ScorpioReflectUtil.GetFullName(method.ReturnType));
+                builder.AppendFormat(templateStr, method.Name, ScorpioFastReflectUtil.GetFullName(method.ReturnType));
             }
             return builder.ToString();
         }

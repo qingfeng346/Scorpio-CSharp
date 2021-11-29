@@ -63,13 +63,13 @@ __methods_content
             foreach (var par in pars) {
                 if (first) { first = false; } else { parameterType.Append(","); refOut.Append(","); }
                 if (Util.IsRetvalOrOut(par)) {
-                    parameterType.Append($"typeof({ScorpioReflectUtil.GetFullName(par.ParameterType.GetElementType())})");
+                    parameterType.Append($"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType.GetElementType())})");
                     refOut.Append("true");
                 } else {
                     refOut.Append("false");
-                    parameterType.Append($"typeof({ScorpioReflectUtil.GetFullName(par.ParameterType)})");
+                    parameterType.Append($"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType)})");
                     if (Util.IsParams(par)) {
-                        paramType = $"typeof({ScorpioReflectUtil.GetFullName(par.ParameterType.GetElementType())})";
+                        paramType = $"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType.GetElementType())})";
                     }
                 }
             }
@@ -83,7 +83,7 @@ __methods_content
             for (var j = 0; j < pars.Length; ++j) {
                 if (Util.IsRetvalOrOut(pars[j])) {
                     hasRefOut = true;
-                    var typeName = ScorpioReflectUtil.GetFullName(pars[j].ParameterType.GetElementType());
+                    var typeName = ScorpioFastReflectUtil.GetFullName(pars[j].ParameterType.GetElementType());
                     callBuilder.Append($@"
                     var retval{j} = args[{j}] == null ? default({typeName}) : ({typeName})args[{j}]; ");
                 }
@@ -131,14 +131,14 @@ __methods_content
                 } else if (par.ParameterType.IsByRef) {
                     builder.Append($"ref retval{i}");
                 } else {
-                    var typeName = ScorpioReflectUtil.GetFullName(par.ParameterType);
+                    var typeName = ScorpioFastReflectUtil.GetFullName(par.ParameterType);
                     builder.Append($"({typeName})args[{i}]");
                 }
             }
             return builder.ToString();
         }
         private string GetScorpioMethodArgs(ParameterInfo[] pars, int index) {
-            return "(" + ScorpioReflectUtil.GetFullName(pars[index].ParameterType) + ")args[" + index + "]";
+            return "(" + ScorpioFastReflectUtil.GetFullName(pars[index].ParameterType) + ")args[" + index + "]";
         }
         private string GetScorpioVariable(bool IsStatic, string name) {
             return (IsStatic ? FullName : $"(({FullName})obj)") + "." + name;

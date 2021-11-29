@@ -29,7 +29,7 @@ namespace __Namespace {
             var builder = new StringBuilder();
             foreach (var type in m_Types) {
                 builder.AppendFormat(@"
-            script.SetGlobal(""{0}"", ScriptValue.CreateObject(typeof({0})));", ScorpioReflectUtil.GetFullName(type));
+            script.SetGlobal(""{0}"", ScriptValue.CreateObject(typeof({0})));", ScorpioFastReflectUtil.GetFullName(type));
             }
             return builder.ToString();
         }

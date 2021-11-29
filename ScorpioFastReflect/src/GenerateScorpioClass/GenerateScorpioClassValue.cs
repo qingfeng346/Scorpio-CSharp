@@ -52,7 +52,7 @@ namespace Scorpio.ScorpioFastReflect {
             //类变量
             foreach (var field in m_Fields) {
                 if (field.IsInitOnly /*readonly 属性*/ || field.IsLiteral /*const 属性*/) { continue; }
-                var fieldFullName = ScorpioReflectUtil.GetFullName(field.FieldType);
+                var fieldFullName = ScorpioFastReflectUtil.GetFullName(field.FieldType);
                 if (IsStruct && !field.IsStatic) {
                     builder.AppendFormat(reflectFormat, field.Name, $"_field_{field.Name}", fieldFullName);
                 } else {
@@ -63,7 +63,7 @@ namespace Scorpio.ScorpioFastReflect {
             foreach (var property in m_Propertys) {
                 MethodInfo setMethod;
                 if (!property.CanWrite || (setMethod = property.GetSetMethod(false)) == null) { continue; }
-                var propertyFullName = ScorpioReflectUtil.GetFullName(property.PropertyType);
+                var propertyFullName = ScorpioFastReflectUtil.GetFullName(property.PropertyType);
                 if (IsStruct && !setMethod.IsStatic) {
                     builder.AppendFormat(reflectFormat, property.Name, $"_property_{property.Name}", propertyFullName);
                 } else {
