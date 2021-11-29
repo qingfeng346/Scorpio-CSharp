@@ -30,7 +30,12 @@ public class DelegateFactory : IDelegateFactory {
         throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);
     }
 }";
+        public struct Option {
+            public int buildType;           //build 类型
+            public bool generateList;       //是否生成 DelegateList
+        }
         private List<Type> m_Delegates = new List<Type>();
+        public Option option { get; set; }
         public void AddType(Type type) {
             if (type == null || !TYPE_DELEGATE.IsAssignableFrom(type) ||
                 // MulticastDelegate 是 event
@@ -38,11 +43,12 @@ public class DelegateFactory : IDelegateFactory {
                 m_Delegates.Contains(type)) { return; }
             m_Delegates.Add(type);
         }
-        public string Generate(int buildType) {
+        public string Generate() {
             m_Delegates.SortType();
-            return (buildType == 0 ? Template : TemplateIf).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate(buildType));
+            return (option.buildType == 0 ? Template : TemplateIf).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate());
         }
         string DelegateList() {
+            if (!option.generateList) { return ""; }
             var builder = new StringBuilder();
             foreach (var type in m_Delegates) {
                 var fullName = ScorpioReflectUtil.GetFullName(type);
@@ -51,7 +57,7 @@ public class DelegateFactory : IDelegateFactory {
             }
             return builder.ToString();
         }
-        string CreateDelegate(int buildType) {
+        string CreateDelegate() {
             var builder = new StringBuilder();
             foreach (var type in m_Delegates) {
                 var fullName = ScorpioReflectUtil.GetFullName(type);
@@ -65,7 +71,7 @@ public class DelegateFactory : IDelegateFactory {
                 var invoke = parameters.Length == 0 ? $"scriptObject.call(ScriptValue.Null)" : $"scriptObject.call(ScriptValue.Null,{pars})";
                 var call = ScorpioReflectUtil.ReturnString(invoke, InvokeMethod.ReturnType);
                 var func = $"return new {fullName}( ({pars}) => {{ {call}; }} );";
-                if (buildType == 0) {
+                if (option.buildType == 0) {
                     builder.Append($@"
         delegates[typeof({fullName})] = (scriptObject) => {{ {func} }};");
                 } else {

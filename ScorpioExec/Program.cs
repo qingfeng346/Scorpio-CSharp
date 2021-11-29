@@ -185,7 +185,7 @@ namespace ScorpioExec {
                 if (clazz == null) { throw new Exception ($"找不到 class, 请输入完整类型或检查类名是否正确 : {className}"); }
                 generate.AddType (clazz);
             }
-            FileUtil.CreateFile (output, generate.Generate (0));
+            FileUtil.CreateFile (output, generate.Generate ());
             Logger.info ($"生成Delegate仓库 {output}");
         }
         static void Interface (CommandLine command, string[] args) {
