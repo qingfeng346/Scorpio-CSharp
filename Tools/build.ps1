@@ -47,6 +47,7 @@ foreach ($platform in $platforms) {
             AdvancedInstaller.com /edit $aipPath /SetPackageType x64 -buildname DefaultBuild
         }
         AdvancedInstaller.com /build $aipPath -buildslist DefaultBuild
+        git checkout $aipPath
     }
 }
 Write-Host "生成完成"
