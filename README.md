@@ -18,7 +18,7 @@ sco是c#实现的解释型脚本,是一种高效,轻量,可嵌入的脚本语言
 * 方式2
     * 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)压缩包并添加环境变量
 ### Mac
-* 方式1，运行命令（推荐）
+* 方式1 - 运行命令（推荐）
 ```
 brew tap qingfeng346/brew
 brew install sco
@@ -34,7 +34,7 @@ brew install sco
 pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
 ```
 ## Unity导入
-* 方式1,upm导入
+* 方式1 - upm导入
 ```json
 // 添加地址 https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.unity.sco#sco/[version]
 // 示例:
@@ -42,7 +42,7 @@ pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadStri
     "com.scorpio.unity.sco": "https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.unity.sco#sco/2.3.5",
 }
 ```
-* 方式2,源码导入
+* 方式2 - 源码导入
     * 导入源码目录 Scorpio/src 即可,不用版本可以下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)的Source Code
 
 ## 兼容的 **.net** 平台
