@@ -33,39 +33,28 @@ Set-Location ../ScorpioExec
 $platforms = @("win-x86", "win-x64", "win-arm", "win-arm64", "linux-x64", "linux-musl-x64", "linux-arm", "linux-arm64", "osx-x64", "osx-arm64")
 foreach ($platform in $platforms) {
     Write-Host "正在打包 $platform 版本..."
-    dotnet publish --self-contained -c release -o ../bin/$name-$platform -r $platform /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
+    $pathName = $name-$platform
+    dotnet publish --self-contained -c release -o ../bin/$pathName -r $platform /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
     Write-Host "正在压缩 $platform ..."
-    Compress-Archive ../bin/$name-$platform/* ../bin/$name-$version-$platform.zip -Force
+    $fileName = "$name-$version-$platform"
+    Compress-Archive ../bin/$pathName/* ../bin/$fileName.zip -Force
+    if ($IsWindows) {
+        if ($platform -eq "win-x86") {
+            git checkout ./Install.aip
+            AdvancedInstaller.com /edit .\Install.aip /AddFolder APPDIR ..\bin\$pathName\
+            AdvancedInstaller.com /edit .\Install.aip /SetPackageName ..\bin\$fileName.msi -buildname DefaultBuild
+            AdvancedInstaller.com /edit MyProject.aip /SetPackageType x86 DefaultBuild
+            AdvancedInstaller.com /edit .\Install.aip /SetVersion $version
+            AdvancedInstaller.com /build .\Install.aip buildslist DefaultBuild
+        } elseif ($platform -eq "win-x64") {
+            git checkout ./Install.aip
+            AdvancedInstaller.com /edit .\Install.aip /AddFolder APPDIR ..\bin\$pathName\
+            AdvancedInstaller.com /edit .\Install.aip /SetPackageName ..\bin\$fileName.msi -buildname DefaultBuild
+            AdvancedInstaller.com /edit MyProject.aip /SetPackageType x64 DefaultBuild
+            AdvancedInstaller.com /edit .\Install.aip /SetVersion $version
+            AdvancedInstaller.com /build .\Install.aip buildslist DefaultBuild
+        }
+    }
 }
-
-
-# # dotnet publish -c release -o ../bin/$name-win-x64 -r win-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
-# # Write-Host "正在打包osx版本..."
-# # dotnet publish -c release -o ../bin/$name-osx-x64 -r osx-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
-# # Write-Host "正在打包linux版本..."
-# # dotnet publish -c release -o ../bin/$name-linux-x64 -r linux-x64 /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
-
-# # Write-Host "正在压缩文件夹..."
-# # Compress-Archive ../bin/sco-win-x64 ../bin/$name-$version-win-x64.zip -Force
-# # Compress-Archive ../bin/sco-osx-x64 ../bin/$name-$version-osx-x64.zip -Force
-# # Compress-Archive ../bin/sco-linux-x64 ../bin/$name-$version-linux-x64.zip -Force
-
-# Write-Host "复制库文件到Unity示例项目"
-# Remove-Item ../ScorpioUnityTest/Assets/Scorpio/ -Force -Recurse
-# Remove-Item ../ScorpioUnityTest/Assets/Editor/ScorpioReflect -Force -Recurse
-# Remove-Item ../ScorpioUnityTest/Assets/Resources/ -Force -Recurse
-
-# Copy-Item ../Scorpio/src/ ../ScorpioUnityTest/Assets/Scorpio/ -Recurse -Force 
-# Copy-Item ../ScorpioReflect/src/ ../ScorpioUnityTest/Assets/Editor/ScorpioReflect/ -Recurse -Force
-# New-Item -ItemType "directory" ../ScorpioUnityTest/Assets/Resources/ | Out-Null
-# Get-ChildItem ../ExampleScripts | ForEach-Object -Process {
-#     if ($_ -is [System.IO.FileInfo]) {
-#         $fileName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
-#         Copy-Item $_.FullName -Destination "../ScorpioUnityTest/Assets/Resources/sco_$fileName.txt" -Recurse -Force
-#     }
-# }
-
 Set-Location $cur
 Write-Host "生成完成"
-
-# dotnet push ./a.nupkg -k oy2ibgtbm2lzfxzi3b4akycdlwhiwgxuzd3mdopbdtdqre -s https://api.nuget.org/v3/index.json
