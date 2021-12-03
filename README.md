@@ -6,33 +6,44 @@
 ```
 sco是c#实现的解释型脚本,是一种高效,轻量,可嵌入的脚本语言,语法类似javascript,类型为弱类型,通过使用基于栈的虚拟机解释字节码来运行.
 ```
-* **脚本示例** [ExampleScripts](https://github.com/qingfeng346/Scorpio-CSharp/tree/master/ExampleScripts)
-* 脚本语法 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/scriptconsole/
-* 脚本实现 Space Shooter 体验地址 http://www.fengyuezhu.com/static/projects/Scorpio-CSharp/unitysample/
-* 脚本实现 Space Shooter 源码地址 https://github.com/qingfeng346/ScorpioUnitySample
-* 码云地址 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
-
+* 脚本Unity示例 https://github.com/qingfeng346/ScorpioUnitySample
+* VSCode语法高亮插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio
+* nuget地址 https://www.nuget.org/packages/Scorpio-CSharp
+* gitee地址 : http://git.oschina.net/qingfeng346/Scorpio-CSharp
 ## 安装 **sco** 命令
 ---
-#### 方式一 手动安装
-* 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)对应版本,解压添加到环境变量
+### Windows
+* 方式1（推荐）
+    * 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)安装包
+* 方式2
+    * 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)压缩包并添加环境变量
+### Mac
+* 方式1，运行命令（推荐）
+```
+brew tap qingfeng346/brew
+brew install sco
+```
+* 方式2
+    * 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)压缩包并添加环境变量
 
-#### 方式二 自动安装
-* windows 7, windows 8, MacOS, Linux 需要预先安装 [PowerShell Core](https://github.com/PowerShell/PowerShell/releases), 运行命令
-```command
+### Linux
+* 方式1
+    * 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)压缩包并添加环境变量
+* 方式2，运行命令（已安装[PowerShell Core](https://github.com/PowerShell/PowerShell/releases)的机器）
+```
 pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
 ```
-
-* windows 10 直接运行命令行, 也可以安装 [PowerShell Core](https://github.com/PowerShell/PowerShell/releases) 使用上面的方法安装
-```command
-powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
+## Unity导入
+* 方式1,upm导入
+```json
+// 添加地址 https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.unity.sco#sco/[version]
+// 示例:
+"dependencies": {
+    "com.scorpio.unity.sco": "https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.unity.sco#sco/2.3.5",
+}
 ```
-
-## 项目中使用
----
-* VSCode 基础语法高亮插件 https://marketplace.visualstudio.com/items?itemName=while.scorpio
-* nuget 地址 https://www.nuget.org/packages/Scorpio-CSharp
-* 导入源码目录 Scorpio/src 即可
+* 方式2,源码导入
+    * 导入源码目录 Scorpio/src 即可,不用版本可以下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)的Source Code
 
 ## 兼容的 **.net** 平台
 ---
@@ -44,6 +55,18 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 * asp.net core
 * mono
 * xamarin
+## Unity相关
+---
+* 支持的Unity版本
+    * **Unity2018**及以上
+    * 请设置 **PlayerSetting** 内 **Api Compatibility Level** 为 **.NET Standard 2.0**
+
+* 支持的Unity平台:
+    * PC, Mac & Linux Standalone(包括IL2CPP)
+    * iOS(包括IL2CPP)
+    * Android(包括IL2CPP)
+    * UWP(仅支持IL2CPP)
+    * WebGL
 
 ## 注意事项
 ---
@@ -98,23 +121,6 @@ powershell.exe -Command "Invoke-Expression ((New-Object System.Net.WebClient).Do
 * **ScorpioExec** 命令行 **sco**
 * **ScorpioReflect** 快速反射机制的实现
 * **ScorpioTest** **Unity3D**内使用**sco**脚本示例
-
-## Unity相关
----
-* 支持的Unity版本
-    * **Unity2018**及以上
-    * 请设置 **PlayerSetting** 内 **Api Compatibility Level** 为 **.NET Standard 2.0**
-
-* 支持的Unity平台:
-    * PC, Mac & Linux Standalone(包括IL2CPP)
-    * iOS(包括IL2CPP)
-    * Android(包括IL2CPP)
-    * UWP(仅支持IL2CPP)
-    * WebGL
-
-* Unity导入Scorpio-CSharp:
-    * 复制源码目录 Scorpio/src 到Unity项目即可
-
 
 ## 捐助作者
 ---
