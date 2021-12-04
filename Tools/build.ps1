@@ -38,7 +38,11 @@ foreach ($platform in $platforms) {
     if ($IsWindows -and (($platform -eq "win-x86") -or ($platform -eq "win-x64"))) {
         Write-Host "正在生成安装包 $platform ..."
         git checkout $aipPath
-        AdvancedInstaller.com /edit $aipPath /AddFolder APPDIR ..\bin\$pathName\
+        Get-ChildItem ..\bin\$pathName\ | ForEach-Object -Process{
+            if($_ -is [System.IO.FileInfo]) {
+                AdvancedInstaller.com /edit $aipPath /AddFile APPDIR $_.FullName
+            }
+        }
         AdvancedInstaller.com /edit $aipPath /SetVersion $version
         AdvancedInstaller.com /edit $aipPath /SetPackageName ..\bin\$fileName.msi -buildname DefaultBuild
         if ($platform -eq "win-x86") {
