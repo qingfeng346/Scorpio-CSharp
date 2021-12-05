@@ -34,7 +34,7 @@ brew install sco
 pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
 ```
 ## Unity导入
-* 方式1 - upm导入
+* 方式1 - upm导入（推荐）
 ```json
 // 添加地址 https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.unity.sco#sco/[version]
 // 示例:
@@ -42,7 +42,11 @@ pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadStri
     "com.scorpio.unity.sco": "https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.unity.sco#sco/2.3.5",
 }
 ```
-* 方式2 - 源码导入
+* 方式2 - openupm导入（推荐）
+```
+openupm install com.scorpio.sco
+```
+* 方式3 - 源码导入
     * 导入源码目录 Scorpio/src 即可,不用版本可以下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)的Source Code
 
 ## 兼容的 **.net** 平台
