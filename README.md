@@ -36,10 +36,10 @@ pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadStri
 ## Unity导入
 * 方式1 - upm导入（推荐）
 ```json
-// 添加地址 https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.unity.sco#sco/[version]
+// 添加地址 https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.sco#sco/[version]
 // 示例:
 "dependencies": {
-    "com.scorpio.unity.sco": "https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.unity.sco#sco/2.3.5",
+    "com.scorpio.sco": "https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.sco#sco/2.3.5",
 }
 ```
 * 方式2 - openupm导入（推荐）
