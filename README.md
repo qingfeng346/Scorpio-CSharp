@@ -15,10 +15,14 @@ sco是c#实现的解释型脚本,是一种高效,轻量,可嵌入的脚本语言
 ### Windows
 * 方式1（推荐）
     * 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)安装包
+* 方式2，winget(Windows 10 1709以上版本系统自带)安装，运行命令（推荐）
+```
+winget install Scorpio.sco
+```
 * 方式2
     * 下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)压缩包并添加环境变量
 ### Mac
-* 方式1 - 运行命令（推荐）
+* 方式1 - brew安装，运行命令（推荐）
 ```
 brew tap qingfeng346/brew
 brew install sco
@@ -34,7 +38,7 @@ brew install sco
 pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://qingfeng346.gitee.io/installsco.ps1'))"
 ```
 ## Unity导入
-* 方式1 - upm导入（推荐）
+### upm导入（推荐）
 ```json
 // 添加地址 https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.sco#sco/[version]
 // 示例:
@@ -42,12 +46,12 @@ pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadStri
     "com.scorpio.sco": "https://github.com/qingfeng346/upm.git?path=/Packages/com.scorpio.sco#sco/2.3.5",
 }
 ```
-* 方式2 - openupm导入（推荐）
+### openupm导入（推荐）
 ```
 openupm install com.scorpio.sco
 ```
-* 方式3 - 源码导入
-    * 导入源码目录 Scorpio/src 即可,不用版本可以下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)的Source Code
+### 源码导入
+* 导入源码目录 Scorpio/src 即可,不用版本可以下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)的Source Code
 
 ## 兼容的 **.net** 平台
 ---
