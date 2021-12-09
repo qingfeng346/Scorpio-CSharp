@@ -51,7 +51,7 @@ pwsh -Command "Invoke-Expression ((New-Object System.Net.WebClient).DownloadStri
 openupm install com.scorpio.sco
 ```
 ### 源码导入
-* 导入源码目录 Scorpio/src 即可,不用版本可以下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)的Source Code
+* 导入源码目录 Scorpio/src 即可,不同版本可以下载[Release](https://github.com/qingfeng346/Scorpio-CSharp/releases)的Source Code
 
 ## 兼容的 **.net** 平台
 ---
