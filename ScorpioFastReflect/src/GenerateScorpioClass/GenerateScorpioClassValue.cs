@@ -46,9 +46,9 @@ namespace Scorpio.FastReflect {
         private string GenerateSetValue() {
             var builder = new StringBuilder();
             var reflectFormat = @"
-            case ""{0}"": {{ {1}.SetValue(obj, Util.ChangeType(value, typeof({2}))); return; }}";
+            case ""{0}"": {{ {1}.SetValue(obj, value.ChangeType(typeof({2}))); return; }}";
             var normalFormat = @"
-            case ""{0}"": {{ {1} = ({2})(Util.ChangeType(value, typeof({2}))); return; }}";
+            case ""{0}"": {{ {1} = ({2})(value.ChangeType(typeof({2}))); return; }}";
             //类变量
             foreach (var field in m_Fields) {
                 if (field.IsInitOnly /*readonly 属性*/ || field.IsLiteral /*const 属性*/) { continue; }
