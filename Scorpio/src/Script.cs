@@ -261,7 +261,7 @@ namespace Scorpio {
         /// <summary> 使用字符串方式加载流 </summary>
         public ScriptValue LoadStreamByString(string breviary, Stream stream, int count, CompileOption compileOption) {
             var buffer = new byte[count];
-            Util.ReadBytes(stream, buffer);
+            ScorpioUtil.ReadBytes(stream, buffer);
             return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), m_SearchPaths, compileOption));
         }
         /// <summary> 使用字节码方式加载流 </summary>
@@ -298,7 +298,7 @@ namespace Scorpio {
             }
             using (var stream = File.OpenRead(fullFileName)) {
                 var buffer = new byte[stream.Length];
-                Util.ReadBytes(stream, buffer);
+                ScorpioUtil.ReadBytes(stream, buffer);
                 return LoadBuffer(fileName, buffer, compileOption);
             }
         }

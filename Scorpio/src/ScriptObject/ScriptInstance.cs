@@ -182,7 +182,7 @@ namespace Scorpio {
             return base.Call(thisObject, parameters, length);
         }
         public override string ToString() { return $"Object<{m_Prototype}>"; }
-        internal virtual void ToJson(JsonSerializer jsonSerializer) {
+        internal virtual void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("{");
             var first = true;

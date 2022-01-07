@@ -34,13 +34,13 @@ namespace Scorpio.Userdata {
                 if (i >= parameters.Length) {
                     m_Objects[i] = parameter.DefaultValue;
                 } else {
-                    m_Objects[i] = Util.ChangeType(parameters[i], parameter.ParameterType);
+                    m_Objects[i] = ScorpioUtil.ChangeType(parameters[i], parameter.ParameterType);
                 }
             }
             return ScriptValue.CreateValue(m_Delegate.DynamicInvoke(m_Objects));
         }
         public override ScriptValue Plus(ScriptValue obj) {
-            return ScriptValue.CreateValue(Delegate.Combine(m_Delegate, (Delegate)Util.ChangeType(obj, m_ValueType)));
+            return ScriptValue.CreateValue(Delegate.Combine(m_Delegate, (Delegate)ScorpioUtil.ChangeType(obj, m_ValueType)));
         }
         public override ScriptValue Minus(ScriptValue obj) {
             if (obj.valueType == ScriptValue.scriptValueType && obj.scriptValue is ScriptUserdataDelegate) {

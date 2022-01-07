@@ -9,7 +9,7 @@ namespace Scorpio.Library {
         }
         private class encode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(new JsonSerializer().ToJson(args[0]));
+                return new ScriptValue(new ScorpioJsonSerializer().ToJson(args[0]));
             }
         }
         private class decode : ScorpioHandle {
@@ -18,7 +18,7 @@ namespace Scorpio.Library {
                 m_Script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new JsonParser(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true).Parse();
+                return new ScorpioJsonParser(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true).Parse();
             }
         }
     }

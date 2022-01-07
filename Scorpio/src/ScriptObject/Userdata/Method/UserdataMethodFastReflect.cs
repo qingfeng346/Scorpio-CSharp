@@ -20,7 +20,7 @@ namespace Scorpio.Userdata {
             }
             var methodInfos = m_Type.GetMethods(Script.BindingFlag);
             Array.ForEach(methodInfos, (methodInfo) => {
-                if (methodInfo.Name.Equals(methodName) && Util.IsGenericMethod(methodInfo)) {
+                if (methodInfo.Name.Equals(methodName) && methodInfo.IsGenericMethod()) {
                     genericMethods.Add(new FunctionDataGeneric(methodInfo));
                 }
             });

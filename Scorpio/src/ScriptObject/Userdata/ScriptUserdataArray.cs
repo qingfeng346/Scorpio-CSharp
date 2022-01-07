@@ -21,13 +21,13 @@ namespace Scorpio.Userdata {
             return ScriptValue.CreateValue(m_Array[Convert.ToInt32(index)]);
         }
         public override void SetValue(double index, ScriptValue value) {
-            m_Array[(int)index] = Util.ChangeType(value, m_ElementType);
+            m_Array[(int)index] = ScorpioUtil.ChangeType(value, m_ElementType);
         }
         public override void SetValue(long index, ScriptValue value) {
-            m_Array[(int)index] = Util.ChangeType(value, m_ElementType);
+            m_Array[(int)index] = ScorpioUtil.ChangeType(value, m_ElementType);
         }
         public override void SetValue(object index, ScriptValue value) {
-            m_Array[Convert.ToInt32(index)] = Util.ChangeType(value, m_ElementType);
+            m_Array[Convert.ToInt32(index)] = ScorpioUtil.ChangeType(value, m_ElementType);
         }
     }
 }

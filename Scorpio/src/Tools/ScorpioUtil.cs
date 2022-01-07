@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Scorpio.Exception;
 using System.Diagnostics;
 namespace Scorpio.Tools {
-    public static class Util {
+    public static class ScorpioUtil {
         public static readonly Type TYPE_VOID = typeof (void);
         public static readonly Type TYPE_OBJECT = typeof (object);
         public static readonly Type TYPE_VALUE = typeof (ScriptValue);
@@ -34,7 +34,7 @@ namespace Scorpio.Tools {
         public static void Assert(bool condition, string message, params object[] args) {
             if (!condition) throw new ExecutionException(string.Format(message, args));
         }
-        public static int ReadBytes(Stream stream, byte[] buffer) {
+        public static int ReadBytes(this Stream stream, byte[] buffer) {
             int count = buffer.Length;
             int numRead = 0;
             do {
@@ -47,17 +47,17 @@ namespace Scorpio.Tools {
             return numRead;
         }
         //是否是不定参
-        public static bool IsParams (ParameterInfo info) { return info.IsDefined (TYPE_PARAMATTRIBUTE, false); }
+        public static bool IsParams (this ParameterInfo info) { return info.IsDefined (TYPE_PARAMATTRIBUTE, false); }
         //是否是扩展函数
-        public static bool IsExtensionMethod (MemberInfo method) { return method.IsDefined (TYPE_EXTENSIONATTRIBUTE, false); }
+        public static bool IsExtensionMethod (this MemberInfo method) { return method.IsDefined (TYPE_EXTENSIONATTRIBUTE, false); }
         //是否是包含扩展函数类
-        public static bool IsExtensionType (Type type) { return type.IsDefined (TYPE_EXTENSIONATTRIBUTE, false); }
+        public static bool IsExtensionType (this Type type) { return type.IsDefined (TYPE_EXTENSIONATTRIBUTE, false); }
         //是否是还没有定义的模板函数
-        public static bool IsGenericMethod (MethodBase method) { return method.IsGenericMethod && method.ContainsGenericParameters; }
+        public static bool IsGenericMethod (this MethodBase method) { return method.IsGenericMethod && method.ContainsGenericParameters; }
         //判断参数是否是 ref out 参数
-        public static bool IsRetvalOrOut (ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
+        public static bool IsRetvalOrOut (this ParameterInfo parameterInfo) { return parameterInfo.IsOut || parameterInfo.ParameterType.IsByRef; }
         //
-        public static object ChangeType (ScriptValue value, Type type) {
+        public static object ChangeType (this ScriptValue value, Type type) {
             if (ReferenceEquals(type, TYPE_VALUE)) { return value; }
             switch (value.valueType) {
                 case ScriptValue.doubleValueType: {
@@ -111,7 +111,7 @@ namespace Scorpio.Tools {
                     return value.Value;
             }
         }
-        public static bool CanChangeTypeRefOut (ScriptValue value, Type type) {
+        public static bool CanChangeTypeRefOut (this ScriptValue value, Type type) {
             if (ReferenceEquals(type, TYPE_OBJECT) || ReferenceEquals(type, TYPE_VALUE)) return true;
             switch (value.valueType) {
                 case ScriptValue.nullValueType:
@@ -130,7 +130,7 @@ namespace Scorpio.Tools {
                     return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
             }
         }
-        public static bool CanChangeType (ScriptValue value, Type type) {
+        public static bool CanChangeType (this ScriptValue value, Type type) {
             if (ReferenceEquals(type, TYPE_OBJECT) || ReferenceEquals(type, TYPE_VALUE)) return true;
             switch (value.valueType) {
                 case ScriptValue.trueValueType:

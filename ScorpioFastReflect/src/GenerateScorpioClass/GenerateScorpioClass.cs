@@ -59,7 +59,7 @@ namespace Scorpio.FastReflect {
             m_ClassFilter = classFilter;
         }
         public void AddExtensionType(Type type) {
-            if (type == null || !Util.IsExtensionType(type)) { return; }
+            if (type == null || !type.IsExtensionType()) { return; }
             m_Extensions.Add(type);
         }
         bool Check(FieldInfo fieldInfo) {
@@ -112,7 +112,7 @@ namespace Scorpio.FastReflect {
                 var methods = extensionInfo.GetMethods(Script.BindingFlag);
                 foreach (var methodInfo in methods) {
                     //非扩展函数
-                    if (!Util.IsExtensionMethod(methodInfo) || !Check(methodInfo)) { continue; }
+                    if (!methodInfo.IsExtensionMethod() || !Check(methodInfo)) { continue; }
                     var paramterType = methodInfo.GetParameters()[0].ParameterType;
                     //判断是模板函数
                     if (paramterType.IsGenericParameter && paramterType.BaseType != null && paramterType.BaseType.IsAssignableFrom(m_Type)) {

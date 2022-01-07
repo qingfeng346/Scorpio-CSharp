@@ -32,7 +32,7 @@ namespace Scorpio.Userdata {
             FunctionData functionData;
             for (int i = 0; i < length; ++i) {
                 var method = methods[i];
-                if (Util.IsGenericMethod(method)) {
+                if (method.IsGenericMethod()) {
                     genericMethods.Add(new FunctionDataGeneric(method as MethodInfo));
                 } else {
                     var parameters = method.GetParameters();            //所有参数
@@ -96,7 +96,7 @@ namespace Scorpio.Userdata {
             refOut.Clear();
             for (int i = begin; i < parameters.Length; ++i) {
                 var parameter = parameters[i];
-                if (Util.IsRetvalOrOut(parameter)) {
+                if (parameter.IsRetvalOrOut()) {
                     hasRefOut = true;
                     refOut.Add(true);
                     parameterTypes.Add(parameter.ParameterType.GetElementType());
@@ -113,7 +113,7 @@ namespace Scorpio.Userdata {
                 } else {
                     defaultParameter.Add(null);
                 }
-                if (Util.IsParams(parameter)) {
+                if (parameter.IsParams()) {
                     paramType = parameter.ParameterType.GetElementType();
                     break;
                 }

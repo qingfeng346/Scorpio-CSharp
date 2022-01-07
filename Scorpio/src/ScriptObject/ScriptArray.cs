@@ -240,14 +240,14 @@ namespace Scorpio {
         public T[] ToArray<T>() {
             var array = new T[m_Length];
             for (var i = 0; i < m_Length; ++i) {
-                array[i] = (T)Util.ChangeType(m_Objects[i], typeof(T));
+                array[i] = (T)ScorpioUtil.ChangeType(m_Objects[i], typeof(T));
             }
             return array;
         }
         public Array ToArray(Type type) {
             var array = Array.CreateInstance(type, m_Length);
             for (var i = 0; i < m_Length; ++i) {
-                array.SetValue(Util.ChangeType(m_Objects[i], type), i);
+                array.SetValue(ScorpioUtil.ChangeType(m_Objects[i], type), i);
             }
             return array;
         }
@@ -285,8 +285,8 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return new JsonSerializer().ToJson(this); }
-        internal override void ToJson(JsonSerializer jsonSerializer) {
+        public override string ToString() { return new ScorpioJsonSerializer().ToJson(this); }
+        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("[");
             for (int i = 0; i < m_Length; ++i) {

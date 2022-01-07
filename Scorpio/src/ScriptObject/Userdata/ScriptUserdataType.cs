@@ -12,7 +12,7 @@ namespace Scorpio.Userdata {
             this.m_ValueType = value;
             this.m_UserdataType = type;
         }
-        public override Type ValueType { get { return Util.TYPE_TYPE; } }
+        public override Type ValueType { get { return ScorpioUtil.TYPE_TYPE; } }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return new ScriptValue(m_UserdataType.CreateInstance(parameters, length));
         }

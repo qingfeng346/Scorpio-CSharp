@@ -62,13 +62,13 @@ __methods_content
             bool first = true;
             foreach (var par in pars) {
                 if (first) { first = false; } else { parameterType.Append(","); refOut.Append(","); }
-                if (Util.IsRetvalOrOut(par)) {
+                if (par.IsRetvalOrOut()) {
                     parameterType.Append($"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType.GetElementType())})");
                     refOut.Append("true");
                 } else {
                     refOut.Append("false");
                     parameterType.Append($"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType)})");
-                    if (Util.IsParams(par)) {
+                    if (par.IsParams()) {
                         paramType = $"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType.GetElementType())})";
                     }
                 }
@@ -81,7 +81,7 @@ __methods_content
             var callBuilder = new StringBuilder();
             var hasRefOut = false;
             for (var j = 0; j < pars.Length; ++j) {
-                if (Util.IsRetvalOrOut(pars[j])) {
+                if (pars[j].IsRetvalOrOut()) {
                     hasRefOut = true;
                     var typeName = ScorpioFastReflectUtil.GetFullName(pars[j].ParameterType.GetElementType());
                     callBuilder.Append($@"
@@ -97,7 +97,7 @@ __methods_content
                     {call};");
                 }
                 for (var j = 0; j < pars.Length; ++j) {
-                    if (Util.IsRetvalOrOut(pars[j])) {
+                    if (pars[j].IsRetvalOrOut()) {
                         callBuilder.Append($@"
                     args[{j}] = retval{j};");
                     }

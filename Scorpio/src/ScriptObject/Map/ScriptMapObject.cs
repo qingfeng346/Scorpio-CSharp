@@ -99,7 +99,7 @@ namespace Scorpio {
             }
             return ret;
         }
-        internal override void ToJson(JsonSerializer jsonSerializer) {
+        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("{");
             var first = true;
