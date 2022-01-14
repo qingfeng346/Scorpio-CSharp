@@ -240,14 +240,14 @@ namespace Scorpio {
         public T[] ToArray<T>() {
             var array = new T[m_Length];
             for (var i = 0; i < m_Length; ++i) {
-                array[i] = (T)ScorpioUtil.ChangeType(m_Objects[i], typeof(T));
+                array[i] = (T)m_Objects[i].ChangeType(typeof(T));
             }
             return array;
         }
         public Array ToArray(Type type) {
             var array = Array.CreateInstance(type, m_Length);
             for (var i = 0; i < m_Length; ++i) {
-                array.SetValue(ScorpioUtil.ChangeType(m_Objects[i], type), i);
+                array.SetValue(m_Objects[i].ChangeType(type), i);
             }
             return array;
         }

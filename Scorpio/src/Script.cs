@@ -261,7 +261,7 @@ namespace Scorpio {
         /// <summary> 使用字符串方式加载流 </summary>
         public ScriptValue LoadStreamByString(string breviary, Stream stream, int count, CompileOption compileOption) {
             var buffer = new byte[count];
-            ScorpioUtil.ReadBytes(stream, buffer);
+            stream.ReadBytes(buffer);
             return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), m_SearchPaths, compileOption));
         }
         /// <summary> 使用字节码方式加载流 </summary>
@@ -298,7 +298,7 @@ namespace Scorpio {
             }
             using (var stream = File.OpenRead(fullFileName)) {
                 var buffer = new byte[stream.Length];
-                ScorpioUtil.ReadBytes(stream, buffer);
+                stream.ReadBytes(buffer);
                 return LoadBuffer(fileName, buffer, compileOption);
             }
         }
@@ -324,7 +324,9 @@ namespace Scorpio {
         }
         /// <summary> 加载一段数据 </summary>
         public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count, CompileOption compileOption) {
-            if (count > 6 && buffer[index] == 0 && BitConverter.ToInt32(buffer, index + 1) == int.MaxValue) {
+            if (count <= 0) { 
+                return ScriptValue.Null;
+            } else if (count > 6 && buffer[index] == 0 && BitConverter.ToInt32(buffer, index + 1) == int.MaxValue) {
                 using (var stream = new MemoryStream(buffer, index, count)) {
                     return Execute(Deserializer.Deserialize(stream));
                 }

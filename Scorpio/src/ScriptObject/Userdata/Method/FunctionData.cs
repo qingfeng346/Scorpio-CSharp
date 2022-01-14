@@ -47,12 +47,12 @@ namespace Scorpio.Userdata {
         public virtual bool CheckNormalType (ScriptValue[] parameters, int length) {
             if (IsNormal && length == ParameterCount) {
                 for (var i = 0; i < length; ++i) {
-                    if (!ScorpioUtil.CanChangeType (parameters[i], ParameterType[i])) {
+                    if (!parameters[i].CanChangeType (ParameterType[i])) {
                         return false;
                     }
                 }
                 for (var i = 0; i < length; ++i) {
-                    Args[i] = ScorpioUtil.ChangeType (parameters[i], ParameterType[i]);
+                    Args[i] = parameters[i].ChangeType (ParameterType[i]);
                 }
                 return true;
             }
@@ -62,12 +62,12 @@ namespace Scorpio.Userdata {
         public virtual bool CheckDefaultType (ScriptValue[] parameters, int length) {
             if (IsDefault && length >= RequiredNumber && length <= ParameterCount) {
                 for (var i = 0; i < length; ++i) {
-                    if (!ScorpioUtil.CanChangeType (parameters[i], ParameterType[i])) {
+                    if (!parameters[i].CanChangeType (ParameterType[i])) {
                         return false;
                     }
                 }
                 for (var i = 0; i < length; ++i) {
-                    Args[i] = ScorpioUtil.ChangeType (parameters[i], ParameterType[i]);
+                    Args[i] = parameters[i].ChangeType (ParameterType[i]);
                 }
                 for (var i = length; i < ParameterCount; ++i) {
                     Args[i] = DefaultParameter[i];
@@ -80,22 +80,22 @@ namespace Scorpio.Userdata {
         public virtual bool CheckArgsType (ScriptValue[] parameters, int length) {
             if (IsParams && length >= RequiredNumber) {
                 for (var i = 0; i < ParameterCount; ++i) {
-                    if (!ScorpioUtil.CanChangeType (parameters[i], ParameterType[i])) {
+                    if (!parameters[i].CanChangeType (ParameterType[i])) {
                         return false;
                     }
                 }
                 for (var i = ParameterCount; i < length; ++i) {
-                    if (!ScorpioUtil.CanChangeType (parameters[i], ParamType)) {
+                    if (!parameters[i].CanChangeType (ParamType)) {
                         return false;
                     }
                 }
                 for (var i = 0; i < ParameterCount; ++i) {
-                    Args[i] = i < length ? (ScorpioUtil.ChangeType (parameters[i], ParameterType[i])) : DefaultParameter[i];
+                    Args[i] = i < length ? (parameters[i].ChangeType (ParameterType[i])) : DefaultParameter[i];
                 }
                 if (length > ParameterCount) {
                     var array = Array.CreateInstance (ParamType, length - ParameterCount);
                     for (int i = ParameterCount; i < length; ++i)
-                        array.SetValue (ScorpioUtil.ChangeType (parameters[i], ParamType), i - ParameterCount);
+                        array.SetValue (parameters[i].ChangeType (ParamType), i - ParameterCount);
                     Args[ParameterCount] = array;
                 } else {
                     Args[ParameterCount] = Array.CreateInstance (ParamType, 0);
@@ -108,23 +108,23 @@ namespace Scorpio.Userdata {
         public virtual void SetArgs(ScriptValue[] parameters, int length) {
             if (IsNormal) {
                 for (var i = 0; i < length; ++i) {
-                    Args[i] = ScorpioUtil.ChangeType(parameters[i], ParameterType[i]);
+                    Args[i] = parameters[i].ChangeType(ParameterType[i]);
                 }
             } else if (IsDefault) {
                 for (var i = 0; i < length; ++i) {
-                    Args[i] = ScorpioUtil.ChangeType(parameters[i], ParameterType[i]);
+                    Args[i] = parameters[i].ChangeType(ParameterType[i]);
                 }
                 for (var i = length; i < ParameterCount; ++i) {
                     Args[i] = DefaultParameter[i];
                 }
             } else {
                 for (var i = 0; i < ParameterCount; ++i) {
-                    Args[i] = i < length ? (ScorpioUtil.ChangeType(parameters[i], ParameterType[i])) : DefaultParameter[i];
+                    Args[i] = i < length ? (parameters[i].ChangeType(ParameterType[i])) : DefaultParameter[i];
                 }
                 if (length > ParameterCount) {
                     var array = Array.CreateInstance(ParamType, length - ParameterCount);
                     for (int i = ParameterCount; i < length; ++i)
-                        array.SetValue(ScorpioUtil.ChangeType(parameters[i], ParamType), i - ParameterCount);
+                        array.SetValue(parameters[i].ChangeType(ParamType), i - ParameterCount);
                     Args[ParameterCount] = array;
                 } else {
                     Args[ParameterCount] = Array.CreateInstance(ParamType, 0);
@@ -139,12 +139,12 @@ namespace Scorpio.Userdata {
         public override bool CheckNormalType (ScriptValue[] parameters, int length) {
             if (IsNormal && length == ParameterCount) {
                 for (var i = 0; i < length; ++i) {
-                    if (RefOuts[i] ? !ScorpioUtil.CanChangeTypeRefOut (parameters[i].GetValue (RefOutValue), ParameterType[i]) : !ScorpioUtil.CanChangeType (parameters[i], ParameterType[i])) {
+                    if (RefOuts[i] ? !parameters[i].GetValue(RefOutValue).CanChangeTypeRefOut (ParameterType[i]) : !parameters[i].CanChangeType (ParameterType[i])) {
                         return false;
                     }
                 }
                 for (var i = 0; i < length; ++i) {
-                    Args[i] = ScorpioUtil.ChangeType (RefOuts[i] ? parameters[i].GetValue (RefOutValue) : parameters[i], ParameterType[i]);
+                    Args[i] = (RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i]).ChangeType (ParameterType[i]);
                 }
                 return true;
             }
@@ -154,12 +154,12 @@ namespace Scorpio.Userdata {
         public override bool CheckDefaultType (ScriptValue[] parameters, int length) {
             if (IsDefault && length >= RequiredNumber && length <= ParameterCount) {
                 for (var i = 0; i < length; ++i) {
-                    if (RefOuts[i] ? !ScorpioUtil.CanChangeTypeRefOut (parameters[i].GetValue (RefOutValue), ParameterType[i]) : !ScorpioUtil.CanChangeType (parameters[i], ParameterType[i])) {
+                    if (RefOuts[i] ? !parameters[i].GetValue(RefOutValue).CanChangeTypeRefOut (ParameterType[i]) : !parameters[i].CanChangeType (ParameterType[i])) {
                         return false;
                     }
                 }
                 for (var i = 0; i < ParameterCount; ++i) {
-                    Args[i] = i < length ? (ScorpioUtil.ChangeType (RefOuts[i] ? parameters[i].GetValue (RefOutValue) : parameters[i], ParameterType[i])) : DefaultParameter[i];
+                    Args[i] = i < length ? ((RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i]).ChangeType (ParameterType[i])) : DefaultParameter[i];
                 }
                 return true;
             }
@@ -169,22 +169,22 @@ namespace Scorpio.Userdata {
         public override bool CheckArgsType (ScriptValue[] parameters, int length) {
             if (IsParams && length >= RequiredNumber) {
                 for (var i = 0; i < ParameterCount; ++i) {
-                    if (RefOuts[i] ? !ScorpioUtil.CanChangeTypeRefOut (parameters[i].GetValue (RefOutValue), ParameterType[i]) : !ScorpioUtil.CanChangeType (parameters[i], ParameterType[i])) {
+                    if (RefOuts[i] ? !parameters[i].GetValue(RefOutValue).CanChangeTypeRefOut (ParameterType[i]) : !parameters[i].CanChangeType (ParameterType[i])) {
                         return false;
                     }
                 }
                 for (var i = ParameterCount; i < length; ++i) {
-                    if (!ScorpioUtil.CanChangeType (parameters[i], ParamType)) {
+                    if (!parameters[i].CanChangeType (ParamType)) {
                         return false;
                     }
                 }
                 for (var i = 0; i < ParameterCount; ++i) {
-                    Args[i] = i < length ? (ScorpioUtil.ChangeType (RefOuts[i] ? parameters[i].GetValue (RefOutValue) : parameters[i], ParameterType[i])) : DefaultParameter[i];
+                    Args[i] = i < length ? ((RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i]).ChangeType (ParameterType[i])) : DefaultParameter[i];
                 }
                 if (length > ParameterCount) {
                     var array = Array.CreateInstance (ParamType, length - ParameterCount);
                     for (int i = ParameterCount; i < length; ++i)
-                        array.SetValue (ScorpioUtil.ChangeType (parameters[i], ParamType), i - ParameterCount);
+                        array.SetValue (parameters[i].ChangeType (ParamType), i - ParameterCount);
                     Args[ParameterCount] = array;
                 } else {
                     Args[ParameterCount] = Array.CreateInstance (ParamType, 0);
@@ -197,20 +197,20 @@ namespace Scorpio.Userdata {
         public override void SetArgs(ScriptValue[] parameters, int length) {
             if (IsNormal) {
                 for (var i = 0; i < length; ++i) {
-                    Args[i] = ScorpioUtil.ChangeType(RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i], ParameterType[i]);
+                    Args[i] = (RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i]).ChangeType(ParameterType[i]);
                 }
             } else if (IsDefault) {
                 for (var i = 0; i < ParameterCount; ++i) {
-                    Args[i] = i < length ? (ScorpioUtil.ChangeType(RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i], ParameterType[i])) : DefaultParameter[i];
+                    Args[i] = i < length ? ((RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i]).ChangeType(ParameterType[i])) : DefaultParameter[i];
                 }
             } else {
                 for (var i = 0; i < ParameterCount; ++i) {
-                    Args[i] = i < length ? (ScorpioUtil.ChangeType(RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i], ParameterType[i])) : DefaultParameter[i];
+                    Args[i] = i < length ? ((RefOuts[i] ? parameters[i].GetValue(RefOutValue) : parameters[i]).ChangeType(ParameterType[i])) : DefaultParameter[i];
                 }
                 if (length > ParameterCount) {
                     var array = Array.CreateInstance(ParamType, length - ParameterCount);
                     for (int i = ParameterCount; i < length; ++i)
-                        array.SetValue(ScorpioUtil.ChangeType(parameters[i], ParamType), i - ParameterCount);
+                        array.SetValue(parameters[i].ChangeType(ParamType), i - ParameterCount);
                     Args[ParameterCount] = array;
                 } else {
                     Args[ParameterCount] = Array.CreateInstance(ParamType, 0);

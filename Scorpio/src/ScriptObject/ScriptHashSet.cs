@@ -74,7 +74,7 @@ namespace Scorpio {
             var array = Array.CreateInstance(type, m_Objects.Count);
             var index = 0;
             foreach (var value in m_Objects) {
-                array.SetValue(ScorpioUtil.ChangeType(value, type), index++);
+                array.SetValue(value.ChangeType(type), index++);
             }
             return array;
         }

@@ -34,19 +34,19 @@ namespace Scorpio.Userdata {
                 if (i >= parameters.Length) {
                     m_Objects[i] = parameter.DefaultValue;
                 } else {
-                    m_Objects[i] = ScorpioUtil.ChangeType(parameters[i], parameter.ParameterType);
+                    m_Objects[i] = parameters[i].ChangeType(parameter.ParameterType);
                 }
             }
             return ScriptValue.CreateValue(m_Delegate.DynamicInvoke(m_Objects));
         }
-        public override ScriptValue Plus(ScriptValue obj) {
-            return ScriptValue.CreateValue(Delegate.Combine(m_Delegate, (Delegate)ScorpioUtil.ChangeType(obj, m_ValueType)));
+        public override ScriptValue Plus(ScriptValue value) {
+            return ScriptValue.CreateValue(Delegate.Combine(m_Delegate, (Delegate)value.ChangeType(m_ValueType)));
         }
-        public override ScriptValue Minus(ScriptValue obj) {
-            if (obj.valueType == ScriptValue.scriptValueType && obj.scriptValue is ScriptUserdataDelegate) {
-                return ScriptValue.CreateValue(Delegate.Remove(m_Delegate, (obj.scriptValue as ScriptUserdataDelegate).m_Delegate));
+        public override ScriptValue Minus(ScriptValue value) {
+            if (value.valueType == ScriptValue.scriptValueType && value.scriptValue is ScriptUserdataDelegate) {
+                return ScriptValue.CreateValue(Delegate.Remove(m_Delegate, (value.scriptValue as ScriptUserdataDelegate).m_Delegate));
             }
-            return base.Minus(obj); 
+            return base.Minus(value); 
         }
         public override ScriptValue GetValue(string key) {
             if (key == "Type") {

@@ -55,21 +55,21 @@ __methods_content
         }
     }";
         //根据MethodInfo生成一个ScorpioMethodInfo对象
-        private string GetScorpioMethod(bool isStatic, ParameterInfo[] pars, int index) {
+        private string GetScorpioMethod(bool isStatic, ParameterInfo[] parameters, int index) {
             var paramType = "null";
             var parameterType = new StringBuilder("new Type[]{");
             var refOut = new StringBuilder("new bool[]{");
             bool first = true;
-            foreach (var par in pars) {
+            foreach (var parameter in parameters) {
                 if (first) { first = false; } else { parameterType.Append(","); refOut.Append(","); }
-                if (par.IsRetvalOrOut()) {
-                    parameterType.Append($"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType.GetElementType())})");
+                if (parameter.IsRetvalOrOut()) {
+                    parameterType.Append($"typeof({parameter.ParameterType.GetElementType().GetFullName()})");
                     refOut.Append("true");
                 } else {
                     refOut.Append("false");
-                    parameterType.Append($"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType)})");
-                    if (par.IsParams()) {
-                        paramType = $"typeof({ScorpioFastReflectUtil.GetFullName(par.ParameterType.GetElementType())})";
+                    parameterType.Append($"typeof({parameter.ParameterType.GetFullName()})");
+                    if (parameter.IsParams()) {
+                        paramType = $"typeof({parameter.ParameterType.GetElementType().GetFullName()})";
                     }
                 }
             }

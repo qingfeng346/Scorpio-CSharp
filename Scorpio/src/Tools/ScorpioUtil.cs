@@ -27,12 +27,8 @@ namespace Scorpio.Tools {
         public static readonly Type TYPE_PARAMATTRIBUTE = typeof (ParamArrayAttribute); //不定参属性
         public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof (ExtensionAttribute); //扩展函数属性
         [Conditional("SCORPIO_DEBUG")]
-        public static void Assert(bool condition, string message) {
+        public static void Assert(this bool condition, string message) {
             if (!condition) throw new ExecutionException(message);
-        }
-        [Conditional("SCORPIO_DEBUG")]
-        public static void Assert(bool condition, string message, params object[] args) {
-            if (!condition) throw new ExecutionException(string.Format(message, args));
         }
         public static int ReadBytes(this Stream stream, byte[] buffer) {
             int count = buffer.Length;

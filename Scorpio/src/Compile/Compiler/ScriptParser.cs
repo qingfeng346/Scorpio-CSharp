@@ -172,7 +172,7 @@ namespace Scorpio.Compile.Compiler {
                     var fileName = ReadString();
                     using (var stream = File.OpenRead(SearchImportFile(fileName))) {
                         var buffer = new byte[stream.Length];
-                        ScorpioUtil.ReadBytes(stream, buffer);
+                        stream.ReadBytes(buffer);
                         parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), searchPaths, compileOption, parsers).Parse());
                     }
                 } else {
