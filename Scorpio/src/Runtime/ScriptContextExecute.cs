@@ -1634,7 +1634,7 @@ namespace Scorpio.Runtime {
                                         stackObjects[stackIndex].scriptValue = function;
                                         continue;
                                     }
-                                    case Opcode.NewType: {
+                                    case Opcode.NewTypeOld: {
                                         var classData = constClasses[opvalue];
                                         var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
                                         var className = constString[classData.name];
@@ -1703,6 +1703,44 @@ namespace Scorpio.Runtime {
                                                     function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                                 }
                                                 type.SetValue(constString[func >> 32], new ScriptValue(function));
+                                            }
+                                        }
+                                        stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                        stackObjects[stackIndex].scriptValue = type;
+                                        continue;
+                                    }
+                                    case Opcode.NewType: {
+                                        var classData = constClasses[opvalue];
+                                        var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]).Get<ScriptType>() : m_script.TypeObject;
+                                        var className = constString[classData.name];
+                                        var type = new ScriptType(className, parentType ?? m_script.TypeObject);
+                                        var functions = classData.functions;
+                                        for (var j = 0; j < functions.Length; ++j) {
+                                            var func = functions[j];
+                                            var functionData = constContexts[(func & 0xffffffff) >> 4];
+                                            var internals = functionData.m_FunctionData.internals;
+                                            var funcType = func & 0xf;
+                                            if (funcType == 0) {
+                                                var function = new ScriptScriptFunction(functionData);
+                                                for (var i = 0; i < internals.Length; ++i) {
+                                                    var internalIndex = internals[i];
+                                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                                }
+                                                type.SetValue(constString[func >> 32], new ScriptValue(function));
+                                            } else if (funcType == 1) {
+                                                var function = new ScriptScriptAsyncFunction(functionData);
+                                                for (var i = 0; i < internals.Length; ++i) {
+                                                    var internalIndex = internals[i];
+                                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                                }
+                                                type.SetValue(constString[func >> 32], new ScriptValue(function));
+                                            } else if (funcType == 2) {
+                                                var function = new ScriptScriptFunction(functionData);
+                                                for (var i = 0; i < internals.Length; ++i) {
+                                                    var internalIndex = internals[i];
+                                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                                }
+                                                type.AddGetProperty(constString[func >> 32], function);
                                             }
                                         }
                                         stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;

@@ -12,7 +12,7 @@ namespace Scorpio.Compile.Compiler {
         private struct TypeFunction {
             public long nameIndex;
             public long funcIndex;
-            public long async;
+            public long funcType;   //函数类型 0 普通函数 1 async 函数 2 get函数
         }
         public List<double> ConstDouble { get; private set; } = new List<double>();                                         //所有的常量 double
         public List<long> ConstLong { get; private set; } = new List<long>();                                               //所有的常量 long
@@ -586,13 +586,9 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 解析Class </summary>
         void ParseClass() {
-            var index = ParseClassContent(out var className, out var async);
+            var index = ParseClassContent(out var className);
             var sourceLine = PeekToken().SourceLine;
-            if (async) {
-                AddScriptInstruction(Opcode.NewAsyncType, index, sourceLine);
-            } else {
-                AddScriptInstruction(Opcode.NewType, index, sourceLine);
-            }
+            AddScriptInstruction(Opcode.NewType, index, sourceLine);
             if (string.IsNullOrWhiteSpace(className)) { return; }
             if (m_scriptExecutable.Block == ExecutableBlock.Context) {
                 AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(className), sourceLine);
@@ -603,7 +599,7 @@ namespace Scorpio.Compile.Compiler {
         /// <summary> 解析一个class </summary>
         /// <param name="className">class名字</param>
         /// <returns>class的索引</returns>
-        int ParseClassContent(out string className, out bool async) {
+        int ParseClassContent(out string className) {
             if (PeekToken().Type == TokenType.Identifier || PeekToken().Type == TokenType.String) {
                 className = ReadToken().Lexeme.ToString();  //类名
             } else {
@@ -616,17 +612,19 @@ namespace Scorpio.Compile.Compiler {
             }
             var functions = new List<TypeFunction>();           //所有的函数
             long nameIndex, funcIndex;
-            async = false;
             ReadLeftBrace();
             while (PeekToken().Type != TokenType.RightBrace) {
                 var token = ReadToken();
                 if (token.Type == TokenType.SemiColon) {
                     continue;
                 }
-                bool isAsync = token.Type == TokenType.Async;
-                if (isAsync) {
-                    async = true;
-                    token = ReadToken(); 
+                long funcType = 0;
+                if (token.Type == TokenType.Async) {
+                    funcType = 1;
+                    token = ReadToken();
+                } else if (token.Type == TokenType.Identifier && token.Lexeme.Equals("get") && PeekToken().Type != TokenType.LeftPar && PeekToken().Type != TokenType.LeftBrace) {
+                    funcType = 2;
+                    token = ReadToken();
                 }
                 if (token.Type == TokenType.Identifier || token.Type == TokenType.String) {
                     var next = ReadToken();
@@ -645,18 +643,12 @@ namespace Scorpio.Compile.Compiler {
                 } else {
                     throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
                 }
-                functions.Add(new TypeFunction() { nameIndex = nameIndex, funcIndex = funcIndex, async = isAsync ? 1 : 0 });
+                functions.Add(new TypeFunction() { nameIndex = nameIndex, funcIndex = funcIndex, funcType = funcType });
             }
             ReadRightBrace();
             var funs = new List<long>();
-            if (async) {
-                foreach (var func in functions) {
-                    funs.Add((func.nameIndex << 32) | (func.funcIndex << 1) | func.async);
-                }
-            } else {
-                foreach (var func in functions) {
-                    funs.Add((func.nameIndex << 32) | (func.funcIndex));
-                }
+            foreach (var func in functions) {
+                funs.Add((func.nameIndex << 32) | (func.funcIndex << 4) | func.funcType);
             }
             var index = Classes.Count;
             Classes.Add(new ScriptClassData() {
@@ -1010,7 +1002,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeClass cl: {
-                    AddScriptInstruction(cl.async ? Opcode.NewAsyncType : Opcode.NewType, cl.index, obj.Line);
+                    AddScriptInstruction(Opcode.NewType, cl.index, obj.Line);
                     break;
                 }
                 case CodeArray array: {
@@ -1289,7 +1281,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case TokenType.Class: {
-                    ret = new CodeClass(ParseClassContent(out _, out var async), async, token.SourceLine);
+                    ret = new CodeClass(ParseClassContent(out _), token.SourceLine);
                     break;
                 }
                 case TokenType.LeftPar: {

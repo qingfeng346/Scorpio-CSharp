@@ -83,7 +83,7 @@ namespace Scorpio.Proto {
         }
         private class addGetProperty : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                args[0].Get<ScriptType>().AddGetProperty(args[1].ToString(), args[2]);
+                args[0].Get<ScriptType>().AddGetProperty(args[1].ToString(), args[2].Get<ScriptFunction>());
                 return ScriptValue.Null;
             }
         }

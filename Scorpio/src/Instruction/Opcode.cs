@@ -45,13 +45,14 @@ namespace Scorpio.Instruction {
         NewArray,               //new array
         NewMap,                 //new map
         NewMapObject,           //new map with key contain object
-        NewType,                //new class
+        NewTypeOld,                //new class
         [System.Obsolete]
         NewTypeParent,          //new class with parent, 已弃用deprecated,兼容旧版本,暂时不能删除
         NewMapString,           //new map only string key
         NewAsyncFunction,       //new async function
         NewAsyncLambdaFunction, //new async lambda function
         NewAsyncType,           //new async type
+        NewType,
         NewEnd,
 
         //取栈操作

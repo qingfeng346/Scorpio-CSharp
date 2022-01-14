@@ -4,20 +4,20 @@ using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
     public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
-        protected Dictionary<string, ScriptValue> m_Values;         //所有的函数
-        protected Dictionary<string, ScriptValue> m_GetProperties;  //所有的get函数
-        protected ScriptFunction m_EqualFunction;                   //==函数重载
-        protected ScriptType m_Prototype;                           //基类
+        protected Dictionary<string, ScriptValue> m_Values;             //所有的函数
+        protected Dictionary<string, ScriptFunction> m_GetProperties;   //所有的get函数
+        protected ScriptFunction m_EqualFunction;                       //==函数重载
+        protected ScriptType m_Prototype;                               //基类
         public ScriptType(string typeName, ScriptType parentType) : base(ObjectType.Type) {
             TypeName = typeName;
             m_Prototype = parentType;
             m_Values = new Dictionary<string, ScriptValue>();
-            m_GetProperties = new Dictionary<string, ScriptValue>();
+            m_GetProperties = new Dictionary<string, ScriptFunction>();
         }
         public string TypeName { get; private set; }        //Type名称
         public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
-        public void AddGetProperty(string key, ScriptValue value) {
+        public void AddGetProperty(string key, ScriptFunction value) {
             m_GetProperties[key] = value;
         }
         public void RemoveGetProperty(string key) {
@@ -27,7 +27,7 @@ namespace Scorpio {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.TryGetValue(key, out var get)) {
-                return get.call(new ScriptValue(instance));
+                return get.CallNoParameters(new ScriptValue(instance));
             }
             return m_Prototype.GetValue(key, instance);
         }
