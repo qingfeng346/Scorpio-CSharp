@@ -12,7 +12,7 @@ using Scorpio;
 using Scorpio.Userdata;
 using Scorpio.Tools;
 using Scorpio.Exception;__extensions_using
-public class __class : ScorpioFastReflectClass {__reflect_content
+public class __class : IScorpioFastReflectClass {__reflect_content
     public UserdataMethodFastReflect GetConstructor() {
         return __class_Constructor.GetInstance();
     }
@@ -41,7 +41,7 @@ __methods_content
 }";
         //单个函数模板
         public const string MethodTemplate = @"
-    public class __name : ScorpioFastReflectMethod {
+    public class __name : IScorpioFastReflectMethod {
         private static UserdataMethodFastReflect _instance = null;
         public static UserdataMethodFastReflect GetInstance() {
             if (_instance != null) { return _instance; }

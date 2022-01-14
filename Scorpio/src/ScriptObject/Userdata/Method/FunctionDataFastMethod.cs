@@ -3,9 +3,9 @@ using Scorpio.Exception;
 namespace Scorpio.Userdata {
     //快速反射函数
     public class FunctionDataFastMethod : FunctionData {
-        protected ScorpioFastReflectMethod FastMethod;
+        protected IScorpioFastReflectMethod FastMethod;
         protected int MethodIndex;                     //函数索引(去反射使用)
-        public FunctionDataFastMethod(ScorpioFastReflectMethod method, Type[] parameterType, bool[] refOut, Type paramType, int methodIndex) :
+        public FunctionDataFastMethod(IScorpioFastReflectMethod method, Type[] parameterType, bool[] refOut, Type paramType, int methodIndex) :
             base(parameterType, null, refOut, parameterType.Length, paramType) {
             FastMethod = method;
             MethodIndex = methodIndex;
@@ -16,9 +16,9 @@ namespace Scorpio.Userdata {
     }
     //带ref out 的快速反射函数
     public class FunctionDataFastMethodWithRefOut : FunctionDataWithRefOut {
-        protected ScorpioFastReflectMethod FastMethod;
+        protected IScorpioFastReflectMethod FastMethod;
         protected int MethodIndex;                     //函数索引(去反射使用)
-        public FunctionDataFastMethodWithRefOut(ScorpioFastReflectMethod method, Type[] parameterType, bool[] refOut, Type paramType, int methodIndex) :
+        public FunctionDataFastMethodWithRefOut(IScorpioFastReflectMethod method, Type[] parameterType, bool[] refOut, Type paramType, int methodIndex) :
             base(parameterType, null, refOut, parameterType.Length, paramType) {
             FastMethod = method;
             MethodIndex = methodIndex;

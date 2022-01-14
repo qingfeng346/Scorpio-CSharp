@@ -2,10 +2,6 @@ using System;
 using Scorpio.Exception;
 
 namespace Scorpio.Userdata {
-    //去反射函数
-    public interface ScorpioFastReflectMethod {
-        object Call(object obj, int methodIndex, object[] args);
-    }
     //单个去反射函数的信息
     public class ScorpioFastReflectMethodInfo {
         public bool IsStatic;           //是否是静态函数
