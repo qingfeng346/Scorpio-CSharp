@@ -23,10 +23,10 @@ namespace Scorpio {
         public void RemoveGetProperty(string key) {
             m_GetProperties.Remove(key);
         }
-        public ScriptValue GetValue(string key, ScriptInstance instance) {
+        public virtual ScriptValue GetValue(string key, ScriptInstance instance) {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
-            } else if (m_GetProperties.TryGetValue(key, out var get)) {
+            } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
                 return get.CallNoParameters(new ScriptValue(instance));
             }
             return m_Prototype.GetValue(key, instance);
@@ -62,6 +62,14 @@ namespace Scorpio {
         public override ScriptFunction EqualFunction => m_EqualFunction;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return new ScriptValue(new ScriptInstance(ObjectType.Type, m_Script.TypeObject));
+        }
+        public override ScriptValue GetValue(string key, ScriptInstance instance) {
+            if (m_Values.TryGetValue(key, out var value)) {
+                return value;
+            } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
+                return get.CallNoParameters(new ScriptValue(instance));
+            }
+            return ScriptValue.Null;
         }
         public override ScriptValue GetValue(string key) {
             return m_Values.TryGetValue(key, out var value) ? value : ScriptValue.Null;
