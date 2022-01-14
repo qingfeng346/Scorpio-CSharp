@@ -6,6 +6,7 @@ namespace Scorpio.Proto {
             ret.SetValue("getHashCode", script.CreateFunction(new getHashCode()));
             ret.SetValue("instanceOf", script.CreateFunction(new instanceOf(script)));
             ret.SetValue("referenceEquals", script.CreateFunction(new referenceEquals()));
+            ret.SetValue("addGetProperty", script.CreateFunction(new addGetProperty()));
             return ret;
         }
         private class toString : ScorpioHandle {
@@ -78,6 +79,12 @@ namespace Scorpio.Proto {
         private class referenceEquals : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return object.ReferenceEquals(args[0].Value, args[1].Value) ? ScriptValue.True : ScriptValue.False;
+            }
+        }
+        private class addGetProperty : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                args[0].Get<ScriptType>().AddGetProperty(args[1].ToString(), args[2]);
+                return ScriptValue.Null;
             }
         }
     }

@@ -1688,7 +1688,6 @@ namespace Scorpio.Runtime {
                                         for (var j = 0; j < functions.Length; ++j) {
                                             var func = functions[j];
                                             var functionData = constContexts[(func & 0xffffffff) >> 1];
-                                            var async = (func & 1) == 1;
                                             var internals = functionData.m_FunctionData.internals;
                                             if ((func & 1) == 1) {
                                                 var function = new ScriptScriptAsyncFunction(functionData);

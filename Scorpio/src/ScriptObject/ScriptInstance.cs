@@ -12,7 +12,7 @@ namespace Scorpio {
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public override ScriptValue GetValue(string key) {
-            return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
+            return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key, this);
         }
         public override void SetValue(string key, ScriptValue value) {
             m_Values[key] = value;
