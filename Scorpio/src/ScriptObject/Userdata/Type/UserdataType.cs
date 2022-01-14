@@ -25,7 +25,7 @@ namespace Scorpio.Userdata {
                     if (!types[i].BaseType.IsAssignableFrom(parameters[i]))
                         throw new ExecutionException($"{m_Type.FullName} 泛型类第{i+1}个参数不符合传入规则 需要:{types[i].BaseType.FullName} 传入:{parameters[i].FullName}");
                 }
-                return TypeManager.GetUserdataType(m_Type.MakeGenericType(parameters));
+                return ScorpioTypeManager.GetUserdataType(m_Type.MakeGenericType(parameters));
             }
             throw new ExecutionException($"类 {m_Type.FullName} 不是未定义的泛型类");
         }

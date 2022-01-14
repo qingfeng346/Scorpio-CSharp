@@ -9,7 +9,7 @@ namespace Scorpio.Userdata {
         }
         public override Type ValueType { get { return ScorpioUtil.TYPE_TYPE; } }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return new ScriptValue(new ScriptUserdataDelegate(ScorpioDelegateFactory.CreateDelegate(m_ValueType, parameters[0].scriptValue)));
+            return new ScriptValue(new ScriptUserdataDelegate(ScorpioDelegateFactoryManager.CreateDelegate(m_ValueType, parameters[0].scriptValue)));
         }
         public override string ToString() { return m_ValueType.Name; }
     }

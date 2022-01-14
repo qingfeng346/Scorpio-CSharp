@@ -7,10 +7,10 @@ namespace Scorpio.FastReflect {
         private const string Template = @"using System;
 using System.Collections.Generic;
 using Scorpio;
-public class DelegateFactory : IDelegateFactory {
+public class DelegateFactory : IScorpioDelegateFactory {
     private static Dictionary<Type, Func<ScriptObject, Delegate>> delegates = new Dictionary<Type, Func<ScriptObject, Delegate>>();
     public static void Initialize(Script script) {
-        ScorpioDelegateFactory.SetFactory(new DelegateFactory());__DelegateList__CreateDelegate
+        script.SetDelegateFactory(new DelegateFactory());__DelegateList__CreateDelegate
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
         if (delegates.TryGetValue(delegateType, out var func)) {
@@ -22,9 +22,9 @@ public class DelegateFactory : IDelegateFactory {
         private const string TemplateIf = @"using System;
 using System.Collections.Generic;
 using Scorpio;
-public class DelegateFactory : IDelegateFactory {
+public class DelegateFactory : IScorpioDelegateFactory {
     public static void Initialize(Script script) {
-        ScorpioDelegateFactory.SetFactory(new DelegateFactory());__DelegateList
+        script.SetDelegateFactory(new DelegateFactory());__DelegateList
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {__CreateDelegate
         throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);

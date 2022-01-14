@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Scorpio;
 using Scorpio.Commons;
 using Scorpio.FastReflect;
 using Scorpio.Serialize;
-using Scorpio.Userdata;
 using ScorpioLibrary;
 using Scorpio.Compile.Compiler;
 
@@ -209,13 +209,13 @@ namespace ScorpioExec {
         static void Execute (CommandLine command, string[] args) {
             Util.PrintSystemInfo ();
             Logger.info ($"Version : {Scorpio.Version.version}[{Scorpio.Version.date}]");
-            TypeManager.PushAssembly(typeof(Program).Assembly);
-            foreach (var assemblyName in typeof(Program).Assembly.GetReferencedAssemblies()) {
-                TypeManager.PushAssembly(Assembly.Load(assemblyName));
-            }
             var script = new Scorpio.Script ();
             script.LoadLibraryV1 ();
             script.LoadLibraryExtend();
+            script.PushAssembly(typeof(Program));
+            foreach (var assemblyName in typeof(Program).Assembly.GetReferencedAssemblies()) {
+                script.PushAssembly(assemblyName);
+            }
             LoadLibrary (Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {
@@ -262,7 +262,7 @@ namespace ScorpioExec {
             string[] files = Directory.GetFiles (path, "*.dll", SearchOption.AllDirectories);
             foreach (var file in files) {
                 try {
-                    TypeManager.PushAssembly (Assembly.LoadFile (file));
+                    ScorpioTypeManager.PushAssembly (Assembly.LoadFile (file));
                     Logger.info ("load dll file [" + file + "] success");
                 } catch (System.Exception ex) {
                     Logger.error ("load dll file [" + file + "] fail : " + ex.ToString ());

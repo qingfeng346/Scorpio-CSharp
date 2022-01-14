@@ -50,7 +50,7 @@ namespace Scorpio.Proto {
                         } else if (thisObject.scriptValue is ScriptType) {
                             type = thisObject;
                         } else {
-                            type = TypeManager.GetUserdataType(thisObject.scriptValue.Type);
+                            type = ScorpioTypeManager.GetUserdataType(thisObject.scriptValue.Type);
                         }
                         break;
                     default:

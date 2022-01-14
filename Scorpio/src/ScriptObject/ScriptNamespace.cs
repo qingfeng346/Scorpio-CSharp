@@ -16,8 +16,8 @@ namespace Scorpio {
             if (m_Objects.TryGetValue(key, out var value))
                 return value;
             var name = $"{m_Value}.{key}";
-            var type = TypeManager.LoadType(name);
-            return m_Objects[name] = type == null ? new ScriptValue(new ScriptNamespace(name)) : TypeManager.GetUserdataType(type);
+            var type = ScorpioTypeManager.LoadType(name);
+            return m_Objects[name] = type == null ? new ScriptValue(new ScriptNamespace(name)) : ScorpioTypeManager.GetUserdataType(type);
         }
         public override string ToString() {
             return $"Namespace<{m_Value}>";

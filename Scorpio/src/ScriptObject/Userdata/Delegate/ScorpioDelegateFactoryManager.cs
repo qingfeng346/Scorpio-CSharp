@@ -1,17 +1,13 @@
 //#define SCORPIO_DYNAMIC_DELEGATE
 using System;
-using System.Collections.Generic;
 using System.Reflection;
+using System.Collections.Generic;
 using Scorpio.Tools;
-
 namespace Scorpio {
-    public interface IDelegateFactory {
-        Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject);
-    }
-    public class ScorpioDelegateFactory {
+    public class ScorpioDelegateFactoryManager {
 #if !SCORPIO_DYNAMIC_DELEGATE
-        private static IDelegateFactory m_Factory = null;
-        public static void SetFactory(IDelegateFactory factory) {
+        private static IScorpioDelegateFactory m_Factory = null;
+        public static void SetFactory(IScorpioDelegateFactory factory) {
             m_Factory = factory;
         }
         public static Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
@@ -26,7 +22,7 @@ namespace Scorpio {
         private static MethodInfo[] m_VoidMethods = new MethodInfo[33];     //无返回值的数组 有效值只有 0 - 32
         private static MethodInfo[] m_Methods = new MethodInfo[33];         //有返回值的数组 有效值只有 0 - 32
         private static Dictionary<Type, DelegateData> m_DelegateDatas = new Dictionary<Type, DelegateData>();
-        static ScorpioDelegateFactory() {
+        static ScorpioDelegateFactoryManager() {
             var methods = typeof(ScriptDelegate).GetMethods(Script.BindingFlag);
             foreach (var method in methods) {
                 if (method.Name == "Action") {
@@ -43,7 +39,7 @@ namespace Scorpio {
             var method = delegateType.GetMethod("Invoke");
             var parameters = method.GetParameters();
             var length = parameters.Length;
-            var isVoid = method.ReturnType == Util.TYPE_VOID;
+            var isVoid = method.ReturnType == ScorpioUtil.TYPE_VOID;
             var types = new Type[isVoid ? length : length + 1];
             for (var i = 0; i < length; ++i) {
                 types[i] = parameters[i].ParameterType;
@@ -59,7 +55,7 @@ namespace Scorpio {
             }
             return m_DelegateDatas[delegateType] = data;
         }
-        public static void SetFactory(IDelegateFactory factory) { }
+        public static void SetFactory(IScorpioDelegateFactory factory) { }
         public static Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
             var data = GetDelegateData(delegateType);
             var func = new ScriptDelegate(scriptObject);
@@ -178,103 +174,103 @@ namespace Scorpio {
         }
 
         public TResult Func<TResult>() {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, TResult>(T1 t1) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, TResult>(T1 t1, T2 t2) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, TResult>(T1 t1, T2 t2, T3 t3) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, TResult>(T1 t1, T2 t2, T3 t3, T4 t4) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25, T26 t26) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25, T26 t26, T27 t27) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25, T26 t26, T27 t27, T28 t28) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25, T26 t26, T27 t27, T28 t28, T29 t29) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25, T26 t26, T27 t27, T28 t28, T29 t29, T30 t30) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25, T26 t26, T27 t27, T28 t28, T29 t29, T30 t30, T31 t31) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31).ChangeType(typeof(TResult));
         }
         public TResult Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, TResult>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12, T13 t13, T14 t14, T15 t15, T16 t16, T17 t17, T18 t18, T19 t19, T20 t20, T21 t21, T22 t22, T23 t23, T24 t24, T25 t25, T26 t26, T27 t27, T28 t28, T29 t29, T30 t30, T31 t31, T32 t32) {
-            return (TResult)Util.ChangeType(m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31, t32), typeof(TResult));
+            return (TResult)m_Func.call(ScriptValue.Null, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30, t31, t32).ChangeType(typeof(TResult));
         }
 #endif
     }

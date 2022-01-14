@@ -104,9 +104,9 @@ namespace Scorpio {
             ProtoStringBuilder.Load(this, TypeStringBuilder);
             ProtoHashSet.Load(this, TypeHashSet);
 
-            TypeManager.PushAssembly(typeof(object).Assembly);                        //mscorlib.dll
-            TypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).Assembly);     //System.dll
-            TypeManager.PushAssembly(GetType().Assembly);                             //当前所在的程序集
+            ScorpioTypeManager.PushAssembly(typeof(object).Assembly);                        //mscorlib.dll
+            ScorpioTypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).Assembly);     //System.dll
+            ScorpioTypeManager.PushAssembly(GetType().Assembly);                             //当前所在的程序集
 
             LibraryBasis.Load(this);
             LibraryJson.Load(this);
@@ -149,6 +149,30 @@ namespace Scorpio {
                 }
             }
             return null;
+        }
+        /// <summary> 压入程序集 </summary>
+        public void PushAssembly(Type type) {
+            PushAssembly(Assembly.GetAssembly(type));
+        }
+        /// <summary> 压入程序集 </summary>
+        public void PushAssembly(AssemblyName assemblyName) {
+            PushAssembly(Assembly.Load(assemblyName));
+        }
+        /// <summary> 压入程序集 </summary>
+        public void PushAssembly(Assembly assembly) {
+            ScorpioTypeManager.PushAssembly(assembly);
+        }
+        /// <summary> 设置函数指针仓库 </summary>
+        public void SetDelegateFactory(IScorpioDelegateFactory factory) {
+            ScorpioDelegateFactoryManager.SetFactory(factory);
+        }
+        /// <summary> 设置快速反射类 </summary>
+        public void SetFastReflectClass(Type type, IScorpioFastReflectClass fastReflectClass) {
+            ScorpioTypeManager.SetFastReflectClass(type, fastReflectClass);
+        }
+        /// <summary> 关联扩展函数 </summary>
+        public void LoadExtension(Type type) {
+            ScorpioTypeManager.LoadExtension(type);
         }
         /// <summary> 设置一个全局变量 </summary>
         /// <param name="key">名字</param>

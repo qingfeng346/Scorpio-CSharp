@@ -10,7 +10,7 @@ namespace Scorpio.Library {
         }
         private class fieldTypeOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return TypeManager.GetUserdataType(TypeManager.GetType(args[0].scriptValue.Type).GetVariableType(args[1].ToString()));
+                return ScorpioTypeManager.GetUserdataType(ScorpioTypeManager.GetType(args[0].scriptValue.Type).GetVariableType(args[1].ToString()));
             }
         }
         private class isType : ScorpioHandle {
@@ -23,7 +23,7 @@ namespace Scorpio.Library {
         }
         private class extend : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                TypeManager.GetType(args[0].scriptValue.Type).SetValue(args[1].ToString(), args[2]);
+                ScorpioTypeManager.GetType(args[0].scriptValue.Type).SetValue(args[1].ToString(), args[2]);
                 return ScriptValue.Null;
             }
         }

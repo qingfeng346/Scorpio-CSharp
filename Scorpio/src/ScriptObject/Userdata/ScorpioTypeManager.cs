@@ -2,14 +2,13 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using Scorpio.Tools;
-
-namespace Scorpio.Userdata {
-    public static class TypeManager {
+using Scorpio.Userdata;
+namespace Scorpio {
+    public static class ScorpioTypeManager {
         private static List<Assembly> m_Assembly = new List<Assembly>();                                                //所有代码集合
         private static List<Type> m_ExtensionType = new List<Type>();                                                   //所有扩展类
         private static Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                   //所有的类集合
         private static Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();             //所有的类集合
-        
         public static UserdataType GetType(Type type) {
             if (m_Types.TryGetValue(type, out var value)) {
                 return value;
@@ -46,7 +45,7 @@ namespace Scorpio.Userdata {
             else
                 return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataType(type, GetType(type)));
         }
-        public static void SetFastReflectClass(Type type, ScorpioFastReflectClass value) {
+        public static void SetFastReflectClass(Type type, IScorpioFastReflectClass value) {
             if (value == null || type == null) { return; }
             m_Types[type] = new UserdataTypeFastReflect(type, value);
         }

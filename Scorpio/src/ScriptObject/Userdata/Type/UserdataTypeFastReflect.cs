@@ -1,16 +1,7 @@
 using System;
-using System.Collections.Generic;
 using Scorpio.Exception;
 
 namespace Scorpio.Userdata {
-    //去反射类
-    public interface ScorpioFastReflectClass {
-        UserdataMethodFastReflect GetConstructor();                     //获取构造函数
-        Type GetVariableType(string name);                              //获取变量类型
-        UserdataMethod GetMethod(string name);                          //获取类函数
-        bool GetValue(object obj, string name, out object value);       //获取变量
-        void SetValue(object obj, string name, ScriptValue value);      //设置变量
-    }
     //去反射函数
     public interface ScorpioFastReflectMethod {
         object Call(object obj, int methodIndex, object[] args);
@@ -32,9 +23,9 @@ namespace Scorpio.Userdata {
     }
     //快速反射类管理
     public class UserdataTypeFastReflect : UserdataType {
-        private ScorpioFastReflectClass m_FastReflectClass;
+        private IScorpioFastReflectClass m_FastReflectClass;
         private UserdataMethodFastReflect m_Constructor;
-        public UserdataTypeFastReflect(Type type, ScorpioFastReflectClass value) : base(type) {
+        public UserdataTypeFastReflect(Type type, IScorpioFastReflectClass value) : base(type) {
             m_FastReflectClass = value;
             m_Constructor = value.GetConstructor();
         }
@@ -57,6 +48,6 @@ namespace Scorpio.Userdata {
         public override void SetValue(object obj, string name, ScriptValue value) {
             m_FastReflectClass.SetValue(obj, name, value);
         }
-        public ScorpioFastReflectClass FastReflectClass { get { return m_FastReflectClass; } }
+        public IScorpioFastReflectClass FastReflectClass { get { return m_FastReflectClass; } }
     }
 }

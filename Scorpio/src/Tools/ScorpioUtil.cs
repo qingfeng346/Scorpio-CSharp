@@ -99,7 +99,7 @@ namespace Scorpio.Tools {
                 case ScriptValue.objectValueType: return value.objectValue;
                 case ScriptValue.scriptValueType: {
                     if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom (type)) {
-                        return ScorpioDelegateFactory.CreateDelegate (type, value.scriptValue);
+                        return ScorpioDelegateFactoryManager.CreateDelegate (type, value.scriptValue);
                     }
                     return value.scriptValue.Value;
                 }

@@ -442,14 +442,14 @@ namespace Scorpio {
             else if (value is ScriptObject)
                 return new ScriptValue((ScriptObject)value);
             else if (value is Type)
-                return TypeManager.GetUserdataType((Type)value);
+                return ScorpioTypeManager.GetUserdataType((Type)value);
             else if (value is Delegate)
                 return new ScriptValue(new ScriptUserdataDelegate((Delegate)value));
             else if (value is Enum)
                 return new ScriptValue(value);
             else if (value is IList)
-                return new ScriptValue(new ScriptUserdataArray((IList)value, TypeManager.GetType(value.GetType())));
-            return new ScriptValue(new ScriptUserdataObject(value, TypeManager.GetType(value.GetType())));
+                return new ScriptValue(new ScriptUserdataArray((IList)value, ScorpioTypeManager.GetType(value.GetType())));
+            return new ScriptValue(new ScriptUserdataObject(value, ScorpioTypeManager.GetType(value.GetType())));
         }
     }
 }
