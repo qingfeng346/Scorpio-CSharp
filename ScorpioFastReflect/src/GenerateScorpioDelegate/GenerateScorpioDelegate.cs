@@ -7,7 +7,7 @@ namespace Scorpio.FastReflect {
         private const string Template = @"using System;
 using System.Collections.Generic;
 using Scorpio;
-public class DelegateFactory : IScorpioDelegateFactory {
+public class __FactoryName : IScorpioDelegateFactory {
     private static Dictionary<Type, Func<ScriptObject, Delegate>> delegates = new Dictionary<Type, Func<ScriptObject, Delegate>>();
     public static void Initialize(Script script) {
         script.SetDelegateFactory(new DelegateFactory());__DelegateList__CreateDelegate
@@ -22,7 +22,7 @@ public class DelegateFactory : IScorpioDelegateFactory {
         private const string TemplateIf = @"using System;
 using System.Collections.Generic;
 using Scorpio;
-public class DelegateFactory : IScorpioDelegateFactory {
+public class __FactoryName : IScorpioDelegateFactory {
     public static void Initialize(Script script) {
         script.SetDelegateFactory(new DelegateFactory());__DelegateList
     }
@@ -33,6 +33,7 @@ public class DelegateFactory : IScorpioDelegateFactory {
         public struct Option {
             public int buildType;           //build 类型
             public bool generateList;       //是否生成 DelegateList
+            public string className;        //生成的仓库类名
         }
         private List<Type> m_Delegates = new List<Type>();
         public Option option { get; set; }
@@ -45,7 +46,7 @@ public class DelegateFactory : IScorpioDelegateFactory {
         }
         public string Generate() {
             m_Delegates.SortType();
-            return (option.buildType == 0 ? Template : TemplateIf).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate());
+            return (option.buildType == 0 ? Template : TemplateIf).Replace("__FactoryName", option.className).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate());
         }
         string DelegateList() {
             if (!option.generateList) { return ""; }
