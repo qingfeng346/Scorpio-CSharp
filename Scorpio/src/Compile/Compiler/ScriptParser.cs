@@ -586,9 +586,14 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 解析Class </summary>
         void ParseClass() {
-            var index = ParseClassContent(out var className);
+            var index = ParseClassContent(out var className, out var async);
             var sourceLine = PeekToken().SourceLine;
-            AddScriptInstruction(Opcode.NewType, index, sourceLine);
+            //AddScriptInstruction(Opcode.NewType, index, sourceLine);
+            if (async) {
+                AddScriptInstruction(Opcode.NewAsyncType, index, sourceLine);
+            } else {
+                AddScriptInstruction(Opcode.NewTypeOld, index, sourceLine);
+            }
             if (string.IsNullOrWhiteSpace(className)) { return; }
             if (m_scriptExecutable.Block == ExecutableBlock.Context) {
                 AddScriptInstruction(Opcode.StoreGlobalString, GetConstString(className), sourceLine);
@@ -599,7 +604,7 @@ namespace Scorpio.Compile.Compiler {
         /// <summary> 解析一个class </summary>
         /// <param name="className">class名字</param>
         /// <returns>class的索引</returns>
-        int ParseClassContent(out string className) {
+        int ParseClassContent(out string className, out bool async) {
             if (PeekToken().Type == TokenType.Identifier || PeekToken().Type == TokenType.String) {
                 className = ReadToken().Lexeme.ToString();  //类名
             } else {
@@ -612,6 +617,7 @@ namespace Scorpio.Compile.Compiler {
             }
             var functions = new List<TypeFunction>();           //所有的函数
             long nameIndex, funcIndex;
+            async = false;
             ReadLeftBrace();
             while (PeekToken().Type != TokenType.RightBrace) {
                 var token = ReadToken();
@@ -622,6 +628,7 @@ namespace Scorpio.Compile.Compiler {
                 if (token.Type == TokenType.Async) {
                     funcType = 1;
                     token = ReadToken();
+                    async = true;
                 } else if (token.Type == TokenType.Identifier && token.Lexeme.Equals("get") && PeekToken().Type != TokenType.LeftPar && PeekToken().Type != TokenType.LeftBrace) {
                     funcType = 2;
                     token = ReadToken();
@@ -647,9 +654,19 @@ namespace Scorpio.Compile.Compiler {
             }
             ReadRightBrace();
             var funs = new List<long>();
-            foreach (var func in functions) {
-                funs.Add((func.nameIndex << 32) | (func.funcIndex << 4) | func.funcType);
+            if (async) {
+                foreach (var func in functions) {
+                    var isAsync = func.funcType == 1 ? 1L : 0L;
+                    funs.Add((func.nameIndex << 32) | (func.funcIndex << 1) | isAsync);
+                }
+            } else {
+                foreach (var func in functions) {
+                    funs.Add((func.nameIndex << 32) | (func.funcIndex));
+                }
             }
+            //foreach (var func in functions) {
+            //    funs.Add((func.nameIndex << 32) | (func.funcIndex << 4) | func.funcType);
+            //}
             var index = Classes.Count;
             Classes.Add(new ScriptClassData() {
                 name = GetConstString(className),
@@ -1002,7 +1019,8 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeClass cl: {
-                    AddScriptInstruction(Opcode.NewType, cl.index, obj.Line);
+                    //AddScriptInstruction(Opcode.NewType, cl.index, obj.Line);
+                    AddScriptInstruction(cl.async ? Opcode.NewAsyncType : Opcode.NewTypeOld, cl.index, obj.Line);
                     break;
                 }
                 case CodeArray array: {
@@ -1281,7 +1299,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case TokenType.Class: {
-                    ret = new CodeClass(ParseClassContent(out _), token.SourceLine);
+                    ret = new CodeClass(ParseClassContent(out _, out var async), async, token.SourceLine);
                     break;
                 }
                 case TokenType.LeftPar: {
