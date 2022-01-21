@@ -22,17 +22,17 @@ namespace Scorpio.Instruction {
             this.opvalue = opvalue;
             if (opcode == Opcode.Nop) {
                 this.optype = OpcodeType.Nop;
-            } else if (opcode > Opcode.LoadBegin && opcode < Opcode.LoadEnd) {
+            } else if (opcode > Opcode.LoadBegin && opcode < Opcode.NewBegin) {
                 this.optype = OpcodeType.Load;
-            } else if (opcode > Opcode.NewBegin && opcode < Opcode.NewEnd) {
+            } else if (opcode > Opcode.NewBegin && opcode < Opcode.StoreBegin) {
                 this.optype = OpcodeType.New;
-            } else if (opcode > Opcode.StoreBegin && opcode < Opcode.StoreEnd) {
+            } else if (opcode > Opcode.StoreBegin && opcode < Opcode.ComputeBegin) {
                 this.optype = OpcodeType.Store;
-            } else if (opcode > Opcode.ComputeBegin && opcode < Opcode.ComputeEnd) {
+            } else if (opcode > Opcode.ComputeBegin && opcode < Opcode.CompareBegin) {
                 this.optype = OpcodeType.Compute;
-            } else if (opcode > Opcode.CompareBegin && opcode < Opcode.CompareEnd) {
+            } else if (opcode > Opcode.CompareBegin && opcode < Opcode.JumpBegin) {
                 this.optype = OpcodeType.Compare;
-            } else if (opcode > Opcode.JumpBegin && opcode < Opcode.JumpEnd) {
+            } else if (opcode > Opcode.JumpBegin) {
                 this.optype = OpcodeType.Jump;
             }
         }
