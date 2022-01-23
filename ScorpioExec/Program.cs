@@ -213,9 +213,7 @@ namespace ScorpioExec {
             script.LoadLibraryV1 ();
             script.LoadLibraryExtend();
             script.PushAssembly(typeof(Program));
-            foreach (var assemblyName in typeof(Program).Assembly.GetReferencedAssemblies()) {
-                script.PushAssembly(assemblyName);
-            }
+            script.PushReferencedAssemblies(typeof(Program).Assembly);
             LoadLibrary (Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {

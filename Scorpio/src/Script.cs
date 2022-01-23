@@ -150,8 +150,8 @@ namespace Scorpio {
             }
             return null;
         }
-        public void PushReferencedAssemblies() {
-            foreach (var assemblyName in GetType ().Assembly.GetReferencedAssemblies ()) {
+        public void PushReferencedAssemblies(Assembly assembly) {
+            foreach (var assemblyName in assembly.GetReferencedAssemblies ()) {
                 PushAssembly (Assembly.Load (assemblyName));
             }
         }
