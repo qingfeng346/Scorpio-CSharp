@@ -51,7 +51,7 @@ namespace Scorpio.Instruction {
         NewAsyncFunction,       //new async function
         NewAsyncLambdaFunction, //new async lambda function
         NewAsyncType,           //new async type
-        NewType,
+        NewType,                //new type, the NewTypeOld and NewAsyncType will deprecated
 
         //取栈操作
         StoreBegin = NewBegin + 20,

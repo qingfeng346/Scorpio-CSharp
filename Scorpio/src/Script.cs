@@ -104,9 +104,9 @@ namespace Scorpio {
             ProtoStringBuilder.Load(this, TypeStringBuilder);
             ProtoHashSet.Load(this, TypeHashSet);
 
-            ScorpioTypeManager.PushAssembly(typeof(object).Assembly);                        //mscorlib.dll
-            ScorpioTypeManager.PushAssembly(typeof(System.Net.Sockets.Socket).Assembly);     //System.dll
-            ScorpioTypeManager.PushAssembly(GetType().Assembly);                             //当前所在的程序集
+            PushAssembly(typeof(object));                        //mscorlib.dll
+            PushAssembly(typeof(System.Net.Sockets.Socket));     //System.dll
+            PushAssembly(GetType());                             //当前所在的程序集
 
             LibraryBasis.Load(this);
             LibraryJson.Load(this);
@@ -149,6 +149,11 @@ namespace Scorpio {
                 }
             }
             return null;
+        }
+        public void PushReferencedAssemblies() {
+            foreach (var assemblyName in GetType ().Assembly.GetReferencedAssemblies ()) {
+                PushAssembly (Assembly.Load (assemblyName));
+            }
         }
         /// <summary> 压入程序集 </summary>
         public void PushAssembly(Type type) {
