@@ -15,13 +15,33 @@ namespace Scorpio.Library {
             map.SetValue("writeAll", script.CreateFunction(new writeAll()));
             map.SetValue("readAllString", script.CreateFunction(new readAllString()));
             map.SetValue("writeAllString", script.CreateFunction(new writeAllString()));
+            map.SetValue("readAllLines", script.CreateFunction(new readAllLines(script)));
+            map.SetValue("writeAllLines", script.CreateFunction(new writeAllLines()));
+            map.SetValue("appendAllText", script.CreateFunction(new appendAllText()));
+            map.SetValue("appendAllLines", script.CreateFunction(new appendAllLines()));
             map.SetValue("fileExist", script.CreateFunction(new fileExist()));
             map.SetValue("pathExist", script.CreateFunction(new pathExist()));
             map.SetValue("createPath", script.CreateFunction(new createPath()));
             map.SetValue("deleteFile", script.CreateFunction(new deleteFile()));
             map.SetValue("deletePath", script.CreateFunction(new deletePath()));
+            map.SetValue("copyFile", script.CreateFunction(new copyFile()));
+            map.SetValue("moveFile", script.CreateFunction(new moveFile()));
+            map.SetValue("movePath", script.CreateFunction(new movePath()));
             map.SetValue("getFiles", script.CreateFunction(new getFiles()));
             map.SetValue("getPaths", script.CreateFunction(new getPaths()));
+            map.SetValue("getCreationTime", script.CreateFunction(new getCreationTime()));
+            map.SetValue("getLastAccessTime", script.CreateFunction(new getLastAccessTime()));
+            map.SetValue("getLastWriteTime", script.CreateFunction(new getLastWriteTime()));
+            map.SetValue("setCreationTime", script.CreateFunction(new setCreationTime()));
+            map.SetValue("setLastAccessTime", script.CreateFunction(new setLastAccessTime()));
+            map.SetValue("setLastWriteTime", script.CreateFunction(new setLastWriteTime()));
+            map.SetValue("getExtension", script.CreateFunction(new getExtension()));
+            map.SetValue("getFileName", script.CreateFunction(new getFileName()));
+            map.SetValue("getDirectoryName", script.CreateFunction(new getDirectoryName()));
+            map.SetValue("changeExtension", script.CreateFunction(new changeExtension()));
+            map.SetValue("combine", script.CreateFunction(new combine()));
+            map.SetValue("getTempFileName", script.CreateFunction(new getTempFileName()));
+            map.SetValue("getTempPath", script.CreateFunction(new getTempPath()));
             map.SetValue("workPath", script.CreateFunction(new workPath()));
             map.SetValue("lineArgs", script.CreateFunction(new lineArgs()));
             script.SetGlobal("io", new ScriptValue(map));
@@ -67,6 +87,33 @@ namespace Scorpio.Library {
                 return ScriptValue.Null;
             }
         }
+        private class readAllLines : ScorpioHandle {
+            private readonly Script script;
+            public readAllLines(Script script) {
+                this.script = script;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(script.CreateArray(File.ReadAllLines(args[0].ToString(), length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding)));
+            }
+        }
+        private class writeAllLines : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                File.WriteAllLines(args[0].ToString(), args[1].Get<ScriptArray>().ToArray<string>(), length > 2 ? Encoding.GetEncoding(args[2].ToString()) : DefaultEncoding);
+                return ScriptValue.Null;
+            }
+        }
+        private class appendAllText : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                File.AppendAllText(args[0].ToString(), args[1].ToString(), length > 2 ? Encoding.GetEncoding(args[2].ToString()) : DefaultEncoding);
+                return ScriptValue.Null;
+            }
+        }
+        private class appendAllLines : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                File.AppendAllLines(args[0].ToString(), args[1].Get<ScriptArray>().ToArray<string>(), length > 2 ? Encoding.GetEncoding(args[2].ToString()) : DefaultEncoding);
+                return ScriptValue.Null;
+            }
+        }
         private class fileExist : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return File.Exists(args[0].ToString()) ? ScriptValue.True : ScriptValue.False;
@@ -98,11 +145,35 @@ namespace Scorpio.Library {
                 return ScriptValue.Null;
             }
         }
+        private class copyFile : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var source = args[0].ToString();
+                var target = args[1].ToString();
+                File.Copy(source, target, length > 2 ? args[2].IsTrue : false);
+                return ScriptValue.Null;
+            }
+        }
+        private class moveFile : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var source = args[0].ToString();
+                var target = args[1].ToString();
+                File.Move(source, target);
+                return ScriptValue.Null;
+            }
+        }
+        private class movePath : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var source = args[0].ToString();
+                var target = args[1].ToString();
+                Directory.Move(source, target);
+                return ScriptValue.Null;
+            }
+        }
         private class getFiles : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var path = args[0].ToString();
                 var searchPattern = length > 1 ? args[1].ToString() : "*";
-                var searchOption = length > 2 ? (args[1].IsTrue ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly) : SearchOption.TopDirectoryOnly;
+                var searchOption = length > 2 ? (args[2].IsTrue ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly) : SearchOption.TopDirectoryOnly;
                 return ScriptValue.CreateValue(Directory.GetFiles(path, searchPattern, searchOption));
             }
         }
@@ -110,8 +181,148 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var path = args[0].ToString();
                 var searchPattern = length > 1 ? args[1].ToString() : "*";
-                var searchOption = length > 2 ? (args[1].IsTrue ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly) : SearchOption.TopDirectoryOnly;
+                var searchOption = length > 2 ? (args[2].IsTrue ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly) : SearchOption.TopDirectoryOnly;
                 return ScriptValue.CreateValue(Directory.GetDirectories(path, searchPattern, searchOption));
+            }
+        }
+        private class getCreationTime : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var path = args[0].ToString();
+                var isDirectory = length > 1 ? args[1].IsTrue : false;
+                if (length > 2 ? args[2].IsTrue : false) {
+                    return ScriptValue.CreateValue(isDirectory ? Directory.GetCreationTimeUtc(path) : File.GetCreationTimeUtc(path));
+                } else {
+                    return ScriptValue.CreateValue(isDirectory ? Directory.GetCreationTime(path) : File.GetCreationTime(path));
+                }
+            }
+        }
+        private class getLastAccessTime : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var path = args[0].ToString();
+                var isDirectory = length > 1 ? args[1].IsTrue : false;
+                if (length > 2 ? args[2].IsTrue : false) {
+                    return ScriptValue.CreateValue(isDirectory ? Directory.GetLastAccessTimeUtc(path) : File.GetLastAccessTimeUtc(path));
+                } else {
+                    return ScriptValue.CreateValue(isDirectory ? Directory.GetLastAccessTime(path) : File.GetLastAccessTime(path));
+                }
+            }
+        }
+        private class getLastWriteTime : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var path = args[0].ToString();
+                var isDirectory = length > 1 ? args[1].IsTrue : false;
+                if (length > 2 ? args[2].IsTrue : false) {
+                    return ScriptValue.CreateValue(isDirectory ? Directory.GetLastWriteTimeUtc(path) : File.GetLastWriteTimeUtc(path));
+                } else {
+                    return ScriptValue.CreateValue(isDirectory ? Directory.GetLastWriteTime(path) : File.GetLastWriteTime(path));
+                }
+            }
+        }
+        private class setCreationTime : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var path = args[0].ToString();
+                var time = (DateTime)args[1].Value;
+                var isDirectory = length > 2 ? args[2].IsTrue : false;
+                if (length > 3 ? args[3].IsTrue : false) {
+                    if (isDirectory) {
+                        Directory.SetCreationTimeUtc(path, time);
+                    } else {
+                        File.SetCreationTimeUtc(path, time);
+                    }
+                } else {
+                    if (isDirectory) {
+                        Directory.SetCreationTime(path, time);
+                    } else {
+                        File.SetCreationTime(path, time);
+                    }
+                }
+                return ScriptValue.Null;
+            }
+        }
+        private class setLastAccessTime : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var path = args[0].ToString();
+                var time = (DateTime)args[1].Value;
+                var isDirectory = length > 2 ? args[2].IsTrue : false;
+                if (length > 3 ? args[3].IsTrue : false) {
+                    if (isDirectory) {
+                        Directory.SetLastAccessTimeUtc(path, time);
+                    } else {
+                        File.SetLastAccessTimeUtc(path, time);
+                    }
+                } else {
+                    if (isDirectory) {
+                        Directory.SetLastAccessTime(path, time);
+                    } else {
+                        File.SetLastAccessTime(path, time);
+                    }
+                }
+                return ScriptValue.Null;
+            }
+        }
+        private class setLastWriteTime : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var path = args[0].ToString();
+                var time = (DateTime)args[1].Value;
+                var isDirectory = length > 2 ? args[2].IsTrue : false;
+                if (length > 3 ? args[3].IsTrue : false) {
+                    if (isDirectory) {
+                        Directory.SetLastWriteTimeUtc(path, time);
+                    } else {
+                        File.SetLastWriteTimeUtc(path, time);
+                    }
+                } else {
+                    if (isDirectory) {
+                        Directory.SetLastWriteTime(path, time);
+                    } else {
+                        File.SetLastWriteTime(path, time);
+                    }
+                }
+                return ScriptValue.Null;
+            }
+        }
+        private class getExtension : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(Path.GetExtension(args[0].ToString()));
+            }
+        }
+        private class getFileName : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue((length > 1 ? args[1].IsTrue : true) ? Path.GetFileName(args[0].ToString()) : Path.GetFileNameWithoutExtension(args[0].ToString()));
+            }
+        }
+        private class getDirectoryName : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(Path.GetDirectoryName(args[0].ToString()));
+            }
+        }
+        private class getFullPath : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(Path.GetFullPath(args[0].ToString()));
+            }
+        }
+        private class changeExtension : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(Path.ChangeExtension(args[0].ToString(), args[1].ToString()));
+            }
+        }
+        private class combine : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var paths = new string[length];
+                for (var i = 0; i < length; i++) {
+                    paths[i] = args[i].ToString();
+                }
+                return new ScriptValue(Path.Combine(paths));
+            }
+        }
+        private class getTempFileName : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(Path.GetTempFileName());
+            }
+        }
+        private class getTempPath : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(Path.GetTempPath());
             }
         }
         private class workPath : ScorpioHandle {

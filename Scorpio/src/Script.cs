@@ -206,6 +206,14 @@ namespace Scorpio {
         }
         /// <summary> 创建一个空的array </summary>
         public ScriptArray CreateArray() { return new ScriptArray(this); }
+        /// <summary> 创建一个array </summary>
+        public ScriptArray CreateArray(System.Collections.IEnumerable list) { 
+            var array = new ScriptArray(this);
+            foreach (var item in list) {
+                array.Add(ScriptValue.CreateValue(item));
+            }
+            return array;
+        }
         /// <summary> 创建一个空的map </summary>
         public ScriptMap CreateMap() { return new ScriptMapObject(this); }
         /// <summary> 创建一个类 </summary>
