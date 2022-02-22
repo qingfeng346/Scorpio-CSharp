@@ -16,7 +16,7 @@ namespace Scorpio.Compile.Compiler {
             SimplePoint,            //带 @ `符号字符串
         }
         private const char END_CHAR = char.MaxValue;    //结尾字符
-        private const int BREVIARY_CHAR = 10;           //摘要的字符数
+        private const int BREVIARY_CHAR = 64;           //摘要的字符数
 
         private char m_ch;                              //当前解析字符
         private char ch;                                //临时保存字符

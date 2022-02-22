@@ -426,6 +426,12 @@ namespace Scorpio.Compile.Compiler {
             } while (true);
             TokenType tokenType;
             switch (m_Builder.ToString()) {
+                case "__FILE__":
+                    AddToken(TokenType.String, Breviary, m_iSourceLine, m_iSourceChar);
+                    return;
+                case "__LINE__":
+                    AddToken(TokenType.Number, (double)(m_iSourceLine + 1), m_iSourceLine, m_iSourceChar);
+                    return;
                 case "var":
                 case "let":
                     tokenType = TokenType.Var;
