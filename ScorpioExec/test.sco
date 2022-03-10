@@ -1,11 +1,10 @@
 class Cl {
-    get getValue() {
-        print("getValue")
-        return 200
+    toString() {
+        return "123123123123123123"
     }
 }
 var c = new Cl()
-print(c.getValue())
+print(c)
 // TestClass = import_type("Scorpio.TestClass")
 // importExtension("Scorpio.ClassEx")
 // TestClass()

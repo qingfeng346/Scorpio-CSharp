@@ -31,6 +31,9 @@ namespace Scorpio {
             }
             return m_Prototype.GetValue(key, instance);
         }
+        public virtual ScriptValue GetValueNoDefault(string key) {
+            return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValueNoDefault(key);
+        }
         public override void SetValue(string key, ScriptValue value) {
             m_Values[key] = value;
             if (key == ScriptOperator.Equal) {
@@ -62,6 +65,9 @@ namespace Scorpio {
         public override ScriptFunction EqualFunction => m_EqualFunction;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return new ScriptValue(new ScriptInstance(ObjectType.Type, m_Script.TypeObject));
+        }
+        public override ScriptValue GetValueNoDefault(string key) {
+            return ScriptValue.Null;
         }
         public override ScriptValue GetValue(string key, ScriptInstance instance) {
             if (m_Values.TryGetValue(key, out var value)) {

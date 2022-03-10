@@ -181,7 +181,13 @@ namespace Scorpio {
             }
             return base.Call(thisObject, parameters, length);
         }
-        public override string ToString() { return $"Object<{m_Prototype}>"; }
+        public override string ToString() {
+            var func = m_Prototype.GetValueNoDefault(ScriptOperator.toString).Get<ScriptFunction>();
+            if (func != null) {
+                return func.Call(ThisValue).ToString();
+            }
+            return $"Object<{m_Prototype}>";
+        }
         internal virtual void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("{");
