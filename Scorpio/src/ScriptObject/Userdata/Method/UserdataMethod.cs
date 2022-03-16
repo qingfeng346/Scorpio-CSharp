@@ -1,5 +1,6 @@
 using System;
 using Scorpio.Exception;
+using Scorpio.Tools;
 namespace Scorpio.Userdata {
     public abstract class UserdataMethod {
         protected Type m_Type; //所在类
@@ -56,9 +57,9 @@ namespace Scorpio.Userdata {
                         }
                     }
                 }
-                throw new ExecutionException ($"类[{m_Type}] 找不到合适的函数 [{MethodName}]");
+                throw new ExecutionException ($"类[{m_Type}] 找不到合适的函数 [{MethodName}] - {parameters.GetParametersString(length)}");
             } catch (System.Exception e) {
-                throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] : {e}");
+                throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] - {parameters.GetParametersString(length)} : {e}");
             }
         }
         public bool CallNoThrow (bool isStatic, object obj, ScriptValue[] parameters, int length, out object result) {

@@ -74,6 +74,8 @@ namespace Scorpio.Runtime {
             byte tempValueType; //临时存储
             int tempIndex; //临时存储
             ScriptInstruction instruction = null;
+            Opcode opcode = Opcode.Nop;
+            int opvalue;
             try {
 #if !EXECUTE_COROUTINE
             KeepOn: 
@@ -81,8 +83,8 @@ namespace Scorpio.Runtime {
 #endif
                     while (iInstruction < iInstructionCount) {
                         instruction = m_scriptInstructions[iInstruction++];
-                        var opvalue = instruction.opvalue;
-                        var opcode = instruction.opcode;
+                        opvalue = instruction.opvalue;
+                        opcode = instruction.opcode;
                         switch (instruction.optype) {
                             case OpcodeType.Load:
                                 switch (opcode) {
@@ -1770,12 +1772,12 @@ namespace Scorpio.Runtime {
                         iInstruction = tryStack[tryIndex--];
                         goto KeepOn;
                     } else {
-                        e.message = $"{m_Breviary}:{instruction.line}({iInstruction})\n  {e.message}";
+                        e.message = $"{m_Breviary}:{instruction.line}({opcode}){parameters.GetParametersString(length)}\n  {e.message}";
                         throw;
                     }
                 //脚本系统错误
                 } catch (ExecutionException e) {
-                    e.message = $"{m_Breviary}:{instruction.line}({iInstruction})\n  {e.message}";
+                    e.message = $"{m_Breviary}:{instruction.line}({opcode}){parameters.GetParametersString(length)}\n  {e.message}";
                     if (tryIndex > -1) {
                         stackObjects[stackIndex = 0] = ScriptValue.CreateValue(e);
                         iInstruction = tryStack[tryIndex--];
@@ -1790,7 +1792,7 @@ namespace Scorpio.Runtime {
                         iInstruction = tryStack[tryIndex--];
                         goto KeepOn;
                     } else {
-                        throw new ExecutionException($"{m_Breviary}:{instruction.line}({iInstruction})", e);
+                        throw new ExecutionException($"{m_Breviary}:{instruction.line}({opcode}){parameters.GetParametersString(length)}", e);
                     }
                 }
             } catch(System.Exception) {

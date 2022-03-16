@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Scorpio.Exception;
 using System.Diagnostics;
+using System.Text;
 namespace Scorpio.Tools {
     public static class ScorpioUtil {
         public static readonly Type TYPE_VOID = typeof (void);
@@ -144,6 +145,13 @@ namespace Scorpio.Tools {
                 default:
                     return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
             }
+        }
+        public static string GetParametersString(this ScriptValue[] parameters, int length) {
+            var builder = new StringBuilder();
+            for (var i = 0; i < length; ++i) {
+                builder.Append($"[{parameters[i]}]");
+            }
+            return builder.ToString();
         }
     }
 }

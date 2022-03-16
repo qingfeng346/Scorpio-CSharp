@@ -109,7 +109,7 @@ namespace Scorpio.Userdata {
             try {
                 variable.SetValue(obj, value.ChangeType(variable.FieldType));
             } catch (System.Exception e) {
-                throw new ExecutionException($"SetValue 出错 源类型:{value.ValueTypeName}  目标类型:{variable?.FieldType?.Name}: {e}");
+                throw new ExecutionException($"SetValue [{name}] 出错 源类型:{value.ValueTypeName}({value}) 目标类型:{variable?.FieldType?.Name}: {e}");
             }
         }
     }
