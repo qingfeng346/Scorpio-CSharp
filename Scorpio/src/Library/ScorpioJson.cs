@@ -1,7 +1,7 @@
 ﻿using Scorpio.Exception;
 using System.Text;
 using System.Collections.Generic;
-namespace Scorpio.Tools {
+namespace Scorpio.Library {
     internal class ScorpioJsonParser {
         const long MinInt = int.MinValue;
         const long MaxInt = int.MaxValue;

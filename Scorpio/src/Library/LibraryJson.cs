@@ -1,4 +1,3 @@
-using Scorpio.Tools;
 namespace Scorpio.Library {
     public partial class LibraryJson {
         public static void Load(Script script) {

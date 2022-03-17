@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Scorpio.Tools;
+using Scorpio.Library;
 namespace Scorpio {
     //脚本map类型
     public abstract class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {

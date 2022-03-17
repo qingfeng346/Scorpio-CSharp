@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Scorpio.Exception;
 using Scorpio.Tools;
+using Scorpio.Library;
 namespace Scorpio {
     //脚本数组类型
     public class ScriptArray : ScriptInstance, IEnumerable<ScriptValue> {

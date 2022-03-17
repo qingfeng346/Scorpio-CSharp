@@ -42,6 +42,10 @@ namespace Scorpio.Library {
             map.SetValue("combine", script.CreateFunction(new combine()));
             map.SetValue("getTempFileName", script.CreateFunction(new getTempFileName()));
             map.SetValue("getTempPath", script.CreateFunction(new getTempPath()));
+            map.SetValue("md5", script.CreateFunction(new md5()));
+            map.SetValue("md5Bytes", script.CreateFunction(new md5Bytes()));
+            map.SetValue("toBase64", script.CreateFunction(new toBase64()));
+            map.SetValue("fromBase64", script.CreateFunction(new fromBase64()));
             map.SetValue("workPath", script.CreateFunction(new workPath()));
             map.SetValue("lineArgs", script.CreateFunction(new lineArgs()));
             script.SetGlobal("io", new ScriptValue(map));
@@ -127,22 +131,31 @@ namespace Scorpio.Library {
         private class createPath : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var path = args[0].ToString();
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                return ScriptValue.Null;
+                if (!Directory.Exists(path)) {
+                    Directory.CreateDirectory(path);
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
             }
         }
         private class deleteFile : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var file = args[0].ToString();
-                if (File.Exists(file)) File.Delete(file);
-                return ScriptValue.Null;
+                if (File.Exists(file)) {
+                    File.Delete(file);
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
             }
         }
         private class deletePath : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var path = args[0].ToString();
-                if (Directory.Exists(path)) Directory.Delete(path);
-                return ScriptValue.Null;
+                if (Directory.Exists(path)) {
+                    Directory.Delete(path);
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
             }
         }
         private class copyFile : ScorpioHandle {
@@ -323,6 +336,67 @@ namespace Scorpio.Library {
         private class getTempPath : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(Path.GetTempPath());
+            }
+        }
+        private class md5 : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (args[0].valueType == ScriptValue.stringValueType) {
+                    if (length > 1 && args[1].IsTrue) {
+                        using (var fileStream = File.OpenRead(args[0].stringValue)) {
+                            return new ScriptValue(ScorpioMD5.GetMd5String(fileStream));
+                        }
+                    } else {
+                        return new ScriptValue(ScorpioMD5.GetMd5String(args[0].stringValue));
+                    }
+                } else {
+                    var value = args[0].scriptValue.Value;
+                    if (value is Stream) {
+                        return new ScriptValue(ScorpioMD5.GetMd5String((Stream)value));
+                    } else if (value is byte[]) {
+                        var bytes = (byte[])value;
+                        return new ScriptValue(ScorpioMD5.GetMd5String(bytes, length > 1 ? args[1].ToInt32() : 0, length > 2 ? args[2].ToInt32() : bytes.Length));
+                    } else {
+                        return ScriptValue.Null;
+                    }
+                }
+            }
+        }
+        private class md5Bytes : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (args[0].valueType == ScriptValue.stringValueType) {
+                    if (length > 1 && args[1].IsTrue) {
+                        using (var fileStream = File.OpenRead(args[0].stringValue)) {
+                            return ScriptValue.CreateValue(ScorpioMD5.GetMd5Bytes(fileStream));
+                        }
+                    } else {
+                        return ScriptValue.CreateValue(ScorpioMD5.GetMd5Bytes(args[0].stringValue));
+                    }
+                } else {
+                    var value = args[0].scriptValue.Value;
+                    if (value is Stream) {
+                        return ScriptValue.CreateValue(ScorpioMD5.GetMd5Bytes((Stream)value));
+                    } else if (value is byte[]) {
+                        var bytes = (byte[])value;
+                        return ScriptValue.CreateValue(ScorpioMD5.GetMd5Bytes(bytes, length > 1 ? args[1].ToInt32() : 0, length > 2 ? args[2].ToInt32() : bytes.Length));
+                    } else {
+                        return ScriptValue.Null;
+                    }
+                }
+            }
+        }
+        private class toBase64 : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (args[0].valueType == ScriptValue.stringValueType) {
+                    return new ScriptValue(Convert.ToBase64String(DefaultEncoding.GetBytes(args[0].stringValue)));
+                } else {
+                    var bytes = args[0].scriptValue.Value as byte[];
+                    return new ScriptValue(Convert.ToBase64String(bytes, length > 1 ? args[1].ToInt32() : 0, length > 2 ? args[2].ToInt32() : bytes.Length));
+                }
+            }
+        }
+        private class fromBase64 : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return ScriptValue.CreateValue(Convert.FromBase64String(args[0].ToString()));
             }
         }
         private class workPath : ScorpioHandle {

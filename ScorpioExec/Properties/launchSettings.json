@@ -14,7 +14,7 @@
     },
     "fast": {
       "commandName": "Project",
-      "commandLineArgs": "fast --class ScorpioExec.TestStruct -extension ScorpioExec.TestClassEx -o ../../../ "
+      "commandLineArgs": "fast --class Scorpio.TestClass -extension Scorpio.TestClassEx -o ../../../ "
     },
     "version": {
       "commandName": "Project",

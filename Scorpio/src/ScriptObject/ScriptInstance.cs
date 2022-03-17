@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Scorpio.Tools;
+using Scorpio.Library;
 namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         internal Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();         //所有的数据(函数和数据都在一个数组)

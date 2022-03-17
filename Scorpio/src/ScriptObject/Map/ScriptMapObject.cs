@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using Scorpio.Tools;
+using Scorpio.Library;
 namespace Scorpio {
     //脚本map类型
     public class ScriptMapObject : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
