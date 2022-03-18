@@ -1,3 +1,33 @@
+## v2.3.7 (*2022-03-18*)
+* `[新增]` io库增加函数
+    * readAllLines
+    * writeAllLines
+    * appendAllText
+    * appendAllLines
+    * copyFile
+    * moveFile
+    * movePath
+    * getCreationTime
+    * getLastAccessTime
+    * getLastWriteTime
+    * setCreationTime
+    * setLastAccessTime
+    * setLastWriteTime
+    * getExtension
+    * getFileName
+    * getDirectoryName
+    * changeExtension
+    * combine
+    * getTempFileName
+    * getTempPath
+    * md5
+    * md5Bytes
+    * md5HashToString
+    * toBase64
+    * fromBase64
+* `[新增]` 新增编译字段 ```__FILE__ __LINE__```
+* `[新增]` 字符串与class操作时, toString 起效
+
 ## v2.3.6 (*2022-02-02*)
 * `[新增]`新增get类型函数,新增 Object.addGetProperty 函数
 * `[优化]`整理代码,避免常用名冲突
