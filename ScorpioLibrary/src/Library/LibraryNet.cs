@@ -72,9 +72,14 @@ namespace ScorpioLibrary {
                     }
                 }
                 if (length > 2 ) Parameters[2].call(ScriptValue.Null, request);
-                using (var stream = new MemoryStream()) {
-                    ReadStream(request, stream);
-                    return ScriptValue.CreateValue(stream.ToArray());
+                if (length > 3) {
+                    ReadStream(request, Parameters[3].Value as Stream);
+                    return ScriptValue.Null;
+                } else {
+                    using (var stream = new MemoryStream()) {
+                        ReadStream(request, stream);
+                        return ScriptValue.CreateValue(stream.ToArray());
+                    }
                 }
             }
         }

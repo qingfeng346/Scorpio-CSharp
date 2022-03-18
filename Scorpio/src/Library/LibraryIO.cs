@@ -44,6 +44,7 @@ namespace Scorpio.Library {
             map.SetValue("getTempPath", script.CreateFunction(new getTempPath()));
             map.SetValue("md5", script.CreateFunction(new md5()));
             map.SetValue("md5Bytes", script.CreateFunction(new md5Bytes()));
+            map.SetValue("md5HashToString", script.CreateFunction(new md5HashToString()));
             map.SetValue("toBase64", script.CreateFunction(new toBase64()));
             map.SetValue("fromBase64", script.CreateFunction(new fromBase64()));
             map.SetValue("workPath", script.CreateFunction(new workPath()));
@@ -382,6 +383,11 @@ namespace Scorpio.Library {
                         return ScriptValue.Null;
                     }
                 }
+            }
+        }
+        private class md5HashToString: ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(ScorpioMD5.HashToString((byte[])args[0].Value));
             }
         }
         private class toBase64 : ScorpioHandle {
