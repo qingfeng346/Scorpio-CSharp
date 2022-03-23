@@ -149,7 +149,11 @@ namespace Scorpio.Tools {
         public static string GetParametersString(this ScriptValue[] parameters, int length) {
             var builder = new StringBuilder();
             for (var i = 0; i < length; ++i) {
-                builder.Append($"[{parameters[i]}]");
+                try {
+                    builder.Append($"[{parameters[i]}]");
+                } catch (System.Exception) {
+                    builder.Append($"[toString Error]");
+                }
             }
             return builder.ToString();
         }
