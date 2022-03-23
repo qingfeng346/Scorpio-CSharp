@@ -1,10 +1,16 @@
 class Cl {
+    constructor() {
+        this.id = "id"
+        this.dataId = "dataId"
+        this.zoneId = "zoneId"
+        this.mapId = "mapId"
+    }
     toString() {
-        return "123123123123123123"
+        return "TileInfo(${this.id}) ${this.dataId} zone:${this.zoneId} map:${this.mapId}"
     }
 }
 var c = new Cl()
-print(c)
+print("wwww " + c)
 // TestClass = import_type("Scorpio.TestClass")
 // importExtension("Scorpio.ClassEx")
 // TestClass()

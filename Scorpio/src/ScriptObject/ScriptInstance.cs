@@ -184,7 +184,7 @@ namespace Scorpio {
         public override string ToString() {
             var func = m_Prototype.GetValueNoDefault(ScriptOperator.toString).Get<ScriptFunction>();
             if (func != null) {
-                return func.Call(ThisValue).ToString();
+                return func.Call(ThisValue, ScriptValue.Parameters, 0).ToString();
             }
             return $"Object<{m_Prototype}>";
         }

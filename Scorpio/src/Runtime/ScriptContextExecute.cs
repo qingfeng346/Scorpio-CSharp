@@ -1772,12 +1772,12 @@ namespace Scorpio.Runtime {
                         iInstruction = tryStack[tryIndex--];
                         goto KeepOn;
                     } else {
-                        e.message = $"{m_Breviary}:{instruction.line}({opcode}){parameters.GetParametersString(length)}\n  {e.message}";
+                        e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
                         throw;
                     }
                 //脚本系统错误
                 } catch (ExecutionException e) {
-                    e.message = $"{m_Breviary}:{instruction.line}({opcode}){parameters.GetParametersString(length)}\n  {e.message}";
+                    e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
                     if (tryIndex > -1) {
                         stackObjects[stackIndex = 0] = ScriptValue.CreateValue(e);
                         iInstruction = tryStack[tryIndex--];

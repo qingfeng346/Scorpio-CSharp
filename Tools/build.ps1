@@ -55,3 +55,5 @@ foreach ($platform in $platforms) {
     }
 }
 Write-Host "生成完成"
+
+Write-Host "更新winget命令 wingetcreate update --urls https://github.com/qingfeng346/Scorpio-CSharp/releases/download/v$version/sco-$version-win-x64.msi --version $version Scorpio.sco"
