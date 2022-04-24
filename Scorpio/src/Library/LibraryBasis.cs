@@ -292,6 +292,7 @@ namespace Scorpio.Library {
                     Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
                     Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
                 }
+                GC.Collect();
                 return ScriptValue.Null;
             }
         }
