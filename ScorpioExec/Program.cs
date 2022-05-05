@@ -6,14 +6,14 @@ using System.IO;
 using System.Reflection;
 using Scorpio;
 using Scorpio.Commons;
+using Scorpio.Compile.Compiler;
 using Scorpio.FastReflect;
 using Scorpio.Serialize;
 using ScorpioLibrary;
-using Scorpio.Compile.Compiler;
 
 namespace ScorpioExec {
     public class Program {
-        private static readonly string CurrentDirectory = Util.CurrentDirectory;
+        private static readonly string CurrentDirectory = ScorpioUtil.CurrentDirectory;
 
         private const string OptionDescribe = @"
 编译选项,json格式
@@ -65,8 +65,8 @@ namespace ScorpioExec {
         private readonly static string[] ParameterOutput = new [] { "-o", "--output", "-output" };
         private readonly static string[] ParameterClass = new [] { "-c", "--class", "-class" };
         private readonly static string[] ParameterDll = new [] { "-d", "--dll", "-dll" };
-        private readonly static string[] ParameterSearch = new[] { "--search", "-search" };
-        private readonly static string[] ParameterOption = new[] { "--option" };
+        private readonly static string[] ParameterSearch = new [] { "--search", "-search" };
+        private readonly static string[] ParameterOption = new [] { "--option" };
         private readonly static string[] ParameterFilter = new [] { "-f", "--filter", "-filter" };
         private readonly static string[] ParameterExtension = new [] { "-e", "--extension", "-extension" };
         private readonly static string[] ParameterCheck = new [] { "-c", "--check", "-check" };
@@ -75,7 +75,6 @@ namespace ScorpioExec {
         static void Main (string[] args) {
             perform = new Perform ();
             perform.Help = HelpExecute;
-            perform.AddExecute ("register", HelpRegister, Register);
             perform.AddExecute ("version", HelpVersion, VersionExec);
             perform.AddExecute ("pack", HelpPack, Pack);
             perform.AddExecute ("fast", HelpFast, Fast);
@@ -84,18 +83,15 @@ namespace ScorpioExec {
             perform.AddExecute ("", HelpExecute, Execute);
             perform.Start (args, null, null);
         }
-        static void Register (CommandLine command, string[] args) {
-            Util.RegisterApplication ($"{Util.BaseDirectory}/{AppDomain.CurrentDomain.FriendlyName}");
-        }
-        static void VersionExec (CommandLine command, string[] args) {
+        static void VersionExec (Perform perform, CommandLine command, string[] args) {
             Logger.info (Scorpio.Version.version);
             if (!command.HadValue (ParameterCheck)) { return; }
             Logger.info ("正在检查最新版本...");
-            var result = Util.RequestString ("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
+            var result = ScorpioUtil.RequestString ("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
                 request.Headers.Add ("Authorization", "token e5ff670eb105f044273f4c81276a67cd1341e649");
             });
             var isPreview = command.HadValue (ParameterPreview);
-            var datas = Json.Deserialize (result, true) as List<object>;
+            var datas = ScorpioJson.Deserialize (result, true) as List<object>;
             foreach (Dictionary<string, object> data in datas) {
                 var name = data["name"] as string;
                 if (name.Contains (Scorpio.Version.version)) {
@@ -120,22 +116,22 @@ namespace ScorpioExec {
                 }
             }
         }
-        static void Pack (CommandLine command, string[] args) {
+        static void Pack (Perform perform, CommandLine command, string[] args) {
             var source = perform.GetPath (ParameterSource);
             var output = perform.GetPath (ParameterOutput);
             var search = command.GetValueDefault (ParameterSearch, "");
-            var searchPaths = new List<string>(search.Split(";"));
-            searchPaths.Add(CurrentDirectory);
-            searchPaths.Add(Path.GetDirectoryName(source));
-            var compileOption = ParseOption(command.GetValueDefault(ParameterOption, ""), searchPaths);
-            File.WriteAllBytes(output, Serializer.SerializeBytes(
+            var searchPaths = new List<string> (search.Split (";"));
+            searchPaths.Add (CurrentDirectory);
+            searchPaths.Add (Path.GetDirectoryName (source));
+            var compileOption = ParseOption (command.GetValueDefault (ParameterOption, ""), searchPaths);
+            File.WriteAllBytes (output, Serializer.SerializeBytes (
                 source,
-                FileUtil.GetFileString(source),
-                searchPaths.ToArray(),
+                FileUtil.GetFileString (source),
+                searchPaths.ToArray (),
                 compileOption));
             Logger.info ($"生成IL文件  {source} -> {output}");
         }
-        static void Fast (CommandLine command, string[] args) {
+        static void Fast (Perform perform, CommandLine command, string[] args) {
             var output = perform.GetPath (ParameterOutput);
             var strClass = command.GetValue (ParameterClass);
             if (strClass.isNullOrWhiteSpace ()) { throw new Exception ("找不到 -class 参数"); }
@@ -171,7 +167,7 @@ namespace ScorpioExec {
                 Logger.info ($"生成快速反射类 {className} -> {outputFile}");
             }
         }
-        static void DelegateFactory (CommandLine command, string[] args) {
+        static void DelegateFactory (Perform perform, CommandLine command, string[] args) {
             var output = perform.GetPath (ParameterOutput);
             var strClass = command.GetValue (ParameterClass);
             if (strClass.isNullOrWhiteSpace ()) { throw new Exception ("找不到 -class 参数"); }
@@ -188,7 +184,7 @@ namespace ScorpioExec {
             FileUtil.CreateFile (output, generate.Generate ());
             Logger.info ($"生成Delegate仓库 {output}");
         }
-        static void Interface (CommandLine command, string[] args) {
+        static void Interface (Perform perform, CommandLine command, string[] args) {
             var output = perform.GetPath (ParameterOutput);
             var strClass = command.GetValue (ParameterClass);
             if (strClass.isNullOrWhiteSpace ()) { throw new Exception ("找不到 -class 参数"); }
@@ -206,14 +202,14 @@ namespace ScorpioExec {
             }
         }
 
-        static void Execute (CommandLine command, string[] args) {
-            Util.PrintSystemInfo ();
+        static void Execute (Perform perform, CommandLine command, string[] args) {
+            ScorpioUtil.PrintSystemInfo ();
             Logger.info ($"Version : {Scorpio.Version.version}[{Scorpio.Version.date}]");
             var script = new Scorpio.Script ();
             script.LoadLibraryV1 ();
-            script.LoadLibraryExtend();
-            script.PushAssembly(typeof(Program));
-            script.PushReferencedAssemblies(typeof(Program).Assembly);
+            script.LoadLibraryExtend ();
+            script.PushAssembly (typeof (Program));
+            script.PushReferencedAssemblies (typeof (Program).Assembly);
             LoadLibrary (Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {
@@ -222,21 +218,21 @@ namespace ScorpioExec {
                         Logger.info ($"文件 : {file} 不存在");
                         return;
                     }
-                    script.PushSearchPath (Path.GetDirectoryName(file));
+                    script.PushSearchPath (Path.GetDirectoryName (file));
                     script.PushSearchPath (CurrentDirectory);
                     var sArgs = new string[args.Length - 1];
-                    Array.Copy(args, 1, sArgs, 0, sArgs.Length);
-                    script.SetArgs(sArgs);
+                    Array.Copy (args, 1, sArgs, 0, sArgs.Length);
+                    script.SetArgs (sArgs);
                     Logger.info ("=============================");
                     var watch = Stopwatch.StartNew ();
-                    var value = script.LoadFile (file, ParseOption(command.GetValueDefault(ParameterOption, ""), script.SearchPaths));
-                    while (script.UpdateCoroutine()) { }
+                    var value = script.LoadFile (file, ParseOption (command.GetValueDefault (ParameterOption, ""), script.SearchPaths));
+                    while (script.UpdateCoroutine ()) { }
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");
                 } catch (Exception e) {
                     var stackInfo = script.GetStackInfo ();
-                    Logger.info($"{stackInfo.Breviary}:{stackInfo.Line} {e}");
+                    Logger.info ($"{stackInfo.Breviary}:{stackInfo.Line} {e}");
                 }
             } else {
                 while (true) {
@@ -278,70 +274,70 @@ namespace ScorpioExec {
             }
             return type;
         }
-        static CompileOption ParseOption(string str, IEnumerable<string> scriptSearchPaths) {
+        static CompileOption ParseOption (string str, IEnumerable<string> scriptSearchPaths) {
             try {
-                if (string.IsNullOrWhiteSpace(str)) { return null; }
-                var option = Json.Deserialize(File.Exists(str) ? System.Text.Encoding.UTF8.GetString(File.ReadAllBytes(str)) : str) as Dictionary<string, object>;
-                var compileOption = new CompileOption();
-                if (option.TryGetValue("defines", out var defines)) {
-                    if (!(defines is IList)) { throw new Exception("defines 参数必须是字符串数组"); }
-                    var values = new List<string>();
+                if (string.IsNullOrWhiteSpace (str)) { return null; }
+                var option = ScorpioJson.Deserialize (File.Exists (str) ? System.Text.Encoding.UTF8.GetString (File.ReadAllBytes (str)) : str) as Dictionary<string, object>;
+                var compileOption = new CompileOption ();
+                if (option.TryGetValue ("defines", out var defines)) {
+                    if (!(defines is IList)) { throw new Exception ("defines 参数必须是字符串数组"); }
+                    var values = new List<string> ();
                     foreach (object value in defines as IList) {
-                        values.Add(value.ToString());
+                        values.Add (value.ToString ());
                     }
                     compileOption.defines = values;
                 }
-                if (option.TryGetValue("ignoreFunctions", out var ignoreFunctions)) {
-                    if (!(ignoreFunctions is IList)) { throw new Exception("ignoreFunctions 参数必须是字符串数组"); }
-                    var values = new List<string>();
+                if (option.TryGetValue ("ignoreFunctions", out var ignoreFunctions)) {
+                    if (!(ignoreFunctions is IList)) { throw new Exception ("ignoreFunctions 参数必须是字符串数组"); }
+                    var values = new List<string> ();
                     foreach (object value in ignoreFunctions as IList) {
-                        values.Add(value.ToString());
+                        values.Add (value.ToString ());
                     }
                     compileOption.ignoreFunctions = values;
                 }
-                if (option.TryGetValue("staticTypes", out var staticTypes)) {
-                    if (!(staticTypes is IList)) { throw new Exception("staticTypes 参数必须是字符串数组"); }
-                    var values = new List<string>();
+                if (option.TryGetValue ("staticTypes", out var staticTypes)) {
+                    if (!(staticTypes is IList)) { throw new Exception ("staticTypes 参数必须是字符串数组"); }
+                    var values = new List<string> ();
                     foreach (object value in staticTypes as IList) {
-                        values.Add(value.ToString());
+                        values.Add (value.ToString ());
                     }
                     compileOption.staticTypes = values;
                 }
-                if (option.TryGetValue("staticVariables", out var staticVariables)) {
-                    if (!(staticTypes is IList)) { throw new Exception("staticVariables 参数必须是字符串数组"); }
-                    var values = new List<string>();
+                if (option.TryGetValue ("staticVariables", out var staticVariables)) {
+                    if (!(staticTypes is IList)) { throw new Exception ("staticVariables 参数必须是字符串数组"); }
+                    var values = new List<string> ();
                     foreach (object value in staticVariables as IList) {
-                        values.Add(value.ToString());
+                        values.Add (value.ToString ());
                     }
                     compileOption.staticVariables = values;
                 }
-                if (option.TryGetValue("searchPaths", out var searchPaths)) {
-                    if (!(searchPaths is IList)) { throw new Exception("searchPaths 参数必须是字符串数组"); }
-                    var values = new List<string>();
+                if (option.TryGetValue ("searchPaths", out var searchPaths)) {
+                    if (!(searchPaths is IList)) { throw new Exception ("searchPaths 参数必须是字符串数组"); }
+                    var values = new List<string> ();
                     foreach (object value in searchPaths as IList) {
-                        values.Add(value.ToString());
+                        values.Add (value.ToString ());
                     }
                     compileOption.searchPaths = values;
                 }
-                if (option.TryGetValue("const", out var constFile)) {
-                    if (!(constFile is string)) { throw new Exception("const 参数必须是文件路径"); }
+                if (option.TryGetValue ("const", out var constFile)) {
+                    if (!(constFile is string)) { throw new Exception ("const 参数必须是文件路径"); }
                     string fileName = constFile as string;
                     foreach (var searchPath in scriptSearchPaths) {
-                        var fullFileName = Path.Combine(searchPath, fileName);
-                        if (File.Exists(fullFileName)) {
-                            var script = new Scorpio.Script();
-                            script.LoadLibraryV1();
+                        var fullFileName = Path.Combine (searchPath, fileName);
+                        if (File.Exists (fullFileName)) {
+                            var script = new Scorpio.Script ();
+                            script.LoadLibraryV1 ();
                             foreach (var path in scriptSearchPaths) {
-                                script.PushSearchPath(path);
+                                script.PushSearchPath (path);
                             }
-                            compileOption.scriptConst = script.LoadConst(fullFileName);
+                            compileOption.scriptConst = script.LoadConst (fullFileName);
                             break;
                         }
                     }
                 }
                 return compileOption;
             } catch (Exception e) {
-                throw new Exception("编译选项解析失败 : " + e.ToString());
+                throw new Exception ("编译选项解析失败 : " + e.ToString ());
             }
         }
     }

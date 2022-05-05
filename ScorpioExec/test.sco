@@ -10,7 +10,7 @@ class Cl {
     }
 }
 var c = new Cl()
-print("wwww " + c)
+print("wwww " + c + "   www")
 // TestClass = import_type("Scorpio.TestClass")
 // importExtension("Scorpio.ClassEx")
 // TestClass()
