@@ -8,9 +8,23 @@ class Cl {
     toString() {
         return "TileInfo(${this.id}) ${this.dataId} zone:${this.zoneId} map:${this.mapId}"
     }
+    async ttt() {
+        await sleep(5)
+        print("tttt")
+    }
+    get get() {
+        return "1111,2222"
+    }
 }
-var c = new Cl()
-print("wwww " + c + "   www")
+async function main() {
+    var c = new Cl()
+    print("wwww " + c + "   www")
+    await c.ttt(5)
+    print("eeeeeeeeeeeeeee")
+    print(c.get)
+}
+main()
+
 // TestClass = import_type("Scorpio.TestClass")
 // importExtension("Scorpio.ClassEx")
 // TestClass()
