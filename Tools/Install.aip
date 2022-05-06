@@ -63,6 +63,23 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
     <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
   </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
+    <ROW Dialog_="AdminBrowseDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="300" MsiKey="AdminBrowseDlg#Logo"/>
+    <ROW Dialog_="AdminInstallPointDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="500" MsiKey="AdminInstallPointDlg#Logo"/>
+    <ROW Dialog_="BrowseDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="300" MsiKey="BrowseDlg#Logo"/>
+    <ROW Dialog_="CustomizeDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="600" MsiKey="CustomizeDlg#Logo"/>
+    <ROW Dialog_="DiskCostDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="400" MsiKey="DiskCostDlg#Logo"/>
+    <ROW Dialog_="FilesInUse" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="600" MsiKey="FilesInUse#Logo"/>
+    <ROW Dialog_="FolderDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="600" MsiKey="FolderDlg#Logo"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="1200" MsiKey="MaintenanceTypeDlg#Logo"/>
+    <ROW Dialog_="MsiRMFilesInUse" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="1100" MsiKey="MsiRMFilesInUse#Logo"/>
+    <ROW Dialog_="OutOfDiskDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="400" MsiKey="OutOfDiskDlg#Logo"/>
+    <ROW Dialog_="OutOfRbDiskDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="500" MsiKey="OutOfRbDiskDlg#Logo"/>
+    <ROW Dialog_="ProgressDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="400" MsiKey="ProgressDlg#Logo"/>
+    <ROW Dialog_="VerifyReadyDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="500" MsiKey="VerifyReadyDlg#Logo"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="600" MsiKey="VerifyRemoveDlg#Logo"/>
+    <ROW Dialog_="VerifyRepairDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Scorpio" Order="500" MsiKey="VerifyRepairDlg#Logo"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
     <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
     <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="201"/>
