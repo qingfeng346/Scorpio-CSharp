@@ -1,4 +1,4 @@
-$version = "2.3.8"
+$version = "2.3.9"
 $name = "sco"
 
 $today = Get-Date

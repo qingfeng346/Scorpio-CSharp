@@ -789,7 +789,7 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> await </summary>
         private void ParseAwait () {
-            PushObject (GetObject ());
+            PushObject (GetObject (), true);
             AddScriptInstructionWithoutValue (Opcode.Await);
         }
         /// <summary> async </summary>
@@ -824,8 +824,11 @@ namespace Scorpio.Compile.Compiler {
             }
             return true;
         }
+        void PushObject(CodeObject obj) {
+            PushObject(obj, false);
+        }
         /// <summary> 压入一个值 </summary>
-        void PushObject (CodeObject obj) {
+        void PushObject (CodeObject obj, bool isAwait) {
             switch (obj) {
                 case CodeNativeObject native:
                     {
@@ -989,20 +992,20 @@ namespace Scorpio.Compile.Compiler {
                             //没有展开参数
                             if (unfold == 0L) {
                                 if (isBase) {
-                                    AddScriptInstruction (Opcode.CallBase, parameters.Count, obj.Line);
+                                    AddScriptInstruction (isAwait ? Opcode.CallBaseAsync : Opcode.CallBase, parameters.Count, obj.Line);
                                 } else if (isCallVi) {
-                                    AddScriptInstruction (Opcode.CallVi, parameters.Count, obj.Line);
+                                    AddScriptInstruction (isAwait ? Opcode.CallViAsync : Opcode.CallVi, parameters.Count, obj.Line);
                                 } else {
-                                    AddScriptInstruction (Opcode.Call, parameters.Count, obj.Line);
+                                    AddScriptInstruction (isAwait ? Opcode.CallAsync : Opcode.Call, parameters.Count, obj.Line);
                                 }
                             } else {
                                 var value = System.Convert.ToInt64 (parameters.Count) << 8 | unfold;
                                 if (isBase) {
-                                    AddScriptInstruction (Opcode.CallBaseUnfold, GetConstLong (value), obj.Line);
+                                    AddScriptInstruction (isAwait ? Opcode.CallBaseUnfoldAsync : Opcode.CallBaseUnfold, GetConstLong (value), obj.Line);
                                 } else if (isCallVi) {
-                                    AddScriptInstruction (Opcode.CallViUnfold, GetConstLong (value), obj.Line);
+                                    AddScriptInstruction (isAwait ? Opcode.CallViUnfoldAsync : Opcode.CallViUnfold, GetConstLong (value), obj.Line);
                                 } else {
-                                    AddScriptInstruction (Opcode.CallUnfold, GetConstLong (value), obj.Line);
+                                    AddScriptInstruction (isAwait ? Opcode.CallUnfoldAsync : Opcode.CallUnfold, GetConstLong (value), obj.Line);
                                 }
                             }
                             if (codeCallFunction.Variables != null) {

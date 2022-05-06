@@ -9,19 +9,34 @@ class Cl {
         return "TileInfo(${this.id}) ${this.dataId} zone:${this.zoneId} map:${this.mapId}"
     }
     async ttt() {
+        print("tttt - 1 " + io.unixNow())
+        this.ttt1()
+        await this.sl()
+        print("tttt - 2 " + io.unixNow())
         await sleep(5)
-        print("tttt")
+        print("tttt - 3  " +  io.unixNow())
+    }
+    async ttt1() {
+        print("tttt1 - 1  " +  io.unixNow())
+        await sleep(2)
+        print("tttt1 - 2  " +  io.unixNow())
+    }
+    async sl() {
+        await sleep(1)
     }
     get get() {
         return "1111,2222"
     }
 }
+Object.addGetProperty(Cl, "get2", function() {
+    return this.get
+})
 async function main() {
     var c = new Cl()
     print("wwww " + c + "   www")
-    await c.ttt(5)
-    print("eeeeeeeeeeeeeee")
+    await c.ttt()
     print(c.get)
+    print(c.get2)
 }
 main()
 

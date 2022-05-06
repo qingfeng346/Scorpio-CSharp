@@ -81,6 +81,8 @@ namespace Scorpio {
         //调用函数
         public virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) { throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用"); }
         internal virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) { throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用"); }
+        internal virtual ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length) { return Call(thisObject, parameters, length); }
+        internal virtual ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) { return Call(thisObject, parameters, length, baseType); }
         public virtual ScriptObject Clone(bool deep) { return this; }                   // 复制一个变量 是否深层复制
 
         public bool IsFunction => ObjectType == ObjectType.Function;

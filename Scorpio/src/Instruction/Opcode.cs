@@ -123,6 +123,12 @@ namespace Scorpio.Instruction {
         TryTo, //异常跳转
         TryEnd, //try结束
         Throw, //throw
-        Await, //await
+        Await,                  //await
+        CallAsync,              //await 调用异步函数
+        CallViAsync,            //await 调用内部异步函数
+        CallUnfoldAsync,        //await 调用一个函数 有参数需要展开
+        CallViUnfoldAsync,      //await 调用内部函数 有参数需要展开
+        CallBaseAsync,          //await 调用父级函数
+        CallBaseUnfoldAsync,    //await 调用父级函数 有参数需要展开
     }
 }

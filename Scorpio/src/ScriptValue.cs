@@ -285,6 +285,22 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用");
             }
         }
+        //await 调用异步函数
+        internal ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            if (valueType == scriptValueType) {
+                return scriptValue.CallAsync(thisObject, parameters, length);
+            } else {
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用");
+            }
+        }
+        //await 调用异步base函数
+        internal ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+            if (valueType == scriptValueType) {
+                return scriptValue.CallAsync(thisObject, parameters, length, baseType);
+            } else {
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用");
+            }
+        }
         //传入参数
         public object Value {
             get {
