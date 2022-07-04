@@ -451,7 +451,6 @@ namespace Scorpio {
                     throw new ExecutionException($"变量{key}不是基础常量:{value.ValueTypeName}");
             }
         }
-        #if SCORPIO_DEBUG || SCORPIO_STACK
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
         private StackInfo m_Stack = new StackInfo();
         private int m_StackLength = 0;
@@ -476,16 +475,5 @@ namespace Scorpio {
             }
             return stackInfos;
         }
-        #else
-        private readonly static StackInfo[] EmptyStackInfos = new StackInfo[0];
-        /// <summary> 最近的堆栈调用 </summary>
-        public StackInfo GetStackInfo() {
-            return default;
-        }
-        /// <summary> 调用堆栈 </summary>
-        public StackInfo[] GetStackInfos() {
-            return EmptyStackInfos;
-        }
-        #endif
     }
 }
