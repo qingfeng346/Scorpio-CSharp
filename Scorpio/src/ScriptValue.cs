@@ -360,6 +360,14 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");
             }
         }
+        public ulong ToULong() {
+            switch (valueType) {
+                case doubleValueType: return (ulong)doubleValue;
+                case longValueType: return (ulong)longValue;
+                case objectValueType: return Convert.ToUInt64(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 ulong");
+            }
+        }
         public char ToChar() {
             switch (valueType) {
                 case doubleValueType: return (char)doubleValue;

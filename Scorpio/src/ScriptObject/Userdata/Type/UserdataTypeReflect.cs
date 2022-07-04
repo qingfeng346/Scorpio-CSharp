@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using Scorpio.Exception;
@@ -6,16 +7,11 @@ using Scorpio.Tools;
 namespace Scorpio.Userdata {
     //反射类管理
     public class UserdataTypeReflect : UserdataType {
-        private bool m_InitializeConstructor;                           //是否初始化过所有构造函数
-        private bool m_InitializeFunctions;                             //是否初始化过所有函数
         private UserdataMethod m_Constructor;                           //所有构造函数
         private List<MethodInfo> m_Methods;                             //所有函数
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
         private Dictionary<string, UserdataMethodReflect> m_Functions;  //所有的函数
         public UserdataTypeReflect(Type type) : base(type) {
-            m_InitializeConstructor = false;
-            m_InitializeFunctions = false;
-            m_Methods = new List<MethodInfo>();
             m_Variables = new Dictionary<string, UserdataVariable>();
             m_Functions = new Dictionary<string, UserdataMethodReflect>();
             InitializeConstructor();
@@ -23,24 +19,20 @@ namespace Scorpio.Userdata {
         }
         //初始化构造函数
         private void InitializeConstructor() {
-            if (m_InitializeConstructor == true) return;
-            m_InitializeConstructor = true;
             //GetConstructors 去掉 NonPublic 标识, 否则取函数会取出一些错误的函数例如类 System.Diagnostics.Process
             var name = string.Intern(m_Type.ToString());
             m_Constructor = new UserdataMethodReflect(m_Type, name, m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
         }
         //初始化所有函数
         private void InitializeFunctions() {
-            if (m_InitializeFunctions == true) return;
-            m_InitializeFunctions = true;
-            m_Methods.AddRange(m_Type.GetMethods(Script.BindingFlag));
+            m_Methods = new List<MethodInfo>(m_Type.GetMethods(Script.BindingFlag));
         }
         //获取一个函数，名字相同返回值相同
         private UserdataMethodReflect GetFunction(string name) {
             var methods = m_Methods.FindAll((method) => method.Name == name);
             if (methods.Count > 0) {
                 name = string.Intern(name);
-                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods.ToArray());
+                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
             }
             return null;
         }

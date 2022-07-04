@@ -10,7 +10,7 @@ namespace Scorpio.Userdata {
             Initialize(new List<MethodBase>(methods), true);
         }
         //普通函数
-        public UserdataMethodReflect(Type type, string methodName, MethodInfo[] methods) :
+        public UserdataMethodReflect(Type type, string methodName, IEnumerable<MethodInfo> methods) :
             base(type, methodName) {
             Initialize(new List<MethodBase>(methods), false);
         }
