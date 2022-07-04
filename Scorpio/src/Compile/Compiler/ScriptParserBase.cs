@@ -19,8 +19,9 @@ namespace Scorpio.Compile.Compiler {
             this.parsers = parsers;
             this.searchPaths = searchPaths;
             this.allSearchPaths = new List<string>(searchPaths ?? EmptyArrayString);
-            this.allSearchPaths.AddRange(this.compileOption.searchPaths ?? EmptyArrayString);
-            this.allDefines = new HashSet<string>(this.compileOption.defines ?? EmptyArrayString);
+            this.allSearchPaths.AddRange(this.compileOption.searchPaths);
+            this.allSearchPaths.Add(Path.GetDirectoryName(this.Breviary));
+            this.allDefines = new HashSet<string>(this.compileOption.defines);
         }
         /// <summary> 当前解析的脚本摘要 </summary>
         public string Breviary { get; private set; }

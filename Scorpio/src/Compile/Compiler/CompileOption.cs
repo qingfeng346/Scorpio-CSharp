@@ -15,32 +15,31 @@ namespace Scorpio.Compile.Compiler {
             get { return mIgnoreFunctions; }
             set { mIgnoreFunctions = new HashSet<string>(value ?? EmptyArrayString); }
         }
-        public IEnumerable<string> defines {
-            get { return mDefines; }
-            set { mDefines = value ?? EmptyArrayString; }
-        }
-        public IEnumerable<string> staticTypes {
-            get { return mStaticTypes; }
-            set { mStaticTypes = value ?? EmptyArrayString; }
-        }
         public IEnumerable<string> staticVariables {
             get { return mStaticVariables; }
             set { mStaticVariables = new HashSet<string>(value ?? EmptyArrayString); }
-        }
-        public IEnumerable<string> searchPaths {
-            get { return mSearchPaths; }
-            set { mSearchPaths = value ?? EmptyArrayString; }
         }
         public ScriptConst scriptConst {
             get { return mScriptConst; }
             set { mScriptConst = value ?? new ScriptConst(); }
         }
+        public IEnumerable<string> defines {
+            get { return mDefines ?? EmptyArrayString; }
+            set { mDefines = value; }
+        }
+        public IEnumerable<string> staticTypes {
+            get { return mStaticTypes ?? EmptyArrayString; }
+            set { mStaticTypes = value; }
+        }
+
+        public IEnumerable<string> searchPaths {
+            get { return mSearchPaths ?? EmptyArrayString; }
+            set { mSearchPaths = value; }
+        }
         public Action<ScriptParser, string> preprocessImportFile { get; set; }
 
         public CompileOption() {
             this.ignoreFunctions = null;
-            this.defines = null;
-            this.staticTypes = null;
             this.staticVariables = null;
             this.scriptConst = null;
             this.preprocessImportFile = null;

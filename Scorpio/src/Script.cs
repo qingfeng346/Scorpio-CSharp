@@ -138,7 +138,7 @@ namespace Scorpio {
                 m_SearchPaths[m_SearchPaths.Length - 1] = path;
             }
         }
-        public string SearchFile(string fileName) {
+        public string SearchFile(string fileName, CompileOption option) {
             if (File.Exists(fileName)) { 
                 return fileName;
             }
@@ -146,6 +146,14 @@ namespace Scorpio {
                 string file = Path.Combine(m_SearchPaths[i], fileName);
                 if (File.Exists(file)) {
                     return file;
+                }
+            }
+            if (option != null) {
+                foreach (var path in option.searchPaths) {
+                    string file = Path.Combine(path, fileName);
+                    if (File.Exists(file)) {
+                        return file;
+                    }
                 }
             }
             return null;
@@ -247,7 +255,7 @@ namespace Scorpio {
         }
         /// <summary> 使用字符串方式加载文件 </summary>
         public ScriptValue LoadFileByString(string fileName, CompileOption compileOption) {
-            var fullFileName = SearchFile(fileName);
+            var fullFileName = SearchFile(fileName, compileOption);
             if (fullFileName == null) {
                 throw new System.Exception($"can't found file : {fileName}");
             }
@@ -255,9 +263,12 @@ namespace Scorpio {
                 return LoadStreamByString(fileName, stream, (int)stream.Length, compileOption);
             }
         }
-        /// <summary> 使用字节码方式加载文件 </summary>
         public ScriptValue LoadFileByIL(string fileName) {
-            var fullFileName = SearchFile(fileName);
+            return LoadFileByIL(fileName, null);
+        }
+        /// <summary> 使用字节码方式加载文件 </summary>
+        public ScriptValue LoadFileByIL(string fileName, CompileOption compileOption) {
+            var fullFileName = SearchFile(fileName, compileOption);
             if (fullFileName == null) {
                 throw new System.Exception($"can't found file : {fileName}");
             }
@@ -329,7 +340,7 @@ namespace Scorpio {
         }
         /// <summary> 加载一个文件 </summary>
         public ScriptValue LoadFile(string fileName, CompileOption compileOption) {
-            var fullFileName = SearchFile(fileName);
+            var fullFileName = SearchFile(fileName, compileOption);
             if (fullFileName == null) {
                 throw new System.Exception($"can't found file : {fileName}");
             }
