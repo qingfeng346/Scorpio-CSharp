@@ -24,17 +24,16 @@ namespace Scorpio.Compile.Compiler {
             set { mScriptConst = value ?? new ScriptConst(); }
         }
         public IEnumerable<string> defines {
-            get { return mDefines ?? EmptyArrayString; }
-            set { mDefines = value; }
+            get { return mDefines; }
+            set { mDefines = value ?? EmptyArrayString; }
         }
         public IEnumerable<string> staticTypes {
-            get { return mStaticTypes ?? EmptyArrayString; }
-            set { mStaticTypes = value; }
+            get { return mStaticTypes; }
+            set { mStaticTypes = value ?? EmptyArrayString; }
         }
-
         public IEnumerable<string> searchPaths {
-            get { return mSearchPaths ?? EmptyArrayString; }
-            set { mSearchPaths = value; }
+            get { return mSearchPaths; }
+            set { mSearchPaths = value ?? EmptyArrayString; }
         }
         public Action<ScriptParser, string> preprocessImportFile { get; set; }
 
@@ -42,6 +41,9 @@ namespace Scorpio.Compile.Compiler {
             this.ignoreFunctions = null;
             this.staticVariables = null;
             this.scriptConst = null;
+            this.defines = null;
+            this.staticTypes = null;
+            this.searchPaths = null;
             this.preprocessImportFile = null;
         }
         internal bool IsIgnoreFunction(string name) {
