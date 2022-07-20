@@ -1,8 +1,9 @@
 ﻿using Scorpio.Exception;
+using System;
 using System.Text;
 using System.Collections.Generic;
 namespace Scorpio.Library {
-    internal class ScorpioJsonParser {
+    internal class ScorpioJsonDeserializer : IDisposable {
         const long MinInt = int.MinValue;
         const long MaxInt = int.MaxValue;
         const char END_CHAR = (char)0;
@@ -19,12 +20,12 @@ namespace Scorpio.Library {
         const string WHITE_SPACE = " \t\n\r";
         const string WORD_BREAK = " \t\n\r{}[],:\"";
 
-        private readonly Script m_Script;
-        private readonly string m_Buffer;
-        private readonly bool m_SupportLong;         //是否支持 数字无[.]解析成long值
+        private Script m_Script;
+        private string m_Buffer;
+        private bool m_SupportLong;         //是否支持 数字无[.]解析成long值
         private int m_Index;
-        private readonly int m_Length;
-        public ScorpioJsonParser(Script script, string buffer, bool supportLong) {
+        private int m_Length;
+        public ScorpioJsonDeserializer(Script script, string buffer, bool supportLong) {
             m_Script = script;
             m_SupportLong = supportLong;
             m_Buffer = buffer;
@@ -209,10 +210,14 @@ namespace Scorpio.Library {
                 }
             }
         }
+        public void Dispose() {
+            m_Script = null;
+            m_Buffer = null;
+        }
     }
-    internal class ScorpioJsonSerializer {
-        internal readonly StringBuilder m_Builder;
-        private readonly HashSet<ScriptObject> m_Recurve;
+    internal class ScorpioJsonSerializer : IDisposable {
+        internal StringBuilder m_Builder;
+        private HashSet<ScriptObject> m_Recurve;
         public ScorpioJsonSerializer() {
             m_Builder = new StringBuilder();
             m_Recurve = new HashSet<ScriptObject>();
@@ -296,6 +301,10 @@ namespace Scorpio.Library {
             } else {
                 Serializer(scriptObject.ToString());
             }
+        }
+        public void Dispose() {
+            m_Builder = null;
+            m_Recurve = null;
         }
     }
 }

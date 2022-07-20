@@ -25,7 +25,7 @@ namespace Scorpio {
         }
         public ScriptMapString(Script script) : base(script) { }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
-        IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
         public override bool ContainsKey(object key) {
             if (!(key is string)) return false;
             return m_Values.ContainsKey(key as string);

@@ -592,11 +592,6 @@ namespace Scorpio.Compile.Compiler {
             var index = ParseClassContent (out var className, out var async);
             var sourceLine = PeekToken ().SourceLine;
             AddScriptInstruction (Opcode.NewType, index, sourceLine);
-            // if (async) {
-            //     AddScriptInstruction(Opcode.NewAsyncType, index, sourceLine);
-            // } else {
-            //     AddScriptInstruction(Opcode.NewTypeOld, index, sourceLine);
-            // }
             if (string.IsNullOrWhiteSpace (className)) { return; }
             if (m_scriptExecutable.Block == ExecutableBlock.Context) {
                 AddScriptInstruction (Opcode.StoreGlobalString, GetConstString (className), sourceLine);
@@ -657,16 +652,6 @@ namespace Scorpio.Compile.Compiler {
             }
             ReadRightBrace ();
             var funs = new List<long> ();
-            // if (async) {
-            //     foreach (var func in functions) {
-            //         var isAsync = func.funcType == 1 ? 1L : 0L;
-            //         funs.Add ((func.nameIndex << 32) | (func.funcIndex << 1) | isAsync);
-            //     }
-            // } else {
-            //     foreach (var func in functions) {
-            //         funs.Add ((func.nameIndex << 32) | (func.funcIndex));
-            //     }
-            // }
             foreach (var func in functions) {
                 funs.Add ((func.nameIndex << 32) | (func.funcIndex << 4) | func.funcType);
             }
@@ -1031,7 +1016,6 @@ namespace Scorpio.Compile.Compiler {
                 case CodeClass cl:
                     {
                         AddScriptInstruction (Opcode.NewType, cl.index, obj.Line);
-                        // AddScriptInstruction (cl.async ? Opcode.NewAsyncType : Opcode.NewTypeOld, cl.index, obj.Line);
                         break;
                     }
                 case CodeArray array:
@@ -1044,7 +1028,7 @@ namespace Scorpio.Compile.Compiler {
                     }
                 case CodeMap map:
                     {
-                        AddScriptInstruction (Opcode.NewMap, map.onlyString ? 1 : 0);
+                        AddScriptInstructionWithoutValue (Opcode.NewMap);
                         foreach (var ele in map.Variables) {
                             AddScriptInstructionWithoutValue (Opcode.CopyStackTop);
                             if (ele.key is double) {
@@ -1065,8 +1049,6 @@ namespace Scorpio.Compile.Compiler {
                                 AddScriptInstruction (Opcode.StoreValueString, GetConstString (ele.key.ToString ()));
                             } else {
                                 AddScriptInstructionWithoutValue (Opcode.StoreValueObject);
-                                //AddScriptInstructionWithoutValue(Opcode.StoreValueObjectAssign);
-                                //AddScriptInstructionWithoutValue(Opcode.Pop);
                             }
                         }
                         break;
@@ -1360,13 +1342,7 @@ namespace Scorpio.Compile.Compiler {
                 case TokenType.LeftBrace:
                     {
                         UndoToken ();
-                        ret = GetMap (false);
-                        break;
-                    }
-                case TokenType.LeftBraceAt:
-                    {
-                        UndoToken ();
-                        ret = GetMap (true);
+                        ret = GetMap ();
                         break;
                     }
                 default:
@@ -1458,7 +1434,7 @@ namespace Scorpio.Compile.Compiler {
             var ret = GetCallFunction (parent);
             ret.nullTo = nullTo;
             if (PeekToken ().Type == TokenType.LeftBrace) {
-                ret.Variables = GetMap (true);
+                ret.Variables = GetMap ();
             }
             return ret;
         }
@@ -1537,13 +1513,9 @@ namespace Scorpio.Compile.Compiler {
             return ret;
         }
         //返回map数据
-        CodeMap GetMap (bool onlyString) {
-            var ret = new CodeMap (GetSourceLine (), onlyString);
-            if (PeekToken ().Type == TokenType.LeftBraceAt) {
-                ReadToken ();
-            } else {
-                ReadLeftBrace ();
-            }
+        CodeMap GetMap () {
+            var ret = new CodeMap (GetSourceLine ());
+            ReadLeftBrace ();
             while (PeekToken ().Type != TokenType.RightBrace) {
                 var token = ReadToken ();
                 switch (token.Type) {
@@ -1555,11 +1527,6 @@ namespace Scorpio.Compile.Compiler {
                     case TokenType.Number:
                     case TokenType.Boolean:
                         {
-                            if (onlyString) {
-                                if (token.Type != TokenType.Identifier && token.Type != TokenType.String) {
-                                    throw new ParserException (this, "当前Map只支持Key为String类型", token);
-                                }
-                            }
                             var next = ReadToken ();
                             if (next.Type == TokenType.Assign || next.Type == TokenType.Colon) {
                                 ret.Variables.Add (new CodeMap.MapVariable (token.Lexeme, GetObject ()));

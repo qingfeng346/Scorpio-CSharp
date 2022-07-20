@@ -2,7 +2,8 @@
   "profiles": {
     "run": {
       "commandName": "Project",
-      "commandLineArgs": "../../../test.sco --option ../../../CompileOption.json"
+      "commandLineArgs": "run.sco --option CompileOption.json",
+      "workingDirectory": "./"
     },
     "runil": {
       "commandName": "Project",
@@ -31,6 +32,11 @@
     "interface": {
       "commandName": "Project",
       "commandLineArgs": "interface --class ScorpioExec.TestInterface -o ../../../ "
+    },
+    "SyntacticSugar": {
+      "commandName": "Project",
+      "commandLineArgs": "SyntacticSugar.sco --option CompileOption.json",
+      "workingDirectory": "./"
     }
   }
 }

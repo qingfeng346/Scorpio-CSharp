@@ -42,16 +42,13 @@ namespace Scorpio.Instruction {
         NewLambdaFunction, //new lambda function
         NewArray, //new array
         NewMap, //new map
-        NewMapObject, //new map with key contain object
-        [System.Obsolete]
-        NewTypeOld, //new class
-        [System.Obsolete]
-        NewTypeParent, //new class with parent, 已弃用deprecated,兼容旧版本,暂时不能删除
-        NewMapString, //new map only string key
+        [System.Obsolete("已删除", true)] NewMapObject, //new map with key contain object
+        [System.Obsolete("已删除", true)] NewTypeOld, //new class
+        [System.Obsolete("已删除", true)] NewTypeParent, //new class with parent
+        [System.Obsolete("已删除", true)] NewMapString, //new map only string key
         NewAsyncFunction, //new async function
         NewAsyncLambdaFunction, //new async lambda function
-        [System.Obsolete]
-        NewAsyncType, //new async type
+        [System.Obsolete("已删除", true)] NewAsyncType, //new async type
         NewType, //new type, the NewTypeOld and NewAsyncType will deprecated
 
         //取栈操作

@@ -3,19 +3,6 @@ using Scorpio.Instruction;
 using Scorpio.Tools;
 namespace Scorpio.Serialize {
     public static class Deserializer {
-        [System.Obsolete]
-        public static SerializeData[] DeserializeV1(string breviary, byte[] data) {
-            using (var stream = new MemoryStream(data)) {
-                return DeserializeV1(breviary, stream);
-            }
-        }
-        [System.Obsolete]
-        public static SerializeData[] DeserializeV1(string breviary, Stream stream) {
-            using (var reader = new ScorpioReader(stream)) {
-                reader.ReadByte();
-                return new SerializeData[1] { new SerializeData(breviary).Deserialize(reader) };
-            }
-        }
         public static SerializeData[] Deserialize(byte[] data) {
             using (var stream = new MemoryStream(data)) {
                 return Deserialize(stream);

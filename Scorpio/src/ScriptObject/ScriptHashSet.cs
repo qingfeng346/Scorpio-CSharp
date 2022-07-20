@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Tools;
+using Scorpio.Library;
 namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
         private Script m_Script;
@@ -77,6 +78,17 @@ namespace Scorpio {
                 array.SetValue(value.ChangeType(type), index++);
             }
             return array;
+        }
+        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
+            var builder = jsonSerializer.m_Builder;
+            builder.Append("[");
+            var first = true;
+            foreach (var value in m_Objects) {
+                if (!first) { builder.Append(","); }
+                first = false;
+                jsonSerializer.Serializer(value);
+            }
+            builder.Append("]");
         }
     }
 }

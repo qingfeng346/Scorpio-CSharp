@@ -1,26 +1,26 @@
 using System;
 using System.Collections.Generic;
 namespace Scorpio.Tools {
-    public class ScorpioValue<TKey, TValue> {
+    public struct ScorpioKeyValue<TKey, TValue> {
         public TKey Key;
         public TValue Value;
-        public ScorpioValue<TKey, TValue> Set(ScorpioValue<TKey, TValue> v) {
+        public ScorpioKeyValue<TKey, TValue> Set(ScorpioKeyValue<TKey, TValue> v) {
             this.Key = v.Key;
             this.Value = v.Value;
             return this;
         }
     }
-    public class ScorpioDictionary<Key, Value> : IEnumerable<ScorpioValue<Key, Value>> {
-        public struct Enumerator : IEnumerator<ScorpioValue<Key, Value>> {
+    public class ScorpioDictionary<Key, Value> : IEnumerable<ScorpioKeyValue<Key, Value>> {
+        public struct Enumerator : IEnumerator<ScorpioKeyValue<Key, Value>> {
             private readonly int length;
             private readonly ScorpioDictionary<Key, Value> dictionary;
             private int index;
-            private ScorpioValue<Key, Value> current;
+            private ScorpioKeyValue<Key, Value> current;
             internal Enumerator(ScorpioDictionary<Key, Value> dictionary) {
                 this.dictionary = dictionary;
                 this.index = 0;
                 this.length = dictionary.Count;
-                this.current = null;
+                this.current = default;
             }
             public bool MoveNext() {
                 if (index < length) {
@@ -30,26 +30,27 @@ namespace Scorpio.Tools {
                 }
                 return false;
             }
-            public ScorpioValue<Key, Value> Current { get { return current; } }
-            object System.Collections.IEnumerator.Current { get { return current; } }
+            public ScorpioKeyValue<Key, Value> Current => current;
+            object System.Collections.IEnumerator.Current => this.current;
             public void Reset() {
                 index = 0;
-                current = null;
+                current = default;
             }
             public void Dispose() { }
         }
-        private static readonly ScorpioValue<Key, Value>[] EmptyArray = new ScorpioValue<Key, Value>[0];
+        private static readonly ScorpioKeyValue<Key, Value>[] EmptyArray = new ScorpioKeyValue<Key, Value>[0];
         protected int mSize;
-        protected ScorpioValue<Key, Value>[] mValues;
-        public ScorpioDictionary() {
-            mValues = EmptyArray;
+        protected ScorpioKeyValue<Key, Value>[] mValues;
+        public ScorpioDictionary() : this(0) { }
+        public ScorpioDictionary(int capacity) {
             mSize = 0;
+            SetCapacity(capacity);
         }
-        public IEnumerator<ScorpioValue<Key, Value>> GetEnumerator() { return new Enumerator(this); }
+        public IEnumerator<ScorpioKeyValue<Key, Value>> GetEnumerator() { return new Enumerator(this); }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
-        void SetCapacity(int value) {
+        protected void SetCapacity(int value) {
             if (value > 0) {
-                var array = new ScorpioValue<Key, Value>[value];
+                var array = new ScorpioKeyValue<Key, Value>[value];
                 if (mSize > 0) {
                     Array.Copy(mValues, 0, array, 0, mSize);
                 }
@@ -60,7 +61,7 @@ namespace Scorpio.Tools {
         }
         protected void EnsureCapacity(int min) {
             if (mValues.Length < min) {
-                int num = (mValues.Length == 0) ? 4 : (mValues.Length * 2);
+                int num = (mValues.Length == 0) ? 4 : (mValues.Length * 32);
                 if (num > 2146435071) { num = 2146435071; }
                 if (num < min) { num = min; }
                 SetCapacity(num);
@@ -102,6 +103,10 @@ namespace Scorpio.Tools {
             mValues[mSize].Value = default;
             return true;
         }
+        public virtual void Clear() {
+            mSize = 0;
+            Array.Clear(mValues, 0, mValues.Length);
+        }
         public virtual bool SetValue(Key key, Value value) {
             for (int i = 0; i < mSize; ++i) {
                 if (mValues[i].Key.Equals(key)) {
@@ -121,7 +126,7 @@ namespace Scorpio.Tools {
             value = default;
             return false;
         }
-        public virtual ScorpioValue<Key, Value> Get(int index) {
+        public virtual ScorpioKeyValue<Key, Value> Get(int index) {
             return mValues[index];
         }
         public virtual Key GetKey(Value value) {
@@ -165,7 +170,7 @@ namespace Scorpio.Tools {
                     if (mSize == mValues.Length) {
                         EnsureCapacity(mSize + 1);
                     }
-                    mValues[mSize] = new ScorpioValue<Key, Value>() { Key = key, Value = value };
+                    mValues[mSize] = new ScorpioKeyValue<Key, Value>() { Key = key, Value = value };
                     ++mSize;
                 } else {
                     mValues[index].Value = value;
@@ -173,39 +178,29 @@ namespace Scorpio.Tools {
             }
         }
     }
-    public class ScorpioDictionaryString<Value> : ScorpioDictionary<string, Value> {
-        public override int IndexOf(string key) {
+    public class ScorpioDictionaryReference<Key, Value> : ScorpioDictionary<Key, Value> {
+        public ScorpioDictionaryReference() : base(0) { }
+        public ScorpioDictionaryReference(int capacity) : base(capacity) { }
+        public override int IndexOf(Key key) {
             for (int i = 0; i < mSize; ++i) {
-                if (mValues[i].Key == key) {
+                if (object.ReferenceEquals(mValues[i].Key,key)) {
                     return i;
                 }
             }
             return -1;
         }
-        public override bool ContainsKey(string key) {
+        public override bool SetValue(Key key, Value value) {
             for (int i = 0; i < mSize; ++i) {
-                if (mValues[i].Key == key) {
+                if (object.ReferenceEquals(mValues[i].Key, key)) {
+                    mValues[i].Value = value;
                     return true;
                 }
             }
             return false;
         }
-        public override bool Remove(string key) {
+        public override bool TryGetValue(Key key, out Value value) {
             for (int i = 0; i < mSize; ++i) {
-                if (mValues[i].Key == key) {
-                    mSize--;
-                    if (i < mSize) {
-                        Array.Copy(mValues, i + 1, mValues, i, mSize - i);
-                    }
-                    mValues[mSize].Value = default;
-                    return true;
-                }
-            }
-            return false;
-        }
-        public override bool TryGetValue(string key, out Value value) {
-            for (int i = 0; i < mSize; ++i) {
-                if (mValues[i].Key == key) {
+                if (object.ReferenceEquals(mValues[i].Key, key)) {
                     value = mValues[i].Value;
                     return true;
                 }
@@ -213,62 +208,14 @@ namespace Scorpio.Tools {
             value = default;
             return false;
         }
-        public override Value this[string key] {
+        public override Value this[Key key] {
             get {
                 for (int i = 0; i < mSize; ++i) {
-                    if (mValues[i].Key == key) {
+                    if (object.ReferenceEquals(mValues[i].Key, key)) {
                         return mValues[i].Value;
                     }
                 }
                 return default;
-            }
-            set {
-                for (int i = 0; i < mSize; ++i) {
-                    if (mValues[i].Key == key) {
-                        mValues[i].Value = value;
-                        return;
-                    }
-                }
-                if (mSize == mValues.Length) {
-                    EnsureCapacity(mSize + 1);
-                }
-                mValues[mSize] = new ScorpioValue<string, Value>() { Key = key, Value = value };
-                ++mSize;
-            }
-        }
-    }
-    public class ScorpioDictionaryStringValue : ScorpioDictionary<string, ScriptValue> {
-        public override bool TryGetValue(string key, out ScriptValue value) {
-            for (int i = 0; i < mSize; ++i) {
-                if (mValues[i].Key == key) {
-                    value = mValues[i].Value;
-                    return true;
-                }
-            }
-            value = ScriptValue.Null;
-            return false;
-        }
-        public override ScriptValue this[string key] {
-            get {
-                for (int i = 0; i < mSize; ++i) {
-                    if (mValues[i].Key == key) {
-                        return mValues[i].Value;
-                    }
-                }
-                return ScriptValue.Null;
-            }
-            set {
-                for (int i = 0; i < mSize; ++i) {
-                    if (mValues[i].Key == key) {
-                        mValues[i].Value = value;
-                        return;
-                    }
-                }
-                if (mSize == mValues.Length) {
-                    EnsureCapacity(mSize + 1);
-                }
-                mValues[mSize] = new ScorpioValue<string, ScriptValue>() { Key = key, Value = value };
-                ++mSize;
             }
         }
     }

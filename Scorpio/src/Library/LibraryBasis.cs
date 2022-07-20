@@ -128,7 +128,7 @@ namespace Scorpio.Library {
         }
         private class GlobalPairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
-            readonly IEnumerator<ScorpioValue<string, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
             public GlobalPairs(ScriptGlobal global, ScriptMap itorResult) {
                 m_Enumerator = global.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -296,6 +296,7 @@ namespace Scorpio.Library {
                 return ScriptValue.Null;
             }
         }
+
         private class isNull : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return args[0].valueType == ScriptValue.nullValueType ? ScriptValue.True : ScriptValue.False;

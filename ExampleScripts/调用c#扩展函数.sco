@@ -20,8 +20,8 @@ namespace ScorpioExec {
 }
 */
 //sco 代码
-TestClass = import_type("ScorpioExec.TestClass")
-importExtension("ScorpioExec.ClassEx")
-var t = new TestClass()
-t.TestFunc1(100)
-print(t.num)
+// TestClass = import_type("ScorpioExec.TestClass")
+// importExtension("ScorpioExec.ClassEx")
+// var t = new TestClass()
+// t.TestFunc1(100)
+// print(t.num)

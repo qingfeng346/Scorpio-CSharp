@@ -109,6 +109,7 @@ namespace Scorpio {
             PushAssembly(GetType());                             //当前所在的程序集
 
             LibraryBasis.Load(this);
+            LibraryType.Load(this);
             LibraryJson.Load(this);
             LibraryMath.Load(this);
             LibraryUserdata.Load(this);
@@ -377,10 +378,6 @@ namespace Scorpio {
             } else if (count > 6 && buffer[index] == 0 && BitConverter.ToInt32(buffer, index + 1) == int.MaxValue) {
                 using (var stream = new MemoryStream(buffer, index, count)) {
                     return Execute(Deserializer.Deserialize(stream));
-                }
-            } else if (buffer[index] == 0) {
-                using (var stream = new MemoryStream(buffer, index, count)) {
-                    return Execute(Deserializer.DeserializeV1(breviary, stream));
                 }
             } else {
                 return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), m_SearchPaths, compileOption));

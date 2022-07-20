@@ -1,13 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Library;
+using Scorpio.Tools;
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapObject : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
-        private Dictionary<object, ScriptValue> m_Objects = new Dictionary<object, ScriptValue>();  //所有的数据(函数和数据都在一个数组)
-        public ScriptMapObject(Script script) : base(script) { }
-        internal ScriptMapObject(Script script, ScriptValue[] parameters, int length) : base(script) { }
-        public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
+    public class ScriptMapPolling : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
+        //数组迭代器
+        public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
+            readonly IEnumerator<ScorpioKeyValue<object, ScriptValue>> m_Enumerator;
+            internal Enumerator(ScriptMapPolling scriptMap) {
+                m_Enumerator = scriptMap.m_Objects.GetEnumerator();
+            }
+            public bool MoveNext() {
+                return m_Enumerator.MoveNext();
+            }
+            public KeyValuePair<object, ScriptValue> Current => new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value);
+            object IEnumerator.Current => this.Current;
+            public void Reset() { m_Enumerator.Reset(); }
+            public void Dispose() { m_Enumerator.Dispose(); }
+        }
+
+        private ScorpioDictionary<object, ScriptValue> m_Objects;  //所有的数据(函数和数据都在一个数组)
+        private bool m_Reference;
+        public ScriptMapPolling(Script script, int capacity, bool reference) : base(script) {
+            m_Reference = reference;
+            if (reference) {
+                m_Objects = new ScorpioDictionaryReference<object, ScriptValue>(capacity);
+            } else {
+                m_Objects = new ScorpioDictionary<object, ScriptValue>(capacity);
+            }
+        }
+        public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
         IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
 
         public override ScriptValue GetValue(string key) {
@@ -69,14 +92,14 @@ namespace Scorpio {
             return ret;
         }
         public override ScriptMap NewCopy() {
-            var ret = new ScriptMapObject(m_Script);
+            var ret = new ScriptMapPolling(m_Script, m_Objects.Count, m_Reference);
             foreach (var pair in m_Objects) {
                 ret.m_Objects[pair.Key] = pair.Value;
             }
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptMapObject(m_Script);
+            var ret = new ScriptMapPolling(m_Script, m_Objects.Count, m_Reference);
             if (deep) {
                 foreach (var pair in m_Objects) {
                     var value = pair.Value;

@@ -32,11 +32,22 @@ Object.addGetProperty(Cl, "get2", function() {
     return this.get
 })
 async function main() {
-    var c = new Cl()
-    print("wwww " + c + "   www")
-    await c.ttt()
-    print(c.get)
-    print(c.get2)
+    // var c = new Cl()
+    // print("wwww " + c + "   www")
+    // await c.ttt()
+    // print(c.get)
+    // print(c.get2)
+    var a = new StringMap()
+    a["123"] = 100
+    var b = new PollingMap(10, false)
+    // var a = "111"
+    b["111"]= 111
+    b["222"] = 222
+    print(b["11" + "1"])
+    print(b)
+    b.clear()
+    b["333"] = 333
+    print(b)
 }
 main()
 

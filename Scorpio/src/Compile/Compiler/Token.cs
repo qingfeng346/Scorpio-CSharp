@@ -8,8 +8,6 @@ namespace Scorpio.Compile.Compiler {
         Var,
         /// <summary> { </summary>
         LeftBrace,
-        /// <summary> @{ </summary>
-        LeftBraceAt,
         /// <summary> } </summary>
         RightBrace,
         /// <summary> ( </summary>

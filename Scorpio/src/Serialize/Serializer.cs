@@ -5,21 +5,6 @@ using Scorpio.Compile.Compiler;
 using Scorpio.Tools;
 namespace Scorpio.Serialize {
     public class Serializer {
-        [System.Obsolete]
-        public static SerializeData SerializeV1(string breviary, string buffer, CompileOption compileOption) {
-            var datas = Serialize(breviary, buffer, null, compileOption);
-            return datas[datas.Length - 1];
-        }
-        [System.Obsolete]
-        public static byte[] SerializeV1Bytes(string breviary, string buffer, CompileOption compileOption) {
-            using (var stream = new MemoryStream()) {
-                using (var writer = new ScorpioWriter(stream)) {
-                    writer.Write((byte)0);
-                    SerializeV1(breviary, buffer, compileOption).Serialize(writer);
-                    return stream.ToArray();
-                }
-            }
-        }
         public static SerializeData[] Serialize(string breviary, string buffer, IEnumerable<string> searchPaths, CompileOption compileOption) {
             var parsers = new List<ScriptParser>();
             parsers.Add(new ScriptParser(new ScriptLexer(buffer, breviary), searchPaths, compileOption, parsers).Parse());

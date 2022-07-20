@@ -250,9 +250,6 @@ namespace Scorpio.Compile.Compiler {
             var ch = PeekChar();
             if (ch == '\'' || ch == '\"' || ch == '`') {
                 ReadSimpleString(true);
-            } else if (ch == '{') {
-                ReadChar();
-                AddToken(TokenType.LeftBraceAt);
             }
         }
         /// <summary> 读取 }  </summary>

@@ -3,17 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Tools;
 namespace Scorpio {
-    public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioValue<string, ScriptValue>> {
-        public struct Enumerator : IEnumerator<ScorpioValue<string, ScriptValue>> {
+    public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
+        public struct Enumerator : IEnumerator<ScorpioKeyValue<string, ScriptValue>> {
             private IEnumerator<string> keys;
             private IEnumerator<int> values;
             private ScriptValue[] objects;
-            private ScorpioValue<string, ScriptValue> current;
+            private ScorpioKeyValue<string, ScriptValue> current;
             internal Enumerator(ScriptGlobal global) {
                 this.keys = global.m_Indexs.Keys.GetEnumerator();
                 this.values = global.m_Indexs.Values.GetEnumerator();
                 this.objects = global.m_Objects;
-                this.current = new ScorpioValue<string, ScriptValue>();
+                this.current = new ScorpioKeyValue<string, ScriptValue>();
             }
             public bool MoveNext() {
                 if (keys.MoveNext()) {
@@ -24,7 +24,7 @@ namespace Scorpio {
                 }
                 return false;
             }
-            public ScorpioValue<string, ScriptValue> Current { get { return current; } }
+            public ScorpioKeyValue<string, ScriptValue> Current { get { return current; } }
             object System.Collections.IEnumerator.Current { get { return current; } }
             public void Reset() {
                 keys.Reset();
@@ -92,11 +92,7 @@ namespace Scorpio {
         }
         public IEnumerable<string> GetKeys() { return m_Indexs.Keys; }
 
-        public IEnumerator<ScorpioValue<string, ScriptValue>> GetEnumerator() {
-            return new Enumerator(this);
-        }
-        IEnumerator IEnumerable.GetEnumerator() {
-            return new Enumerator(this);
-        }
+        public IEnumerator<ScorpioKeyValue<string, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
+        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
     }
 }
