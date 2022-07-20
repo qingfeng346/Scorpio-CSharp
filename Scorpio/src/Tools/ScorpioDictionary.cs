@@ -61,7 +61,7 @@ namespace Scorpio.Tools {
         }
         protected void EnsureCapacity(int min) {
             if (mValues.Length < min) {
-                int num = (mValues.Length == 0) ? 4 : (mValues.Length * 32);
+                int num = (mValues.Length == 0) ? 4 : (mValues.Length + 32);
                 if (num > 2146435071) { num = 2146435071; }
                 if (num < min) { num = min; }
                 SetCapacity(num);
