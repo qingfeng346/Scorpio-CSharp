@@ -79,13 +79,17 @@ namespace Scorpio {
             }
             return array;
         }
+        public override string ToString() {
+            using (var serializer = new ScorpioJsonSerializer()) {
+                return serializer.ToJson(this);
+            }
+        }
         internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("[");
             var first = true;
             foreach (var value in m_Objects) {
-                if (!first) { builder.Append(","); }
-                first = false;
+                if (first) { first = false; } else { builder.Append(","); }
                 jsonSerializer.Serializer(value);
             }
             builder.Append("]");

@@ -61,7 +61,7 @@ namespace Scorpio.Tools {
         }
         protected void EnsureCapacity(int min) {
             if (mValues.Length < min) {
-                int num = (mValues.Length == 0) ? 4 : (mValues.Length + 32);
+                int num = mValues.Length + 8;
                 if (num > 2146435071) { num = 2146435071; }
                 if (num < min) { num = min; }
                 SetCapacity(num);
@@ -165,16 +165,16 @@ namespace Scorpio.Tools {
                 return default;
             }
             set {
-                int index = IndexOf(key);
-                if (index == -1) {
-                    if (mSize == mValues.Length) {
-                        EnsureCapacity(mSize + 1);
+                for (int i = 0; i < mSize; ++i) {
+                    if (mValues[i].Key.Equals(key)) {
+                        mValues[i].Value = value;
+                        return;
                     }
-                    mValues[mSize] = new ScorpioKeyValue<Key, Value>() { Key = key, Value = value };
-                    ++mSize;
-                } else {
-                    mValues[index].Value = value;
                 }
+                if (mSize == mValues.Length) {
+                    EnsureCapacity(mSize + 1);
+                }
+                mValues[mSize++] = new ScorpioKeyValue<Key, Value>() { Key = key, Value = value };
             }
         }
     }
@@ -216,6 +216,18 @@ namespace Scorpio.Tools {
                     }
                 }
                 return default;
+            }
+            set {
+                for (int i = 0; i < mSize; ++i) {
+                    if (object.ReferenceEquals(mValues[i].Key, key)) {
+                        mValues[i].Value = value;
+                        return;
+                    }
+                }
+                if (mSize == mValues.Length) {
+                    EnsureCapacity(mSize + 1);
+                }
+                mValues[mSize++] = new ScorpioKeyValue<Key, Value>() { Key = key, Value = value };
             }
         }
     }

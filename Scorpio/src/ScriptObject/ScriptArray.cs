@@ -285,7 +285,11 @@ namespace Scorpio {
             }
             return ret;
         }
-        public override string ToString() { return new ScorpioJsonSerializer().ToJson(this); }
+        public override string ToString() {
+            using (var serializer = new ScorpioJsonSerializer()) {
+                return serializer.ToJson(this);
+            }
+        }
         internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("[");

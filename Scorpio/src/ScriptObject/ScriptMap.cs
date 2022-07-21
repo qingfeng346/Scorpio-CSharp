@@ -17,6 +17,10 @@ namespace Scorpio {
         public abstract ScriptArray GetKeys();
         public abstract ScriptArray GetValues();
         public abstract ScriptMap NewCopy();
-        public override string ToString() { return new ScorpioJsonSerializer().ToJson(this); }
+        public override string ToString() {
+            using (var serializer = new ScorpioJsonSerializer()) {
+                return serializer.ToJson(this);
+            }
+        }
     }
 }
