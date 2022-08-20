@@ -31,7 +31,7 @@ namespace Scorpio.Runtime {
         }
         internal AsyncValue AllocAsyncValue() {
             if (AsyncValueQueue.Count == 0) {
-                return new AsyncValue() { variable = new ScriptValue[VariableValueLength], stack = new ScriptValue[StackValueLength] };
+                return new AsyncValue() { variable = new ScriptValue[64], stack = new ScriptValue[64] };
             }
             return AsyncValueQueue.Dequeue();
         }
