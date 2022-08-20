@@ -1,5 +1,5 @@
 using Scorpio.Instruction;
-using System;
+using System.Collections.Generic;
 
 namespace Scorpio.Runtime {
 
@@ -7,27 +7,34 @@ namespace Scorpio.Runtime {
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public partial class ScriptContext {
-        internal const int ValueCacheLength = 128; //函数最大调用层级,超过会堆栈溢出
-        internal const int StackValueLength = 256; //堆栈数据最大数量
-        internal const int VariableValueLength = 128; //局部变量最大数量
-        internal const int TryStackLength = 16; //最多可以嵌套多少层try catch
+        internal const int ValueCacheLength = 128;          //函数最大调用层级,超过会堆栈溢出
+        internal const int StackValueLength = 256;          //堆栈数据最大数量
+        internal const int VariableValueLength = 128;       //局部变量最大数量
+        internal const int TryStackLength = 16;             //最多可以嵌套多少层try catch
         
         internal static ScriptValue[][] VariableValues = new ScriptValue[ValueCacheLength][]; //局部变量数据
         internal static ScriptValue[][] StackValues = new ScriptValue[ValueCacheLength][]; //堆栈数据
         internal static int[][] TryStackValues = new int[ValueCacheLength][]; //try catch数据
+        internal static ScriptValue[][] AsyncVariableValues = new ScriptValue[ValueCacheLength][]; //局部变量数据
+        internal static ScriptValue[][] AsyncStackValues = new ScriptValue[ValueCacheLength][]; //堆栈数据
         internal static int VariableValueIndex = 0;
+        internal static Queue<int> FreeAsyncIndexQueue = new Queue<int>();
         static ScriptContext() {
-            for (var i = 0; i < StackValues.Length; ++i) {
+            for (var i = 0; i < ValueCacheLength; ++i) {
                 StackValues[i] = new ScriptValue[StackValueLength];
-            }
-            for (var i = 0; i < VariableValues.Length; ++i) {
                 VariableValues[i] = new ScriptValue[VariableValueLength];
-            }
-            for (var i = 0; i < TryStackValues.Length; ++i) {
                 TryStackValues[i] = new int[TryStackLength];
+                AsyncStackValues[i] = new ScriptValue[StackValueLength];
+                AsyncVariableValues[i] = new ScriptValue[VariableValueLength];
+                FreeAsyncIndexQueue.Enqueue(i);
             }
         }
-
+        internal int PopFreeAsyncIndex() {
+            return FreeAsyncIndexQueue.Dequeue();
+        }
+        internal void ReleaseFreeAsyncIndex(int index) {
+            FreeAsyncIndexQueue.Enqueue(index);
+        }
         public Script m_script; //脚本类
         private ScriptGlobal m_global; //global
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Scorpio.Exception;
@@ -111,12 +112,16 @@ namespace Scorpio.Library {
         }
         private class UserdataPairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
-            readonly System.Collections.IEnumerator m_Enumerator;
+            readonly IEnumerator m_Enumerator;
             public UserdataPairs(ScriptUserdata userdata, ScriptMap itorResult) {
-                var ienumerable = userdata.Value as System.Collections.IEnumerable;
-                if (ienumerable == null) throw new ExecutionException("pairs 只支持继承 IEnumerable 的类");
-                m_Enumerator = ienumerable.GetEnumerator();
                 m_ItorResult = itorResult;
+                if (userdata.Value is IEnumerator) {
+                    m_Enumerator = (IEnumerator)userdata.Value;
+                } else if (userdata.Value is IEnumerable)  {
+                    m_Enumerator = ((IEnumerable)userdata.Value).GetEnumerator();
+                } else {
+                    throw new ExecutionException("pairs 只支持继承 IEnumerable 的类 或 IEnumerator");
+                }
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {

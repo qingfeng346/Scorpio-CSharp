@@ -157,5 +157,10 @@ namespace Scorpio.Tools {
             }
             return builder.ToString();
         }
+        public static ScriptValue[] CloneParameters(this ScriptValue[] parameters, int length) {
+            var pars = new ScriptValue[length];
+            Array.Copy(parameters, pars, length);
+            return pars;
+        }
     }
 }

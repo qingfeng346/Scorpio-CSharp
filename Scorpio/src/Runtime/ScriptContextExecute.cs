@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Scorpio.Exception;
 using Scorpio.Function;
@@ -30,9 +31,15 @@ namespace Scorpio.Runtime {
                 throw new ExecutionException($"only run script on mainthread : {m_script.MainThreadId} - {currentThread.ManagedThreadId}({currentThread.Name})");
             }
 #endif
-            var variableObjects = VariableValues[VariableValueIndex]; //局部变量
-            var tryStack = TryStackValues[VariableValueIndex]; //try catch
-            var stackObjects = StackValues[VariableValueIndex++]; //堆栈数据
+#if EXECUTE_COROUTINE
+            var freeIndex = PopFreeAsyncIndex();                        //空闲数据索引
+            var variableObjects = AsyncVariableValues[freeIndex];       //局部变量
+            var stackObjects = AsyncStackValues[freeIndex];             //堆栈数据 
+#else
+            var variableObjects = VariableValues[VariableValueIndex];   //局部变量
+            var stackObjects = StackValues[VariableValueIndex++];       //堆栈数据
+            var tryStack = TryStackValues[VariableValueIndex];          //try catch
+#endif
             variableObjects[0] = thisObject;
             InternalValue[] internalObjects = null;
             if (internalCount > 0) {
@@ -257,11 +264,11 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case Opcode.LoadBase: {
-                                        #if EXECUTE_BASE
+#if EXECUTE_BASE
                                         stackObjects[++stackIndex] = new ScriptValue(baseType.Prototype);
-                                        #else
+#else
                                         stackObjects[++stackIndex] = new ScriptValue(thisObject.Get<ScriptInstance>().Prototype.Prototype);
-                                        #endif
+#endif
                                         continue;
                                     }
                                     case Opcode.ToGlobal: {
@@ -1386,20 +1393,20 @@ namespace Scorpio.Runtime {
                                         }
                                     }
                                     case Opcode.RetNone: {
-                                        #if EXECUTE_COROUTINE
+#if EXECUTE_COROUTINE
                                         yield break;
-                                        #else
+#else
                                         --VariableValueIndex;
                                         return ScriptValue.Null;
-                                        #endif
+#endif
                                     }
                                     case Opcode.Ret: {
-                                        #if EXECUTE_COROUTINE
+#if EXECUTE_COROUTINE
                                         yield break;
-                                        #else
+#else
                                         --VariableValueIndex;
                                         return stackObjects[stackIndex];
-                                        #endif
+#endif
                                     }
                                     case Opcode.CallUnfold: {
                                         var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
@@ -1533,7 +1540,7 @@ namespace Scorpio.Runtime {
                                         }
                                         continue;
                                     }
-                                    #if EXECUTE_COROUTINE
+#if EXECUTE_COROUTINE
                                     case Opcode.Await: {
                                         yield return stackObjects[stackIndex--].Value;
                                         continue;
@@ -1679,7 +1686,7 @@ namespace Scorpio.Runtime {
                                         }
                                         continue;
                                     }
-                                    #else
+#else
                                     case Opcode.TryTo: {
                                         tryStack[++tryIndex] = opvalue;
                                         continue;
@@ -1689,7 +1696,7 @@ namespace Scorpio.Runtime {
                                         --tryIndex;
                                         continue;
                                     }
-                                    #endif
+#endif
                                     default: throw new ExecutionException("unknown opcode : " + opcode);
                                 }
                             case OpcodeType.New:
@@ -1848,7 +1855,7 @@ namespace Scorpio.Runtime {
             return ScriptValue.Null;
 #else
             } finally {
-                --VariableValueIndex;
+                ReleaseFreeAsyncIndex(freeIndex);
             }
 #endif
         }

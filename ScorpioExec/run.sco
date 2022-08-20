@@ -1,51 +1,76 @@
-class Cl {
-    constructor() {
-        this.id = "id"
-        this.dataId = "dataId"
-        this.zoneId = "zoneId"
-        this.mapId = "mapId"
-    }
-    toString() {
-        return "TileInfo(${this.id}) ${this.dataId} zone:${this.zoneId} map:${this.mapId}"
-    }
-    async ttt() {
-        print("tttt - 1 " + io.unixNow())
-        this.ttt1()
-        await this.sl()
-        print("tttt - 2 " + io.unixNow())
-        await sleep(5)
-        print("tttt - 3  " +  io.unixNow())
-    }
-    async ttt1() {
-        print("tttt1 - 1  " +  io.unixNow())
-        await sleep(2)
-        print("tttt1 - 2  " +  io.unixNow())
-    }
-    async sl() {
-        await sleep(1)
-    }
-    get get() {
-        return "1111,2222"
-    }
+// class Cl {
+//     constructor() {
+//         this.id = "id"
+//         this.dataId = "dataId"
+//         this.zoneId = "zoneId"
+//         this.mapId = "mapId"
+//     }
+//     toString() {
+//         return "TileInfo(${this.id}) ${this.dataId} zone:${this.zoneId} map:${this.mapId}"
+//     }
+//     async ttt() {
+//         print("tttt - 1 " + io.unixNow())
+//         this.ttt1()
+//         await this.sl()
+//         print("tttt - 2 " + io.unixNow())
+//         await sleep(5)
+//         print("tttt - 3  " +  io.unixNow())
+//     }
+//     async ttt1() {
+//         print("tttt1 - 1  " +  io.unixNow())
+//         await sleep(2)
+//         print("tttt1 - 2  " +  io.unixNow())
+//     }
+//     async sl() {
+//         await sleep(1)
+//     }
+//     get get() {
+//         return "1111,2222"
+//     }
+// }
+// Object.addGetProperty(Cl, "get2", function() {
+//     return this.get
+// })
+// Test = importType("Test")
+// // async function sssss() {
+// //     print("ssss1")
+// //     await sleep(2)
+// //     print("ssss2")
+// // }
+async function main1(num, a, b, c) {
+    print("main1-1", num, a, b, c)
+    var s = sleep(num)
+    await s
+    print("main1-2", num, a, b, c)
 }
-Object.addGetProperty(Cl, "get2", function() {
-    return this.get
-})
-async function main() {
-    // var c = new Cl()
-    // print("wwww " + c + "   www")
-    // await c.ttt()
-    // print(c.get)
-    // print(c.get2)
-    var a = new StringMap()
-    a["123"] = 100
-    var b = new PollingMap(10, false)
-    // var a = "111"
-    b["aaa"]= 111
-    b["bbb"] = 222
-    print(b.aaa)
+function main() {
+    coroutine.start(main1(1.1, "a3", "b3", "c3"))
+    coroutine.start(main1(1.2, "a4", "b4", "c4"))
+    coroutine.start(main1(2.15, "a1", "b1", "c1"))
+    coroutine.start(main1(2, "a2", "b2", "c2"))
+}
+function testCall(a, b, c) {
+    print("testCall ", a, b, c)
 }
 main()
+// async function main2(a, b, c) {
+//     print("main2-1", a, b, c)
+//     await sleep(1)
+//     print("main2-2", a, b, c)
+//     coroutine.start(main3("3", "3", "3"))
+// }
+// async function main3(a, b, c) {
+//     print("main3-1", a, b, c)
+//     await sleep(0.1)
+//     print("main3-2", a, b, c)
+// }
+// function testCall() {
+// }
+// coroutine.start(main1("1", "1", "1"))
+// coroutine.start(main2("2", "2", "2"))
+// main("1111", "2222")
+// test("3333", "44444")
+
 
 // TestClass = import_type("Scorpio.TestClass")
 // importExtension("Scorpio.ClassEx")
