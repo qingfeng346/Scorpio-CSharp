@@ -34,9 +34,9 @@ namespace Scorpio.Runtime {
             }
 #endif
 #if EXECUTE_COROUTINE
-            var freeIndex = PopFreeAsyncIndex();                        //空闲数据索引
-            var variableObjects = AsyncVariableValues[freeIndex];       //局部变量
-            var stackObjects = AsyncStackValues[freeIndex];             //堆栈数据 
+            var asyncValue = AllocAsyncValue();             //空闲数据索引
+            var variableObjects = asyncValue.variable;      //局部变量
+            var stackObjects = asyncValue.stack;            //堆栈数据
 #else
             var variableObjects = VariableValues[VariableValueIndex];   //局部变量
             var stackObjects = StackValues[VariableValueIndex++];       //堆栈数据
@@ -1857,7 +1857,7 @@ namespace Scorpio.Runtime {
             return ScriptValue.Null;
 #else
             } finally {
-                ReleaseFreeAsyncIndex(freeIndex);
+                FreeAsyncValue(asyncValue);
             }
 #endif
         }
