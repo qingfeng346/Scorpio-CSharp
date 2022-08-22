@@ -50,24 +50,24 @@ namespace Scorpio.Compile.Compiler {
         /// <summary> 返回第一个Token </summary>
         public Token PeekToken() {
             if (!HasMoreTokens())
-                throw new ParserException(this, "PeekToken - 没有更多的Token");
+                throw new ParserException(this, "PeekToken - 没有更多的Token", null);
             return m_listTokens[m_indexToken];
         }
         /// <summary> 获得第一个Token </summary>
         Token ReadToken() {
             if (!HasMoreTokens())
-                throw new ParserException(this, "ReadToken - 没有更多的Token");
+                throw new ParserException(this, "ReadToken - 没有更多的Token", null);
             return m_listTokens[m_indexToken++];
         }
         Token LastToken() {
             if (m_indexToken <= 0)
-                throw new ParserException(this, "LastToken - 没有更早的Token");
+                throw new ParserException(this, "LastToken - 没有更早的Token", null);
             return m_listTokens[m_indexToken - 1];
         }
         /// <summary> 回滚Token </summary>
         void UndoToken() {
             if (m_indexToken <= 0)
-                throw new ParserException(this, "UndoToken - 没有更早的Token");
+                throw new ParserException(this, "UndoToken - 没有更早的Token", null);
             --m_indexToken;
         }
         /// <summary> 读取, </summary>

@@ -153,7 +153,7 @@ namespace Scorpio.Compile.Compiler {
                         ParseMacroElse ();
                         break;
                     case TokenType.MacroEndif:
-                        break;
+                        throw new ParserException(this, "endif不对称", token);
                     default:
                         tokens.Add (token);
                         break;
@@ -830,7 +830,7 @@ namespace Scorpio.Compile.Compiler {
                         } else if (value is string) {
                             AddScriptInstruction (Opcode.LoadConstString, GetConstString ((string) value), obj.Line);
                         } else {
-                            throw new ParserException (this, "未知的常量 " + value.GetType () + ":" + value);
+                            throw new ParserException (this, "未知的常量 " + value.GetType () + ":" + value, PeekToken());
                         }
                         break;
                     }
@@ -848,7 +848,7 @@ namespace Scorpio.Compile.Compiler {
                                     var constValue = compileOption.scriptConst.Get (member.key, out var contains);
                                     if (contains) {
                                         if (constValue is ScriptConst) {
-                                            throw new ParserException (this, "常量不是基础变量:" + member.key);
+                                            throw new ParserException (this, "常量不是基础变量:" + member.key, PeekToken());
                                         } else {
                                             PushObject (new CodeNativeObject (constValue, 0));
                                         }
@@ -865,13 +865,13 @@ namespace Scorpio.Compile.Compiler {
                                         if (constValue is ScriptConst) {
                                             constValue = (constValue as ScriptConst).Get (stack.Pop ().key, out contains);
                                         } else {
-                                            throw new ParserException (this, "常量已经是基础变量,不能再往下取值:" + member.key);
+                                            throw new ParserException (this, "常量已经是基础变量,不能再往下取值:" + member.key, PeekToken());
                                         }
                                     }
                                     if (contains == false) {
-                                        throw new ParserException (this, "未知的常量:" + member.key);
+                                        throw new ParserException (this, "未知的常量:" + member.key, PeekToken());
                                     } else if (constValue is ScriptConst) {
-                                        throw new ParserException (this, "常量不是基础变量:" + member.key);
+                                        throw new ParserException (this, "常量不是基础变量:" + member.key, PeekToken());
                                     } else {
                                         PushObject (new CodeNativeObject (constValue, 0));
                                         return;
@@ -1038,7 +1038,7 @@ namespace Scorpio.Compile.Compiler {
                             } else if (ele.key is bool) {
                                 AddScriptInstructionWithoutValue (((bool) ele.key) ? Opcode.LoadConstTrue : Opcode.LoadConstFalse, obj.Line);
                             } else if (!(ele.key is string)) {
-                                throw new ParserException (this, "未知的map key 类型 : " + ele.key.GetType ());
+                                throw new ParserException (this, "未知的map key 类型 : " + ele.key.GetType (), PeekToken());
                             }
                             if (ele.value == null) {
                                 AddScriptInstructionWithoutValue (Opcode.LoadConstNull, obj.Line);
@@ -1089,7 +1089,7 @@ namespace Scorpio.Compile.Compiler {
                         break;
                     }
                 default:
-                    throw new ParserException (this, "不支持的语法 : " + obj);
+                    throw new ParserException (this, "不支持的语法 : " + obj, PeekToken());
             }
             if (obj.Not) {
                 AddScriptInstructionWithoutValue (Opcode.FlagNot, obj.Line);

@@ -1,3 +1,11 @@
+#if !DA_GLOBAL
+#else
+
+#if UNITY_EDITOR
+#else
+#endif
+
+#endif
 // class Cl {
 //     constructor() {
 //         this.id = "id"
@@ -37,22 +45,22 @@
 // //     await sleep(2)
 // //     print("ssss2")
 // // }
-async function main1(num, a, b, c) {
-    print("main1-1", num, a, b, c)
-    var s = sleep(num)
-    await s
-    print("main1-2", num, a, b, c)
-}
-function main() {
-    coroutine.start(main1(1.1, "a3", "b3", "c3"))
-    coroutine.start(main1(1.2, "a4", "b4", "c4"))
-    coroutine.start(main1(2.15, "a1", "b1", "c1"))
-    coroutine.start(main1(2, "a2", "b2", "c2"))
-}
-function testCall(a, b, c) {
-    print("testCall ", a, b, c)
-}
-main()
+// async function main1(num, a, b, c) {
+//     print("main1-1", num, a, b, c)
+//     var s = sleep(num)
+//     await s
+//     print("main1-2", num, a, b, c)
+// }
+// function main() {
+//     coroutine.start(main1(1.1, "a3", "b3", "c3"))
+//     coroutine.start(main1(1.2, "a4", "b4", "c4"))
+//     coroutine.start(main1(2.15, "a1", "b1", "c1"))
+//     coroutine.start(main1(2, "a2", "b2", "c2"))
+// }
+// function testCall(a, b, c) {
+//     print("testCall ", a, b, c)
+// }
+// main()
 // async function main2(a, b, c) {
 //     print("main2-1", a, b, c)
 //     await sleep(1)

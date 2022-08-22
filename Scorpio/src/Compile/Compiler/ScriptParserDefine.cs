@@ -70,9 +70,8 @@ namespace Scorpio.Compile.Compiler {
                 if (token.Type == TokenType.MacroIf) {
                     ++index;
                 } else if (token.Type == TokenType.MacroEndif) {
-                    if (index == 0) {
-                        return;
-                    }
+                    if (index == 0) return;
+                    --index;
                 }
             }
         }
