@@ -153,7 +153,7 @@ namespace Scorpio.Compile.Compiler {
                         ParseMacroElse ();
                         break;
                     case TokenType.MacroEndif:
-                        throw new ParserException(this, "endif不对称", token);
+                        break;
                     default:
                         tokens.Add (token);
                         break;

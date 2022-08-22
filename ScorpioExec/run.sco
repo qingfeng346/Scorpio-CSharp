@@ -1,4 +1,9 @@
 #if !DA_GLOBAL
+
+#if UNITY_EDITOR
+#else
+#endif
+
 #else
 
 #if UNITY_EDITOR
