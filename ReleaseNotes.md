@@ -1,6 +1,12 @@
+## v2.4.0 (*2022-08-23*)
+* `[新增]`新增 **isBool** **toBool** **toBoolean** 函数
+* `[新增]`pairs支持IEnumerator
+* `[修复]`修复协程问题
+* `[修复]`修复宏定义嵌套解析
+
 ## v2.3.10 (*2022-07-21*)
 * `[新增]`新增 StringMap 类
-* `[新增]`新增 StringPolling 类
+* `[新增]`新增 PollingMap 类
 * `[修改]`#import支持搜索以文件为目录的相对目录
 * `[修改]`HashSet.toString 默认为 json 格式
 * `[删除]`删除编译选项SCORPIO_STACK
