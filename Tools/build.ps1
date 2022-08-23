@@ -15,12 +15,12 @@ namespace Scorpio {
     }
 }
 "@
-Set-Content -Path ../Scorpio/src/Version.cs -Value $fileData -Encoding utf8
+Set-Content -Path ../Scorpio/src/Version.cs -Value $fileData -Encoding utf8NoBOM -NoNewline
 
 $contextExcute = Get-Content -Path ../Scorpio/src/Runtime/ScriptContextExecute.cs
-Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteBase.cs -Value "#define EXECUTE_BASE",$contextExcute
-Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteCoroutine.cs -Value "#define EXECUTE_COROUTINE",$contextExcute
-Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteCoroutineBase.cs -Value "#define EXECUTE_COROUTINE","#define EXECUTE_BASE",$contextExcute
+Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteBase.cs -Value "#define EXECUTE_BASE",$contextExcute -Encoding utf8NoBOM
+Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteCoroutine.cs -Value "#define EXECUTE_COROUTINE",$contextExcute -Encoding utf8NoBOM
+Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteCoroutineBase.cs -Value "#define EXECUTE_COROUTINE","#define EXECUTE_BASE",$contextExcute -Encoding utf8NoBOM
 
 Remove-Item ../bin/* -Force -Recurse
 Write-Host "正在生成nupkg..."
