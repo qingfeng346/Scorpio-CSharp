@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using Scorpio;
 public class __FactoryName : IScorpioDelegateFactory {
     private static Dictionary<Type, Func<ScriptObject, Delegate>> delegates = new Dictionary<Type, Func<ScriptObject, Delegate>>();
-    public static void Initialize(Script script) {
-        script.SetDelegateFactory(new DelegateFactory());__DelegateList__CreateDelegate
+    public static void Initialize() {
+        ScorpioDelegateFactoryManager.SetFactory(new DelegateFactory());__DelegateList__CreateDelegate
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
         if (delegates.TryGetValue(delegateType, out var func)) {
@@ -23,8 +23,8 @@ public class __FactoryName : IScorpioDelegateFactory {
 using System.Collections.Generic;
 using Scorpio;
 public class __FactoryName : IScorpioDelegateFactory {
-    public static void Initialize(Script script) {
-        script.SetDelegateFactory(new DelegateFactory());__DelegateList
+    public static void Initialize() {
+        ScorpioDelegateFactoryManager.SetFactory(new DelegateFactory());__DelegateList
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {__CreateDelegate
         throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);

@@ -127,5 +127,6 @@ namespace Scorpio.Instruction {
         CallViUnfoldAsync,      //await 调用内部函数 有参数需要展开
         CallBaseAsync,          //await 调用父级函数
         CallBaseUnfoldAsync,    //await 调用父级函数 有参数需要展开
+        NewAwait,               //await
     }
 }

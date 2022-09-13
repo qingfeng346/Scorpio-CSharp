@@ -85,7 +85,7 @@ namespace Scorpio.Runtime {
             int opvalue;
             try {
 #if !EXECUTE_COROUTINE
-            KeepOn: 
+            KeepOn:
                 try {
 #endif
                     while (iInstruction < iInstructionCount) {
@@ -393,7 +393,7 @@ namespace Scorpio.Runtime {
                                                 stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]);
                                                 break;
                                             default:
-                                                throw new ExecutionException($"类型[{stackObjects[stackIndex-2].ValueTypeName}]不支持设置变量:{stackObjects[stackIndex-1].ValueTypeName}");
+                                                throw new ExecutionException($"类型[{stackObjects[stackIndex - 2].ValueTypeName}]不支持设置变量:{stackObjects[stackIndex - 1].ValueTypeName}");
                                         }
                                         stackObjects[stackIndex -= 2] = stackObjects[tempIndex];
                                         continue;
@@ -510,7 +510,7 @@ namespace Scorpio.Runtime {
                                                 stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1].objectValue, stackObjects[stackIndex]);
                                                 break;
                                             default:
-                                                throw new ExecutionException($"类型[{stackObjects[stackIndex-2].ValueTypeName}]不支持设置变量:{stackObjects[stackIndex-1].ValueTypeName}");
+                                                throw new ExecutionException($"类型[{stackObjects[stackIndex - 2].ValueTypeName}]不支持设置变量:{stackObjects[stackIndex - 1].ValueTypeName}");
                                         }
                                         stackIndex -= 3;
                                         continue;
@@ -1402,6 +1402,7 @@ namespace Scorpio.Runtime {
                                     }
                                     case Opcode.Ret: {
 #if EXECUTE_COROUTINE
+                                        m_script.CoroutineResult = stackObjects[stackIndex];
                                         yield break;
 #else
                                         --VariableValueIndex;
@@ -1543,6 +1544,11 @@ namespace Scorpio.Runtime {
 #if EXECUTE_COROUTINE
                                     case Opcode.Await: {
                                         yield return stackObjects[stackIndex--].Value;
+                                        continue;
+                                    }
+                                    case Opcode.NewAwait: {
+                                        yield return stackObjects[stackIndex--].Value;
+                                        stackObjects[++stackIndex] = m_script.CoroutineResult;
                                         continue;
                                     }
                                     case Opcode.CallAsync: {
@@ -1828,7 +1834,7 @@ namespace Scorpio.Runtime {
                         e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
                         throw;
                     }
-                //脚本系统错误
+                    //脚本系统错误
                 } catch (ExecutionException e) {
                     e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
                     if (tryIndex > -1) {
@@ -1838,7 +1844,7 @@ namespace Scorpio.Runtime {
                     } else {
                         throw;
                     }
-                //其他错误
+                    //其他错误
                 } catch (System.Exception e) {
                     if (tryIndex > -1) {
                         stackObjects[stackIndex = 0] = ScriptValue.CreateValue(e);
@@ -1848,7 +1854,7 @@ namespace Scorpio.Runtime {
                         throw new ExecutionException($"{m_Breviary}:{instruction.line}({opcode}){parameters.GetParametersString(length)}", e);
                     }
                 }
-            } catch(System.Exception) {
+            } catch (System.Exception) {
                 --VariableValueIndex;
                 throw;
             }

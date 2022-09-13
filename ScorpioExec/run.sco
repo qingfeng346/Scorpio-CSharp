@@ -1,16 +1,31 @@
-#if !DA_GLOBAL
+async function test1() {
+    return "2222"
+}
+async function test(v) {
+    await sleep(2)
+    return "1111 " + v
+}
+async function main() {
+    await test("main")
+}
+async function main1() {
+    await test("main1")
+}
+main()
+main1()
+// #if !DA_GLOBAL
 
-#if UNITY_EDITOR
-#else
-#endif
+// #if UNITY_EDITOR
+// #else
+// #endif
 
-#else
+// #else
 
-#if UNITY_EDITOR
-#else
-#endif
+// #if UNITY_EDITOR
+// #else
+// #endif
 
-#endif
+// #endif
 // class Cl {
 //     constructor() {
 //         this.id = "id"

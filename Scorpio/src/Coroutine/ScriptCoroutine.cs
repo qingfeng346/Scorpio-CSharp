@@ -35,7 +35,12 @@ namespace Scorpio.Coroutine {
                 result = enumerator.MoveNext();
             } else {
                 m_processor.SetCurrent(enumerator.Current);
-                result = m_processor.MoveNext(enumerator);
+                if (!m_processor.MoveNext(out var ret)) {
+                    m_script.CoroutineResult = ScriptValue.CreateValue(ret);
+                    result = enumerator.MoveNext();
+                } else {
+                    result = true;
+                }
             }
             while (IEnumeratorProcessingStack.Count > 1) {
                 if (result) {

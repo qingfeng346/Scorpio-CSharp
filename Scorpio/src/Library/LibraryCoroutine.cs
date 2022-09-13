@@ -47,7 +47,7 @@ namespace Scorpio.Library {
         }
         private class poll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScriptValue.CreateValue(new CoroutinePoll(args[0]));
+                return ScriptValue.CreateValue(new CoroutinePoll(args[0], args[1]));
             }
         }
         private class epoll : ScorpioHandle {
@@ -59,7 +59,7 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var coroutineCallback = args[0].Value as CoroutineEpoll;
                 if (coroutineCallback != null) {
-                    coroutineCallback.Done();
+                    coroutineCallback.Done(args[1]);
                 }
                 return ScriptValue.Null;
             }
