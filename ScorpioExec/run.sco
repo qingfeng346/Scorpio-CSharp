@@ -1,18 +1,31 @@
-async function test1() {
-    return "2222"
+function sleep1(seconds) {
+    var end = io.unixNow() + seconds * 1000
+    return coroutine.poll(function() {
+        return io.unixNow() >= end
+    }, function() {
+        return "poll123123123123"
+    })
 }
-async function test(v) {
-    await sleep(2)
-    return "1111 " + v
+function sleep2(seconds) {
+    //coroutine.epoll 回调, 调用 coroutine.done 时跳出
+    var ret = coroutine.epoll()
+    done(ret, seconds, "epoll")
+    return ret 
+}
+async function done(ret, seconds, result) {
+    await sleep1(seconds)
+    coroutine.done(ret, result)
 }
 async function main() {
-    await test("main")
-}
-async function main1() {
-    await test("main1")
+    var now = io.unixNow()
+    print("start")
+    print(await sleep1(2))
+    print(io.unixNow() - now)
+    print(await sleep2(2))
+    print(io.unixNow() - now)
 }
 main()
-main1()
+
 // #if !DA_GLOBAL
 
 // #if UNITY_EDITOR
