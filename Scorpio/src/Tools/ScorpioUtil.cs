@@ -150,7 +150,7 @@ namespace Scorpio.Tools {
             var builder = new StringBuilder();
             for (var i = 0; i < length; ++i) {
                 try {
-                    builder.Append($"[{parameters[i]}]");
+                    builder.Append($"[{parameters[i].valueType}-{parameters[i]}]");
                 } catch (System.Exception) {
                     builder.Append($"[toString Error]");
                 }
@@ -161,6 +161,21 @@ namespace Scorpio.Tools {
             var pars = new ScriptValue[length];
             Array.Copy(parameters, pars, length);
             return pars;
+        }
+        public static ScriptValue GetArgs(this ScriptValue[] parameters, int index, int length) {
+            return GetArgs(parameters, length, index, ScriptValue.Null);
+        }
+        public static ScriptValue GetArgs(this ScriptValue[] parameters, int index, int length, ScriptValue def) {
+            if (index < length) {
+                return parameters[index];
+            }
+            return def;
+        }
+        public static ScriptValue GetArgsThrow(this ScriptValue[] parameters, int length, int index) {
+            if (index < length) {
+                return parameters[index];
+            }
+            throw new ExecutionException($"参数个数少于要获取的索引 index:{index} length:{length}");
         }
     }
 }

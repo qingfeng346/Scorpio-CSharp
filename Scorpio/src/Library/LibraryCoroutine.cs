@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Scorpio.Coroutine;
+using Scorpio.Tools;
 namespace Scorpio.Library {
     public class LibraryCoroutine {
         public static void Load(Script script) {
@@ -47,7 +48,7 @@ namespace Scorpio.Library {
         }
         private class poll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScriptValue.CreateValue(new CoroutinePoll(args[0], args[1]));
+                return ScriptValue.CreateValue(new CoroutinePoll(args.GetArgsThrow(0, length), args.GetArgsThrow(1, length)));
             }
         }
         private class epoll : ScorpioHandle {
@@ -59,7 +60,7 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var coroutineCallback = args[0].Value as CoroutineEpoll;
                 if (coroutineCallback != null) {
-                    coroutineCallback.Done(args[1]);
+                    coroutineCallback.Done(args.GetArgs(1, length));
                 }
                 return ScriptValue.Null;
             }
@@ -67,9 +68,9 @@ namespace Scorpio.Library {
         private class sleep : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var start = LibraryIO.UnixNow;
-                var milliseconds = args[0].ToDouble() * 1000;
+                var end = start + args.GetArgsThrow(0, length).ToLong() * 1000;
                 return ScriptValue.CreateValue(new CoroutineFuncPoll(() => {
-                    return LibraryIO.UnixNow - start >= milliseconds;
+                    return LibraryIO.UnixNow >= end;
                 }));
             }
         }
