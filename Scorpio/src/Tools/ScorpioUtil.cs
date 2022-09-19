@@ -171,7 +171,7 @@ namespace Scorpio.Tools {
             }
             return def;
         }
-        public static ScriptValue GetArgsThrow(this ScriptValue[] parameters, int length, int index) {
+        public static ScriptValue GetArgsThrow(this ScriptValue[] parameters, int index, int length) {
             if (index < length) {
                 return parameters[index];
             }
