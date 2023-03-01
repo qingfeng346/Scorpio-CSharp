@@ -1,7 +1,7 @@
 //github : https://github.com/qingfeng346/Scorpio-CSharp
 namespace Scorpio {
     public static class Version {
-        public const string version = "2.5.0";
-        public const string date = "2022-09-14";
+        public const string version = "2.6.0";
+        public const string date = "2023-03-01";
     }
 }

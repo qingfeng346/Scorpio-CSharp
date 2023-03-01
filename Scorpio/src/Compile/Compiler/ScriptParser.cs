@@ -777,7 +777,7 @@ namespace Scorpio.Compile.Compiler {
         private void ParseAwait() {
             UndoToken();
             PushObject(GetObject());
-            //AddScriptInstructionWithoutValue(Opcode.Pop); //弹出赋值的返回值
+            AddScriptInstructionWithoutValue(Opcode.Pop); //弹出赋值的返回值
         }
         /// <summary> async </summary>
         private void ParseAsync() {
@@ -814,7 +814,7 @@ namespace Scorpio.Compile.Compiler {
         void PushObject(CodeObject obj) {
             if (obj is CodeAwait) {
                 PushObject(((CodeAwait)obj).codeObject, true);
-                AddScriptInstructionWithoutValue(Opcode.Await);
+                AddScriptInstructionWithoutValue(Opcode.NewAwait);
             } else {
                 PushObject(obj, false);
             }

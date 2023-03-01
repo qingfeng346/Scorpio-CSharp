@@ -17,12 +17,7 @@ async function done(ret, seconds, result) {
     coroutine.done(ret, result)
 }
 async function main() {
-    var now = io.unixNow()
-    print("start")
-    print(await sleep1(2))
-    print(io.unixNow() - now)
-    print(await sleep2(2))
-    print(io.unixNow() - now)
+    await sleep1(2)
 }
 main()
 

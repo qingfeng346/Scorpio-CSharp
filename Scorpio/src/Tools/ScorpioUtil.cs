@@ -163,7 +163,7 @@ namespace Scorpio.Tools {
             return pars;
         }
         public static ScriptValue GetArgs(this ScriptValue[] parameters, int index, int length) {
-            return GetArgs(parameters, length, index, ScriptValue.Null);
+            return GetArgs(parameters, index, length, ScriptValue.Null);
         }
         public static ScriptValue GetArgs(this ScriptValue[] parameters, int index, int length, ScriptValue def) {
             if (index < length) {

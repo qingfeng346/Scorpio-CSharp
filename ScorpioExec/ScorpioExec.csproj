@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;SCORPIO_DEBUG;SCORPIO_DYNAMIC_DELEGATE</DefineConstants>
+    <DefineConstants>$(DefineConstants);SCORPIO_DEBUG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
