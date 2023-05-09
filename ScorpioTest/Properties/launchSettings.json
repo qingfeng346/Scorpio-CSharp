@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ScorpioTest": {
+      "commandName": "Project",
+      "workingDirectory": "./"
+    }
+  }
+}

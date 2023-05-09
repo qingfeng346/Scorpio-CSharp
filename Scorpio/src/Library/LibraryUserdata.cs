@@ -1,11 +1,15 @@
-using Scorpio.Userdata;
 namespace Scorpio.Library {
     public partial class LibraryUserdata {
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
-            map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf()));
-            map.SetValue("isType", script.CreateFunction(new isType()));
-            map.SetValue("extend", script.CreateFunction(new extend()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("fieldTypeOf", new fieldTypeOf()),
+                ("isType", new isType()),
+                ("extend", new extend()),
+            };
+            var map = new ScriptMapString(script, functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             script.SetGlobal("userdata", new ScriptValue(map));
         }
         private class fieldTypeOf : ScorpioHandle {

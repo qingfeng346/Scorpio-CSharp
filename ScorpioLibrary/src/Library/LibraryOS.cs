@@ -6,19 +6,24 @@ using System.Runtime.InteropServices;
 namespace ScorpioLibrary {
     public class LibraryOS {
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
-            map.SetValue("platform", script.CreateFunction(new platform()));
-            map.SetValue("isWindows", script.CreateFunction(new isWindows()));
-            map.SetValue("isLinux", script.CreateFunction(new isLinux()));
-            map.SetValue("isOSX", script.CreateFunction(new isOSX()));
-            map.SetValue("machineName", script.CreateFunction(new machineName()));
-            map.SetValue("userName", script.CreateFunction(new userName()));
-            map.SetValue("dotnetVersion", script.CreateFunction(new dotnetVersion()));
-            map.SetValue("version", script.CreateFunction(new version()));
-            map.SetValue("getEnvironmentVariable", script.CreateFunction(new getEnvironmentVariable()));
-            map.SetValue("setEnvironmentVariable", script.CreateFunction(new setEnvironmentVariable()));
-            map.SetValue("getFolderPath", script.CreateFunction(new getFolderPath()));
-            map.SetValue("process", script.CreateFunction(new process(script)));
+            var functions = new (string, ScorpioHandle)[] {
+                ("platform", new platform()),
+                ("isWindows", new isWindows()),
+                ("isLinux", new isLinux()),
+                ("isOSX", new isOSX()),
+                ("machineName", new machineName()),
+                ("userName", new userName()),
+                ("dotnetVersion", new dotnetVersion()),
+                ("version", new version()),
+                ("getEnvironmentVariable", new getEnvironmentVariable()),
+                ("setEnvironmentVariable", new setEnvironmentVariable()),
+                ("getFolderPath", new getFolderPath()),
+                ("process", new process(script)),
+            };
+            var map = new ScriptMapString(script, functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             script.SetGlobal("os", new ScriptValue(map));
         }
         private class platform : ScorpioHandle {

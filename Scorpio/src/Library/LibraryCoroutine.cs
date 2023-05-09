@@ -4,15 +4,20 @@ using Scorpio.Tools;
 namespace Scorpio.Library {
     public class LibraryCoroutine {
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
-            map.SetValue("start", script.CreateFunction(new start(script)));
-            map.SetValue("stop", script.CreateFunction(new stop()));
-            map.SetValue("stopAll", script.CreateFunction(new stopAll(script)));
-            map.SetValue("poll", script.CreateFunction(new poll()));
-            map.SetValue("epoll", script.CreateFunction(new epoll()));
-            map.SetValue("done", script.CreateFunction(new done()));
-            script.SetGlobal("sleep", script.CreateFunction(new sleep()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("start", new start(script)),
+                ("stop", new stop()),
+                ("stopAll", new stopAll(script)),
+                ("poll", new poll()),
+                ("epoll", new epoll()),
+                ("done", new done()),
+            };
+            var map = new ScriptMapString(script, functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             script.SetGlobal("coroutine", new ScriptValue(map));
+            script.SetGlobal("sleep", script.CreateFunction(new sleep()));
         }
         private class start : ScorpioHandle {
             readonly Script m_Script;

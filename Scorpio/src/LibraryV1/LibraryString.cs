@@ -4,25 +4,30 @@ namespace Scorpio.LibraryV1 {
     public class LibraryString {
         public static void Load(Script script) {
             var protoString = script.TypeString;
-            var map = new ScriptMapString(script);
-            map.SetValue("format", protoString.GetValue("format"));
-            map.SetValue("cs_format", protoString.GetValue("csFormat"));
-            map.SetValue("isnullorempty", protoString.GetValue("isNullOrEmpty"));
-            map.SetValue("join", protoString.GetValue("join"));
+            var functions = new (string, ScriptValue)[] {
+                ("format", protoString.GetValue("format")),
+                ("cs_format", protoString.GetValue("csFormat")),
+                ("isnullorempty", protoString.GetValue("isNullOrEmpty")),
+                ("join", protoString.GetValue("join")),
 
-            map.SetValue("length", script.CreateFunction(new length()));
-            map.SetValue("substring", script.CreateFunction(new substring()));
-            map.SetValue("tolower", script.CreateFunction(new toLower()));
-            map.SetValue("toupper", script.CreateFunction(new toUpper()));
-            map.SetValue("trim", script.CreateFunction(new trim()));
-            map.SetValue("replace", script.CreateFunction(new replace()));
-            map.SetValue("indexof", script.CreateFunction(new indexOf()));
-            map.SetValue("lastindexof", script.CreateFunction(new lastIndexOf()));
-            map.SetValue("startswith", script.CreateFunction(new startsWith()));
-            map.SetValue("endswith", script.CreateFunction(new endsWith()));
-            map.SetValue("contains", script.CreateFunction(new contains()));
-            map.SetValue("split", script.CreateFunction(new split(script)));
-            map.SetValue("at", script.CreateFunction(new at()));
+                ("length", script.CreateFunction(new length())),
+                ("substring", script.CreateFunction(new substring())),
+                ("tolower", script.CreateFunction(new toLower())),
+                ("toupper", script.CreateFunction(new toUpper())),
+                ("trim", script.CreateFunction(new trim())),
+                ("replace", script.CreateFunction(new replace())),
+                ("indexof", script.CreateFunction(new indexOf())),
+                ("lastindexof", script.CreateFunction(new lastIndexOf())),
+                ("startswith", script.CreateFunction(new startsWith())),
+                ("endswith", script.CreateFunction(new endsWith())),
+                ("contains", script.CreateFunction(new contains())),
+                ("split", script.CreateFunction(new split(script))),
+                ("at", script.CreateFunction(new at())),
+            };
+            var map = new ScriptMapString(script, functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, func);
+            }
             script.SetGlobal("string", new ScriptValue(map));
         }
         private class length : ScorpioHandle {

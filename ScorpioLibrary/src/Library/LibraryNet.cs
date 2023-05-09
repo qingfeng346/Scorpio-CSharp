@@ -1,5 +1,6 @@
 ﻿using Scorpio;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -11,13 +12,18 @@ namespace ScorpioLibrary {
         static byte[] READ_BYTES = new byte[READ_LENGTH];
         static Encoding DEFAULT_ENCODING = Encoding.UTF8;
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
-            map.SetValue("get", script.CreateFunction(new get()));
-            map.SetValue("post", script.CreateFunction(new post()));
-            map.SetValue("urlencode", script.CreateFunction(new urlencode()));
-            map.SetValue("urldecode", script.CreateFunction(new urldecode()));
-            map.SetValue("qpencode", script.CreateFunction(new qpencode()));
-            map.SetValue("qpdecode", script.CreateFunction(new qpdecode()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("get", new get()),
+                ("post", new post()),
+                ("urlencode", new urlencode()),
+                ("urldecode", new urldecode()),
+                ("qpencode", new qpencode()),
+                ("qpdecode", new qpdecode()),
+            };
+            var map = new ScriptMapString(script, functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             script.SetGlobal("net", new ScriptValue(map));
         }
         static HttpWebRequest CreateRequest(string url, string method) {

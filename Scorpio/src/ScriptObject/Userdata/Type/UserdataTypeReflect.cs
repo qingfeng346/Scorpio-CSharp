@@ -1,37 +1,32 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using Scorpio.Exception;
 using Scorpio.Tools;
+
 namespace Scorpio.Userdata {
     //反射类管理
     public class UserdataTypeReflect : UserdataType {
         private UserdataMethod m_Constructor;                           //所有构造函数
         private List<MethodInfo> m_Methods;                             //所有函数
-        private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
-        private Dictionary<string, UserdataMethodReflect> m_Functions;  //所有的函数
+        private ScorpioStringDictionary<UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
+        private ScorpioStringDictionary<UserdataMethodReflect> m_Functions;  //所有的函数
         public UserdataTypeReflect(Type type) : base(type) {
-            m_Variables = new Dictionary<string, UserdataVariable>();
-            m_Functions = new Dictionary<string, UserdataMethodReflect>();
-            InitializeConstructor();
-            InitializeFunctions();
-        }
-        //初始化构造函数
-        private void InitializeConstructor() {
-            //GetConstructors 去掉 NonPublic 标识, 否则取函数会取出一些错误的函数例如类 System.Diagnostics.Process
-            var name = string.Intern(m_Type.ToString());
-            m_Constructor = new UserdataMethodReflect(m_Type, name, m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
-        }
-        //初始化所有函数
-        private void InitializeFunctions() {
+            //构造函数
+            m_Constructor = new UserdataMethodReflect(m_Type, string.Intern(m_Type.ToString()), m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
+            //所有变量和属性
+            m_Variables = new ScorpioStringDictionary<UserdataVariable>();
+            //所有函数
             m_Methods = new List<MethodInfo>(m_Type.GetMethods(Script.BindingFlag));
+            var methods = new HashSet<string>();
+            m_Methods.ForEach(method =>  methods.Add(method.Name));
+            //固定长度,节省内存,只执行一次,消耗可以忽略
+            m_Functions = new ScorpioStringDictionary<UserdataMethodReflect>(m_Methods.Count);
         }
-        //获取一个函数，名字相同返回值相同
-        private UserdataMethodReflect GetFunction(string name) {
+        //创建一个函数，名字相同返回值相同
+        private UserdataMethodReflect CreateMethodReflect(string name) {
             var methods = m_Methods.FindAll((method) => method.Name == name);
             if (methods.Count > 0) {
-                name = string.Intern(name);
                 return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
             }
             return null;
@@ -40,7 +35,7 @@ namespace Scorpio.Userdata {
         private ScriptValue GetNestedType(string name) {
             var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
             if (nestedType != null) {
-                return m_Values[string.Intern(name)] = ScorpioTypeManager.GetUserdataType(nestedType);
+                return m_Values[name] = ScorpioTypeManager.GetUserdataType(nestedType);
             }
             return ScriptValue.Null;
         }
@@ -48,10 +43,9 @@ namespace Scorpio.Userdata {
         private UserdataVariable GetVariable(string name) {
             if (m_Variables.TryGetValue(name, out var value))
                 return value;
-            name = string.Intern(name);
-            FieldInfo fInfo = m_Type.GetField(name, Script.BindingFlag);
+            var fInfo = m_Type.GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
-            PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
+            var pInfo = m_Type.GetProperty(name, Script.BindingFlag);
             if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Type, pInfo);
             return null;
         }
@@ -73,7 +67,7 @@ namespace Scorpio.Userdata {
         protected override UserdataMethod GetMethod(string name) {
             if (m_Functions.TryGetValue(name, out var userdataMethod))
                 return userdataMethod;
-            return GetFunction(name);
+            return CreateMethodReflect(name);
         }
         //获得一个变量的类型
         public override Type GetVariableType(string name) {
@@ -88,7 +82,7 @@ namespace Scorpio.Userdata {
                 return value;
             var variable = GetVariable(name);
             if (variable != null) return variable.GetValue(obj);
-            userdataMethod = GetFunction(name);
+            userdataMethod = CreateMethodReflect(name);
             if (userdataMethod != null) return userdataMethod;
             value = GetNestedType(name);
             if (value.valueType != ScriptValue.nullValueType) return value;

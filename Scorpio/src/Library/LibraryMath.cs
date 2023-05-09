@@ -7,35 +7,37 @@ namespace Scorpio.Library {
         public const double Rad2Deg = 57.29578;                 //弧度转角度
         public const double Epsilon = 1.401298E-45;             //一个很小的浮点数
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
-            map.SetValue("PI", new ScriptValue(PI));
-            map.SetValue("Deg2Rad", new ScriptValue(Deg2Rad));              //角度转弧度 角度*此值=弧度
-            map.SetValue("Rad2Deg", new ScriptValue(Rad2Deg));              //弧度转角度 弧度*此值=角度
-            map.SetValue("Epsilon", new ScriptValue(Epsilon));              //一个很小的浮点数
-            map.SetValue("min", script.CreateFunction(new min()));          //取最小值
-            map.SetValue("max", script.CreateFunction(new max()));          //取最大值
-            map.SetValue("abs", script.CreateFunction(new abs()));          //取绝对值
-            map.SetValue("floor", script.CreateFunction(new floor()));      //向下取整
-            map.SetValue("ceil", script.CreateFunction(new ceil()));        //向上取整
-            map.SetValue("round", script.CreateFunction(new round()));      //四舍五入
-            map.SetValue("clamp", script.CreateFunction(new clamp()));      //指定最大最小值取合适值
-            map.SetValue("sqrt", script.CreateFunction(new sqrt()));        //开平方根
-            map.SetValue("pow", script.CreateFunction(new pow()));          //幂运算
-            map.SetValue("log", script.CreateFunction(new log()));          //返回指定数字的对数
+            var functions = new (string, ScriptValue)[] {
+                ("PI", new ScriptValue(PI)),
+                ("Deg2Rad", new ScriptValue(Deg2Rad)),
+                ("Rad2Deg", new ScriptValue(Rad2Deg)),
+                ("Epsilon", new ScriptValue(Epsilon)),
 
-            //三角函数
-            map.SetValue("sin", script.CreateFunction(new sin()));          //
-            map.SetValue("sinh", script.CreateFunction(new sinh()));        //
-            map.SetValue("asin", script.CreateFunction(new asin()));        //
-
-            map.SetValue("cos", script.CreateFunction(new cos()));          //
-            map.SetValue("cosh", script.CreateFunction(new cosh()));        //
-            map.SetValue("acos", script.CreateFunction(new acos()));        //
-
-            map.SetValue("tan", script.CreateFunction(new tan()));          //
-            map.SetValue("tanh", script.CreateFunction(new tanh()));        //
-            map.SetValue("atan", script.CreateFunction(new atan()));        //
-
+                ("min", script.CreateFunction(new min())),
+                ("max", script.CreateFunction(new max())),
+                ("abs", script.CreateFunction(new abs())),
+                ("floor", script.CreateFunction(new floor())),
+                ("ceil", script.CreateFunction(new ceil())),
+                ("round", script.CreateFunction(new round())),
+                ("clamp", script.CreateFunction(new clamp())),
+                ("sqrt", script.CreateFunction(new sqrt())),
+                ("pow", script.CreateFunction(new pow())),
+                ("log", script.CreateFunction(new log())),
+                 
+                ("sin", script.CreateFunction(new sin())),
+                ("sinh", script.CreateFunction(new sinh())),
+                ("asin", script.CreateFunction(new asin())),
+                ("cos", script.CreateFunction(new cos())),
+                ("cosh", script.CreateFunction(new cosh())),
+                ("acos", script.CreateFunction(new acos())),
+                ("tan", script.CreateFunction(new tan())),
+                ("tanh", script.CreateFunction(new tanh())),
+                ("atan", script.CreateFunction(new atan())),
+            };
+            var map = new ScriptMapString(script, functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, func);
+            }
             script.SetGlobal("math", new ScriptValue(map));
         }
         private class min : ScorpioHandle {

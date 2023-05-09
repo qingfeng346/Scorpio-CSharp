@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using Scorpio.Library;
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapObject : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
-        private Dictionary<object, ScriptValue> m_Objects = new Dictionary<object, ScriptValue>();  //所有的数据(函数和数据都在一个数组)
-        public ScriptMapObject(Script script) : base(script) { }
-        internal ScriptMapObject(Script script, ScriptValue[] parameters, int length) : base(script) { }
-        public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
+    public class ScriptMapObject : ScriptMap {
+
+        private Dictionary<object, ScriptValue> m_Objects;         //所有的数据(函数和数据都在一个数组)
+        public ScriptMapObject(Script script) : base(script) {
+            m_Objects = new Dictionary<object, ScriptValue>();
+        }
+        internal ScriptMapObject(Script script, ScriptValue[] parameters, int length) : base(script) {
+            m_Objects = new Dictionary<object, ScriptValue>();
+        }
+        public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() => m_Objects.GetEnumerator();
 
         public override ScriptValue GetValue(string key) {
             return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
@@ -97,18 +101,6 @@ namespace Scorpio {
                 }
             }
             return ret;
-        }
-        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
-            builder.Append("{");
-            var first = true;
-            foreach (var pair in m_Objects) {
-                if (first) { first = false; } else { builder.Append(","); }
-                jsonSerializer.Serializer(pair.Key.ToString());
-                builder.Append(":");
-                jsonSerializer.Serializer(pair.Value);
-            }
-            builder.Append("}");
         }
     }
 }

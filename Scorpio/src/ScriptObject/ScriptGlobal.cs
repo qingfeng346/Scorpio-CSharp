@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
         public struct Enumerator : IEnumerator<ScorpioKeyValue<string, ScriptValue>> {
@@ -35,9 +34,9 @@ namespace Scorpio {
                 values.Dispose();
             }
         }
-        private ScriptValue[] m_Objects = ScriptValue.EMPTY;                                //数据
+        public ScriptValue[] m_Objects = ScriptValue.EMPTY;                                //数据
         private int m_Size = 0;                                                             //有效数据数量
-        private Dictionary<string, int> m_Indexs = new Dictionary<string, int>();           //名字到索引的映射
+        public Dictionary<string, int> m_Indexs = new Dictionary<string, int>();           //名字到索引的映射
         public ScriptGlobal() : base(ObjectType.Global) { }
         public void Shutdown() {
             m_Objects = ScriptValue.EMPTY;
@@ -57,9 +56,8 @@ namespace Scorpio {
         }
         void EnsureCapacity(int min) {
             if (m_Objects.Length < min) {
-                var num = (m_Objects.Length == 0) ? 4 : (m_Objects.Length * 2);
-                if (num > 2146435071) { num = 2146435071; }
-                else if (num < min) { num = min; }
+                var num = (m_Objects.Length == 0) ? 8 : (m_Objects.Length + 8);
+                if (num < min) { num = min; }
                 SetCapacity(num);
             }
         }
@@ -80,7 +78,7 @@ namespace Scorpio {
                 SetValueByIndex(index, value);
                 return;
             }
-            m_Indexs[string.Intern(key)] = m_Size;
+            m_Indexs[key] = m_Size;
             EnsureCapacity(m_Size + 1);
             m_Objects[m_Size++] = value;
         }

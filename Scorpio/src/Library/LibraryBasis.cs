@@ -5,7 +5,6 @@ using System.Text;
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Userdata;
-using Scorpio.Tools;
 using System.Reflection;
 using Scorpio.Instruction;
 using Scorpio.Runtime;
@@ -78,7 +77,7 @@ namespace Scorpio.Library {
         }
         private class InstancePairs : ScorpioHandle {
             readonly ScriptInstance m_ItorResult;
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
             public InstancePairs(ScriptInstance map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -95,7 +94,7 @@ namespace Scorpio.Library {
         }
         private class TypePairs : ScorpioHandle {
             readonly ScriptInstance m_ItorResult;
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
             public TypePairs(ScriptType map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
@@ -270,7 +269,8 @@ namespace Scorpio.Library {
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
-                var map = new ScriptMapString(m_script);
+                //3个字段, next函数 key value内容
+                var map = new ScriptMapString(m_script, 3);
                 if (obj is ScriptArray) {
                     map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs((ScriptArray)obj, map)));
                 } else if (obj is ScriptMapObject) {

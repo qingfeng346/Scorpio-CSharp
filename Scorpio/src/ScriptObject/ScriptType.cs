@@ -1,27 +1,23 @@
 using Scorpio.Exception;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
-    public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
-        protected Dictionary<string, ScriptValue> m_Values;             //所有的函数
-        protected Dictionary<string, ScriptFunction> m_GetProperties;   //所有的get函数
+    public class ScriptType : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
+        protected ScorpioStringDictionary<ScriptValue> m_Values;             //所有的函数
+        protected ScorpioStringDictionary<ScriptFunction> m_GetProperties;   //所有的get函数
         protected ScriptFunction m_EqualFunction;                       //==函数重载
         protected ScriptType m_Prototype;                               //基类
         public ScriptType(string typeName, ScriptType parentType) : base(ObjectType.Type) {
             TypeName = typeName;
             m_Prototype = parentType;
-            m_Values = new Dictionary<string, ScriptValue>();
-            m_GetProperties = new Dictionary<string, ScriptFunction>();
+            m_Values = new ScorpioStringDictionary<ScriptValue>();
+            m_GetProperties = new ScorpioStringDictionary<ScriptFunction>();
         }
         public string TypeName { get; private set; }        //Type名称
-        public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
+        public virtual ScriptType Prototype { get => m_Prototype; set => m_Prototype = value; }
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
         public void AddGetProperty(string key, ScriptFunction value) {
             m_GetProperties[key] = value;
-        }
-        public void RemoveGetProperty(string key) {
-            m_GetProperties.Remove(key);
         }
         public virtual ScriptValue GetValue(string key, ScriptInstance instance) {
             if (m_Values.TryGetValue(key, out var value)) {
@@ -51,8 +47,8 @@ namespace Scorpio {
             }
             return ret;
         }
-        public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
+        public IEnumerator<ScorpioKeyValue<string, ScriptValue>> GetEnumerator() => m_Values.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => m_Values.GetEnumerator();
         public override string ToString() { return $"Class<{TypeName}>"; }
     }
     //Object原表, GetValue 找不到就返回 null
@@ -61,7 +57,7 @@ namespace Scorpio {
         internal ScriptTypeObject(Script script, string typeName) : base(typeName, null) {
             m_Script = script;
         }
-        public override ScriptType Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
+        public override ScriptType Prototype { set => throw new ExecutionException("Class<Object>不支持设置 Prototype"); }
         public override ScriptFunction EqualFunction => m_EqualFunction;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return new ScriptValue(new ScriptInstance(ObjectType.Type, m_Script.TypeObject));

@@ -291,13 +291,7 @@ namespace Scorpio {
             }
         }
         internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
-            builder.Append("[");
-            for (int i = 0; i < m_Length; ++i) {
-                if (i != 0) builder.Append(",");
-                jsonSerializer.Serializer(m_Objects[i]);
-            }
-            builder.Append("]");
+            jsonSerializer.Serializer(m_Objects);
         }
     }
 }

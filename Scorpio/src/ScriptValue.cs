@@ -4,7 +4,7 @@ using Scorpio.Userdata;
 using Scorpio.Exception;
 using System.Runtime.InteropServices;
 namespace Scorpio {
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量
         public static ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
@@ -14,7 +14,6 @@ namespace Scorpio {
         public static readonly ScriptValue False = new ScriptValue(false);
         public static readonly ScriptValue Zero = new ScriptValue((double)0);
         public static readonly ScriptValue InvalidIndex = new ScriptValue((double)-1);
-
 
         public const byte nullValueType = 0;        //null
         public const byte scriptValueType = 1;      //脚本变量
@@ -26,12 +25,13 @@ namespace Scorpio {
         public const byte objectValueType = 7;      //除了 double long 以外的number类型 和 枚举
 
 
-        [FieldOffset(0)] public byte valueType;
+        [FieldOffset(0)] public string stringValue;
+        [FieldOffset(0)] public ScriptObject scriptValue;
+        [FieldOffset(0)] public object objectValue;
         [FieldOffset(8)] public double doubleValue;
         [FieldOffset(8)] public long longValue;
-        [FieldOffset(16)] public string stringValue;
-        [FieldOffset(16)] public ScriptObject scriptValue;
-        [FieldOffset(16)] public object objectValue;
+        [FieldOffset(16)] public byte valueType;
+
 
         public ScriptValue(bool value) {
             this.valueType = value ? trueValueType : falseValueType;
@@ -475,5 +475,11 @@ namespace Scorpio {
                 return new ScriptValue(new ScriptUserdataArray((IList)value, ScorpioTypeManager.GetType(value.GetType())));
             return new ScriptValue(new ScriptUserdataObject(value, ScorpioTypeManager.GetType(value.GetType())));
         }
+        
+        public static implicit operator ScriptValue(bool value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(long value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(double value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(string value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(ScriptObject value) => new ScriptValue(value);
     }
 }

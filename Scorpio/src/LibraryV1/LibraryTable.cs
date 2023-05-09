@@ -2,13 +2,18 @@
 namespace Scorpio.LibraryV1 {
     public class LibraryTable {
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
-            map.SetValue("count", script.CreateFunction(new count()));
-            map.SetValue("clear", script.CreateFunction(new clear()));
-            map.SetValue("remove", script.CreateFunction(new remove()));
-            map.SetValue("containskey", script.CreateFunction(new containskey()));
-            map.SetValue("keys", script.CreateFunction(new keys()));
-            map.SetValue("values", script.CreateFunction(new values()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("count", new count()),
+                ("clear", new clear()),
+                ("remove", new remove()),
+                ("containskey", new containskey()),
+                ("keys", new keys()),
+                ("values", new values()),
+            };
+            var map = new ScriptMapString(script, functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             script.SetGlobal("table", new ScriptValue(map));
         }
         private class count : ScorpioHandle {

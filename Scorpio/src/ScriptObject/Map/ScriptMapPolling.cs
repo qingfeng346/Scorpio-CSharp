@@ -1,37 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
-using Scorpio.Library;
-using Scorpio.Tools;
+using Scorpio.Exception;
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapPolling : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
+    public class ScriptMapPolling : ScriptMap {
         //数组迭代器
         public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
             readonly IEnumerator<ScorpioKeyValue<object, ScriptValue>> m_Enumerator;
-            internal Enumerator(ScriptMapPolling scriptMap) {
-                m_Enumerator = scriptMap.m_Objects.GetEnumerator();
+            internal Enumerator(ScriptMapPolling map) {
+                m_Enumerator = map.m_Objects.GetEnumerator();
             }
             public bool MoveNext() {
                 return m_Enumerator.MoveNext();
             }
             public KeyValuePair<object, ScriptValue> Current => new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value);
-            object IEnumerator.Current => this.Current;
+            object IEnumerator.Current => Current;
             public void Reset() { m_Enumerator.Reset(); }
             public void Dispose() { m_Enumerator.Dispose(); }
         }
 
-        private ScorpioDictionary<object, ScriptValue> m_Objects;  //所有的数据(函数和数据都在一个数组)
-        private bool m_Reference;
-        public ScriptMapPolling(Script script, int capacity, bool reference) : base(script) {
-            m_Reference = reference;
-            if (reference) {
-                m_Objects = new ScorpioDictionaryReference<object, ScriptValue>(capacity);
-            } else {
-                m_Objects = new ScorpioDictionary<object, ScriptValue>(capacity);
-            }
+        private ScorpioObjectDictionary<ScriptValue> m_Objects;  //所有的数据(函数和数据都在一个数组)
+        public ScriptMapPolling(Script script, int capacity) : base(script) {
+            m_Objects = new ScorpioObjectDictionary<ScriptValue>(capacity);
         }
-        public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
-        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
+        public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() => new Enumerator(this);
 
         public override ScriptValue GetValue(string key) {
             return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
@@ -75,7 +67,7 @@ namespace Scorpio {
             m_Objects.Clear();
         }
         public override void Remove(object key) {
-            m_Objects.Remove(key);
+            throw new ExecutionException("MapPolling 不支持 Remove, 请使用普通 Map");
         }
         public override ScriptArray GetKeys() {
             var ret = new ScriptArray(m_Script);
@@ -92,14 +84,14 @@ namespace Scorpio {
             return ret;
         }
         public override ScriptMap NewCopy() {
-            var ret = new ScriptMapPolling(m_Script, m_Objects.Count, m_Reference);
+            var ret = new ScriptMapPolling(m_Script, m_Objects.Count);
             foreach (var pair in m_Objects) {
                 ret.m_Objects[pair.Key] = pair.Value;
             }
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptMapPolling(m_Script, m_Objects.Count, m_Reference);
+            var ret = new ScriptMapPolling(m_Script, m_Objects.Count);
             if (deep) {
                 foreach (var pair in m_Objects) {
                     var value = pair.Value;
@@ -120,18 +112,6 @@ namespace Scorpio {
                 }
             }
             return ret;
-        }
-        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
-            builder.Append("{");
-            var first = true;
-            foreach (var pair in m_Objects) {
-                if (first) { first = false; } else { builder.Append(","); }
-                jsonSerializer.Serializer(pair.Key.ToString());
-                builder.Append(":");
-                jsonSerializer.Serializer(pair.Value);
-            }
-            builder.Append("}");
         }
     }
 }

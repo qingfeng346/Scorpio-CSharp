@@ -6,7 +6,7 @@ namespace Scorpio.Userdata {
     /// <summary> 普通Object类型 </summary>
     public class ScriptUserdataObject : ScriptUserdata {
         protected UserdataType m_UserdataType;
-        protected Dictionary<string, ScriptValue> m_Methods = new Dictionary<string, ScriptValue>();
+        protected ScorpioStringDictionary<ScriptValue> m_Methods = new ScorpioStringDictionary<ScriptValue>();
         public ScriptUserdataObject(object value, UserdataType type) {
             this.m_Value = value;
             this.m_ValueType = value.GetType();

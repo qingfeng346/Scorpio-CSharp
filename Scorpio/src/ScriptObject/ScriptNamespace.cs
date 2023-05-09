@@ -1,16 +1,15 @@
 using System;
 using Scorpio.Tools;
-using Scorpio.Userdata;
-using System.Collections.Generic;
 namespace Scorpio {
     public class ScriptNamespace : ScriptObject {
-        private Dictionary<string, ScriptValue> m_Objects = new Dictionary<string, ScriptValue>();
+        private ScorpioStringDictionary<ScriptValue> m_Objects;
         private string m_Value;
         public override Type ValueType { get { return ScorpioUtil.TYPE_STRING; } } //值类型，如果是Type则返回 typeof(Type)
         public override Type Type { get { return ScorpioUtil.TYPE_STRING; } }      //获取类型
         public override object Value { get { return m_Value; } }            //值
         public ScriptNamespace(string name) : base(ObjectType.Namespace) {
             m_Value = name;
+            m_Objects = new ScorpioStringDictionary<ScriptValue>();
         }
         public override ScriptValue GetValue(string key) {
             if (m_Objects.TryGetValue(key, out var value))

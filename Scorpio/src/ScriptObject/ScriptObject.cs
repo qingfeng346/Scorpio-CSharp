@@ -16,16 +16,15 @@ namespace Scorpio {
     }
     public abstract class ScriptObject {
         private static ScriptValue CommonThisValue = new ScriptValue() { valueType = ScriptValue.scriptValueType };
-
-        // 构图函数
+        public ObjectType ObjectType { get; private set; }              //类型
+        public virtual object Value => this;                            //值
+        public virtual Type ValueType => GetType();                     //值类型
+        public virtual Type Type => GetType();                          //获取类型
+        public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
+        //构造函数
         public ScriptObject(ObjectType objectType) {
             ObjectType = objectType;
         }
-        public ObjectType ObjectType { get; private set; }                              //类型
-        public virtual object Value { get { return this; } }                            //值
-        public virtual Type ValueType { get { return GetType(); } }                     //值类型
-        public virtual Type Type { get { return GetType(); } }                          //获取类型
-        public virtual string ValueTypeName { get { return ObjectType.ToString(); } }   //类型名称
         public ScriptValue ThisValue { 
             get {
                 CommonThisValue.scriptValue = this;

@@ -5,17 +5,20 @@ class TestClass {
     }
     //支持的运算符重载有 + - * / % ^ & | << >> ()
     "+"(num) {
+        print("重载 +")
         return TestClass() { num = this.num + num}
     }
     "-"(num) {
+        print("重载 -")
         this.num -= num
         return this
     }
     "=="(num) {
+        print("重载 ==")
         return this.num == num
     }
     "()" {
-        print("()call : " + this.num)
+        print("重载() : " + this.num)
     }
 }
 var t1 = TestClass(100)

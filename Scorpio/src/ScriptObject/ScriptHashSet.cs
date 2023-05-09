@@ -6,21 +6,24 @@ using Scorpio.Library;
 namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
         private Script m_Script;
-        public HashSet<ScriptValue> m_Objects = new HashSet<ScriptValue>();
-        public ScriptHashSet(Script script) : base(ObjectType.HashSet, script.TypeHashSet) { m_Script = script; }
+        public HashSet<ScriptValue> m_Objects;
+        public ScriptHashSet(Script script) : base(ObjectType.HashSet) {
+            //不继承,避免分配父级m_Values
+            m_Script = script;
+            m_Prototype = script.TypeHashSet;
+            m_Objects = new HashSet<ScriptValue>();
+        }
         internal ScriptHashSet(Script script, ScriptValue[] parameters, int length) : this(script) {
-            if (length == 0) { return; }
-            var ienumerable = parameters[0].Value as IEnumerable<ScriptValue>;
-            if (ienumerable != null) {
-                m_Objects.UnionWith(ienumerable);
+            if (length == 1 && parameters[0].Value is IEnumerable<ScriptValue>) {
+                m_Objects.UnionWith((IEnumerable<ScriptValue>)parameters[0].Value);
             } else {
                 for (var i = 0; i < length; ++i) {
                     m_Objects.Add(parameters[i]);
                 }
             }
         }
-        public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
+        public new IEnumerator<ScriptValue> GetEnumerator() => m_Objects.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => m_Objects.GetEnumerator();
         public Script getScript() { return m_Script; }
         public void Add(ScriptValue item) {
             m_Objects.Add(item);
@@ -85,14 +88,7 @@ namespace Scorpio {
             }
         }
         internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
-            builder.Append("[");
-            var first = true;
-            foreach (var value in m_Objects) {
-                if (first) { first = false; } else { builder.Append(","); }
-                jsonSerializer.Serializer(value);
-            }
-            builder.Append("]");
+            jsonSerializer.Serializer(m_Objects);
         }
     }
 }

@@ -7,12 +7,12 @@ namespace Scorpio.Userdata {
         protected Type m_Type;                                                                          //Type
         protected UserdataMethod[] m_Operators = new UserdataMethod[UserdataOperator.OperatorCount];    //所有重载函数
         protected bool[] m_InitOperators = new bool[UserdataOperator.OperatorCount];                    //是否初始化过重载函数
-        protected Dictionary<string, ScriptValue> m_Values;                                             //所有的内部数据,内部类,脚本扩展函数
+        protected ScorpioStringDictionary<ScriptValue> m_Values;                                        //所有的内部数据,内部类,脚本扩展函数
         public UserdataType(Type type) { 
             m_Type = type;
-            m_Values = new Dictionary<string, ScriptValue>();
+            m_Values = new ScorpioStringDictionary<ScriptValue>();
         }
-        public Type Type { get { return m_Type; } }
+        public Type Type => m_Type;
         //创建一个模板类
         public ScriptValue MakeGenericType(Type[] parameters) {
             if (m_Type.IsGenericType && m_Type.IsGenericTypeDefinition) {
@@ -55,11 +55,7 @@ namespace Scorpio.Userdata {
             return m_Operators[operate] = GetMethod(operatorName);
         }
         public void SetValue(string name, ScriptValue value) {
-            if (value.valueType == ScriptValue.nullValueType) {
-                m_Values.Remove(name);
-            } else {
-                m_Values[name] = value;
-            }
+            m_Values[name] = value;
         }
         /// <summary> 创建一个实例 </summary>
         public abstract ScriptUserdata CreateInstance(ScriptValue[] parameters, int length);

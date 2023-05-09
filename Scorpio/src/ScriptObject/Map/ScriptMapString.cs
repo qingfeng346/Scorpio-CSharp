@@ -1,31 +1,27 @@
-using System.Text;
 using System.Collections;
 using System.Collections.Generic;
-using Scorpio.Tools;
+using Scorpio.Exception;
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapString : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
+    public class ScriptMapString : ScriptMap {
         //数组迭代器
         public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
+            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
             internal Enumerator(ScriptMapString map) {
                 m_Enumerator = map.m_Values.GetEnumerator();
             }
             public bool MoveNext() {
                 return m_Enumerator.MoveNext();
             }
-            public KeyValuePair<object, ScriptValue> Current { 
-                get { 
-                    return new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value); 
-                }
-            }
-            object IEnumerator.Current { get { return m_Enumerator.Current; } }
+            public KeyValuePair<object, ScriptValue> Current => new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value); 
+            object IEnumerator.Current => Current;
             public void Reset() { m_Enumerator.Reset(); }
             public void Dispose() { m_Enumerator.Dispose(); }
         }
-        public ScriptMapString(Script script) : base(script) { }
-        public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
-        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
+        public ScriptMapString(Script script, int capacity) : base(script) {
+            m_Values = new ScorpioStringDictionary<ScriptValue>(capacity);
+        }
+        public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() => new Enumerator(this);
         public override bool ContainsKey(object key) {
             if (!(key is string)) return false;
             return m_Values.ContainsKey(key as string);
@@ -40,7 +36,7 @@ namespace Scorpio {
             m_Values.Clear();
         }
         public override void Remove(object key) {
-            m_Values.Remove(key as string);
+            throw new ExecutionException("MapString 不支持 Remove, 请使用普通 Map");
         }
         public override ScriptArray GetKeys() {
             var ret = new ScriptArray(m_Script);
@@ -57,14 +53,14 @@ namespace Scorpio {
             return ret;
         }
         public override ScriptMap NewCopy() {
-            var ret = new ScriptMapString(m_Script);
+            var ret = new ScriptMapString(m_Script, m_Values.Count);
             foreach (var pair in m_Values) {
                 ret.m_Values[pair.Key] = pair.Value;
             }
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptMapString(m_Script);
+            var ret = new ScriptMapString(m_Script, m_Values.Count);
             if (deep) {
                 foreach (var pair in m_Values) {
                     var value = pair.Value;
