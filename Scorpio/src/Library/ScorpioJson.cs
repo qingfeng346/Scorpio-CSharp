@@ -311,6 +311,15 @@ namespace Scorpio.Library {
             }
             m_Builder.Append("]");
         }
+        internal void Serializer(ScriptValue[] values, int start, int end) {
+            m_Builder.Append("[");
+            var first = true;
+            for (var i = start; i < end; ++i) {
+                if (first) { first = false; } else { m_Builder.Append(","); }
+                Serializer(values[i]);
+            }
+            m_Builder.Append("]");
+        }
         public void Dispose() {
             m_Builder = null;
             m_Recurve = null;

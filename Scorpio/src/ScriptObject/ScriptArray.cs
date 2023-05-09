@@ -291,7 +291,7 @@ namespace Scorpio {
             }
         }
         internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            jsonSerializer.Serializer(m_Objects);
+            jsonSerializer.Serializer(m_Objects, 0, m_Length);
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Scorpio {
     public abstract class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
         protected Script m_Script;
         public ScriptMap(Script script) : base(ObjectType.Map) {
+            //不继承,避免分配父级m_Values
             m_Script = script;
             m_Prototype = script.TypeMap;
         }

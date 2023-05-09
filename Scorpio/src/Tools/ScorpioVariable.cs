@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 
 namespace Scorpio {
     internal static class ScorpioVariable {
         private static long newId = 0;
         public static long Id => newId++;
-        private static Dictionary<long, Dictionary<string, int>> StringVariables = new Dictionary<long, Dictionary<string, int>>();
-        private static Dictionary<long, Dictionary<object, int>> ObjectVariables = new Dictionary<long, Dictionary<object, int>>();
+        private static ConcurrentDictionary<long, Dictionary<string, int>> StringVariables = new ConcurrentDictionary<long, Dictionary<string, int>>();
+        private static ConcurrentDictionary<long, Dictionary<object, int>> ObjectVariables = new ConcurrentDictionary<long, Dictionary<object, int>>();
         public static string[] GetStringKeys(long id) {
             if (StringVariables.TryGetValue(id, out var variable)) {
                 return variable.Keys.ToArray();
@@ -37,7 +38,7 @@ namespace Scorpio {
             return variable[key] = variable.Count;
         }
         public static void ReleaseStringId(long id) {
-            StringVariables.Remove(id);
+            StringVariables.TryRemove(id, out _);
         }
 
         public static object[] GetObjectKeys(long id) {
@@ -69,7 +70,7 @@ namespace Scorpio {
             return variable[key] = variable.Count;
         }
         public static void ReleaseObjectId(long id) {
-            ObjectVariables.Remove(id);
+            ObjectVariables.TryRemove(id, out _);
         }
     }
 }

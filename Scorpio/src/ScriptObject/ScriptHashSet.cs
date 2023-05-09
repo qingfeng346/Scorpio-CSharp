@@ -7,10 +7,8 @@ namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
         private Script m_Script;
         public HashSet<ScriptValue> m_Objects;
-        public ScriptHashSet(Script script) : base(ObjectType.HashSet) {
-            //不继承,避免分配父级m_Values
+        public ScriptHashSet(Script script) : base(ObjectType.HashSet, script.TypeHashSet) {
             m_Script = script;
-            m_Prototype = script.TypeHashSet;
             m_Objects = new HashSet<ScriptValue>();
         }
         internal ScriptHashSet(Script script, ScriptValue[] parameters, int length) : this(script) {

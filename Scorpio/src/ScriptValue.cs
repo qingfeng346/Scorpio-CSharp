@@ -4,7 +4,7 @@ using Scorpio.Userdata;
 using Scorpio.Exception;
 using System.Runtime.InteropServices;
 namespace Scorpio {
-    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    [StructLayout(LayoutKind.Explicit)]
     public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量
         public static ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
@@ -14,6 +14,7 @@ namespace Scorpio {
         public static readonly ScriptValue False = new ScriptValue(false);
         public static readonly ScriptValue Zero = new ScriptValue((double)0);
         public static readonly ScriptValue InvalidIndex = new ScriptValue((double)-1);
+
 
         public const byte nullValueType = 0;        //null
         public const byte scriptValueType = 1;      //脚本变量
@@ -25,13 +26,12 @@ namespace Scorpio {
         public const byte objectValueType = 7;      //除了 double long 以外的number类型 和 枚举
 
 
-        [FieldOffset(0)] public string stringValue;
-        [FieldOffset(0)] public ScriptObject scriptValue;
-        [FieldOffset(0)] public object objectValue;
+        [FieldOffset(0)] public byte valueType;
         [FieldOffset(8)] public double doubleValue;
         [FieldOffset(8)] public long longValue;
-        [FieldOffset(16)] public byte valueType;
-
+        [FieldOffset(16)] public string stringValue;
+        [FieldOffset(16)] public ScriptObject scriptValue;
+        [FieldOffset(16)] public object objectValue;
 
         public ScriptValue(bool value) {
             this.valueType = value ? trueValueType : falseValueType;
