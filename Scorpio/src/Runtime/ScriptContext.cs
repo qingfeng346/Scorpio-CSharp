@@ -8,7 +8,7 @@ namespace Scorpio.Runtime {
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public partial class ScriptContext {
-        internal class AsyncValue {
+        internal struct AsyncValue {
             public ScriptValue[] variable;
             public ScriptValue[] stack;
         }
@@ -29,6 +29,9 @@ namespace Scorpio.Runtime {
                 TryStackValues[i] = new int[TryStackLength];
             }
         }
+        internal void FreeValue() {
+
+        }
         internal AsyncValue AllocAsyncValue() {
             if (AsyncValueQueue.Count == 0) {
                 return new AsyncValue() { variable = new ScriptValue[64], stack = new ScriptValue[64] };
@@ -36,6 +39,8 @@ namespace Scorpio.Runtime {
             return AsyncValueQueue.Dequeue();
         }
         internal void FreeAsyncValue(AsyncValue value) {
+            Array.Clear(value.variable, 0, value.variable.Length);
+            Array.Clear(value.stack, 0, value.stack.Length);
             AsyncValueQueue.Enqueue(value);
         }
         public Script m_script; //脚本类

@@ -11,11 +11,10 @@ namespace Scorpio.Serialize {
             var datas = new SerializeData[parsers.Count];
             for (var i = 0; i < datas.Length; ++i) {
                 var parser = parsers[i];
-                var constString = parser.ConstString.ConvertAll(_ => string.Intern(_)).ToArray();
                 datas[i] = new SerializeData(parser.Breviary,
                         parser.ConstDouble.ToArray(),
                         parser.ConstLong.ToArray(),
-                        constString,
+                        parser.ConstString.ToArray(),
                         parser.Context,
                         parser.Functions.ToArray(),
                         parser.Classes.ToArray());

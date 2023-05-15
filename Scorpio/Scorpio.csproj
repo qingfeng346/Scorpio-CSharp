@@ -17,6 +17,7 @@
     <RepositoryUrl>https://github.com/qingfeng346/Scorpio-CSharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">

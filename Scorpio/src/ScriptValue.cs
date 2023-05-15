@@ -4,7 +4,7 @@ using Scorpio.Userdata;
 using Scorpio.Exception;
 using System.Runtime.InteropServices;
 namespace Scorpio {
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量
         public static ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组

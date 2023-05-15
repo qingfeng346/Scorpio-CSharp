@@ -10,10 +10,10 @@ namespace Scorpio.Instruction {
         public ScriptFunctionData[] Functions { get; private set; }     //定义的所有 function
         public ScriptClassData[] Classes { get; private set; }          //定义的所有class
         public SerializeData(string breviary) {
-            this.Breviary = string.Intern(breviary);
+            this.Breviary = breviary;
         }
         public SerializeData(string breviary, double[] constDouble, long[] constLong, string[] constString, ScriptFunctionData context, ScriptFunctionData[] functions, ScriptClassData[] classes) {
-            this.Breviary = string.Intern(breviary);
+            this.Breviary = breviary;
             this.ConstDouble = constDouble;
             this.ConstLong = constLong;
             this.ConstString = constString;
