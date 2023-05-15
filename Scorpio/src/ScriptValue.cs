@@ -87,7 +87,7 @@ namespace Scorpio {
             _valueType = falseValueType;
             _objectValue = null;
         }
-        public ScriptValue(bool value) {
+        private ScriptValue(bool value) {
             this._valueType = value ? trueValueType : falseValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -103,7 +103,7 @@ namespace Scorpio {
             this._objectValue = null;
             this._scriptValue = null;
         }
-        public ScriptValue(long value) {
+        private ScriptValue(long value) {
             this._valueType = longValueType;
             this._doubleValue = 0;
             this._longValue = value;
@@ -127,7 +127,7 @@ namespace Scorpio {
             this._objectValue = null;
             this._scriptValue = value;
         }
-        internal ScriptValue(sbyte value) {
+        private ScriptValue(sbyte value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -135,7 +135,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(byte value) {
+        private ScriptValue(byte value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -143,7 +143,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(short value) {
+        private ScriptValue(short value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -151,7 +151,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(ushort value) {
+        private ScriptValue(ushort value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -159,7 +159,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(int value) {
+        private ScriptValue(int value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -167,7 +167,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(uint value) {
+        private ScriptValue(uint value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -175,7 +175,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(ulong value) {
+        private ScriptValue(ulong value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -183,7 +183,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(char value) {
+        private ScriptValue(char value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -191,7 +191,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(float value) {
+        private ScriptValue(float value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -199,7 +199,7 @@ namespace Scorpio {
             this._scriptValue = null;
             this._objectValue = value;
         }
-        internal ScriptValue(decimal value) {
+        private ScriptValue(decimal value) {
             this._valueType = objectValueType;
             this._doubleValue = 0;
             this._longValue = 0;
@@ -390,6 +390,38 @@ namespace Scorpio {
                 }
             }
         }
+        public sbyte ToInt8() {
+            switch (valueType) {
+                case doubleValueType: return (sbyte)doubleValue;
+                case longValueType: return (sbyte)longValue;
+                case objectValueType: return Convert.ToSByte(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int8");
+            }
+        }
+        public byte ToUint8() {
+            switch (valueType) {
+                case doubleValueType: return (byte)doubleValue;
+                case longValueType: return (byte)longValue;
+                case objectValueType: return Convert.ToByte(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 uint8");
+            }
+        }
+        public short ToInt16() {
+            switch (valueType) {
+                case doubleValueType: return (short)doubleValue;
+                case longValueType: return (short)longValue;
+                case objectValueType: return Convert.ToInt16(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int16");
+            }
+        }
+        public ushort ToUint16() {
+            switch (valueType) {
+                case doubleValueType: return (ushort)doubleValue;
+                case longValueType: return (ushort)longValue;
+                case objectValueType: return Convert.ToUInt16(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 uint16");
+            }
+        }
         public int ToInt32() {
             switch (valueType) {
                 case doubleValueType: return (int)doubleValue;
@@ -398,12 +430,12 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
             }
         }
-        public double ToDouble() {
+        public uint ToUint32() {
             switch (valueType) {
-                case doubleValueType: return doubleValue;
-                case longValueType: return longValue;
-                case objectValueType: return Convert.ToDouble(objectValue);
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
+                case doubleValueType: return (uint)doubleValue;
+                case longValueType: return (uint)longValue;
+                case objectValueType: return Convert.ToUInt32(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 uint32");
             }
         }
         public long ToLong() {
@@ -422,12 +454,36 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 ulong");
             }
         }
+        public float ToFloat() {
+            switch (valueType) {
+                case doubleValueType: return (float)doubleValue;
+                case longValueType: return (float)longValue;
+                case objectValueType: return Convert.ToSingle(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 float");
+            }
+        }
+        public double ToDouble() {
+            switch (valueType) {
+                case doubleValueType: return doubleValue;
+                case longValueType: return longValue;
+                case objectValueType: return Convert.ToDouble(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
+            }
+        }
         public char ToChar() {
             switch (valueType) {
                 case doubleValueType: return (char)doubleValue;
                 case longValueType: return (char)longValue;
                 case objectValueType: return Convert.ToChar(objectValue);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
+            }
+        }
+        public decimal ToDecimal() {
+            switch (valueType) {
+                case doubleValueType: return (decimal)doubleValue;
+                case longValueType: return (decimal)longValue;
+                case objectValueType: return Convert.ToDecimal(objectValue);
+                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 decimal");
             }
         }
         public T Get<T>() where T : ScriptObject {
@@ -529,10 +585,21 @@ namespace Scorpio {
                 return new ScriptValue(new ScriptUserdataArray((IList)value, ScorpioTypeManager.GetType(value.GetType())));
             return new ScriptValue(new ScriptUserdataObject(value, ScorpioTypeManager.GetType(value.GetType())));
         }
-        
-        //public static implicit operator ScriptValue(bool value) => new ScriptValue(value);
-        //public static implicit operator ScriptValue(long value) => new ScriptValue(value);
-        //public static implicit operator ScriptValue(double value) => new ScriptValue(value);
+
+        public static implicit operator ScriptValue(sbyte value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(byte value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(short value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(ushort value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(int value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(uint value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(ulong value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(float value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(char value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(decimal value) => new ScriptValue(value);
+
+        public static implicit operator ScriptValue(bool value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(long value) => new ScriptValue(value);
+        public static implicit operator ScriptValue(double value) => new ScriptValue(value);
         //public static implicit operator ScriptValue(string value) => new ScriptValue(value);
         //public static implicit operator ScriptValue(ScriptObject value) => new ScriptValue(value);
     }

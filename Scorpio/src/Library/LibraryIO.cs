@@ -58,7 +58,7 @@ namespace Scorpio.Library {
         }
         private class unixNow : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(UnixNow);
+                return UnixNow;
             }
         }
         private class toString : ScorpioHandle {

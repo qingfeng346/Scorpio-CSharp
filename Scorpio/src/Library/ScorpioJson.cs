@@ -139,11 +139,11 @@ namespace Scorpio.Library {
             if (number.IndexOf('.') >= 0) {
                 return new ScriptValue(double.Parse(number));
             } else if (number[length] == 'L' || number[length] == 'N') {
-                return new ScriptValue(long.Parse(number.Substring(0, length)));
+                return long.Parse(number.Substring(0, length));
             } else {
                 var parsedLong = long.Parse(number);
                 if (m_SupportLong || parsedLong < MinInt || parsedLong > MaxInt) {
-                    return new ScriptValue(parsedLong);
+                    return parsedLong;
                 } else {
                     return new ScriptValue(System.Convert.ToDouble(parsedLong));
                 }

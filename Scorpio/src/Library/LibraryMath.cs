@@ -111,7 +111,7 @@ namespace Scorpio.Library {
                 var value = args[0];
                 switch (value.valueType) {
                     case ScriptValue.doubleValueType: return new ScriptValue(value.doubleValue >= 0 ? value.doubleValue : -value.doubleValue);
-                    case ScriptValue.longValueType: return new ScriptValue(value.longValue >= 0 ? value.longValue : -value.longValue);
+                    case ScriptValue.longValueType: return value.longValue >= 0 ? value.longValue : -value.longValue;
                     default: return value;
                 }
             }
@@ -157,9 +157,9 @@ namespace Scorpio.Library {
                     }
                     case ScriptValue.longValueType: {
                         var min = Convert.ToInt64(args[1].Value);
-                        if (value.longValue < min) return new ScriptValue(min);
+                        if (value.longValue < min) return min;
                         var max = Convert.ToInt64(args[2].Value);
-                        if (value.longValue > max) return new ScriptValue(max);
+                        if (value.longValue > max) return max;
                         return value;
                     }
                     default: return value;
