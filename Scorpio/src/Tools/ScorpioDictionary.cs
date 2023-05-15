@@ -25,7 +25,6 @@ namespace Scorpio {
         }
         protected void SetCapacity(int value) {
             if (value > 0) {
-                List<int> e;
                 var array = new Value[value];
                 if (size > 0) {
                     Array.Copy(values, 0, array, 0, size);

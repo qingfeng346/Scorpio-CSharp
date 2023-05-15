@@ -25,13 +25,14 @@ namespace Scorpio {
         public const byte stringValueType = 6;      //string
         public const byte objectValueType = 7;      //除了 double long 以外的number类型 和 枚举
 
-
-        [FieldOffset(0)] public byte valueType;
+        [FieldOffset(0)] public string stringValue;
+        [FieldOffset(0)] public ScriptObject scriptValue;
+        [FieldOffset(0)] public object objectValue;
         [FieldOffset(8)] public double doubleValue;
         [FieldOffset(8)] public long longValue;
-        [FieldOffset(16)] public string stringValue;
-        [FieldOffset(16)] public ScriptObject scriptValue;
-        [FieldOffset(16)] public object objectValue;
+        [FieldOffset(16)] public byte valueType;
+        
+
 
         public ScriptValue(bool value) {
             this.valueType = value ? trueValueType : falseValueType;
@@ -476,10 +477,10 @@ namespace Scorpio {
             return new ScriptValue(new ScriptUserdataObject(value, ScorpioTypeManager.GetType(value.GetType())));
         }
         
-        public static implicit operator ScriptValue(bool value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(long value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(double value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(string value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(ScriptObject value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(bool value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(long value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(double value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(string value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(ScriptObject value) => new ScriptValue(value);
     }
 }
