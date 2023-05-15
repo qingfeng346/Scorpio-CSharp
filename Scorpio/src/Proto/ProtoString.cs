@@ -50,7 +50,7 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var isCode = length > 1 ? args[1].IsTrue : true;
                 if (isCode) {
-                    return new ScriptValue(thisObject.stringValue[args[0].ToInt32()]);
+                    return thisObject.stringValue[args[0].ToInt32()];
                 } else {
                     return new ScriptValue(thisObject.stringValue[args[0].ToInt32()].ToString());
                 }
@@ -296,11 +296,11 @@ namespace Scorpio.Proto {
                 if (isArray) {
                     var ret = new ScriptArray(m_script);
                     foreach (var c in str) {
-                        ret.Add(new ScriptValue(c));
+                        ret.Add(c);
                     }
                     return new ScriptValue(ret);
                 } else {
-                    return new ScriptValue(str[0]);
+                    return str[0];
                 }
             }
         }

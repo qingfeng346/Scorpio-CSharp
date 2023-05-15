@@ -87,26 +87,11 @@ namespace Scorpio {
             _valueType = falseValueType;
             _objectValue = null;
         }
-        private ScriptValue(bool value) {
-            this._valueType = value ? trueValueType : falseValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
-            this._stringValue = null;
-            this._objectValue = null;
-            this._scriptValue = null;
-        }
+
         public ScriptValue(double value) {
             this._valueType = doubleValueType;
             this._longValue = 0;
             this._doubleValue = value;
-            this._stringValue = null;
-            this._objectValue = null;
-            this._scriptValue = null;
-        }
-        private ScriptValue(long value) {
-            this._valueType = longValueType;
-            this._doubleValue = 0;
-            this._longValue = value;
             this._stringValue = null;
             this._objectValue = null;
             this._scriptValue = null;
@@ -126,6 +111,23 @@ namespace Scorpio {
             this._stringValue = null;
             this._objectValue = null;
             this._scriptValue = value;
+        }
+        
+        private ScriptValue(bool value) {
+            this._valueType = value ? trueValueType : falseValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._objectValue = null;
+            this._scriptValue = null;
+        }
+        private ScriptValue(long value) {
+            this._valueType = longValueType;
+            this._doubleValue = 0;
+            this._longValue = value;
+            this._stringValue = null;
+            this._objectValue = null;
+            this._scriptValue = null;
         }
         private ScriptValue(sbyte value) {
             this._valueType = objectValueType;

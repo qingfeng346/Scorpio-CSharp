@@ -10,13 +10,13 @@ namespace Scorpio {
             }
         }
         public override ScriptValue GetValue(double index) {
-            return new ScriptValue(Builder[(int)index]);
+            return Builder[(int)index];
         }
         public override ScriptValue GetValue(long index) {
-            return new ScriptValue(Builder[(int)index]);
+            return Builder[(int)index];
         }
         public override ScriptValue GetValue(object index) {
-            return new ScriptValue(Builder[Convert.ToInt32(index)]);
+            return Builder[Convert.ToInt32(index)];
         }
         public override void SetValue(double index, ScriptValue value) {
             Builder[(int)index] = value.ToChar();
