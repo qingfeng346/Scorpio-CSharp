@@ -162,7 +162,7 @@ namespace Scorpio {
             if (index < 0 || index >= m_Length) throw new ExecutionException($"Array.RemoveAt 索引小于0或超过最大值 index:{index} length:{m_Length}");
             m_Length--;
             Array.Copy(m_Objects, index + 1, m_Objects, index, m_Length - index);
-            m_Objects[m_Length].valueType = ScriptValue.nullValueType;
+            m_Objects[m_Length].SetNull();
         }
         public bool Contains(ScriptValue obj) {
             for (int i = 0; i < m_Length; ++i) {

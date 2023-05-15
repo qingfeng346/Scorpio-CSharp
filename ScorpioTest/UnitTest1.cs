@@ -14,7 +14,7 @@ namespace Scorpio {
         }
         [TestMethod]
         public unsafe void TestMemory() {
-            Console.WriteLine(sizeof(ScriptValue));
+            //Console.WriteLine(sizeof(ScriptValue));
             //var script = new Script();
             //foreach (var value in script.Global) {
             //    var map = value.Value.Get<ScriptMapString>();

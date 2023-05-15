@@ -68,7 +68,6 @@ namespace Scorpio.Runtime {
                     array.Add(args[i]);
                 }
                 stackObjects[++stackIndex].scriptValue = array;
-                stackObjects[stackIndex].valueType = ScriptValue.scriptValueType;
                 for (var i = parameterCount - 2; i >= 0; --i) {
                     stackObjects[++stackIndex] = i >= length ? ScriptValue.Null : args[i];
                 }
@@ -98,61 +97,53 @@ namespace Scorpio.Runtime {
                             #region Load
                             case Opcode.LoadConstDouble: {
                                 stackObjects[++stackIndex].doubleValue = constDouble[opvalue];
-                                stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
                                 continue;
                             }
                             case Opcode.LoadConstString: {
                                 stackObjects[++stackIndex].stringValue = constString[opvalue];
-                                stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
                                 continue;
                             }
                             case Opcode.LoadConstNull: {
-                                stackObjects[++stackIndex].valueType = ScriptValue.nullValueType;
+                                stackObjects[++stackIndex].SetNull();
                                 continue;
                             }
                             case Opcode.LoadConstTrue: {
-                                stackObjects[++stackIndex].valueType = ScriptValue.trueValueType;
+                                stackObjects[++stackIndex].SetTrue();
                                 continue;
                             }
                             case Opcode.LoadConstFalse: {
-                                stackObjects[++stackIndex].valueType = ScriptValue.falseValueType;
+                                stackObjects[++stackIndex].SetFalse();
                                 continue;
                             }
                             case Opcode.LoadConstLong: {
                                 stackObjects[++stackIndex].longValue = constLong[opvalue];
-                                stackObjects[stackIndex].valueType = ScriptValue.longValueType;
                                 continue;
                             }
                             case Opcode.LoadLocal: {
                                 switch (variableObjects[opvalue].valueType) {
                                     case ScriptValue.scriptValueType:
                                         stackObjects[++stackIndex].scriptValue = variableObjects[opvalue].scriptValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.scriptValueType;
                                         continue;
                                     case ScriptValue.doubleValueType:
                                         stackObjects[++stackIndex].doubleValue = variableObjects[opvalue].doubleValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
                                         continue;
                                     case ScriptValue.nullValueType:
-                                        stackObjects[++stackIndex].valueType = ScriptValue.nullValueType;
+                                        stackObjects[++stackIndex].SetNull();
                                         continue;
                                     case ScriptValue.trueValueType:
-                                        stackObjects[++stackIndex].valueType = ScriptValue.trueValueType;
+                                        stackObjects[++stackIndex].SetTrue();
                                         continue;
                                     case ScriptValue.falseValueType:
-                                        stackObjects[++stackIndex].valueType = ScriptValue.falseValueType;
+                                        stackObjects[++stackIndex].SetFalse();
                                         continue;
                                     case ScriptValue.stringValueType:
                                         stackObjects[++stackIndex].stringValue = variableObjects[opvalue].stringValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
                                         continue;
                                     case ScriptValue.longValueType:
                                         stackObjects[++stackIndex].longValue = variableObjects[opvalue].longValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.longValueType;
                                         continue;
                                     case ScriptValue.objectValueType:
                                         stackObjects[++stackIndex].objectValue = variableObjects[opvalue].objectValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.objectValueType;
                                         continue;
                                     default:
                                         throw new ExecutionException($"LoadLocal : 未知错误数据类型 : {variableObjects[opvalue].ValueTypeName}");
@@ -162,32 +153,27 @@ namespace Scorpio.Runtime {
                                 switch (internalObjects[opvalue].value.valueType) {
                                     case ScriptValue.scriptValueType:
                                         stackObjects[++stackIndex].scriptValue = internalObjects[opvalue].value.scriptValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.scriptValueType;
                                         continue;
                                     case ScriptValue.doubleValueType:
                                         stackObjects[++stackIndex].doubleValue = internalObjects[opvalue].value.doubleValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
                                         continue;
                                     case ScriptValue.nullValueType:
-                                        stackObjects[++stackIndex].valueType = ScriptValue.nullValueType;
+                                        stackObjects[++stackIndex].SetNull();
                                         continue;
                                     case ScriptValue.trueValueType:
-                                        stackObjects[++stackIndex].valueType = ScriptValue.trueValueType;
+                                        stackObjects[++stackIndex].SetTrue();
                                         continue;
                                     case ScriptValue.falseValueType:
-                                        stackObjects[++stackIndex].valueType = ScriptValue.falseValueType;
+                                        stackObjects[++stackIndex].SetFalse();
                                         continue;
                                     case ScriptValue.stringValueType:
                                         stackObjects[++stackIndex].stringValue = internalObjects[opvalue].value.stringValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
                                         continue;
                                     case ScriptValue.longValueType:
                                         stackObjects[++stackIndex].longValue = internalObjects[opvalue].value.longValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.longValueType;
                                         continue;
                                     case ScriptValue.objectValueType:
                                         stackObjects[++stackIndex].objectValue = internalObjects[opvalue].value.objectValue;
-                                        stackObjects[stackIndex].valueType = ScriptValue.objectValueType;
                                         continue;
                                     default:
                                         throw new ExecutionException($"LoadInternal : 未知错误数据类型 : {internalObjects[opvalue].value.valueType}");
@@ -265,11 +251,11 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.LoadBase: {
-    #if EXECUTE_BASE
-                                stackObjects[++stackIndex] = new ScriptValue(baseType.Prototype);
-    #else
-                                    stackObjects[++stackIndex] = new ScriptValue(thisObject.Get<ScriptInstance>().Prototype.Prototype);
-    #endif
+#if EXECUTE_BASE
+                                stackObjects[++stackIndex].scriptValue = baseType.Prototype;
+#else
+                                stackObjects[++stackIndex].scriptValue = thisObject.Get<ScriptInstance>().Prototype.Prototype;
+#endif
                                 continue;
                             }
                             case Opcode.ToGlobal: {
@@ -301,32 +287,27 @@ namespace Scorpio.Runtime {
                                 switch (stackObjects[stackIndex].valueType) {
                                     case ScriptValue.scriptValueType:
                                         variableObjects[opvalue].scriptValue = stackObjects[stackIndex].scriptValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.scriptValueType;
                                         continue;
                                     case ScriptValue.doubleValueType:
                                         variableObjects[opvalue].doubleValue = stackObjects[stackIndex].doubleValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.doubleValueType;
                                         continue;
                                     case ScriptValue.nullValueType:
-                                        variableObjects[opvalue].valueType = ScriptValue.nullValueType;
+                                        variableObjects[opvalue].SetNull();
                                         continue;
                                     case ScriptValue.trueValueType:
-                                        variableObjects[opvalue].valueType = ScriptValue.trueValueType;
+                                        variableObjects[opvalue].SetTrue();
                                         continue;
                                     case ScriptValue.falseValueType:
-                                        variableObjects[opvalue].valueType = ScriptValue.falseValueType;
+                                        variableObjects[opvalue].SetFalse();
                                         continue;
                                     case ScriptValue.stringValueType:
                                         variableObjects[opvalue].stringValue = stackObjects[stackIndex].stringValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.stringValueType;
                                         continue;
                                     case ScriptValue.longValueType:
                                         variableObjects[opvalue].longValue = stackObjects[stackIndex].longValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.longValueType;
                                         continue;
                                     case ScriptValue.objectValueType:
                                         variableObjects[opvalue].objectValue = stackObjects[stackIndex].objectValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.objectValueType;
                                         continue;
                                     default:
                                         throw new ExecutionException($"StoreLocalAssign : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
@@ -336,32 +317,27 @@ namespace Scorpio.Runtime {
                                 switch (stackObjects[stackIndex].valueType) {
                                     case ScriptValue.scriptValueType:
                                         internalObjects[opvalue].value.scriptValue = stackObjects[stackIndex].scriptValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
                                         continue;
                                     case ScriptValue.doubleValueType:
                                         internalObjects[opvalue].value.doubleValue = stackObjects[stackIndex].doubleValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
                                         continue;
                                     case ScriptValue.nullValueType:
-                                        internalObjects[opvalue].value.valueType = ScriptValue.nullValueType;
+                                        internalObjects[opvalue].value.SetNull();
                                         continue;
                                     case ScriptValue.trueValueType:
-                                        internalObjects[opvalue].value.valueType = ScriptValue.trueValueType;
+                                        internalObjects[opvalue].value.SetTrue();
                                         continue;
                                     case ScriptValue.falseValueType:
-                                        internalObjects[opvalue].value.valueType = ScriptValue.falseValueType;
+                                        internalObjects[opvalue].value.SetFalse();
                                         continue;
                                     case ScriptValue.stringValueType:
                                         internalObjects[opvalue].value.stringValue = stackObjects[stackIndex].stringValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
                                         continue;
                                     case ScriptValue.longValueType:
                                         internalObjects[opvalue].value.longValue = stackObjects[stackIndex].longValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
                                         continue;
                                     case ScriptValue.objectValueType:
                                         internalObjects[opvalue].value.objectValue = stackObjects[stackIndex].objectValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
                                         continue;
                                     default:
                                         throw new ExecutionException("StoreInternalAssign : 未知错误数据类型 : " + stackObjects[stackIndex].valueType);
@@ -419,32 +395,27 @@ namespace Scorpio.Runtime {
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.scriptValueType:
                                         variableObjects[opvalue].scriptValue = stackObjects[tempIndex].scriptValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.scriptValueType;
                                         continue;
                                     case ScriptValue.doubleValueType:
                                         variableObjects[opvalue].doubleValue = stackObjects[tempIndex].doubleValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.doubleValueType;
                                         continue;
                                     case ScriptValue.nullValueType:
-                                        variableObjects[opvalue].valueType = ScriptValue.nullValueType;
+                                        variableObjects[opvalue].SetNull();
                                         continue;
                                     case ScriptValue.trueValueType:
-                                        variableObjects[opvalue].valueType = ScriptValue.trueValueType;
+                                        variableObjects[opvalue].SetTrue();
                                         continue;
                                     case ScriptValue.falseValueType:
-                                        variableObjects[opvalue].valueType = ScriptValue.falseValueType;
+                                        variableObjects[opvalue].SetFalse();
                                         continue;
                                     case ScriptValue.stringValueType:
                                         variableObjects[opvalue].stringValue = stackObjects[tempIndex].stringValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.stringValueType;
                                         continue;
                                     case ScriptValue.longValueType:
                                         variableObjects[opvalue].longValue = stackObjects[tempIndex].longValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.longValueType;
                                         continue;
                                     case ScriptValue.objectValueType:
                                         variableObjects[opvalue].objectValue = stackObjects[tempIndex].objectValue;
-                                        variableObjects[opvalue].valueType = ScriptValue.objectValueType;
                                         continue;
                                     default:
                                         throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
@@ -455,32 +426,27 @@ namespace Scorpio.Runtime {
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.scriptValueType:
                                         internalObjects[opvalue].value.scriptValue = stackObjects[tempIndex].scriptValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
                                         continue;
                                     case ScriptValue.doubleValueType:
                                         internalObjects[opvalue].value.doubleValue = stackObjects[tempIndex].doubleValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
                                         continue;
                                     case ScriptValue.nullValueType:
-                                        internalObjects[opvalue].value.valueType = ScriptValue.nullValueType;
+                                        internalObjects[opvalue].value.SetNull();
                                         continue;
                                     case ScriptValue.trueValueType:
-                                        internalObjects[opvalue].value.valueType = ScriptValue.trueValueType;
+                                        internalObjects[opvalue].value.SetTrue();
                                         continue;
                                     case ScriptValue.falseValueType:
-                                        internalObjects[opvalue].value.valueType = ScriptValue.falseValueType;
+                                        internalObjects[opvalue].value.SetFalse();
                                         continue;
                                     case ScriptValue.stringValueType:
                                         internalObjects[opvalue].value.stringValue = stackObjects[tempIndex].stringValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
                                         continue;
                                     case ScriptValue.longValueType:
                                         internalObjects[opvalue].value.longValue = stackObjects[tempIndex].longValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
                                         continue;
                                     case ScriptValue.objectValueType:
                                         internalObjects[opvalue].value.objectValue = stackObjects[tempIndex].objectValue;
-                                        internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
                                         continue;
                                     default:
                                         throw new ExecutionException("StoreInternal : 未知错误数据类型 : " + stackObjects[tempIndex].valueType);
@@ -542,26 +508,14 @@ namespace Scorpio.Runtime {
                                     default: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
                                             stackObjects[tempIndex].stringValue = stackObjects[tempIndex].ToString() + stackObjects[stackIndex].stringValue;
-                                            stackObjects[tempIndex].valueType = ScriptValue.stringValueType;
                                         } else {
                                             if (tempValueType == ScriptValue.doubleValueType) {
-                                                if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                                    stackObjects[tempIndex].doubleValue += stackObjects[stackIndex].doubleValue;
-                                                } else {
-                                                    stackObjects[tempIndex].doubleValue += stackObjects[stackIndex].ToDouble();
-                                                }
+                                                stackObjects[tempIndex].doubleValue += stackObjects[stackIndex].ToDouble();
                                             } else if (tempValueType == ScriptValue.longValueType) {
-                                                switch (stackObjects[stackIndex].valueType) {
-                                                    case ScriptValue.longValueType:
-                                                        stackObjects[tempIndex].longValue += stackObjects[stackIndex].longValue;
-                                                        break;
-                                                    case ScriptValue.doubleValueType:
-                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue + stackObjects[stackIndex].doubleValue;
-                                                        stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
-                                                        break;
-                                                    default:
-                                                        stackObjects[tempIndex].longValue += stackObjects[stackIndex].ToLong();
-                                                        break;
+                                                if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                                    stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue + stackObjects[stackIndex].doubleValue;
+                                                } else {
+                                                    stackObjects[tempIndex].longValue += stackObjects[stackIndex].ToLong();
                                                 }
                                             } else {
                                                 throw new ExecutionException($"【+】运算符不支持当前类型 : {stackObjects[tempIndex].ValueTypeName}");
@@ -576,11 +530,7 @@ namespace Scorpio.Runtime {
                                 tempIndex = stackIndex - 1;
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.doubleValueType: {
-                                        if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                            stackObjects[tempIndex].doubleValue -= stackObjects[stackIndex].doubleValue;
-                                        } else {
-                                            stackObjects[tempIndex].doubleValue -= stackObjects[stackIndex].ToDouble();
-                                        }
+                                        stackObjects[tempIndex].doubleValue -= stackObjects[stackIndex].ToDouble();
                                         --stackIndex;
                                         continue;
                                     }
@@ -590,17 +540,10 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.longValueType: {
-                                        switch (stackObjects[stackIndex].valueType) {
-                                            case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].longValue -= stackObjects[stackIndex].longValue;
-                                                break;
-                                            case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue - stackObjects[stackIndex].doubleValue;
-                                                stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
-                                                break;
-                                            default:
-                                                stackObjects[tempIndex].longValue += stackObjects[stackIndex].ToLong();
-                                                break;
+                                        if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                            stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue - stackObjects[stackIndex].doubleValue;
+                                        } else {
+                                            stackObjects[tempIndex].longValue -= stackObjects[stackIndex].ToLong();
                                         }
                                         --stackIndex;
                                         continue;
@@ -613,11 +556,7 @@ namespace Scorpio.Runtime {
                                 tempIndex = stackIndex - 1;
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.doubleValueType: {
-                                        if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                            stackObjects[tempIndex].doubleValue *= stackObjects[stackIndex].doubleValue;
-                                        } else {
-                                            stackObjects[tempIndex].doubleValue *= stackObjects[stackIndex].ToDouble();
-                                        }
+                                        stackObjects[tempIndex].doubleValue *= stackObjects[stackIndex].ToDouble();
                                         --stackIndex;
                                         continue;
                                     }
@@ -627,17 +566,10 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.longValueType: {
-                                        switch (stackObjects[stackIndex].valueType) {
-                                            case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].longValue *= stackObjects[stackIndex].longValue;
-                                                break;
-                                            case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue * stackObjects[stackIndex].doubleValue;
-                                                stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
-                                                break;
-                                            default:
-                                                stackObjects[tempIndex].longValue *= stackObjects[stackIndex].ToLong();
-                                                break;
+                                        if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                            stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue * stackObjects[stackIndex].doubleValue;
+                                        } else {
+                                            stackObjects[tempIndex].longValue *= stackObjects[stackIndex].ToLong();
                                         }
                                         --stackIndex;
                                         continue;
@@ -650,11 +582,7 @@ namespace Scorpio.Runtime {
                                 tempIndex = stackIndex - 1;
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.doubleValueType: {
-                                        if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                            stackObjects[tempIndex].doubleValue /= stackObjects[stackIndex].doubleValue;
-                                        } else {
-                                            stackObjects[tempIndex].doubleValue /= stackObjects[stackIndex].ToDouble();
-                                        }
+                                        stackObjects[tempIndex].doubleValue /= stackObjects[stackIndex].ToDouble();
                                         --stackIndex;
                                         continue;
                                     }
@@ -664,17 +592,10 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.longValueType: {
-                                        switch (stackObjects[stackIndex].valueType) {
-                                            case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].longValue /= stackObjects[stackIndex].longValue;
-                                                break;
-                                            case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue / stackObjects[stackIndex].doubleValue;
-                                                stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
-                                                break;
-                                            default:
-                                                stackObjects[tempIndex].longValue /= stackObjects[stackIndex].ToLong();
-                                                break;
+                                        if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                            stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue / stackObjects[stackIndex].doubleValue;
+                                        } else {
+                                            stackObjects[tempIndex].longValue /= stackObjects[stackIndex].ToLong();
                                         }
                                         --stackIndex;
                                         continue;
@@ -687,11 +608,7 @@ namespace Scorpio.Runtime {
                                 tempIndex = stackIndex - 1;
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.doubleValueType: {
-                                        if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                            stackObjects[tempIndex].doubleValue %= stackObjects[stackIndex].doubleValue;
-                                        } else {
-                                            stackObjects[tempIndex].doubleValue %= stackObjects[stackIndex].ToDouble();
-                                        }
+                                        stackObjects[tempIndex].doubleValue %= stackObjects[stackIndex].ToDouble();
                                         --stackIndex;
                                         continue;
                                     }
@@ -701,17 +618,10 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.longValueType: {
-                                        switch (stackObjects[stackIndex].valueType) {
-                                            case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].longValue %= stackObjects[stackIndex].longValue;
-                                                break;
-                                            case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue % stackObjects[stackIndex].doubleValue;
-                                                stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
-                                                break;
-                                            default:
-                                                stackObjects[tempIndex].longValue %= stackObjects[stackIndex].ToLong();
-                                                break;
+                                        if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
+                                            stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue % stackObjects[stackIndex].doubleValue;
+                                        } else {
+                                            stackObjects[tempIndex].longValue %= stackObjects[stackIndex].ToLong();
                                         }
                                         --stackIndex;
                                         continue;
@@ -724,11 +634,7 @@ namespace Scorpio.Runtime {
                                 tempIndex = stackIndex - 1;
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.longValueType: {
-                                        if (stackObjects[stackIndex].valueType == ScriptValue.longValueType) {
-                                            stackObjects[tempIndex].longValue |= stackObjects[stackIndex].longValue;
-                                        } else {
-                                            stackObjects[tempIndex].longValue |= stackObjects[stackIndex].ToLong();
-                                        }
+                                        stackObjects[tempIndex].longValue |= stackObjects[stackIndex].ToLong();
                                         --stackIndex;
                                         continue;
                                     }
@@ -742,7 +648,7 @@ namespace Scorpio.Runtime {
                                             case ScriptValue.falseValueType:
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].SetTrue();
                                                 break;
                                         }
                                         --stackIndex;
@@ -761,11 +667,7 @@ namespace Scorpio.Runtime {
                                 tempIndex = stackIndex - 1;
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.longValueType: {
-                                        if (stackObjects[stackIndex].valueType == ScriptValue.longValueType) {
-                                            stackObjects[tempIndex].longValue &= stackObjects[stackIndex].longValue;
-                                        } else {
-                                            stackObjects[tempIndex].longValue &= stackObjects[stackIndex].ToLong();
-                                        }
+                                        stackObjects[tempIndex].longValue &= stackObjects[stackIndex].ToLong();
                                         --stackIndex;
                                         continue;
                                     }
@@ -777,7 +679,7 @@ namespace Scorpio.Runtime {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.nullValueType:
                                             case ScriptValue.falseValueType:
-                                                stackObjects[tempIndex].valueType = ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].SetFalse();
                                                 break;
                                         }
                                         --stackIndex;
@@ -796,11 +698,7 @@ namespace Scorpio.Runtime {
                                 tempIndex = stackIndex - 1;
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.longValueType: {
-                                        if (stackObjects[stackIndex].valueType == ScriptValue.longValueType) {
-                                            stackObjects[tempIndex].longValue ^= stackObjects[stackIndex].longValue;
-                                        } else {
-                                            stackObjects[tempIndex].longValue ^= stackObjects[stackIndex].ToLong();
-                                        }
+                                        stackObjects[tempIndex].longValue ^= stackObjects[stackIndex].ToLong();
                                         --stackIndex;
                                         continue;
                                     }
@@ -850,11 +748,11 @@ namespace Scorpio.Runtime {
                             case Opcode.FlagNot: {
                                 switch (stackObjects[stackIndex].valueType) {
                                     case ScriptValue.trueValueType:
-                                        stackObjects[stackIndex].valueType = ScriptValue.falseValueType;
+                                        stackObjects[stackIndex].SetFalse();
                                         continue;
                                     case ScriptValue.falseValueType:
                                     case ScriptValue.nullValueType:
-                                        stackObjects[stackIndex].valueType = ScriptValue.trueValueType;
+                                        stackObjects[stackIndex].SetTrue();
                                         continue;
                                     default:
                                         throw new ExecutionException($"当前数据类型不支持取反操作 : {stackObjects[stackIndex].ValueTypeName}");
@@ -889,13 +787,13 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.doubleValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].doubleValue;
                                                 break;
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].longValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].SetFalse();
                                                 break;
                                         }
                                         --stackIndex;
@@ -903,9 +801,9 @@ namespace Scorpio.Runtime {
                                     }
                                     case ScriptValue.stringValueType: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].stringValue == stackObjects[stackIndex].stringValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].stringValue == stackObjects[stackIndex].stringValue;
                                         } else {
-                                            stackObjects[tempIndex].valueType = ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].SetFalse();
                                         }
                                         --stackIndex;
                                         continue;
@@ -913,32 +811,32 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.trueValueType:
                                     case ScriptValue.nullValueType:
                                     case ScriptValue.falseValueType: {
-                                        stackObjects[tempIndex].valueType = tempValueType == stackObjects[stackIndex].valueType ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = tempValueType == stackObjects[stackIndex].valueType;
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.longValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue == stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue == stackObjects[stackIndex].longValue;
                                                 break;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue == stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue == stackObjects[stackIndex].doubleValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].SetFalse();
                                                 break;
                                         }
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].scriptValue.Equals(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].scriptValue.Equals(stackObjects[stackIndex]);
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.objectValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].objectValue.Equals(stackObjects[stackIndex].Value) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].objectValue.Equals(stackObjects[stackIndex].Value);
                                         --stackIndex;
                                         continue;
                                     }
@@ -953,13 +851,13 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.doubleValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].doubleValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue != stackObjects[stackIndex].doubleValue;
                                                 break;
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].longValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue != stackObjects[stackIndex].longValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].SetTrue();
                                                 break;
                                         }
                                         --stackIndex;
@@ -967,9 +865,9 @@ namespace Scorpio.Runtime {
                                     }
                                     case ScriptValue.stringValueType: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].stringValue == stackObjects[stackIndex].stringValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].stringValue != stackObjects[stackIndex].stringValue;
                                         } else {
-                                            stackObjects[tempIndex].valueType = ScriptValue.trueValueType;
+                                            stackObjects[tempIndex].SetTrue();
                                         }
                                         --stackIndex;
                                         continue;
@@ -977,32 +875,32 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.trueValueType:
                                     case ScriptValue.nullValueType:
                                     case ScriptValue.falseValueType: {
-                                        stackObjects[tempIndex].valueType = tempValueType == stackObjects[stackIndex].valueType ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                        stackObjects[tempIndex].boolValue = tempValueType != stackObjects[stackIndex].valueType;
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.longValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue == stackObjects[stackIndex].longValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue != stackObjects[stackIndex].longValue;
                                                 break;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue == stackObjects[stackIndex].doubleValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue != stackObjects[stackIndex].doubleValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].SetTrue();
                                                 break;
                                         }
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].scriptValue.Equals(stackObjects[stackIndex]) ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                        stackObjects[tempIndex].boolValue = !stackObjects[tempIndex].scriptValue.Equals(stackObjects[stackIndex]);
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.objectValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].objectValue.Equals(stackObjects[stackIndex].Value) ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                        stackObjects[tempIndex].boolValue = !stackObjects[tempIndex].objectValue.Equals(stackObjects[stackIndex].Value);
                                         --stackIndex;
                                         continue;
                                     }
@@ -1015,9 +913,9 @@ namespace Scorpio.Runtime {
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.doubleValueType: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue < stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue < stackObjects[stackIndex].doubleValue;
                                         } else {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue < stackObjects[stackIndex].ToDouble() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue < stackObjects[stackIndex].ToDouble();
                                         }
                                         --stackIndex;
                                         continue;
@@ -1025,20 +923,20 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.longValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue < stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue < stackObjects[stackIndex].longValue;
                                                 break;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue < stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue < stackObjects[stackIndex].doubleValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue < stackObjects[stackIndex].ToLong() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue < stackObjects[stackIndex].ToLong();
                                                 break;
                                         }
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].scriptValue.Less(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].scriptValue.Less(stackObjects[stackIndex]);
                                         --stackIndex;
                                         continue;
                                     }
@@ -1051,9 +949,9 @@ namespace Scorpio.Runtime {
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.doubleValueType: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue <= stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue <= stackObjects[stackIndex].doubleValue;
                                         } else {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue <= stackObjects[stackIndex].ToDouble() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue <= stackObjects[stackIndex].ToDouble();
                                         }
                                         --stackIndex;
                                         continue;
@@ -1061,20 +959,20 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.longValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue <= stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue <= stackObjects[stackIndex].longValue;
                                                 break;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue <= stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue <= stackObjects[stackIndex].doubleValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue <= stackObjects[stackIndex].ToLong() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue <= stackObjects[stackIndex].ToLong();
                                                 break;
                                         }
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].scriptValue.LessOrEqual(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].scriptValue.LessOrEqual(stackObjects[stackIndex]);
                                         --stackIndex;
                                         continue;
                                     }
@@ -1087,9 +985,9 @@ namespace Scorpio.Runtime {
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.doubleValueType: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue > stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue > stackObjects[stackIndex].doubleValue;
                                         } else {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue > stackObjects[stackIndex].ToDouble() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue > stackObjects[stackIndex].ToDouble();
                                         }
                                         --stackIndex;
                                         continue;
@@ -1097,20 +995,20 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.longValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue > stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue > stackObjects[stackIndex].longValue;
                                                 break;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue > stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue > stackObjects[stackIndex].doubleValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue > stackObjects[stackIndex].ToLong() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue > stackObjects[stackIndex].ToLong();
                                                 break;
                                         }
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].scriptValue.Greater(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].scriptValue.Greater(stackObjects[stackIndex]);
                                         --stackIndex;
                                         continue;
                                     }
@@ -1123,9 +1021,9 @@ namespace Scorpio.Runtime {
                                 switch (stackObjects[tempIndex].valueType) {
                                     case ScriptValue.doubleValueType: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue >= stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue >= stackObjects[stackIndex].doubleValue;
                                         } else {
-                                            stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue >= stackObjects[stackIndex].ToDouble() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue >= stackObjects[stackIndex].ToDouble();
                                         }
                                         --stackIndex;
                                         continue;
@@ -1133,20 +1031,20 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.longValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue >= stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue >= stackObjects[stackIndex].longValue;
                                                 break;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue >= stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue >= stackObjects[stackIndex].doubleValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue >= stackObjects[stackIndex].ToLong() ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue >= stackObjects[stackIndex].ToLong();
                                                 break;
                                         }
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].scriptValue.GreaterOrEqual(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].scriptValue.GreaterOrEqual(stackObjects[stackIndex]);
                                         --stackIndex;
                                         continue;
                                     }
@@ -1161,13 +1059,13 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.doubleValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].doubleValue;
                                                 break;
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].longValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].SetFalse();
                                                 break;
                                         }
                                         --stackIndex;
@@ -1175,9 +1073,9 @@ namespace Scorpio.Runtime {
                                     }
                                     case ScriptValue.stringValueType: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
-                                            stackObjects[tempIndex].valueType = ReferenceEquals(stackObjects[tempIndex].stringValue, stackObjects[stackIndex].stringValue) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].boolValue = ReferenceEquals(stackObjects[tempIndex].stringValue, stackObjects[stackIndex].stringValue);
                                         } else {
-                                            stackObjects[tempIndex].valueType = ScriptValue.falseValueType;
+                                            stackObjects[tempIndex].SetFalse();
                                         }
                                         --stackIndex;
                                         continue;
@@ -1185,32 +1083,32 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.trueValueType:
                                     case ScriptValue.nullValueType:
                                     case ScriptValue.falseValueType: {
-                                        stackObjects[tempIndex].valueType = tempValueType == stackObjects[stackIndex].valueType ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = tempValueType == stackObjects[stackIndex].valueType;
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.longValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue == stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue == stackObjects[stackIndex].longValue;
                                                 break;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue == stackObjects[stackIndex].doubleValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue == stackObjects[stackIndex].doubleValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].SetFalse();
                                                 break;
                                         }
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].scriptValue.EqualReference(stackObjects[stackIndex]) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].scriptValue.EqualReference(stackObjects[stackIndex]);
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.objectValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].objectValue.Equals(stackObjects[stackIndex].Value) ? ScriptValue.trueValueType : ScriptValue.falseValueType;
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].objectValue.Equals(stackObjects[stackIndex].Value);
                                         --stackIndex;
                                         continue;
                                     }
@@ -1225,13 +1123,13 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.doubleValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].doubleValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue != stackObjects[stackIndex].doubleValue;
                                                 break;
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].longValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue != stackObjects[stackIndex].longValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].SetTrue();
                                                 break;
                                         }
                                         --stackIndex;
@@ -1239,9 +1137,9 @@ namespace Scorpio.Runtime {
                                     }
                                     case ScriptValue.stringValueType: {
                                         if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
-                                            stackObjects[tempIndex].valueType = ReferenceEquals(stackObjects[tempIndex].stringValue, stackObjects[stackIndex].stringValue) ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                            stackObjects[tempIndex].boolValue = !ReferenceEquals(stackObjects[tempIndex].stringValue, stackObjects[stackIndex].stringValue);
                                         } else {
-                                            stackObjects[tempIndex].valueType = ScriptValue.trueValueType;
+                                            stackObjects[tempIndex].SetTrue();
                                         }
                                         --stackIndex;
                                         continue;
@@ -1249,32 +1147,32 @@ namespace Scorpio.Runtime {
                                     case ScriptValue.trueValueType:
                                     case ScriptValue.nullValueType:
                                     case ScriptValue.falseValueType: {
-                                        stackObjects[tempIndex].valueType = tempValueType == stackObjects[stackIndex].valueType ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                        stackObjects[tempIndex].boolValue = tempValueType != stackObjects[stackIndex].valueType;
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.longValueType: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.longValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue == stackObjects[stackIndex].longValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue != stackObjects[stackIndex].longValue;
                                                 break;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[tempIndex].valueType = stackObjects[tempIndex].longValue == stackObjects[stackIndex].doubleValue ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue != stackObjects[stackIndex].doubleValue;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.trueValueType;
+                                                stackObjects[tempIndex].SetTrue();
                                                 break;
                                         }
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].scriptValue.EqualReference(stackObjects[stackIndex]) ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                        stackObjects[tempIndex].boolValue = !stackObjects[tempIndex].scriptValue.EqualReference(stackObjects[stackIndex]);
                                         --stackIndex;
                                         continue;
                                     }
                                     case ScriptValue.objectValueType: {
-                                        stackObjects[tempIndex].valueType = stackObjects[tempIndex].objectValue.Equals(stackObjects[stackIndex].Value) ? ScriptValue.falseValueType : ScriptValue.trueValueType;
+                                        stackObjects[tempIndex].boolValue = !stackObjects[tempIndex].objectValue.Equals(stackObjects[stackIndex].Value);
                                         --stackIndex;
                                         continue;
                                     }
@@ -1366,7 +1264,7 @@ namespace Scorpio.Runtime {
                                         --stackIndex;
                                         continue;
                                     default:
-                                        stackObjects[stackIndex].valueType = ScriptValue.trueValueType;
+                                        stackObjects[stackIndex].SetTrue();
                                         iInstruction = opvalue;
                                         continue;
                                 }
@@ -1377,7 +1275,7 @@ namespace Scorpio.Runtime {
                                         iInstruction = opvalue;
                                         continue;
                                     case ScriptValue.nullValueType:
-                                        stackObjects[stackIndex].valueType = ScriptValue.falseValueType;
+                                        stackObjects[stackIndex].SetFalse();
                                         iInstruction = opvalue;
                                         continue;
                                     default:
@@ -1704,8 +1602,7 @@ namespace Scorpio.Runtime {
                             #endregion
                             #region New
                             case Opcode.NewMap: {
-                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                stackObjects[stackIndex].scriptValue = new ScriptMapObject(m_script);
+                                stackObjects[++stackIndex].scriptValue = new ScriptMapObject(m_script);
                                 continue;
                             }
                             case Opcode.NewArray: {
@@ -1714,8 +1611,7 @@ namespace Scorpio.Runtime {
                                     array.Add(stackObjects[stackIndex - i]);
                                 }
                                 stackIndex -= opvalue;
-                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                stackObjects[stackIndex].scriptValue = array;
+                                stackObjects[++stackIndex].scriptValue = array;
                                 continue;
                             }
                             case Opcode.NewFunction: {
@@ -1726,8 +1622,7 @@ namespace Scorpio.Runtime {
                                     var internalIndex = internals[i];
                                     function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                 }
-                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                stackObjects[stackIndex].scriptValue = function;
+                                stackObjects[++stackIndex].scriptValue = function;
                                 continue;
                             }
                             case Opcode.NewLambdaFunction: {
@@ -1738,8 +1633,7 @@ namespace Scorpio.Runtime {
                                     var internalIndex = internals[i];
                                     function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                 }
-                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                stackObjects[stackIndex].scriptValue = function;
+                                stackObjects[++stackIndex].scriptValue = function;
                                 continue;
                             }
                             case Opcode.NewAsyncFunction: {
@@ -1750,8 +1644,7 @@ namespace Scorpio.Runtime {
                                     var internalIndex = internals[i];
                                     function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                 }
-                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                stackObjects[stackIndex].scriptValue = function;
+                                stackObjects[++stackIndex].scriptValue = function;
                                 continue;
                             }
                             case Opcode.NewAsyncLambdaFunction: {
@@ -1762,8 +1655,7 @@ namespace Scorpio.Runtime {
                                     var internalIndex = internals[i];
                                     function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                 }
-                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                stackObjects[stackIndex].scriptValue = function;
+                                stackObjects[++stackIndex].scriptValue = function;
                                 continue;
                             }
                             case Opcode.NewType: {
@@ -1800,8 +1692,7 @@ namespace Scorpio.Runtime {
                                         type.AddGetProperty(constString[func >> 32], function);
                                     }
                                 }
-                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                                stackObjects[stackIndex].scriptValue = type;
+                                stackObjects[++stackIndex].scriptValue = type;
                                 continue;
                             }
                             #endregion

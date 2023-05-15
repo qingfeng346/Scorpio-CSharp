@@ -25,143 +25,196 @@ namespace Scorpio {
         public const byte stringValueType = 6;      //string
         public const byte objectValueType = 7;      //除了 double long 以外的number类型 和 枚举
 
-        [FieldOffset(0)] public string stringValue;
-        [FieldOffset(0)] public ScriptObject scriptValue;
-        [FieldOffset(0)] public object objectValue;
-        [FieldOffset(8)] public double doubleValue;
-        [FieldOffset(8)] public long longValue;
-        [FieldOffset(16)] public byte valueType;
-        
-
-
+        [FieldOffset(0)] private object _objectValue;
+        [FieldOffset(0)] private string _stringValue;
+        [FieldOffset(0)] private ScriptObject _scriptValue;
+        [FieldOffset(8)] private double _doubleValue;
+        [FieldOffset(8)] private long _longValue;
+        [FieldOffset(16)] private byte _valueType;
+        public byte valueType { get => _valueType; private set => _valueType = value; }
+        public double doubleValue { 
+            get => _doubleValue;
+            set {
+                _valueType = doubleValueType;
+                _doubleValue = value;
+                _objectValue = null;
+            }
+        }
+        public long longValue {
+            get => _longValue;
+            set {
+                _valueType = longValueType;
+                _longValue = value;
+                _objectValue = null;
+            }
+        }
+        public object objectValue {
+            get => _objectValue;
+            set {
+                _valueType = objectValueType;
+                _objectValue = value;
+            }
+        }
+        public string stringValue {
+            get => _stringValue;
+            set {
+                _stringValue = value;
+                _valueType = stringValueType;
+            }
+        }
+        public ScriptObject scriptValue {
+            get => _scriptValue;
+            set {
+                _scriptValue = value;
+                _valueType = scriptValueType;
+            }
+        }
+        public bool boolValue {
+            set {
+                _valueType = value ? trueValueType : falseValueType;
+                _objectValue = null;
+            }
+        }
+        public void SetNull() {
+            _valueType = nullValueType;
+            _objectValue = null;
+        }
+        public void SetTrue() {
+            _valueType = trueValueType;
+            _objectValue = null;
+        }
+        public void SetFalse() {
+            _valueType = falseValueType;
+            _objectValue = null;
+        }
         public ScriptValue(bool value) {
-            this.valueType = value ? trueValueType : falseValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.objectValue = null;
-            this.scriptValue = null;
+            this._valueType = value ? trueValueType : falseValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._objectValue = null;
+            this._scriptValue = null;
         }
         public ScriptValue(double value) {
-            this.valueType = doubleValueType;
-            this.longValue = 0;
-            this.doubleValue = value;
-            this.stringValue = null;
-            this.objectValue = null;
-            this.scriptValue = null;
+            this._valueType = doubleValueType;
+            this._longValue = 0;
+            this._doubleValue = value;
+            this._stringValue = null;
+            this._objectValue = null;
+            this._scriptValue = null;
         }
         public ScriptValue(long value) {
-            this.valueType = longValueType;
-            this.doubleValue = 0;
-            this.longValue = value;
-            this.stringValue = null;
-            this.objectValue = null;
-            this.scriptValue = null;
+            this._valueType = longValueType;
+            this._doubleValue = 0;
+            this._longValue = value;
+            this._stringValue = null;
+            this._objectValue = null;
+            this._scriptValue = null;
         }
         public ScriptValue(string value) {
-            this.valueType = value == null ? nullValueType : stringValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.scriptValue = null;
-            this.objectValue = null;
-            this.stringValue = value;
+            this._valueType = value == null ? nullValueType : stringValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._scriptValue = null;
+            this._objectValue = null;
+            this._stringValue = value;
         }
         public ScriptValue(ScriptObject value) {
-            this.valueType = value == null ? nullValueType : scriptValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.objectValue = null;
-            this.scriptValue = value;
+            this._valueType = value == null ? nullValueType : scriptValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._objectValue = null;
+            this._scriptValue = value;
         }
         internal ScriptValue(sbyte value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(byte value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(short value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(ushort value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(int value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(uint value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(ulong value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(char value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(float value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         internal ScriptValue(decimal value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
         //私有,创建枚举
         private ScriptValue(object value) {
-            this.valueType = objectValueType;
-            this.doubleValue = 0;
-            this.longValue = 0;
-            this.stringValue = null;
-            this.scriptValue = null;
-            this.objectValue = value;
+            this._valueType = objectValueType;
+            this._doubleValue = 0;
+            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
         }
 
         //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
