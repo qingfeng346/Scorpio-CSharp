@@ -144,7 +144,8 @@ namespace Scorpio.Compile.Compiler {
                 }
             }
             //重新计算操作局部变量 索引
-            foreach (var instruction in m_listScriptInstructions) {
+            for (var i = 0; i < m_listScriptInstructions.Count; ++i) {
+                var instruction = m_listScriptInstructions[i];
                 if (instruction.opcode == Opcode.LoadLocal || instruction.opcode == Opcode.StoreLocal || instruction.opcode == Opcode.StoreLocalAssign) {
                     var count = 0;
                     foreach (var pair in m_VariableToInternal) {
@@ -154,6 +155,7 @@ namespace Scorpio.Compile.Compiler {
                     }
                     if (count > 0) {
                         instruction.opvalue -= count;
+                        m_listScriptInstructions[i] = instruction;
                     }
                 }
             }

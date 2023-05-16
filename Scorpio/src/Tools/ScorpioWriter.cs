@@ -56,21 +56,19 @@ namespace Scorpio.Tools {
             Write(data.variableCount);
             Write(data.internalCount);
             Write(data.internals.Length);
-            Array.ForEach(data.internals, (value) => Write(value));
+            Array.ForEach(data.internals, Write);
             Write(data.scriptInstructions.Length);
             Array.ForEach(data.scriptInstructions, (value) => {
                 Write((int)value.opcode);
-                Write(value.opvalue);
-                Write(value.line);
+                Write((int)value.opvalue);
+                Write((int)value.line);
             });
         }
         public void Write(ScriptClassData data) {
             Write(data.name);
             Write(data.parent);
             Write(data.functions.Length);
-            Array.ForEach(data.functions, (value) => {
-                Write(value);
-            });
+            Array.ForEach(data.functions, Write);
         }
     }
 }

@@ -38,6 +38,9 @@ namespace Scorpio {
         public override void Remove(object key) {
             throw new ExecutionException("MapString 不支持 Remove, 请使用普通 Map");
         }
+        public override void Trim() {
+            m_Values.TrimCapacity();
+        }
         public override ScriptArray GetKeys() {
             var ret = new ScriptArray(m_Script);
             foreach (var pair in m_Values) {

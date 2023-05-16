@@ -6,7 +6,6 @@ using System.Linq;
 namespace Scorpio {
     internal class VariableFactory<Key> {
         private uint id = 0;
-        private object sync = new object();
         private ConcurrentQueue<uint> cacheId = new ConcurrentQueue<uint>();
         public uint Id {
             get {
@@ -14,48 +13,94 @@ namespace Scorpio {
                     return id;
                 }
                 id = this.id++;
-                if (id >= variables.Length) {
-                    lock (sync) {
-                        var array = new Dictionary<Key, int>[variables.Length * 32];
-                        Array.Copy(variables, 0, array, 0, variables.Length);
-                        variables = array;
-                    }
-                }
                 return id;
             }
         }
-        private Dictionary<Key, int>[] variables = new Dictionary<Key, int>[256];
+        private ConcurrentDictionary<uint, List<Key>> variables = new ConcurrentDictionary<uint, List<Key>>();
         public Key[] GetKeys(uint id) {
-            if (variables[id] == null) return Array.Empty<Key>();
-            return variables[id].Keys.ToArray();
+            if (variables.TryGetValue(id, out var variable)) {
+                return variable.ToArray();
+            }
+            return Array.Empty<Key>();
         }
         public bool ContainsVariable(uint id, Key key) {
-            if (variables[id] == null) return false;
-            return variables[id].ContainsKey(key);
+            if (variables.TryGetValue(id, out var variable)) {
+                return variable.Contains(key);
+            }
+            return false;
         }
         public bool TryGetVariable(uint id, Key key, out int index) {
-            if (variables[id] == null) {
-                index = default;
-                return false;
-            }
-            if (variables[id].TryGetValue(key, out index)) {
-                return true;
+            if (variables.TryGetValue(id, out var variable)) {
+                index = variable.IndexOf(key);
+                return index >= 0;
             }
             index = default;
             return false;
         }
         public int AddVariable(uint id, Key key) {
-            var variable = variables[id];
-            if (variable == null) {
-                variables[id] = variable = new Dictionary<Key, int>();
+            if (!variables.TryGetValue(id, out var variable)) {
+                variables[id] = variable = new List<Key>();
             }
-            return variable[key] = variable.Count;
+            variable.Add(key);
+            return variable.Count - 1;
         }
         public void ReleaseId(uint id) {
-            lock (sync) {
-                variables[id] = null;
-            }
+            variables.TryRemove(id, out _);
             cacheId.Enqueue(id);
+        }
+        public void TrimExcess() {
+            foreach (var pair in variables) {
+                pair.Value.TrimExcess();
+            }
+        }
+    }
+    internal class VariableHashFactory<Key> {
+        private uint id = 0;
+        private ConcurrentQueue<uint> cacheId = new ConcurrentQueue<uint>();
+        public uint Id {
+            get {
+                if (cacheId.TryDequeue(out var id)) {
+                    return id;
+                }
+                id = this.id++;
+                return id;
+            }
+        }
+        private ConcurrentDictionary<uint, Dictionary<Key, int>> variables = new ConcurrentDictionary<uint, Dictionary<Key, int>>();
+        public Key[] GetKeys(uint id) {
+            if (variables.TryGetValue(id, out var variable)) {
+                return variable.Keys.ToArray();
+            }
+            return Array.Empty<Key>();
+        }
+        public bool ContainsVariable(uint id, Key key) {
+            if (variables.TryGetValue(id, out var variable)) {
+                return variable.ContainsKey(key);
+            }
+            return false;
+        }
+        public bool TryGetVariable(uint id, Key key, out int index) {
+            if (variables.TryGetValue(id, out var variable)) {
+                if (variable.TryGetValue(key, out index)) {
+                    return true;
+                }
+            }
+            index = default;
+            return false;
+        }
+        public int AddVariable(uint id, Key key) {
+            if (variables.TryGetValue(id, out var variable)) {
+                return variable[key] = variable.Count;
+            }
+            variables[id] = variable = new Dictionary<Key, int>();
+            return variable[key] = 0;
+        }
+        public void ReleaseId(uint id) {
+            variables.TryRemove(id, out _);
+            cacheId.Enqueue(id);
+        }
+        public void TrimExcess() {
+            
         }
     }
     internal static class ScorpioVariable {
@@ -67,7 +112,7 @@ namespace Scorpio {
         public static int AddVariable(uint id, string key) => stringFactory.AddVariable(id, key);
         public static void ReleaseStringId(uint id) => stringFactory.ReleaseId(id);
 
-        private static VariableFactory<object> objectFactory = new VariableFactory<object>();
+        private static VariableHashFactory<object> objectFactory = new VariableHashFactory<object>();
         public static uint ObjectId => objectFactory.Id;
         public static object[] GetObjectKeys(uint id) => objectFactory.GetKeys(id);
         public static bool ContainsVariable(uint id, object key) => objectFactory.ContainsVariable(id, key);

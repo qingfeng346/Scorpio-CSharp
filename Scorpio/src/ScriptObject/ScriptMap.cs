@@ -21,6 +21,7 @@ namespace Scorpio {
         public abstract ScriptArray GetKeys();
         public abstract ScriptArray GetValues();
         public abstract ScriptMap NewCopy();
+        public virtual void Trim() { }
         public override string ToString() {
             using (var serializer = new ScorpioJsonSerializer()) {
                 return serializer.ToJson(this);

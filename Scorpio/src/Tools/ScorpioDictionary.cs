@@ -41,6 +41,10 @@ namespace Scorpio {
                 SetCapacity(num);
             }
         }
+        public void TrimCapacity() {
+            if (size == values.Length) return;
+            SetCapacity(size);
+        }
         public int Count => size;
         public void Clear() {
             size = 0;

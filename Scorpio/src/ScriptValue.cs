@@ -31,6 +31,7 @@ namespace Scorpio {
         [FieldOffset(8)] private double _doubleValue;
         [FieldOffset(8)] private long _longValue;
         [FieldOffset(16)] private byte _valueType;
+
         public byte valueType { get => _valueType; private set => _valueType = value; }
         public double doubleValue { 
             get => _doubleValue;
@@ -396,7 +397,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (sbyte)doubleValue;
                 case longValueType: return (sbyte)longValue;
-                case objectValueType: return Convert.ToSByte(objectValue);
+                case stringValueType: return Convert.ToSByte(_stringValue);
+                case objectValueType: return Convert.ToSByte(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int8");
             }
         }
@@ -404,7 +411,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (byte)doubleValue;
                 case longValueType: return (byte)longValue;
-                case objectValueType: return Convert.ToByte(objectValue);
+                case stringValueType: return Convert.ToByte(_stringValue);
+                case objectValueType: return Convert.ToByte(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 uint8");
             }
         }
@@ -412,7 +425,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (short)doubleValue;
                 case longValueType: return (short)longValue;
-                case objectValueType: return Convert.ToInt16(objectValue);
+                case stringValueType: return Convert.ToInt16(_stringValue);
+                case objectValueType: return Convert.ToInt16(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int16");
             }
         }
@@ -420,7 +439,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (ushort)doubleValue;
                 case longValueType: return (ushort)longValue;
-                case objectValueType: return Convert.ToUInt16(objectValue);
+                case stringValueType: return Convert.ToUInt16(_stringValue);
+                case objectValueType: return Convert.ToUInt16(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 uint16");
             }
         }
@@ -428,7 +453,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (int)doubleValue;
                 case longValueType: return (int)longValue;
-                case objectValueType: return Convert.ToInt32(objectValue);
+                case stringValueType: return Convert.ToInt32(_stringValue);
+                case objectValueType: return Convert.ToInt32(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
             }
         }
@@ -436,7 +467,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (uint)doubleValue;
                 case longValueType: return (uint)longValue;
-                case objectValueType: return Convert.ToUInt32(objectValue);
+                case stringValueType: return Convert.ToUInt32(_stringValue);
+                case objectValueType: return Convert.ToUInt32(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 uint32");
             }
         }
@@ -444,7 +481,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (long)doubleValue;
                 case longValueType: return longValue;
-                case objectValueType: return Convert.ToInt64(objectValue);
+                case stringValueType: return Convert.ToInt64(_stringValue);
+                case objectValueType: return Convert.ToInt64(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");
             }
         }
@@ -452,7 +495,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (ulong)doubleValue;
                 case longValueType: return (ulong)longValue;
-                case objectValueType: return Convert.ToUInt64(objectValue);
+                case stringValueType: return Convert.ToUInt64(_stringValue);
+                case objectValueType: return Convert.ToUInt64(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 ulong");
             }
         }
@@ -460,7 +509,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (float)doubleValue;
                 case longValueType: return (float)longValue;
-                case objectValueType: return Convert.ToSingle(objectValue);
+                case stringValueType: return Convert.ToSingle(_stringValue);
+                case objectValueType: return Convert.ToSingle(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 float");
             }
         }
@@ -468,7 +523,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return doubleValue;
                 case longValueType: return longValue;
-                case objectValueType: return Convert.ToDouble(objectValue);
+                case stringValueType: return Convert.ToDouble(_stringValue);
+                case objectValueType: return Convert.ToDouble(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
             }
         }
@@ -476,7 +537,8 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (char)doubleValue;
                 case longValueType: return (char)longValue;
-                case objectValueType: return Convert.ToChar(objectValue);
+                case stringValueType: return Convert.ToChar(_stringValue);
+                case objectValueType: return Convert.ToChar(_objectValue);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
             }
         }
@@ -484,7 +546,13 @@ namespace Scorpio {
             switch (valueType) {
                 case doubleValueType: return (decimal)doubleValue;
                 case longValueType: return (decimal)longValue;
-                case objectValueType: return Convert.ToDecimal(objectValue);
+                case stringValueType: return Convert.ToDecimal(_stringValue);
+                case objectValueType: return Convert.ToDecimal(_objectValue);
+                case nullValueType:
+                case falseValueType:
+                    return 0;
+                case trueValueType:
+                    return 1;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 decimal");
             }
         }

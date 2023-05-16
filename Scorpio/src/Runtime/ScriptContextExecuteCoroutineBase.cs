@@ -81,7 +81,7 @@ namespace Scorpio.Runtime {
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
             byte tempValueType; //临时存储
             int tempIndex; //临时存储
-            ScriptInstruction instruction = null;
+            ScriptInstruction instruction = default;
             Opcode opcode = Opcode.Nop;
             int opvalue;
             try {
