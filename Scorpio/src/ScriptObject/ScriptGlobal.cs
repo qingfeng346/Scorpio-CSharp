@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
         public struct Enumerator : IEnumerator<ScorpioKeyValue<string, ScriptValue>> {

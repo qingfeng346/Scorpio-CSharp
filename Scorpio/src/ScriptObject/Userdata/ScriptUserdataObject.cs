@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using Scorpio.Exception;
 using Scorpio.Function;
+using Scorpio.Tools;
 
 namespace Scorpio.Userdata {
     /// <summary> 普通Object类型 </summary>

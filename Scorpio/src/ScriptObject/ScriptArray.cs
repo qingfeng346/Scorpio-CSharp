@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Scorpio.Exception;
 using Scorpio.Tools;
 using Scorpio.Library;
+
 namespace Scorpio {
     //脚本数组类型
     public class ScriptArray : ScriptInstance, IEnumerable<ScriptValue> {
@@ -116,11 +117,7 @@ namespace Scorpio {
                 return i < m_Length ? m_Objects[i] : ScriptValue.Null;
             }
             set {
-                if (i < 0) throw new ExecutionException($"Array.set[] 索引小于0:{i}");
-                if (i >= m_Length) {
-                    EnsureCapacity(i + 1);
-                    m_Length = i + 1;
-                }
+                if (i < 0 || i >= m_Length) throw new ExecutionException($"Array.set[] 索引小于0或超过最大值 index:{i} length:{m_Length}");
                 m_Objects[i] = value;
             }
         }
@@ -200,7 +197,7 @@ namespace Scorpio {
         }
         public void Clear() {
             if (m_Length > 0) {
-                Array.Clear(m_Objects, 0, m_Length);
+                m_Objects = ScriptValue.EMPTY;
                 m_Length = 0;
             }
         }
@@ -208,7 +205,7 @@ namespace Scorpio {
             return m_Length;
         }
         public void Sort(ScriptFunction func) {
-            Array.Sort<ScriptValue>(m_Objects, 0, m_Length, new Comparer(func));
+            Array.Sort(m_Objects, 0, m_Length, new Comparer(func));
         }
         public ScriptValue First() {
             return m_Length > 0 ? m_Objects[0] : ScriptValue.Null;

@@ -1,7 +1,10 @@
+using System.Drawing;
+
 namespace Scorpio.Proto {
     public class ProtoArray {
         public static ScriptType Load(Script script, ScriptType ret) {
             ret.SetValue("length", script.CreateFunction(new length()));
+            ret.SetValue("resize", script.CreateFunction(new resize()));
             ret.SetValue("count", script.CreateFunction(new length()));
             ret.SetValue("insert", script.CreateFunction(new insert()));
             ret.SetValue("add", script.CreateFunction(new add()));
@@ -42,6 +45,12 @@ namespace Scorpio.Proto {
         private class length : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue((double)thisObject.Get<ScriptArray>().m_Length);
+            }
+        }
+        private class resize : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                thisObject.Get<ScriptArray>().Resize(args[0].ToInt32());
+                return ScriptValue.Null;
             }
         }
         private class insert : ScorpioHandle {

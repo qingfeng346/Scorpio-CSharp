@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Exception;
+using Scorpio.Tools;
 namespace Scorpio {
     //脚本map类型
     public class ScriptMapPolling : ScriptMap {
@@ -19,9 +20,9 @@ namespace Scorpio {
             public void Dispose() { m_Enumerator.Dispose(); }
         }
 
-        private ScorpioObjectDictionary<ScriptValue> m_Objects;  //所有的数据(函数和数据都在一个数组)
+        private ScorpioPollingDictionary<object, ScriptValue> m_Objects;  //所有的数据(函数和数据都在一个数组)
         public ScriptMapPolling(Script script, int capacity) : base(script) {
-            m_Objects = new ScorpioObjectDictionary<ScriptValue>(capacity);
+            m_Objects = new ScorpioPollingDictionary<object, ScriptValue>(capacity);
         }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() => new Enumerator(this);
 

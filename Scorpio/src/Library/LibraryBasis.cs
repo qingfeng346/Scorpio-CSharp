@@ -8,6 +8,7 @@ using Scorpio.Userdata;
 using System.Reflection;
 using Scorpio.Instruction;
 using Scorpio.Runtime;
+using Scorpio.Tools;
 namespace Scorpio.Library {
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
@@ -372,32 +373,32 @@ namespace Scorpio.Library {
 
         private class toInt8 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToInt8();
+                return new ScriptValue(args[0].ToInt8());
             }
         }
         private class toUint8 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToUint8();
+                return new ScriptValue(args[0].ToUint8());
             }
         }
         private class toInt16 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToInt16();
+                return new ScriptValue(args[0].ToInt16());
             }
         }
         private class toUint16 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToUint16();
+                return new ScriptValue(args[0].ToUint16());
             }
         }
         private class toInt32 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToInt32();
+                return new ScriptValue(args[0].ToInt32());
             }
         }
         private class toUint32 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToUint32();
+                return new ScriptValue(args[0].ToUint32());
             }
         }
         private class toInt64 : ScorpioHandle {
@@ -407,7 +408,7 @@ namespace Scorpio.Library {
         }
         private class toUint64 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToULong();
+                return new ScriptValue(args[0].ToULong());
             }
         }
         private class toBoolean : ScorpioHandle {
@@ -417,23 +418,23 @@ namespace Scorpio.Library {
         }
         private class toChar : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToChar();
+                return new ScriptValue(args[0].ToChar());
             }
         }
 
         private class toFloat : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToFloat();
+                return new ScriptValue(args[0].ToFloat());
             }
         }
         private class toDecimal : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToDecimal();
+                return new ScriptValue(args[0].ToDecimal());
             }
         }
         private class toDouble : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].ToDouble();
+                return new ScriptValue(args[0].ToDouble());
             }
         }
         private class toEnum : ScorpioHandle {

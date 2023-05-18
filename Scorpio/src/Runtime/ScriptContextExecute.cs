@@ -238,6 +238,7 @@ namespace Scorpio.Runtime {
                             case Opcode.LoadGlobalString: {
                                 stackObjects[++stackIndex] = m_global.GetValue(constString[opvalue]);
                                 instruction.SetOpcode(Opcode.LoadGlobal, m_global.GetIndex(constString[opvalue]));
+                                //m_scriptInstructions[iInstruction - 1] = new ScriptInstruction(Opcode.LoadGlobal, m_global.GetIndex(constString[opvalue]), instruction.line);
                                 continue;
                             }
                             case Opcode.CopyStackTop: {
@@ -260,8 +261,10 @@ namespace Scorpio.Runtime {
                                 tempIndex = m_global.GetIndex(stackObjects[stackIndex--].stringValue);
                                 m_global.SetValueByIndex(tempIndex, stackObjects[stackIndex]);
                                 instruction.SetOpcode(Opcode.LoadGlobal, tempIndex);
+                                //m_scriptInstructions[iInstruction - 1] = new ScriptInstruction(Opcode.LoadGlobal, tempIndex, instruction.line);
                                 for (var i = 0; i < opvalue; ++i) {
                                     m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.Nop);
+                                    //m_scriptInstructions[iInstruction - i - 2] = new ScriptInstruction(Opcode.Nop, 0, 0);
                                 }
                                 continue;
                             }
@@ -269,11 +272,14 @@ namespace Scorpio.Runtime {
                                 tempIndex = m_global.GetIndex(stackObjects[stackIndex--].stringValue);
                                 m_global.SetValueByIndex(tempIndex, stackObjects[stackIndex]);
                                 instruction.SetOpcode(Opcode.LoadGlobal, tempIndex);
+                                //m_scriptInstructions[iInstruction - 1] = new ScriptInstruction(Opcode.LoadGlobal, tempIndex, instruction.line);
                                 for (var i = 0; i < opvalue; ++i) {
                                     if (i == 0) {
                                         m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.LoadConstNull);
+                                        //m_scriptInstructions[iInstruction - i - 2] = new ScriptInstruction(Opcode.LoadConstNull, 0, 0);
                                     } else {
                                         m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.Nop);
+                                        //m_scriptInstructions[iInstruction - i - 2] = new ScriptInstruction(Opcode.Nop, 0, 0);
                                     }
                                 }
                                 continue;
@@ -378,6 +384,7 @@ namespace Scorpio.Runtime {
                             case Opcode.StoreGlobalStringAssign: {
                                 m_global.SetValue(constString[opvalue], stackObjects[stackIndex]);
                                 instruction.SetOpcode(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]));
+                                //m_scriptInstructions[iInstruction - 1] = new ScriptInstruction(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]), instruction.line);
                                 continue;
                             }
                             case Opcode.StoreValueAssign: {
@@ -485,6 +492,7 @@ namespace Scorpio.Runtime {
                             case Opcode.StoreGlobalString: {
                                 m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
                                 instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
+                                //m_scriptInstructions[iInstruction - 1] = new ScriptInstruction(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]), instruction.line);
                                 continue;
                             }
                             #endregion Store

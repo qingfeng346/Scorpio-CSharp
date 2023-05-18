@@ -1,6 +1,7 @@
 using Scorpio.Exception;
 using System.Collections;
 using System.Collections.Generic;
+using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptType : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
         protected ScorpioStringDictionary<ScriptValue> m_Values;             //所有的函数

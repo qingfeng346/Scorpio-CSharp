@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Exception;
+using Scorpio.Tools;
 namespace Scorpio {
     //脚本map类型
     public class ScriptMapString : ScriptMap {

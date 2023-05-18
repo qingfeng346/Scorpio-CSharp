@@ -28,25 +28,23 @@ namespace Scorpio {
         [FieldOffset(0)] private object _objectValue;
         [FieldOffset(0)] private string _stringValue;
         [FieldOffset(0)] private ScriptObject _scriptValue;
-        [FieldOffset(8)] private double _doubleValue;
-        [FieldOffset(8)] private long _longValue;
-        [FieldOffset(16)] private byte _valueType;
+        //[FieldOffset(8)] private double _doubleValue;
+        //[FieldOffset(8)] private long _longValue;
+        [FieldOffset(8)] private byte _valueType;
 
         public byte valueType { get => _valueType; private set => _valueType = value; }
         public double doubleValue { 
-            get => _doubleValue;
+            get => (double)_objectValue;
             set {
                 _valueType = doubleValueType;
-                _doubleValue = value;
-                _objectValue = null;
+                _objectValue = value;
             }
         }
         public long longValue {
-            get => _longValue;
+            get => (long)_objectValue;
             set {
                 _valueType = longValueType;
-                _longValue = value;
-                _objectValue = null;
+                _objectValue = value;
             }
         }
         public object objectValue {
@@ -91,121 +89,90 @@ namespace Scorpio {
 
         public ScriptValue(double value) {
             this._valueType = doubleValueType;
-            this._longValue = 0;
-            this._doubleValue = value;
             this._stringValue = null;
-            this._objectValue = null;
             this._scriptValue = null;
+            this._objectValue = value;
         }
         public ScriptValue(string value) {
             this._valueType = value == null ? nullValueType : stringValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._scriptValue = null;
             this._objectValue = null;
             this._stringValue = value;
         }
         public ScriptValue(ScriptObject value) {
             this._valueType = value == null ? nullValueType : scriptValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._objectValue = null;
             this._scriptValue = value;
         }
-        
         private ScriptValue(bool value) {
             this._valueType = value ? trueValueType : falseValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._objectValue = null;
             this._scriptValue = null;
         }
         private ScriptValue(long value) {
             this._valueType = longValueType;
-            this._doubleValue = 0;
-            this._longValue = value;
-            this._stringValue = null;
-            this._objectValue = null;
-            this._scriptValue = null;
-        }
-        private ScriptValue(sbyte value) {
-            this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(byte value) {
+        internal ScriptValue(sbyte value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(short value) {
+        internal ScriptValue(byte value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(ushort value) {
+        internal ScriptValue(short value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(int value) {
+        internal ScriptValue(ushort value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(uint value) {
+        internal ScriptValue(int value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(ulong value) {
+        internal ScriptValue(uint value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(char value) {
+        internal ScriptValue(ulong value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(float value) {
+        internal ScriptValue(char value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
-        private ScriptValue(decimal value) {
+        internal ScriptValue(float value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
+            this._stringValue = null;
+            this._scriptValue = null;
+            this._objectValue = value;
+        }
+        internal ScriptValue(decimal value) {
+            this._valueType = objectValueType;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
@@ -213,8 +180,6 @@ namespace Scorpio {
         //私有,创建枚举
         private ScriptValue(object value) {
             this._valueType = objectValueType;
-            this._doubleValue = 0;
-            this._longValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
@@ -362,13 +327,13 @@ namespace Scorpio {
         public object Value {
             get {
                 switch (valueType) {
-                    case doubleValueType: return doubleValue;
-                    case longValueType: return longValue;
+                    case doubleValueType: return _objectValue;
+                    case longValueType: return _objectValue;
                     case nullValueType: return null;
                     case trueValueType: return true;
                     case falseValueType: return false;
                     case stringValueType: return stringValue;
-                    case objectValueType: return objectValue;
+                    case objectValueType: return _objectValue;
                     default: return scriptValue.Value;
                 }
             }
@@ -656,20 +621,20 @@ namespace Scorpio {
             return new ScriptValue(new ScriptUserdataObject(value, ScorpioTypeManager.GetType(value.GetType())));
         }
 
-        public static implicit operator ScriptValue(sbyte value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(byte value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(short value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(ushort value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(int value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(uint value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(ulong value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(float value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(char value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(decimal value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(sbyte value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(byte value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(short value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(ushort value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(int value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(uint value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(ulong value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(float value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(char value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(decimal value) => new ScriptValue(value);
 
         public static implicit operator ScriptValue(bool value) => new ScriptValue(value);
         public static implicit operator ScriptValue(long value) => new ScriptValue(value);
-        public static implicit operator ScriptValue(double value) => new ScriptValue(value);
+        //public static implicit operator ScriptValue(double value) => new ScriptValue(value);
         //public static implicit operator ScriptValue(string value) => new ScriptValue(value);
         //public static implicit operator ScriptValue(ScriptObject value) => new ScriptValue(value);
     }

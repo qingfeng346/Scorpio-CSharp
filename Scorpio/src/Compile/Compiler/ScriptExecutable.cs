@@ -132,14 +132,18 @@ namespace Scorpio.Compile.Compiler {
         public int[] ScriptInternals { get { return m_ParentInternal.ToArray(); } }
         public void Finished() {
             //计算局部变量是否是内部引用变量，并修改为 内部变量赋值 Opcode
-            foreach (var instruction in m_listScriptInstructions) {
+            for (var i = 0; i < m_listScriptInstructions.Count; ++i) {
+                var instruction = m_listScriptInstructions[i];
                 if (m_VariableToInternal.TryGetValue(instruction.opvalue, out var internalValue)) {
                     if (instruction.opcode == Opcode.LoadLocal) {
-                        instruction.SetOpcode(Opcode.LoadInternal, internalValue);
+                        //instruction.SetOpcode(Opcode.LoadInternal, internalValue);
+                        m_listScriptInstructions[i] = new ScriptInstruction(Opcode.LoadInternal, internalValue, instruction.line);
                     } else if (instruction.opcode == Opcode.StoreLocal) {
-                        instruction.SetOpcode(Opcode.StoreInternal, internalValue);
+                        //instruction.SetOpcode(Opcode.StoreInternal, internalValue);
+                        m_listScriptInstructions[i] = new ScriptInstruction(Opcode.StoreInternal, internalValue, instruction.line);
                     } else if (instruction.opcode == Opcode.StoreLocalAssign) {
-                        instruction.SetOpcode(Opcode.StoreInternalAssign, internalValue);
+                        //instruction.SetOpcode(Opcode.StoreInternalAssign, internalValue);
+                        m_listScriptInstructions[i] = new ScriptInstruction(Opcode.StoreInternalAssign, internalValue, instruction.line);
                     }
                 }
             }
@@ -154,8 +158,7 @@ namespace Scorpio.Compile.Compiler {
                         }
                     }
                     if (count > 0) {
-                        instruction.opvalue -= count;
-                        m_listScriptInstructions[i] = instruction;
+                        m_listScriptInstructions[i] = new ScriptInstruction(instruction.opcode, instruction.opvalue - count, instruction.line);
                     }
                 }
             }

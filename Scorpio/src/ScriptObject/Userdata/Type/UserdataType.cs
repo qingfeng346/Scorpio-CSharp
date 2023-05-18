@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Scorpio.Exception;
+using Scorpio.Tools;
 namespace Scorpio.Userdata {
     /// <summary> 一个c#类的所有数据 </summary>
     public abstract class UserdataType {
