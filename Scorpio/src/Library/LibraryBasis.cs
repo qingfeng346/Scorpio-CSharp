@@ -639,9 +639,9 @@ namespace Scorpio.Library {
                 }
                 var method = (args[0].scriptValue as ScriptMethodFunction).Method.MakeGenericMethod(types);
                 if (method.IsStatic) {
-                    return new ScriptValue(new ScriptStaticMethodFunction(method, method.MethodName));
+                    return new ScriptValue(new ScriptStaticMethodFunction(method));
                 } else {
-                    return new ScriptValue(new ScriptGenericMethodFunction(method, method.MethodName));
+                    return new ScriptValue(new ScriptGenericMethodFunction(method));
                 }
             }
         }

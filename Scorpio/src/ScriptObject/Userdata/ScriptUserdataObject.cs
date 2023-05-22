@@ -18,7 +18,7 @@ namespace Scorpio.Userdata {
             }
             var ret = m_UserdataType.GetValue(m_Value, key);
             if (ret is UserdataMethod) {
-                return m_Methods[key] = new ScriptValue(new ScriptInstanceMethodFunction((UserdataMethod)ret, m_Value, key));
+                return m_Methods[key] = new ScriptValue(new ScriptInstanceMethodFunction((UserdataMethod)ret, m_Value));
             }
             return ScriptValue.CreateValue(ret);
         }
