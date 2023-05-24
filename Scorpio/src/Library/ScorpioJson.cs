@@ -25,12 +25,19 @@ namespace Scorpio.Library {
         private bool m_SupportLong;         //是否支持 数字无[.]解析成long值
         private int m_Index;
         private int m_Length;
-        public ScorpioJsonDeserializer(Script script, string buffer, bool supportLong) {
+        private StringBuilder m_Builder;
+        private char[] m_Hex;
+        public ScorpioJsonDeserializer() {
+            m_Builder = new StringBuilder();
+            m_Hex = new char[4];
+        }
+        public ScorpioJsonDeserializer Reset(Script script, string buffer, bool supportLong) {
             m_Script = script;
             m_SupportLong = supportLong;
             m_Buffer = buffer;
             m_Index = 0;
             m_Length = buffer.Length;
+            return this;
         }
         char Read() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index++]; }
         char Peek() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index]; }
@@ -92,7 +99,7 @@ namespace Scorpio.Library {
             }
         }
         string ParseString() {
-            var m_Builder = new StringBuilder();
+            m_Builder.Length = 0;
             while (true) {
                 if (Peek() == -1) {
                     return m_Builder.ToString();
@@ -118,11 +125,10 @@ namespace Scorpio.Library {
                             case '0': m_Builder.Append('\0'); break;
                             case '/': m_Builder.Append("/"); break;
                             case 'u': {
-                                var hex = new StringBuilder();
                                 for (int i = 0; i < 4; i++) {
-                                    hex.Append(Read());
+                                    m_Hex[i] = Read();
                                 }
-                                m_Builder.Append((char)System.Convert.ToUInt16(hex.ToString(), 16));
+                                m_Builder.Append((char)System.Convert.ToUInt16(new string(m_Hex), 16));
                                 break;
                             }
                         }
@@ -213,15 +219,12 @@ namespace Scorpio.Library {
         public void Dispose() {
             m_Script = null;
             m_Buffer = null;
+            m_Builder.Length = 0;
         }
     }
     internal class ScorpioJsonSerializer : IDisposable {
-        internal StringBuilder m_Builder;
-        private HashSet<ScriptObject> m_Recurve;
-        public ScorpioJsonSerializer() {
-            m_Builder = new StringBuilder();
-            m_Recurve = new HashSet<ScriptObject>();
-        }
+        internal StringBuilder m_Builder = new StringBuilder();
+        private HashSet<ScriptObject> m_Recurve = new HashSet<ScriptObject>();
         public string ToJson(ScriptValue value) {
             Serializer(value);
             return m_Builder.ToString();
@@ -321,8 +324,8 @@ namespace Scorpio.Library {
             m_Builder.Append("]");
         }
         public void Dispose() {
-            m_Builder = null;
-            m_Recurve = null;
+            m_Builder.Length = 0;
+            m_Recurve.Clear();
         }
     }
 }

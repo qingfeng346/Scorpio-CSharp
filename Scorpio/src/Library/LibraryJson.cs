@@ -1,5 +1,7 @@
 namespace Scorpio.Library {
     public partial class LibraryJson {
+        private static ScorpioJsonSerializer jsonSerializer = new ScorpioJsonSerializer();
+        private static ScorpioJsonDeserializer jsonDeserializer = new ScorpioJsonDeserializer();
         public static void Load(Script script) {
             var functions = new (string, ScorpioHandle)[] {
                 ("encode", new encode()),
@@ -13,8 +15,8 @@ namespace Scorpio.Library {
         }
         private class encode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                using (var serializer = new ScorpioJsonSerializer()) {
-                    return new ScriptValue(serializer.ToJson(args[0]));
+                using (jsonSerializer) {
+                    return new ScriptValue(jsonSerializer.ToJson(args[0]));
                 }
             }
         }
@@ -24,8 +26,8 @@ namespace Scorpio.Library {
                 m_Script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                using (var deserializer = new ScorpioJsonDeserializer(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true)) {
-                    return deserializer.Parse();
+                using (jsonDeserializer.Reset(m_Script, args[0].ToString(), length > 1 ? args[1].IsTrue : true)) {
+                    return jsonDeserializer.Parse();
                 }
             }
         }

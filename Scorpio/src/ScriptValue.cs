@@ -28,23 +28,23 @@ namespace Scorpio {
         [FieldOffset(0)] private object _objectValue;
         [FieldOffset(0)] private string _stringValue;
         [FieldOffset(0)] private ScriptObject _scriptValue;
-        //[FieldOffset(8)] private double _doubleValue;
-        //[FieldOffset(8)] private long _longValue;
-        [FieldOffset(8)] private byte _valueType;
+        [FieldOffset(8)] private double _doubleValue;
+        [FieldOffset(8)] private long _longValue;
+        [FieldOffset(16)] private byte _valueType;
 
         public byte valueType { get => _valueType; private set => _valueType = value; }
         public double doubleValue { 
-            get => (double)_objectValue;
+            get => _doubleValue;
             set {
                 _valueType = doubleValueType;
-                _objectValue = value;
+                _doubleValue = value;
             }
         }
         public long longValue {
-            get => (long)_objectValue;
+            get => _longValue;
             set {
                 _valueType = longValueType;
-                _objectValue = value;
+                _longValue = value;
             }
         }
         public object objectValue {
@@ -89,90 +89,120 @@ namespace Scorpio {
 
         public ScriptValue(double value) {
             this._valueType = doubleValueType;
+            this._longValue = 0;
+            this._doubleValue = value;
             this._stringValue = null;
             this._scriptValue = null;
-            this._objectValue = value;
+            this._objectValue = null;
         }
         public ScriptValue(string value) {
             this._valueType = value == null ? nullValueType : stringValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._scriptValue = null;
             this._objectValue = null;
             this._stringValue = value;
         }
         public ScriptValue(ScriptObject value) {
             this._valueType = value == null ? nullValueType : scriptValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._objectValue = null;
             this._scriptValue = value;
         }
         private ScriptValue(bool value) {
             this._valueType = value ? trueValueType : falseValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._objectValue = null;
             this._scriptValue = null;
         }
         private ScriptValue(long value) {
             this._valueType = longValueType;
+            this._doubleValue = 0;
+            this._longValue = value;
             this._stringValue = null;
             this._scriptValue = null;
-            this._objectValue = value;
+            this._objectValue = null;
         }
         internal ScriptValue(sbyte value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(byte value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(short value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(ushort value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(int value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(uint value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(ulong value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(char value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(float value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
         }
         internal ScriptValue(decimal value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
@@ -180,6 +210,8 @@ namespace Scorpio {
         //私有,创建枚举
         private ScriptValue(object value) {
             this._valueType = objectValueType;
+            this._longValue = 0;
+            this._doubleValue = 0;
             this._stringValue = null;
             this._scriptValue = null;
             this._objectValue = value;
