@@ -9,7 +9,7 @@ namespace Scorpio.Tools {
         public static uint StringToIndex(string key) {
             if (stringToIndex.TryGetValue(key, out var index))
                 return index;
-            if (index >= indexToString.Length) {
+            if (stringIndex >= indexToString.Length) {
                 var newArray = new string[indexToString.Length + 1024];
                 Array.Copy(indexToString, newArray, indexToString.Length);
                 indexToString = newArray;
