@@ -10,6 +10,10 @@ namespace Scorpio {
                 var script = new Script();
                 script.LoadLibraryV1();
                 script.LoadFile(file);
+                var table = new ScriptMapString(script, 10);
+                table.SetValue("aaa", new ScriptValue("123123"));
+                Console.WriteLine(table.GetValue("aaa"));
+                return;
             }
         }
         [TestMethod]

@@ -359,8 +359,8 @@ namespace Scorpio {
         public object Value {
             get {
                 switch (valueType) {
-                    case doubleValueType: return _objectValue;
-                    case longValueType: return _objectValue;
+                    case doubleValueType: return _doubleValue;
+                    case longValueType: return _longValue;
                     case nullValueType: return null;
                     case trueValueType: return true;
                     case falseValueType: return false;
