@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Scorpio.Tools {
     public static class ScorpioParameters {
-        public class Parameter : IDisposable {
+        public const int Length = 128;
+        public unsafe class Parameter : IDisposable {
             public ScriptValue[] values;
-            public int length;
             public ScriptValue this[int index] {
                 set {
                     values[index].CopyFrom(value);
                 }
             }
             public Parameter() {
-                values = new ScriptValue[128];
+                values = new ScriptValue[Length];
             }
-            public void Dispose() {
-                Array.ForEach(values, _ => _.Free());
+            public unsafe void Dispose() {
+                fixed (ScriptValue* ptr = values) {
+                    for (var i = 0; i < Length; ++i) {
+                        (ptr + i)->Free();
+                    }
+                }
                 Free(this);
             }
         }

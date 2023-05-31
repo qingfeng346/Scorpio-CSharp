@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Scorpio {
     public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         protected Dictionary<string, ScriptValue> m_Values;             //所有的函数
-        protected Dictionary<string, ScriptValue> m_GetProperties;   //所有的get函数
+        protected Dictionary<string, ScriptValue> m_GetProperties;      //所有的get函数
         protected ScriptFunction m_EqualFunction;                       //==函数重载
         protected ScriptValue m_PrototypeValue;                         //基类
         protected ScriptType m_Prototype;                               //基类
@@ -19,6 +19,15 @@ namespace Scorpio {
         public string TypeName { get; private set; }        //Type名称
         public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
+        public override void Free() {
+            base.Free();
+            m_PrototypeValue.Free();
+            m_Prototype = null;
+            foreach (var pair in m_Values) { pair.Value.Free(); }
+            foreach (var pair in m_GetProperties) { pair.Value.Free(); }
+            m_Values.Clear();
+            m_GetProperties.Clear();
+        }
         public void AddGetProperty(string key, ScriptFunction value) {
             if (m_GetProperties.TryGetValue(key, out var result)) {
                 result.SetScriptValue(value);

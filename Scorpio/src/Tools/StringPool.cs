@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-
 namespace Scorpio.Tools {
-    public class ScriptObjectPool {
+    public class StringPool {
         private static readonly Entity DefaultEntity = new Entity(null, -1);
         public struct Entity {
-            public ScriptObject value;
+            public string value;
             public int referenceCount;
-            public Entity(ScriptObject value, int referenceCount) {
+            public Entity(string value, int referenceCount) {
                 this.value = value;
                 this.referenceCount = referenceCount;
             }
@@ -19,8 +18,8 @@ namespace Scorpio.Tools {
         private static int count = 0;
         public static Queue<int> pool = new Queue<int>();
         public static Entity[] entities = new Entity[Stage];
-        public static List<int> freeIndex = new List<int>();
-        public static int GetIndex(ScriptObject scriptObject) {
+        public static List<int> freeIndex = new List<int>(Stage);
+        public static int GetIndex(string stringValue) {
             int index;
             if (pool.Count > 0) {
                 index = pool.Dequeue();
@@ -32,7 +31,9 @@ namespace Scorpio.Tools {
                     entities = newEntities;
                 }
             }
-            entities[index] = new Entity(scriptObject, 1);
+            entities[index] = new Entity(stringValue, 1);
+            //if (entities[index].value == "1")
+            //    logger.debug("GetIndex- " + entities[index]);
             return index;
         }
         public static void Free(int index) {
@@ -40,19 +41,22 @@ namespace Scorpio.Tools {
                 //添加到待释放列表
                 freeIndex.Add(index);
             }
+            //if (entities[index].value == "1")
+            //    logger.debug("Free- " + entities[index]);
+        }
+        public static string GetValue(int index) {
+            return entities[index].value;
         }
         public static void Reference(int index) {
             ++entities[index].referenceCount;
-        }
-        public static ScriptObject GetValue(int index) {
-            return entities[index].value;
+            //if (entities[index].value == "1")
+            //    logger.debug("Reference- " + entities[index]);
         }
         //释放index
         public static void CheckFree() {
             for (var i = 0; i < freeIndex.Count; ++i) {
                 var index = freeIndex[i];
                 if (entities[index].referenceCount == 0) {
-                    entities[index].value.Free();
                     pool.Enqueue(index);
                     entities[index] = DefaultEntity;
                 }
@@ -62,7 +66,7 @@ namespace Scorpio.Tools {
         public static void CheckEntity() {
             foreach (var entity in entities) {
                 if (entity.value != null) {
-                    Console.WriteLine($"当前未释放Scirpt变量 : {entity}");
+                    Console.WriteLine("当前未释放String变量 : " + entity);
                 }
             }
         }

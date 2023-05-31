@@ -13,10 +13,8 @@ namespace Scorpio {
         }
         public override void Free() {
             base.Free();
-            foreach (var pair in m_Objects) {
-                pair.Value.Free();
-            }
-            m_Objects.Clear();
+            Clear();
+            m_Script.Free(this);
         }
         public override ScriptValue GetValue(string key) {
             return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
@@ -31,16 +29,32 @@ namespace Scorpio {
             return m_Objects.TryGetValue(key, out var value) ? value : ScriptValue.Null;
         }
         public override void SetValue(string key, ScriptValue value) {
-            m_Objects[key] = value;
+            if (m_Objects.TryGetValue(key, out var result)) {
+                result.CopyFrom(value);
+            } else {
+                m_Objects[key] = new ScriptValue(value);
+            }
         }
         public override void SetValue(double key, ScriptValue value) {
-            m_Objects[key] = value;
+            if (m_Objects.TryGetValue(key, out var result)) {
+                result.CopyFrom(value);
+            } else {
+                m_Objects[key] = new ScriptValue(value);
+            }
         }
         public override void SetValue(long key, ScriptValue value) {
-            m_Objects[key] = value;
+            if (m_Objects.TryGetValue(key, out var result)) {
+                result.CopyFrom(value);
+            } else {
+                m_Objects[key] = new ScriptValue(value);
+            }
         }
         public override void SetValue(object key, ScriptValue value) {
-            m_Objects[key] = value;
+            if (m_Objects.TryGetValue(key, out var result)) {
+                result.CopyFrom(value);
+            } else {
+                m_Objects[key] = new ScriptValue(value);
+            }
         }
 
         public override bool HasValue(string key) {
@@ -57,6 +71,9 @@ namespace Scorpio {
             return m_Objects.Count;
         }
         public override void Clear() {
+            foreach (var pair in m_Objects) {
+                pair.Value.Free();
+            }
             m_Objects.Clear();
         }
         public override void Remove(object key) {
@@ -65,7 +82,9 @@ namespace Scorpio {
         public override ScriptArray GetKeys() {
             var ret = new ScriptArray(m_Script);
             foreach (var pair in m_Objects) {
-                ret.Add(ScriptValue.CreateValue(pair.Key));
+                using (var value = ScriptValue.CreateValue(pair.Key)) {
+                    ret.Add(value);
+                }
             }
             return ret;
         }

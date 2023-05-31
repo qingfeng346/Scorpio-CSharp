@@ -17,7 +17,16 @@
 //     await sleep1(seconds)
 //     coroutine.done(ret, result)
 // }
-// var a = "feawfaewfw"
+function main1() {
+    var a = "12321313"
+    return a
+}
+function main() {
+    var a = main1()
+    // a["123213"] = 12321312
+}
+main()
+
 
 // #if !DA_GLOBAL
 

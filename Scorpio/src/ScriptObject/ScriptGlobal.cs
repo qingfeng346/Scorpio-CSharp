@@ -40,10 +40,7 @@ namespace Scorpio {
         private Dictionary<string, int> m_Indexs = new Dictionary<string, int>();           //名字到索引的映射
         public ScriptGlobal() : base(ObjectType.Global) { }
         public void Shutdown() {
-            for (int i = 0; i < m_Size; i++) {
-                m_Objects[i].Free();
-            }
-            Array.Clear(m_Objects);
+            ScorpioUtil.Free(m_Objects, m_Size);
             m_Indexs.Clear();
             m_Size = 0;
         }

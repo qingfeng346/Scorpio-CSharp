@@ -71,7 +71,9 @@ namespace Scorpio {
 
         }
         public override void Free() {
-
+            base.Free();
+            Clear();
+            m_Script.Free(this);
         }
         void SetCapacity(int value) {
             if (value > 0) {
@@ -113,7 +115,6 @@ namespace Scorpio {
         public override void SetValue(object index, ScriptValue value) {
             this[Convert.ToInt32(index)] = value;
         }
-
         public virtual ScriptValue this[int i] {
             get {
                 if (i < 0) throw new ExecutionException($"Array.get[] 索引小于0:{i}");
@@ -125,14 +126,14 @@ namespace Scorpio {
                     EnsureCapacity(i + 1);
                     m_Length = i + 1;
                 }
-                m_Objects[i] = value;
+                m_Objects[i].CopyFrom(value);
             }
         }
         public void Add(ScriptValue value) {
             if (m_Length == m_Objects.Length) {
                 EnsureCapacity(m_Length + 1);
             }
-            m_Objects[m_Length++] = value;
+            m_Objects[m_Length++].CopyFrom(value);
         }
         public void AddUnique(ScriptValue value) {
             for (int i = 0; i < m_Length; ++i) {
@@ -143,7 +144,7 @@ namespace Scorpio {
             if (m_Length == m_Objects.Length) {
                 EnsureCapacity(m_Length + 1);
             }
-            m_Objects[m_Length++] = value;
+            m_Objects[m_Length++].CopyFrom(value);
         }
         public void Insert(int index, ScriptValue value) {
             if (index < 0 || index > m_Length) throw new ExecutionException($"Array.Insert 索引小于0或超过最大值 index:{index} length:{m_Length}");
@@ -151,7 +152,7 @@ namespace Scorpio {
                 EnsureCapacity(m_Length + 1);
             }
             Array.Copy(m_Objects, index, m_Objects, index + 1, m_Length - index);
-            m_Objects[index] = value;
+            m_Objects[index].CopyFrom(value);
             m_Length++;
         }
         public bool Remove(ScriptValue value) {
@@ -164,9 +165,13 @@ namespace Scorpio {
         }
         public void RemoveAt(int index) {
             if (index < 0 || index >= m_Length) throw new ExecutionException($"Array.RemoveAt 索引小于0或超过最大值 index:{index} length:{m_Length}");
+            //先释放要删除的元素
+            m_Objects[index].Free();
             m_Length--;
+            //复制后续元素
             Array.Copy(m_Objects, index + 1, m_Objects, index, m_Length - index);
-            m_Objects[m_Length].SetNull();
+            //不能调用SetNull 否则可能会调用一次释放
+            m_Objects[m_Length] = ScriptValue.Null;
         }
         public bool Contains(ScriptValue obj) {
             for (int i = 0; i < m_Length; ++i) {
@@ -198,13 +203,15 @@ namespace Scorpio {
                 EnsureCapacity(length);
                 m_Length = length;
             } else {
-                Array.Clear(m_Objects, length, m_Length - length);
+                for (var i = length; i < m_Length; ++i) {
+                    m_Objects[i].Free();
+                }
                 m_Length = length;
             }
         }
         public void Clear() {
             if (m_Length > 0) {
-                Array.Clear(m_Objects, 0, m_Length);
+                ScorpioUtil.Free(m_Objects, m_Length);
                 m_Length = 0;
             }
         }
@@ -212,7 +219,7 @@ namespace Scorpio {
             return m_Length;
         }
         public void Sort(ScriptFunction func) {
-            Array.Sort<ScriptValue>(m_Objects, 0, m_Length, new Comparer(func));
+            Array.Sort(m_Objects, 0, m_Length, new Comparer(func));
         }
         public ScriptValue First() {
             return m_Length > 0 ? m_Objects[0] : ScriptValue.Null;
@@ -235,10 +242,14 @@ namespace Scorpio {
         }
         public ScriptValue PopLast() {
             if (m_Length <= 0)  throw new ExecutionException($"Array.PopLast 数组长度为0");
-            return m_Objects[--m_Length];
+            using var ret = m_Objects[--m_Length];
+            return ret;
         }
         public ScriptValue SafePopLast() {
-            return m_Length == 0 ? ScriptValue.Null : m_Objects[--m_Length];
+            if (m_Length == 0)
+                return ScriptValue.Null;
+            using var ret = m_Objects[--m_Length];
+            return ret;
         }
         //仅限于number和string
         public T[] ToArray<T>() {

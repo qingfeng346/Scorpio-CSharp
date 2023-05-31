@@ -116,7 +116,6 @@ namespace Scorpio {
                 ScriptObjectPool.Reference(_index);
             }
         }
-
         public void Free() {
             if (_valueType == stringValueType) {
                 StringPool.Free(_index);

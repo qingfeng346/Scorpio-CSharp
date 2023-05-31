@@ -1,4 +1,5 @@
 using Scorpio.Instruction;
+using Scorpio.Tools;
 using System;
 using System.Collections.Generic;
 
@@ -39,10 +40,10 @@ namespace Scorpio.Runtime {
             Array.ForEach(value.stack, _ => _.Free());
             AsyncValueQueue.Enqueue(value);
         }
-        private static void Free(ref ScriptValue[] variableObjects, ref ScriptValue[] stackObjects) {
+        private static void Free(ScriptValue[] variableObjects, ScriptValue[] stackObjects) {
             --VariableValueIndex;
-            Array.ForEach(variableObjects, _ => _.Free());
-            Array.ForEach(stackObjects, _ => _.Free());
+            ScorpioUtil.Free(variableObjects, variableObjects.Length);
+            ScorpioUtil.Free(stackObjects, stackObjects.Length);
         }
         public Script m_script; //脚本类
         private ScriptGlobal m_global; //global

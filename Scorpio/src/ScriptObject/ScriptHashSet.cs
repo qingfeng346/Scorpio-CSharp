@@ -11,17 +11,31 @@ namespace Scorpio {
         public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
         public Script getScript() { return m_Script; }
+        public override void Free() {
+            base.Free();
+            Clear();
+            m_Script.Free(this);
+        }
         public void Add(ScriptValue item) {
-            m_Objects.Add(item);
+            if (!m_Objects.Contains(item)) {
+                m_Objects.Add(new ScriptValue(item));
+            }
         }
         public void Clear() {
+            foreach (var value in m_Objects) {
+                value.Free();
+            }
             m_Objects.Clear();
         }
         public bool Contains(ScriptValue item) {
             return m_Objects.Contains(item);
         }
         public bool Remove(ScriptValue item) {
-            return m_Objects.Remove(item);
+            if (m_Objects.Remove(item)) {
+                item.Free();
+                return true;
+            }
+            return false;
         }
         public int RemoveWhere(Predicate<ScriptValue> match) {
             return m_Objects.RemoveWhere(match);
