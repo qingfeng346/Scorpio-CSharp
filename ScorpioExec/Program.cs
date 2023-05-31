@@ -226,7 +226,15 @@ namespace ScorpioExec {
                     Logger.info ("=============================");
                     var watch = Stopwatch.StartNew ();
                     var value = script.LoadFile (file, ParseOption (command.GetValueDefault (ParameterOption, ""), script.SearchPaths));
+                    script.Shutdown();
+                    script.CheckFree();
                     while (script.UpdateCoroutine ()) { }
+                    Scorpio.Tools.StringPool.CheckEntity();
+                    Scorpio.Tools.ScriptObjectPool.CheckEntity ();
+                    var entities = Scorpio.Tools.StringPool.entities;
+                    var pool = Scorpio.Tools.StringPool.pool;
+                    var en = Scorpio.Tools.ScriptObjectPool.entities;
+                    var p = Scorpio.Tools.ScriptObjectPool.pool;
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");

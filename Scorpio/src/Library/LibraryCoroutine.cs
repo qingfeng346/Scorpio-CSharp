@@ -12,7 +12,7 @@ namespace Scorpio.Library {
             map.SetValue("epoll", script.CreateFunction(new epoll()));
             map.SetValue("done", script.CreateFunction(new done()));
             script.SetGlobal("sleep", script.CreateFunction(new sleep()));
-            script.SetGlobal("coroutine", new ScriptValue(map));
+            script.SetGlobal("coroutine", map);
         }
         private class start : ScorpioHandle {
             readonly Script m_Script;

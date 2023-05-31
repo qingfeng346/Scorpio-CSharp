@@ -29,14 +29,20 @@ namespace Scorpio.Runtime {
                 TryStackValues[i] = new int[TryStackLength];
             }
         }
-        internal AsyncValue AllocAsyncValue() {
-            if (AsyncValueQueue.Count == 0) {
+        private static AsyncValue AllocAsyncValue() {
+            if (AsyncValueQueue.Count == 0)
                 return new AsyncValue() { variable = new ScriptValue[64], stack = new ScriptValue[64] };
-            }
             return AsyncValueQueue.Dequeue();
         }
-        internal void FreeAsyncValue(AsyncValue value) {
+        private static void FreeAsyncValue(AsyncValue value) {
+            Array.ForEach(value.variable, _ => _.Free());
+            Array.ForEach(value.stack, _ => _.Free());
             AsyncValueQueue.Enqueue(value);
+        }
+        private static void Free(ref ScriptValue[] variableObjects, ref ScriptValue[] stackObjects) {
+            --VariableValueIndex;
+            Array.ForEach(variableObjects, _ => _.Free());
+            Array.ForEach(stackObjects, _ => _.Free());
         }
         public Script m_script; //脚本类
         private ScriptGlobal m_global; //global

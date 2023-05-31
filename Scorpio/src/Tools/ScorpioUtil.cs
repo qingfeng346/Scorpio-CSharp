@@ -75,7 +75,7 @@ namespace Scorpio.Tools {
                     }
                     throw new System.Exception($"其他数字类型请先转换再传入 source:DoubleNumber  target:{type}");
                 }
-                case ScriptValue.longValueType: {
+                case ScriptValue.int64ValueType: {
                     unchecked {
                         if (ReferenceEquals(type, TYPE_INT)) { return (int)value.longValue; }
                         if (ReferenceEquals(type, TYPE_FLOAT)) { return (float)value.longValue; }
@@ -97,7 +97,7 @@ namespace Scorpio.Tools {
                 case ScriptValue.trueValueType: return true;
                 case ScriptValue.falseValueType: return false;
                 case ScriptValue.stringValueType: return value.stringValue;
-                case ScriptValue.objectValueType: return value.objectValue;
+                //case ScriptValue.objectValueType: return value.objectValue;
                 case ScriptValue.scriptValueType: {
                     if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom (type)) {
                         return ScorpioDelegateFactoryManager.CreateDelegate (type, value.scriptValue);
@@ -117,12 +117,12 @@ namespace Scorpio.Tools {
                 case ScriptValue.falseValueType:
                     return ReferenceEquals(type, TYPE_BOOL);
                 case ScriptValue.doubleValueType:
-                case ScriptValue.longValueType:
+                case ScriptValue.int64ValueType:
                     return type.IsPrimitive;
                 case ScriptValue.stringValueType:
                     return ReferenceEquals(type, TYPE_STRING);
-                case ScriptValue.objectValueType:
-                    return type.IsAssignableFrom (value.objectValue.GetType ());
+                //case ScriptValue.objectValueType:
+                //    return type.IsAssignableFrom (value.objectValue.GetType ());
                 default:
                     return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
             }
@@ -134,14 +134,14 @@ namespace Scorpio.Tools {
                 case ScriptValue.falseValueType:
                     return ReferenceEquals(type, TYPE_BOOL);
                 case ScriptValue.doubleValueType:
-                case ScriptValue.longValueType:
+                case ScriptValue.int64ValueType:
                     return type.IsPrimitive;
                 case ScriptValue.stringValueType:
                     return ReferenceEquals(type, TYPE_STRING);
                 case ScriptValue.nullValueType:
                     return !type.IsValueType;
-                case ScriptValue.objectValueType:
-                    return type.IsAssignableFrom (value.objectValue.GetType ());
+                //case ScriptValue.objectValueType:
+                //    return type.IsAssignableFrom (value.objectValue.GetType ());
                 default:
                     return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
             }

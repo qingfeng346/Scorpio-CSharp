@@ -1,3 +1,4 @@
+using Scorpio.Tools;
 using System;
 
 namespace Scorpio.LibraryV1 {
@@ -23,7 +24,7 @@ namespace Scorpio.LibraryV1 {
             map.SetValue("contains", script.CreateFunction(new contains()));
             map.SetValue("split", script.CreateFunction(new split(script)));
             map.SetValue("at", script.CreateFunction(new at()));
-            script.SetGlobal("string", new ScriptValue(map));
+            script.SetGlobal("string", map);
         }
         private class length : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
@@ -111,11 +112,12 @@ namespace Scorpio.LibraryV1 {
                 var splits = new string[length];
                 for (var i = 1; i < length; ++i) { splits[i] = args[i].ToString(); }
                 var strs = args[0].stringValue.Split(splits, StringSplitOptions.RemoveEmptyEntries);
-                var ret = new ScriptArray(m_script);
+                var ret = m_script.NewArray();
                 foreach (string str in strs) {
                     ret.Add(new ScriptValue(str));
                 }
-                return new ScriptValue(ret);
+                using var value = new ScriptValue(ret);
+                return value;
             }
         }
     }

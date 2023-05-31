@@ -20,7 +20,7 @@ namespace Scorpio.LibraryV1 {
             map.SetValue("safepopfirst", script.CreateFunction(new safepopfirst()));
             map.SetValue("poplast", script.CreateFunction(new poplast()));
             map.SetValue("safepoplast", script.CreateFunction(new safepoplast()));
-            script.SetGlobal("array", new ScriptValue(map));
+            script.SetGlobal("array", map);
         }
         private class count : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

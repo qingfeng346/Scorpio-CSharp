@@ -13,16 +13,19 @@ namespace Scorpio {
                 this.func = func;
             }
             public int Compare(ScriptValue o1, ScriptValue o2) {
-                ScriptValue.Parameters[0] = o1;
-                ScriptValue.Parameters[1] = o2;
-                var ret = func.Call(ScriptValue.Null, ScriptValue.Parameters, 2);
-                switch (ret.valueType) {
-                    case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
-                    case ScriptValue.longValueType: return Convert.ToInt32(ret.longValue);
-                    case ScriptValue.trueValueType: return 1;
-                    case ScriptValue.falseValueType: return -1;
-                    default: throw new ExecutionException("数组排序返回值必须是Number或Bool类型");
+                using (var parameter = ScorpioParameters.Get()) {
+                    parameter[0] = o1;
+                    parameter[1] = o2;
+                    var ret = func.Call(ScriptValue.Null, parameter.values, 2);
+                    switch (ret.valueType) {
+                        case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
+                        case ScriptValue.int64ValueType: return Convert.ToInt32(ret.longValue);
+                        case ScriptValue.trueValueType: return 1;
+                        case ScriptValue.falseValueType: return -1;
+                        default: throw new ExecutionException("数组排序返回值必须是Number或Bool类型");
+                    }
                 }
+                
             }
         }
         //数组迭代器
@@ -62,13 +65,14 @@ namespace Scorpio {
             m_Objects = ScriptValue.EMPTY;
             m_Length = 0;
         }
-        internal ScriptArray(Script script, ScriptValue[] parameters, int length) : this(script) {
-            for (var i = 0; i < length;++i) {
-                Add(parameters[i]);
-            }
-        }
         public Script getScript() { return m_Script; }
         internal ScriptValue[] getObjects() { return m_Objects; }
+        public override void Alloc() {
+
+        }
+        public override void Free() {
+
+        }
         void SetCapacity(int value) {
             if (value > 0) {
                 var array = new ScriptValue[value];
@@ -162,7 +166,7 @@ namespace Scorpio {
             if (index < 0 || index >= m_Length) throw new ExecutionException($"Array.RemoveAt 索引小于0或超过最大值 index:{index} length:{m_Length}");
             m_Length--;
             Array.Copy(m_Objects, index + 1, m_Objects, index, m_Length - index);
-            m_Objects[m_Length].valueType = ScriptValue.nullValueType;
+            m_Objects[m_Length].SetNull();
         }
         public bool Contains(ScriptValue obj) {
             for (int i = 0; i < m_Length; ++i) {

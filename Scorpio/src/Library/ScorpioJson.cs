@@ -244,15 +244,15 @@ namespace Scorpio.Library {
                 case ScriptValue.doubleValueType:
                     m_Builder.Append(value.doubleValue);
                     break;
-                case ScriptValue.longValueType:
+                case ScriptValue.int64ValueType:
                     m_Builder.Append(value.longValue);
                     break;
                 case ScriptValue.stringValueType:
                     Serializer(value.stringValue);
                     break;
-                case ScriptValue.objectValueType:
-                    Serializer(value.objectValue.ToString());
-                    break;
+                //case ScriptValue.objectValueType:
+                //    Serializer(value.objectValue.ToString());
+                //    break;
                 case ScriptValue.scriptValueType:
                     Serializer(value.scriptValue);
                     break;

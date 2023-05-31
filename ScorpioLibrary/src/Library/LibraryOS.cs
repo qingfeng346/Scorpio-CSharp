@@ -19,7 +19,7 @@ namespace ScorpioLibrary {
             map.SetValue("setEnvironmentVariable", script.CreateFunction(new setEnvironmentVariable()));
             map.SetValue("getFolderPath", script.CreateFunction(new getFolderPath()));
             map.SetValue("process", script.CreateFunction(new process(script)));
-            script.SetGlobal("os", new ScriptValue(map));
+            script.SetGlobal("os", map);
         }
         private class platform : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
@@ -105,7 +105,8 @@ namespace ScorpioLibrary {
                     var result = script.CreateMap();
                     result.SetValue("output", new ScriptValue(process.StandardOutput.ReadToEnd()));
                     result.SetValue("exitCode", new ScriptValue((double)process.ExitCode));
-                    return new ScriptValue(result);
+                    using var ret = new ScriptValue(result);
+                    return ret;
                 }
             }
         }

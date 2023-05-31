@@ -1,5 +1,7 @@
 using System;
 using Scorpio.Exception;
+using Scorpio.Tools;
+
 namespace Scorpio {
     public enum ObjectType {
         Type,           //原表
@@ -14,12 +16,18 @@ namespace Scorpio {
         UserData,       //普通类
         Global,         //全局变量保存类,只有_G是这个类型
     }
-    public abstract class ScriptObject {
-        private static ScriptValue CommonThisValue = new ScriptValue() { valueType = ScriptValue.scriptValueType };
+    public abstract class ScriptObject : IPool {
+        private static ScriptValue CommonThisValue = ScriptValue.Null;
 
         // 构图函数
         public ScriptObject(ObjectType objectType) {
             ObjectType = objectType;
+        }
+        public virtual void Alloc() {
+
+        }
+        public virtual void Free() {
+
         }
         public ObjectType ObjectType { get; private set; }                              //类型
         public virtual object Value { get { return this; } }                            //值
@@ -28,7 +36,7 @@ namespace Scorpio {
         public virtual string ValueTypeName { get { return ObjectType.ToString(); } }   //类型名称
         public ScriptValue ThisValue { 
             get {
-                CommonThisValue.scriptValue = this;
+                CommonThisValue.SetScriptValue(this);
                 return CommonThisValue;
             }
         }
@@ -72,9 +80,11 @@ namespace Scorpio {
         //调用函数
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
-            var parameters = ScriptValue.Parameters;
-            for (var i = 0; i < length; ++i) parameters[i] = ScriptValue.CreateValue(args[i]);
-            return Call(thisObject, parameters, length);
+            using (var parameters = ScorpioParameters.Get()) {
+                for (var i = 0; i < length; ++i)
+                    parameters[i] = ScriptValue.CreateValue(args[i]);
+                return Call(thisObject, parameters.values, length);
+            }
         }
         //调用无参函数
         public ScriptValue CallNoParameters(ScriptValue thisObject) { return Call(thisObject, ScriptValue.EMPTY, 0); }

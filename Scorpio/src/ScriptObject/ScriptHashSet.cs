@@ -8,17 +8,6 @@ namespace Scorpio {
         private Script m_Script;
         public HashSet<ScriptValue> m_Objects = new HashSet<ScriptValue>();
         public ScriptHashSet(Script script) : base(ObjectType.HashSet, script.TypeHashSet) { m_Script = script; }
-        internal ScriptHashSet(Script script, ScriptValue[] parameters, int length) : this(script) {
-            if (length == 0) { return; }
-            var ienumerable = parameters[0].Value as IEnumerable<ScriptValue>;
-            if (ienumerable != null) {
-                m_Objects.UnionWith(ienumerable);
-            } else {
-                for (var i = 0; i < length; ++i) {
-                    m_Objects.Add(parameters[i]);
-                }
-            }
-        }
         public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
         public Script getScript() { return m_Script; }

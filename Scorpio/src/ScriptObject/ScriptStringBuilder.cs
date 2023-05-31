@@ -4,11 +4,6 @@ namespace Scorpio {
     public class ScriptStringBuilder : ScriptInstance {
         public StringBuilder Builder { get; } = new StringBuilder();
         public ScriptStringBuilder(Script script) : base(ObjectType.StringBuilder, script.TypeStringBuilder) { }
-        internal ScriptStringBuilder(Script script, ScriptValue[] parameters, int length) : this(script) {
-            for (var i = 0; i < length; ++i) {
-                Builder.Append(parameters[i]);
-            }
-        }
         public override ScriptValue GetValue(double index) {
             return new ScriptValue(Builder[(int)index]);
         }

@@ -1,25 +1,23 @@
-function sleep1(seconds) {
-    var end = io.unixNow() + seconds * 1000
-    return coroutine.poll(function() {
-        return io.unixNow() >= end
-    }, function() {
-        return "poll123123123123"
-    })
-}
-function sleep2(seconds) {
-    //coroutine.epoll 回调, 调用 coroutine.done 时跳出
-    var ret = coroutine.epoll()
-    done(ret, seconds, "epoll")
-    return ret 
-}
-async function done(ret, seconds, result) {
-    await sleep1(seconds)
-    coroutine.done(ret, result)
-}
-async function main() {
-    await sleep1(2)
-}
-main()
+
+// function sleep1(seconds) {
+//     var end = io.unixNow() + seconds * 1000
+//     return coroutine.poll(function() {
+//         return io.unixNow() >= end
+//     }, function() {
+//         return "poll123123123123"
+//     })
+// }
+// function sleep2(seconds) {
+//     //coroutine.epoll 回调, 调用 coroutine.done 时跳出
+//     var ret = coroutine.epoll()
+//     done(ret, seconds, "epoll")
+//     return ret 
+// }
+// async function done(ret, seconds, result) {
+//     await sleep1(seconds)
+//     coroutine.done(ret, result)
+// }
+// var a = "feawfaewfw"
 
 // #if !DA_GLOBAL
 

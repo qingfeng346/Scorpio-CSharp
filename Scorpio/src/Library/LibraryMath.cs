@@ -36,7 +36,7 @@ namespace Scorpio.Library {
             map.SetValue("tanh", script.CreateFunction(new tanh()));        //
             map.SetValue("atan", script.CreateFunction(new atan()));        //
 
-            script.SetGlobal("math", new ScriptValue(map));
+            script.SetGlobal("math", map);
         }
         private class min : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
@@ -58,7 +58,7 @@ namespace Scorpio.Library {
                                 }
                                 break;
                             }
-                            case ScriptValue.longValueType: {
+                            case ScriptValue.int64ValueType: {
                                 if (arg.longValue < min.longValue) {
                                     min = arg;
                                 }
@@ -91,7 +91,7 @@ namespace Scorpio.Library {
                                 }
                                 break;
                             }
-                            case ScriptValue.longValueType: {
+                            case ScriptValue.int64ValueType: {
                                 if (arg.longValue > max.longValue) {
                                     max = arg;
                                 }
@@ -109,7 +109,7 @@ namespace Scorpio.Library {
                 var value = args[0];
                 switch (value.valueType) {
                     case ScriptValue.doubleValueType: return new ScriptValue(value.doubleValue >= 0 ? value.doubleValue : -value.doubleValue);
-                    case ScriptValue.longValueType: return new ScriptValue(value.longValue >= 0 ? value.longValue : -value.longValue);
+                    case ScriptValue.int64ValueType: return new ScriptValue(value.longValue >= 0 ? value.longValue : -value.longValue);
                     default: return value;
                 }
             }
@@ -153,7 +153,7 @@ namespace Scorpio.Library {
                         if (value.doubleValue > max) return new ScriptValue(max);
                         return value;
                     }
-                    case ScriptValue.longValueType: {
+                    case ScriptValue.int64ValueType: {
                         var min = Convert.ToInt64(args[1].Value);
                         if (value.longValue < min) return new ScriptValue(min);
                         var max = Convert.ToInt64(args[2].Value);

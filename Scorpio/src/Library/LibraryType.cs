@@ -14,7 +14,8 @@ namespace Scorpio.Library {
                 m_Script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(new ScriptMapString(m_Script));
+                using var value = new ScriptValue(new ScriptMapString(m_Script));
+                return value;
             }
         }
         private class PollingMap : ScorpioHandle {
@@ -23,7 +24,9 @@ namespace Scorpio.Library {
                 m_Script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(new ScriptMapPolling(m_Script, length > 0 ? args[0].ToInt32() : 0, length > 1 ? args[1].IsTrue : false));
+                using (var value = new ScriptValue(new ScriptMapPolling(m_Script, length > 0 ? args[0].ToInt32() : 0, length > 1 ? args[1].IsTrue : false))) {
+                    return value;
+                }
             }
         }
     }

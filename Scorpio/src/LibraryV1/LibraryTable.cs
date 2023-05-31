@@ -9,7 +9,7 @@ namespace Scorpio.LibraryV1 {
             map.SetValue("containskey", script.CreateFunction(new containskey()));
             map.SetValue("keys", script.CreateFunction(new keys()));
             map.SetValue("values", script.CreateFunction(new values()));
-            script.SetGlobal("table", new ScriptValue(map));
+            script.SetGlobal("table", map);
         }
         private class count : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
@@ -37,12 +37,16 @@ namespace Scorpio.LibraryV1 {
         }
         private class keys : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(args[0].Get<ScriptMap>().GetKeys());
+                using (var value = new ScriptValue(args[0].Get<ScriptMap>().GetKeys())) {
+                    return value;
+                }
             }
         }
         private class values : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(args[0].Get<ScriptMap>().GetValues());
+                using (var value = new ScriptValue(args[0].Get<ScriptMap>().GetValues())) {
+                    return value;
+                }
             }
         }
     }

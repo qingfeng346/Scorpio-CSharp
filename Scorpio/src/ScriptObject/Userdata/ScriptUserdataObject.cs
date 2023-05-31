@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Scorpio.Exception;
 using Scorpio.Function;
+using Scorpio.Tools;
 
 namespace Scorpio.Userdata {
     /// <summary> 普通Object类型 </summary>
@@ -28,77 +29,88 @@ namespace Scorpio.Userdata {
         public override ScriptValue GetValue(double index) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
-            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
-            return ScriptValue.CreateValue(func.Call(false, m_Value, ScriptValue.Parameters, 1));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ScriptValue.CreateValue(index);
+            return ScriptValue.CreateValue(func.Call(false, m_Value, parameters.values, 1));
         }
         public override ScriptValue GetValue(long index) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
-            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
-            return ScriptValue.CreateValue(func.Call(false, m_Value, ScriptValue.Parameters, 1));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ScriptValue.CreateValue(index);
+            return ScriptValue.CreateValue(func.Call(false, m_Value, parameters.values, 1));
         }
         public override ScriptValue GetValue(object index) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
-            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
-            return ScriptValue.CreateValue(func.Call(false, m_Value, ScriptValue.Parameters, 1));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ScriptValue.CreateValue(index);
+            return ScriptValue.CreateValue(func.Call(false, m_Value, parameters.values, 1));
         }
         public override void SetValue(double index, ScriptValue value) {
             var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] set ]运算符重载");
-            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
-            ScriptValue.Parameters[1] = value;
-            func.Call(false, m_Value, ScriptValue.Parameters, 2);
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ScriptValue.CreateValue(index);
+            parameters[1] = value;
+            func.Call(false, m_Value, parameters.values, 2);
         }
         public override void SetValue(long index, ScriptValue value) {
             var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] set ]运算符重载");
-            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
-            ScriptValue.Parameters[1] = value;
-            func.Call(false, m_Value, ScriptValue.Parameters, 2);
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ScriptValue.CreateValue(index);
+            parameters[1] = value;
+            func.Call(false, m_Value, parameters.values, 2);
         }
         public override void SetValue(object index, ScriptValue value) {
             var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] set ]运算符重载");
-            ScriptValue.Parameters[0] = ScriptValue.CreateValue(index);
-            ScriptValue.Parameters[1] = value;
-            func.Call(false, m_Value, ScriptValue.Parameters, 2);
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ScriptValue.CreateValue(index);
+            parameters[1] = value;
+            func.Call(false, m_Value, parameters.values, 2);
         }
         public override string ToString() { return m_Value.ToString(); }
         public override bool Less(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.LessIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[<]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return (bool)func.Call(true, null, ScriptValue.Parameters, 2);
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return (bool)func.Call(true, null, parameters.values, 2);
         }
         public override bool LessOrEqual(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.LessOrEqualIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[<=]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return (bool)func.Call(true, null, ScriptValue.Parameters, 2);
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return (bool)func.Call(true, null, parameters.values, 2);
         }
         public override bool Greater(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GreaterIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[>]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return (bool)func.Call(true, null, ScriptValue.Parameters, 2);
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return (bool)func.Call(true, null, parameters.values, 2);
         }
         public override bool GreaterOrEqual(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GreaterOrEqualIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[>=]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return (bool)func.Call(true, null, ScriptValue.Parameters, 2);
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return (bool)func.Call(true, null, parameters.values, 2);
         }
         public override bool Equals(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.EqualIndex);
             if (func != null) {
-                ScriptValue.Parameters[0] = ThisValue;
-                ScriptValue.Parameters[1] = obj;
-                if (func.CallNoThrow(true, null, ScriptValue.Parameters, 2, out var result)) {
+                using var parameters = ScorpioParameters.Get();
+                parameters[0] = ThisValue;
+                parameters[1] = obj;
+                if (func.CallNoThrow(true, null, parameters.values, 2, out var result)) {
                     return (bool)result;
                 }
             }
@@ -111,72 +123,82 @@ namespace Scorpio.Userdata {
         public override ScriptValue Plus(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.PlusIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[+]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue Minus(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.MinusIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[-]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue Multiply(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.MultiplyIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[*]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue Divide(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.DivideIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[/]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue Modulo(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.ModuloIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[%]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue InclusiveOr(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.InclusiveOrIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[|]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue Combine(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.CombineIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[&]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue XOR(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.XORIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[^]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue Shi(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.ShiIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[<<]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
         public override ScriptValue Shr(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.ShrIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[>>]运算符重载");
-            ScriptValue.Parameters[0] = ThisValue;
-            ScriptValue.Parameters[1] = obj;
-            return ScriptValue.CreateValue(func.Call(true, null, ScriptValue.Parameters, 2));
+            using var parameters = ScorpioParameters.Get();
+            parameters[0] = ThisValue;
+            parameters[1] = obj;
+            return ScriptValue.CreateValue(func.Call(true, null, parameters.values, 2));
         }
     }
 }

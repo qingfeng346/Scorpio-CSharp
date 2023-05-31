@@ -6,7 +6,7 @@ namespace Scorpio.Library {
             map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf()));
             map.SetValue("isType", script.CreateFunction(new isType()));
             map.SetValue("extend", script.CreateFunction(new extend()));
-            script.SetGlobal("userdata", new ScriptValue(map));
+            script.SetGlobal("userdata", map);
         }
         private class fieldTypeOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

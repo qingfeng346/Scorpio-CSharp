@@ -74,8 +74,9 @@ namespace Scorpio {
 
         public Script() {
             m_SearchPaths = new string[0];
+            InitPool();
             Global = new ScriptGlobal();
-            
+
             TypeObject = new ScriptTypeObject(this, "Object");
             TypeObjectValue = new ScriptValue(TypeObject);
             Global.SetValue(TypeObject.TypeName, TypeObjectValue);
@@ -85,14 +86,21 @@ namespace Scorpio {
             AddPrimitivePrototype("String", ref m_TypeString, ref m_TypeValueString);
             AddPrimitivePrototype("Function", ref m_TypeFunction, ref m_TypeValueFunction);
 
-            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", TypeObject), ref m_TypeValueArray);
-            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", TypeObject), ref m_TypeValueMap);
-            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObject), ref m_TypeValueStringBuilder);
-            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObject), ref m_TypeValueHashSet);
+            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", TypeObjectValue), ref m_TypeValueArray);
+            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", TypeObjectValue), ref m_TypeValueMap);
+            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObjectValue), ref m_TypeValueStringBuilder);
+            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObjectValue), ref m_TypeValueHashSet);
 
-            Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
-            Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateValue(this));
-            Global.SetValue(GLOBAL_VERSION, ScriptValue.CreateValue(typeof(Version)));
+            
+            using (var value = new ScriptValue(Global)) {
+                Global.SetValue(GLOBAL_NAME, value);
+            }
+            using (var value = ScriptValue.CreateValue(this)) {
+                Global.SetValue(GLOBAL_SCRIPT, value);
+            }
+            using (var value = ScriptValue.CreateValue(typeof(Version))) {
+                Global.SetValue(GLOBAL_VERSION, value);
+            }
 
             ProtoObject.Load(this, TypeObject);
             ProtoBoolean.Load(this, TypeBoolean);
@@ -119,11 +127,19 @@ namespace Scorpio {
         }
         public void Shutdown() {
             Global.Shutdown();
-            TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = null;
-            TypeObjectValue = m_TypeValueBool = m_TypeValueNumber = m_TypeValueString = m_TypeValueArray = m_TypeValueMap = m_TypeValueFunction = m_TypeValueStringBuilder = default;
+            TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = m_TypeHashSet = null;
+            TypeObjectValue.Free();
+            m_TypeValueBool.Free();
+            m_TypeValueNumber.Free();
+            m_TypeValueString.Free();
+            m_TypeValueArray.Free();
+            m_TypeValueMap.Free();
+            m_TypeValueFunction.Free();
+            m_TypeValueStringBuilder.Free();
+            m_TypeValueHashSet.Free();
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
-            type = new ScriptTypePrimitive(name, TypeObject);
+            type = new ScriptTypePrimitive(name, TypeObjectValue);
             typeValue = new ScriptValue(type);
             Global.SetValue(name, typeValue);
         }
@@ -191,8 +207,13 @@ namespace Scorpio {
         /// <summary> 设置一个全局变量 </summary>
         /// <param name="key">名字</param>
         /// <param name="value">值</param>
-        public void SetGlobal(string key, ScriptValue value) {
-            Global.SetValue(key, value);
+        //public void SetGlobal(string key, ScriptValue value) {
+        //    Global.SetValue(key, value);
+        //}
+        public void SetGlobal(string key, ScriptObject value) {
+            using (var scriptValue = new ScriptValue(value)) {
+                Global.SetValue(key, scriptValue);
+            }
         }
         /// <summary> 获得一个全局变量 </summary>
         /// <param name="key">名字</param>
@@ -214,10 +235,12 @@ namespace Scorpio {
             Global.SetValue(GLOBAL_ARGS, new ScriptValue(array));
         }
         /// <summary> 创建一个空的array </summary>
-        public ScriptArray CreateArray() { return new ScriptArray(this); }
+        public ScriptArray CreateArray() {
+            return NewArray();
+        }
         /// <summary> 创建一个array </summary>
-        public ScriptArray CreateArray(System.Collections.IEnumerable list) { 
-            var array = new ScriptArray(this);
+        public ScriptArray CreateArray(System.Collections.IEnumerable list) {
+            var array = NewArray();
             foreach (var item in list) {
                 array.Add(ScriptValue.CreateValue(item));
             }
@@ -225,13 +248,9 @@ namespace Scorpio {
         }
         /// <summary> 创建一个空的map </summary>
         public ScriptMap CreateMap() { return new ScriptMapObject(this); }
-        /// <summary> 创建一个类 </summary>
-        /// <param name="typeName">类名</param>
-        /// <param name="parentType">类数据</param>
-        public ScriptType CreateType(string typeName, ScriptType parentType) { return new ScriptType(typeName, parentType); }
         /// <summary> 创建一个Function </summary>
         /// <param name="value">ScorpioHandle</param>
-        public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }
+        public ScriptHandleFunction CreateFunction(ScorpioHandle value) { return new ScriptHandleFunction(this, value); }
         /// <summary> 创建一个 Instance </summary>
         public ScriptInstance CreateInstance() { return new ScriptInstance(ObjectType.Type, TypeObject); }
         /// <summary> 调用一个全局函数 </summary>
@@ -437,7 +456,7 @@ namespace Scorpio {
                 case ScriptValue.doubleValueType:
                     scriptConst.Add(key, value.doubleValue);
                     break;
-                case ScriptValue.longValueType:
+                case ScriptValue.int64ValueType:
                     scriptConst.Add(key, value.longValue);
                     break;
                 case ScriptValue.stringValueType:
@@ -482,6 +501,10 @@ namespace Scorpio {
                 stackInfos[i] = m_StackInfos[i];
             }
             return stackInfos;
+        }
+        public void CheckFree() {
+            StringPool.CheckFree();
+            ScriptObjectPool.CheckFree();
         }
     }
 }

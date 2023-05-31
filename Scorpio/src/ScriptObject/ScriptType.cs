@@ -5,37 +5,50 @@ using System.Collections.Generic;
 namespace Scorpio {
     public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         protected Dictionary<string, ScriptValue> m_Values;             //所有的函数
-        protected Dictionary<string, ScriptFunction> m_GetProperties;   //所有的get函数
+        protected Dictionary<string, ScriptValue> m_GetProperties;   //所有的get函数
         protected ScriptFunction m_EqualFunction;                       //==函数重载
+        protected ScriptValue m_PrototypeValue;                         //基类
         protected ScriptType m_Prototype;                               //基类
-        public ScriptType(string typeName, ScriptType parentType) : base(ObjectType.Type) {
+        public ScriptType(string typeName, ScriptValue parentValue) : base(ObjectType.Type) {
             TypeName = typeName;
-            m_Prototype = parentType;
+            m_PrototypeValue.CopyFrom(parentValue);
+            m_Prototype = parentValue.Get<ScriptType>();
             m_Values = new Dictionary<string, ScriptValue>();
-            m_GetProperties = new Dictionary<string, ScriptFunction>();
+            m_GetProperties = new Dictionary<string, ScriptValue>();
         }
         public string TypeName { get; private set; }        //Type名称
         public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
         public void AddGetProperty(string key, ScriptFunction value) {
-            m_GetProperties[key] = value;
-        }
-        public void RemoveGetProperty(string key) {
-            m_GetProperties.Remove(key);
+            if (m_GetProperties.TryGetValue(key, out var result)) {
+                result.SetScriptValue(value);
+            } else {
+                m_GetProperties[key] = new ScriptValue(value);
+            }
         }
         public virtual ScriptValue GetValue(string key, ScriptInstance instance) {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
-                return get.CallNoParameters(new ScriptValue(instance));
+                using var parameter = new ScriptValue(instance);
+                return get.Get<ScriptFunction>().CallNoParameters(parameter);
             }
             return m_Prototype.GetValue(key, instance);
         }
         public virtual ScriptValue GetValueNoDefault(string key) {
             return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValueNoDefault(key);
         }
+        public void SetValue(string key, ScriptObject scriptObject) {
+            using (var value = new ScriptValue(scriptObject)) {
+                SetValue(key, value);
+            }
+        }
         public override void SetValue(string key, ScriptValue value) {
-            m_Values[key] = value;
+            if (m_Values.TryGetValue(key, out var result)) {
+                result.CopyFrom(value);
+            } else {
+                m_Values[key] = new ScriptValue(value);
+            }
             if (key == ScriptOperator.Equal) {
                 m_EqualFunction = value.Get<ScriptFunction>();
             }
@@ -58,7 +71,7 @@ namespace Scorpio {
     //Object原表, GetValue 找不到就返回 null
     internal class ScriptTypeObject : ScriptType {
         private Script m_Script;
-        internal ScriptTypeObject(Script script, string typeName) : base(typeName, null) {
+        internal ScriptTypeObject(Script script, string typeName) : base(typeName, ScriptValue.Null) {
             m_Script = script;
         }
         public override ScriptType Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
@@ -73,7 +86,8 @@ namespace Scorpio {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
-                return get.CallNoParameters(new ScriptValue(instance));
+                using var parameter = new ScriptValue(instance);
+                return get.Get<ScriptFunction>().CallNoParameters(parameter);
             }
             return ScriptValue.Null;
         }
@@ -83,7 +97,7 @@ namespace Scorpio {
     }
     //自带基础类型的原表,不支持动态申请,只能已特定形式申请变量, number, string, bool, function 等
     internal class ScriptTypePrimitive : ScriptType {
-        public ScriptTypePrimitive(string typeName, ScriptType parentType) : base(typeName, parentType) { }
+        public ScriptTypePrimitive(string typeName, ScriptValue parentValue) : base(typeName, parentValue) { }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             throw new ExecutionException($"Class<{TypeName}>不支持构造");
         }
@@ -91,40 +105,44 @@ namespace Scorpio {
     //Array类型原表
     internal class ScriptTypeBasicArray : ScriptType {
         private Script m_Script;
-        internal ScriptTypeBasicArray(Script script, string typeName, ScriptType parentType) : base(typeName, parentType) {
+        internal ScriptTypeBasicArray(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
             m_Script = script;
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return new ScriptValue(new ScriptArray(m_Script, parameters, length));
+            using var value = new ScriptValue(m_Script.NewArray());
+            return value;
         }
     }
     //Map原表
     internal class ScriptTypeBasicMap : ScriptType {
         private Script m_Script;
-        internal ScriptTypeBasicMap(Script script, string typeName, ScriptType parentType) : base(typeName, parentType) {
+        internal ScriptTypeBasicMap(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
             m_Script = script;
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return new ScriptValue(new ScriptMapObject(m_Script, parameters, length));
+            using var value = new ScriptValue(m_Script.NewMapObject());
+            return value;
         }
     }
     internal class ScriptTypeBasicHashSet : ScriptType {
         private Script m_Script;
-        internal ScriptTypeBasicHashSet(Script script, string typeName, ScriptType parentType) : base(typeName, parentType) {
+        internal ScriptTypeBasicHashSet(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
             m_Script = script;
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return new ScriptValue(new ScriptHashSet(m_Script, parameters, length));
+            using var value = new ScriptValue(m_Script.NewHashSet());
+            return value;
         }
     }
     //StringBuilding原表
     internal class ScriptTypeBasicStringBuilder : ScriptType {
         private Script m_Script;
-        internal ScriptTypeBasicStringBuilder(Script script, string typeName, ScriptType parentType) : base(typeName, parentType) {
+        internal ScriptTypeBasicStringBuilder(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
             m_Script = script;
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return new ScriptValue(new ScriptStringBuilder(m_Script, parameters, length));
+            using var value = new ScriptValue(m_Script.NewStringBuilder());
+            return value;
         }
     }
 }

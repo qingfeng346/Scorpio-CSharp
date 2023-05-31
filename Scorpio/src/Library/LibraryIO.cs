@@ -49,7 +49,7 @@ namespace Scorpio.Library {
             map.SetValue("fromBase64", script.CreateFunction(new fromBase64()));
             map.SetValue("workPath", script.CreateFunction(new workPath()));
             map.SetValue("lineArgs", script.CreateFunction(new lineArgs()));
-            script.SetGlobal("io", new ScriptValue(map));
+            script.SetGlobal("io", map);
         }
         private class unixNow : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
@@ -98,7 +98,8 @@ namespace Scorpio.Library {
                 this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(script.CreateArray(File.ReadAllLines(args[0].ToString(), length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding)));
+                using var ret = new ScriptValue(script.CreateArray(File.ReadAllLines(args[0].ToString(), length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding)));
+                return ret;
             }
         }
         private class writeAllLines : ScorpioHandle {

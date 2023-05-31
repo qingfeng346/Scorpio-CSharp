@@ -4,7 +4,7 @@ namespace Scorpio.Library {
             var map = new ScriptMapString(script);
             map.SetValue("encode", script.CreateFunction(new encode()));
             map.SetValue("decode", script.CreateFunction(new decode(script)));
-            script.SetGlobal("json", new ScriptValue(map));
+            script.SetGlobal("json", map);
         }
         private class encode : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

@@ -2,7 +2,7 @@
   "profiles": {
     "run": {
       "commandName": "Project",
-      "commandLineArgs": "run.sco --option CompileOption.json",
+      "commandLineArgs": "run.sco",
       "workingDirectory": "./"
     },
     "runil": {

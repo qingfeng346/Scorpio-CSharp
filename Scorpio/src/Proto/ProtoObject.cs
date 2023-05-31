@@ -32,7 +32,7 @@ namespace Scorpio.Proto {
                         type = m_Script.TypeBooleanValue;
                         break;
                     case ScriptValue.doubleValueType:
-                    case ScriptValue.longValueType:
+                    case ScriptValue.int64ValueType:
                         type = m_Script.TypeNumberValue;
                         break;
                     case ScriptValue.stringValueType:
