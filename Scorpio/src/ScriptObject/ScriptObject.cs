@@ -17,29 +17,30 @@ namespace Scorpio {
         Global,         //全局变量保存类,只有_G是这个类型
     }
     public abstract class ScriptObject : IPool {
-        private static ScriptValue CommonThisValue = ScriptValue.Null;
-
+        private static uint AutomaticId = 0;
+        protected Script m_Script;
+        public uint Id { get; private set; }
         // 构图函数
-        public ScriptObject(ObjectType objectType) {
+        public ScriptObject(Script script, ObjectType objectType) {
+            m_Script = script;
             ObjectType = objectType;
+            Id = AutomaticId++;
         }
-        public virtual void Alloc() {
-
-        }
-        public virtual void Free() {
-
-        }
-        public ObjectType ObjectType { get; private set; }                              //类型
-        public virtual object Value { get { return this; } }                            //值
-        public virtual Type ValueType { get { return GetType(); } }                     //值类型
-        public virtual Type Type { get { return GetType(); } }                          //获取类型
-        public virtual string ValueTypeName { get { return ObjectType.ToString(); } }   //类型名称
-        public ScriptValue ThisValue { 
+        public virtual void Alloc() { }
+        public virtual void Free() { }
+        public ObjectType ObjectType { get; private set; }              //类型
+        public virtual object Value => this;                            //值
+        public virtual Type ValueType => GetType();                     //值类型
+        public virtual Type Type => GetType();                          //获取类型
+        public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
+        //ThisValue没有占用引用计数
+        protected ScriptValue ThisValue {
             get {
-                CommonThisValue.SetScriptValue(this);
-                return CommonThisValue;
+                using var ret = new ScriptValue(this);
+                return ret;
             }
         }
+        
         //获取变量
         public virtual ScriptValue GetValueByIndex(int key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : {key}"); }
         public virtual ScriptValue GetValue(string key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : {key}"); }

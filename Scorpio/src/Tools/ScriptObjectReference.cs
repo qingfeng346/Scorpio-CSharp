@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Scorpio.Tools {
-    public class ScriptObjectPool {
+    public class ScriptObjectReference {
         private static readonly Entity DefaultEntity = new Entity(null, -1);
         public struct Entity {
             public ScriptObject value;
@@ -16,23 +16,27 @@ namespace Scorpio.Tools {
             }
         }
         private const int Stage = 8192;
-        private static int count = 0;
+        private static int length = 0;
+        private static Dictionary<uint, int> object2index = new Dictionary<uint, int>();
         public static Queue<int> pool = new Queue<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
-        public static int GetIndex(ScriptObject scriptObject) {
-            int index;
+        public static int Alloc(ScriptObject value) {
+            if (object2index.TryGetValue(value.Id, out var index)) {
+                ++entities[index].referenceCount;
+                return index;
+            }
             if (pool.Count > 0) {
                 index = pool.Dequeue();
             } else {
-                index = count++;
-                if (count >= entities.Length) {
+                index = length++;
+                if (length >= entities.Length) {
                     var newEntities = new Entity[entities.Length + Stage];
                     Array.Copy(entities, newEntities, entities.Length);
                     entities = newEntities;
                 }
             }
-            entities[index] = new Entity(scriptObject, 1);
+            entities[index] = new Entity(value, 1);
             return index;
         }
         public static void Free(int index) {
@@ -47,11 +51,12 @@ namespace Scorpio.Tools {
         public static ScriptObject GetValue(int index) {
             return entities[index].value;
         }
-        //释放index
-        public static void CheckFree() {
+        //释放
+        public static void ReleaseAll() {
             for (var i = 0; i < freeIndex.Count; ++i) {
                 var index = freeIndex[i];
                 if (entities[index].referenceCount == 0) {
+                    object2index.Remove(entities[index].value.Id);
                     entities[index].value.Free();
                     pool.Enqueue(index);
                     entities[index] = DefaultEntity;
@@ -59,7 +64,7 @@ namespace Scorpio.Tools {
             }
             freeIndex.Clear();
         }
-        public static void CheckEntity() {
+        public static void Check() {
             foreach (var entity in entities) {
                 if (entity.value != null) {
                     Console.WriteLine($"当前未释放Scirpt变量 : {entity}");

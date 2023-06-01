@@ -3,7 +3,9 @@ using System.Text;
 namespace Scorpio {
     public class ScriptStringBuilder : ScriptInstance {
         public StringBuilder Builder { get; } = new StringBuilder();
-        public ScriptStringBuilder(Script script) : base(ObjectType.StringBuilder, script.TypeStringBuilder) { }
+        public ScriptStringBuilder(Script script) : base(script, ObjectType.StringBuilder) {
+            Set(script.TypeStringBuilder);
+        }
         public override ScriptValue GetValue(double index) {
             return new ScriptValue(Builder[(int)index]);
         }

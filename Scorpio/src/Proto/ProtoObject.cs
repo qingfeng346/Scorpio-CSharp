@@ -1,5 +1,5 @@
-using Scorpio.Userdata;
-namespace Scorpio.Proto {
+namespace Scorpio.Proto
+{
     public class ProtoObject {
         public static ScriptType Load(Script script, ScriptType ret) {
             ret.SetValue("toString", script.CreateFunction(new toString()));

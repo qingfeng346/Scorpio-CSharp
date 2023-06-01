@@ -18,22 +18,9 @@ namespace Scorpio.Function {
         internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return m_Context.Execute(thisObject, parameters, length, m_internalValues, baseType);
         }
-//#if SCORPIO_DEBUG
-//        public ScriptContext Context {
-//            get { return m_Context; }
-//            set {
-//                m_Context = value;
-//                m_internalValues = new InternalValue[value.internalCount];
-//            }
-//        }
-//        public override ScriptFunction SetBindObject(ScriptValue obj) {
-//            return new ScriptScriptBindFunction(this, obj);
-//        }
-//#else
         public override ScriptFunction SetBindObject(ScriptValue obj) {
             return m_Script.NewLambdaFunction().SetContext(m_Context, obj);
         }
-//#endif
     }
     public class ScriptScriptLambdaFunction : ScriptScriptFunction {
         private ScriptValue m_BindObject = ScriptValue.Null;

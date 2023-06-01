@@ -15,14 +15,14 @@ namespace Scorpio.Library {
             script.SetGlobal("coroutine", map);
         }
         private class start : ScorpioHandle {
-            readonly Script m_Script;
+            readonly Script script;
             public start(Script script) {
-                m_Script = script;
+                this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var enumerator = args[0].Value as IEnumerator;
                 if (enumerator != null) {
-                    return ScriptValue.CreateValue(m_Script.StartCoroutine(enumerator));
+                    return ScriptValue.CreateValue(script, script.StartCoroutine(enumerator));
                 }
                 return ScriptValue.Null;
             }
@@ -47,8 +47,12 @@ namespace Scorpio.Library {
             }
         }
         private class poll : ScorpioHandle {
+            private Script script;
+            public poll(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScriptValue.CreateValue(new CoroutinePoll(args.GetArgsThrow(0, length), args.GetArgsThrow(1, length)));
+                return ScriptValue.CreateValue(script, new CoroutinePoll(args.GetArgsThrow(0, length), args.GetArgsThrow(1, length)));
             }
         }
         private class epoll : ScorpioHandle {

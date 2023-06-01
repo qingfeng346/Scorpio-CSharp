@@ -1,4 +1,5 @@
 namespace Scorpio {
+    using Exception;
     //运算符重载
     public class ScriptOperator {
         public const string Plus = "+";
@@ -21,7 +22,7 @@ namespace Scorpio {
         public const string toString = "toString";
     }
     //c#运算符重载
-    public class UserdataOperator {
+    public static class UserdataOperator {
         public const int PlusIndex = 0;                                 //运算符重载 +
         public const int MinusIndex = 1;                                //运算符重载 -
         public const int MultiplyIndex = 2;                             //运算符重载 *
@@ -42,8 +43,29 @@ namespace Scorpio {
         public const int GetItemIndex = 15;                             //运算符重载 [] get
         public const int SetItemIndex = 16;                             //运算符重载 [] set
         public const int OperatorCount = 17;
-        
-        
+
+        public static string GetOperatorByIndex(int index) {
+            return index switch {
+                PlusIndex => "+",
+                MinusIndex => "-",
+                MultiplyIndex => "*",
+                DivideIndex => "/",
+                ModuloIndex => "%",
+                InclusiveOrIndex => "|",
+                CombineIndex => "&",
+                XORIndex => "^",
+                ShiIndex => "<<",
+                ShrIndex => ">>",
+                GreaterIndex => ">",
+                GreaterOrEqualIndex => ">=",
+                LessIndex => "<",
+                LessOrEqualIndex => "<=",
+                EqualIndex => "==",
+                GetItemIndex => "[] get",
+                SetItemIndex => "[] set",
+                _ => throw new ExecutionException($"未知的运算符索引 : {index}")
+            };
+        }
 
         public const string Plus = "op_Addition";                       //运算符重载 +
         public const string Minus = "op_Subtraction";                   //运算符重载 -
@@ -64,5 +86,7 @@ namespace Scorpio {
 
         public const string GetItem = "get_Item";                       //运算符重载 [] get
         public const string SetItem = "set_Item";                       //运算符重载 [] set
+
+
     }
 }

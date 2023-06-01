@@ -1,10 +1,11 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using Scorpio.Exception;
 using Scorpio.Tools;
-namespace Scorpio.Userdata {
+
+namespace Scorpio.Userdata
+{
     //反射类管理
     public class UserdataTypeReflect : UserdataType {
         private UserdataMethod m_Constructor;                           //所有构造函数

@@ -1,5 +1,4 @@
 using Scorpio.Exception;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
@@ -9,24 +8,27 @@ namespace Scorpio {
         protected ScriptFunction m_EqualFunction;                       //==函数重载
         protected ScriptValue m_PrototypeValue;                         //基类
         protected ScriptType m_Prototype;                               //基类
-        public ScriptType(string typeName, ScriptValue parentValue) : base(ObjectType.Type) {
+        public ScriptType(Script script, string typeName, ScriptValue parentValue) : base(script, ObjectType.Type) {
+            m_Values = new Dictionary<string, ScriptValue>();
+            m_GetProperties = new Dictionary<string, ScriptValue>();
             TypeName = typeName;
             m_PrototypeValue.CopyFrom(parentValue);
             m_Prototype = parentValue.Get<ScriptType>();
-            m_Values = new Dictionary<string, ScriptValue>();
-            m_GetProperties = new Dictionary<string, ScriptValue>();
         }
         public string TypeName { get; private set; }        //Type名称
         public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
         public override void Free() {
-            base.Free();
-            m_PrototypeValue.Free();
-            m_Prototype = null;
-            foreach (var pair in m_Values) { pair.Value.Free(); }
-            foreach (var pair in m_GetProperties) { pair.Value.Free(); }
-            m_Values.Clear();
-            m_GetProperties.Clear();
+            //m_PrototypeValue.Free();
+            //m_Prototype = null;
+            //foreach (var pair in m_Values) { 
+            //    pair.Value.Free();
+            //}
+            //foreach (var pair in m_GetProperties) { 
+            //    pair.Value.Free();
+            //}
+            //m_Values.Clear();
+            //m_GetProperties.Clear();
         }
         public void AddGetProperty(string key, ScriptFunction value) {
             if (m_GetProperties.TryGetValue(key, out var result)) {
@@ -66,7 +68,9 @@ namespace Scorpio {
             return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            var ret = new ScriptValue(new ScriptInstance(ObjectType.Instance, this));
+            var instance = m_Script.NewInstance();
+            instance.Set(this);
+            using var ret = new ScriptValue(instance);
             var constructor = GetValue(ScriptOperator.Constructor).Get<ScriptFunction>();
             if (constructor != null) {
                 constructor.Call(ret, parameters, length);
@@ -79,14 +83,16 @@ namespace Scorpio {
     }
     //Object原表, GetValue 找不到就返回 null
     internal class ScriptTypeObject : ScriptType {
-        private Script m_Script;
-        internal ScriptTypeObject(Script script, string typeName) : base(typeName, ScriptValue.Null) {
-            m_Script = script;
+        internal ScriptTypeObject(Script script, string typeName) : base(script) {
+            Set(typeName, ScriptValue.Null);
         }
         public override ScriptType Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
         public override ScriptFunction EqualFunction => m_EqualFunction;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return new ScriptValue(new ScriptInstance(ObjectType.Type, m_Script.TypeObject));
+            var instance = m_Script.NewInstance();
+            instance.Set(this);
+            using var ret = new ScriptValue(instance);
+            return ret;
         }
         public override ScriptValue GetValueNoDefault(string key) {
             return ScriptValue.Null;
@@ -106,52 +112,48 @@ namespace Scorpio {
     }
     //自带基础类型的原表,不支持动态申请,只能已特定形式申请变量, number, string, bool, function 等
     internal class ScriptTypePrimitive : ScriptType {
-        public ScriptTypePrimitive(string typeName, ScriptValue parentValue) : base(typeName, parentValue) { }
+        public ScriptTypePrimitive(Script script, string typeName, ScriptValue parentValue) : base(script) {
+            Set(typeName, parentValue);
+        }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             throw new ExecutionException($"Class<{TypeName}>不支持构造");
         }
     }
-    //Array类型原表
-    internal class ScriptTypeBasicArray : ScriptType {
-        private Script m_Script;
-        internal ScriptTypeBasicArray(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
-            m_Script = script;
+    internal abstract class ScriptTypeBasic<T> : ScriptType where T : ScriptObject {
+        internal ScriptTypeBasic(Script script, string typeName, ScriptValue parentType) : base(script) {
+            Set(typeName, parentType);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            using var value = new ScriptValue(m_Script.NewArray());
+            using var value = new ScriptValue(New());
             return value;
+        }
+        protected abstract T New();
+    }
+    //Array类型原表
+    internal class ScriptTypeBasicArray : ScriptTypeBasic<ScriptArray> {
+        internal ScriptTypeBasicArray(Script script, string typeName, ScriptValue parentType) : base(script, typeName, parentType) { }
+        protected override ScriptArray New() {
+            return m_Script.NewArray();
         }
     }
     //Map原表
-    internal class ScriptTypeBasicMap : ScriptType {
-        private Script m_Script;
-        internal ScriptTypeBasicMap(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
-            m_Script = script;
-        }
-        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            using var value = new ScriptValue(m_Script.NewMapObject());
-            return value;
+    internal class ScriptTypeBasicMap : ScriptTypeBasic<ScriptMapObject> {
+        internal ScriptTypeBasicMap(Script script, string typeName, ScriptValue parentType) : base(script, typeName, parentType) { }
+        protected override ScriptMapObject New() {
+            return m_Script.NewMapObject();
         }
     }
-    internal class ScriptTypeBasicHashSet : ScriptType {
-        private Script m_Script;
-        internal ScriptTypeBasicHashSet(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
-            m_Script = script;
-        }
-        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            using var value = new ScriptValue(m_Script.NewHashSet());
-            return value;
+    internal class ScriptTypeBasicHashSet : ScriptTypeBasic<ScriptHashSet> {
+        internal ScriptTypeBasicHashSet(Script script, string typeName, ScriptValue parentType) : base(script, typeName, parentType) { }
+        protected override ScriptHashSet New() {
+            return m_Script.NewHashSet();
         }
     }
     //StringBuilding原表
-    internal class ScriptTypeBasicStringBuilder : ScriptType {
-        private Script m_Script;
-        internal ScriptTypeBasicStringBuilder(Script script, string typeName, ScriptValue parentType) : base(typeName, parentType) {
-            m_Script = script;
-        }
-        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            using var value = new ScriptValue(m_Script.NewStringBuilder());
-            return value;
+    internal class ScriptTypeBasicStringBuilder : ScriptTypeBasic<ScriptStringBuilder> {
+        internal ScriptTypeBasicStringBuilder(Script script, string typeName, ScriptValue parentType) : base(script, typeName, parentType) { }
+        protected override ScriptStringBuilder New() {
+            return m_Script.NewStringBuilder();
         }
     }
 }

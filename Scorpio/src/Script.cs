@@ -1,3 +1,7 @@
+/*
+Call返回值占用引用计数
+GetValue返回值不占用引用计数
+*/
 using System;
 using System.IO;
 using System.Text;
@@ -9,11 +13,12 @@ using Scorpio.Function;
 using Scorpio.Library;
 using Scorpio.Runtime;
 using Scorpio.Proto;
-using Scorpio.Userdata;
 using Scorpio.Serialize;
 using Scorpio.Tools;
 using Scorpio.Compile.Compiler;
-namespace Scorpio {
+
+namespace Scorpio
+{
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
@@ -75,7 +80,7 @@ namespace Scorpio {
         public Script() {
             m_SearchPaths = new string[0];
             InitPool();
-            Global = new ScriptGlobal();
+            Global = new ScriptGlobal(this);
 
             TypeObject = new ScriptTypeObject(this, "Object");
             TypeObjectValue = new ScriptValue(TypeObject);
@@ -139,7 +144,7 @@ namespace Scorpio {
             m_TypeValueHashSet.Free();
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
-            type = new ScriptTypePrimitive(name, TypeObjectValue);
+            type = new ScriptTypePrimitive(this, name, TypeObjectValue);
             typeValue = new ScriptValue(type);
             Global.SetValue(name, typeValue);
         }
@@ -189,21 +194,21 @@ namespace Scorpio {
             PushAssembly(Assembly.Load(assemblyName));
         }
         /// <summary> 压入程序集 </summary>
-        public void PushAssembly(Assembly assembly) {
-            ScorpioTypeManager.PushAssembly(assembly);
-        }
+        //public void PushAssembly(Assembly assembly) {
+        //    ScorpioTypeManager.PushAssembly(assembly);
+        //}
         /// <summary> 设置函数指针仓库 </summary>
         public void SetDelegateFactory(IScorpioDelegateFactory factory) {
             ScorpioDelegateFactoryManager.SetFactory(factory);
         }
         /// <summary> 设置快速反射类 </summary>
-        public void SetFastReflectClass(Type type, IScorpioFastReflectClass fastReflectClass) {
-            ScorpioTypeManager.SetFastReflectClass(type, fastReflectClass);
-        }
+        //public void SetFastReflectClass(Type type, IScorpioFastReflectClass fastReflectClass) {
+        //    ScorpioTypeManager.SetFastReflectClass(type, fastReflectClass);
+        //}
         /// <summary> 关联扩展函数 </summary>
-        public void LoadExtension(Type type) {
-            ScorpioTypeManager.LoadExtension(type);
-        }
+        //public void LoadExtension(Type type) {
+        //    ScorpioTypeManager.LoadExtension(type);
+        //}
         /// <summary> 设置一个全局变量 </summary>
         /// <param name="key">名字</param>
         /// <param name="value">值</param>
@@ -503,8 +508,8 @@ namespace Scorpio {
             return stackInfos;
         }
         public void CheckFree() {
-            ScriptObjectPool.CheckFree();
-            StringPool.CheckFree();
+            ScriptObjectReference.ReleaseAll();
+            StringReference.ReleaseAll();
         }
     }
 }

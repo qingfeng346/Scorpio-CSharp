@@ -3,9 +3,8 @@ using Scorpio.Library;
 namespace Scorpio {
     //脚本map类型
     public abstract class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
-        protected Script m_Script;
-        public ScriptMap(Script script) : base(ObjectType.Map, script.TypeMap) {
-            m_Script = script;
+        public ScriptMap(Script script) : base(script, ObjectType.Map) {
+            Set(script.TypeMap);
         }
         public Script getScript() { return m_Script; }
         public abstract new IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator();

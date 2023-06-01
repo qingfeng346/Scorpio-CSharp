@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Scorpio.Library;
 using Scorpio.Tools;
 
@@ -8,12 +7,24 @@ namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         internal Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptType m_Prototype = null;
-        protected ScriptInstance(ObjectType objectType) : base(objectType) { }
-        public ScriptInstance(ObjectType objectType, ScriptType prototype) : base(objectType) {
+        public ScriptInstance(Script script) : base(script, ObjectType.Instance) { }
+        public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) { }
+        public void Set(ScriptType prototype) {
             m_Prototype = prototype;
         }
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
+        protected void Release() {
+            m_Prototype = null;
+            foreach (var pair in m_Values) {
+                pair.Value.Free();
+            }
+            m_Values.Clear();
+        }
+        public override void Free() {
+            Release();
+            m_Script.Free(this);
+        }
         public override ScriptValue GetValue(string key) {
             return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key, this);
         }
@@ -23,21 +34,18 @@ namespace Scorpio {
             }
         }
         public override void SetValue(string key, ScriptValue value) {
+            //正常引用计数
+            value.Reference();
+            if (m_Values.TryGetValue(key, out var result)) {
+                result.Free();
+            }
             m_Values[key] = value;
         }
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
-        public ScriptArray GetKeys(Script script) {
-            var ret = new ScriptArray(script);
-            foreach (var pair in m_Values) {
-                ret.Add(ScriptValue.CreateValue(pair.Key));
-            }
-            return ret;
-        }
         public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
-        
         public override ScriptValue Plus(ScriptValue obj) {
             var func = m_Prototype.GetValue(ScriptOperator.Plus).Get<ScriptFunction>();
             if (func != null) {

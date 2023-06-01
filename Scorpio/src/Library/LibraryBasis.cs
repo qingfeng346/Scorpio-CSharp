@@ -8,8 +8,9 @@ using Scorpio.Userdata;
 using Scorpio.Tools;
 using System.Reflection;
 using Scorpio.Instruction;
-using Scorpio.Runtime;
-namespace Scorpio.Library {
+
+namespace Scorpio.Library
+{
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
@@ -214,7 +215,7 @@ namespace Scorpio.Library {
             script.SetGlobal("pushSearch", script.CreateFunction(new pushSearch(script)));
             script.SetGlobal("pushAssembly", script.CreateFunction(new pushAssembly()));
             script.SetGlobal("importType", script.CreateFunction(new importType()));
-            script.SetGlobal("importNamespace", script.CreateFunction(new importNamespace()));
+            script.SetGlobal("importNamespace", script.CreateFunction(new importNamespace(script)));
             script.SetGlobal("importExtension", script.CreateFunction(new importExtension()));
             script.SetGlobal("genericType", script.CreateFunction(new genericType()));
             script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod()));
@@ -496,14 +497,16 @@ namespace Scorpio.Library {
         }
         private class toString : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(args[0].ToString());
+                using var ret = new ScriptValue(args[0].ToString());
+                return ret;
             }
         }
         private class clone : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var deep = length > 1 ? args[1].IsTrue : true;
                 if (args[0].valueType == ScriptValue.scriptValueType) {
-                    return new ScriptValue(args[0].scriptValue.Clone(deep));
+                    using var ret = new ScriptValue(args[0].scriptValue.Clone(deep));
+                    return ret;
                 } else {
                     return args[0];
                 }
@@ -618,6 +621,10 @@ namespace Scorpio.Library {
         }
 
         private class pushAssembly : ScorpioHandle {
+            private Script script;
+            public pushAssembly(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var throwException = length > 1 ? args[1].IsTrue : true;
                 Assembly assembly = null;
@@ -632,18 +639,27 @@ namespace Scorpio.Library {
                 } else {
                     assembly = args[0].Value as Assembly;
                 }
-                ScorpioTypeManager.PushAssembly(assembly);
+                script.PushAssembly(assembly);
                 return ScriptValue.Null;
             }
         }
         private class importType : ScorpioHandle {
+            private Script script;
+            public importType(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScorpioTypeManager.GetUserdataType(args[0].ToString());
+                return new ScriptValue(script.GetUserdataType(args[0].ToString()));
             }
         }
         private class importNamespace : ScorpioHandle {
+            private Script script;
+            public importNamespace(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(new ScriptNamespace(args[0].ToString()));
+                using var ret = new ScriptValue(new ScriptNamespace(script, args[0].ToString()));
+                return ret;
             }
         }
         private class importExtension : ScorpioHandle {

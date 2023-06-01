@@ -8,11 +8,8 @@ namespace Scorpio {
         public ScriptMapObject(Script script) : base(script) { }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
-        public override void Alloc() {
-            base.Alloc();
-        }
         public override void Free() {
-            base.Free();
+            Release();
             Clear();
             m_Script.Free(this);
         }
@@ -29,32 +26,36 @@ namespace Scorpio {
             return m_Objects.TryGetValue(key, out var value) ? value : ScriptValue.Null;
         }
         public override void SetValue(string key, ScriptValue value) {
+            //正常引用计数
+            value.Reference();
             if (m_Objects.TryGetValue(key, out var result)) {
-                result.CopyFrom(value);
-            } else {
-                m_Objects[key] = new ScriptValue(value);
+                result.Free();
             }
+            m_Objects[key] = value;
         }
         public override void SetValue(double key, ScriptValue value) {
+            //正常引用计数
+            value.Reference();
             if (m_Objects.TryGetValue(key, out var result)) {
-                result.CopyFrom(value);
-            } else {
-                m_Objects[key] = new ScriptValue(value);
+                result.Free();
             }
+            m_Objects[key] = value;
         }
         public override void SetValue(long key, ScriptValue value) {
+            //正常引用计数
+            value.Reference();
             if (m_Objects.TryGetValue(key, out var result)) {
-                result.CopyFrom(value);
-            } else {
-                m_Objects[key] = new ScriptValue(value);
+                result.Free();
             }
+            m_Objects[key] = value;
         }
         public override void SetValue(object key, ScriptValue value) {
+            //正常引用计数
+            value.Reference();
             if (m_Objects.TryGetValue(key, out var result)) {
-                result.CopyFrom(value);
-            } else {
-                m_Objects[key] = new ScriptValue(value);
+                result.Free();
             }
+            m_Objects[key] = value;
         }
 
         public override bool HasValue(string key) {
@@ -77,7 +78,10 @@ namespace Scorpio {
             m_Objects.Clear();
         }
         public override void Remove(object key) {
-            m_Objects.Remove(key);
+            if (m_Objects.TryGetValue(key, out var result)) {
+                result.Free();
+                m_Objects.Remove(key);
+            }
         }
         public override ScriptArray GetKeys() {
             var ret = new ScriptArray(m_Script);
@@ -89,21 +93,21 @@ namespace Scorpio {
             return ret;
         }
         public override ScriptArray GetValues() {
-            var ret = new ScriptArray(m_Script);
+            var ret = m_Script.NewArray();
             foreach (var pair in m_Objects) {
                 ret.Add(pair.Value);
             }
             return ret;
         }
         public override ScriptMap NewCopy() {
-            var ret = new ScriptMapObject(m_Script);
+            var ret = m_Script.NewMapObject();
             foreach (var pair in m_Objects) {
-                ret.m_Objects[pair.Key] = pair.Value;
+                ret.SetValue(pair.Key, pair.Value);
             }
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptMapObject(m_Script);
+            var ret = m_Script.NewMapObject();
             if (deep) {
                 foreach (var pair in m_Objects) {
                     var value = pair.Value;
@@ -112,15 +116,15 @@ namespace Scorpio {
                         if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
                             ret.m_Objects[pair.Key] = new ScriptValue(scriptObject.Clone(true));
                         } else {
-                            ret.m_Objects[pair.Key] = value;
+                            ret.SetValue(pair.Key, value);
                         }
                     } else {
-                        ret.m_Objects[pair.Key] = value;
+                        ret.SetValue(pair.Key, value);
                     }
                 }
             } else {
                 foreach (var pair in m_Objects) {
-                    ret.m_Objects[pair.Key] = pair.Value;
+                    ret.SetValue(pair.Key, pair.Value);
                 }
             }
             return ret;

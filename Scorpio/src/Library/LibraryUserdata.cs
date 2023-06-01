@@ -1,5 +1,5 @@
-using Scorpio.Userdata;
-namespace Scorpio.Library {
+namespace Scorpio.Library
+{
     public partial class LibraryUserdata {
         public static void Load(Script script) {
             var map = new ScriptMapString(script);

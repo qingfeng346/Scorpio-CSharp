@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Scorpio;
 using Scorpio.Commons;
 using Scorpio.Compile.Compiler;
 using Scorpio.FastReflect;
 using Scorpio.Serialize;
+using Scorpio.src;
 using ScorpioLibrary;
 
-namespace ScorpioExec {
+namespace ScorpioExec
+{
     public class Program {
         private static readonly string CurrentDirectory = ScorpioUtil.CurrentDirectory;
 
@@ -229,12 +230,12 @@ namespace ScorpioExec {
                     script.Shutdown();
                     script.CheckFree();
                     while (script.UpdateCoroutine ()) { }
-                    Scorpio.Tools.StringPool.CheckEntity();
-                    Scorpio.Tools.ScriptObjectPool.CheckEntity ();
-                    var entities = Scorpio.Tools.StringPool.entities;
-                    var pool = Scorpio.Tools.StringPool.pool;
-                    var en = Scorpio.Tools.ScriptObjectPool.entities;
-                    var p = Scorpio.Tools.ScriptObjectPool.pool;
+                    Scorpio.Tools.StringReference.Check();
+                    Scorpio.Tools.ScriptObjectReference.Check ();
+                    var entities = Scorpio.Tools.StringReference.entities;
+                    var pool = Scorpio.Tools.StringReference.pool;
+                    var en = Scorpio.Tools.ScriptObjectReference.entities;
+                    var p = Scorpio.Tools.ScriptObjectReference.pool;
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");

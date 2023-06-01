@@ -1,7 +1,9 @@
 using Scorpio.Function;
 using Scorpio.Tools;
+using Scorpio.Userdata;
 namespace Scorpio {
     public partial class Script {
+        private ObjectsPool<ScriptInstance> instancePool;
         private ObjectsPool<ScriptArray> arrayPool;
         private ObjectsPool<ScriptMapObject> mapObjectPool;
         private ObjectsPool<ScriptHashSet> hashSetPool;
@@ -10,7 +12,15 @@ namespace Scorpio {
         private ObjectsPool<ScriptScriptLambdaFunction> lambdaFunctionPool;
         private ObjectsPool<ScriptScriptAsyncFunction> asyncFunctionPool;
         private ObjectsPool<ScriptScriptAsyncLambdaFunction> asyncLambdaFunctionPool;
+
+
+        private ObjectsPool<ScriptUserdataObject> userdataObjectPool;
+        private ObjectsPool<ScriptInstanceMethodFunction> instanceMethodPool;
+        private ObjectsPool<ScriptGenericMethodFunction> genericMethodPool;
+        private ObjectsPool<ScriptStaticMethodFunction> staticMethodPool;
+
         private void InitPool() {
+            instancePool = new ObjectsPool<ScriptInstance>(() => new ScriptInstance(this));
             arrayPool = new ObjectsPool<ScriptArray>(() => new ScriptArray(this));
             mapObjectPool = new ObjectsPool<ScriptMapObject>(() => new ScriptMapObject(this));
             hashSetPool = new ObjectsPool<ScriptHashSet>(() => new ScriptHashSet(this));
@@ -19,6 +29,14 @@ namespace Scorpio {
             lambdaFunctionPool = new ObjectsPool<ScriptScriptLambdaFunction>(() => new ScriptScriptLambdaFunction(this));
             asyncFunctionPool = new ObjectsPool<ScriptScriptAsyncFunction>(() => new ScriptScriptAsyncFunction(this));
             asyncLambdaFunctionPool = new ObjectsPool<ScriptScriptAsyncLambdaFunction>(() => new ScriptScriptAsyncLambdaFunction(this));
+
+            userdataObjectPool = new ObjectsPool<ScriptUserdataObject>(() => new ScriptUserdataObject(this));
+            instanceMethodPool = new ObjectsPool<ScriptInstanceMethodFunction>(() => new ScriptInstanceMethodFunction(this));
+            genericMethodPool = new ObjectsPool<ScriptGenericMethodFunction>(() => new ScriptGenericMethodFunction(this));
+            staticMethodPool = new ObjectsPool<ScriptStaticMethodFunction>(() => new ScriptStaticMethodFunction(this));
+        }
+        public ScriptInstance NewInstance() {
+            return instancePool.Alloc();
         }
         public ScriptArray NewArray() {
             return arrayPool.Alloc();
@@ -44,6 +62,24 @@ namespace Scorpio {
         public ScriptScriptAsyncLambdaFunction NewAsyncLambdaFunction() {
             return asyncLambdaFunctionPool.Alloc();
         }
+
+        public ScriptUserdataObject NewUserdataObject() {
+            return userdataObjectPool.Alloc();
+        }
+        public ScriptInstanceMethodFunction NewInstanceMethod() {
+            return instanceMethodPool.Alloc();
+        }
+        public ScriptGenericMethodFunction NewGenericMethod() {
+            return genericMethodPool.Alloc();
+        }
+        public ScriptStaticMethodFunction NewStaticMethod() {
+            return staticMethodPool.Alloc();
+        }
+
+
+        public void Free(ScriptInstance value) {
+            instancePool.Free(value);
+        }
         public void Free(ScriptArray value) {
             arrayPool.Free(value);
         }
@@ -67,6 +103,18 @@ namespace Scorpio {
         }
         public void Free(ScriptScriptAsyncLambdaFunction value) {
             asyncLambdaFunctionPool.Free(value);
+        }
+        public void Free(ScriptUserdataObject value) {
+            userdataObjectPool.Free(value);
+        }
+        public void Free(ScriptInstanceMethodFunction value) {
+            instanceMethodPool.Free(value);
+        }
+        public void Free(ScriptGenericMethodFunction value) {
+            genericMethodPool.Free(value);
+        }
+        public void Free(ScriptStaticMethodFunction value) {
+            staticMethodPool.Free(value);
         }
     }
 }

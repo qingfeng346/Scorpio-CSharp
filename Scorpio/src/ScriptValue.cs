@@ -5,7 +5,8 @@ using Scorpio.Exception;
 using System.Runtime.InteropServices;
 using Scorpio.Tools;
 
-namespace Scorpio {
+namespace Scorpio
+{
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public struct ScriptValue : IDisposable {
         public static readonly ScriptValue[] EMPTY = new ScriptValue[0];
@@ -68,7 +69,7 @@ namespace Scorpio {
                 Free();
                 _index = value;
                 _valueType = scriptValueType;
-                ScriptObjectPool.Reference(_index);
+                ScriptObjectReference.Reference(_index);
             }
         }
         public int stringValueIndex {
@@ -77,11 +78,11 @@ namespace Scorpio {
                 Free();
                 _index = value;
                 _valueType = stringValueType;
-                StringPool.Reference(_index);
+                StringReference.Reference(_index);
             }
         }
-        public string stringValue => StringPool.GetValue(_index);
-        public ScriptObject scriptValue => ScriptObjectPool.GetValue(_index);
+        public string stringValue => StringReference.GetValue(_index);
+        public ScriptObject scriptValue => ScriptObjectReference.GetValue(_index);
         public void SetNull() {
             Free();
             _valueType = nullValueType;
@@ -99,40 +100,52 @@ namespace Scorpio {
         public void SetScriptValue(ScriptObject value) {
             Free();
             _valueType = scriptValueType;
-            _index = ScriptObjectPool.GetIndex(value);
+            _index = ScriptObjectReference.Alloc(value);
         }
         public void SetStringValue(string value) {
             Free();
             _valueType = stringValueType;
-            _index = StringPool.GetIndex(value);
+            _index = StringReference.Alloc(value);
         }
         public void CopyFrom(ScriptValue value) {
             Free();
             _valueType = value._valueType;
             _longValue = value._longValue;
             if (_valueType == stringValueType) {
-                StringPool.Reference(_index);
+                StringReference.Reference(_index);
             } else if (_valueType == scriptValueType) {
-                ScriptObjectPool.Reference(_index);
+                ScriptObjectReference.Reference(_index);
+            }
+        }
+        public void Set(ScriptValue value) {
+            Free();
+            _valueType = value._valueType;
+            _longValue = value._longValue;
+        }
+        public void Reference() {
+            if (_valueType == stringValueType) {
+                StringReference.Reference(_index);
+            } else if (_valueType == scriptValueType) {
+                ScriptObjectReference.Reference(_index);
             }
         }
         public void Free() {
             if (_valueType == stringValueType) {
-                StringPool.Free(_index);
+                StringReference.Free(_index);
             } else if (_valueType == scriptValueType) {
-                ScriptObjectPool.Free(_index);
+                ScriptObjectReference.Free(_index);
             }
             _valueType = 0;
         }
-        public ScriptValue(ScriptValue value) {
+                public ScriptValue(ScriptValue value) {
             _valueType = value._valueType;
             _index = value._index;
             _doubleValue = value._doubleValue;
             _longValue = value._longValue;
             if (_valueType == stringValueType) {
-                StringPool.Reference(_index);
+                StringReference.Reference(_index);
             } else if (_valueType == scriptValueType) {
-                ScriptObjectPool.Reference(_index);
+                ScriptObjectReference.Reference(_index);
             }
         }
         public ScriptValue(bool value) {
@@ -161,7 +174,7 @@ namespace Scorpio {
                 this._index = 0;
             } else {
                 this._valueType = stringValueType;
-                this._index = StringPool.GetIndex(value);
+                this._index = StringReference.Alloc(value);
             }
         }
         public ScriptValue(ScriptObject value) {
@@ -172,7 +185,7 @@ namespace Scorpio {
                 this._index = 0;
             } else {
                 this._valueType = scriptValueType;
-                this._index = ScriptObjectPool.GetIndex(value);
+                this._index = ScriptObjectReference.Alloc(value);
             }
         }
 
@@ -473,10 +486,11 @@ namespace Scorpio {
             }
         }
 
-        public static ScriptValue CreateValue(object value) {
+        public static ScriptValue CreateValue(Script script, object value) {
             if (value == null)
                 return Null;
             else if (value is ScriptValue)
+                //需要增加一次引用计数
                 return new ScriptValue((ScriptValue)value);
             else if (value is bool)
                 return (bool)value ? True : False;
@@ -488,14 +502,17 @@ namespace Scorpio {
                 return new ScriptValue(Convert.ToDouble(value));
             else if (value is long)
                 return new ScriptValue((long)value);
+            else if (value is ulong)
+                return new ScriptValue(Convert.ToInt64(value));
             else if (value is ScriptObject)
                 return new ScriptValue((ScriptObject)value);
             else if (value is Type)
-                return ScorpioTypeManager.GetUserdataType((Type)value);
-            else if (value is Delegate)
-                return new ScriptValue(new ScriptUserdataDelegate((Delegate)value));
+                //需要增加一次引用计数
+                return new ScriptValue(script.GetUserdataType((Type)value));
+            //else if (value is Delegate)
+            //    return new ScriptValue(new ScriptUserdataDelegate((Delegate)value));
             else if (value is IList)
-                return new ScriptValue(new ScriptUserdataArray((IList)value, ScorpioTypeManager.GetType(value.GetType())));
+                return new ScriptValue(new ScriptUserdataArray((IList)value, script.GetType(value.GetType())));
             return new ScriptValue(new ScriptUserdataObject(value, ScorpioTypeManager.GetType(value.GetType())));
         }
         public void Dispose() {

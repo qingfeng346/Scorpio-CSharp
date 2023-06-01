@@ -1,6 +1,7 @@
 using System;
 using Scorpio.Tools;
-namespace Scorpio.Userdata {
+namespace Scorpio.Userdata
+{
     /// <summary> delegate object </summary>
     public class ScriptUserdataDelegate : ScriptUserdata {
         private class FunctionParameter {
@@ -14,7 +15,7 @@ namespace Scorpio.Userdata {
         private Delegate m_Delegate;
         private FunctionParameter[] m_Parameters;
         private object[] m_Objects;
-        public ScriptUserdataDelegate(Delegate value) {
+        public ScriptUserdataDelegate(Script script, Delegate value) : base(script) {
             this.m_Delegate = value;
             this.m_Value = value;
             this.m_ValueType = value.GetType();
@@ -27,6 +28,9 @@ namespace Scorpio.Userdata {
                 var parameter = parameters[i];
                 m_Parameters[i] = new FunctionParameter(parameter.ParameterType, parameter.DefaultValue);
             }
+        }
+        public override void Free() {
+            throw new NotImplementedException();
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             for (int i = 0; i < m_Parameters.Length; i++) {

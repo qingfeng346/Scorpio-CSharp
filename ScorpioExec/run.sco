@@ -18,11 +18,17 @@
 //     coroutine.done(ret, result)
 // }
 function main1() {
-    var a = "12321313"
-    return a
+    // var a = "12321313"
+    // return a
 }
 function main() {
-    var a = main1()
+    var a = {a:100}
+    var b = clone(a)
+    // var a = main1()
+    // var a = "1231232"
+    // var a = {}
+    // a[1] = a
+    // a[1] = a
     // a["123213"] = 12321312
 }
 main()

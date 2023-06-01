@@ -56,22 +56,20 @@ namespace Scorpio {
             }
             public void Dispose() { }
         }
-        private Script m_Script;
         internal ScriptValue[] m_Objects;
         internal int m_Length;
         
-        public ScriptArray(Script script) : base(ObjectType.Array, script.TypeArray) {
-            m_Script = script;
+        public ScriptArray(Script script) : base(script, ObjectType.Array) {
             m_Objects = ScriptValue.EMPTY;
             m_Length = 0;
+            Set(script.TypeArrayValue);
         }
-        public Script getScript() { return m_Script; }
         internal ScriptValue[] getObjects() { return m_Objects; }
         public override void Alloc() {
 
         }
         public override void Free() {
-            base.Free();
+            Release();
             Clear();
             m_Script.Free(this);
         }
@@ -88,7 +86,7 @@ namespace Scorpio {
         }
         void EnsureCapacity(int min) {
             if (m_Objects.Length < min) {
-                int num = (m_Objects.Length == 0) ? 4 : (m_Objects.Length * 2);
+                int num = (m_Objects.Length == 0) ? 8 : (m_Objects.Length * 2);
                 if (num > 2146435071) { num = 2146435071; } else if (num < min) { num = min; }
                 SetCapacity(num);
             }
@@ -267,9 +265,9 @@ namespace Scorpio {
             return array;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptArray(m_Script);
-            ret.m_Objects = new ScriptValue[m_Length];
+            var ret = m_Script.NewArray();
             ret.m_Length = m_Length;
+            ret.EnsureCapacity(m_Length);
             if (deep) {
                 for (int i = 0; i < m_Length; ++i) {
                     var value = m_Objects[i];
@@ -278,25 +276,25 @@ namespace Scorpio {
                         if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
                             ret.m_Objects[i] = new ScriptValue(scriptObject.Clone(true));
                         } else {
-                            ret.m_Objects[i] = value;
+                            ret.m_Objects[i].CopyFrom(value);
                         }
                     } else {
-                        ret.m_Objects[i] = value;
+                        ret.m_Objects[i].CopyFrom(value);
                     }
                 }
             } else {
                 for (int i = 0; i < m_Length; ++i) {
-                    ret.m_Objects[i] = m_Objects[i];
+                    ret.m_Objects[i].CopyFrom(m_Objects[i]);
                 }
             }
             return ret;
         }
         public ScriptArray NewCopy() {
-            var ret = new ScriptArray(m_Script);
-            ret.m_Objects = new ScriptValue[m_Length];
+            var ret = m_Script.NewArray();
             ret.m_Length = m_Length;
+            ret.EnsureCapacity(m_Length);
             for (int i = 0; i < m_Length; ++i) {
-                ret.m_Objects[i] = m_Objects[i];
+                ret.m_Objects[i].CopyFrom(m_Objects[i]);
             }
             return ret;
         }

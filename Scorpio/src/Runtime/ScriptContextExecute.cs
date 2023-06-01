@@ -890,7 +890,7 @@ namespace Scorpio.Runtime {
                                     }
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[stackIndex].CopyFrom(stackObjects[stackIndex].Call(ScriptValue.Null, parameter.values, opvalue));
+                                        stackObjects[stackIndex].Set(stackObjects[stackIndex].Call(ScriptValue.Null, parameter.values, opvalue));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -905,7 +905,7 @@ namespace Scorpio.Runtime {
                                     var parent = stackObjects[stackIndex--];
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex].CopyFrom(func.Call(parent, parameters.values, opvalue));
+                                        stackObjects[++stackIndex].Set(func.Call(parent, parameters.values, opvalue));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -915,7 +915,7 @@ namespace Scorpio.Runtime {
                             case Opcode.CallEmpty: {
                                 var func = stackObjects[stackIndex--];
                                 var parent = stackObjects[stackIndex--];
-                                stackObjects[++stackIndex].CopyFrom(func.Call(parent));
+                                stackObjects[++stackIndex].Set(func.Call(parent));
                                 continue;
                             }
                             case Opcode.TrueTo: {
@@ -1021,7 +1021,7 @@ namespace Scorpio.Runtime {
                                     var func = stackObjects[stackIndex--]; //函数对象
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex] = func.Call(ScriptValue.Null, parameters.values, parameterIndex);
+                                        stackObjects[++stackIndex].Set(func.Call(ScriptValue.Null, parameters.values, parameterIndex));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1057,7 +1057,7 @@ namespace Scorpio.Runtime {
                                     var parent = stackObjects[stackIndex--]; //函数父级
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex] = func.Call(parent, parameters.values, parameterIndex);
+                                        stackObjects[++stackIndex].Set(func.Call(parent, parameters.values, parameterIndex));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1090,7 +1090,7 @@ namespace Scorpio.Runtime {
                                     var prototype = stackObjects[stackIndex--];
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex] = func.Call(thisObject, parameters.values, opvalue, prototype.Get<ScriptType>());
+                                        stackObjects[++stackIndex].Set(func.Call(thisObject, parameters.values, opvalue, prototype.Get<ScriptType>()));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1126,7 +1126,7 @@ namespace Scorpio.Runtime {
                                     var prototype = stackObjects[stackIndex--];
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex].CopyFrom(func.Call(thisObject, parameters.values, parameterIndex, prototype.Get<ScriptType>()));
+                                        stackObjects[++stackIndex].Set(func.Call(thisObject, parameters.values, parameterIndex, prototype.Get<ScriptType>()));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1150,7 +1150,7 @@ namespace Scorpio.Runtime {
                                     }
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[stackIndex].CopyFrom(stackObjects[stackIndex].CallAsync(ScriptValue.Null, parameters.values, opvalue));
+                                        stackObjects[stackIndex].Set(stackObjects[stackIndex].CallAsync(ScriptValue.Null, parameters.values, opvalue));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1166,7 +1166,7 @@ namespace Scorpio.Runtime {
                                     var parent = stackObjects[stackIndex--];
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex].CopyFrom(func.CallAsync(parent, parameters.values, opvalue));
+                                        stackObjects[++stackIndex].Set(func.CallAsync(parent, parameters.values, opvalue));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1201,7 +1201,7 @@ namespace Scorpio.Runtime {
                                     var func = stackObjects[stackIndex--]; //函数对象
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex].CopyFrom(func.CallAsync(ScriptValue.Null, parameters.values, parameterIndex));
+                                        stackObjects[++stackIndex].Set(func.CallAsync(ScriptValue.Null, parameters.values, parameterIndex));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1237,7 +1237,7 @@ namespace Scorpio.Runtime {
                                     var parent = stackObjects[stackIndex--]; //函数父级
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex].CopyFrom(func.CallAsync(parent, parameters.values, parameterIndex));
+                                        stackObjects[++stackIndex].Set(func.CallAsync(parent, parameters.values, parameterIndex));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1253,7 +1253,7 @@ namespace Scorpio.Runtime {
                                     var prototype = stackObjects[stackIndex--];
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex] = func.CallAsync(thisObject, parameters.values, opvalue, prototype.Get<ScriptType>());
+                                        stackObjects[++stackIndex].Set(func.CallAsync(thisObject, parameters.values, opvalue, prototype.Get<ScriptType>()));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1289,7 +1289,7 @@ namespace Scorpio.Runtime {
                                     var prototype = stackObjects[stackIndex--];
                                     m_script.PushStackInfo(m_Breviary, instruction.line);
                                     try {
-                                        stackObjects[++stackIndex] = func.CallAsync(thisObject, parameters.values, parameterIndex, prototype.Get<ScriptType>());
+                                        stackObjects[++stackIndex].Set(func.CallAsync(thisObject, parameters.values, parameterIndex, prototype.Get<ScriptType>()));
                                     } finally {
                                         m_script.PopStackInfo();
                                     }
@@ -1374,7 +1374,7 @@ namespace Scorpio.Runtime {
                                 var classData = constClasses[opvalue];
                                 var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
                                 var className = constString[classData.name];
-                                var type = new ScriptType(className, parentType);
+                                var type = new ScriptType(m_script, className, parentType);
                                 var functions = classData.functions;
                                 for (var j = 0; j < functions.Length; ++j) {
                                     var func = functions[j];
@@ -1436,7 +1436,7 @@ namespace Scorpio.Runtime {
                     } catch (ExecutionException e) {
                         e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
                         if (tryIndex > -1) {
-                            stackObjects[stackIndex = 0] = ScriptValue.CreateValue(e);
+                            stackObjects[stackIndex = 0].Set(ScriptValue.CreateValue(m_script, e));
                             iInstruction = tryStack[tryIndex--];
                             goto KeepOn;
                         } else {
@@ -1445,7 +1445,7 @@ namespace Scorpio.Runtime {
                         //其他错误
                     } catch (System.Exception e) {
                         if (tryIndex > -1) {
-                            stackObjects[stackIndex = 0] = ScriptValue.CreateValue(e);
+                            stackObjects[stackIndex = 0].Set(ScriptValue.CreateValue(m_script, e));
                             iInstruction = tryStack[tryIndex--];
                             goto KeepOn;
                         } else {

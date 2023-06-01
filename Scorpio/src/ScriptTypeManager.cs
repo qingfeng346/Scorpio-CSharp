@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using Scorpio.Tools;
 using Scorpio.Userdata;
 namespace Scorpio {
-    public static class ScorpioTypeManager {
-        private static List<Assembly> m_Assembly = new List<Assembly>();                                                //所有代码集合
-        private static List<Type> m_ExtensionType = new List<Type>();                                                   //所有扩展类
-        private static Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                   //所有的类集合
-        private static Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();             //所有的类集合
-        public static UserdataType GetType(Type type) {
+    public partial class Script {
+        private List<Assembly> m_Assembly = new List<Assembly>();                                                //所有代码集合
+        private List<Type> m_ExtensionType = new List<Type>();                                                   //所有扩展类
+        private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                   //所有的类集合
+        private Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();             //所有的类集合
+        public UserdataType GetType(Type type) {
             if (m_Types.TryGetValue(type, out var value)) {
                 return value;
             }
@@ -17,7 +17,7 @@ namespace Scorpio {
             LoadExtension(type, userdataType);
             return m_Types[type] = userdataType;
         }
-        private static void LoadExtension(Type type, UserdataTypeReflect userdataType) {
+        private void LoadExtension(Type type, UserdataTypeReflect userdataType) {
             foreach (var extensionType in m_ExtensionType) {
                 var methods = extensionType.GetMethods(Script.BindingFlag);
                 foreach (var method in methods) {
@@ -29,46 +29,46 @@ namespace Scorpio {
                 }
             }
         }
-        public static ScriptValue GetUserdataType(string name) {
+        public ScriptValue GetUserdataType(string name) {
             var type = LoadType(name);
             if (type == null) return ScriptValue.Null;
             return GetUserdataType(type);
         }
-        public static ScriptValue GetUserdataType(Type type) {
+        public ScriptValue GetUserdataType(Type type) {
             if (m_UserdataTypes.TryGetValue(type, out var value)) {
                 return value;
             }
             if (type.IsEnum)
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataEnumType(type));
+                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataEnumType(this, type));
             else if (ScorpioUtil.TYPE_DELEGATE.IsAssignableFrom(type))
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(type));
+                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(this, type));
             else
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataType(type, GetType(type)));
+                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataType(this, type, GetType(type)));
         }
-        public static void SetFastReflectClass(Type type, IScorpioFastReflectClass value) {
+        public void SetFastReflectClass(Type type, IScorpioFastReflectClass value) {
             if (value == null || type == null) { return; }
             m_Types[type] = new UserdataTypeFastReflect(type, value);
         }
-        public static UserdataTypeFastReflect GetFastReflectClass(Type type) {
+        public UserdataTypeFastReflect GetFastReflectClass(Type type) {
             if (type == null) { return null; }
             if (m_Types.TryGetValue(type, out var value)) {
                 return value as UserdataTypeFastReflect;
             }
             return null;
         }
-        public static bool IsFastReflectClass(Type type) {
+        public bool IsFastReflectClass(Type type) {
             if (type == null) { return false; }
             if (m_Types.TryGetValue(type, out var value)) {
                 return value is UserdataTypeFastReflect;
             }
             return false;
         }
-        public static void PushAssembly(Assembly assembly) {
+        public void PushAssembly(Assembly assembly) {
             if (assembly == null) return;
             if (!m_Assembly.Contains(assembly))
                 m_Assembly.Add(assembly);
         }
-        public static Type LoadType(string name) {
+        public Type LoadType(string name) {
             var type = Type.GetType(name, false, false);
             if (type != null) return type;
             for (int i = 0; i < m_Assembly.Count; ++i) {
@@ -78,13 +78,13 @@ namespace Scorpio {
             return null;
         }
         //加载扩展类
-        public static void LoadExtension(string type) {
+        public void LoadExtension(string type) {
             LoadExtension(LoadType(type));
         }
-        public static void LoadExtension(Type type) {
+        public void LoadExtension(Type type) {
             if (type == null || !type.IsExtensionType() || m_ExtensionType.Contains(type)) { return; }
             m_ExtensionType.Add(type);
-            var methods = type.GetMethods(Script.BindingFlag);
+            var methods = type.GetMethods(BindingFlag);
             foreach (var method in methods) {
                 if (!method.IsExtensionMethod()) { continue; }
                 //第1个参数就是 this 类

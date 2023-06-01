@@ -38,12 +38,13 @@ namespace Scorpio {
         private ScriptValue[] m_Objects = ScriptValue.EMPTY;                                //数据
         private int m_Size = 0;                                                             //有效数据数量
         private Dictionary<string, int> m_Indexs = new Dictionary<string, int>();           //名字到索引的映射
-        public ScriptGlobal() : base(ObjectType.Global) { }
+        public ScriptGlobal(Script script) : base(script, ObjectType.Global) { }
         public void Shutdown() {
             ScorpioUtil.Free(m_Objects, m_Size);
             m_Indexs.Clear();
             m_Size = 0;
         }
+        public override void Free() { }
         void SetCapacity(int value) {
             if (value > 0) {
                 var array = new ScriptValue[value];
