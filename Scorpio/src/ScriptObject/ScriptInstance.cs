@@ -6,20 +6,21 @@ using Scorpio.Tools;
 namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         internal Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();         //所有的数据(函数和数据都在一个数组)
+        protected ScriptValue m_PrototypeValue;
         protected ScriptType m_Prototype = null;
         public ScriptInstance(Script script) : base(script, ObjectType.Instance) { }
         public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) { }
-        public void Set(ScriptType prototype) {
-            m_Prototype = prototype;
+        public ScriptInstance Set(ScriptValue prototypeValue) {
+            m_PrototypeValue.CopyFrom(prototypeValue);
+            m_Prototype = prototypeValue.Get<ScriptType>();
+            return this;
         }
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         protected void Release() {
+            m_PrototypeValue.Free();
             m_Prototype = null;
-            foreach (var pair in m_Values) {
-                pair.Value.Free();
-            }
-            m_Values.Clear();
+            m_Values.Free();
         }
         public override void Free() {
             Release();
@@ -34,12 +35,11 @@ namespace Scorpio {
             }
         }
         public override void SetValue(string key, ScriptValue value) {
-            //正常引用计数
-            value.Reference();
             if (m_Values.TryGetValue(key, out var result)) {
                 result.Free();
             }
-            m_Values[key] = value;
+            //正常引用计数
+            m_Values[key] = value.Reference();
         }
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);

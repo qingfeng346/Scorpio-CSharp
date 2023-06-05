@@ -36,7 +36,7 @@ namespace Scorpio.Userdata {
             }
             throw new ExecutionException ($"没有找到合适的泛型函数 : {MethodName}");
         }
-        public object Call (bool isStatic, object obj, ScriptValue[] parameters, int length) {
+        public object Call(Script script, bool isStatic, object obj, ScriptValue[] parameters, int length) {
             try {
                 //如果obj为null 则调用静态函数
                 var methods = isStatic ? m_StaticMethods : m_Methods;
@@ -44,16 +44,16 @@ namespace Scorpio.Userdata {
                 if (methodLength == 1) {
                     var method = methods[0];
                     method.SetArgs(parameters, length);
-                    return method.Invoke(obj, parameters);
+                    return method.Invoke(script, obj, parameters);
                 } else {
                     for (var i = 0; i < methodLength; ++i) {
                         var method = methods[i];
                         if (method.CheckNormalType(parameters, length)) {
-                            return method.Invoke(obj, parameters);
+                            return method.Invoke(script, obj, parameters);
                         } else if (method.CheckDefaultType(parameters, length)) {
-                            return method.Invoke(obj, parameters);
+                            return method.Invoke(script, obj, parameters);
                         } else if (method.CheckArgsType(parameters, length)) {
-                            return method.Invoke(obj, parameters);
+                            return method.Invoke(script, obj, parameters);
                         }
                     }
                 }
@@ -62,7 +62,7 @@ namespace Scorpio.Userdata {
                 throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] - {parameters.GetParametersString(length)} : {e}");
             }
         }
-        public bool CallNoThrow (bool isStatic, object obj, ScriptValue[] parameters, int length, out object result) {
+        public bool CallNoThrow (Script script, bool isStatic, object obj, ScriptValue[] parameters, int length, out object result) {
             try {
                 //如果obj为null 则调用静态函数
                 var methods = isStatic ? m_StaticMethods : m_Methods;
@@ -70,19 +70,19 @@ namespace Scorpio.Userdata {
                 if (methodLength == 1) {
                     var method = methods[0];
                     method.SetArgs(parameters, length);
-                    result = method.Invoke(obj, parameters);
+                    result = method.Invoke(script, obj, parameters);
                     return true;
                 } else {
                     for (var i = 0; i < methodLength; ++i) {
                         var method = methods[i];
                         if (method.CheckNormalType (parameters, length)) {
-                            result = method.Invoke (obj, parameters);
+                            result = method.Invoke (script, obj, parameters);
                             return true;
                         } else if (method.CheckDefaultType(parameters, length)) {
-                            result = method.Invoke(obj, parameters);
+                            result = method.Invoke(script, obj, parameters);
                             return true;
                         } else if (method.CheckArgsType(parameters, length)) {
-                            result = method.Invoke(obj, parameters);
+                            result = method.Invoke(script, obj, parameters);
                             return true;
                         }
                     }

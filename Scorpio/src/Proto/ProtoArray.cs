@@ -1,4 +1,5 @@
 namespace Scorpio.Proto {
+    using Scorpio.Userdata;
     public class ProtoArray {
         public static ScriptType Load(Script script, ScriptType ret) {
             ret.SetValue("length", script.CreateFunction(new length()));
@@ -166,7 +167,7 @@ namespace Scorpio.Proto {
         private class findAll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
-                var ret = new ScriptArray(array.getScript());
+                var ret = array.script.NewArray();
                 var func = args[0].Get<ScriptFunction>();
                 for (int i = 0, count = array.Length(); i < count; ++i) {
                     if (func.Call(array[i]).IsTrue) {
@@ -179,7 +180,7 @@ namespace Scorpio.Proto {
         private class findAllIndex : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
-                var ret = new ScriptArray(array.getScript());
+                var ret = array.script.NewArray();
                 var func = args[0].Get<ScriptFunction>();
                 for (int i = 0, count = array.Length(); i < count; ++i) {
                     if (func.Call(array[i]).IsTrue) {
@@ -192,7 +193,7 @@ namespace Scorpio.Proto {
         private class findAllLast : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
-                var ret = new ScriptArray(array.getScript());
+                var ret = array.script.NewArray();
                 var func = args[0].Get<ScriptFunction>();
                 for (var i = array.Length() - 1; i >= 0; --i) {
                     if (func.Call(array[i]).IsTrue) {
@@ -205,7 +206,7 @@ namespace Scorpio.Proto {
         private class findAllLastIndex : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
-                var ret = new ScriptArray(array.getScript());
+                var ret = array.script.NewArray();
                 var func = args[0].Get<ScriptFunction>();
                 for (var i = array.Length() - 1; i >= 0; --i) {
                     if (func.Call(array[i]).IsTrue) {
@@ -242,7 +243,7 @@ namespace Scorpio.Proto {
         private class map : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
-                var ret = new ScriptArray(array.getScript());
+                var ret = array.script.NewArray();
                 var func = args[0].Get<ScriptFunction>();
                 for (int i = 0, count = array.Length(); i < count; ++i) {
                     ret.Add(func.Call(array[i]));
@@ -253,7 +254,7 @@ namespace Scorpio.Proto {
         private class reverse : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
-                var ret = new ScriptArray(array.getScript());
+                var ret = array.script.NewArray();
                 for (var i = array.Length() - 1; i >= 0; --i) {
                     ret.Add(array[i]);
                 }
@@ -303,8 +304,9 @@ namespace Scorpio.Proto {
         }
         private class toArray : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var type = args[0].Get<Scorpio.Userdata.ScriptUserdataType>();
-                return type == null ? ScriptValue.Null : ScriptValue.CreateValue(thisObject.Get<ScriptArray>().ToArray(type.Type));
+                var array = thisObject.Get<ScriptArray>();
+                var type = args[0].Get<ScriptUserdataType>();
+                return type == null ? ScriptValue.Null : ScriptValue.CreateValue(array.script, array.ToArray(type.Type));
             }
         }
         private class plus : ScorpioHandle {

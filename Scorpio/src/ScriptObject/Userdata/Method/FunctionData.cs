@@ -42,7 +42,7 @@ namespace Scorpio.Userdata {
         //是否是静态函数
         public virtual bool IsStatic => false;
         public int Priority => IsNormal ? 0 : (IsDefault ? 1 : 2);
-        public abstract object Invoke (object obj, ScriptValue[] parameters);
+        public abstract object Invoke (Script script, object obj, ScriptValue[] parameters);
         //优先检查无默认值，非不定参的函数
         public virtual bool CheckNormalType (ScriptValue[] parameters, int length) {
             if (IsNormal && length == ParameterCount) {

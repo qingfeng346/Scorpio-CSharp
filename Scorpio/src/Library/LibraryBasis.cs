@@ -12,14 +12,34 @@ using Scorpio.Instruction;
 namespace Scorpio.Library
 {
     public partial class LibraryBasis {
-        private class ArrayPairs : ScorpioHandle {
+        private abstract class KeyValuePairs<T> : ScorpioHandle {
+            readonly Script script;
+            readonly ScriptMap m_ItorResult;
+            readonly IEnumerator<KeyValuePair<T, ScriptValue>> m_Enumerator;
+            public KeyValuePairs(Script script, ScriptMap itorResult, IEnumerator<KeyValuePair<T, ScriptValue>> enumerator) {
+                this.script = script;
+                m_ItorResult = itorResult;
+                m_Enumerator = enumerator;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (m_Enumerator.MoveNext()) {
+                    var value = m_Enumerator.Current;
+                    using (var key = ScriptValue.CreateValue(script, value.Key)) {
+                        m_ItorResult.SetValue("key", key);
+                        m_ItorResult.SetValue("value", value.Value);
+                    }
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
+            }
+        }
+        private abstract class ValuePairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
             readonly IEnumerator<ScriptValue> m_Enumerator;
-            double m_Index = 0;
-            public ArrayPairs(ScriptArray array, ScriptMap itorResult) {
-                m_Index = 0;
-                m_Enumerator = array.GetEnumerator();
+            private double m_Index = 0;
+            public ValuePairs(ScriptMap itorResult, IEnumerator<ScriptValue> enumerator) {
                 m_ItorResult = itorResult;
+                m_Enumerator = enumerator;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
@@ -30,91 +50,31 @@ namespace Scorpio.Library
                 return ScriptValue.False;
             }
         }
-        private class MapObjectPairs : ScorpioHandle {
-            readonly ScriptMap m_ItorResult;
-            readonly IEnumerator<KeyValuePair<object, ScriptValue>> m_Enumerator;
-            public MapObjectPairs(ScriptMapObject map, ScriptMap itorResult) {
-                m_Enumerator = map.GetEnumerator();
-                m_ItorResult = itorResult;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (m_Enumerator.MoveNext()) {
-                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(m_Enumerator.Current.Key));
-                    m_ItorResult.SetValue("value", m_Enumerator.Current.Value);
-                    return ScriptValue.True;
-                }
-                return ScriptValue.False;
-            }
+        private class ArrayPairs : ValuePairs {
+            public ArrayPairs(ScriptMap itorResult, ScriptArray array) : base(itorResult, array.GetEnumerator()) { }
         }
-        private class MapStringPairs : ScorpioHandle {
-            readonly ScriptMap m_ItorResult;
-            readonly IEnumerator<KeyValuePair<object, ScriptValue>> m_Enumerator;
-            public MapStringPairs(ScriptMapString map, ScriptMap itorResult) {
-                m_Enumerator = map.GetEnumerator();
-                m_ItorResult = itorResult;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (m_Enumerator.MoveNext()) {
-                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(m_Enumerator.Current.Key));
-                    m_ItorResult.SetValue("value", m_Enumerator.Current.Value);
-                    return ScriptValue.True;
-                }
-                return ScriptValue.False;
-            }
+        private class HashSetPairs : ValuePairs {
+            public HashSetPairs(ScriptMap itorResult, ScriptHashSet hashSet) : base(itorResult, hashSet.GetEnumerator()) { }
         }
-        private class HashSetPairs : ScorpioHandle {
-            readonly ScriptMap m_ItorResult;
-            readonly IEnumerator<ScriptValue> m_Enumerator;
-            public HashSetPairs(ScriptHashSet hashSet, ScriptMap itorResult) {
-                m_Enumerator = hashSet.GetEnumerator();
-                m_ItorResult = itorResult;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (m_Enumerator.MoveNext()) {
-                    m_ItorResult.SetValue("value", m_Enumerator.Current);
-                    return ScriptValue.True;
-                }
-                return ScriptValue.False;
-            }
+        private class MapObjectPairs : KeyValuePairs<object> {
+            public MapObjectPairs(Script script, ScriptMap itorResult, ScriptMapObject map) : base(script, itorResult, map.GetEnumerator()) { }
         }
-        private class InstancePairs : ScorpioHandle {
-            readonly ScriptInstance m_ItorResult;
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
-            public InstancePairs(ScriptInstance map, ScriptMap itorResult) {
-                m_Enumerator = map.GetEnumerator();
-                m_ItorResult = itorResult;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (m_Enumerator.MoveNext()) {
-                    var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key));
-                    m_ItorResult.SetValue("value", value.Value);
-                    return ScriptValue.True;
-                }
-                return ScriptValue.False;
-            }
+        private class MapStringPairs : KeyValuePairs<object> {
+            public MapStringPairs(Script script, ScriptMap itorResult, ScriptMapString map) : base(script, itorResult, map.GetEnumerator()) { }
         }
-        private class TypePairs : ScorpioHandle {
-            readonly ScriptInstance m_ItorResult;
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
-            public TypePairs(ScriptType map, ScriptMap itorResult) {
-                m_Enumerator = map.GetEnumerator();
-                m_ItorResult = itorResult;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (m_Enumerator.MoveNext()) {
-                    var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", ScriptValue.CreateValue(value.Key));
-                    m_ItorResult.SetValue("value", value.Value);
-                    return ScriptValue.True;
-                }
-                return ScriptValue.False;
-            }
+
+        private class InstancePairs : KeyValuePairs<string> {
+            public InstancePairs(Script script, ScriptMap itorResult, ScriptInstance map) : base(script, itorResult, map.GetEnumerator()) { }
+        }
+        private class TypePairs : KeyValuePairs<string> {
+            public TypePairs(Script script, ScriptMap itorResult, ScriptType map) : base(script, itorResult, map.GetEnumerator()) { }
         }
         private class UserdataPairs : ScorpioHandle {
+            readonly Script script;
             readonly ScriptMap m_ItorResult;
             readonly IEnumerator m_Enumerator;
-            public UserdataPairs(ScriptUserdata userdata, ScriptMap itorResult) {
+            public UserdataPairs(Script script, ScriptMap itorResult, ScriptUserdata userdata) {
+                this.script = script;
                 m_ItorResult = itorResult;
                 if (userdata.Value is IEnumerator) {
                     m_Enumerator = (IEnumerator)userdata.Value;
@@ -126,7 +86,9 @@ namespace Scorpio.Library
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
-                    m_ItorResult.SetValue("value", ScriptValue.CreateValue(m_Enumerator.Current));
+                    using (var value = ScriptValue.CreateValue(script, m_Enumerator.Current)) {
+                        m_ItorResult.SetValue("value", value);
+                    }
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;
@@ -135,7 +97,7 @@ namespace Scorpio.Library
         private class GlobalPairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
             readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
-            public GlobalPairs(ScriptGlobal global, ScriptMap itorResult) {
+            public GlobalPairs(ScriptMap itorResult, ScriptGlobal global) {
                 m_Enumerator = global.GetEnumerator();
                 m_ItorResult = itorResult;
             }
@@ -197,7 +159,7 @@ namespace Scorpio.Library
             script.SetGlobal("toNumber", script.CreateFunction(new toDouble()));
             script.SetGlobal("toDouble", script.CreateFunction(new toDouble()));
 
-            script.SetGlobal("toEnum", script.CreateFunction(new toEnum()));
+            script.SetGlobal("toEnum", script.CreateFunction(new toEnum(script)));
             script.SetGlobal("toString", script.CreateFunction(new toString()));
 
             script.SetGlobal("typeOf", script.CreateFunction(new getPrototype(script)));
@@ -209,16 +171,16 @@ namespace Scorpio.Library
             script.SetGlobal("clone", script.CreateFunction(new clone()));
 
             script.SetGlobal("require", script.CreateFunction(new require(script)));
-            script.SetGlobal("setFastReflectClass", script.CreateFunction(new setFastReflectClass()));
-            script.SetGlobal("isFastReflectClass", script.CreateFunction(new isFastReflectClass()));
+            script.SetGlobal("setFastReflectClass", script.CreateFunction(new setFastReflectClass(script)));
+            script.SetGlobal("isFastReflectClass", script.CreateFunction(new isFastReflectClass(script)));
 
             script.SetGlobal("pushSearch", script.CreateFunction(new pushSearch(script)));
-            script.SetGlobal("pushAssembly", script.CreateFunction(new pushAssembly()));
-            script.SetGlobal("importType", script.CreateFunction(new importType()));
+            script.SetGlobal("pushAssembly", script.CreateFunction(new pushAssembly(script)));
+            script.SetGlobal("importType", script.CreateFunction(new importType(script)));
             script.SetGlobal("importNamespace", script.CreateFunction(new importNamespace(script)));
-            script.SetGlobal("importExtension", script.CreateFunction(new importExtension()));
-            script.SetGlobal("genericType", script.CreateFunction(new genericType()));
-            script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod()));
+            script.SetGlobal("importExtension", script.CreateFunction(new importExtension(script)));
+            script.SetGlobal("genericType", script.CreateFunction(new genericType(script)));
+            script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod(script)));
         }
         private class print : ScorpioHandle {
             private Script script;
@@ -271,27 +233,27 @@ namespace Scorpio.Library
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
-                var map = new ScriptMapString(m_script);
+                var itorResult = m_script.NewMapObject();  
                 if (obj is ScriptArray) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs((ScriptArray)obj, map)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, (ScriptArray)obj)));
                 } else if (obj is ScriptMapObject) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapObjectPairs((ScriptMapObject)obj, map)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapObjectPairs(m_script, itorResult, (ScriptMapObject)obj)));
                 } else if (obj is ScriptMapString) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapStringPairs((ScriptMapString)obj, map)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapStringPairs(m_script, itorResult, (ScriptMapString)obj)));
                 } else if (obj is ScriptHashSet) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new HashSetPairs((ScriptHashSet)obj, map)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new HashSetPairs(itorResult, (ScriptHashSet)obj)));
                 } else if (obj is ScriptUserdata) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new UserdataPairs((ScriptUserdata)obj, map)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new UserdataPairs(m_script, itorResult, (ScriptUserdata)obj)));
                 } else if (obj is ScriptInstance) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new InstancePairs((ScriptInstance)obj, map)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new InstancePairs(m_script, itorResult, (ScriptInstance)obj)));
                 } else if (obj is ScriptType) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new TypePairs((ScriptType)obj, map)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new TypePairs(m_script, itorResult, (ScriptType)obj)));
                 } else if (obj is ScriptGlobal) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new GlobalPairs((ScriptGlobal)obj, map)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new GlobalPairs(itorResult, (ScriptGlobal)obj)));
                 } else {
                     throw new ExecutionException("pairs 必须用于 array, map, type, global 或者 继承 IEnumerable 的 userdata 类型");
                 }
-                return new ScriptValue(map);
+                return new ScriptValue(itorResult);
             }
         }
         private class gc : ScorpioHandle {
@@ -485,28 +447,30 @@ namespace Scorpio.Library
             }
         }
         private class toEnum : ScorpioHandle {
+            readonly Script script;
+            public toEnum(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var type = args[0].Get<ScriptUserdataEnumType>();
                 if (args[1].valueType == ScriptValue.stringValueType) {
                     var ignoreCase = length > 2 ? args[2].valueType == ScriptValue.trueValueType : false;
-                    return ScriptValue.CreateValue(Enum.Parse(type.Type, args[1].stringValue, ignoreCase));
+                    return ScriptValue.CreateValue(script, Enum.Parse(type.Type, args[1].stringValue, ignoreCase));
                 } else {
-                    return ScriptValue.CreateValue(Enum.ToObject(type.Type, args[1].ToLong()));
+                    return ScriptValue.CreateValue(script, Enum.ToObject(type.Type, args[1].ToLong()));
                 }
             }
         }
         private class toString : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                using var ret = new ScriptValue(args[0].ToString());
-                return ret;
+                return new ScriptValue(args[0].ToString());
             }
         }
         private class clone : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var deep = length > 1 ? args[1].IsTrue : true;
                 if (args[0].valueType == ScriptValue.scriptValueType) {
-                    using var ret = new ScriptValue(args[0].scriptValue.Clone(deep));
-                    return ret;
+                    return new ScriptValue(args[0].scriptValue.Clone(deep));
                 } else {
                     return args[0];
                 }
@@ -550,36 +514,36 @@ namespace Scorpio.Library
             }
         }
         private class getPrototype : ScorpioHandle {
-            readonly Script m_Script;
+            private Script script;
             public getPrototype(Script script) {
-                m_Script = script;
+                this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var value = args[0];
                 switch (value.valueType) {
                     case ScriptValue.trueValueType:
                     case ScriptValue.falseValueType:
-                        return m_Script.TypeBooleanValue;
+                        return script.TypeBooleanValue;
                     case ScriptValue.doubleValueType:
                     case ScriptValue.int64ValueType:
-                        return m_Script.TypeNumberValue;
+                        return script.TypeNumberValue;
                     case ScriptValue.stringValueType:
-                        return m_Script.TypeStringValue;
+                        return script.TypeStringValue;
                     case ScriptValue.scriptValueType:
                         if (value.scriptValue is ScriptArray) {
-                            return m_Script.TypeArrayValue;
+                            return script.TypeArrayValue;
                         } else if (value.scriptValue is ScriptMap) {
-                            return m_Script.TypeMapValue;
+                            return script.TypeMapValue;
                         } else if (value.scriptValue is ScriptFunction) {
-                            return m_Script.TypeFunctionValue;
+                            return script.TypeFunctionValue;
                         } else if (value.scriptValue is ScriptInstance) {
                             return new ScriptValue((value.scriptValue as ScriptInstance).Prototype);
                         } else if (value.scriptValue is ScriptType) {
                             return new ScriptValue((value.scriptValue as ScriptType).Prototype);
                         } else {
-                            return ScorpioTypeManager.GetUserdataType(value.scriptValue.Type);
+                            return script.GetUserdataTypeValue(value.scriptValue.Type);
                         }
-                    default: return m_Script.TypeObjectValue;
+                    default: return script.TypeObjectValue;
                 }
             }
         }
@@ -603,7 +567,8 @@ namespace Scorpio.Library
         }
         private class createArray : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScriptValue.CreateValue(Array.CreateInstance(args[0].Get<ScriptUserdata>().Type, args[1].ToInt32()));
+                var userData = args[0].Get<ScriptUserdata>();
+                return ScriptValue.CreateValue(userData.script, Array.CreateInstance(userData.Type, args[1].ToInt32()));
             }
         }
         private class getBase : ScorpioHandle {
@@ -649,7 +614,7 @@ namespace Scorpio.Library
                 this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(script.GetUserdataType(args[0].ToString()));
+                return new ScriptValue(script.GetUserdataTypeValue(args[0].ToString()));
             }
         }
         private class importNamespace : ScorpioHandle {
@@ -663,19 +628,27 @@ namespace Scorpio.Library
             }
         }
         private class importExtension : ScorpioHandle {
+            private Script script;
+            public importExtension(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType == ScriptValue.stringValueType) {
-                    ScorpioTypeManager.LoadExtension(args[0].stringValue);
+                    script.LoadExtension(args[0].stringValue);
                 } else {
                     var userdata = args[0].Get<ScriptUserdata>();
                     if (userdata != null) {
-                        ScorpioTypeManager.LoadExtension(userdata.Type);
+                        script.LoadExtension(userdata.Type);
                     }
                 }
                 return ScriptValue.Null;
             }
         }
         private class genericType : ScorpioHandle {
+            private Script script;
+            public genericType(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType != ScriptValue.scriptValueType)
                     throw new ExecutionException("generic_type 第1个参数必须是 Type");
@@ -685,10 +658,14 @@ namespace Scorpio.Library
                         throw new ExecutionException($"generic_type 第{i+1}个参数必须是 Type");
                     types[i - 1] = args[i].scriptValue.Type;
                 }
-                return ScorpioTypeManager.GetType(args[0].scriptValue.Type).MakeGenericType(types);
+                return script.GetUserdataType(args[0].scriptValue.Type).MakeGenericType(script, types);
             }
         }
         private class genericMethod : ScorpioHandle {
+            private Script script;
+            public genericMethod(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType != ScriptValue.scriptValueType || !(args[0].scriptValue is ScriptMethodFunction)) {
                     throw new ExecutionException("generic_method 第1个参数必须是函数");
@@ -701,23 +678,31 @@ namespace Scorpio.Library
                 }
                 var method = (args[0].scriptValue as ScriptMethodFunction).Method.MakeGenericMethod(types);
                 if (method.IsStatic) {
-                    return new ScriptValue(new ScriptStaticMethodFunction(method, method.MethodName));
+                    return new ScriptValue(script.NewStaticMethod().Set(method.MethodName, method));
                 } else {
-                    return new ScriptValue(new ScriptGenericMethodFunction(method, method.MethodName));
+                    return new ScriptValue(script.NewGenericMethod().Set(method.MethodName, method));
                 }
             }
         }
         private class setFastReflectClass : ScorpioHandle {
+            private Script script;
+            public setFastReflectClass(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var type = args[0].Get<ScriptUserdata>().Type;
                 var fastClass = args[1].Value as IScorpioFastReflectClass;
-                ScorpioTypeManager.SetFastReflectClass(type, fastClass);
+                script.SetFastReflectClass(type, fastClass);
                 return ScriptValue.Null;
             }
         }
         private class isFastReflectClass : ScorpioHandle {
+            private Script script;
+            public isFastReflectClass(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScorpioTypeManager.IsFastReflectClass(args[0].Get<ScriptUserdata>().Type) ? ScriptValue.True : ScriptValue.False;
+                return script.IsFastReflectClass(args[0].Get<ScriptUserdata>().Type) ? ScriptValue.True : ScriptValue.False;
             }
         }
     }

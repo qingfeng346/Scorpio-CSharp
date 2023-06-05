@@ -3,14 +3,18 @@ namespace Scorpio.Library
     public partial class LibraryUserdata {
         public static void Load(Script script) {
             var map = new ScriptMapString(script);
-            map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf()));
+            map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf(script)));
             map.SetValue("isType", script.CreateFunction(new isType()));
-            map.SetValue("extend", script.CreateFunction(new extend()));
+            map.SetValue("extend", script.CreateFunction(new extend(script)));
             script.SetGlobal("userdata", map);
         }
         private class fieldTypeOf : ScorpioHandle {
+            private Script script;
+            public fieldTypeOf(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScorpioTypeManager.GetUserdataType(ScorpioTypeManager.GetType(args[0].scriptValue.Type).GetVariableType(args[1].ToString()));
+                return script.GetUserdataTypeValue(script.GetUserdataType(args[0].scriptValue.Type).GetVariableType(args[1].ToString()));
             }
         }
         private class isType : ScorpioHandle {
@@ -22,8 +26,12 @@ namespace Scorpio.Library
             }
         }
         private class extend : ScorpioHandle {
+            public Script script;
+            public extend(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                ScorpioTypeManager.GetType(args[0].scriptValue.Type).SetValue(args[1].ToString(), args[2]);
+                script.GetUserdataType(args[0].scriptValue.Type).SetValue(args[1].ToString(), args[2]);
                 return ScriptValue.Null;
             }
         }

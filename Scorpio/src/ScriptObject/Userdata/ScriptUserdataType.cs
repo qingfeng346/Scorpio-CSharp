@@ -12,21 +12,22 @@ namespace Scorpio.Userdata {
             this.m_ValueType = value;
             this.m_UserdataType = type;
         }
+        public override void Free() {
+        }
         public override Type ValueType => ScorpioUtil.TYPE_TYPE;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            using var ret = new ScriptValue(m_UserdataType.CreateInstance(parameters, length));
-            return ret;
+            return new ScriptValue(m_UserdataType.CreateInstance(m_Script, parameters, length));
         }
         public override ScriptValue GetValue(string key) {
             if (m_Methods.TryGetValue(key, out var value)) {
                 return value;
             }
-            var ret = m_UserdataType.GetValue(null, key);
+            var ret = m_UserdataType.GetValue(m_Script, null, key);
             if (ret is UserdataMethod) {
                 key = string.Intern(key);
-                return m_Methods[key] = new ScriptValue(new ScriptStaticMethodFunction((UserdataMethod)ret, key));
+                return m_Methods[key] = new ScriptValue(m_Script.NewStaticMethod().Set(key, (UserdataMethod)ret));
             }
-            using var v = ScriptValue.CreateValue(ret);
+            using var v = ScriptValue.CreateValue(script, ret);
             return v;
         }
         public override void SetValue(string key, ScriptValue value) {

@@ -9,6 +9,10 @@ namespace Scorpio.Function {
             m_internalValues = new InternalValue[context.internalCount];
             return this;
         }
+        public override void Free() {
+            Release();
+            m_Script.Free(this);
+        }
         public void SetInternal(int index, InternalValue value) {
             m_internalValues[index] = value;
         }
@@ -28,8 +32,13 @@ namespace Scorpio.Function {
         }
         public ScriptScriptLambdaFunction SetContext(ScriptContext context, ScriptValue bindObject) {
             SetContext(context);
-            m_BindObject = bindObject;
+            m_BindObject.CopyFrom(bindObject);
             return this;
+        }
+        public override void Free() {
+            Release();
+            m_BindObject.Free();
+            m_Script.Free(this);
         }
         public override ScriptValue BindObject => m_BindObject;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
@@ -43,50 +52,4 @@ namespace Scorpio.Function {
             return func != null && ReferenceEquals(m_Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);
         }
     }
-//#if SCORPIO_DEBUG
-//    public class ScriptScriptBindFunction : ScriptScriptFunction {
-//        private ScriptScriptFunction m_Function;
-//        private ScriptValue m_BindObject = ScriptValue.Null;
-//        public ScriptScriptBindFunction(ScriptScriptFunction function, ScriptValue bindObject) : base(function.Context) {
-//            m_Function = function;
-//            m_BindObject = bindObject;
-//        }
-//        public override ScriptValue BindObject => m_BindObject;
-//        public new void SetInternal(int index, InternalValue value) {
-//            m_Function.SetInternal(index, value);
-//        }
-//        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-//            return m_Function.Call(m_BindObject, parameters, length);
-//        }
-//        internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
-//            return m_Function.Call(m_BindObject, parameters, length, baseType);
-//        }
-//        public override bool Equals(ScriptValue obj) {
-//            var func = obj.Get<ScriptScriptBindFunction>();
-//            return func != null && ReferenceEquals(m_Function.Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);
-//        }
-//    }
-//#else
-    //public class ScriptScriptBindFunction : ScriptScriptFunction {
-    //    private ScriptValue m_BindObject = ScriptValue.Null;
-    //    public ScriptScriptBindFunction(Script script) : base(script) {
-    //    }
-    //    public ScriptScriptBindFunction SetContext(ScriptContext context, ScriptValue bindObject) {
-    //        SetContext(context);
-    //        m_BindObject = bindObject;
-    //        return this;
-    //    }
-    //    public override ScriptValue BindObject => m_BindObject;
-    //    public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-    //        return m_Context.Execute(m_BindObject, parameters, length, m_internalValues);
-    //    }
-    //    internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
-    //        return m_Context.Execute(m_BindObject, parameters, length, m_internalValues, baseType);
-    //    }
-    //    public override bool Equals(ScriptValue obj) {
-    //        var func = obj.Get<ScriptScriptBindFunction>();
-    //        return func != null && ReferenceEquals(m_Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);
-    //    }
-    //}
-//#endif
 }

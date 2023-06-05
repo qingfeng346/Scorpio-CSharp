@@ -3,9 +3,12 @@ using Scorpio.Exception;
 namespace Scorpio.Function {
     public class ScriptHandleFunction : ScriptFunction {
         protected ScorpioHandle m_Handle;                                         //程序函数执行类
-        public ScriptHandleFunction(Script script, ScorpioHandle handle) : this(script, null, handle) { }
+        public ScriptHandleFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().FullName, handle) { }
         public ScriptHandleFunction(Script script, string name, ScorpioHandle handle) : base(script, name) {
             m_Handle = handle;
+        }
+        public override void Free() {
+            Release();
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             try {
@@ -21,7 +24,11 @@ namespace Scorpio.Function {
     public class ScriptHandleBindFunction : ScriptHandleFunction {
         private ScriptValue m_BindObject = ScriptValue.Null;
         public ScriptHandleBindFunction(Script script, string name, ScorpioHandle handle, ScriptValue bindObject) : base(script, name, handle) {
-            m_BindObject = bindObject;
+            m_BindObject.CopyFrom(bindObject);
+        }
+        public override void Free() {
+            Release();
+            m_BindObject.Free();
         }
         public override ScriptValue BindObject { get { return m_BindObject; } }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {

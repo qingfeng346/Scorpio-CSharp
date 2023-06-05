@@ -9,7 +9,7 @@ namespace Scorpio.Userdata {
             base(parameterType, defaultParameter, refOut, requiredNumber, paramType) {
             this.Constructor = constructor;
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             return Constructor.Invoke(Args);
         }
     }
@@ -20,13 +20,15 @@ namespace Scorpio.Userdata {
             base(parameterType, defaultParameter, refOut, requiredNumber, paramType) {
             this.Constructor = constructor;
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             var ret = Constructor.Invoke(Args);
             for (var i = 0; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
                     var instance = parameters[i].Get<ScriptInstance>();
                     if (instance == null) throw new ExecutionException($"带 ref out 标识的字段,必须传入 map, 索引 : {i}");
-                    instance.SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
+                    using (var value = ScriptValue.CreateValue(script, Args[i])) {
+                        instance.SetValue(RefOutValue, value);
+                    }
                 }
             }
             return ret;
@@ -38,7 +40,7 @@ namespace Scorpio.Userdata {
         public FunctionDataStructConstructor(Type type) : base(EmptyTypes, null, EmptyBool, 0, null) {
             m_Type = type;
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             return Activator.CreateInstance(m_Type);
         }
     }

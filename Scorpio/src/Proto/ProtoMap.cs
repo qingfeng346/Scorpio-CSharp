@@ -9,10 +9,10 @@ namespace Scorpio.Proto {
             ret.SetValue("containsValue", script.CreateFunction(new containsValue()));
             ret.SetValue("keys", script.CreateFunction(new keys()));
             ret.SetValue("values", script.CreateFunction(new values()));
-            ret.SetValue("forEach", script.CreateFunction(new forEach()));
-            ret.SetValue("forEachValue", script.CreateFunction(new forEachValue()));
-            ret.SetValue("find", script.CreateFunction(new find()));
-            ret.SetValue("findValue", script.CreateFunction(new findValue()));
+            ret.SetValue("forEach", script.CreateFunction(new forEach(script)));
+            ret.SetValue("forEachValue", script.CreateFunction(new forEachValue(script)));
+            ret.SetValue("find", script.CreateFunction(new find(script)));
+            ret.SetValue("findValue", script.CreateFunction(new findValue(script)));
             ret.SetValue("+", script.CreateFunction(new plus()));
             ret.SetValue("-", script.CreateFunction(new minus()));
             return ret;
@@ -59,44 +59,68 @@ namespace Scorpio.Proto {
             }
         }
         private class forEach : ScorpioHandle {
+            private Script script;
+            public forEach(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
-                    if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).valueType == ScriptValue.falseValueType) {
-                        return ScriptValue.CreateValue(pair.Key);
+                    using (var key = ScriptValue.CreateValue(script, pair.Key)) {
+                        if (func.Call(key, pair.Value).valueType == ScriptValue.falseValueType) {
+                            return key.Reference();
+                        }
                     }
                 }
                 return ScriptValue.Null;
             }
         }
         private class forEachValue : ScorpioHandle {
+            private Script script;
+            public forEachValue(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
-                    if (func.Call(pair.Value, ScriptValue.CreateValue(pair.Key)).valueType == ScriptValue.falseValueType) {
-                        return ScriptValue.CreateValue(pair.Key);
+                    using (var key = ScriptValue.CreateValue(script, pair.Key)) {
+                        if (func.Call(pair.Value, key).valueType == ScriptValue.falseValueType) {
+                            return key.Reference();
+                        }
                     }
                 }
                 return ScriptValue.Null;
             }
         }
         private class find : ScorpioHandle {
+            private Script script;
+            public find(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
-                    if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).IsTrue) {
-                        return ScriptValue.CreateValue(pair.Key);
+                    using (var key = ScriptValue.CreateValue(script, pair.Key)) {
+                        if (func.Call(key, pair.Value).IsTrue) {
+                            return key.Reference();
+                        }
                     }
                 }
                 return ScriptValue.Null;
             }
         }
         private class findValue : ScorpioHandle {
+            private Script script;
+            public findValue(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
-                    if (func.Call(ScriptValue.CreateValue(pair.Key), pair.Value).IsTrue) {
-                        return pair.Value;
+                    using (var key = ScriptValue.CreateValue(script, pair.Key)) {
+                        if (func.Call(key, pair.Value).IsTrue) {
+                            return new ScriptValue(pair.Value);
+                        }
                     }
                 }
                 return ScriptValue.Null;

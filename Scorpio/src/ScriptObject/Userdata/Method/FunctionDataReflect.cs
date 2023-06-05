@@ -11,7 +11,7 @@ namespace Scorpio.Userdata {
             this.Method = method;
         }
         public override bool IsStatic => Method.IsStatic;
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             return Method.Invoke(obj, Args);
         }
     }
@@ -22,11 +22,13 @@ namespace Scorpio.Userdata {
             base(parameterType, defaultParameter, refOut, requiredNumber, paramType) {
             this.Method = method;
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             var ret = Method.Invoke(obj, Args);
             for (var i = 0; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
-                    parameters[i].Get<ScriptInstance>().SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
+                    using (var value = ScriptValue.CreateValue(script, Args[i])) {
+                        parameters[i].Get<ScriptInstance>().SetValue(RefOutValue, value);
+                    }
                 }
             }
             return ret;

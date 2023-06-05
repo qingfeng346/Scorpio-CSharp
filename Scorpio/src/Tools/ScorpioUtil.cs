@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 using Scorpio.Exception;
 using System.Diagnostics;
 using System.Text;
+using System.Collections.Generic;
+
 namespace Scorpio.Tools {
     public static class ScorpioUtil {
         public static readonly Type TYPE_VOID = typeof (void);
@@ -183,6 +185,12 @@ namespace Scorpio.Tools {
                     (ptr + i)->Free();
                 }
             }
+        }
+        public static void Free<T>(this Dictionary<T, ScriptValue> values) {
+            foreach (var pair in values) {
+                pair.Value.Free();
+            }
+            values.Clear();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Scorpio.Userdata
         }
         public Type Type { get { return m_Type; } }
         //创建一个模板类
-        public ScriptValue MakeGenericType(Type[] parameters) {
+        public ScriptValue MakeGenericType(Script script, Type[] parameters) {
             if (m_Type.IsGenericType && m_Type.IsGenericTypeDefinition) {
                 var types = m_Type.GetGenericArguments();
                 var length = types.Length;
@@ -26,7 +26,7 @@ namespace Scorpio.Userdata
                     if (!types[i].BaseType.IsAssignableFrom(parameters[i]))
                         throw new ExecutionException($"{m_Type.FullName} 泛型类第{i+1}个参数不符合传入规则 需要:{types[i].BaseType.FullName} 传入:{parameters[i].FullName}");
                 }
-                return ScorpioTypeManager.GetUserdataType(m_Type.MakeGenericType(parameters));
+                return new ScriptValue(script.GetUserdataTypeValue(m_Type.MakeGenericType(parameters)));
             }
             throw new ExecutionException($"类 {m_Type.FullName} 不是未定义的泛型类");
         }
@@ -64,13 +64,13 @@ namespace Scorpio.Userdata
             }
         }
         /// <summary> 创建一个实例 </summary>
-        public abstract ScriptUserdata CreateInstance(ScriptValue[] parameters, int length);
+        public abstract ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length);
         /// <summary> 获取函数 </summary>
         protected abstract UserdataMethod GetMethod(string name);
         /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
         public abstract Type GetVariableType(string name);
         /// <summary> 获得一个类变量 </summary>
-        public abstract object GetValue(object obj, string name);
+        public abstract object GetValue(Script script, object obj, string name);
         /// <summary> 设置一个类变量 </summary>
         public abstract void SetValue(object obj, string name, ScriptValue value);
     }

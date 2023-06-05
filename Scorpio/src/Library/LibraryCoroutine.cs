@@ -8,10 +8,10 @@ namespace Scorpio.Library {
             map.SetValue("start", script.CreateFunction(new start(script)));
             map.SetValue("stop", script.CreateFunction(new stop()));
             map.SetValue("stopAll", script.CreateFunction(new stopAll(script)));
-            map.SetValue("poll", script.CreateFunction(new poll()));
-            map.SetValue("epoll", script.CreateFunction(new epoll()));
+            map.SetValue("poll", script.CreateFunction(new poll(script)));
+            map.SetValue("epoll", script.CreateFunction(new epoll(script)));
             map.SetValue("done", script.CreateFunction(new done()));
-            script.SetGlobal("sleep", script.CreateFunction(new sleep()));
+            script.SetGlobal("sleep", script.CreateFunction(new sleep(script)));
             script.SetGlobal("coroutine", map);
         }
         private class start : ScorpioHandle {
@@ -56,8 +56,12 @@ namespace Scorpio.Library {
             }
         }
         private class epoll : ScorpioHandle {
+            private Script script;
+            public epoll(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return ScriptValue.CreateValue(new CoroutineEpoll());
+                return ScriptValue.CreateValue(script, new CoroutineEpoll());
             }
         }
         private class done : ScorpioHandle {
@@ -70,10 +74,14 @@ namespace Scorpio.Library {
             }
         }
         private class sleep : ScorpioHandle {
+            private Script script;
+            public sleep(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var start = LibraryIO.UnixNow;
                 var end = start + args.GetArgsThrow(0, length).ToLong() * 1000;
-                return ScriptValue.CreateValue(new CoroutineFuncPoll(() => {
+                return ScriptValue.CreateValue(script, new CoroutineFuncPoll(() => {
                     return LibraryIO.UnixNow >= end;
                 }));
             }

@@ -25,8 +25,8 @@ namespace Scorpio.Userdata {
             m_FastReflectClass = value;
             m_Constructor = value.GetConstructor();
         }
-        public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
-            return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
+        public override ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length) {
+            return script.NewUserdataObject().Set(this, m_Constructor.Call(script, false, null, parameters, length));
         }
         public override Type GetVariableType(string name) {
             return m_FastReflectClass.GetVariableType(name);
@@ -34,7 +34,7 @@ namespace Scorpio.Userdata {
         protected override UserdataMethod GetMethod(string name) {
             return m_FastReflectClass.GetMethod(name);
         }
-        public override object GetValue(object obj, string name) {
+        public override object GetValue(Script script, object obj, string name) {
             if (m_FastReflectClass.GetValue(obj, name, out var output))
                 return output;
             if (m_Values.TryGetValue(name, out var value))

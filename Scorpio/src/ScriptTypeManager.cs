@@ -9,14 +9,6 @@ namespace Scorpio {
         private List<Type> m_ExtensionType = new List<Type>();                                                   //所有扩展类
         private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                   //所有的类集合
         private Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();             //所有的类集合
-        public UserdataType GetType(Type type) {
-            if (m_Types.TryGetValue(type, out var value)) {
-                return value;
-            }
-            var userdataType = new UserdataTypeReflect(type);
-            LoadExtension(type, userdataType);
-            return m_Types[type] = userdataType;
-        }
         private void LoadExtension(Type type, UserdataTypeReflect userdataType) {
             foreach (var extensionType in m_ExtensionType) {
                 var methods = extensionType.GetMethods(Script.BindingFlag);
@@ -28,22 +20,6 @@ namespace Scorpio {
                     }
                 }
             }
-        }
-        public ScriptValue GetUserdataType(string name) {
-            var type = LoadType(name);
-            if (type == null) return ScriptValue.Null;
-            return GetUserdataType(type);
-        }
-        public ScriptValue GetUserdataType(Type type) {
-            if (m_UserdataTypes.TryGetValue(type, out var value)) {
-                return value;
-            }
-            if (type.IsEnum)
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataEnumType(this, type));
-            else if (ScorpioUtil.TYPE_DELEGATE.IsAssignableFrom(type))
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(this, type));
-            else
-                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataType(this, type, GetType(type)));
         }
         public void SetFastReflectClass(Type type, IScorpioFastReflectClass value) {
             if (value == null || type == null) { return; }
@@ -63,6 +39,31 @@ namespace Scorpio {
             }
             return false;
         }
+        public UserdataType GetUserdataType(Type type) {
+            if (m_Types.TryGetValue(type, out var value)) {
+                return value;
+            }
+            var userdataType = new UserdataTypeReflect(type);
+            LoadExtension(type, userdataType);
+            return m_Types[type] = userdataType;
+        }
+        public ScriptValue GetUserdataTypeValue(string name) {
+            var type = LoadType(name);
+            if (type == null) return ScriptValue.Null;
+            return GetUserdataTypeValue(type);
+        }
+        public ScriptValue GetUserdataTypeValue(Type type) {
+            if (m_UserdataTypes.TryGetValue(type, out var value)) {
+                return value;
+            }
+            if (type.IsEnum)
+                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataEnumType(this, type));
+            else if (ScorpioUtil.TYPE_DELEGATE.IsAssignableFrom(type))
+                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataDelegateType(this, type));
+            else
+                return m_UserdataTypes[type] = new ScriptValue(new ScriptUserdataType(this, type, GetUserdataType(type)));
+        }
+
         public void PushAssembly(Assembly assembly) {
             if (assembly == null) return;
             if (!m_Assembly.Contains(assembly))

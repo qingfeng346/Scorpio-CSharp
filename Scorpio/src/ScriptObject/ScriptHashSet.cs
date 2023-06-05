@@ -8,7 +8,7 @@ namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
         public HashSet<ScriptValue> m_Objects = new HashSet<ScriptValue>();
         public ScriptHashSet(Script script) : base(script, ObjectType.HashSet) {
-            Set(script.TypeHashSet);
+            Set(script.TypeHashSetValue);
         }
         public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }

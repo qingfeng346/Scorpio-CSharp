@@ -4,9 +4,10 @@ namespace Scorpio.Function {
         public UserdataMethod Method;
         public string MethodName;
         public ScriptMethodFunction(Script script) : base(script, ObjectType.Function) { }
-        public void Set(string methodName, UserdataMethod method) {
+        public ScriptMethodFunction Set(string methodName, UserdataMethod method) {
             MethodName = methodName;
             Method = method;
+            return this;
         }
     }
 }

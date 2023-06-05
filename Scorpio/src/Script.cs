@@ -100,10 +100,10 @@ namespace Scorpio
             using (var value = new ScriptValue(Global)) {
                 Global.SetValue(GLOBAL_NAME, value);
             }
-            using (var value = ScriptValue.CreateValue(this)) {
+            using (var value = ScriptValue.CreateValue(this, this)) {
                 Global.SetValue(GLOBAL_SCRIPT, value);
             }
-            using (var value = ScriptValue.CreateValue(typeof(Version))) {
+            using (var value = ScriptValue.CreateValue(this, typeof(Version))) {
                 Global.SetValue(GLOBAL_VERSION, value);
             }
 
@@ -507,7 +507,7 @@ namespace Scorpio
             }
             return stackInfos;
         }
-        public void CheckFree() {
+        public void ReleaseAll() {
             ScriptObjectReference.ReleaseAll();
             StringReference.ReleaseAll();
         }

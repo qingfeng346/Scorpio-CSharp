@@ -7,10 +7,12 @@ namespace Scorpio.Userdata {
             this.m_Value = value;
             this.m_ValueType = value;
         }
+        public override void Free() {
+        }
         public override Type ValueType => ScorpioUtil.TYPE_TYPE;
-        //public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-        //    return new ScriptValue(new ScriptUserdataDelegate(ScorpioDelegateFactoryManager.CreateDelegate(m_ValueType, parameters[0].scriptValue)));
-        //}
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            return new ScriptValue(m_Script.NewUserdataDelegate().Set(ScorpioDelegateFactoryManager.CreateDelegate(m_ValueType, parameters[0].scriptValue)));
+        }
         public override string ToString() { return m_ValueType.Name; }
     }
 }

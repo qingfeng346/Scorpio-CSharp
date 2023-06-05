@@ -27,12 +27,13 @@ namespace Scorpio {
             Id = AutomaticId++;
         }
         public virtual void Alloc() { }
-        public virtual void Free() { }
+        public abstract void Free();
         public ObjectType ObjectType { get; private set; }              //类型
         public virtual object Value => this;                            //值
         public virtual Type ValueType => GetType();                     //值类型
         public virtual Type Type => GetType();                          //获取类型
         public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
+        public Script script => m_Script;
         //ThisValue没有占用引用计数
         protected ScriptValue ThisValue {
             get {
@@ -61,7 +62,7 @@ namespace Scorpio {
         public virtual bool Greater(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [>] 运算"); }
         public virtual bool GreaterOrEqual(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [>=] 运算"); }
         public override int GetHashCode() { return base.GetHashCode(); }
-        public override bool Equals(object obj) { return Equals(ScriptValue.CreateValue(obj)); }
+        public override bool Equals(object obj) { using (var value = ScriptValue.CreateValue(m_Script, obj)) { return Equals(value); } }
         public virtual bool Equals(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.scriptValue == this; }
         public bool EqualReference(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && ReferenceEquals(obj.scriptValue, this); }
         public override string ToString() { return base.ToString(); }
@@ -83,7 +84,7 @@ namespace Scorpio {
             var length = args.Length;
             using (var parameters = ScorpioParameters.Get()) {
                 for (var i = 0; i < length; ++i)
-                    parameters[i] = ScriptValue.CreateValue(args[i]);
+                    parameters[i] = ScriptValue.CreateValue(m_Script, args[i]);
                 return Call(thisObject, parameters.values, length);
             }
         }

@@ -122,12 +122,13 @@ namespace Scorpio
             _valueType = value._valueType;
             _longValue = value._longValue;
         }
-        public void Reference() {
+        public ScriptValue Reference() {
             if (_valueType == stringValueType) {
                 StringReference.Reference(_index);
             } else if (_valueType == scriptValueType) {
                 ScriptObjectReference.Reference(_index);
             }
+            return this;
         }
         public void Free() {
             if (_valueType == stringValueType) {
@@ -137,7 +138,7 @@ namespace Scorpio
             }
             _valueType = 0;
         }
-                public ScriptValue(ScriptValue value) {
+        public ScriptValue(ScriptValue value) {
             _valueType = value._valueType;
             _index = value._index;
             _doubleValue = value._doubleValue;
@@ -320,10 +321,11 @@ namespace Scorpio
         }
         //调用函数
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
-            var length = args.Length;
-            using var parameters = ScorpioParameters.Get();
-            for (var i = 0; i < length; ++i) parameters[i] = CreateValue(args[i]);
-            return Call(thisObject, parameters.values, length);
+            if (valueType == scriptValueType) {
+                return scriptValue.call(thisObject, args);
+            } else {
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用");
+            }
         }
         //调用无参函数
         public ScriptValue Call(ScriptValue thisObject) { return Call(thisObject, EMPTY, 0); }
@@ -508,12 +510,14 @@ namespace Scorpio
                 return new ScriptValue((ScriptObject)value);
             else if (value is Type)
                 //需要增加一次引用计数
-                return new ScriptValue(script.GetUserdataType((Type)value));
-            //else if (value is Delegate)
-            //    return new ScriptValue(new ScriptUserdataDelegate((Delegate)value));
+                return new ScriptValue(script.GetUserdataTypeValue((Type)value));
+            else if (value is Delegate)
+                return new ScriptValue(script.NewUserdataDelegate().Set((Delegate)value));
+            else if (value is Enum)
+                return new ScriptValue(Convert.ToInt64(value));
             else if (value is IList)
-                return new ScriptValue(new ScriptUserdataArray((IList)value, script.GetType(value.GetType())));
-            return new ScriptValue(new ScriptUserdataObject(value, ScorpioTypeManager.GetType(value.GetType())));
+                return new ScriptValue(script.NewUserdataArray().Set(script.GetUserdataType(value.GetType()), (IList)value));
+            return new ScriptValue(script.NewUserdataObject().Set(script.GetUserdataType(value.GetType()), value));
         }
         public void Dispose() {
             Free();

@@ -10,7 +10,7 @@ namespace Scorpio.Userdata {
             FastMethod = method;
             MethodIndex = methodIndex;
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             return FastMethod.Call(obj, MethodIndex, Args);
         }
     }
@@ -23,11 +23,13 @@ namespace Scorpio.Userdata {
             FastMethod = method;
             MethodIndex = methodIndex;
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             var ret = FastMethod.Call(obj, MethodIndex, Args);
             for (var i = 0; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
-                    parameters[i].Get<ScriptInstance>().SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
+                    using (var value = ScriptValue.CreateValue(script, Args[i])) {
+                        parameters[i].Get<ScriptInstance>().SetValue(RefOutValue, value);
+                    }
                 }
             }
             return ret;

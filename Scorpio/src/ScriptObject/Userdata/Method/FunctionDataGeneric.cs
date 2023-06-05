@@ -8,7 +8,7 @@ namespace Scorpio.Userdata {
         public FunctionDataGeneric(MethodInfo method) : base(EmptyTypes, null, null, 0, null) {
             Method = method;
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             throw new NotImplementedException();
         }
     }

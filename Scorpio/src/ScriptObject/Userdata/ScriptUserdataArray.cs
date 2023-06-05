@@ -7,18 +7,27 @@ namespace Scorpio.Userdata {
     public class ScriptUserdataArray : ScriptUserdataObject {
         protected IList m_Array;
         protected Type m_ElementType;
-        public ScriptUserdataArray(IList array, UserdataType type) : base(array, type) {
+        public ScriptUserdataArray(Script script) : base(script) { }
+        public ScriptUserdataArray Set(UserdataType type, IList array) {
+            base.Set(type, array);
             m_Array = array;
             m_ElementType = type.Type.GetElementType();
+            return this;
         }
         public override ScriptValue GetValue(double index) {
-            return ScriptValue.CreateValue(m_Array[(int)index]);
+            using (var ret = ScriptValue.CreateValue(m_Script, m_Array[(int)index])) {
+                return ret;
+            }
         }
         public override ScriptValue GetValue(long index) {
-            return ScriptValue.CreateValue(m_Array[(int)index]);
+            using (var ret = ScriptValue.CreateValue(m_Script, m_Array[(int)index])) {
+                return ret;
+            }
         }
         public override ScriptValue GetValue(object index) {
-            return ScriptValue.CreateValue(m_Array[Convert.ToInt32(index)]);
+            using (var ret = ScriptValue.CreateValue(m_Script, Convert.ToInt32(index))) {
+                return ret;
+            }
         }
         public override void SetValue(double index, ScriptValue value) {
             m_Array[(int)index] = value.ChangeType(m_ElementType);

@@ -3,9 +3,12 @@ using Scorpio.Tools;
 using Scorpio.Userdata;
 namespace Scorpio {
     public partial class Script {
+        private ObjectsPool<ScriptType> typePool;
         private ObjectsPool<ScriptInstance> instancePool;
         private ObjectsPool<ScriptArray> arrayPool;
         private ObjectsPool<ScriptMapObject> mapObjectPool;
+        private ObjectsPool<ScriptMapString> mapStringPool;
+        private ObjectsPool<ScriptMapPolling> mapPollingPool;
         private ObjectsPool<ScriptHashSet> hashSetPool;
         private ObjectsPool<ScriptStringBuilder> stringBuilderPool;
         private ObjectsPool<ScriptScriptFunction> functionPool;
@@ -15,14 +18,20 @@ namespace Scorpio {
 
 
         private ObjectsPool<ScriptUserdataObject> userdataObjectPool;
+        private ObjectsPool<ScriptUserdataArray> userdataArrayPool;
+        private ObjectsPool<ScriptUserdataDelegate> userdataDelegatePool;
         private ObjectsPool<ScriptInstanceMethodFunction> instanceMethodPool;
         private ObjectsPool<ScriptGenericMethodFunction> genericMethodPool;
         private ObjectsPool<ScriptStaticMethodFunction> staticMethodPool;
 
         private void InitPool() {
+            typePool = new ObjectsPool<ScriptType>(() => new ScriptType(this));
             instancePool = new ObjectsPool<ScriptInstance>(() => new ScriptInstance(this));
             arrayPool = new ObjectsPool<ScriptArray>(() => new ScriptArray(this));
             mapObjectPool = new ObjectsPool<ScriptMapObject>(() => new ScriptMapObject(this));
+            mapStringPool = new ObjectsPool<ScriptMapString>(() => new ScriptMapString(this));
+            mapPollingPool = new ObjectsPool<ScriptMapPolling>(() => new ScriptMapPolling(this));
+
             hashSetPool = new ObjectsPool<ScriptHashSet>(() => new ScriptHashSet(this));
             stringBuilderPool = new ObjectsPool<ScriptStringBuilder>(() => new ScriptStringBuilder(this));
             functionPool = new ObjectsPool<ScriptScriptFunction>(() => new ScriptScriptFunction(this));
@@ -31,9 +40,14 @@ namespace Scorpio {
             asyncLambdaFunctionPool = new ObjectsPool<ScriptScriptAsyncLambdaFunction>(() => new ScriptScriptAsyncLambdaFunction(this));
 
             userdataObjectPool = new ObjectsPool<ScriptUserdataObject>(() => new ScriptUserdataObject(this));
+            userdataArrayPool = new ObjectsPool<ScriptUserdataArray>(() => new ScriptUserdataArray(this));
+            userdataDelegatePool = new ObjectsPool<ScriptUserdataDelegate>(() => new ScriptUserdataDelegate(this));
             instanceMethodPool = new ObjectsPool<ScriptInstanceMethodFunction>(() => new ScriptInstanceMethodFunction(this));
             genericMethodPool = new ObjectsPool<ScriptGenericMethodFunction>(() => new ScriptGenericMethodFunction(this));
             staticMethodPool = new ObjectsPool<ScriptStaticMethodFunction>(() => new ScriptStaticMethodFunction(this));
+        }
+        public ScriptType NewType() {
+            return typePool.Alloc();
         }
         public ScriptInstance NewInstance() {
             return instancePool.Alloc();
@@ -43,6 +57,12 @@ namespace Scorpio {
         }
         public ScriptMapObject NewMapObject() {
             return mapObjectPool.Alloc();
+        }
+        public ScriptMapString NewMapString() {
+            return mapStringPool.Alloc();
+        }
+        public ScriptMapPolling NewMapPolling() {
+            return mapPollingPool.Alloc();
         }
         public ScriptHashSet NewHashSet() {
             return hashSetPool.Alloc();
@@ -66,6 +86,12 @@ namespace Scorpio {
         public ScriptUserdataObject NewUserdataObject() {
             return userdataObjectPool.Alloc();
         }
+        public ScriptUserdataArray NewUserdataArray() {
+            return userdataArrayPool.Alloc();
+        }
+        public ScriptUserdataDelegate NewUserdataDelegate() {
+            return userdataDelegatePool.Alloc();
+        }
         public ScriptInstanceMethodFunction NewInstanceMethod() {
             return instanceMethodPool.Alloc();
         }
@@ -77,6 +103,9 @@ namespace Scorpio {
         }
 
 
+        public void Free(ScriptType value) {
+            typePool.Free(value);
+        }
         public void Free(ScriptInstance value) {
             instancePool.Free(value);
         }
@@ -85,6 +114,12 @@ namespace Scorpio {
         }
         public void Free(ScriptMapObject value) {
             mapObjectPool.Free(value);
+        }
+        public void Free(ScriptMapString value) {
+            mapStringPool.Free(value);
+        }
+        public void Free(ScriptMapPolling value) {
+            mapPollingPool.Free(value);
         }
         public void Free(ScriptHashSet value) {
             hashSetPool.Free(value);
@@ -106,6 +141,12 @@ namespace Scorpio {
         }
         public void Free(ScriptUserdataObject value) {
             userdataObjectPool.Free(value);
+        }
+        public void Free(ScriptUserdataArray value) {
+            userdataArrayPool.Free(value);
+        }
+        public void Free(ScriptUserdataDelegate value) {
+            userdataDelegatePool.Free(value);
         }
         public void Free(ScriptInstanceMethodFunction value) {
             instanceMethodPool.Free(value);

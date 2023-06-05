@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Library;
+using Scorpio.Tools;
+
 namespace Scorpio {
     //脚本map类型
     public class ScriptMapObject : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
@@ -26,36 +28,32 @@ namespace Scorpio {
             return m_Objects.TryGetValue(key, out var value) ? value : ScriptValue.Null;
         }
         public override void SetValue(string key, ScriptValue value) {
-            //正常引用计数
-            value.Reference();
             if (m_Objects.TryGetValue(key, out var result)) {
                 result.Free();
             }
-            m_Objects[key] = value;
+            //正常引用计数
+            m_Objects[key] = value.Reference();
         }
         public override void SetValue(double key, ScriptValue value) {
-            //正常引用计数
-            value.Reference();
             if (m_Objects.TryGetValue(key, out var result)) {
                 result.Free();
             }
-            m_Objects[key] = value;
+            //正常引用计数
+            m_Objects[key] = value.Reference();
         }
         public override void SetValue(long key, ScriptValue value) {
-            //正常引用计数
-            value.Reference();
             if (m_Objects.TryGetValue(key, out var result)) {
                 result.Free();
             }
-            m_Objects[key] = value;
+            //正常引用计数
+            m_Objects[key] = value.Reference();
         }
         public override void SetValue(object key, ScriptValue value) {
-            //正常引用计数
-            value.Reference();
             if (m_Objects.TryGetValue(key, out var result)) {
                 result.Free();
             }
-            m_Objects[key] = value;
+            //正常引用计数
+            m_Objects[key] = value.Reference();
         }
 
         public override bool HasValue(string key) {
@@ -72,10 +70,7 @@ namespace Scorpio {
             return m_Objects.Count;
         }
         public override void Clear() {
-            foreach (var pair in m_Objects) {
-                pair.Value.Free();
-            }
-            m_Objects.Clear();
+            m_Objects.Free();
         }
         public override void Remove(object key) {
             if (m_Objects.TryGetValue(key, out var result)) {
@@ -84,9 +79,9 @@ namespace Scorpio {
             }
         }
         public override ScriptArray GetKeys() {
-            var ret = new ScriptArray(m_Script);
+            var ret = m_Script.NewArray();
             foreach (var pair in m_Objects) {
-                using (var value = ScriptValue.CreateValue(pair.Key)) {
+                using (var value = ScriptValue.CreateValue(m_Script, pair.Key)) {
                     ret.Add(value);
                 }
             }

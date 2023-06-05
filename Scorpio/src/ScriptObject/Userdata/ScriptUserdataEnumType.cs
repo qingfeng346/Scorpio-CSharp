@@ -14,6 +14,7 @@ namespace Scorpio.Userdata {
                 m_Enums[string.Intern(name)] = new ScriptValue(Convert.ToInt64(Enum.Parse(m_ValueType, name)));
             }
         }
+        public override void Free() { }
         public override Type ValueType => ScorpioUtil.TYPE_TYPE;
         public override string ToString() { return m_ValueType.Name; }
         public override ScriptValue GetValue(string key) {

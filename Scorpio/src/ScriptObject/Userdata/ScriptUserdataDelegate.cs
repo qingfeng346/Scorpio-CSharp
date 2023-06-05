@@ -15,7 +15,8 @@ namespace Scorpio.Userdata
         private Delegate m_Delegate;
         private FunctionParameter[] m_Parameters;
         private object[] m_Objects;
-        public ScriptUserdataDelegate(Script script, Delegate value) : base(script) {
+        public ScriptUserdataDelegate(Script script) : base(script) { }
+        public ScriptUserdataDelegate Set(Delegate value) {
             this.m_Delegate = value;
             this.m_Value = value;
             this.m_ValueType = value.GetType();
@@ -28,9 +29,10 @@ namespace Scorpio.Userdata
                 var parameter = parameters[i];
                 m_Parameters[i] = new FunctionParameter(parameter.ParameterType, parameter.DefaultValue);
             }
+            return this;
         }
         public override void Free() {
-            throw new NotImplementedException();
+            m_Script.Free(this);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             for (int i = 0; i < m_Parameters.Length; i++) {
@@ -41,22 +43,16 @@ namespace Scorpio.Userdata
                     m_Objects[i] = parameters[i].ChangeType(parameter.ParameterType);
                 }
             }
-            return ScriptValue.CreateValue(m_Delegate.DynamicInvoke(m_Objects));
+            return ScriptValue.CreateValue(m_Script, m_Delegate.DynamicInvoke(m_Objects));
         }
         public override ScriptValue Plus(ScriptValue value) {
-            return ScriptValue.CreateValue(Delegate.Combine(m_Delegate, (Delegate)value.ChangeType(m_ValueType)));
+            return ScriptValue.CreateValue(m_Script, Delegate.Combine(m_Delegate, (Delegate)value.ChangeType(m_ValueType)));
         }
         public override ScriptValue Minus(ScriptValue value) {
             if (value.valueType == ScriptValue.scriptValueType && value.scriptValue is ScriptUserdataDelegate) {
-                return ScriptValue.CreateValue(Delegate.Remove(m_Delegate, (value.scriptValue as ScriptUserdataDelegate).m_Delegate));
+                return ScriptValue.CreateValue(m_Script, Delegate.Remove(m_Delegate, (value.scriptValue as ScriptUserdataDelegate).m_Delegate));
             }
-            return base.Minus(value); 
-        }
-        public override ScriptValue GetValue(string key) {
-            if (key == "Type") {
-                return ScorpioTypeManager.GetUserdataType(m_ValueType);
-            }
-            return base.GetValue(key);
+            return base.Minus(value);
         }
         public override string ToString() { return m_Value.ToString(); }
     }

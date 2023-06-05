@@ -10,7 +10,7 @@ namespace Scorpio.Userdata {
             base(parameterType, defaultParameter, refOut, requiredNumber, paramType) {
             this.Method = method;
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             Args[0] = obj;
             return Method.Invoke(obj, Args);
         }
@@ -111,12 +111,14 @@ namespace Scorpio.Userdata {
         public FunctionDataExtensionMethodWithRefOut(MethodInfo method, Type[] parameterType, object[] defaultParameter, bool[] refOut, int requiredNumber, Type paramType) :
             base(method, parameterType, defaultParameter, refOut, requiredNumber, paramType) {
         }
-        public override object Invoke(object obj, ScriptValue[] parameters) {
+        public override object Invoke(Script script, object obj, ScriptValue[] parameters) {
             Args[0] = obj;
             var ret = Method.Invoke(obj, Args);
             for (var i = 1; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
-                    parameters[i - 1].Get<ScriptInstance>().SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
+                    using (var value = ScriptValue.CreateValue(script, Args[i])) {
+                        parameters[i - 1].Get<ScriptInstance>().SetValue(RefOutValue, value);
+                    }
                 }
             }
             return ret;

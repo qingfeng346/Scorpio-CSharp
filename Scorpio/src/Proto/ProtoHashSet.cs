@@ -21,7 +21,7 @@ namespace Scorpio.Proto {
             ret.SetValue("trimExcess", script.CreateFunction(new trimExcess()));
             ret.SetValue("forEach", script.CreateFunction(new forEach()));
             ret.SetValue("find", script.CreateFunction(new find()));
-            ret.SetValue("toArray", script.CreateFunction(new toArray()));
+            ret.SetValue("toArray", script.CreateFunction(new toArray(script)));
             ret.SetValue("convertAll", script.CreateFunction(new convertAll()));
             return ret;
         }
@@ -148,9 +148,13 @@ namespace Scorpio.Proto {
             }
         }
         private class toArray : ScorpioHandle {
+            private Script script;
+            public toArray(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var type = args[0].Get<Scorpio.Userdata.ScriptUserdataType>();
-                return type == null ? ScriptValue.Null : ScriptValue.CreateValue(thisObject.Get<ScriptHashSet>().ToArray(type.Type));
+                return type == null ? ScriptValue.Null : ScriptValue.CreateValue(script, thisObject.Get<ScriptHashSet>().ToArray(type.Type));
             }
         }
         private class convertAll : ScorpioHandle {

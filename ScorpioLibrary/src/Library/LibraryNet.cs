@@ -12,8 +12,8 @@ namespace ScorpioLibrary {
         static Encoding DEFAULT_ENCODING = Encoding.UTF8;
         public static void Load(Script script) {
             var map = new ScriptMapString(script);
-            map.SetValue("get", script.CreateFunction(new get()));
-            map.SetValue("post", script.CreateFunction(new post()));
+            map.SetValue("get", script.CreateFunction(new get(script)));
+            map.SetValue("post", script.CreateFunction(new post(script)));
             map.SetValue("urlencode", script.CreateFunction(new urlencode()));
             map.SetValue("urldecode", script.CreateFunction(new urldecode()));
             map.SetValue("qpencode", script.CreateFunction(new qpencode()));
@@ -47,6 +47,10 @@ namespace ScorpioLibrary {
             }
         }
         private class get : ScorpioHandle {
+            private Script script;
+            public get(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
                 var request = CreateRequest(Parameters[0].ToString(), "GET");
                 if (length > 1) Parameters[1].call(ScriptValue.Null, request);
@@ -56,12 +60,16 @@ namespace ScorpioLibrary {
                 } else {
                     using (var stream = new MemoryStream()) {
                         ReadStream(request, stream);
-                        return ScriptValue.CreateValue(stream.ToArray());
+                        return ScriptValue.CreateValue(script, stream.ToArray());
                     }
                 }
             }
         }
         private class post : ScorpioHandle {
+            private Script script;
+            public post(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {
                 var request = CreateRequest(Parameters[0].ToString(), "POST");
                 if (length > 1) {
@@ -78,7 +86,7 @@ namespace ScorpioLibrary {
                 } else {
                     using (var stream = new MemoryStream()) {
                         ReadStream(request, stream);
-                        return ScriptValue.CreateValue(stream.ToArray());
+                        return ScriptValue.CreateValue(script, stream.ToArray());
                     }
                 }
             }

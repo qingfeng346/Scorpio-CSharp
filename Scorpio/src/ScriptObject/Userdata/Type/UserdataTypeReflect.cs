@@ -38,10 +38,10 @@ namespace Scorpio.Userdata
             return null;
         }
         //获取一个内部类
-        private ScriptValue GetNestedType(string name) {
+        private ScriptValue GetNestedType(Script script, string name) {
             var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
             if (nestedType != null) {
-                return m_Values[string.Intern(name)] = ScorpioTypeManager.GetUserdataType(nestedType);
+                return m_Values[string.Intern(name)] = new ScriptValue(script.GetUserdataTypeValue(nestedType));
             }
             return ScriptValue.Null;
         }
@@ -67,8 +67,8 @@ namespace Scorpio.Userdata
             ((UserdataMethodReflect)userdataMethod).AddExtensionMethod(method);
         }
         /// <summary> 创建一个实例 </summary>
-        public override ScriptUserdata CreateInstance(ScriptValue[] parameters, int length) {
-            return new ScriptUserdataObject(m_Constructor.Call(false, null, parameters, length), this);
+        public override ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length) {
+            return script.NewUserdataObject().Set(this, m_Constructor.Call(script, false, null, parameters, length));
         }
         /// <summary> 获得函数 </summary>
         protected override UserdataMethod GetMethod(string name) {
@@ -82,7 +82,7 @@ namespace Scorpio.Userdata
             return variable != null ? variable.FieldType : null;
         }
         /// <summary> 获得一个类变量 </summary>
-        public override object GetValue(object obj, string name) {
+        public override object GetValue(Script script, object obj, string name) {
             if (m_Functions.TryGetValue(name, out var userdataMethod)) 
                 return userdataMethod;
             if (m_Values.TryGetValue(name, out var value)) 
@@ -91,7 +91,7 @@ namespace Scorpio.Userdata
             if (variable != null) return variable.GetValue(obj);
             userdataMethod = GetFunction(name);
             if (userdataMethod != null) return userdataMethod;
-            value = GetNestedType(name);
+            value = GetNestedType(script, name);
             if (value.valueType != ScriptValue.nullValueType) return value;
             throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
         }

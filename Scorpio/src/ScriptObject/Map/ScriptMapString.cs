@@ -2,6 +2,7 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Tools;
+
 namespace Scorpio {
     //脚本map类型
     public class ScriptMapString : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
@@ -24,6 +25,11 @@ namespace Scorpio {
             public void Dispose() { m_Enumerator.Dispose(); }
         }
         public ScriptMapString(Script script) : base(script) { }
+        public override void Free() {
+            Release();
+            Clear();
+            m_Script.Free(this);
+        }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
         IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
         public override bool ContainsKey(object key) {
@@ -37,34 +43,36 @@ namespace Scorpio {
             return m_Values.Count;
         }
         public override void Clear() {
-            m_Values.Clear();
+            m_Values.Free();
         }
         public override void Remove(object key) {
             m_Values.Remove(key as string);
         }
         public override ScriptArray GetKeys() {
-            var ret = new ScriptArray(m_Script);
+            var ret = m_Script.NewArray();
             foreach (var pair in m_Values) {
-                ret.Add(new ScriptValue(pair.Key));
+                using (var key = new ScriptValue(pair.Key)) {
+                    ret.Add(key);
+                }
             }
             return ret;
         }
         public override ScriptArray GetValues() {
-            var ret = new ScriptArray(m_Script);
+            var ret = m_Script.NewArray();
             foreach (var pair in m_Values) {
                 ret.Add(pair.Value);
             }
             return ret;
         }
         public override ScriptMap NewCopy() {
-            var ret = new ScriptMapString(m_Script);
+            var ret = m_Script.NewMapString();
             foreach (var pair in m_Values) {
-                ret.m_Values[pair.Key] = pair.Value;
+                ret.SetValue(pair.Key, pair.Value);
             }
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptMapString(m_Script);
+            var ret = m_Script.NewMapString();
             if (deep) {
                 foreach (var pair in m_Values) {
                     var value = pair.Value;
@@ -73,15 +81,15 @@ namespace Scorpio {
                         if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
                             ret.m_Values[pair.Key] = new ScriptValue(scriptObject.Clone(true));
                         } else {
-                            ret.m_Values[pair.Key] = value;
+                            ret.SetValue(pair.Key, pair.Value);
                         }
                     } else {
-                        ret.m_Values[pair.Key] = value;
+                        ret.SetValue(pair.Key, pair.Value);
                     }
                 }
             } else {
                 foreach (var pair in m_Values) {
-                    ret.m_Values[pair.Key] = pair.Value;
+                    ret.SetValue(pair.Key, pair.Value);
                 }
             }
             return ret;

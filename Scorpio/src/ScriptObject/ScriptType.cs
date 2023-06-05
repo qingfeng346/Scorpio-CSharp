@@ -8,9 +8,11 @@ namespace Scorpio {
         protected ScriptFunction m_EqualFunction;                       //==函数重载
         protected ScriptValue m_PrototypeValue;                         //基类
         protected ScriptType m_Prototype;                               //基类
-        public ScriptType(Script script, string typeName, ScriptValue parentValue) : base(script, ObjectType.Type) {
+        public ScriptType(Script script) : base(script, ObjectType.Type) {
             m_Values = new Dictionary<string, ScriptValue>();
             m_GetProperties = new Dictionary<string, ScriptValue>();
+        }
+        public void Set(string typeName, ScriptValue parentValue) {
             TypeName = typeName;
             m_PrototypeValue.CopyFrom(parentValue);
             m_Prototype = parentValue.Get<ScriptType>();
@@ -19,16 +21,16 @@ namespace Scorpio {
         public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
         public override void Free() {
-            //m_PrototypeValue.Free();
-            //m_Prototype = null;
-            //foreach (var pair in m_Values) { 
-            //    pair.Value.Free();
-            //}
-            //foreach (var pair in m_GetProperties) { 
-            //    pair.Value.Free();
-            //}
-            //m_Values.Clear();
-            //m_GetProperties.Clear();
+            m_PrototypeValue.Free();
+            m_Prototype = null;
+            foreach (var pair in m_Values) {
+                pair.Value.Free();
+            }
+            foreach (var pair in m_GetProperties) {
+                pair.Value.Free();
+            }
+            m_Values.Clear();
+            m_GetProperties.Clear();
         }
         public void AddGetProperty(string key, ScriptFunction value) {
             if (m_GetProperties.TryGetValue(key, out var result)) {
@@ -69,8 +71,10 @@ namespace Scorpio {
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             var instance = m_Script.NewInstance();
-            instance.Set(this);
-            using var ret = new ScriptValue(instance);
+            using (var value = new ScriptValue(this)) {
+                instance.Set(value);
+            }
+            var ret = new ScriptValue(instance);
             var constructor = GetValue(ScriptOperator.Constructor).Get<ScriptFunction>();
             if (constructor != null) {
                 constructor.Call(ret, parameters, length);
@@ -89,10 +93,7 @@ namespace Scorpio {
         public override ScriptType Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
         public override ScriptFunction EqualFunction => m_EqualFunction;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            var instance = m_Script.NewInstance();
-            instance.Set(this);
-            using var ret = new ScriptValue(instance);
-            return ret;
+            return new ScriptValue(m_Script.NewInstance().Set(script.TypeObjectValue));
         }
         public override ScriptValue GetValueNoDefault(string key) {
             return ScriptValue.Null;
@@ -124,8 +125,7 @@ namespace Scorpio {
             Set(typeName, parentType);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            using var value = new ScriptValue(New());
-            return value;
+            return new ScriptValue(New());
         }
         protected abstract T New();
     }

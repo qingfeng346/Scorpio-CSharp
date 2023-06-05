@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Scorpio;
 using Scorpio.Commons;
 using Scorpio.Compile.Compiler;
 using Scorpio.FastReflect;
 using Scorpio.Serialize;
-using Scorpio.src;
 using ScorpioLibrary;
 
 namespace ScorpioExec
@@ -211,7 +211,7 @@ namespace ScorpioExec
             script.LoadLibraryExtend ();
             script.PushAssembly (typeof (Program));
             script.PushReferencedAssemblies (typeof (Program).Assembly);
-            LoadLibrary (Path.Combine (CurrentDirectory, "dll"));
+            LoadLibrary (script, Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {
                     var file = Path.Combine (CurrentDirectory, args[0]);
@@ -228,14 +228,10 @@ namespace ScorpioExec
                     var watch = Stopwatch.StartNew ();
                     var value = script.LoadFile (file, ParseOption (command.GetValueDefault (ParameterOption, ""), script.SearchPaths));
                     script.Shutdown();
-                    script.CheckFree();
+                    script.ReleaseAll();
                     while (script.UpdateCoroutine ()) { }
                     Scorpio.Tools.StringReference.Check();
                     Scorpio.Tools.ScriptObjectReference.Check ();
-                    var entities = Scorpio.Tools.StringReference.entities;
-                    var pool = Scorpio.Tools.StringReference.pool;
-                    var en = Scorpio.Tools.ScriptObjectReference.entities;
-                    var p = Scorpio.Tools.ScriptObjectReference.pool;
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");
@@ -260,12 +256,12 @@ namespace ScorpioExec
                 }
             }
         }
-        static void LoadLibrary (string path) {
+        static void LoadLibrary (Script script, string path) {
             if (!Directory.Exists (path)) { return; }
             string[] files = Directory.GetFiles (path, "*.dll", SearchOption.AllDirectories);
             foreach (var file in files) {
                 try {
-                    ScorpioTypeManager.PushAssembly (Assembly.LoadFile (file));
+                    script.PushAssembly (Assembly.LoadFile (file));
                     Logger.info ("load dll file [" + file + "] success");
                 } catch (System.Exception ex) {
                     Logger.error ("load dll file [" + file + "] fail : " + ex.ToString ());
