@@ -7,11 +7,10 @@ namespace Scorpio
     }
     /// <summary> 函数类型 </summary>
     public abstract class ScriptFunction : ScriptInstance {
-        public ScriptFunction(Script script, string name) : base(script, ObjectType.Function) {
+        public ScriptFunction(Script script) : base(script, ObjectType.Function) {
             Set(script.TypeFunctionValue);
-            FunctionName = name;
         }
-        public string FunctionName { get; private set; }
+        public string FunctionName { get; protected set; }
         public virtual ScriptValue BindObject => ScriptValue.Null;
         public abstract ScriptFunction SetBindObject(ScriptValue obj);
         public abstract override void Free();

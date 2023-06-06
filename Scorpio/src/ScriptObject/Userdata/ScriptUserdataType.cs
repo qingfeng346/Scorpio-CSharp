@@ -13,6 +13,7 @@ namespace Scorpio.Userdata {
             this.m_UserdataType = type;
         }
         public override void Free() {
+            m_Methods.Free();
         }
         public override Type ValueType => ScorpioUtil.TYPE_TYPE;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {

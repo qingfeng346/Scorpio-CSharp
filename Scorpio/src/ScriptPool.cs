@@ -1,4 +1,5 @@
 using Scorpio.Function;
+using Scorpio.Library;
 using Scorpio.Tools;
 using Scorpio.Userdata;
 namespace Scorpio {
@@ -24,6 +25,8 @@ namespace Scorpio {
         private ObjectsPool<ScriptGenericMethodFunction> genericMethodPool;
         private ObjectsPool<ScriptStaticMethodFunction> staticMethodPool;
 
+        private ScorpioJsonSerializer scorpioJsonSerializer;
+        private ScorpioJsonDeserializer scorpioJsonDeserializer;
         private void InitPool() {
             typePool = new ObjectsPool<ScriptType>(() => new ScriptType(this));
             instancePool = new ObjectsPool<ScriptInstance>(() => new ScriptInstance(this));
@@ -45,6 +48,8 @@ namespace Scorpio {
             instanceMethodPool = new ObjectsPool<ScriptInstanceMethodFunction>(() => new ScriptInstanceMethodFunction(this));
             genericMethodPool = new ObjectsPool<ScriptGenericMethodFunction>(() => new ScriptGenericMethodFunction(this));
             staticMethodPool = new ObjectsPool<ScriptStaticMethodFunction>(() => new ScriptStaticMethodFunction(this));
+            scorpioJsonSerializer = new ScorpioJsonSerializer();
+            scorpioJsonDeserializer = new ScorpioJsonDeserializer(this);
         }
         public ScriptType NewType() {
             return typePool.Alloc();
@@ -156,6 +161,21 @@ namespace Scorpio {
         }
         public void Free(ScriptStaticMethodFunction value) {
             staticMethodPool.Free(value);
+        }
+        public string ToJson(ScriptValue scriptValue) {
+            using (scorpioJsonSerializer) {
+                return scorpioJsonSerializer.ToJson(scriptValue);
+            }
+        }
+        public string ToJson(ScriptObject scriptObject) {
+            using (scorpioJsonSerializer) {
+                return scorpioJsonSerializer.ToJson(scriptObject);
+            }
+        }
+        public ScriptValue ParseJson(string buffer, bool supportLong) {
+            using (scorpioJsonDeserializer) {
+                return scorpioJsonDeserializer.Parse(buffer, supportLong);
+            }
         }
     }
 }

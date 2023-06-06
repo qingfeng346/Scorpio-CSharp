@@ -19,6 +19,7 @@ namespace Scorpio {
         }
         public string TypeName { get; private set; }        //Type名称
         public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
+        public ScriptValue PrototypeValue => m_PrototypeValue;
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
         public override void Free() {
             m_PrototypeValue.Free();
@@ -32,12 +33,11 @@ namespace Scorpio {
             m_Values.Clear();
             m_GetProperties.Clear();
         }
-        public void AddGetProperty(string key, ScriptFunction value) {
+        public void AddGetProperty(string key, ScriptFunction function) {
             if (m_GetProperties.TryGetValue(key, out var result)) {
-                result.SetScriptValue(value);
-            } else {
-                m_GetProperties[key] = new ScriptValue(value);
+                result.Free();
             }
+            m_GetProperties[key] = new ScriptValue(function);
         }
         public virtual ScriptValue GetValue(string key, ScriptInstance instance) {
             if (m_Values.TryGetValue(key, out var value)) {
@@ -58,10 +58,9 @@ namespace Scorpio {
         }
         public override void SetValue(string key, ScriptValue value) {
             if (m_Values.TryGetValue(key, out var result)) {
-                result.CopyFrom(value);
-            } else {
-                m_Values[key] = new ScriptValue(value);
+                result.Free();
             }
+            m_Values[key] = value.Reference();
             if (key == ScriptOperator.Equal) {
                 m_EqualFunction = value.Get<ScriptFunction>();
             }

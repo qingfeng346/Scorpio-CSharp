@@ -48,14 +48,12 @@ namespace Scorpio.Proto {
         }
         private class keys : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                using var ret = new ScriptValue(thisObject.Get<ScriptMap>().GetKeys());
-                return ret;
+                return new ScriptValue(thisObject.Get<ScriptMap>().GetKeys());
             }
         }
         private class values : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                using var ret = new ScriptValue(thisObject.Get<ScriptMap>().GetValues());
-                return ret;
+                return new ScriptValue(thisObject.Get<ScriptMap>().GetValues());
             }
         }
         private class forEach : ScorpioHandle {

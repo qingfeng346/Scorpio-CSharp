@@ -9,12 +9,13 @@ using Scorpio.Commons;
 using Scorpio.Compile.Compiler;
 using Scorpio.FastReflect;
 using Scorpio.Serialize;
+using Scorpio.Tools;
 using ScorpioLibrary;
 
 namespace ScorpioExec
 {
     public class Program {
-        private static readonly string CurrentDirectory = ScorpioUtil.CurrentDirectory;
+        private static readonly string CurrentDirectory = Scorpio.Commons.ScorpioUtil.CurrentDirectory;
 
         private const string OptionDescribe = @"
 编译选项,json格式
@@ -88,7 +89,7 @@ namespace ScorpioExec
             Logger.info (Scorpio.Version.version);
             if (!command.HadValue (ParameterCheck)) { return; }
             Logger.info ("正在检查最新版本...");
-            var result = ScorpioUtil.RequestString ("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
+            var result = Scorpio.Commons.ScorpioUtil.RequestString ("http://api.github.com/repos/qingfeng346/Scorpio-CSharp/releases", (request) => {
                 request.Headers.Add ("Authorization", "token e5ff670eb105f044273f4c81276a67cd1341e649");
             });
             var isPreview = command.HadValue (ParameterPreview);
@@ -204,10 +205,10 @@ namespace ScorpioExec
         }
 
         static void Execute (Perform perform, CommandLine command, string[] args) {
-            ScorpioUtil.PrintSystemInfo ();
+            Scorpio.Commons.ScorpioUtil.PrintSystemInfo ();
             Logger.info ($"Version : {Scorpio.Version.version}[{Scorpio.Version.date}]");
             var script = new Scorpio.Script ();
-            script.LoadLibraryV1 ();
+            //script.LoadLibraryV1 ();
             script.LoadLibraryExtend ();
             script.PushAssembly (typeof (Program));
             script.PushReferencedAssemblies (typeof (Program).Assembly);
@@ -230,8 +231,12 @@ namespace ScorpioExec
                     script.Shutdown();
                     script.ReleaseAll();
                     while (script.UpdateCoroutine ()) { }
-                    Scorpio.Tools.StringReference.Check();
-                    Scorpio.Tools.ScriptObjectReference.Check ();
+                    StringReference.Check((i, entity) => {
+                        Console.WriteLine($"当前未释放String变量 索引:{i}  {entity}");
+                    });
+                    ScriptObjectReference.Check((i, entity) => {
+                        Console.WriteLine($"当前未释放Script变量 索引:{i}  {entity}");
+                    });
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");

@@ -11,17 +11,17 @@ namespace Scorpio.Runtime {
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public partial class ScriptContext {
 #if EXECUTE_COROUTINE && EXECUTE_BASE
-        public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, ScriptType baseType) {
+        public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues, ScriptType baseType) {
 #elif EXECUTE_COROUTINE
-        public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
+        public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues) {
 #elif EXECUTE_BASE
-        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, ScriptType baseType) {
+        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues, ScriptType baseType) {
 #else
-        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
+        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues) {
 #endif
 
 #if SCORPIO_DEBUG
-            //System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
+            System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
             if (VariableValueIndex < 0 || VariableValueIndex >= ValueCacheLength) {
                 throw new ExecutionException($"Stack overflow : {VariableValueIndex}");
             }
@@ -41,17 +41,17 @@ namespace Scorpio.Runtime {
             var stackObjects = StackValues[VariableValueIndex];         //堆栈数据
             var tryStack = TryStackValues[VariableValueIndex++];        //try catch
 #endif
-            variableObjects[0] = thisObject;
-            InternalValue[] internalObjects = null;
+            variableObjects[0].CopyFrom(thisObject);
+            InternalValue[] internalValues = null;
             if (internalCount > 0) {
-                internalObjects = new InternalValue[internalCount]; //内部变量，有外部引用
-                if (internalValues == null) {
+                internalValues = new InternalValue[internalCount];      //内部变量，有外部引用
+                if (parentInternalValues == null) {
                     for (int i = 0; i < internalCount; ++i) {
-                        internalObjects[i] = new InternalValue();
+                        internalValues[i] = new InternalValue();
                     }
                 } else {
                     for (int i = 0; i < internalCount; ++i) {
-                        internalObjects[i] = internalValues[i] ?? new InternalValue();
+                        internalValues[i] = parentInternalValues[i] ?? new InternalValue();
                     }
                 }
             }
@@ -122,7 +122,7 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.LoadInternal: {
-                                stackObjects[++stackIndex].CopyFrom(internalObjects[opvalue].value);
+                                stackObjects[++stackIndex].CopyFrom(internalValues[opvalue].value);
                                 continue;
                             }
                             case Opcode.LoadValue: {
@@ -198,7 +198,7 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.StoreInternalAssign: {
-                                internalObjects[opvalue].value.CopyFrom(stackObjects[stackIndex]);
+                                internalValues[opvalue].value.CopyFrom(stackObjects[stackIndex]);
                                 continue;
                             }
                             case Opcode.StoreValueStringAssign: {
@@ -236,7 +236,7 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.StoreInternal: {
-                                internalObjects[opvalue].value.CopyFrom(stackObjects[stackIndex--]);
+                                internalValues[opvalue].value.CopyFrom(stackObjects[stackIndex--]);
                                 continue;
                             }
                             case Opcode.StoreValueString: {
@@ -270,7 +270,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.Plus(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.Plus(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -304,7 +304,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.Minus(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.Minus(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -330,7 +330,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.Multiply(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.Multiply(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -356,7 +356,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.Divide(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.Divide(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -382,7 +382,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.Modulo(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.Modulo(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -424,7 +424,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.InclusiveOr(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.InclusiveOr(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -455,7 +455,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.Combine(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.Combine(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -472,7 +472,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.XOR(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.XOR(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -489,7 +489,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.Shi(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.Shi(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -506,7 +506,7 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case ScriptValue.scriptValueType: {
-                                        stackObjects[tempIndex].CopyFrom(stackObjects[tempIndex].scriptValue.Shr(stackObjects[stackIndex]));
+                                        stackObjects[tempIndex].Set(stackObjects[tempIndex].scriptValue.Shr(stackObjects[stackIndex]));
                                         --stackIndex;
                                         continue;
                                     }
@@ -549,6 +549,65 @@ namespace Scorpio.Runtime {
                             }
                             #endregion
                             #region Compare
+                            case Opcode.Equal: {
+                                tempIndex = stackIndex - 1;
+                                tempValueType = stackObjects[tempIndex].valueType;
+                                switch (tempValueType) {
+                                    case ScriptValue.doubleValueType: {
+                                        switch (stackObjects[stackIndex].valueType) {
+                                            case ScriptValue.doubleValueType:
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].doubleValue;
+                                                break;
+                                            case ScriptValue.int64ValueType:
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].doubleValue == stackObjects[stackIndex].longValue;
+                                                break;
+                                            default:
+                                                stackObjects[tempIndex].SetFalse();
+                                                break;
+                                        }
+                                        --stackIndex;
+                                        continue;
+                                    }
+                                    case ScriptValue.stringValueType: {
+                                        if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
+                                            stackObjects[tempIndex].boolValue = stackObjects[tempIndex].stringValue == stackObjects[stackIndex].stringValue;
+                                        } else {
+                                            stackObjects[tempIndex].SetFalse();
+                                        }
+                                        --stackIndex;
+                                        continue;
+                                    }
+                                    case ScriptValue.trueValueType:
+                                    case ScriptValue.nullValueType:
+                                    case ScriptValue.falseValueType: {
+                                        stackObjects[tempIndex].boolValue = tempValueType == stackObjects[stackIndex].valueType;
+                                        --stackIndex;
+                                        continue;
+                                    }
+                                    case ScriptValue.int64ValueType: {
+                                        switch (stackObjects[stackIndex].valueType) {
+                                            case ScriptValue.int64ValueType:
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue == stackObjects[stackIndex].longValue;
+                                                break;
+                                            case ScriptValue.doubleValueType:
+                                                stackObjects[tempIndex].boolValue = stackObjects[tempIndex].longValue == stackObjects[stackIndex].doubleValue;
+                                                break;
+                                            default:
+                                                stackObjects[tempIndex].SetFalse();
+                                                break;
+                                        }
+                                        --stackIndex;
+                                        continue;
+                                    }
+                                    case ScriptValue.scriptValueType: {
+                                        stackObjects[tempIndex].boolValue = stackObjects[tempIndex].scriptValue.Equals(stackObjects[stackIndex]);
+                                        --stackIndex;
+                                        continue;
+                                    }
+                                    default:
+                                        throw new ExecutionException($"【==】未知的数据类型 {stackObjects[tempIndex].ValueTypeName}");
+                                }
+                            }
                             case Opcode.NotEqual: {
                                 tempIndex = stackIndex - 1;
                                 tempValueType = stackObjects[tempIndex].valueType;
@@ -980,17 +1039,17 @@ namespace Scorpio.Runtime {
     #if EXECUTE_COROUTINE
                                 yield break;
     #else
-                                Free(variableObjects, stackObjects);
+                                Free(variableObjects, stackObjects, internalValues);
                                 return ScriptValue.Null;
     #endif
                             }
                             case Opcode.Ret: {
     #if EXECUTE_COROUTINE
-                                m_script.CoroutineResult = stackObjects[stackIndex];
+                                m_script.CoroutineResult.CopyFrom(stackObjects[stackIndex]);
                                 yield break;
     #else
-                                var ret = stackObjects[stackIndex];
-                                Free(variableObjects, stackObjects);
+                                var ret = stackObjects[stackIndex].Reference();
+                                Free(variableObjects, stackObjects, internalValues);
                                 return ret;
     #endif
                             }
@@ -1134,7 +1193,7 @@ namespace Scorpio.Runtime {
                                     continue;
                                 }
                             }
-    #if EXECUTE_COROUTINE
+#if EXECUTE_COROUTINE
                             case Opcode.Await: {
                                 yield return stackObjects[stackIndex--].Value;
                                 continue;
@@ -1142,6 +1201,7 @@ namespace Scorpio.Runtime {
                             case Opcode.NewAwait: {
                                 yield return stackObjects[stackIndex--].Value;
                                 stackObjects[++stackIndex].CopyFrom(m_script.CoroutineResult);
+                                m_script.CoroutineResult.SetNull();
                                 continue;
                             }
                             case Opcode.CallAsync: {
@@ -1297,8 +1357,8 @@ namespace Scorpio.Runtime {
                                     continue;
                                 }
                             }
-    #else
-                                case Opcode.TryTo: {
+#else
+                            case Opcode.TryTo: {
                                     tryStack[++tryIndex] = opvalue;
                                     continue;
                                 }
@@ -1330,7 +1390,7 @@ namespace Scorpio.Runtime {
                                 function.SetContext(functionData);
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
-                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                    function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                 }
                                 stackObjects[++stackIndex].SetScriptValue(function);
                                 continue;
@@ -1342,7 +1402,7 @@ namespace Scorpio.Runtime {
                                 function.SetContext(functionData, thisObject);
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
-                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                    function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                 }
                                 stackObjects[++stackIndex].SetScriptValue(function);
                                 continue;
@@ -1354,7 +1414,7 @@ namespace Scorpio.Runtime {
                                 function.SetContext(functionData);
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
-                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                    function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                 }
                                 stackObjects[++stackIndex].SetScriptValue(function);
                                 continue;
@@ -1366,7 +1426,7 @@ namespace Scorpio.Runtime {
                                 function.SetContext(functionData, thisObject);
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
-                                    function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                    function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                 }
                                 stackObjects[++stackIndex].SetScriptValue(function);
                                 continue;
@@ -1387,21 +1447,21 @@ namespace Scorpio.Runtime {
                                         var function = m_script.NewFunction().SetContext(functionData);
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
-                                            function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                            function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                         }
                                         type.SetValue(constString[func >> 32], function);
                                     } else if (funcType == 1) {
                                         var function = m_script.NewAsyncFunction().SetContext(functionData);
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
-                                            function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                            function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                         }
                                         type.SetValue(constString[func >> 32], function);
                                     } else if (funcType == 2) {
                                         var function = m_script.NewFunction().SetContext(functionData);
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
-                                            function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
+                                            function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                         }
                                         type.AddGetProperty(constString[func >> 32], function);
                                     }
@@ -1412,10 +1472,12 @@ namespace Scorpio.Runtime {
                             #endregion
                             case Opcode.Nop:
                                 continue;
+                            default:
+                                throw new ExecutionException($"未知的Opcode : {opcode}");
                         }
                     }
 #if !EXECUTE_COROUTINE
-                    Free(variableObjects, stackObjects);
+                    Free(variableObjects, stackObjects, internalValues);
 #endif
                     //正常执行命令到最后,判断堆栈是否清空 return 或 exception 不判断
 #if SCORPIO_DEBUG
@@ -1455,13 +1517,13 @@ namespace Scorpio.Runtime {
                         }
                     }
                 } catch (System.Exception) {
-                    Free(variableObjects, stackObjects);
+                    Free(variableObjects, stackObjects, internalValues);
                     throw;
                 }
                 return ScriptValue.Null;
 #else
             } finally {
-                FreeAsyncValue(asyncValue);
+                FreeAsyncValue(asyncValue, internalValues);
             }
 #endif
         }

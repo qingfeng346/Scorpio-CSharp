@@ -1,4 +1,42 @@
+var arr = [100]
+// print("=================")
+function mypair(a) {
+	var index = 0
+	return {
+		//必须实现一个 next 函数
+		next() {
+			if (index < 1) {
+				this.key = index
+				this.value = a[index]
+				index += 1
+				return true
+			}
+			return false
+		}
+	}
+}
+// var a = mypair(arr)
+// a.next()
+// print(a.key, a.value)
+foreach (var p in mypair(arr)) {
+	print(p.value)
+}
+// c# 重载 [] 的类 可以直接使用 [] 操作
+// Dictionary = importType("System.Collections.Generic.Dictionary`2")
+// DicIntStr = genericType(Dictionary, Int32, SystemString)
+// var d = DicIntStr()
+// d[100] = "feawfaew"
+// print(d[100])
 
+// 如果重载 [] 的 key 为 string, 则必须使用 get_Item set_Item 设置获取值
+// DicStrInt = genericType(Dictionary, SystemString, Int32)
+// var d2 = DicStrInt()
+// d2.set_Item("123", 100)
+// print(d2.get_Item("123"))
+
+// "str".testFunc().objFunc()
+// print(true.testFunc(false))
+// 100.testFunc().objFunc()
 // function sleep1(seconds) {
 //     var end = io.unixNow() + seconds * 1000
 //     return coroutine.poll(function() {
@@ -17,21 +55,16 @@
 //     await sleep1(seconds)
 //     coroutine.done(ret, result)
 // }
-function main1() {
-    // var a = "12321313"
-    // return a
-}
-function main() {
-    var a = {a:100}
-    var b = clone(a)
-    // var a = main1()
-    // var a = "1231232"
-    // var a = {}
-    // a[1] = a
-    // a[1] = a
-    // a["123213"] = 12321312
-}
-main()
+// function main1() {
+//     // var a = "12321313"
+//     // return a
+// }
+// function main() {
+//     switch (a) {
+//         case 1: 
+//             break
+//     }
+// }
 
 
 // #if !DA_GLOBAL

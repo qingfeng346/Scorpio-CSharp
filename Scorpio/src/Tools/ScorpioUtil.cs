@@ -6,6 +6,7 @@ using Scorpio.Exception;
 using System.Diagnostics;
 using System.Text;
 using System.Collections.Generic;
+using Scorpio.Runtime;
 
 namespace Scorpio.Tools {
     public static class ScorpioUtil {
@@ -191,6 +192,16 @@ namespace Scorpio.Tools {
                 pair.Value.Free();
             }
             values.Clear();
+        }
+        //清理内部数据只减少引用,不清理值,否则其他内部引用也会被清理
+        public static void FreeInternal(InternalValue[] values) {
+            if (values != null) {
+                for (var i = 0; i < values.Length; ++i) {
+                    if (values[i] != null) {
+                        values[i].value.FreeInternal();
+                    }
+                }
+            }
         }
     }
 }

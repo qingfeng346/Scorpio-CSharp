@@ -12,7 +12,12 @@ namespace Scorpio.Tools {
                 this.referenceCount = referenceCount;
             }
             public override string ToString() {
-                return $"{value}  引用计数:{referenceCount}";
+                try {
+                    return $"{value}  引用计数:{referenceCount}";
+                } catch (System.Exception) {
+                    return $"{value.GetType()}  引用计数:{referenceCount}";
+                }
+                
             }
         }
         private const int Stage = 8192;
@@ -21,7 +26,17 @@ namespace Scorpio.Tools {
         public static Queue<int> pool = new Queue<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
+        public static void Clear() {
+            object2index.Clear();
+            pool.Clear();
+            Array.Clear(entities);
+            freeIndex.Clear();
+            length = 0;
+        }
         public static int Alloc(ScriptObject value) {
+            if (value is ScriptArray) {
+                logger.debug("===================== Alloc " + value);
+            }
             if (object2index.TryGetValue(value.Id, out var index)) {
                 ++entities[index].referenceCount;
                 return index;
@@ -44,15 +59,22 @@ namespace Scorpio.Tools {
                 //添加到待释放列表
                 freeIndex.Add(index);
             }
+            if (entities[index].value is ScriptArray) {
+                logger.debug("Free  ===================== " + entities[index]);
+            }
         }
         public static void Reference(int index) {
             ++entities[index].referenceCount;
+            if (entities[index].value is ScriptArray) {
+                logger.debug("Reference  ===================== " + entities[index]);
+            }
         }
         public static ScriptObject GetValue(int index) {
             return entities[index].value;
         }
         //释放
-        public static void ReleaseAll() {
+        public static bool ReleaseAll() {
+            var isReleased = false;
             for (var i = 0; i < freeIndex.Count; ++i) {
                 var index = freeIndex[i];
                 if (entities[index].referenceCount == 0) {
@@ -60,14 +82,17 @@ namespace Scorpio.Tools {
                     entities[index].value.Free();
                     pool.Enqueue(index);
                     entities[index] = DefaultEntity;
+                    isReleased = true;
                 }
             }
             freeIndex.Clear();
+            return isReleased;
         }
-        public static void Check() {
-            foreach (var entity in entities) {
-                if (entity.value != null) {
-                    Console.WriteLine($"当前未释放Scirpt变量 : {entity}");
+        public static void Check(Action<int, Entity> action) {
+            for (var i = 0; i < entities.Length; ++i) {
+                if (entities[i].value != null) {
+                    action(i, entities[i]);
+                    //Console.WriteLine($"当前未释放Scirpt变量 索引:{i}  {entities[i]}");
                 }
             }
         }

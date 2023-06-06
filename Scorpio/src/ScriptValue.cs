@@ -138,6 +138,13 @@ namespace Scorpio
             }
             _valueType = 0;
         }
+        public void FreeInternal() {
+            if (_valueType == stringValueType) {
+                StringReference.Free(_index);
+            } else if (_valueType == scriptValueType) {
+                ScriptObjectReference.Free(_index);
+            }
+        }
         public ScriptValue(ScriptValue value) {
             _valueType = value._valueType;
             _index = value._index;

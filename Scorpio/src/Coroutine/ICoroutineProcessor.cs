@@ -2,6 +2,6 @@
 namespace Scorpio.Coroutine {
     public interface ICoroutineProcessor {
         void SetCurrent(object current);
-        bool MoveNext(out object result);
+        bool MoveNext(out ScriptValue result);
     }
 }

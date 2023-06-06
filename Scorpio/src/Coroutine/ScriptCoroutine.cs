@@ -36,7 +36,7 @@ namespace Scorpio.Coroutine {
             } else {
                 m_processor.SetCurrent(enumerator.Current);
                 if (!m_processor.MoveNext(out var ret)) {
-                    m_script.CoroutineResult = ScriptValue.CreateValue(m_script, ret);
+                    m_script.CoroutineResult.Set(ret);
                     result = enumerator.MoveNext();
                 } else {
                     result = true;

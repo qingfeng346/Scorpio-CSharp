@@ -34,8 +34,10 @@ namespace Scorpio
         private string[] m_SearchPaths;
         public string[] SearchPaths => m_SearchPaths;
         /// <summary> 所有类型的基类 </summary>
-        public ScriptType TypeObject { get; private set; }
-        public ScriptValue TypeObjectValue { get; private set; }
+        private ScriptType m_TypeObject;
+        private ScriptValue m_TypeValueObject;
+        public ScriptType TypeObject => m_TypeObject;
+        public ScriptValue TypeObjectValue => m_TypeValueObject;
 
         /// <summary> 所有基础类型数据 </summary>
         private ScriptType m_TypeBool, m_TypeNumber, m_TypeString, m_TypeArray, m_TypeMap, m_TypeFunction, m_TypeStringBuilder, m_TypeHashSet;
@@ -82,8 +84,8 @@ namespace Scorpio
             InitPool();
             Global = new ScriptGlobal(this);
 
-            TypeObject = new ScriptTypeObject(this, "Object");
-            TypeObjectValue = new ScriptValue(TypeObject);
+            m_TypeObject = new ScriptTypeObject(this, "Object");
+            m_TypeValueObject = new ScriptValue(TypeObject);
             Global.SetValue(TypeObject.TypeName, TypeObjectValue);
 
             AddPrimitivePrototype("Bool", ref m_TypeBool, ref m_TypeValueBool);
@@ -96,7 +98,7 @@ namespace Scorpio
             AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObjectValue), ref m_TypeValueStringBuilder);
             AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObjectValue), ref m_TypeValueHashSet);
 
-            
+
             using (var value = new ScriptValue(Global)) {
                 Global.SetValue(GLOBAL_NAME, value);
             }
@@ -132,16 +134,40 @@ namespace Scorpio
         }
         public void Shutdown() {
             Global.Shutdown();
-            TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = m_TypeHashSet = null;
-            TypeObjectValue.Free();
+            m_TypeValueObject.Free();
             m_TypeValueBool.Free();
             m_TypeValueNumber.Free();
             m_TypeValueString.Free();
+            m_TypeValueFunction.Free();
             m_TypeValueArray.Free();
             m_TypeValueMap.Free();
-            m_TypeValueFunction.Free();
             m_TypeValueStringBuilder.Free();
             m_TypeValueHashSet.Free();
+
+            m_TypeObject.Free();
+            m_TypeBool.Free();
+            m_TypeNumber.Free();
+            m_TypeString.Free();
+            m_TypeFunction.Free();
+            m_TypeArray.Free();
+            m_TypeMap.Free();
+            m_TypeStringBuilder.Free();
+            m_TypeHashSet.Free();
+
+            m_TypeObject = null;
+            m_TypeBool = null;
+            m_TypeNumber = null;
+            m_TypeString = null;
+            m_TypeFunction = null;
+            m_TypeArray = null;
+            m_TypeMap = null;
+            m_TypeStringBuilder = null;
+            m_TypeHashSet = null;
+
+            m_UserdataTypes.Free();
+            m_Types.Clear();
+            m_ExtensionType.Clear();
+            m_Assembly.Clear();
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
             type = new ScriptTypePrimitive(this, name, TypeObjectValue);
@@ -508,8 +534,12 @@ namespace Scorpio
             return stackInfos;
         }
         public void ReleaseAll() {
-            ScriptObjectReference.ReleaseAll();
-            StringReference.ReleaseAll();
+            var released = true;
+            while (released) {
+                released = false;
+                released |= ScriptObjectReference.ReleaseAll();
+                released |= StringReference.ReleaseAll();
+            }
         }
     }
 }

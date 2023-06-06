@@ -1,8 +1,6 @@
 using System.IO;
 using System.Text;
 using System;
-using Scorpio.Tools;
-using Scorpio.Runtime;
 
 namespace Scorpio.Library {
     public class LibraryIO {
@@ -113,8 +111,7 @@ namespace Scorpio.Library {
                 foreach (var line in File.ReadAllLines(args[0].ToString(), length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding)) {
                     array.Add(new ScriptValue(line));
                 }
-                using var ret = new ScriptValue(array);
-                return ret;
+                return new ScriptValue(array);
             }
         }
         private class writeAllLines : ScorpioHandle {

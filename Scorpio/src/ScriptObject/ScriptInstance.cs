@@ -17,6 +17,7 @@ namespace Scorpio {
         }
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
+        public ScriptValue PrototypeValue => m_PrototypeValue;
         protected void Release() {
             m_PrototypeValue.Free();
             m_Prototype = null;

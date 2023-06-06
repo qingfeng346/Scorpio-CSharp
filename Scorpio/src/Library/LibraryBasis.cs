@@ -523,27 +523,27 @@ namespace Scorpio.Library
                 switch (value.valueType) {
                     case ScriptValue.trueValueType:
                     case ScriptValue.falseValueType:
-                        return script.TypeBooleanValue;
+                        return script.TypeBooleanValue.Reference();
                     case ScriptValue.doubleValueType:
                     case ScriptValue.int64ValueType:
-                        return script.TypeNumberValue;
+                        return script.TypeNumberValue.Reference();
                     case ScriptValue.stringValueType:
-                        return script.TypeStringValue;
+                        return script.TypeStringValue.Reference();
                     case ScriptValue.scriptValueType:
                         if (value.scriptValue is ScriptArray) {
-                            return script.TypeArrayValue;
+                            return script.TypeArrayValue.Reference();
                         } else if (value.scriptValue is ScriptMap) {
-                            return script.TypeMapValue;
+                            return script.TypeMapValue.Reference();
                         } else if (value.scriptValue is ScriptFunction) {
-                            return script.TypeFunctionValue;
+                            return script.TypeFunctionValue.Reference();
                         } else if (value.scriptValue is ScriptInstance) {
-                            return new ScriptValue((value.scriptValue as ScriptInstance).Prototype);
+                            return (value.scriptValue as ScriptInstance).PrototypeValue.Reference();
                         } else if (value.scriptValue is ScriptType) {
-                            return new ScriptValue((value.scriptValue as ScriptType).Prototype);
+                            return (value.scriptValue as ScriptType).PrototypeValue.Reference();
                         } else {
-                            return script.GetUserdataTypeValue(value.scriptValue.Type);
+                            return script.GetUserdataTypeValue(value.scriptValue.Type).Reference();
                         }
-                    default: return script.TypeObjectValue;
+                    default: return script.TypeObjectValue.Reference();
                 }
             }
         }
@@ -576,9 +576,9 @@ namespace Scorpio.Library
                 var value = args[0];
                 if (value.valueType == ScriptValue.scriptValueType) {
                     if (value.scriptValue is ScriptInstance) {
-                        return new ScriptValue((value.scriptValue as ScriptInstance).Prototype.Prototype);
+                        return (value.scriptValue as ScriptInstance).Prototype.PrototypeValue.Reference();
                     } else if (value.scriptValue is ScriptType) {
-                        return new ScriptValue((value.scriptValue as ScriptType).Prototype);
+                        return (value.scriptValue as ScriptType).PrototypeValue.Reference();
                     }
                 }
                 return ScriptValue.Null;
@@ -623,8 +623,7 @@ namespace Scorpio.Library
                 this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                using var ret = new ScriptValue(new ScriptNamespace(script, args[0].ToString()));
-                return ret;
+                return new ScriptValue(new ScriptNamespace(script, args[0].ToString()));
             }
         }
         private class importExtension : ScorpioHandle {
@@ -658,7 +657,7 @@ namespace Scorpio.Library
                         throw new ExecutionException($"generic_type 第{i+1}个参数必须是 Type");
                     types[i - 1] = args[i].scriptValue.Type;
                 }
-                return script.GetUserdataType(args[0].scriptValue.Type).MakeGenericType(script, types);
+                return script.GetUserdataType(args[0].scriptValue.Type).MakeGenericType(script, types).Reference();
             }
         }
         private class genericMethod : ScorpioHandle {

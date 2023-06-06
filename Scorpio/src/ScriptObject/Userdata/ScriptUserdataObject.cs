@@ -15,6 +15,7 @@ namespace Scorpio.Userdata {
             return this;
         }
         public override void Free() {
+            m_Methods.Free();
             m_Script.Free(this);
         }
         public override ScriptValue GetValue(string key) {
@@ -35,21 +36,24 @@ namespace Scorpio.Userdata {
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
             using var parameters = ScorpioParameters.Get();
             parameters.values[0] = new ScriptValue(index);
-            return ScriptValue.CreateValue(m_Script, func.Call(m_Script, false, m_Value, parameters.values, 1));
+            using var ret = ScriptValue.CreateValue(m_Script, func.Call(m_Script, false, m_Value, parameters.values, 1));
+            return ret;
         }
         public override ScriptValue GetValue(long index) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
             using var parameters = ScorpioParameters.Get();
             parameters.values[0] = new ScriptValue(index);
-            return ScriptValue.CreateValue(m_Script, func.Call(m_Script, false, m_Value, parameters.values, 1));
+            using var ret = ScriptValue.CreateValue(m_Script, func.Call(m_Script, false, m_Value, parameters.values, 1));
+            return ret;
         }
         public override ScriptValue GetValue(object index) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
             using var parameters = ScorpioParameters.Get();
             parameters.values[0] = ScriptValue.CreateValue(m_Script, index);
-            return ScriptValue.CreateValue(m_Script, func.Call(m_Script, false, m_Value, parameters.values, 1));
+            using var ret = ScriptValue.CreateValue(m_Script, func.Call(m_Script, false, m_Value, parameters.values, 1));
+            return ret;
         }
         public override void SetValue(double index, ScriptValue value) {
             var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);
