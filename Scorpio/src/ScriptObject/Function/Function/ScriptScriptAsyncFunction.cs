@@ -20,11 +20,11 @@ namespace Scorpio.Function {
             return ScriptValue.CreateValue(m_Script, m_Context.ExecuteCoroutine(thisObject, parameters.CloneParameters(length), length, m_internalValues, baseType));
         }
         public override ScriptFunction SetBindObject(ScriptValue obj) {
-            return m_Script.NewAsyncLambdaFunction().SetContext(m_Context, obj);
+            return m_Script.NewAsyncBindFunction().SetContext(m_Context, obj);
         }
     }
-    public class ScriptScriptAsyncLambdaFunction : ScriptScriptBindFunctionBase {
-        public ScriptScriptAsyncLambdaFunction(Script script) : base(script) {
+    public class ScriptScriptAsyncBindFunction : ScriptScriptBindFunctionBase {
+        public ScriptScriptAsyncBindFunction(Script script) : base(script) {
         }
         public override void Free() {
             base.Free();
@@ -43,11 +43,11 @@ namespace Scorpio.Function {
             return ScriptValue.CreateValue(m_Script, m_Context.ExecuteCoroutine(m_BindObject, parameters.CloneParameters(length), length, m_internalValues, baseType));
         }
         public override bool Equals(ScriptValue obj) {
-            var func = obj.Get<ScriptScriptAsyncLambdaFunction>();
+            var func = obj.Get<ScriptScriptAsyncBindFunction>();
             return func != null && ReferenceEquals(m_Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);
         }
         public override ScriptFunction SetBindObject(ScriptValue obj) {
-            return m_Script.NewAsyncLambdaFunction().SetContext(m_Context, obj);
+            return m_Script.NewAsyncBindFunction().SetContext(m_Context, obj);
         }
     }
 }

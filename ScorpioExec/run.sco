@@ -1,11 +1,12 @@
-var arr = [100]
+var arr = [100,200,300,400]
 // print("=================")
 function mypair(a) {
 	var index = 0
+    var count = a.length()
 	return {
 		//必须实现一个 next 函数
 		next() {
-			if (index < 1) {
+			if (index < count) {
 				this.key = index
 				this.value = a[index]
 				index += 1
@@ -16,6 +17,8 @@ function mypair(a) {
 	}
 }
 // var a = mypair(arr)
+// a.next()
+// a.next()
 // a.next()
 // print(a.key, a.value)
 foreach (var p in mypair(arr)) {

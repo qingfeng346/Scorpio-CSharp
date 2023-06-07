@@ -13,9 +13,9 @@ namespace Scorpio {
         private ObjectsPool<ScriptHashSet> hashSetPool;
         private ObjectsPool<ScriptStringBuilder> stringBuilderPool;
         private ObjectsPool<ScriptScriptFunction> functionPool;
-        private ObjectsPool<ScriptScriptLambdaFunction> lambdaFunctionPool;
+        private ObjectsPool<ScriptScriptBindFunction> bindFunctionPool;
         private ObjectsPool<ScriptScriptAsyncFunction> asyncFunctionPool;
-        private ObjectsPool<ScriptScriptAsyncLambdaFunction> asyncLambdaFunctionPool;
+        private ObjectsPool<ScriptScriptAsyncBindFunction> asyncBindFunctionPool;
 
 
         private ObjectsPool<ScriptUserdataObject> userdataObjectPool;
@@ -38,9 +38,9 @@ namespace Scorpio {
             hashSetPool = new ObjectsPool<ScriptHashSet>(() => new ScriptHashSet(this));
             stringBuilderPool = new ObjectsPool<ScriptStringBuilder>(() => new ScriptStringBuilder(this));
             functionPool = new ObjectsPool<ScriptScriptFunction>(() => new ScriptScriptFunction(this));
-            lambdaFunctionPool = new ObjectsPool<ScriptScriptLambdaFunction>(() => new ScriptScriptLambdaFunction(this));
+            bindFunctionPool = new ObjectsPool<ScriptScriptBindFunction>(() => new ScriptScriptBindFunction(this));
             asyncFunctionPool = new ObjectsPool<ScriptScriptAsyncFunction>(() => new ScriptScriptAsyncFunction(this));
-            asyncLambdaFunctionPool = new ObjectsPool<ScriptScriptAsyncLambdaFunction>(() => new ScriptScriptAsyncLambdaFunction(this));
+            asyncBindFunctionPool = new ObjectsPool<ScriptScriptAsyncBindFunction>(() => new ScriptScriptAsyncBindFunction(this));
 
             userdataObjectPool = new ObjectsPool<ScriptUserdataObject>(() => new ScriptUserdataObject(this));
             userdataArrayPool = new ObjectsPool<ScriptUserdataArray>(() => new ScriptUserdataArray(this));
@@ -78,14 +78,14 @@ namespace Scorpio {
         public ScriptScriptFunction NewFunction() {
             return functionPool.Alloc();
         }
-        public ScriptScriptLambdaFunction NewLambdaFunction() {
-            return lambdaFunctionPool.Alloc();
+        public ScriptScriptBindFunction NewBindFunction() {
+            return bindFunctionPool.Alloc();
         }
         public ScriptScriptAsyncFunction NewAsyncFunction() {
             return asyncFunctionPool.Alloc();
         }
-        public ScriptScriptAsyncLambdaFunction NewAsyncLambdaFunction() {
-            return asyncLambdaFunctionPool.Alloc();
+        public ScriptScriptAsyncBindFunction NewAsyncBindFunction() {
+            return asyncBindFunctionPool.Alloc();
         }
 
         public ScriptUserdataObject NewUserdataObject() {
@@ -135,14 +135,14 @@ namespace Scorpio {
         public void Free(ScriptScriptFunction value) {
             functionPool.Free(value);
         }
-        public void Free(ScriptScriptLambdaFunction value) {
-            lambdaFunctionPool.Free(value);
+        public void Free(ScriptScriptBindFunction value) {
+            bindFunctionPool.Free(value);
         }
         public void Free(ScriptScriptAsyncFunction value) {
             asyncFunctionPool.Free(value);
         }
-        public void Free(ScriptScriptAsyncLambdaFunction value) {
-            asyncLambdaFunctionPool.Free(value);
+        public void Free(ScriptScriptAsyncBindFunction value) {
+            asyncBindFunctionPool.Free(value);
         }
         public void Free(ScriptUserdataObject value) {
             userdataObjectPool.Free(value);

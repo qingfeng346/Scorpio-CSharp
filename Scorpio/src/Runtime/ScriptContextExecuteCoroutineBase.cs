@@ -22,7 +22,7 @@ namespace Scorpio.Runtime {
 #endif
 
 #if SCORPIO_DEBUG
-            System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
+            //System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
             if (VariableValueIndex < 0 || VariableValueIndex >= ValueCacheLength) {
                 throw new ExecutionException($"Stack overflow : {VariableValueIndex}");
             }
@@ -52,7 +52,12 @@ namespace Scorpio.Runtime {
                     }
                 } else {
                     for (int i = 0; i < internalCount; ++i) {
-                        internalValues[i] = parentInternalValues[i] ?? new InternalValue();
+                        if (parentInternalValues[i] == null) {
+                            internalValues[i] = new InternalValue();
+                        } else {
+                            parentInternalValues[i].value.Reference();
+                            internalValues[i] = parentInternalValues[i];
+                        }
                     }
                 }
             }
@@ -1397,7 +1402,7 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.NewLambdaFunction: {
-                                var function = m_script.NewLambdaFunction();
+                                var function = m_script.NewBindFunction();
                                 var functionData = constContexts[opvalue];
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData, thisObject);
@@ -1421,7 +1426,7 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.NewAsyncLambdaFunction: {
-                                var function = m_script.NewAsyncLambdaFunction();
+                                var function = m_script.NewAsyncBindFunction();
                                 var functionData = constContexts[opvalue];
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData, thisObject);
