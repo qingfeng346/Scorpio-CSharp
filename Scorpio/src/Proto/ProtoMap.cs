@@ -12,6 +12,7 @@ namespace Scorpio.Proto {
             ret.SetValue("forEach", script.CreateFunction(new forEach(script)));
             ret.SetValue("forEachValue", script.CreateFunction(new forEachValue(script)));
             ret.SetValue("find", script.CreateFunction(new find(script)));
+            ret.SetValue("findKey", script.CreateFunction(new find(script)));
             ret.SetValue("findValue", script.CreateFunction(new findValue(script)));
             ret.SetValue("+", script.CreateFunction(new plus()));
             ret.SetValue("-", script.CreateFunction(new minus()));
@@ -117,7 +118,7 @@ namespace Scorpio.Proto {
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
                     using (var key = ScriptValue.CreateValue(script, pair.Key)) {
                         if (func.Call(key, pair.Value).IsTrue) {
-                            return new ScriptValue(pair.Value);
+                            return pair.Value.Reference();
                         }
                     }
                 }
@@ -131,8 +132,7 @@ namespace Scorpio.Proto {
                 foreach (var pair in map) {
                     thisMap.SetValue(pair.Key, pair.Value);
                 }
-                using var ret = new ScriptValue(thisMap);
-                return ret;
+                return new ScriptValue(thisMap);
             }
         }
         private class minus : ScorpioHandle {
@@ -146,8 +146,7 @@ namespace Scorpio.Proto {
                 } else {
                     thisMap.Remove(args[0].Value);
                 }
-                using var ret = new ScriptValue(thisMap);
-                return ret;
+                return new ScriptValue(thisMap);
             }
         }
     }

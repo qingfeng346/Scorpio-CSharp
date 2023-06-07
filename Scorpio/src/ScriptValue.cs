@@ -21,16 +21,18 @@ namespace Scorpio
         public const byte trueValueType = 2;        //true
         public const byte falseValueType = 3;       //false
         public const byte stringValueType = 4;      //string
-        //public const byte int8ValueType = 11;       //
-        //public const byte uint8ValueType = 12;      //
-        //public const byte int16ValueType = 13;      //
-        //public const byte uint16ValueType = 14;     //
-        //public const byte int32ValueType = 15;      //
-        //public const byte uint32ValueType = 16;     //
+        public const byte int8ValueType = 11;       //
+        public const byte uint8ValueType = 12;      //
+        public const byte int16ValueType = 13;      //
+        public const byte uint16ValueType = 14;     //
+        public const byte int32ValueType = 15;      //
+        public const byte uint32ValueType = 16;     //
         public const byte int64ValueType = 17;      //long
-        //public const byte uint64ValueType = 18;     //
-        //public const byte floatValueType = 19;      //
-        public const byte doubleValueType = 20;     //double
+        public const byte uint64ValueType = 18;     //
+        public const byte charValueType = 19;
+
+        public const byte floatValueType = 20;      //
+        public const byte doubleValueType = 21;     //double
 
         [FieldOffset(0)] private double _doubleValue;
         [FieldOffset(0)] private long _longValue;
@@ -195,6 +197,61 @@ namespace Scorpio
                 this._valueType = scriptValueType;
                 this._index = ScriptObjectReference.Alloc(value);
             }
+        }
+
+        private ScriptValue(sbyte value) {
+            this._valueType = int8ValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        private ScriptValue(byte value) {
+            this._valueType = uint8ValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        private ScriptValue(short value) {
+            this._valueType = int16ValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        private ScriptValue(ushort value) {
+            this._valueType = uint16ValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        internal ScriptValue(int value) {
+            this._valueType = int32ValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        private ScriptValue(uint value) {
+            this._valueType = uint32ValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        private ScriptValue(ulong value) {
+            this._valueType = uint64ValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = (long)value;
+        }
+        internal ScriptValue(char value) {
+            this._valueType = charValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        private ScriptValue(float value) {
+            this._valueType = floatValueType;
+            this._index = 0;
+            this._longValue = 0;
+            this._doubleValue = value;
         }
 
         internal ScriptValue GetValue(ScriptValue value, Script script) {
@@ -372,8 +429,19 @@ namespace Scorpio
         public object Value {
             get {
                 switch (valueType) {
-                    case doubleValueType: return _doubleValue;
-                    case int64ValueType: return _longValue;
+                    case floatValueType:
+                    case doubleValueType:
+                        return _doubleValue;
+                    case int8ValueType:
+                    case uint8ValueType:
+                    case int16ValueType:
+                    case uint16ValueType:
+                    case int32ValueType:
+                    case uint32ValueType:
+                    case int64ValueType:
+                    case uint64ValueType:
+                    case charValueType:
+                        return _longValue;
                     case nullValueType: return null;
                     case trueValueType: return true;
                     case falseValueType: return false;
@@ -390,8 +458,17 @@ namespace Scorpio
                     case trueValueType:
                     case falseValueType:
                         return "Boolean";
+                    case floatValueType:
                     case doubleValueType:
+                    case int8ValueType:
+                    case uint8ValueType:
+                    case int16ValueType:
+                    case uint16ValueType:
+                    case int32ValueType:
+                    case uint32ValueType:
                     case int64ValueType:
+                    case uint64ValueType:
+                    case charValueType:
                         return "Number";
                     case stringValueType:
                         return "String";
@@ -402,38 +479,84 @@ namespace Scorpio
         }
         public int ToInt32() {
             switch (valueType) {
-                case doubleValueType: return (int)_doubleValue;
-                case int64ValueType: return (int)_longValue;
+                case floatValueType:
+                case doubleValueType:
+                    return (int)_doubleValue;
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case int64ValueType:
+                case uint64ValueType:
+                case charValueType:
+                    return (int)_longValue;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
             }
         }
         public double ToDouble() {
             switch (valueType) {
-                case doubleValueType: return _doubleValue;
-                case int64ValueType: return _longValue;
+                case floatValueType:
+                case doubleValueType:
+                    return _doubleValue;
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case int64ValueType:
+                case uint64ValueType:
+                case charValueType:
+                    return _longValue;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
             }
         }
         public long ToLong() {
             switch (valueType) {
-                case doubleValueType: return (long)_doubleValue;
-                case int64ValueType: return _longValue;
+                case floatValueType:
+                case doubleValueType:
+                    return (long)_doubleValue;
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case int64ValueType:
+                case uint64ValueType:
+                case charValueType:
+                    return _longValue;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");
             }
         }
         public char ToChar() {
             switch (valueType) {
-                case doubleValueType: return (char)doubleValue;
-                case int64ValueType: return (char)longValue;
+                case floatValueType:
+                case doubleValueType:
+                    return (char)_doubleValue;
+                case stringValueType:
+                    return stringValue[0];
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case int64ValueType:
+                case uint64ValueType:
+                case charValueType:
+                    return (char)_longValue;
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
             }
         }
         public T Get<T>() where T : ScriptObject {
             return valueType == scriptValueType ? (scriptValue as T) : null;
         }
-        public ScriptObject Get() {
-            return valueType == scriptValueType ? scriptValue : null;
-        }
+        //public ScriptObject Get() {
+        //    return valueType == scriptValueType ? scriptValue : null;
+        //}
         public bool IsNull => valueType == nullValueType;
         public bool IsTrue => valueType == trueValueType;
         public bool IsFalse => valueType == falseValueType;
@@ -445,8 +568,19 @@ namespace Scorpio
         public override string ToString() {
             switch (valueType) {
                 case stringValueType: return stringValue;
-                case doubleValueType: return _doubleValue.ToString();
-                case int64ValueType: return _longValue.ToString();
+                case floatValueType:
+                case doubleValueType: 
+                    return _doubleValue.ToString();
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case int64ValueType:
+                case uint64ValueType:
+                case charValueType:
+                    return _longValue.ToString();
                 case trueValueType: return "true";
                 case falseValueType: return "false";
                 case nullValueType: return "null";
@@ -459,8 +593,19 @@ namespace Scorpio
                 case nullValueType: return 0;
                 case trueValueType: return true.GetHashCode();
                 case falseValueType: return false.GetHashCode();
-                case doubleValueType: return _doubleValue.GetHashCode();
-                case int64ValueType: return _longValue.GetHashCode();
+                case floatValueType:
+                case doubleValueType: 
+                    return _doubleValue.GetHashCode();
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case int64ValueType:
+                case uint64ValueType:
+                case charValueType:
+                    return _longValue.GetHashCode();
                 case stringValueType: return stringValue.GetHashCode();
                 default: return scriptValue.GetHashCode();
             }
@@ -487,8 +632,19 @@ namespace Scorpio
         public bool Equals(ScriptValue value) {
             if (valueType != value.valueType) { return false; }
             switch (valueType) {
-                case doubleValueType: return _doubleValue == value._doubleValue;
-                case int64ValueType: return _longValue == value._longValue;
+                case floatValueType:
+                case doubleValueType:
+                    return _doubleValue == value._doubleValue;
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case int64ValueType:
+                case uint64ValueType:
+                case charValueType:
+                    return _longValue == value._longValue;
                 case stringValueType: return stringValue == value.stringValue;
                 case scriptValueType: return scriptValue.Equals(value);
                 default: return true;
@@ -512,7 +668,7 @@ namespace Scorpio
             else if (value is long)
                 return new ScriptValue((long)value);
             else if (value is ulong)
-                return new ScriptValue(Convert.ToInt64(value));
+                return new ScriptValue((long)(ulong)value);
             else if (value is ScriptObject)
                 return new ScriptValue((ScriptObject)value);
             else if (value is Type)

@@ -48,12 +48,7 @@ namespace Scorpio.Proto {
         }
         private class at : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var isCode = length > 1 ? args[1].IsTrue : true;
-                if (isCode) {
-                    return new ScriptValue(thisObject.stringValue[args[0].ToInt32()]);
-                } else {
-                    return new ScriptValue(thisObject.stringValue[args[0].ToInt32()].ToString());
-                }
+                return new ScriptValue(thisObject.stringValue[args[0].ToInt32()]);
             }
         }
         private class insert : ScorpioHandle {
@@ -219,9 +214,11 @@ namespace Scorpio.Proto {
                 var splits = new string[length];
                 for (var i = 0; i < length; ++i) { splits[i] = args[i].ToString(); }
                 var strs = thisObject.stringValue.Split(splits, StringSplitOptions.RemoveEmptyEntries);
-                var ret = new ScriptArray(m_script);
+                var ret = m_script.NewArray();
                 foreach (string str in strs) {
-                    ret.Add(new ScriptValue(str));
+                    using (var value = new ScriptValue(str)) {
+                        ret.Add(value);
+                    }
                 }
                 return new ScriptValue(ret);
             }
@@ -292,16 +289,11 @@ namespace Scorpio.Proto {
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var str = args[0].ToString();
-                var isArray = length > 1 ? args[1].IsTrue : false;
-                if (isArray) {
-                    var ret = new ScriptArray(m_script);
-                    foreach (var c in str) {
-                        ret.Add(new ScriptValue(c));
-                    }
-                    return new ScriptValue(ret);
-                } else {
-                    return new ScriptValue(str[0]);
+                var ret = m_script.NewArray();
+                foreach (var c in str) {
+                    ret.Add(new ScriptValue(c));
                 }
+                return new ScriptValue(ret);
             }
         }
         private class isInterned : ScorpioHandle {

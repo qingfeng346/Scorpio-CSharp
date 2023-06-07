@@ -265,25 +265,9 @@ namespace Scorpio
             }
             SetGlobal(GLOBAL_ARGS, array);
         }
-        /// <summary> 创建一个空的array </summary>
-        //public ScriptArray CreateArray() {
-        //    return NewArray();
-        //}
-        ///// <summary> 创建一个array </summary>
-        //public ScriptArray CreateArray(System.Collections.IEnumerable list) {
-        //    var array = NewArray();
-        //    foreach (var item in list) {
-        //        array.Add(ScriptValue.CreateValue(item));
-        //    }
-        //    return array;
-        //}
-        /// <summary> 创建一个空的map </summary>
-        //public ScriptMap CreateMap() { return new ScriptMapObject(this); }
         /// <summary> 创建一个Function </summary>
         /// <param name="value">ScorpioHandle</param>
         public ScriptHandleFunction CreateFunction(ScorpioHandle value) { return new ScriptHandleFunction(this, value); }
-        /// <summary> 创建一个 Instance </summary>
-        //public ScriptInstance CreateInstance() { return new ScriptInstance(ObjectType.Type, TypeObject); }
         /// <summary> 调用一个全局函数 </summary>
         /// <param name="name">函数名</param>
         /// <param name="args">参数</param>

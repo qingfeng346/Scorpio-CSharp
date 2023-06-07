@@ -105,8 +105,7 @@ namespace ScorpioLibrary {
                     var result = script.NewMapObject();
                     result.SetValue("output", new ScriptValue(process.StandardOutput.ReadToEnd()));
                     result.SetValue("exitCode", new ScriptValue((double)process.ExitCode));
-                    using var ret = new ScriptValue(result);
-                    return ret;
+                    return new ScriptValue(result);
                 }
             }
         }

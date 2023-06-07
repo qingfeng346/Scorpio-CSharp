@@ -1,12 +1,12 @@
 var arr = [100,200,300,400]
-print(array.count(arr))			//1.0 语法
+// print(array.count(arr))			//1.0 语法
 print(arr.length())				//2.0 语法
 foreach (var p in pairs(arr)) {
     print("array : " + p.key + " = " + p.value)
 }
 print("=================")
 var tab = {a = 100, b = 200, c = 300, d = 400}
-print(table.count(tab))			//1.0 语法
+// print(table.count(tab))			//1.0 语法
 print(tab.length())				//2.0 语法
 foreach ( var p in pairs(tab)) {
     print("table : " + p.key + " = " + p.value)

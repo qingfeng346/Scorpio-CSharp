@@ -18,7 +18,7 @@ namespace Scorpio {
             m_Prototype = parentValue.Get<ScriptType>();
         }
         public string TypeName { get; private set; }        //Type名称
-        public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
+        public virtual ScriptType Prototype => m_Prototype;
         public ScriptValue PrototypeValue => m_PrototypeValue;
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype?.EqualFunction;
         public override void Free() {
@@ -89,7 +89,6 @@ namespace Scorpio {
         internal ScriptTypeObject(Script script, string typeName) : base(script) {
             Set(typeName, ScriptValue.Null);
         }
-        public override ScriptType Prototype { set { throw new ExecutionException("Class<Object>不支持设置 Prototype"); } }
         public override ScriptFunction EqualFunction => m_EqualFunction;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return new ScriptValue(m_Script.NewInstance().Set(script.TypeObjectValue));
