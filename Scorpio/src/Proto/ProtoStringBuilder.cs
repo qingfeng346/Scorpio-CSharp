@@ -19,13 +19,13 @@ namespace Scorpio.Proto {
         private class setLength : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptStringBuilder>().Builder.Length = args[0].ToInt32();
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class clear : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptStringBuilder>().Builder.Clear();
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class append : ScorpioHandle {
@@ -34,7 +34,7 @@ namespace Scorpio.Proto {
                 for (var i = 0; i < length; ++i) {
                     builder.Append(args[i].Value);
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class appendFormat : ScorpioHandle {
@@ -44,25 +44,25 @@ namespace Scorpio.Proto {
                     objs[i - 1] = args[i].Value;
                 }
                 thisObject.Get<ScriptStringBuilder>().Builder.AppendFormat(args[0].ToString(), objs);
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class insert : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptStringBuilder>().Builder.Insert(args[0].ToInt32(), args[1].Value);
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class remove : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptStringBuilder>().Builder.Remove(args[0].ToInt32(), args[1].ToInt32());
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class replace : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptStringBuilder>().Builder.Replace(args[0].ToString(), args[1].ToString());
-                return thisObject;
+                return thisObject.Reference();
             }
         }
     }

@@ -31,7 +31,7 @@ namespace Scorpio.Proto {
                 for (int i = 0; i < length; ++i) {
                     hashSet.Add(args[i]);
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class remove : ScorpioHandle {
@@ -55,7 +55,7 @@ namespace Scorpio.Proto {
         private class clear : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptHashSet>().Clear();
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class length : ScorpioHandle {
@@ -66,19 +66,19 @@ namespace Scorpio.Proto {
         private class unionWith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptHashSet>().UnionWith(args[0].Value as IEnumerable<ScriptValue>);
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class exceptWith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptHashSet>().ExceptWith(args[0].Value as IEnumerable<ScriptValue>);
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class intersectWith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptHashSet>().IntersectWith(args[0].Value as IEnumerable<ScriptValue>);
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class isProperSubsetOf : ScorpioHandle {
@@ -114,13 +114,13 @@ namespace Scorpio.Proto {
         private class symmetricExceptWith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptHashSet>().SymmetricExceptWith(args[0].Value as IEnumerable<ScriptValue>);
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class trimExcess : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptHashSet>().TrimExcess();
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class forEach : ScorpioHandle {

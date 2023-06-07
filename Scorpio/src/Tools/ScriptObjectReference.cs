@@ -34,8 +34,8 @@ namespace Scorpio.Tools {
             length = 0;
         }
         public static int Alloc(ScriptObject value) {
-            //if (value is ScriptArray) {
-            //    logger.debug("===================== Alloc " + value);
+            //if (value is ScriptMapObject) {
+            //    logger.debug("===================== Alloc ");
             //}
             if (object2index.TryGetValue(value.Id, out var index)) {
                 ++entities[index].referenceCount;
@@ -59,14 +59,14 @@ namespace Scorpio.Tools {
                 //添加到待释放列表
                 freeIndex.Add(index);
             }
-            //if (entities[index].value is ScriptArray) {
-            //    logger.debug("Free  ===================== " + entities[index]);
+            //if (entities[index].value is ScriptMapObject) {
+            //    logger.debug("Free  ===================== ");
             //}
         }
         public static void Reference(int index) {
             ++entities[index].referenceCount;
-            //if (entities[index].value is ScriptArray) {
-            //    logger.debug("Reference  ===================== " + entities[index]);
+            //if (entities[index].value is ScriptMapObject) {
+            //    logger.debug("Reference  ===================== ");
             //}
         }
         public static ScriptObject GetValue(int index) {

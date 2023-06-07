@@ -13,7 +13,7 @@ namespace Scorpio.Proto {
         }
         private class bindObject : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptFunction>().BindObject;
+                return thisObject.Get<ScriptFunction>().BindObject.Reference();
             }
         }
         private class call : ScorpioHandle {

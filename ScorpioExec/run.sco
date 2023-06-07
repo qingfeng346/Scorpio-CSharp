@@ -1,29 +1,9 @@
-var arr = [100,200,300,400]
-// print("=================")
-function mypair(a) {
-	var index = 0
-    var count = a.length()
-	return {
-		//必须实现一个 next 函数
-		next() {
-			if (index < count) {
-				this.key = index
-				this.value = a[index]
-				index += 1
-				return true
-			}
-			return false
-		}
-	}
-}
-// var a = mypair(arr)
-// a.next()
-// a.next()
-// a.next()
-// print(a.key, a.value)
-foreach (var p in mypair(arr)) {
-	print(p.value)
-}
+var a = {}
+a.a = a
+a.clear()
+print(a.a)
+// a.a = 100
+// a.b = []
 // c# 重载 [] 的类 可以直接使用 [] 操作
 // Dictionary = importType("System.Collections.Generic.Dictionary`2")
 // DicIntStr = genericType(Dictionary, Int32, SystemString)

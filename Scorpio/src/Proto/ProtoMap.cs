@@ -25,7 +25,7 @@ namespace Scorpio.Proto {
         private class clear : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptMap>().Clear();
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class remove : ScorpioHandle {
@@ -33,7 +33,7 @@ namespace Scorpio.Proto {
                 for (var i = 0; i < length; ++i) {
                     thisObject.Get<ScriptMap>().Remove(args[i].Value);
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class containsKey : ScorpioHandle {

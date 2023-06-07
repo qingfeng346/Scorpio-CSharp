@@ -52,7 +52,7 @@ namespace Scorpio.Proto {
                 for (int i = 1; i < length; ++i) {
                     array.Insert(index, args[i]);
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class add : ScorpioHandle {
@@ -61,7 +61,7 @@ namespace Scorpio.Proto {
                 for (int i = 0; i < length; ++i) {
                     array.Add(args[i]);
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class addUnique : ScorpioHandle {
@@ -70,7 +70,7 @@ namespace Scorpio.Proto {
                 for (int i = 0; i < length; ++i) {
                     array.AddUnique(args[i]);
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class remove : ScorpioHandle {
@@ -79,20 +79,20 @@ namespace Scorpio.Proto {
                 for (int i = 0; i < length; ++i) {
                     array.Remove(args[i]);
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class removeAt : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
                 array.RemoveAt(args[0].ToInt32());
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class clear : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptArray>().Clear();
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class contains : ScorpioHandle {
@@ -103,7 +103,7 @@ namespace Scorpio.Proto {
         private class sort : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 thisObject.Get<ScriptArray>().Sort(args[0].Get<ScriptFunction>());
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class indexOf : ScorpioHandle {
@@ -264,32 +264,32 @@ namespace Scorpio.Proto {
 
         private class first : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptArray>().First();
+                return thisObject.Get<ScriptArray>().First().Reference();
             }
         }
         private class last : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptArray>().Last();
+                return thisObject.Get<ScriptArray>().Last().Reference();
             }
         }
         private class popFirst : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptArray>().PopFirst();
+                return thisObject.Get<ScriptArray>().PopFirst().Reference();
             }
         }
         private class safePopFirst : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptArray>().SafePopFirst();
+                return thisObject.Get<ScriptArray>().SafePopFirst().Reference();
             }
         }
         private class popLast : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptArray>().PopLast();
+                return thisObject.Get<ScriptArray>().PopLast().Reference();
             }
         }
         private class safePopLast : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptArray>().SafePopLast();
+                return thisObject.Get<ScriptArray>().SafePopLast().Reference();
             }
         }
         private class join : ScorpioHandle {

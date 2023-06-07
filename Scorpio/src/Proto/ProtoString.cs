@@ -61,7 +61,7 @@ namespace Scorpio.Proto {
                 if (length == 2) {
                     return new ScriptValue(thisObject.stringValue.Insert(args[0].ToInt32(), args[1].ToString()));
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class remove : ScorpioHandle {
@@ -71,7 +71,7 @@ namespace Scorpio.Proto {
                 } else if (length == 2) {
                     return new ScriptValue(thisObject.stringValue.Remove(args[0].ToInt32(), args[0].ToInt32()));
                 }
-                return thisObject;
+                return thisObject.Reference();
             }
         }
         private class toLower : ScorpioHandle {
@@ -203,7 +203,7 @@ namespace Scorpio.Proto {
         private class sub : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (length == 0)
-                    return thisObject;
+                    return thisObject.Reference();
                 else if (length == 1)
                     return new ScriptValue(thisObject.ToString().Substring(args[0].ToInt32()));
                 else

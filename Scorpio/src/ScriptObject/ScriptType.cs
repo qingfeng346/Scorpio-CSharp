@@ -20,7 +20,7 @@ namespace Scorpio {
         public string TypeName { get; private set; }        //Type名称
         public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public ScriptValue PrototypeValue => m_PrototypeValue;
-        public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
+        public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype?.EqualFunction;
         public override void Free() {
             m_PrototypeValue.Free();
             m_Prototype = null;
