@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Tools;
 using Scorpio.Library;
-using Scorpio.Exception;
+using System.Linq;
+
 namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
+        private static List<ScriptValue> tempList = new List<ScriptValue>();
         public HashSet<ScriptValue> m_Objects = new HashSet<ScriptValue>();
         public ScriptHashSet(Script script) : base(script, ObjectType.HashSet) {
             Set(script.TypeHashSetValue);
@@ -20,7 +22,7 @@ namespace Scorpio {
         }
         public void Add(ScriptValue item) {
             if (!m_Objects.Contains(item)) {
-                m_Objects.Add(new ScriptValue(item));
+                m_Objects.Add(item.Reference());
             }
         }
         public void Clear() {
@@ -49,42 +51,69 @@ namespace Scorpio {
             });
         }
         public int Count => m_Objects.Count;
+        //添加一个集合
         public void UnionWith(IEnumerable<ScriptValue> other) {
             foreach (var element in other) {
                 Add(element);
             }
         }
+        //删除一个集合
         public void ExceptWith(IEnumerable<ScriptValue> other) {
             foreach (var element in other) {
                 Remove(element);
             }
         }
+        //返回两个集合内重复的元素
         public void IntersectWith(IEnumerable<ScriptValue> other) {
-            //m_Objects.IntersectWith(other);
-            throw new ExecutionException("未实现 IntersectWith");
+            tempList.Clear();
+            foreach (var element in m_Objects) {
+                if (!other.Contains(element)) {
+                    tempList.Add(element);
+                }
+            }
+            for (var i = 0; i < tempList.Count;++i) {
+                Remove(tempList[i]);
+            }
         }
+        //返回两个集合内不重复的所有元素
         public void SymmetricExceptWith(IEnumerable<ScriptValue> other) {
-            //m_Objects.SymmetricExceptWith(other);
-            throw new ExecutionException("未实现 SymmetricExceptWith");
+            tempList.Clear();
+            foreach (var element in other) {
+                if (m_Objects.Contains(element)) {
+                    tempList.Add(element);
+                } else {
+                    Add(element);
+                }
+            }
+            for (var i = 0; i < tempList.Count; ++i) {
+                Remove(tempList[i]);
+            }
         }
+        //当前集合是否全部包含在other内,  this是other的真子集(两个集合内容长度一致返回false)
         public bool IsProperSubsetOf(IEnumerable<ScriptValue> other) {
             return m_Objects.IsProperSubsetOf(other);
         }
+        //当前集合是否全部包含other内的元素  other是this的真子集(两个集合内容长度一致返回false)
         public bool IsProperSupersetOf(IEnumerable<ScriptValue> other) {
             return m_Objects.IsProperSupersetOf(other);
         }
+        //当前集合是否全部包含在other内,  this是other的子集
         public bool IsSubsetOf(IEnumerable<ScriptValue> other) {
             return m_Objects.IsSubsetOf(other);
         }
+        //当前集合是否全部包含other内的元素  other是this的子集
         public bool IsSupersetOf(IEnumerable<ScriptValue> other) {
             return m_Objects.IsSupersetOf(other);
         }
+        //两个集合是否有相同的元素
         public bool Overlaps(IEnumerable<ScriptValue> other) {
             return m_Objects.Overlaps(other);
         }
+        //两个集合内容和长度一致,两个集合相同
         public bool SetEquals(IEnumerable<ScriptValue> other) {
             return m_Objects.SetEquals(other);
         }
+        //清理冗余的分配
         public void TrimExcess() {
             m_Objects.TrimExcess();
         }
