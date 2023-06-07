@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 namespace Scorpio.Tools {
-    public static class logger {
+    internal static class logger {
         public static void debug(string message) {
             var stack = new StackTrace(1, true);
             var builder = new StringBuilder();
