@@ -1,6 +1,28 @@
-foreach (var a in pairs(_G)) {
-    print(a.key, a.value)
+TestClass = importType("TestClass")
+var a = {
+    Update() {
+        print("fffff")
+    }
 }
+print(TestClass.AddComponent(a))
+// async function main1() {
+//     await sleep(10)
+//     return 100
+// }
+// async function main() {
+//     // var a = await main1()
+//     print("feawfeawfaewfwef")
+//     var a = {
+        
+//     }
+//     // print("-------------------------- ")
+//     print(TestClass.AddComponent(a))
+//     while (true) {
+//         await sleep(1000)
+//     }
+// }
+// main()
+// return ""
 // a.a = 100
 // a.b = []
 // c# 重载 [] 的类 可以直接使用 [] 操作

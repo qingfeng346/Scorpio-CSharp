@@ -42,6 +42,7 @@ namespace Scorpio.Tools {
                     entities = newEntities;
                 }
             }
+            object2index[value] = index;
             entities[index] = new Entity(value, 1);
             return index;
         }

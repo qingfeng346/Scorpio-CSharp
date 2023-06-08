@@ -212,6 +212,7 @@ namespace ScorpioExec
             script.LoadLibraryExtend ();
             script.PushAssembly (typeof (Program));
             script.PushReferencedAssemblies (typeof (Program).Assembly);
+            script.PushAssembly (typeof(TestClass));
             LoadLibrary (script, Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {
@@ -227,10 +228,18 @@ namespace ScorpioExec
                     script.SetArgs (sArgs);
                     Logger.info ("=============================");
                     var watch = Stopwatch.StartNew ();
-                    var value = script.LoadFile (file, ParseOption (command.GetValueDefault (ParameterOption, ""), script.SearchPaths));
+                    var ret = "";
+                    using (var value = script.LoadFile(file, ParseOption(command.GetValueDefault(ParameterOption, ""), script.SearchPaths))) {
+                        ret = value.ToString ();
+                    }
+                    while (script.UpdateCoroutine()) { TestClass.Update(); }
+                    //while (true) {
+                    //    script.ReleaseAll();
+                    //    script.UpdateCoroutine();
+                    //    TestClass.Update();
+                    //}
                     script.Shutdown();
                     script.ReleaseAll();
-                    while (script.UpdateCoroutine ()) { }
                     StringReference.Check((i, entity) => {
                         Console.WriteLine($"当前未释放String变量 索引:{i}  {entity}");
                     });
@@ -238,7 +247,7 @@ namespace ScorpioExec
                         Console.WriteLine($"当前未释放Script变量 索引:{i}  {entity}");
                     });
                     Logger.info ("=============================");
-                    Logger.info ("return value : " + value);
+                    Logger.info ("return value : " + ret);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");
                 } catch (Exception e) {
                     var stackInfo = script.GetStackInfo ();

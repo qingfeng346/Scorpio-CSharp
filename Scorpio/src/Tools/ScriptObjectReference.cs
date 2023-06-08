@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define PRINT_REFERENCE
+using System;
 using System.Collections.Generic;
 
 namespace Scorpio.Tools {
@@ -13,9 +14,9 @@ namespace Scorpio.Tools {
             }
             public override string ToString() {
                 try {
-                    return $"{value}  引用计数:{referenceCount}";
+                    return $"{value.Id}:{value}  引用计数:{referenceCount}";
                 } catch (System.Exception) {
-                    return $"{value.GetType()}  引用计数:{referenceCount}";
+                    return $"{value.Id}:{value.GetType()}:  引用计数:{referenceCount}";
                 }
                 
             }
@@ -33,12 +34,22 @@ namespace Scorpio.Tools {
             freeIndex.Clear();
             length = 0;
         }
+#if PRINT_REFERENCE
+        static bool Is(ScriptObject value) {
+            if (value is ScriptMapObject) {
+                return ((ScriptMapObject)value).ContainsKey("Update");
+            }
+            return false;
+        }
+#endif
         public static int Alloc(ScriptObject value) {
-            //if (value is ScriptMapObject) {
-            //    logger.debug("===================== Alloc ");
-            //}
             if (object2index.TryGetValue(value.Id, out var index)) {
                 ++entities[index].referenceCount;
+#if PRINT_REFERENCE
+                if (Is(value)) {
+                    logger.debug($"===================== Alloc重复 {index} : {entities[index]}");
+                }
+#endif
                 return index;
             }
             if (pool.Count > 0) {
@@ -51,7 +62,13 @@ namespace Scorpio.Tools {
                     entities = newEntities;
                 }
             }
+            object2index[value.Id] = index;
             entities[index] = new Entity(value, 1);
+#if PRINT_REFERENCE
+            if (Is(value)) {
+                logger.debug($"===================== Alloc新 {index} : {entities[index]}");
+            }
+#endif
             return index;
         }
         public static void Free(int index) {
@@ -59,15 +76,19 @@ namespace Scorpio.Tools {
                 //添加到待释放列表
                 freeIndex.Add(index);
             }
-            //if (entities[index].value is ScriptMapObject) {
-            //    logger.debug("Free  ===================== ");
-            //}
+#if PRINT_REFERENCE
+            if (Is(entities[index].value)) {
+                logger.debug($"===================== Free  {index} : {entities[index]}");
+            }
+#endif
         }
         public static void Reference(int index) {
             ++entities[index].referenceCount;
-            //if (entities[index].value is ScriptMapObject) {
-            //    logger.debug("Reference  ===================== ");
-            //}
+#if PRINT_REFERENCE
+            if (Is(entities[index].value)) {
+                logger.debug($"===================== Reference {index} : {entities[index]}");
+            }
+#endif
         }
         public static ScriptObject GetValue(int index) {
             return entities[index].value;
@@ -75,17 +96,24 @@ namespace Scorpio.Tools {
         //释放
         public static bool ReleaseAll() {
             var isReleased = false;
-            for (var i = 0; i < freeIndex.Count; ++i) {
-                var index = freeIndex[i];
-                if (entities[index].referenceCount == 0) {
-                    object2index.Remove(entities[index].value.Id);
-                    entities[index].value.Free();
-                    pool.Enqueue(index);
-                    entities[index] = DefaultEntity;
-                    isReleased = true;
+            if (freeIndex.Count > 0) {
+                for (var i = 0; i < freeIndex.Count; ++i) {
+                    var index = freeIndex[i];
+                    if (entities[index].referenceCount == 0) {
+#if PRINT_REFERENCE
+                        if (Is(entities[index].value)) {
+                            logger.debug($"============Release : {index} : {entities[index]}");
+                        }
+#endif
+                        object2index.Remove(entities[index].value.Id);
+                        entities[index].value.Free();
+                        pool.Enqueue(index);
+                        entities[index] = DefaultEntity;
+                        isReleased = true;
+                    }
                 }
+                freeIndex.Clear();
             }
-            freeIndex.Clear();
             return isReleased;
         }
         public static void Check(Action<int, Entity> action) {

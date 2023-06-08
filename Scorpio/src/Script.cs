@@ -243,8 +243,11 @@ namespace Scorpio
         //    Global.SetValue(key, value);
         //}
         public void SetGlobal(string key, ScriptObject value) {
-            using (var scriptValue = new ScriptValue(value)) {
-                Global.SetValue(key, scriptValue);
+            SetGlobal(key, new ScriptValue(value));
+        }
+        public void SetGlobal(string key, ScriptValue value) {
+            using (value) {
+                Global.SetValue(key, value);
             }
         }
         /// <summary> 获得一个全局变量 </summary>
