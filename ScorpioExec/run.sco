@@ -1,10 +1,30 @@
-TestClass = importType("TestClass")
-var a = {
-    Update() {
-        print("fffff")
-    }
+// tab = {
+//     www = 1,
+// }
+// async function timer(s, f) {
+//     await sleep(s)
+//     f()
+// }
+// function init() {
+//     print(tab.containsKey(""))
+// }
+// function main() {
+//     var a = [1]
+//     foreach (var pair in pairs(a)) {
+//         timer(1, () => {
+//             tab = {
+
+//             }
+//             init()
+//         })
+//     }
+// }
+// main()
+function aaa() {
+
 }
-print(TestClass.AddComponent(a))
+print(aaa)
+
 // async function main1() {
 //     await sleep(10)
 //     return 100

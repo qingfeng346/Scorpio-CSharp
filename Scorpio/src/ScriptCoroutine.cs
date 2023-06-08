@@ -32,7 +32,8 @@ namespace Scorpio {
         public void StopAllCoroutine() {
             m_DelCoroutines.AddRange(m_Coroutines);
         }
-        public bool UpdateCoroutine() {
+        //UpdateCoroutine 必须在 ReleaseAll前面
+        private bool UpdateCoroutine() {
             if (m_DelCoroutines.Count > 0) {
                 var length = m_DelCoroutines.Count;
                 for (var i = 0; i < length; ++i) {
@@ -51,6 +52,13 @@ namespace Scorpio {
                 coroutine.UpdateCoroutine();
             }
             return m_Coroutines.Count > 0;
+        }
+        public bool Update() {
+            if (UpdateCoroutine()) {
+                ReleaseAll();
+                return true;
+            }
+            return false;
         }
     }
 }

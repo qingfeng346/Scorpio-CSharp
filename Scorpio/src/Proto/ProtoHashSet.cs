@@ -160,10 +160,12 @@ namespace Scorpio.Proto {
         private class convertAll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptHashSet>();
-                var ret = new ScriptHashSet(array.getScript());
+                var ret = array.script.NewHashSet();
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var value in array) {
-                    ret.Add(func.Call(value));
+                    using (var v = func.Call(value)) {
+                        ret.Add(func.Call(value));
+                    }
                 }
                 return new ScriptValue(ret);
             }

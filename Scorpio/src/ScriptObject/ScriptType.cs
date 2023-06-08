@@ -1,4 +1,5 @@
 using Scorpio.Exception;
+using Scorpio.Tools;
 using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
@@ -24,14 +25,8 @@ namespace Scorpio {
         public override void Free() {
             m_PrototypeValue.Free();
             m_Prototype = null;
-            foreach (var pair in m_Values) {
-                pair.Value.Free();
-            }
-            foreach (var pair in m_GetProperties) {
-                pair.Value.Free();
-            }
-            m_Values.Clear();
-            m_GetProperties.Clear();
+            m_Values.Free();
+            m_GetProperties.Free();
         }
         public void AddGetProperty(string key, ScriptFunction function) {
             if (m_GetProperties.TryGetValue(key, out var result)) {
@@ -71,7 +66,7 @@ namespace Scorpio {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             var instance = m_Script.NewInstance();
             using (var value = new ScriptValue(this)) {
-                instance.Set(value);
+                instance.SetPrototypeValue(value);
             }
             var ret = new ScriptValue(instance);
             var constructor = GetValue(ScriptOperator.Constructor).Get<ScriptFunction>();
@@ -91,7 +86,7 @@ namespace Scorpio {
         }
         public override ScriptFunction EqualFunction => m_EqualFunction;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return new ScriptValue(m_Script.NewInstance().Set(script.TypeObjectValue));
+            return new ScriptValue(m_Script.NewInstance().SetPrototypeValue(script.TypeObjectValue));
         }
         public override ScriptValue GetValueNoDefault(string key) {
             return ScriptValue.Null;

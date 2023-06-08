@@ -10,7 +10,7 @@ namespace Scorpio {
         protected ScriptType m_Prototype = null;
         public ScriptInstance(Script script) : base(script, ObjectType.Instance) { }
         public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) { }
-        public ScriptInstance Set(ScriptValue prototypeValue) {
+        public ScriptInstance SetPrototypeValue(ScriptValue prototypeValue) {
             m_PrototypeValue.CopyFrom(prototypeValue);
             m_Prototype = prototypeValue.Get<ScriptType>();
             return this;

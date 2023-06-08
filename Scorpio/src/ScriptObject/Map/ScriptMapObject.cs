@@ -10,6 +10,9 @@ namespace Scorpio {
         public ScriptMapObject(Script script) : base(script) { }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
+        public override void Alloc() {
+            SetPrototypeValue(script.TypeMapValue);
+        }
         public override void Free() {
             Release();
             Clear();

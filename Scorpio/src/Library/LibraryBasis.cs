@@ -217,7 +217,7 @@ namespace Scorpio.Library
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
-                var itorResult = m_script.NewMapObject();  
+                var itorResult = m_script.NewMapObject();
                 if (obj is ScriptArray) {
                     itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, (ScriptArray)obj)));
                 } else if (obj is ScriptMapObject) {

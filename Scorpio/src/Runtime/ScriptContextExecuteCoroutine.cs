@@ -21,7 +21,7 @@ namespace Scorpio.Runtime {
 #endif
 
 #if SCORPIO_DEBUG
-            System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
+            //System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
             if (VariableValueIndex < 0 || VariableValueIndex >= ValueCacheLength) {
                 throw new ExecutionException($"Stack overflow : {VariableValueIndex}");
             }
@@ -259,7 +259,12 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.StoreGlobalString: {
-                                m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
+                                var globalValue = stackObjects[stackIndex--];
+                                var function = globalValue.Get<ScriptFunction>();
+                                if (function != null) {
+                                    function.FunctionName = constString[opvalue];
+                                }
+                                m_global.SetValue(constString[opvalue], globalValue);
                                 instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
                                 continue;
                             }
@@ -1364,15 +1369,15 @@ namespace Scorpio.Runtime {
                             }
 #else
                             case Opcode.TryTo: {
-                                    tryStack[++tryIndex] = opvalue;
-                                    continue;
-                                }
-                                case Opcode.TryEnd: {
-                                    iInstruction = opvalue;
-                                    --tryIndex;
-                                    continue;
-                                }
-    #endif
+                                tryStack[++tryIndex] = opvalue;
+                                continue;
+                            }
+                            case Opcode.TryEnd: {
+                                iInstruction = opvalue;
+                                --tryIndex;
+                                continue;
+                            }
+#endif
                             #endregion
                             #region New
                             case Opcode.NewMap: {

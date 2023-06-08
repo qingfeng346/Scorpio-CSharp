@@ -14,9 +14,9 @@ namespace Scorpio.Tools {
             }
             public override string ToString() {
                 try {
-                    return $"{value.Id}:{value}  引用计数:{referenceCount}";
+                    return $"ID:{value?.Id}  {value}  引用计数:{referenceCount}";
                 } catch (System.Exception) {
-                    return $"{value.Id}:{value.GetType()}:  引用计数:{referenceCount}";
+                    return $"ID:{value?.Id}  {value.GetType()}:  引用计数:{referenceCount}";
                 }
                 
             }
@@ -35,9 +35,11 @@ namespace Scorpio.Tools {
             length = 0;
         }
 #if PRINT_REFERENCE
-        static bool Is(ScriptObject value) {
-            if (value is ScriptMapObject) {
-                return ((ScriptMapObject)value).ContainsKey("Update");
+        static bool Is(int index, Entity entity) {
+            //return index == 296;
+            if (entity.value is ScriptMapObject) {
+                return true;
+                //return ((ScriptMapObject)entity.value).ContainsKey("www");
             }
             return false;
         }
@@ -46,8 +48,8 @@ namespace Scorpio.Tools {
             if (object2index.TryGetValue(value.Id, out var index)) {
                 ++entities[index].referenceCount;
 #if PRINT_REFERENCE
-                if (Is(value)) {
-                    logger.debug($"===================== Alloc重复 {index} : {entities[index]}");
+                if (Is(index, entities[index])) {
+                    logger.debug($"===================== Alloc重复  Index:{index} - {entities[index]}");
                 }
 #endif
                 return index;
@@ -62,11 +64,11 @@ namespace Scorpio.Tools {
                     entities = newEntities;
                 }
             }
-            object2index[value.Id] = index;
+            object2index.Add(value.Id, index);
             entities[index] = new Entity(value, 1);
 #if PRINT_REFERENCE
-            if (Is(value)) {
-                logger.debug($"===================== Alloc新 {index} : {entities[index]}");
+            if (Is(index, entities[index])) {
+                logger.debug($"===================== Alloc新  Index:{index} - {entities[index]}");
             }
 #endif
             return index;
@@ -77,16 +79,16 @@ namespace Scorpio.Tools {
                 freeIndex.Add(index);
             }
 #if PRINT_REFERENCE
-            if (Is(entities[index].value)) {
-                logger.debug($"===================== Free  {index} : {entities[index]}");
+            if (Is(index, entities[index])) {
+                logger.debug($"===================== Free  Index:{index} - {entities[index]}");
             }
 #endif
         }
         public static void Reference(int index) {
             ++entities[index].referenceCount;
 #if PRINT_REFERENCE
-            if (Is(entities[index].value)) {
-                logger.debug($"===================== Reference {index} : {entities[index]}");
+            if (Is(index, entities[index])) {
+                logger.debug($"===================== Reference  Index:{index} - {entities[index]}");
             }
 #endif
         }
@@ -101,8 +103,8 @@ namespace Scorpio.Tools {
                     var index = freeIndex[i];
                     if (entities[index].referenceCount == 0) {
 #if PRINT_REFERENCE
-                        if (Is(entities[index].value)) {
-                            logger.debug($"============Release : {index} : {entities[index]}");
+                        if (Is(index, entities[index])) {
+                            logger.debug($"============Release  Index:{index} - {entities[index]}");
                         }
 #endif
                         object2index.Remove(entities[index].value.Id);

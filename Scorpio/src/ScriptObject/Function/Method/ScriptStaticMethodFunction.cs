@@ -5,6 +5,7 @@ namespace Scorpio.Function {
             return ScriptValue.CreateValue(m_Script, Method.Call(m_Script, true, null, parameters, length));
         }
         public override void Free() {
+            Method = null;
             m_Script.Free(this);
         }
     }

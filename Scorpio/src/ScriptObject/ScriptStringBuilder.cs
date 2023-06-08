@@ -3,8 +3,14 @@ using System.Text;
 namespace Scorpio {
     public class ScriptStringBuilder : ScriptInstance {
         public StringBuilder Builder { get; } = new StringBuilder();
-        public ScriptStringBuilder(Script script) : base(script, ObjectType.StringBuilder) {
-            Set(script.TypeStringBuilderValue);
+        public ScriptStringBuilder(Script script) : base(script, ObjectType.StringBuilder) { }
+        public override void Alloc() {
+            SetPrototypeValue(script.TypeStringBuilderValue);
+        }
+        public override void Free() {
+            Release();
+            Builder.Clear();
+            m_Script.Free(this);
         }
         public override ScriptValue GetValue(double index) {
             return new ScriptValue(Builder[(int)index]);

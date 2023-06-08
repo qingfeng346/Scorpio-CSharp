@@ -386,7 +386,7 @@ namespace Scorpio
             using (var stream = File.OpenRead(fullFileName)) {
                 var buffer = new byte[stream.Length];
                 stream.ReadBytes(buffer);
-                return LoadBuffer(fileName, buffer, compileOption);
+                return LoadBuffer(true, fileName, buffer, 0, buffer.Length, compileOption);
             }
         }
         /// <summary> 加载一段数据 </summary>
@@ -411,6 +411,10 @@ namespace Scorpio
         }
         /// <summary> 加载一段数据 </summary>
         public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count, CompileOption compileOption) {
+            return LoadBuffer(false, breviary, buffer, index, count, compileOption);
+        }
+        /// <summary> 加载一段数据 </summary>
+        private ScriptValue LoadBuffer(bool isFile, string breviary, byte[] buffer, int index, int count, CompileOption compileOption) {
             if (count <= 0) { 
                 return ScriptValue.Null;
             } else if (count > 6 && buffer[index] == 0 && BitConverter.ToInt32(buffer, index + 1) == int.MaxValue) {

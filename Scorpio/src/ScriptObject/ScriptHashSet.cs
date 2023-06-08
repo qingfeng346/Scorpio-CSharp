@@ -9,12 +9,12 @@ namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
         private static List<ScriptValue> tempList = new List<ScriptValue>();
         public HashSet<ScriptValue> m_Objects = new HashSet<ScriptValue>();
-        public ScriptHashSet(Script script) : base(script, ObjectType.HashSet) {
-            Set(script.TypeHashSetValue);
-        }
+        public ScriptHashSet(Script script) : base(script, ObjectType.HashSet) { }
         public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
-        public Script getScript() { return m_Script; }
+        public override void Alloc() {
+            SetPrototypeValue(script.TypeHashSetValue);
+        }
         public override void Free() {
             Release();
             Clear();

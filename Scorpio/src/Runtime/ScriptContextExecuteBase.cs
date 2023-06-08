@@ -259,7 +259,12 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.StoreGlobalString: {
-                                m_global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
+                                var globalValue = stackObjects[stackIndex--];
+                                var function = globalValue.Get<ScriptFunction>();
+                                if (function != null) {
+                                    function.FunctionName = constString[opvalue];
+                                }
+                                m_global.SetValue(constString[opvalue], globalValue);
                                 instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
                                 continue;
                             }
@@ -1364,15 +1369,15 @@ namespace Scorpio.Runtime {
                             }
 #else
                             case Opcode.TryTo: {
-                                    tryStack[++tryIndex] = opvalue;
-                                    continue;
-                                }
-                                case Opcode.TryEnd: {
-                                    iInstruction = opvalue;
-                                    --tryIndex;
-                                    continue;
-                                }
-    #endif
+                                tryStack[++tryIndex] = opvalue;
+                                continue;
+                            }
+                            case Opcode.TryEnd: {
+                                iInstruction = opvalue;
+                                --tryIndex;
+                                continue;
+                            }
+#endif
                             #endregion
                             #region New
                             case Opcode.NewMap: {

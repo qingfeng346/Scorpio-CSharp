@@ -230,14 +230,11 @@ namespace ScorpioExec
                     var watch = Stopwatch.StartNew ();
                     var ret = "";
                     using (var value = script.LoadFile(file, ParseOption(command.GetValueDefault(ParameterOption, ""), script.SearchPaths))) {
-                        ret = value.ToString ();
+                        ret = value.ToString();
                     }
-                    while (script.UpdateCoroutine()) { TestClass.Update(); }
-                    //while (true) {
-                    //    script.ReleaseAll();
-                    //    script.UpdateCoroutine();
-                    //    TestClass.Update();
-                    //}
+                    while (script.Update()) {
+                        TestClass.Update();
+                    }
                     script.Shutdown();
                     script.ReleaseAll();
                     StringReference.Check((i, entity) => {
