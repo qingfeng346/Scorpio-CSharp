@@ -25,6 +25,9 @@ namespace Scorpio {
             public void Dispose() { m_Enumerator.Dispose(); }
         }
         public ScriptMapString(Script script) : base(script) { }
+        public override void Alloc() {
+            SetPrototypeValue(script.TypeMapValue);
+        }
         public override void Free() {
             Release();
             Clear();

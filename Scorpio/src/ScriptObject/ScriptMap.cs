@@ -3,7 +3,6 @@ namespace Scorpio {
     //脚本map类型
     public abstract class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
         public ScriptMap(Script script) : base(script, ObjectType.Map) { }
-        public Script getScript() { return m_Script; }
         public abstract new IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator();
         public abstract bool ContainsKey(object key);
         public abstract bool ContainsValue(ScriptValue value);
