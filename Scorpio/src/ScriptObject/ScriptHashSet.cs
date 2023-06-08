@@ -63,7 +63,7 @@ namespace Scorpio {
                 Remove(element);
             }
         }
-        //返回两个集合内重复的元素
+        //两个集合内重复的元素
         public void IntersectWith(IEnumerable<ScriptValue> other) {
             tempList.Clear();
             foreach (var element in m_Objects) {
@@ -75,7 +75,7 @@ namespace Scorpio {
                 Remove(tempList[i]);
             }
         }
-        //返回两个集合内不重复的所有元素
+        //两个集合内不重复的所有元素
         public void SymmetricExceptWith(IEnumerable<ScriptValue> other) {
             tempList.Clear();
             foreach (var element in other) {
