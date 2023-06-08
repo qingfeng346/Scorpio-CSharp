@@ -1,11 +1,6 @@
-var a = new HashSet()
-var b = new HashSet()
-a.unionWith([1,2,3,4,5])
-b.unionWith([2,3,8])
-// a.symmetricExceptWith(b)
-a.exceptWith(b)
-print(a)
-
+foreach (var a in pairs(_G)) {
+    print(a.key, a.value)
+}
 // a.a = 100
 // a.b = []
 // c# 重载 [] 的类 可以直接使用 [] 操作

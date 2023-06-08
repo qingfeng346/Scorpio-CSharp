@@ -239,14 +239,14 @@ namespace Scorpio {
         }
         public ScriptValue PopLast() {
             if (m_Length <= 0)  throw new ExecutionException($"Array.PopLast 数组长度为0");
-            using var ret = m_Objects[--m_Length];
-            return ret;
+            using (var ret = m_Objects[--m_Length])
+                return ret;
         }
         public ScriptValue SafePopLast() {
             if (m_Length == 0)
                 return ScriptValue.Null;
-            using var ret = m_Objects[--m_Length];
-            return ret;
+            using (var ret = m_Objects[--m_Length])
+                return ret;
         }
         //仅限于number和string
         public T[] ToArray<T>() {

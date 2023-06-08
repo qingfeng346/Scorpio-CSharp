@@ -24,10 +24,9 @@ namespace Scorpio.Library
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    using (var key = ScriptValue.CreateValue(script, value.Key)) {
+                    using (var key = ScriptValue.CreateValue(script, value.Key))
                         m_ItorResult.SetValue("key", key);
-                        m_ItorResult.SetValue("value", value.Value);
-                    }
+                    m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;
@@ -94,22 +93,8 @@ namespace Scorpio.Library
                 return ScriptValue.False;
             }
         }
-        private class GlobalPairs : ScorpioHandle {
-            readonly ScriptMap m_ItorResult;
-            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
-            public GlobalPairs(ScriptMap itorResult, ScriptGlobal global) {
-                m_Enumerator = global.GetEnumerator();
-                m_ItorResult = itorResult;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (m_Enumerator.MoveNext()) {
-                    var value = m_Enumerator.Current;
-                    m_ItorResult.SetValue("key", new ScriptValue(value.Key));
-                    m_ItorResult.SetValue("value", value.Value);
-                    return ScriptValue.True;
-                }
-                return ScriptValue.False;
-            }
+        private class GlobalPairs : KeyValuePairs<string> {
+            public GlobalPairs(Script script, ScriptMap itorResult, ScriptGlobal global) : base(script, itorResult, global.GetEnumerator()) { }
         }
         public static void Load(Script script) {
             script.SetGlobal("print", script.CreateFunction(new print(script)));
@@ -131,33 +116,32 @@ namespace Scorpio.Library
             script.SetGlobal("isType", script.CreateFunction(new isType()));
             script.SetGlobal("isInstance", script.CreateFunction(new isInstance()));
 
-            //script.SetGlobal("toInt8", script.CreateFunction(new toInt8()));
-            //script.SetGlobal("toUint8", script.CreateFunction(new toUint8()));
-            //script.SetGlobal("toInt16", script.CreateFunction(new toInt16()));
-            //script.SetGlobal("toUint16", script.CreateFunction(new toUint16()));
+            script.SetGlobal("toInt8", script.CreateFunction(new toNumber<sbyte>()));
+            script.SetGlobal("toUint8", script.CreateFunction(new toNumber<byte>()));
+            script.SetGlobal("toInt16", script.CreateFunction(new toNumber<short>()));
+            script.SetGlobal("toUint16", script.CreateFunction(new toNumber<ushort>()));
             script.SetGlobal("toInt32", script.CreateFunction(new toInt32()));
-            //script.SetGlobal("toUint32", script.CreateFunction(new toUint32()));
-            //script.SetGlobal("toInt64", script.CreateFunction(new toInt64()));
-            //script.SetGlobal("toUint64", script.CreateFunction(new toUint64()));
+            script.SetGlobal("toUint32", script.CreateFunction(new toNumber<uint>()));
+            script.SetGlobal("toInt64", script.CreateFunction(new toInt64()));
+            script.SetGlobal("toUint64", script.CreateFunction(new toNumber<ulong>()));
+            script.SetGlobal("toFloat32", script.CreateFunction(new toNumber<float>()));
+            script.SetGlobal("toFloat64", script.CreateFunction(new toDouble()));
 
-            //script.SetGlobal("toSbyte", script.CreateFunction(new toInt8()));
-            //script.SetGlobal("toByte", script.CreateFunction(new toUint8()));
-            //script.SetGlobal("toShort", script.CreateFunction(new toInt16()));
-            //script.SetGlobal("toUshort", script.CreateFunction(new toUint16()));
+            script.SetGlobal("toSbyte", script.CreateFunction(new toNumber<sbyte>()));
+            script.SetGlobal("toByte", script.CreateFunction(new toNumber<byte>()));
+            script.SetGlobal("toShort", script.CreateFunction(new toNumber<short>()));
+            script.SetGlobal("toUshort", script.CreateFunction(new toNumber<ushort>()));
             script.SetGlobal("toInt", script.CreateFunction(new toInt32()));
-            //script.SetGlobal("toUint", script.CreateFunction(new toUint32()));
-            //script.SetGlobal("toLong", script.CreateFunction(new toInt64()));
-            //script.SetGlobal("toUlong", script.CreateFunction(new toUint64()));
+            script.SetGlobal("toUint", script.CreateFunction(new toNumber<uint>()));
+            script.SetGlobal("toLong", script.CreateFunction(new toInt64()));
+            script.SetGlobal("toUlong", script.CreateFunction(new toNumber<ulong>()));
+            script.SetGlobal("toFloat", script.CreateFunction(new toNumber<float>()));
+            script.SetGlobal("toDouble", script.CreateFunction(new toDouble()));
 
             script.SetGlobal("toBool", script.CreateFunction(new toBoolean()));
             script.SetGlobal("toBoolean", script.CreateFunction(new toBoolean()));
             script.SetGlobal("toChar", script.CreateFunction(new toChar()));
-
-            //script.SetGlobal("toFloat", script.CreateFunction(new toFloat()));
-            //script.SetGlobal("toDecimal", script.CreateFunction(new toDecimal()));
-
             script.SetGlobal("toNumber", script.CreateFunction(new toDouble()));
-            script.SetGlobal("toDouble", script.CreateFunction(new toDouble()));
 
             script.SetGlobal("toEnum", script.CreateFunction(new toEnum(script)));
             script.SetGlobal("toString", script.CreateFunction(new toString()));
@@ -249,7 +233,7 @@ namespace Scorpio.Library
                 } else if (obj is ScriptType) {
                     itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new TypePairs(m_script, itorResult, (ScriptType)obj)));
                 } else if (obj is ScriptGlobal) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new GlobalPairs(itorResult, (ScriptGlobal)obj)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new GlobalPairs(m_script, itorResult, (ScriptGlobal)obj)));
                 } else {
                     throw new ExecutionException("pairs 必须用于 array, map, type, global 或者 继承 IEnumerable 的 userdata 类型");
                 }
@@ -330,79 +314,14 @@ namespace Scorpio.Library
                 return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue.GetType() == typeof(ScriptInstance)) ? ScriptValue.True : ScriptValue.False;
             }
         }
-
-
-        //private class toInt8 : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((sbyte)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue((sbyte)args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToSByte(args[0].Value));
-        //        }
-        //    }
-        //}
-        //private class toUint8 : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((byte)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue((byte)args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToByte(args[0].Value));
-        //        }
-        //    }
-        //}
-        //private class toInt16 : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((short)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue((short)args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToInt16(args[0].Value));
-        //        }
-        //    }
-        //}
-        //private class toUint16 : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((ushort)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue((ushort)args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToUInt16(args[0].Value));
-        //        }
-        //    }
-        //}
-        private class toInt32 : ScorpioHandle {
+        public class toNumber<T> : ScorpioHandle where T : struct, IConvertible {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(args[0].ToInt32());
+                return ScriptValue.CreateNumber(args[0].ToNumber<T>());
             }
         }
-        //private class toUint32 : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((uint)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue((uint)args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToUInt32(args[0].Value));
-        //        }
-        //    }
-        //}
-        //private class toInt64 : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((long)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue(args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToInt64(args[0].Value));
-        //        }
-        //    }
-        //}
-        //private class toUint64 : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((ulong)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue((ulong)args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToUInt64(args[0].Value));
-        //        }
-        //    }
-        //}
         private class toBoolean : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Convert.ToBoolean(args[0].Value));
+                return Convert.ToBoolean(args[0].Value) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class toChar : ScorpioHandle {
@@ -410,32 +329,19 @@ namespace Scorpio.Library
                 return new ScriptValue(args[0].ToChar());
             }
         }
-
-        //private class toFloat : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((float)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue((float)args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToSingle(args[0].Value));
-        //        }
-        //    }
-        //}
-        //private class toDecimal : ScorpioHandle {
-        //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-        //        switch (args[0].valueType) {
-        //            case ScriptValue.doubleValueType: return new ScriptValue((decimal)args[0].doubleValue);
-        //            case ScriptValue.int64ValueType: return new ScriptValue((decimal)args[0].longValue);
-        //            default: return new ScriptValue(Convert.ToDecimal(args[0].Value));
-        //        }
-        //    }
-        //}
+        private class toInt32 : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(args[0].ToInt32());
+            }
+        }
+        private class toInt64 : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(args[0].ToLong());
+            }
+        }
         private class toDouble : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                switch (args[0].valueType) {
-                    case ScriptValue.doubleValueType: return new ScriptValue(args[0].doubleValue);
-                    case ScriptValue.int64ValueType: return new ScriptValue((double)args[0].longValue);
-                    default: return new ScriptValue(Convert.ToDouble(args[0].Value));
-                }
+                return new ScriptValue(args[0].ToDouble());
             }
         }
         private class toEnum : ScorpioHandle {
@@ -446,7 +352,7 @@ namespace Scorpio.Library
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var type = args[0].Get<ScriptUserdataEnumType>();
                 if (args[1].valueType == ScriptValue.stringValueType) {
-                    var ignoreCase = length > 2 ? args[2].valueType == ScriptValue.trueValueType : false;
+                    var ignoreCase = length > 2 ? args[2].valueType == ScriptValue.trueValueType : true;
                     return ScriptValue.CreateValue(script, Enum.Parse(type.Type, args[1].stringValue, ignoreCase));
                 } else {
                     return ScriptValue.CreateValue(script, Enum.ToObject(type.Type, args[1].ToLong()));

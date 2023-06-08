@@ -23,7 +23,7 @@ namespace Scorpio.Tools {
         public static void Clear() {
             object2index.Clear();
             pool.Clear();
-            Array.Clear(entities);
+            Array.Clear(entities, 0, entities.Length);
             freeIndex.Clear();
             length = 0;
         }

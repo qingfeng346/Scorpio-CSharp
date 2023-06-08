@@ -45,26 +45,26 @@ namespace Scorpio {
         public const int OperatorCount = 17;
 
         public static string GetOperatorByIndex(int index) {
-            return index switch {
-                PlusIndex => "+",
-                MinusIndex => "-",
-                MultiplyIndex => "*",
-                DivideIndex => "/",
-                ModuloIndex => "%",
-                InclusiveOrIndex => "|",
-                CombineIndex => "&",
-                XORIndex => "^",
-                ShiIndex => "<<",
-                ShrIndex => ">>",
-                GreaterIndex => ">",
-                GreaterOrEqualIndex => ">=",
-                LessIndex => "<",
-                LessOrEqualIndex => "<=",
-                EqualIndex => "==",
-                GetItemIndex => "[] get",
-                SetItemIndex => "[] set",
-                _ => throw new ExecutionException($"未知的运算符索引 : {index}")
-            };
+            switch (index) {
+                case PlusIndex: return "+";
+                case MinusIndex: return "-";
+                case MultiplyIndex: return "*";
+                case DivideIndex: return "/";
+                case ModuloIndex: return "%";
+                case InclusiveOrIndex: return "|";
+                case CombineIndex: return "&";
+                case XORIndex: return "^";
+                case ShiIndex: return "<<";
+                case ShrIndex: return ">>";
+                case GreaterIndex: return ">";
+                case GreaterOrEqualIndex: return ">=";
+                case LessIndex: return "<";
+                case LessOrEqualIndex: return "<=";
+                case EqualIndex: return "==";
+                case GetItemIndex: return "[] get";
+                case SetItemIndex: return "[] set";
+                default: throw new ExecutionException($"未知的运算符索引 : {index}");
+            }
         }
 
         public const string Plus = "op_Addition";                       //运算符重载 +

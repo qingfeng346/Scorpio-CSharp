@@ -14,6 +14,7 @@ namespace Scorpio
             m_Value = name;
         }
         public override void Free() {
+            m_Objects.Free();
         }
         public override ScriptValue GetValue(string key) {
             if (m_Objects.TryGetValue(key, out var value))

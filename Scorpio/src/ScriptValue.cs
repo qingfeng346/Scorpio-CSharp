@@ -158,12 +158,6 @@ namespace Scorpio
                 ScriptObjectReference.Reference(_index);
             }
         }
-        public ScriptValue(bool value) {
-            this._valueType = value ? trueValueType : falseValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = 0;
-        }
         public ScriptValue(double value) {
             this._valueType = doubleValueType;
             this._index = 0;
@@ -198,7 +192,24 @@ namespace Scorpio
                 this._index = ScriptObjectReference.Alloc(value);
             }
         }
-
+        internal ScriptValue(char value) {
+            this._valueType = charValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        internal ScriptValue(int value) {
+            this._valueType = int32ValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = value;
+        }
+        private ScriptValue(bool value) {
+            this._valueType = value ? trueValueType : falseValueType;
+            this._index = 0;
+            this._doubleValue = 0;
+            this._longValue = 0;
+        }
         private ScriptValue(sbyte value) {
             this._valueType = int8ValueType;
             this._index = 0;
@@ -223,12 +234,6 @@ namespace Scorpio
             this._doubleValue = 0;
             this._longValue = value;
         }
-        internal ScriptValue(int value) {
-            this._valueType = int32ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
-        }
         private ScriptValue(uint value) {
             this._valueType = uint32ValueType;
             this._index = 0;
@@ -240,12 +245,6 @@ namespace Scorpio
             this._index = 0;
             this._doubleValue = 0;
             this._longValue = (long)value;
-        }
-        internal ScriptValue(char value) {
-            this._valueType = charValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
         }
         private ScriptValue(float value) {
             this._valueType = floatValueType;
@@ -477,6 +476,25 @@ namespace Scorpio
                 }
             }
         }
+        public T ToNumber<T>() where T : struct, IConvertible {
+            switch (valueType) {
+                case floatValueType:
+                case doubleValueType:
+                    return (T)Convert.ChangeType(_doubleValue, typeof(T));
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case int64ValueType:
+                case uint64ValueType:
+                case charValueType:
+                    return (T)Convert.ChangeType(_longValue, typeof(T));
+                default:
+                    return (T)Convert.ChangeType(Value, typeof(T));
+            }
+        }
         public int ToInt32() {
             switch (valueType) {
                 case floatValueType:
@@ -492,7 +510,8 @@ namespace Scorpio
                 case uint64ValueType:
                 case charValueType:
                     return (int)_longValue;
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 int32");
+                default:
+                    return Convert.ToInt32(Value);
             }
         }
         public double ToDouble() {
@@ -510,7 +529,8 @@ namespace Scorpio
                 case uint64ValueType:
                 case charValueType:
                     return _longValue;
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 double");
+                default:
+                    return Convert.ToDouble(Value);
             }
         }
         public long ToLong() {
@@ -528,7 +548,8 @@ namespace Scorpio
                 case uint64ValueType:
                 case charValueType:
                     return _longValue;
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 long");
+                default:
+                    return Convert.ToInt64(Value);
             }
         }
         public char ToChar() {
@@ -536,8 +557,6 @@ namespace Scorpio
                 case floatValueType:
                 case doubleValueType:
                     return (char)_doubleValue;
-                case stringValueType:
-                    return stringValue[0];
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -548,15 +567,15 @@ namespace Scorpio
                 case uint64ValueType:
                 case charValueType:
                     return (char)_longValue;
-                default: throw new ExecutionException($"类型[{ValueTypeName}]不支持转换为 char");
+                case stringValueType:
+                    return stringValue[0];
+                default:
+                    return Convert.ToChar(Value);
             }
         }
         public T Get<T>() where T : ScriptObject {
             return valueType == scriptValueType ? (scriptValue as T) : null;
         }
-        //public ScriptObject Get() {
-        //    return valueType == scriptValueType ? scriptValue : null;
-        //}
         public bool IsNull => valueType == nullValueType;
         public bool IsTrue => valueType == trueValueType;
         public bool IsFalse => valueType == falseValueType;
@@ -681,6 +700,33 @@ namespace Scorpio
             else if (value is IList)
                 return new ScriptValue(script.NewUserdataArray().Set(script.GetUserdataType(value.GetType()), (IList)value));
             return new ScriptValue(script.NewUserdataObject().Set(script.GetUserdataType(value.GetType()), value));
+        }
+        public static ScriptValue CreateNumber(object value) {
+            if (value is double)
+                return new ScriptValue((double)value);
+            else if (value is long)
+                return new ScriptValue((long)value);
+            else if (value is char)
+                return new ScriptValue((char)value);
+            else if (value is int)
+                return new ScriptValue((int)value);
+            else if (value is char)
+                return new ScriptValue((char)value);
+            else if (value is sbyte)
+                return new ScriptValue((sbyte)value);
+            else if (value is byte)
+                return new ScriptValue((byte)value);
+            else if (value is short)
+                return new ScriptValue((short)value);
+            else if (value is ushort)
+                return new ScriptValue((ushort)value);
+            else if (value is uint)
+                return new ScriptValue((uint)value);
+            else if (value is ulong)
+                return new ScriptValue((ulong)value);
+            else if (value is float)
+                return new ScriptValue((float)value);
+            throw new ExecutionException($"未知的Number类型:{value?.GetType()?.FullName}");
         }
         public void Dispose() {
             Free();

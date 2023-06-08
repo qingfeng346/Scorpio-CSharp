@@ -37,11 +37,12 @@ namespace Scorpio {
         //ThisValue没有占用引用计数
         protected ScriptValue ThisValue {
             get {
-                using var ret = new ScriptValue(this);
-                return ret;
+                using (var ret = new ScriptValue(this))
+                    return ret;
             }
         }
-        
+
+        //SetValueByIndex GetValueByIndex 目前只有Global在用
         //获取变量
         public virtual ScriptValue GetValueByIndex(int key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : {key}"); }
         public virtual ScriptValue GetValue(string key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : {key}"); }

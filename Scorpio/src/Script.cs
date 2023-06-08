@@ -1,6 +1,7 @@
 /*
 Call返回值占用引用计数
 GetValue返回值不占用引用计数
+ICoroutineProcessor MoveNext 返回值占用引用计数
 */
 using System;
 using System.IO;
