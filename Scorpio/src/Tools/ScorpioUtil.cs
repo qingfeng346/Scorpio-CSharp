@@ -100,11 +100,9 @@ namespace Scorpio.Tools {
                 case ScriptValue.trueValueType: return true;
                 case ScriptValue.falseValueType: return false;
                 case ScriptValue.stringValueType: return value.stringValue;
-                //case ScriptValue.objectValueType: return value.objectValue;
                 case ScriptValue.scriptValueType: {
-                    if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom (type)) {
-                        return ScorpioDelegateFactoryManager.CreateDelegate (type, value.scriptValue);
-                    }
+                    if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom (type))
+                        return ScorpioDelegateFactoryManager.CreateDelegate (type, value);
                     return value.scriptValue.Value;
                 }
                 default:
@@ -121,13 +119,22 @@ namespace Scorpio.Tools {
                     return ReferenceEquals(type, TYPE_BOOL);
                 case ScriptValue.doubleValueType:
                 case ScriptValue.int64ValueType:
-                    return type.IsPrimitive;
+                    return type.IsPrimitive || type.IsEnum;
                 case ScriptValue.stringValueType:
                     return ReferenceEquals(type, TYPE_STRING);
-                //case ScriptValue.objectValueType:
-                //    return type.IsAssignableFrom (value.objectValue.GetType ());
-                default:
-                    return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
+                case ScriptValue.scriptValueType:
+                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom(value.scriptValue.ValueType);
+                case ScriptValue.floatValueType:
+                case ScriptValue.int8ValueType:
+                case ScriptValue.uint8ValueType:
+                case ScriptValue.int16ValueType:
+                case ScriptValue.uint16ValueType:
+                case ScriptValue.int32ValueType:
+                case ScriptValue.uint32ValueType:
+                case ScriptValue.uint64ValueType:
+                case ScriptValue.charValueType:
+                    return type.IsPrimitive || type.IsEnum;
+                default: return false;
             }
         }
         public static bool CanChangeType (this ScriptValue value, Type type) {
@@ -138,15 +145,25 @@ namespace Scorpio.Tools {
                     return ReferenceEquals(type, TYPE_BOOL);
                 case ScriptValue.doubleValueType:
                 case ScriptValue.int64ValueType:
-                    return type.IsPrimitive;
+                    return type.IsPrimitive || type.IsEnum;
                 case ScriptValue.stringValueType:
                     return ReferenceEquals(type, TYPE_STRING);
                 case ScriptValue.nullValueType:
                     return !type.IsValueType;
-                //case ScriptValue.objectValueType:
-                //    return type.IsAssignableFrom (value.objectValue.GetType ());
+                case ScriptValue.scriptValueType:
+                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom(value.scriptValue.ValueType);
+                case ScriptValue.floatValueType:
+                case ScriptValue.int8ValueType:
+                case ScriptValue.uint8ValueType:
+                case ScriptValue.int16ValueType:
+                case ScriptValue.uint16ValueType:
+                case ScriptValue.int32ValueType:
+                case ScriptValue.uint32ValueType:
+                case ScriptValue.uint64ValueType:
+                case ScriptValue.charValueType:
+                    return type.IsPrimitive || type.IsEnum;
                 default:
-                    return TYPE_DELEGATE.IsAssignableFrom (type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom (value.scriptValue.ValueType);
+                    return false;
             }
         }
         public static string GetParametersString(this ScriptValue[] parameters, int length) {

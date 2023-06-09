@@ -428,24 +428,23 @@ namespace Scorpio
         public object Value {
             get {
                 switch (valueType) {
-                    case floatValueType:
-                    case doubleValueType:
-                        return _doubleValue;
-                    case int8ValueType:
-                    case uint8ValueType:
-                    case int16ValueType:
-                    case uint16ValueType:
-                    case int32ValueType:
-                    case uint32ValueType:
-                    case int64ValueType:
-                    case uint64ValueType:
-                    case charValueType:
-                        return _longValue;
+                    case doubleValueType: return _doubleValue;
+                    case int64ValueType: return _longValue;
                     case nullValueType: return null;
                     case trueValueType: return true;
                     case falseValueType: return false;
                     case stringValueType: return stringValue;
-                    default: return scriptValue.Value;
+                    case scriptValueType: return scriptValue.Value;
+                    case floatValueType: return (float)_doubleValue;
+                    case int8ValueType: return (sbyte)_longValue;
+                    case uint8ValueType: return (byte)_longValue;
+                    case int16ValueType: return (short)_longValue;
+                    case uint16ValueType: return (ushort)_longValue;
+                    case int32ValueType: return (int)_longValue;
+                    case uint32ValueType: return (uint)_longValue;
+                    case uint64ValueType: return (ulong)_longValue;
+                    case charValueType: return (char)_longValue;
+                    default: throw new ExecutionException($"未知的数据类型 : {valueType}");
                 }
             }
         }

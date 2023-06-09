@@ -4,14 +4,27 @@ using System.Reflection;
 using System.Collections.Generic;
 using Scorpio.Tools;
 namespace Scorpio {
+    public class ScorpioDelegateReference {
+        private ScriptValue scriptValue;
+        public ScorpioDelegateReference(ScriptValue scriptValue) {
+            this.scriptValue = scriptValue.Reference();
+        }
+        ~ScorpioDelegateReference() {
+            scriptValue.Free();
+        }
+        public ScriptValue call(params object[] args) {
+            return scriptValue.call(ScriptValue.Null, args);
+        }
+    }
     public class ScorpioDelegateFactoryManager {
+        
 #if !SCORPIO_DYNAMIC_DELEGATE
         private static IScorpioDelegateFactory m_Factory = null;
         public static void SetFactory(IScorpioDelegateFactory factory) {
             m_Factory = factory;
         }
-        public static Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
-            return m_Factory.CreateDelegate(delegateType, scriptObject);
+        public static Delegate CreateDelegate(Type delegateType, ScriptValue scriptValue) {
+            return m_Factory.CreateDelegate(delegateType, scriptValue);
         }
 #else
         class DelegateData {
