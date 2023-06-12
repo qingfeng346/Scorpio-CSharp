@@ -211,13 +211,15 @@ namespace Scorpio.Tools {
             values.Clear();
         }
         //清理内部数据只减少引用,不清理值,否则其他内部引用也会被清理
-        public static void FreeInternal(InternalValue[] values) {
+        public static void Free(Script script, InternalValue[] values, int count) {
             if (values != null) {
-                for (var i = 0; i < values.Length; ++i) {
+                for (var i = 0; i < count; ++i) {
                     if (values[i] != null) {
-                        values[i].value.FreeInternal();
+                        values[i].Free();
+                        values[i] = null;
                     }
                 }
+                script.Free(values);
             }
         }
     }

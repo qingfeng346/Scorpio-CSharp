@@ -1,6 +1,14 @@
-a = {}
-async function main() {
-    var a = 100
+function main() {
+    var tab = {
+        a = {
+
+        }
+    }
+    var b = function() {
+        var c = tab.a
+        print(c)
+    }
+    b()
 }
 main()
 // async function timer(s, f) {

@@ -2,52 +2,59 @@ using Scorpio.Function;
 using Scorpio.Library;
 using Scorpio.Tools;
 using Scorpio.Userdata;
+using Scorpio.Runtime;
 namespace Scorpio {
     public partial class Script {
-        private ObjectsPool<ScriptType> typePool;
-        private ObjectsPool<ScriptInstance> instancePool;
-        private ObjectsPool<ScriptArray> arrayPool;
-        private ObjectsPool<ScriptMapObject> mapObjectPool;
-        private ObjectsPool<ScriptMapString> mapStringPool;
-        private ObjectsPool<ScriptMapPolling> mapPollingPool;
-        private ObjectsPool<ScriptHashSet> hashSetPool;
-        private ObjectsPool<ScriptStringBuilder> stringBuilderPool;
-        private ObjectsPool<ScriptScriptFunction> functionPool;
-        private ObjectsPool<ScriptScriptBindFunction> bindFunctionPool;
-        private ObjectsPool<ScriptScriptAsyncFunction> asyncFunctionPool;
-        private ObjectsPool<ScriptScriptAsyncBindFunction> asyncBindFunctionPool;
+        private ScriptObjectsPool<ScriptType> typePool;
+        private ScriptObjectsPool<ScriptInstance> instancePool;
+        private ScriptObjectsPool<ScriptArray> arrayPool;
+        private ScriptObjectsPool<ScriptMapObject> mapObjectPool;
+        private ScriptObjectsPool<ScriptMapString> mapStringPool;
+        private ScriptObjectsPool<ScriptMapPolling> mapPollingPool;
+        private ScriptObjectsPool<ScriptHashSet> hashSetPool;
+        private ScriptObjectsPool<ScriptStringBuilder> stringBuilderPool;
+        private ScriptObjectsPool<ScriptScriptFunction> functionPool;
+        private ScriptObjectsPool<ScriptScriptBindFunction> bindFunctionPool;
+        private ScriptObjectsPool<ScriptScriptAsyncFunction> asyncFunctionPool;
+        private ScriptObjectsPool<ScriptScriptAsyncBindFunction> asyncBindFunctionPool;
 
 
-        private ObjectsPool<ScriptUserdataObject> userdataObjectPool;
-        private ObjectsPool<ScriptUserdataArray> userdataArrayPool;
-        private ObjectsPool<ScriptUserdataDelegate> userdataDelegatePool;
-        private ObjectsPool<ScriptInstanceMethodFunction> instanceMethodPool;
-        private ObjectsPool<ScriptGenericMethodFunction> genericMethodPool;
-        private ObjectsPool<ScriptStaticMethodFunction> staticMethodPool;
+        private ScriptObjectsPool<ScriptUserdataObject> userdataObjectPool;
+        private ScriptObjectsPool<ScriptUserdataArray> userdataArrayPool;
+        private ScriptObjectsPool<ScriptUserdataDelegate> userdataDelegatePool;
+        private ScriptObjectsPool<ScriptInstanceMethodFunction> instanceMethodPool;
+        private ScriptObjectsPool<ScriptGenericMethodFunction> genericMethodPool;
+        private ScriptObjectsPool<ScriptStaticMethodFunction> staticMethodPool;
 
+        private ObjectsPool<InternalValue[]> internalValuesPool;
+        private ObjectsPool<InternalValue> internalValuePool;
         private ScorpioJsonSerializer scorpioJsonSerializer;
         private ScorpioJsonDeserializer scorpioJsonDeserializer;
         private void InitPool() {
-            typePool = new ObjectsPool<ScriptType>(() => new ScriptType(this));
-            instancePool = new ObjectsPool<ScriptInstance>(() => new ScriptInstance(this));
-            arrayPool = new ObjectsPool<ScriptArray>(() => new ScriptArray(this));
-            mapObjectPool = new ObjectsPool<ScriptMapObject>(() => new ScriptMapObject(this));
-            mapStringPool = new ObjectsPool<ScriptMapString>(() => new ScriptMapString(this));
-            mapPollingPool = new ObjectsPool<ScriptMapPolling>(() => new ScriptMapPolling(this));
+            typePool = new ScriptObjectsPool<ScriptType>(() => new ScriptType(this));
+            instancePool = new ScriptObjectsPool<ScriptInstance>(() => new ScriptInstance(this));
+            arrayPool = new ScriptObjectsPool<ScriptArray>(() => new ScriptArray(this));
+            mapObjectPool = new ScriptObjectsPool<ScriptMapObject>(() => new ScriptMapObject(this));
+            mapStringPool = new ScriptObjectsPool<ScriptMapString>(() => new ScriptMapString(this));
+            mapPollingPool = new ScriptObjectsPool<ScriptMapPolling>(() => new ScriptMapPolling(this));
 
-            hashSetPool = new ObjectsPool<ScriptHashSet>(() => new ScriptHashSet(this));
-            stringBuilderPool = new ObjectsPool<ScriptStringBuilder>(() => new ScriptStringBuilder(this));
-            functionPool = new ObjectsPool<ScriptScriptFunction>(() => new ScriptScriptFunction(this));
-            bindFunctionPool = new ObjectsPool<ScriptScriptBindFunction>(() => new ScriptScriptBindFunction(this));
-            asyncFunctionPool = new ObjectsPool<ScriptScriptAsyncFunction>(() => new ScriptScriptAsyncFunction(this));
-            asyncBindFunctionPool = new ObjectsPool<ScriptScriptAsyncBindFunction>(() => new ScriptScriptAsyncBindFunction(this));
+            hashSetPool = new ScriptObjectsPool<ScriptHashSet>(() => new ScriptHashSet(this));
+            stringBuilderPool = new ScriptObjectsPool<ScriptStringBuilder>(() => new ScriptStringBuilder(this));
+            functionPool = new ScriptObjectsPool<ScriptScriptFunction>(() => new ScriptScriptFunction(this));
+            bindFunctionPool = new ScriptObjectsPool<ScriptScriptBindFunction>(() => new ScriptScriptBindFunction(this));
+            asyncFunctionPool = new ScriptObjectsPool<ScriptScriptAsyncFunction>(() => new ScriptScriptAsyncFunction(this));
+            asyncBindFunctionPool = new ScriptObjectsPool<ScriptScriptAsyncBindFunction>(() => new ScriptScriptAsyncBindFunction(this));
 
-            userdataObjectPool = new ObjectsPool<ScriptUserdataObject>(() => new ScriptUserdataObject(this));
-            userdataArrayPool = new ObjectsPool<ScriptUserdataArray>(() => new ScriptUserdataArray(this));
-            userdataDelegatePool = new ObjectsPool<ScriptUserdataDelegate>(() => new ScriptUserdataDelegate(this));
-            instanceMethodPool = new ObjectsPool<ScriptInstanceMethodFunction>(() => new ScriptInstanceMethodFunction(this));
-            genericMethodPool = new ObjectsPool<ScriptGenericMethodFunction>(() => new ScriptGenericMethodFunction(this));
-            staticMethodPool = new ObjectsPool<ScriptStaticMethodFunction>(() => new ScriptStaticMethodFunction(this));
+            userdataObjectPool = new ScriptObjectsPool<ScriptUserdataObject>(() => new ScriptUserdataObject(this));
+            userdataArrayPool = new ScriptObjectsPool<ScriptUserdataArray>(() => new ScriptUserdataArray(this));
+            userdataDelegatePool = new ScriptObjectsPool<ScriptUserdataDelegate>(() => new ScriptUserdataDelegate(this));
+            instanceMethodPool = new ScriptObjectsPool<ScriptInstanceMethodFunction>(() => new ScriptInstanceMethodFunction(this));
+            genericMethodPool = new ScriptObjectsPool<ScriptGenericMethodFunction>(() => new ScriptGenericMethodFunction(this));
+            staticMethodPool = new ScriptObjectsPool<ScriptStaticMethodFunction>(() => new ScriptStaticMethodFunction(this));
+
+            internalValuesPool = new ObjectsPool<InternalValue[]>(() => new InternalValue[128]);
+            internalValuePool = new ObjectsPool<InternalValue>(() => new InternalValue(this));
+
             scorpioJsonSerializer = new ScorpioJsonSerializer();
             scorpioJsonDeserializer = new ScorpioJsonDeserializer(this);
         }
@@ -106,6 +113,12 @@ namespace Scorpio {
         public ScriptStaticMethodFunction NewStaticMethod() {
             return staticMethodPool.Alloc();
         }
+        public InternalValue[] NewIntervalValues() {
+            return internalValuesPool.Alloc();
+        }
+        public InternalValue NewIntervalValue() {
+            return internalValuePool.Alloc();
+        }
 
 
         public void Free(ScriptType value) {
@@ -162,6 +175,13 @@ namespace Scorpio {
         public void Free(ScriptStaticMethodFunction value) {
             staticMethodPool.Free(value);
         }
+        public void Free(InternalValue[] internalValues) {
+            internalValuesPool.Free(internalValues);
+        }
+        public void Free(InternalValue internalValue) {
+            internalValuePool.Free(internalValue);
+        }
+
         public string ToJson(ScriptValue scriptValue) {
             using (scorpioJsonSerializer) {
                 return scorpioJsonSerializer.ToJson(scriptValue);

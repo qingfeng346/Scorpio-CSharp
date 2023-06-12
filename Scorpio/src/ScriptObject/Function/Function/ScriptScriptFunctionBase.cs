@@ -8,7 +8,9 @@ namespace Scorpio.Function {
         public ScriptScriptFunctionBase(Script script) : base(script) { }
         public ScriptScriptFunctionBase SetContext(ScriptContext context) {
             m_Context = context;
-            m_internalValues = new InternalValue[context.internalCount];
+            if (context.internalCount > 0) {
+                m_internalValues = m_Script.NewIntervalValues();
+            }
             return this;
         }
         public override void Free() {
@@ -16,14 +18,11 @@ namespace Scorpio.Function {
             Release();
         }
         protected void ReleaseInternal() {
-            ScorpioUtil.FreeInternal(m_internalValues);
+            ScorpioUtil.Free(m_Script, m_internalValues, m_Context.internalCount);
             m_internalValues = null;
         }
         public void SetInternal(int index, InternalValue value) {
-            if (m_internalValues[index] != null)
-                m_internalValues[index].value.Free();
-            value.value.Reference();
-            m_internalValues[index] = value;
+            m_internalValues[index] = value.Reference();
         }
     }
     public abstract class ScriptScriptBindFunctionBase : ScriptScriptFunctionBase {

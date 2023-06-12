@@ -45,18 +45,17 @@ namespace Scorpio.Runtime {
             variableObjects[0].CopyFrom(thisObject);
             InternalValue[] internalValues = null;
             if (internalCount > 0) {
-                internalValues = new InternalValue[internalCount];      //内部变量，有外部引用
+                internalValues = m_script.NewIntervalValues();          //内部变量，有外部引用
                 if (parentInternalValues == null) {
                     for (int i = 0; i < internalCount; ++i) {
-                        internalValues[i] = new InternalValue();
+                        internalValues[i] = m_script.NewIntervalValue();
                     }
                 } else {
                     for (int i = 0; i < internalCount; ++i) {
                         if (parentInternalValues[i] == null) {
-                            internalValues[i] = new InternalValue();
+                            internalValues[i] = m_script.NewIntervalValue();
                         } else {
-                            parentInternalValues[i].value.Reference();
-                            internalValues[i] = parentInternalValues[i];
+                            internalValues[i] = parentInternalValues[i].Reference();
                         }
                     }
                 }
