@@ -76,11 +76,5 @@ namespace Scorpio.Runtime {
             m_FunctionData = functionData;
             m_scriptInstructions = functionData.scriptInstructions;
         }
-#if SCORPIO_DEBUG
-        public void SetScript(Script script) {
-            m_script = script;
-            m_global = script.Global;
-        }
-#endif
     }
 }

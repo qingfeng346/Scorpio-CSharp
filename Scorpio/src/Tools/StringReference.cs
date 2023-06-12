@@ -20,13 +20,6 @@ namespace Scorpio.Tools {
         public static Queue<int> pool = new Queue<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
-        public static void Clear() {
-            object2index.Clear();
-            pool.Clear();
-            Array.Clear(entities, 0, entities.Length);
-            freeIndex.Clear();
-            length = 0;
-        }
         public static int Alloc(string value) {
             if (object2index.TryGetValue(value, out var index)) {
                 ++entities[index].referenceCount;
@@ -76,13 +69,19 @@ namespace Scorpio.Tools {
             freeIndex.Clear();
             return isReleased;
         }
-        public static void Check(Action<int, Entity> action) {
+        internal static void CheckPool() {
             for (var i = 0; i < entities.Length; ++i) {
                 if (entities[i].value != null) {
-                    action(i, entities[i]);
-                    //Console.WriteLine($"当前未释放String变量 索引:{i}  {entities[i]}");
+                    ScorpioLogger.error($"当前未释放String变量 索引:{i}  {entities[i]}");
                 }
             }
+        }
+        public static void Shutdown() {
+            object2index.Clear();
+            pool.Clear();
+            Array.Clear(entities, 0, entities.Length);
+            freeIndex.Clear();
+            length = 0;
         }
     }
 }

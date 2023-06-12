@@ -226,13 +226,13 @@ namespace Scorpio.Compile.Compiler {
                 tokenType = ReadToken().Type;
                 if (tokenType == finished) { break; }
                 UndoToken();
-                ParseStatement();
+                ParseStatement(block);
             }
             return EndExecutable(block);
         }
         #region 解析块内容
         /// <summary> 解析单句代码内容 </summary>
-        void ParseStatement() {
+        void ParseStatement(ExecutableBlock block) {
             var token = ReadToken();
             switch (token.Type) {
                 case TokenType.Var:

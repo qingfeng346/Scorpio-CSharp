@@ -27,13 +27,6 @@ namespace Scorpio.Tools {
         public static Queue<int> pool = new Queue<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
-        public static void Clear() {
-            object2index.Clear();
-            pool.Clear();
-            Array.Clear(entities, 0, entities.Length);
-            freeIndex.Clear();
-            length = 0;
-        }
 #if PRINT_REFERENCE
         static bool Is(int index, Entity entity) {
             //return index == 296;
@@ -121,13 +114,19 @@ namespace Scorpio.Tools {
             }
             return isReleased;
         }
-        public static void Check(Action<int, Entity> action) {
+        internal static void CheckPool() {
             for (var i = 0; i < entities.Length; ++i) {
                 if (entities[i].value != null) {
-                    action(i, entities[i]);
-                    //Console.WriteLine($"当前未释放Scirpt变量 索引:{i}  {entities[i]}");
+                    ScorpioLogger.error($"当前未释放Scirpt变量 索引:{i}  {entities[i]}");
                 }
             }
+        }
+        public static void Shutdown() {
+            object2index.Clear();
+            pool.Clear();
+            Array.Clear(entities, 0, entities.Length);
+            freeIndex.Clear();
+            length = 0;
         }
     }
 }

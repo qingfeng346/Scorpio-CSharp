@@ -5,7 +5,7 @@ namespace Scorpio.LibraryV1 {
     public class LibraryString {
         public static void Load(Script script) {
             var protoString = script.TypeString;
-            var map = new ScriptMapString(script);
+            var map = script.NewMapString();
             map.SetValue("format", protoString.GetValue("format"));
             map.SetValue("cs_format", protoString.GetValue("csFormat"));
             map.SetValue("isnullorempty", protoString.GetValue("isNullOrEmpty"));

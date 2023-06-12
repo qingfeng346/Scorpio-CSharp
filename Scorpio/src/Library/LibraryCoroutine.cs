@@ -4,7 +4,7 @@ using Scorpio.Tools;
 namespace Scorpio.Library {
     public class LibraryCoroutine {
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
+            var map = script.NewMapString();
             map.SetValue("start", script.CreateFunction(new start(script)));
             map.SetValue("stop", script.CreateFunction(new stop()));
             map.SetValue("stopAll", script.CreateFunction(new stopAll(script)));

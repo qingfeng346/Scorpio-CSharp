@@ -22,11 +22,15 @@ namespace Scorpio {
         public virtual ScriptType Prototype => m_Prototype;
         public ScriptValue PrototypeValue => m_PrototypeValue;
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype?.EqualFunction;
-        public override void Free() {
+        protected void Release() {
             m_PrototypeValue.Free();
             m_Prototype = null;
             m_Values.Free();
             m_GetProperties.Free();
+        }
+        public override void Free() {
+            Release();
+            m_Script.Free(this);
         }
         public void AddGetProperty(string key, ScriptFunction function) {
             if (m_GetProperties.TryGetValue(key, out var result)) {
@@ -84,6 +88,9 @@ namespace Scorpio {
         internal ScriptTypeObject(Script script, string typeName) : base(script) {
             Set(typeName, ScriptValue.Null);
         }
+        public override void Free() {
+            Release();
+        }
         public override ScriptFunction EqualFunction => m_EqualFunction;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return new ScriptValue(m_Script.NewInstance().SetPrototypeValue(script.TypeObjectValue));
@@ -109,6 +116,9 @@ namespace Scorpio {
         public ScriptTypePrimitive(Script script, string typeName, ScriptValue parentValue) : base(script) {
             Set(typeName, parentValue);
         }
+        public override void Free() {
+            Release();
+        }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             throw new ExecutionException($"Class<{TypeName}>不支持构造");
         }
@@ -116,6 +126,9 @@ namespace Scorpio {
     internal abstract class ScriptTypeBasic<T> : ScriptType where T : ScriptObject {
         internal ScriptTypeBasic(Script script, string typeName, ScriptValue parentType) : base(script) {
             Set(typeName, parentType);
+        }
+        public override void Free() {
+            Release();
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return new ScriptValue(New());
@@ -136,6 +149,7 @@ namespace Scorpio {
             return m_Script.NewMapObject();
         }
     }
+    //HashSet
     internal class ScriptTypeBasicHashSet : ScriptTypeBasic<ScriptHashSet> {
         internal ScriptTypeBasicHashSet(Script script, string typeName, ScriptValue parentType) : base(script, typeName, parentType) { }
         protected override ScriptHashSet New() {

@@ -25,7 +25,6 @@ namespace Scorpio {
                         default: throw new ExecutionException("数组排序返回值必须是Number或Bool类型");
                     }
                 }
-                
             }
         }
         //数组迭代器
@@ -150,7 +149,8 @@ namespace Scorpio {
                 EnsureCapacity(m_Length + 1);
             }
             Array.Copy(m_Objects, index, m_Objects, index + 1, m_Length - index);
-            m_Objects[index].CopyFrom(value);
+            //直接赋值 不需要释放
+            m_Objects[index] = value.Reference();
             m_Length++;
         }
         public bool Remove(ScriptValue value) {

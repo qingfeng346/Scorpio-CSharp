@@ -197,5 +197,40 @@ namespace Scorpio {
                 return scorpioJsonDeserializer.Parse(buffer, supportLong);
             }
         }
+
+        void Check<T>(ObjectsPool<T> pool) {
+            var count = pool.Check();
+            if (count != 0) ScorpioLogger.error($"当前未释放{pool}变量 数量:{count}");
+        }
+        void Check<T>(ScriptObjectsPool<T> pool) where T : IPool {
+            var count = pool.Check();
+            if (count != 0) ScorpioLogger.error($"当前未释放{pool}变量 数量:{count}");
+        }
+        public void CheckPool() {
+            StringReference.CheckPool();
+            ScriptObjectReference.CheckPool();
+            Check(typePool);
+            Check(instancePool);
+            Check(arrayPool);
+            Check(mapObjectPool);
+            Check(mapStringPool);
+            Check(mapPollingPool);
+            Check(hashSetPool);
+            Check(stringBuilderPool);
+            Check(functionPool);
+            Check(bindFunctionPool);
+            Check(asyncFunctionPool);
+            Check(asyncBindFunctionPool);
+
+            Check(userdataObjectPool);
+            Check(userdataArrayPool);
+            Check(userdataDelegatePool);
+            Check(instanceMethodPool);
+            Check(genericMethodPool);
+            Check(staticMethodPool);
+
+            Check(internalValuesPool);
+            Check(internalValuePool);
+        }
     }
 }

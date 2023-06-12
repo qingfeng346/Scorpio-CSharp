@@ -30,7 +30,7 @@ namespace Scorpio.Tools {
         public static readonly Type TYPE_DECIMAL = typeof (decimal);
         public static readonly Type TYPE_PARAMATTRIBUTE = typeof (ParamArrayAttribute); //不定参属性
         public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof (ExtensionAttribute); //扩展函数属性
-        [Conditional("SCORPIO_DEBUG")]
+        [Conditional("SCORPIO_ASSERT")]
         public static void Assert(this bool condition, string message) {
             if (!condition) throw new ExecutionException(message);
         }

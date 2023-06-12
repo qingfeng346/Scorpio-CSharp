@@ -8,7 +8,7 @@ namespace Scorpio.Library {
         public const long BaseTime = 621355968000000000;                        //1970, 1, 1, 0, 0, 0, DateTimeKind.Utc
         public static long UnixNow => (DateTime.UtcNow.Ticks - BaseTime) / 10000;
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
+            var map = script.NewMapString();
             map.SetValue("unixNow", script.CreateFunction(new unixNow()));
             map.SetValue("toString", script.CreateFunction(new toString()));
             map.SetValue("toBytes", script.CreateFunction(new toBytes(script)));
