@@ -34,6 +34,6 @@ namespace Scorpio.Userdata {
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(null, key, value);
         }
-        public override string ToString() { return m_ValueType.Name; }
+        public override string ToString() { return m_ValueType.FullName; }
     }
 }

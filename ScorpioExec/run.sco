@@ -1,16 +1,9 @@
-function main() {
-    var tab = {
-        a = {
-
-        }
-    }
-    var b = function() {
-        var c = tab.a
-        print(c)
-    }
-    b()
-}
-main()
+CSharpInt = importType("System.Int32")
+Dictionary = importType("System.Collections.Generic.Dictionary`2")
+print(Dictionary)
+DicInt = genericType(Dictionary, CSharpInt, CSharpInt)
+var a = new DicInt()
+print(a, typeOf(a))
 // async function timer(s, f) {
 //     await sleep(s)
 //     f()

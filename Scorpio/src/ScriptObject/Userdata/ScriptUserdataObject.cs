@@ -15,6 +15,7 @@ namespace Scorpio.Userdata {
             return this;
         }
         public override void Free() {
+            m_UserdataType = null;
             m_Methods.Free();
             m_Script.Free(this);
         }

@@ -5,6 +5,7 @@ using System.Text;
 using Scorpio.Tools;
 using System.Reflection;
 using Scorpio.FastReflect;
+using System.Diagnostics;
 
 namespace ScorpioTest {
     public class UnitTest {
@@ -29,11 +30,24 @@ namespace ScorpioTest {
                 return ScriptValue.Null;
             }
         }
+        public class Logger : IScorpioLogger {
+            public void error(string message) {
+                var stack = new StackTrace(1, true);
+                var builder = new StringBuilder();
+                builder.AppendLine(message);
+                for (var i = 0; i < stack.FrameCount; i++) {
+                    var frame = stack.GetFrame(i);
+                    builder.Append($"    {frame.GetMethod().Name} {frame.GetFileName()}:{frame.GetFileLineNumber()}\n");
+                }
+                WriteLine(builder.ToString());
+            }
+        }
         public UnitTest(ITestOutputHelper output) {
             _output = output;
         }
         [Fact]
         public void Test1() {
+            ScorpioLogger.ilog = new Logger();
             foreach (var file in FileUtil.GetFiles("../../../../ExampleScripts", new[] { "*.sco" }, SearchOption.TopDirectoryOnly)) {
                 WriteLine($"============================开始运行文件{file}============================");
                 var script = new Script();

@@ -14,6 +14,13 @@ namespace Scorpio.Userdata {
             m_ElementType = type.Type.GetElementType();
             return this;
         }
+        public override void Free() {
+            m_UserdataType = null;
+            m_Array = null;
+            m_ElementType = null;
+            m_Methods.Free();
+            m_Script.Free(this);
+        }
         public override ScriptValue GetValue(double index) {
             using (var ret = ScriptValue.CreateValue(m_Script, m_Array[(int)index])) {
                 return ret;
