@@ -7,7 +7,7 @@ namespace Scorpio {
             this.scriptValue = scriptValue.Reference();
         }
         ~ScorpioDelegateReference() {
-            //Script.MainSynchronizationContext.Post(_ => scriptValue.Free(), null);
+            Script.MainSynchronizationContext.Post(_ => scriptValue.Free(), null);
         }
         public ScriptValue call(params object[] args) {
             return scriptValue.call(ScriptValue.Null, args);
