@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ScorpioFastReflect\ScorpioFastReflect.csproj" />
     <ProjectReference Include="..\Scorpio\Scorpio.csproj" />
   </ItemGroup>
 

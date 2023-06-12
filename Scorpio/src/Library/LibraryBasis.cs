@@ -419,6 +419,8 @@ namespace Scorpio.Library
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var value = args[0];
                 switch (value.valueType) {
+                    case ScriptValue.nullValueType:
+                        return ScriptValue.Null;
                     case ScriptValue.trueValueType:
                     case ScriptValue.falseValueType:
                         return script.TypeBooleanValue.Reference();
@@ -428,13 +430,7 @@ namespace Scorpio.Library
                     case ScriptValue.stringValueType:
                         return script.TypeStringValue.Reference();
                     case ScriptValue.scriptValueType:
-                        if (value.scriptValue is ScriptArray) {
-                            return script.TypeArrayValue.Reference();
-                        } else if (value.scriptValue is ScriptMap) {
-                            return script.TypeMapValue.Reference();
-                        } else if (value.scriptValue is ScriptFunction) {
-                            return script.TypeFunctionValue.Reference();
-                        } else if (value.scriptValue is ScriptInstance) {
+                        if (value.scriptValue is ScriptInstance) {
                             return (value.scriptValue as ScriptInstance).PrototypeValue.Reference();
                         } else if (value.scriptValue is ScriptType) {
                             return (value.scriptValue as ScriptType).PrototypeValue.Reference();

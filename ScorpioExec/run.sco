@@ -1,29 +1,28 @@
-// tab = {
-//     www = 1,
-// }
+a = {}
+async function main() {
+    var a = 100
+}
+main()
 // async function timer(s, f) {
 //     await sleep(s)
 //     f()
 // }
-// function init() {
-//     print(tab.containsKey(""))
+// var a = { a : 100 }
+// function getdata() {
+//     return a
 // }
-// function main() {
-//     var a = [1]
-//     foreach (var pair in pairs(a)) {
-//         timer(1, () => {
-//             tab = {
-
-//             }
-//             init()
-//         })
+// class FunctionBuildingInfo {
+//     constructor() {
+//         this.data = getdata()
+//     }
+//     test() {
+//         print(this.data.a)
 //     }
 // }
-// main()
-function aaa() {
-
-}
-print(aaa)
+// var info = new FunctionBuildingInfo()
+// timer(1, () => {
+//     info.test()
+// })
 
 // async function main1() {
 //     await sleep(10)

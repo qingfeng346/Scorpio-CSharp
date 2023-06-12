@@ -112,19 +112,19 @@ namespace Scorpio.FastReflect {
             if (returnType == typeof(void)) {
                 return $"{invoke}";
             } else if (returnType == typeof(ScriptValue)) {
-                return $"return {invoke}";
+                return $"{invoke}";
             } else if (returnType == typeof(bool)) {
-                return $"return {invoke}.IsTrue";
+                return $"{invoke}.IsTrue";
             } else if (returnType == typeof(string)) {
-                return $"return {invoke}.ToString()";
+                return $"{invoke}.ToString()";
             } else if (returnType == typeof(sbyte) || returnType == typeof(byte) ||
                         returnType == typeof(short) || returnType == typeof(ushort) ||
                         returnType == typeof(int) || returnType == typeof(uint) ||
                         returnType == typeof(long) || returnType == typeof(ulong) ||
                         returnType == typeof(float) || returnType == typeof(double) || returnType == typeof(decimal)) {
-                return $"return ({returnFullName})Convert.ChangeType({invoke}.Value, typeof({returnFullName}))";
+                return $"({returnFullName})Convert.ChangeType({invoke}.Value, typeof({returnFullName}))";
             } else {
-                return $"return ({returnFullName}){invoke}.Value";
+                return $"({returnFullName}){invoke}.Value";
             }
         }
     }

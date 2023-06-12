@@ -12,7 +12,7 @@ public class __FactoryName : IScorpioDelegateFactory {
     public static void Initialize() {
         ScorpioDelegateFactoryManager.SetFactory(new DelegateFactory());__DelegateList__CreateDelegate
     }
-    public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
+    public Delegate CreateDelegate(Type delegateType, ScriptValue scriptValue) {
         if (delegates.TryGetValue(delegateType, out var func)) {
             return func(scriptObject);
         }
@@ -26,8 +26,8 @@ public class __FactoryName : IScorpioDelegateFactory {
     public static void Initialize() {
         ScorpioDelegateFactoryManager.SetFactory(new DelegateFactory());__DelegateList
     }
-    public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {__CreateDelegate
-        throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);
+    public Delegate CreateDelegate(Type delegateType, ScriptValue scriptValue) {__CreateDelegate
+        throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptValue : "" + scriptValue);
     }
 }";
         public struct Option {
@@ -46,7 +46,7 @@ public class __FactoryName : IScorpioDelegateFactory {
         }
         public string Generate() {
             m_Delegates.SortType();
-            return (option.buildType == 0 ? Template : TemplateIf).Replace("__FactoryName", option.className).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate());
+            return (option.buildType == 0 ? TemplateIf : Template).Replace("__FactoryName", option.className).Replace("__DelegateList", DelegateList()).Replace("__CreateDelegate", CreateDelegate());
         }
         string DelegateList() {
             if (!option.generateList) { return ""; }
@@ -66,19 +66,21 @@ public class __FactoryName : IScorpioDelegateFactory {
                 var parameters = InvokeMethod.GetParameters();
                 var pars = "";
                 for (int i = 0; i < parameters.Length; ++i) {
-                    if (i != 0) { pars += ","; }
+                    if (i != 0) { pars += ", "; }
                     pars += $"arg{i}";
                 }
-                var invoke = parameters.Length == 0 ? $"scriptObject.call(ScriptValue.Null)" : $"scriptObject.call(ScriptValue.Null,{pars})";
+                var invoke = $"value.call({pars})";
                 var call = ScorpioFastReflectUtil.ReturnString(invoke, InvokeMethod.ReturnType);
-                var func = $"return new {fullName}( ({pars}) => {{ {call}; }} );";
+                var func = $@"var value = new ScorpioDelegateReference(scriptValue);
+            return new {fullName}( ({pars}) => {call} );";
                 if (option.buildType == 0) {
                     builder.Append($@"
-        delegates[typeof({fullName})] = (scriptObject) => {{ {func} }};");
+        if (delegateType == typeof({fullName})) {{
+            {func}
+        }}");
                 } else {
                     builder.Append($@"
-        if (delegateType == typeof({fullName}))
-            {func}");
+        delegates[typeof({fullName})] = (scriptObject) => {{ {func} }};");
                 }
             }
             return builder.ToString();
