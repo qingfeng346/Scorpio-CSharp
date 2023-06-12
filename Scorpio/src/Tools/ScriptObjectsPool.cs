@@ -8,17 +8,17 @@ namespace Scorpio.Tools {
     }
     public class ScriptObjectsPool<T> where T : IPool {
         public Func<T> Generator;
-        private Queue<T> pool = new Queue<T>();
+        private Stack<T> pool = new Stack<T>();
         public ScriptObjectsPool(Func<T> generator) {
             Generator = generator;
         }
         public T Alloc() {
-            var ret = pool.Count > 0 ? pool.Dequeue() : Generator();
+            var ret = pool.Count > 0 ? pool.Pop() : Generator();
             ret.Alloc();
             return ret;
         }
         public void Free(T item) {
-            pool.Enqueue(item);
+            pool.Push(item);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Scorpio {
         private ScriptObjectsPool<ScriptStaticMethodFunction> staticMethodPool;
 
         private ObjectsPool<InternalValue[]> internalValuesPool;
-        private ObjectsPool<InternalValue> internalValuePool;
+        private ScriptObjectsPool<InternalValue> internalValuePool;
         private ScorpioJsonSerializer scorpioJsonSerializer;
         private ScorpioJsonDeserializer scorpioJsonDeserializer;
         private void InitPool() {
@@ -53,7 +53,7 @@ namespace Scorpio {
             staticMethodPool = new ScriptObjectsPool<ScriptStaticMethodFunction>(() => new ScriptStaticMethodFunction(this));
 
             internalValuesPool = new ObjectsPool<InternalValue[]>(() => new InternalValue[128]);
-            internalValuePool = new ObjectsPool<InternalValue>(() => new InternalValue(this));
+            internalValuePool = new ScriptObjectsPool<InternalValue>(() => new InternalValue(this));
 
             scorpioJsonSerializer = new ScorpioJsonSerializer();
             scorpioJsonDeserializer = new ScorpioJsonDeserializer(this);

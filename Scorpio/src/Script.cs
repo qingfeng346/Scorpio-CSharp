@@ -17,6 +17,7 @@ using Scorpio.Proto;
 using Scorpio.Serialize;
 using Scorpio.Tools;
 using Scorpio.Compile.Compiler;
+using System.Threading;
 
 namespace Scorpio
 {
@@ -80,6 +81,8 @@ namespace Scorpio
 
         public int MainThreadId { get; private set; }
 
+        public static SynchronizationContext MainSynchronizationContext { get; private set; }
+
         public Script() {
             m_SearchPaths = new string[0];
             InitPool();
@@ -132,6 +135,7 @@ namespace Scorpio
             LibraryIO.Load(this);
             LibraryCoroutine.Load(this);
             MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+            MainSynchronizationContext = SynchronizationContext.Current;
         }
         public void Shutdown() {
             Global.Shutdown();

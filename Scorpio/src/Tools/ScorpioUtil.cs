@@ -215,7 +215,7 @@ namespace Scorpio.Tools {
             if (values != null) {
                 for (var i = 0; i < count; ++i) {
                     if (values[i] != null) {
-                        values[i].Free();
+                        values[i].Release();
                         values[i] = null;
                     }
                 }

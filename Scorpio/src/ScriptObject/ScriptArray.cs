@@ -229,7 +229,6 @@ namespace Scorpio {
             if (m_Length <= 0)  throw new ExecutionException($"Array.PopFirst 数组长度为0");
             var value = m_Objects[0];
             RemoveAt(0);
-            value.Free();
             return value;
         }
         public ScriptValue SafePopFirst() {
@@ -237,7 +236,6 @@ namespace Scorpio {
                 return ScriptValue.Null;
             var value = m_Objects[0];
             RemoveAt(0);
-            value.Free();
             return value;
         }
         public ScriptValue PopLast() {

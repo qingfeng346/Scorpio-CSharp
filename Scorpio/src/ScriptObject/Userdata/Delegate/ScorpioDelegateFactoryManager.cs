@@ -1,8 +1,5 @@
 //#define SCORPIO_DYNAMIC_DELEGATE
 using System;
-using System.Reflection;
-using System.Collections.Generic;
-using Scorpio.Tools;
 namespace Scorpio {
     public class ScorpioDelegateReference {
         private ScriptValue scriptValue;
@@ -10,7 +7,7 @@ namespace Scorpio {
             this.scriptValue = scriptValue.Reference();
         }
         ~ScorpioDelegateReference() {
-            scriptValue.Free();
+            //Script.MainSynchronizationContext.Post(_ => scriptValue.Free(), null);
         }
         public ScriptValue call(params object[] args) {
             return scriptValue.call(ScriptValue.Null, args);
