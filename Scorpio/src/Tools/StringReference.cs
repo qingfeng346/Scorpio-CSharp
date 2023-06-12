@@ -51,6 +51,9 @@ namespace Scorpio.Tools {
                 //添加到待释放列表
                 freeIndex.Add(index);
             }
+            if (entities[index].referenceCount < 0) {
+                ScorpioLogger.error($"String 释放有问题,当前计数:{entities[index].referenceCount}  Index:{index} - {entities[index]}");
+            }
         }
         public static string GetValue(int index) {
             return entities[index].value;

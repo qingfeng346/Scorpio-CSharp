@@ -164,7 +164,7 @@ namespace Scorpio.Proto {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var value in array) {
                     using (var v = func.Call(value)) {
-                        ret.Add(func.Call(value));
+                        ret.Add(v);
                     }
                 }
                 return new ScriptValue(ret);

@@ -79,7 +79,7 @@ namespace Scorpio.Tools {
                 freeIndex.Add(index);
             }
             if (entities[index].referenceCount < 0) {
-                ScorpioLogger.error($"Free引用计数小于0,释放有问题  Index:{index} - {entities[index]}");
+                ScorpioLogger.error($"ScriptObject 释放有问题,当前计数:{entities[index].referenceCount}  Index:{index} - {entities[index]}");
             }
 #if PRINT_REFERENCE
             if (Is(index, entities[index])) {

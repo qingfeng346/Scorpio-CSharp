@@ -25,8 +25,8 @@ namespace Scorpio.Proto {
             ret.SetValue("findAllLastIndex", script.CreateFunction(new findAllLastIndex()));
             ret.SetValue("forEach", script.CreateFunction(new forEach()));
             ret.SetValue("forEachLast", script.CreateFunction(new forEachLast()));
-            ret.SetValue("convertAll", script.CreateFunction(new map()));
-            ret.SetValue("map", script.CreateFunction(new map()));
+            ret.SetValue("convertAll", script.CreateFunction(new convertAll()));
+            ret.SetValue("map", script.CreateFunction(new convertAll()));
             ret.SetValue("reverse", script.CreateFunction(new reverse()));
             ret.SetValue("first", script.CreateFunction(new first()));
             ret.SetValue("last", script.CreateFunction(new last()));
@@ -122,7 +122,7 @@ namespace Scorpio.Proto {
                 var func = args[0].Get<ScriptFunction>();
                 for (int i = 0, count = array.Length(); i < count; ++i) {
                     if (func.Call(array[i]).IsTrue) {
-                        return array[i];
+                        return array[i].Reference();
                     }
                 }
                 return ScriptValue.Null;
@@ -240,13 +240,14 @@ namespace Scorpio.Proto {
                 return ScriptValue.InvalidIndex;
             }
         }
-        private class map : ScorpioHandle {
+        private class convertAll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
                 var ret = array.script.NewArray();
                 var func = args[0].Get<ScriptFunction>();
                 for (int i = 0, count = array.Length(); i < count; ++i) {
-                    ret.Add(func.Call(array[i]));
+                    using (var v = func.Call(array[i]))
+                        ret.Add(v);
                 }
                 return new ScriptValue(ret);
             }

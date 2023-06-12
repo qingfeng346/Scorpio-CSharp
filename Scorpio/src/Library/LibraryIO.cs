@@ -109,7 +109,8 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = script.NewArray();
                 foreach (var line in File.ReadAllLines(args[0].ToString(), length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding)) {
-                    array.Add(new ScriptValue(line));
+                    using (var v = new ScriptValue(line))
+                        array.Add(v);
                 }
                 return new ScriptValue(array);
             }
