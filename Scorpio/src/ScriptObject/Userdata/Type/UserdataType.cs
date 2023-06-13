@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Scorpio.Exception;
+using Scorpio.Tools;
 
 namespace Scorpio.Userdata
 {
@@ -17,7 +18,10 @@ namespace Scorpio.Userdata
             m_Type = type;
             m_Values = new Dictionary<string, ScriptValue>();
         }
-        public Type Type { get { return m_Type; } }
+        public Type Type => m_Type;
+        public void Free() {
+            m_Values.Free();
+        }
         //创建一个模板类
         public ScriptValue MakeGenericType(Script script, Type[] parameters) {
             if (m_Type.IsGenericType && m_Type.IsGenericTypeDefinition) {
@@ -60,11 +64,11 @@ namespace Scorpio.Userdata
             return m_Operators[operate] = GetMethod(operatorName);
         }
         public void SetValue(string name, ScriptValue value) {
-            if (value.valueType == ScriptValue.nullValueType) {
-                m_Values.Remove(name);
-            } else {
-                m_Values[name] = value;
+            if (m_Values.TryGetValue(name, out var result)) {
+                result.Free();
             }
+            //正常引用计数
+            m_Values[name] = value.Reference();
         }
         /// <summary> 创建一个实例 </summary>
         public abstract ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length);

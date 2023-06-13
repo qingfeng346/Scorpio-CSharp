@@ -233,7 +233,7 @@ namespace ScorpioExec
                         ret = value.ToString();
                     }
                     while (script.Update()) {
-                        TestClass.Update();
+                        TestStaticClass.Update();
                     }
                     script.ReleaseAll();
                     script.Shutdown();

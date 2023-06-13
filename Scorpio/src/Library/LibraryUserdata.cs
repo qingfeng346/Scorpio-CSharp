@@ -14,7 +14,7 @@ namespace Scorpio.Library
                 this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return script.GetUserdataTypeValue(script.GetUserdataType(args[0].scriptValue.Type).GetVariableType(args[1].ToString()));
+                return script.GetUserdataTypeValue(script.GetUserdataType(args[0].scriptValue.Type).GetVariableType(args[1].ToString())).Reference();
             }
         }
         private class isType : ScorpioHandle {

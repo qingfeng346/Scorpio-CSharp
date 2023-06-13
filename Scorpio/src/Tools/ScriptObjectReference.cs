@@ -1,6 +1,8 @@
 ﻿//#define PRINT_REFERENCE
+using Scorpio.Function;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Scorpio.Tools {
     public class ScriptObjectReference {
@@ -114,10 +116,43 @@ namespace Scorpio.Tools {
             }
             return isReleased;
         }
+        static void AddChildren(ScriptValue value, HashSet<string> children) {
+            if (value.valueType == ScriptValue.stringValueType) {
+                children.Add($"s{value.stringValueIndex}");
+            } else if (value.valueType == ScriptValue.scriptValueType) {
+                if (!children.Contains(value.scriptValueIndex.ToString())) {
+                    children.Add($"{value.scriptValueIndex}");
+                    AddChildren(value.scriptValue, children);
+                }
+            }
+        }
+        static void AddChildren(ScriptObject value, HashSet<string> children) {
+            if (value is ScriptMap) {
+                foreach (var pair in (ScriptMap)value) {
+                    AddChildren(pair.Value, children);
+                }
+            } else if (value is ScriptArray) {
+                foreach (var element in (ScriptArray)value) {
+                    AddChildren(element, children);
+                }
+            } else if (value is ScriptScriptBindFunctionBase) {
+                AddChildren(((ScriptScriptBindFunctionBase)value).BindObject, children);
+            } else if (value is ScriptType) {
+                AddChildren((value as ScriptType).PrototypeValue, children);
+            }
+            if (value is ScriptInstance) {
+                foreach (var pair in (value as ScriptInstance)) {
+                    AddChildren(pair.Value, children);
+                }
+                AddChildren((value as ScriptInstance).PrototypeValue, children);
+            }
+        }
         internal static void CheckPool() {
             for (var i = 0; i < entities.Length; ++i) {
                 if (entities[i].value != null) {
-                    ScorpioLogger.error($"当前未释放Scirpt变量 索引:{i}  {entities[i]}");
+                    var children = new HashSet<string>();
+                    AddChildren(entities[i].value, children);
+                    ScorpioLogger.error($"当前未释放Scirpt变量 索引:{i}  {entities[i]}, 持有对象:{string.Join(",", children.ToArray())}");
                 }
             }
         }

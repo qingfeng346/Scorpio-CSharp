@@ -1,7 +1,31 @@
-TestEnum = importType("TestEnum")
-TestEnum1 = importType("TestEnum1")
-print(toEnumString(TestEnum.Test1, TestEnum1))
-print(TestEnum1.Test1)
+var a = { ddd : "faewfawf"}
+var b = {}
+a.b = b
+b.a = a
+// class FunplusSdk {
+//     init() {
+//         this.aaa = TestStaticClass.www
+//     }
+//     get() {
+//         print(this.aaa.test1)
+//     }
+// }
+// function main() {
+//     FunplusSdk.init()
+//     // var a = json.decode(io.toString(.Bytes))
+//     // print(a)
+//     main1()
+// }
+// async function main1() {
+//     await sleep(1)
+//     FunplusSdk.get()
+// }
+// main()
+// TestStaticClass.
+// TestEnum = importType("TestEnum")
+// TestEnum1 = importType("TestEnum1")
+// print(toEnumString(TestEnum.Test1, TestEnum1))
+// print(TestEnum1.Test1)
 // CSharpInt = importType("System.Int32")
 // Dictionary = importType("System.Collections.Generic.Dictionary`2")
 // print(Dictionary)

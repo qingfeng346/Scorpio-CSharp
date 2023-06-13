@@ -170,7 +170,11 @@ namespace Scorpio
             m_TypeStringBuilder = null;
             m_TypeHashSet = null;
 
+
             m_UserdataTypes.Free();
+            foreach (var pair in m_Types) {
+                pair.Value.Free();
+            }
             m_Types.Clear();
             m_ExtensionType.Clear();
             m_Assembly.Clear();

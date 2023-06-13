@@ -12,6 +12,7 @@ namespace Scorpio {
             script.RunOnMainThread(() => scriptValue.Free());
         }
         public ScriptValue call(params object[] args) {
+            if (script.IsShutdown) return ScriptValue.Null;
             using (var v = scriptValue.call(ScriptValue.Null, args))
                 return v;
         }

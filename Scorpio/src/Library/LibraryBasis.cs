@@ -522,7 +522,7 @@ namespace Scorpio.Library
                 this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(script.GetUserdataTypeValue(args[0].ToString()));
+                return script.GetUserdataTypeValue(args[0].ToString()).Reference();
             }
         }
         private class importNamespace : ScorpioHandle {
