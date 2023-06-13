@@ -65,10 +65,11 @@ namespace ScorpioTest {
         [Fact]
         public void CreateDelegate() {
             var generate = new GenerateScorpioDelegate();
-            generate.option = new GenerateScorpioDelegate.Option() { buildType = 0, className = "DelegateFactory" };
+            generate.option = new GenerateScorpioDelegate.Option() { buildType = 0, className = "TestDelegateFactory" };
+            generate.AddType(typeof(Action));
             generate.AddType(typeof(Action<int, int, string>));
             generate.AddType(typeof(Func<int, int, string>));
-            var output = "../../../DelegateFactory.cs";
+            var output = "../../../../ScorpioTestLibrary/TestDelegateFactory.cs";
             FileUtil.CreateFile(output, generate.Generate());
             WriteLine($"Éú³ÉDelegate²Ö¿â {Path.GetFullPath(output)}");
         }

@@ -161,6 +161,90 @@ namespace Scorpio.Tools {
                 }
             }
         }
+        static void Collect(ScriptValue value, int originIndex, Dictionary<int, HashSet<int>> re, Dictionary<int, HashSet<int>> beRe) {
+            if (value.valueType == ScriptValue.scriptValueType) {
+                var index = value.scriptValueIndex;
+                if (originIndex != index && (!re.TryGetValue(originIndex, out var set) || !set.Contains(index))) {
+                    if (set == null) {
+                        set = re[originIndex] = new HashSet<int>();
+                    }
+                    set.Add(index);
+                    if (!beRe.TryGetValue(index, out var beSet)) {
+                        beSet = beRe[index] = new HashSet<int>();
+                    }
+                    beSet.Add(originIndex);
+                    Collect(value.scriptValue, originIndex, re, beRe);
+                }
+            }
+        }
+        static void Collect(ScriptObject value, int originIndex, Dictionary<int, HashSet<int>> re, Dictionary<int, HashSet<int>> beRe) {
+            if (value is ScriptMap) {
+                foreach (var pair in (ScriptMap)value) {
+                    Collect(pair.Value, originIndex, re, beRe);
+                }
+            } else if (value is ScriptArray) {
+                foreach (var element in (ScriptArray)value) {
+                    Collect(element, originIndex, re, beRe);
+                }
+            } else if (value is ScriptScriptBindFunctionBase) {
+                Collect(((ScriptScriptBindFunctionBase)value).BindObject, originIndex, re, beRe);
+            } else if (value is ScriptType) {
+                Collect((value as ScriptType).PrototypeValue, originIndex, re, beRe);
+            }
+            if (value is ScriptInstance) {
+                foreach (var pair in (value as ScriptInstance)) {
+                    Collect(pair.Value, originIndex, re, beRe);
+                }
+                Collect((value as ScriptInstance).PrototypeValue, originIndex, re, beRe);
+            }
+        }
+        static void Release(int index) {
+            //entities[index].referenceCount = 0;
+            //object2index.Remove(entities[index].value.Id);
+            //entities[index].value.Free();
+            //pool.Enqueue(index);
+            //entities[index] = DefaultEntity;
+        }
+        public static void GCCollect() {
+            var re = new Dictionary<int, HashSet<int>>();       //持有
+            var beRe = new Dictionary<int, HashSet<int>>();     //被持有
+            for (var i = 0; i < entities.Length; ++i) {
+                if (entities[i].value != null && entities[i].referenceCount > 0) {
+                    Collect(entities[i].value, i, re, beRe);
+                }
+            }
+            var dic = new Dictionary<int, int>();
+            foreach (var pair in beRe) {
+                Console.WriteLine($"{pair.Key} 被持有 : {string.Join(",", pair.Value.ToArray())}  {entities[pair.Key]}");
+                //被持有数量跟计数不同,重复持有判断有问题
+                if (pair.Value.Count == entities[pair.Key].referenceCount) {
+                    foreach (var index in pair.Value) {
+                        if (beRe.TryGetValue(index, out var set) && set.Contains(pair.Key)) {
+                            if (dic.ContainsKey(pair.Key)) {
+                                dic[pair.Key] += 1;
+                            } else {
+                                dic[pair.Key] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var pair in beRe) {
+                //
+                if (dic.TryGetValue(pair.Key, out var number) && pair.Value.Count == number) {
+                    Console.WriteLine("被释放 " + pair.Key);
+                }
+            }
+            //(entities[293].value as ScriptMap).Clear();
+            //(entities[294].value as ScriptMap).Clear();
+            //Release(293);
+            //Release(294);
+            //Release(295);
+            //Release(296);
+            //if () {
+            //    //添加到待释放列表
+            //}
+        }
         public static void Shutdown() {
             object2index.Clear();
             pool.Clear();

@@ -213,6 +213,7 @@ namespace ScorpioExec
             script.PushAssembly (typeof (Program));
             script.PushReferencedAssemblies (typeof (Program).Assembly);
             script.PushAssembly (typeof(TestClass));
+            TestDelegateFactory.Initialize();
             LoadLibrary (script, Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {
@@ -235,6 +236,13 @@ namespace ScorpioExec
                     while (script.Update()) {
                         TestStaticClass.Update();
                     }
+                    //script.ReleaseAll();
+                    //script.CheckPool();
+                    //while (true) {
+                    //    script.ReleaseAll();
+                    //    TestStaticClass.Update();
+                    //}
+                    script.GCCollect();
                     script.ReleaseAll();
                     script.Shutdown();
                     script.ReleaseAll();

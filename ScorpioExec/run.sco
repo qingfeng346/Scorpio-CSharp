@@ -1,7 +1,34 @@
-var a = { ddd : "faewfawf"}
+var a = {}
 var b = {}
+var c = {}
 a.b = b
-b.a = a
+b.c = c
+c.a = a
+// var b = {}
+// var c = {
+//     d : {}
+// }
+// a.b = b
+// a.c = b
+// a.d = b
+// b.c = c
+// c.a = a
+// async function timer(s, func) {
+//     await sleep(1)
+//     d = func
+//     func()
+// }
+// TestStaticClass = importType("TestStaticClass")
+// class Test {
+//     test() {
+//         var _this = this
+//         TestStaticClass.Timer(1, function() {
+//             print(_this)
+//         })
+//     }
+// }
+// var t = new Test()
+// t.test()
 // class FunplusSdk {
 //     init() {
 //         this.aaa = TestStaticClass.www

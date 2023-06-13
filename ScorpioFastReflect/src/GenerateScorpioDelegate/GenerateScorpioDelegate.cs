@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using Scorpio;
 public class __FactoryName : IScorpioDelegateFactory {
     public static void Initialize() {
-        ScorpioDelegateFactoryManager.SetFactory(new DelegateFactory());__DelegateList
+        ScorpioDelegateFactoryManager.SetFactory(new __FactoryName());__DelegateList
     }
     public Delegate CreateDelegate(Script script, Type delegateType, ScriptValue scriptValue) {__CreateDelegate
         throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptValue : "" + scriptValue);

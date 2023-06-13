@@ -206,6 +206,9 @@ namespace Scorpio {
             var count = pool.Check();
             if (count != 0) ScorpioLogger.error($"当前未释放{pool}变量 数量:{count}");
         }
+        public void GCCollect() {
+            ScriptObjectReference.GCCollect();
+        }
         public void CheckPool() {
             StringReference.CheckPool();
             ScriptObjectReference.CheckPool();

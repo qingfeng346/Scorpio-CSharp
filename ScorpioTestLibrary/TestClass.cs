@@ -33,10 +33,20 @@ public static class TestStaticClass {
     //    wwww.Free();
     //    return instance;
     //}
+    static DateTime start;
+    static Action action1;
     public static void Update() {
+        if (action1 != null && DateTime.Now > start) {
+            action1();
+            action1 = null;
+        }
         //wwww.GetValue("Update").call(wwww);
     }
     public static TestClass Get() {
         return new TestClass();
+    }
+    public static void Timer(float s, Action action) {
+        start = DateTime.Now.AddSeconds(s);
+        action1 = action;
     }
 }
