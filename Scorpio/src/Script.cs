@@ -28,6 +28,7 @@ namespace Scorpio
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
         private const string GLOBAL_ARGS = "_ARGS";                     //命令行参数
+        public static int GCFrame = 500;
         /// <summary> 按文本读取时,文本文件的编码 </summary>
         public static Encoding Encoding { get; set; } = Encoding.UTF8;
 
@@ -78,10 +79,10 @@ namespace Scorpio
 
         /// <summary> 全局变量 </summary>
         public ScriptGlobal Global { get; private set; }
-
         public bool IsShutdown { get; private set; }
         public int MainThreadId { get; private set; }
         public SynchronizationContext MainSynchronizationContext { get; private set; }
+        private short frame = 0;
         public Script() {
             m_SearchPaths = new string[0];
             InitPool();
@@ -509,6 +510,10 @@ namespace Scorpio
             return stackInfos;
         }
         public void ReleaseAll() {
+            if (++frame > GCFrame) {
+                frame = 0;
+                GC.Collect();
+            }
             var released = true;
             while (released) {
                 released = false;

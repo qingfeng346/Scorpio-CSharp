@@ -3,6 +3,7 @@ using Scorpio.Function;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Scorpio.Tools {
     public class ScriptObjectReference {
@@ -116,42 +117,46 @@ namespace Scorpio.Tools {
             }
             return isReleased;
         }
-        static void AddChildren(ScriptValue value, HashSet<string> children) {
+        static void AddChildren(ScriptValue value, int originIndex, string from, HashSet<string> children, HashSet<int> childrenIndex) {
             if (value.valueType == ScriptValue.stringValueType) {
-                children.Add($"s{value.stringValueIndex}");
+                children.Add($"{from}s{value.stringValueIndex}");
             } else if (value.valueType == ScriptValue.scriptValueType) {
-                if (!children.Contains(value.scriptValueIndex.ToString())) {
-                    children.Add($"{value.scriptValueIndex}");
-                    AddChildren(value.scriptValue, children);
+                if (originIndex != value.scriptValueIndex && !childrenIndex.Contains(value.scriptValueIndex)) {
+                    childrenIndex.Add(value.scriptValueIndex);
+                    children.Add($"{from}{value.scriptValueIndex}");
+                    AddChildren(value.scriptValue, originIndex, $"{from}{value.scriptValueIndex}->", children, childrenIndex);
                 }
             }
         }
-        static void AddChildren(ScriptObject value, HashSet<string> children) {
+        static void AddChildren(ScriptObject value, int originIndex, string from, HashSet<string> children, HashSet<int> childrenIndex) {
             if (value is ScriptMap) {
                 foreach (var pair in (ScriptMap)value) {
-                    AddChildren(pair.Value, children);
+                    AddChildren(pair.Value, originIndex, $"{from}[k:{pair.Key}]", children, childrenIndex);
                 }
             } else if (value is ScriptArray) {
+                var index = 0;
                 foreach (var element in (ScriptArray)value) {
-                    AddChildren(element, children);
+                    AddChildren(element, originIndex, $"{from}[i:{index}]", children, childrenIndex);
+                    ++index;
                 }
             } else if (value is ScriptScriptBindFunctionBase) {
-                AddChildren(((ScriptScriptBindFunctionBase)value).BindObject, children);
+                AddChildren(((ScriptScriptBindFunctionBase)value).BindObject, originIndex, $"{from}[b]", children, childrenIndex);
             } else if (value is ScriptType) {
-                AddChildren((value as ScriptType).PrototypeValue, children);
+                AddChildren((value as ScriptType).PrototypeValue, originIndex, $"{from}[p]", children, childrenIndex);
             }
             if (value is ScriptInstance) {
                 foreach (var pair in (value as ScriptInstance)) {
-                    AddChildren(pair.Value, children);
+                    AddChildren(pair.Value, originIndex, $"{from}[ik:{pair.Key}]", children, childrenIndex);
                 }
-                AddChildren((value as ScriptInstance).PrototypeValue, children);
+                AddChildren((value as ScriptInstance).PrototypeValue, originIndex, $"{from}[t]", children, childrenIndex);
             }
         }
         internal static void CheckPool() {
             for (var i = 0; i < entities.Length; ++i) {
                 if (entities[i].value != null) {
+                    var childrenIndex = new HashSet<int>();
                     var children = new HashSet<string>();
-                    AddChildren(entities[i].value, children);
+                    AddChildren(entities[i].value, i, "", children, childrenIndex);
                     ScorpioLogger.error($"当前未释放Scirpt变量 索引:{i}  {entities[i]}, 持有对象:{string.Join(",", children.ToArray())}");
                 }
             }
