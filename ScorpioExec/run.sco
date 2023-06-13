@@ -1,9 +1,95 @@
-CSharpInt = importType("System.Int32")
-Dictionary = importType("System.Collections.Generic.Dictionary`2")
-print(Dictionary)
-DicInt = genericType(Dictionary, CSharpInt, CSharpInt)
-var a = new DicInt()
-print(a, typeOf(a))
+TestEnum = importType("TestEnum")
+TestEnum1 = importType("TestEnum1")
+print(toEnumString(TestEnum.Test1, TestEnum1))
+print(TestEnum1.Test1)
+// CSharpInt = importType("System.Int32")
+// Dictionary = importType("System.Collections.Generic.Dictionary`2")
+// print(Dictionary)
+// DicInt = genericType(Dictionary, CSharpInt, CSharpInt)
+// var a = new DicInt()
+// print(a, typeOf(a))
+// var a = ["1", "2", "3"]
+// a.insert(0, "4")
+// print(a)
+// function main() {
+//     for (var i = 0, 2) {
+//         switch (i) {
+//             case 1:
+//                 continue;
+//             case 2:
+//                 break;
+//         }
+//         print("11111")
+//     }
+// }
+// main()
+// var a = []
+// // for (var i = 1, 10) {
+// //     a.add(toString(i))
+// // }
+// foreach (var pair in pairs(Array)) {
+//     var args = []
+//     switch (pair.key) {
+//         // case "add":
+//         // case "push":
+//         // case "addUnique":
+//         //     args = ["add1", "add2", "add3"]
+//         //     break
+//         // case "insert":
+//         //     args = [0, "insert1", "insert2", "insert3"]
+//         //     break 
+//         // case "remove":
+//         //     args = ["8","9","10"]
+//         //     break;
+//         // case "removeAt":
+//         //     args = [0]
+//         //     break
+//         case "clear":
+//             continue;
+//         // case "sort":
+//         //     args = [function(a, b) { return a.compareTo(b) }]
+//         //     break
+//         // case "indexOf":
+//         // case "lastIndexOf":
+//         //     args = ["1"]
+//         //     break;
+//         // case "find":
+//         // case "findIndex":
+//         // case "findLast":
+//         // case "findLastIndex":
+//         // case "findAll":
+//         // case "findAllIndex":
+//         // case "findAllLast":
+//         // case "findAllLastIndex":
+//         //     args = [ function(a) { return a == "5" } ]
+//         //     break
+//         // case "forEach":
+//         // case "forEachLast":
+//         //     args = [ function(a) { print(a) } ]
+//         //     break;
+//         // case "convertAll":
+//         // case "map":
+//         //     args = [ function(a) { return a } ]
+//         //     break;
+//         // case "+":
+//         // case "-":
+//         // case "toArray":
+//         //     break
+//     }
+//     // print("调用函数 : " + pair.key)
+//     // print(a[pair.key](args...))
+// }
+// a.clear()
+// a += b
+// b.clear()
+// print(a.popFirst())
+// a.forEach((v) => {
+//     print(v)
+//     var index = a.find((_) => { return _ == v})
+//     print(index)
+// })
+// print(a)
+
 // async function timer(s, f) {
 //     await sleep(s)
 //     f()

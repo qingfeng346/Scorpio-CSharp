@@ -144,7 +144,8 @@ namespace Scorpio.Library
             script.SetGlobal("toNumber", script.CreateFunction(new toDouble()));
 
             script.SetGlobal("toEnum", script.CreateFunction(new toEnum(script)));
-            script.SetGlobal("toString", script.CreateFunction(new toString()));
+            script.SetGlobal("toEnumString", script.CreateFunction(new toEnumString(script)));
+            script.SetGlobal("toString", script.CreateFunction(new toString(script)));
 
             script.SetGlobal("typeOf", script.CreateFunction(new getPrototype(script)));
             //script.SetGlobal("setPrototype", script.CreateFunction(new setPrototype()));
@@ -359,7 +360,20 @@ namespace Scorpio.Library
                 }
             }
         }
+        private class toEnumString : ScorpioHandle {
+            readonly Script script;
+            public toEnumString(Script script) {
+                this.script = script;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return ScriptValue.CreateValue(script, Enum.ToObject(args[1].Get<ScriptUserdataEnumType>().Type, args[0].ToLong()).ToString());
+            }
+        }
         private class toString : ScorpioHandle {
+            readonly Script script;
+            public toString(Script script) {
+                this.script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(args[0].ToString());
             }

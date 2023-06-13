@@ -2,15 +2,18 @@
 using System;
 namespace Scorpio {
     public class ScorpioDelegateReference {
+        private Script script;
         private ScriptValue scriptValue;
-        public ScorpioDelegateReference(ScriptValue scriptValue) {
+        public ScorpioDelegateReference(Script script, ScriptValue scriptValue) {
+            this.script = script;
             this.scriptValue = scriptValue.Reference();
         }
         ~ScorpioDelegateReference() {
-            Script.MainSynchronizationContext.Post(_ => scriptValue.Free(), null);
+            script.RunOnMainThread(() => scriptValue.Free());
         }
         public ScriptValue call(params object[] args) {
-            return scriptValue.call(ScriptValue.Null, args);
+            using (var v = scriptValue.call(ScriptValue.Null, args))
+                return v;
         }
     }
     public class ScorpioDelegateFactoryManager {
@@ -20,8 +23,8 @@ namespace Scorpio {
         public static void SetFactory(IScorpioDelegateFactory factory) {
             m_Factory = factory;
         }
-        public static Delegate CreateDelegate(Type delegateType, ScriptValue scriptValue) {
-            return m_Factory.CreateDelegate(delegateType, scriptValue);
+        public static Delegate CreateDelegate(Script script, Type delegateType, ScriptValue scriptValue) {
+            return m_Factory.CreateDelegate(script, delegateType, scriptValue);
         }
 #else
         class DelegateData {

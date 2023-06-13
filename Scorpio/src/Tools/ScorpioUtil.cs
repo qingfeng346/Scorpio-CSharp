@@ -101,8 +101,10 @@ namespace Scorpio.Tools {
                 case ScriptValue.falseValueType: return false;
                 case ScriptValue.stringValueType: return value.stringValue;
                 case ScriptValue.scriptValueType: {
-                    if (value.scriptValue is ScriptFunction && TYPE_DELEGATE.IsAssignableFrom (type))
-                        return ScorpioDelegateFactoryManager.CreateDelegate (type, value);
+                    if (TYPE_DELEGATE.IsAssignableFrom(type)) {
+                        var func = value.Get<ScriptFunction>();
+                        if (func != null) return ScorpioDelegateFactoryManager.CreateDelegate(func.script, type, value);
+                    }
                     return value.scriptValue.Value;
                 }
                 default:

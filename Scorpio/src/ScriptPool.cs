@@ -209,6 +209,8 @@ namespace Scorpio {
         public void CheckPool() {
             StringReference.CheckPool();
             ScriptObjectReference.CheckPool();
+        }
+        public void CheckValuePool() {
             Check(typePool);
             Check(instancePool);
             Check(arrayPool);

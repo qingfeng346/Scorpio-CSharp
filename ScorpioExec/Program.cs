@@ -235,14 +235,10 @@ namespace ScorpioExec
                     while (script.Update()) {
                         TestClass.Update();
                     }
+                    script.ReleaseAll();
                     script.Shutdown();
                     script.ReleaseAll();
-                    StringReference.Check((i, entity) => {
-                        Console.WriteLine($"当前未释放String变量 索引:{i}  {entity}");
-                    });
-                    ScriptObjectReference.Check((i, entity) => {
-                        Console.WriteLine($"当前未释放Script变量 索引:{i}  {entity}");
-                    });
+                    script.CheckPool();
                     Logger.info ("=============================");
                     Logger.info ("return value : " + ret);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");

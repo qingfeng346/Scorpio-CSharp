@@ -57,14 +57,9 @@ namespace ScorpioTest {
                 script.LoadFile(file);
                 script.Shutdown();
                 script.ReleaseAll();
-                StringReference.Check((i, entity) => {
-                    WriteLine($"当前未释放String变量 索引:{i}  {entity}");
-                });
-                ScriptObjectReference.Check((i, entity) => {
-                    WriteLine($"当前未释放Script变量 索引:{i}  {entity}");
-                });
-                StringReference.Clear();
-                ScriptObjectReference.Clear();
+                script.CheckPool();
+                StringReference.Shutdown();
+                ScriptObjectReference.Shutdown();
             }
         }
         [Fact]

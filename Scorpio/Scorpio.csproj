@@ -26,6 +26,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-    <DefineConstants>$(DefineConstants);SCORPIO_DEBUG</DefineConstants>
+    <DefineConstants>$(DefineConstants);SCORPIO_DEBUG;SCORPIO_ASSERT</DefineConstants>
   </PropertyGroup>
 </Project>

@@ -12,7 +12,7 @@ public class __FactoryName : IScorpioDelegateFactory {
     public static void Initialize() {
         ScorpioDelegateFactoryManager.SetFactory(new DelegateFactory());__DelegateList__CreateDelegate
     }
-    public Delegate CreateDelegate(Type delegateType, ScriptValue scriptValue) {
+    public Delegate CreateDelegate(Script script, Type delegateType, ScriptValue scriptValue) {
         if (delegates.TryGetValue(delegateType, out var func)) {
             return func(scriptObject);
         }
@@ -26,7 +26,7 @@ public class __FactoryName : IScorpioDelegateFactory {
     public static void Initialize() {
         ScorpioDelegateFactoryManager.SetFactory(new DelegateFactory());__DelegateList
     }
-    public Delegate CreateDelegate(Type delegateType, ScriptValue scriptValue) {__CreateDelegate
+    public Delegate CreateDelegate(Script script, Type delegateType, ScriptValue scriptValue) {__CreateDelegate
         throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptValue : "" + scriptValue);
     }
 }";
@@ -71,7 +71,7 @@ public class __FactoryName : IScorpioDelegateFactory {
                 }
                 var invoke = $"value.call({pars})";
                 var call = ScorpioFastReflectUtil.ReturnString(invoke, InvokeMethod.ReturnType);
-                var func = $@"var value = new ScorpioDelegateReference(scriptValue);
+                var func = $@"var value = new ScorpioDelegateReference(script, scriptValue);
             return new {fullName}( ({pars}) => {call} );";
                 if (option.buildType == 0) {
                     builder.Append($@"

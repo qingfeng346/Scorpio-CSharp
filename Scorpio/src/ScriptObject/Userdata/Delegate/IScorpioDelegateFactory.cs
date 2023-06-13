@@ -1,6 +1,6 @@
 ﻿using System;
 namespace Scorpio {
     public interface IScorpioDelegateFactory {
-        Delegate CreateDelegate(Type delegateType, ScriptValue scriptValue);
+        Delegate CreateDelegate(Script script, Type delegateType, ScriptValue scriptValue);
     }
 }

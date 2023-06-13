@@ -5,19 +5,23 @@ using System.Collections.Generic;
 namespace Scorpio.Userdata {
     /// <summary> 枚举 Type </summary>
     public class ScriptUserdataEnumType : ScriptUserdata {
+        private bool init = false;
         private Dictionary<string, ScriptValue> m_Enums = new Dictionary<string, ScriptValue>();     //所有枚举的值
         public ScriptUserdataEnumType(Script script, Type value) : base(script) {
             this.m_Value = value;
             this.m_ValueType = value;
-            var names = Enum.GetNames(value);
-            foreach (var name in names) {
-                m_Enums[string.Intern(name)] = new ScriptValue(Convert.ToInt64(Enum.Parse(m_ValueType, name)));
-            }
+            
         }
         public override void Free() { }
         public override Type ValueType => ScorpioUtil.TYPE_TYPE;
         public override string ToString() { return m_ValueType.Name; }
         public override ScriptValue GetValue(string key) {
+            if (!init) {
+                init = true;
+                foreach (var name in Enum.GetNames(m_ValueType)) {
+                    m_Enums[string.Intern(name)] = ScriptValue.CreateValue(script, Enum.Parse(m_ValueType, name));
+                }
+            }
             if (m_Enums.TryGetValue(key, out var value))
                 return value;
             throw new ExecutionException($"枚举[{m_ValueType}]不存在[{key}");
