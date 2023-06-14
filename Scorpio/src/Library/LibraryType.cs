@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Scorpio.Library {
+﻿namespace Scorpio.Library {
     public class LibraryType {
         public static void Load(Script script) {
             script.SetGlobal("StringMap", script.CreateFunction(new StringMap(script)));
