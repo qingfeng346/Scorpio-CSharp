@@ -1,12 +1,17 @@
-var str = "var functions = new (string, ScorpioHandle)[] {\n"
-var count = 0
-foreach (var pair in pairs(Array)) {
-    str += '("${pair.key}", new ${pair.key}()),\n'
-    count += 1
-}
-print(count)
-str += "}"
-print(str)
+var a = StringMap()
+a["1111"] = 111
+a["2222"] = 222
+a[222] = 333
+// print(a.keys())
+// var str = "var functions = new (string, ScorpioHandle)[] {\n"
+// var count = 0
+// foreach (var pair in pairs(Array)) {
+//     str += '("${pair.key}", new ${pair.key}()),\n'
+//     count += 1
+// }
+// print(count)
+// str += "}"
+// print(str)
 // var a = {}
 // var b = {}
 // var c = {}
