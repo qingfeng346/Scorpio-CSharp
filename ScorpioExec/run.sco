@@ -1,4 +1,10 @@
-// TestStaticClass = importType("TestStaticClass")
+TestStaticClass = importType("TestStaticClass")
+// var a = {}
+// var b = {}
+// var c = {}
+// a.b = b
+// b.c = c
+// c.a = a
 class test {
 
 }
@@ -7,12 +13,12 @@ t.a = t
 var a = {}
 a.t = t
 t.www = a
-// function func() {
-//     print(a)
-// }
-// TestStaticClass.action1 = function() {
-//     // print(a)
-// }
+function func() {
+    // print(a)
+}
+TestStaticClass.action1 = function() {
+    // print(a)
+}
 // a.a = a
 // b.c = c
 // c.a = a

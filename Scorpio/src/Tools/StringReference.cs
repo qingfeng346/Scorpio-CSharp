@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 namespace Scorpio.Tools {
     public class StringReference {
-        private static readonly Entity DefaultEntity = new Entity(null, -1);
-        public struct Entity {
+        public class Entity {
             public string value;
             public int referenceCount;
-            public Entity(string value, int referenceCount) {
+            public void Set(string value) {
                 this.value = value;
-                this.referenceCount = referenceCount;
+                this.referenceCount = 1;
+            }
+            public void Clear() {
+                this.value = null;
+                this.referenceCount = -1;
             }
             public override string ToString() {
                 return $"{value}  引用计数:{referenceCount}";
@@ -34,9 +37,10 @@ namespace Scorpio.Tools {
                     Array.Copy(entities, newEntities, entities.Length);
                     entities = newEntities;
                 }
+                entities[index] = new Entity();
             }
             object2index.Add(value, index);
-            entities[index] = new Entity(value, 1);
+            entities[index].Set(value);
             return index;
         }
         public static void Free(int index) {
@@ -55,22 +59,24 @@ namespace Scorpio.Tools {
             ++entities[index].referenceCount;
         }
         //释放index
-        public static bool ReleaseAll() {
-            var isReleased = false;
-            for (var i = 0; i < freeIndex.Count; ++i) {
-                var index = freeIndex[i];
-                if (entities[index].referenceCount == 0) {
-                    object2index.Remove(entities[index].value);
-                    pool.Enqueue(index);
-                    entities[index] = DefaultEntity;
-                    isReleased = true;
+        public static void ReleaseAll() {
+            if (freeIndex.Count > 0) {
+                int index;
+                Entity entity;
+                for (var i = 0; i < freeIndex.Count; ++i) {
+                    index = freeIndex[i];
+                    entity = entities[index];
+                    if (entity.referenceCount == 0) {
+                        object2index.Remove(entity.value);
+                        pool.Enqueue(index);
+                        entity.Clear();
+                    }
                 }
+                freeIndex.Clear();
             }
-            freeIndex.Clear();
-            return isReleased;
         }
         internal static void CheckPool() {
-            for (var i = 0; i < entities.Length; ++i) {
+            for (var i = 0; i < length; ++i) {
                 if (entities[i].value != null) {
                     ScorpioLogger.error($"当前未释放String变量 索引:{i}  {entities[i]}");
                 }
@@ -79,7 +85,7 @@ namespace Scorpio.Tools {
         public static void Shutdown() {
             object2index.Clear();
             pool.Clear();
-            Array.Clear(entities, 0, entities.Length);
+            Array.Clear(entities, 0, length);
             freeIndex.Clear();
             length = 0;
         }

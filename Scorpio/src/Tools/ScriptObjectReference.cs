@@ -2,35 +2,36 @@
 using Scorpio.Function;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Scorpio.Tools {
     public class ScriptObjectReference {
-        private static readonly Entity DefaultEntity = new Entity(null, -1);
-        public struct Entity {
+        public class Entity {
             public ScriptObject value;
             public int referenceCount;
-            public Entity(ScriptObject value, int referenceCount) {
+            public void Set(ScriptObject value) {
                 this.value = value;
-                this.referenceCount = referenceCount;
+                this.referenceCount = 1;
+            }
+            public void Clear() {
+                this.value = null;
+                this.referenceCount = -1;
             }
             public override string ToString() {
                 try {
-                    return $"ID:{value?.Id}  {value}  引用计数:{referenceCount}";
+                    return $"{value.ToFullString()} 计数:{referenceCount}";
                 } catch (System.Exception) {
-                    return $"ID:{value?.Id}  {value.GetType()}:  引用计数:{referenceCount}";
+                    return $"{value?.GetType()}:  计数:{referenceCount}";
                 }
-                
             }
         }
         public class GCHandle {
             public int index;
             public int count;
             public HashSet<int> beCatch = new HashSet<int>();
-            public GCHandle Set(int index) {
+            public GCHandle(int index) {
                 this.index = index;
-                this.beCatch.Clear();
                 this.count = 0;
-                return this;
             }
         }
         private const int Stage = 8192;
@@ -39,7 +40,6 @@ namespace Scorpio.Tools {
         public static Queue<int> pool = new Queue<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
-
 #if PRINT_REFERENCE
         static bool Is(int index, Entity entity) {
             //return index == 296;
@@ -64,14 +64,15 @@ namespace Scorpio.Tools {
                 index = pool.Dequeue();
             } else {
                 index = length++;
-                if (length >= entities.Length) {
+                if (length == entities.Length) {
                     var newEntities = new Entity[entities.Length + Stage];
                     Array.Copy(entities, newEntities, entities.Length);
                     entities = newEntities;
                 }
+                entities[index] = new Entity();
             }
             object2index.Add(value.Id, index);
-            entities[index] = new Entity(value, 1);
+            entities[index].Set(value);
 #if PRINT_REFERENCE
             if (Is(index, entities[index])) {
                 logger.debug($"===================== Alloc新  Index:{index} - {entities[index]}");
@@ -105,38 +106,38 @@ namespace Scorpio.Tools {
             return entities[index].value;
         }
         //释放
-        public static bool ReleaseAll() {
-            var isReleased = false;
+        public static void ReleaseAll() {
             if (freeIndex.Count > 0) {
+                int index;
+                Entity entity;
                 for (var i = 0; i < freeIndex.Count; ++i) {
-                    var index = freeIndex[i];
-                    if (entities[index].referenceCount == 0) {
+                    index = freeIndex[i];
+                    entity = entities[index];
+                    if (entity.referenceCount == 0) {
 #if PRINT_REFERENCE
                         if (Is(index, entities[index])) {
                             logger.debug($"============Release  Index:{index} - {entities[index]}");
                         }
 #endif
-                        object2index.Remove(entities[index].value.Id);
-                        entities[index].value.Free();
+                        object2index.Remove(entity.value.Id);
+                        entity.value.Free();
                         pool.Enqueue(index);
-                        entities[index] = DefaultEntity;
-                        isReleased = true;
+                        entity.Clear();
                     }
                 }
                 freeIndex.Clear();
             }
-            return isReleased;
         }
         //检查未释放
         internal static void CheckPool() {
-            for (var i = 0; i < entities.Length; ++i) {
+            for (var i = 0; i < length; ++i) {
                 if (entities[i].value != null) {
                     ScorpioLogger.error($"当前未释放Scirpt变量 索引:{i}  {entities[i]}");
                 }
             }
         }
 
-        static ObjectsPool<GCHandle> gcHandlePool = new ObjectsPool<GCHandle>(() => new GCHandle());
+        //static ObjectsPool<GCHandle> gcHandlePool = new ObjectsPool<GCHandle>(() => new GCHandle());
         static Dictionary<int, GCHandle> gcHandle = new Dictionary<int, GCHandle>();
         static HashSet<int> canGC = new HashSet<int>();
         static HashSet<int> stack = new HashSet<int>();
@@ -144,7 +145,7 @@ namespace Scorpio.Tools {
             if (value.valueType == ScriptValue.scriptValueType) {
                 var index = value.scriptValueIndex;
                 if (!gcHandle.TryGetValue(index, out var handle)) {
-                    handle = gcHandle[index] = gcHandlePool.Alloc().Set(index);
+                    handle = gcHandle[index] = new GCHandle(index);// gcHandlePool.Alloc().Set(index);
                 }
                 handle.count++;
                 handle.beCatch.Add(originIndex);
@@ -163,6 +164,9 @@ namespace Scorpio.Tools {
                 Collect(((ScriptScriptBindFunctionBase)value).BindObject, originIndex);
             } else if (value is ScriptType) {
                 Collect((value as ScriptType).PrototypeValue, originIndex);
+                foreach (var pair in (value as ScriptType)) {
+                    Collect(pair.Value, originIndex);
+                }
             }
             if (value is ScriptInstance) {
                 foreach (var pair in (value as ScriptInstance)) {
@@ -185,12 +189,9 @@ namespace Scorpio.Tools {
             }
             return true;
         }
-        public static void GCCollect() {
-            foreach (var pair in gcHandle) {
-                gcHandlePool.Free(pair.Value);
-            }
+        static void CollectGC() {
             gcHandle.Clear();
-            for (var i = 0; i < entities.Length; ++i) {
+            for (var i = 0; i < length; ++i) {
                 if (entities[i].value != null && entities[i].referenceCount > 0) {
                     Collect(entities[i].value, i);
                 }
@@ -202,17 +203,27 @@ namespace Scorpio.Tools {
                     canGC.Add(pair.Key);
                 }
             }
+        }
+        public static void GCCollect() {
+            CollectGC();
             if (canGC.Count > 0) {
-                //ScorpioLogger.error("回收对象 : " + canGC.Count);
                 foreach (var index in canGC) {
                     entities[index].value.gc();
+                }
+            }
+        }
+        public static void CheckGCCollect() {
+            CollectGC();
+            if (canGC.Count > 0) {
+                foreach (var index in canGC) {
+                    ScorpioLogger.error($"[{index}] 可以被释放,被持有列表:{string.Join(",", gcHandle[index].beCatch.ToArray())}  内容:{entities[index]}");
                 }
             }
         }
         public static void Shutdown() {
             object2index.Clear();
             pool.Clear();
-            Array.Clear(entities, 0, entities.Length);
+            Array.Clear(entities, 0, length);
             freeIndex.Clear();
             length = 0;
         }

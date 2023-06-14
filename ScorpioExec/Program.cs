@@ -242,11 +242,9 @@ namespace ScorpioExec
                     //    script.ReleaseAll();
                     //    TestStaticClass.Update();
                     //}
-                    script.GCCollect();
                     script.ReleaseAll();
+                    script.CheckGCCollect();
                     script.Shutdown();
-                    script.ReleaseAll();
-                    script.GCCollect();
                     script.ReleaseAll();
                     script.CheckPool();
                     Logger.info ("=============================");

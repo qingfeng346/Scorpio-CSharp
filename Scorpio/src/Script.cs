@@ -81,7 +81,6 @@ namespace Scorpio
         public bool IsShutdown { get; private set; }
         public int MainThreadId { get; private set; }
         public SynchronizationContext MainSynchronizationContext { get; private set; }
-        private short frame = 0;
         public Script() {
             m_SearchPaths = new string[0];
             InitPool();
@@ -509,12 +508,8 @@ namespace Scorpio
             return stackInfos;
         }
         public void ReleaseAll() {
-            var released = true;
-            while (released) {
-                released = false;
-                released |= ScriptObjectReference.ReleaseAll();
-                released |= StringReference.ReleaseAll();
-            }
+            ScriptObjectReference.ReleaseAll();
+            StringReference.ReleaseAll();
         }
     }
 }

@@ -209,6 +209,9 @@ namespace Scorpio {
         public void GCCollect() {
             ScriptObjectReference.GCCollect();
         }
+        public void CheckGCCollect() {
+            ScriptObjectReference.CheckGCCollect();
+        }
         public void CheckPool() {
             StringReference.CheckPool();
             ScriptObjectReference.CheckPool();
