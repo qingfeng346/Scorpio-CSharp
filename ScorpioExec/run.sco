@@ -1,24 +1,32 @@
-TestStaticClass = importType("TestStaticClass")
+var str = "var functions = new (string, ScorpioHandle)[] {\n"
+var count = 0
+foreach (var pair in pairs(Array)) {
+    str += '("${pair.key}", new ${pair.key}()),\n'
+    count += 1
+}
+print(count)
+str += "}"
+print(str)
 // var a = {}
 // var b = {}
 // var c = {}
 // a.b = b
 // b.c = c
 // c.a = a
-class test {
+// class test {
 
-}
-var t = new test()
-t.a = t
-var a = {}
-a.t = t
-t.www = a
-function func() {
-    // print(a)
-}
-TestStaticClass.action1 = function() {
-    // print(a)
-}
+// }
+// var t = new test()
+// t.a = t
+// var a = {}
+// a.t = t
+// t.www = a
+// function func() {
+//     // print(a)
+// }
+// TestStaticClass.action1 = function() {
+//     // print(a)
+// }
 // a.a = a
 // b.c = c
 // c.a = a

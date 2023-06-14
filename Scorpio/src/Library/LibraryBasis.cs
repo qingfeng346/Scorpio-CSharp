@@ -12,31 +12,11 @@ using Scorpio.Instruction;
 namespace Scorpio.Library
 {
     public partial class LibraryBasis {
-        private abstract class KeyValuePairs<T> : ScorpioHandle {
-            readonly Script script;
-            readonly ScriptMap m_ItorResult;
-            readonly IEnumerator<KeyValuePair<T, ScriptValue>> m_Enumerator;
-            public KeyValuePairs(Script script, ScriptMap itorResult, IEnumerator<KeyValuePair<T, ScriptValue>> enumerator) {
-                this.script = script;
-                m_ItorResult = itorResult;
-                m_Enumerator = enumerator;
-            }
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                if (m_Enumerator.MoveNext()) {
-                    var value = m_Enumerator.Current;
-                    using (var key = ScriptValue.CreateValue(script, value.Key))
-                        m_ItorResult.SetValue("key", key);
-                    m_ItorResult.SetValue("value", value.Value);
-                    return ScriptValue.True;
-                }
-                return ScriptValue.False;
-            }
-        }
-        private abstract class ValuePairs : ScorpioHandle {
+        private class ArrayPairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
             readonly IEnumerator<ScriptValue> m_Enumerator;
             private double m_Index = 0;
-            public ValuePairs(ScriptMap itorResult, IEnumerator<ScriptValue> enumerator) {
+            public ArrayPairs(ScriptMap itorResult, IEnumerator<ScriptValue> enumerator) {
                 m_ItorResult = itorResult;
                 m_Enumerator = enumerator;
             }
@@ -49,24 +29,45 @@ namespace Scorpio.Library
                 return ScriptValue.False;
             }
         }
-        private class ArrayPairs : ValuePairs {
-            public ArrayPairs(ScriptMap itorResult, ScriptArray array) : base(itorResult, array.GetEnumerator()) { }
+        private class MapPairs : ScorpioHandle {
+            readonly Script script;
+            readonly ScriptMap m_ItorResult;
+            readonly IEnumerator<KeyValuePair<object, ScriptValue>> m_Enumerator;
+            public MapPairs(Script script, ScriptMap itorResult, IEnumerator<KeyValuePair<object, ScriptValue>> enumerator) {
+                this.script = script;
+                this.m_ItorResult = itorResult;
+                this.m_Enumerator = enumerator;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (m_Enumerator.MoveNext()) {
+                    var value = m_Enumerator.Current;
+                    using (var key = ScriptValue.CreateValue(script, value.Key))
+                        m_ItorResult.SetValue("key", key);
+                    m_ItorResult.SetValue("value", value.Value);
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
+            }
         }
-        private class HashSetPairs : ValuePairs {
-            public HashSetPairs(ScriptMap itorResult, ScriptHashSet hashSet) : base(itorResult, hashSet.GetEnumerator()) { }
-        }
-        private class MapObjectPairs : KeyValuePairs<object> {
-            public MapObjectPairs(Script script, ScriptMap itorResult, ScriptMapObject map) : base(script, itorResult, map.GetEnumerator()) { }
-        }
-        private class MapStringPairs : KeyValuePairs<object> {
-            public MapStringPairs(Script script, ScriptMap itorResult, ScriptMapString map) : base(script, itorResult, map.GetEnumerator()) { }
-        }
-
-        private class InstancePairs : KeyValuePairs<string> {
-            public InstancePairs(Script script, ScriptMap itorResult, ScriptInstance map) : base(script, itorResult, map.GetEnumerator()) { }
-        }
-        private class TypePairs : KeyValuePairs<string> {
-            public TypePairs(Script script, ScriptMap itorResult, ScriptType map) : base(script, itorResult, map.GetEnumerator()) { }
+        private class StringMapPairs : ScorpioHandle {
+            readonly Script script;
+            readonly ScriptMap m_ItorResult;
+            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
+            public StringMapPairs(Script script, ScriptMap itorResult, IEnumerator<ScorpioKeyValue<string, ScriptValue>> enumerator) {
+                this.script = script;
+                this.m_ItorResult = itorResult;
+                this.m_Enumerator = enumerator;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                if (m_Enumerator.MoveNext()) {
+                    var value = m_Enumerator.Current;
+                    using (var key = ScriptValue.CreateValue(script, value.Key))
+                        m_ItorResult.SetValue("key", key);
+                    m_ItorResult.SetValue("value", value.Value);
+                    return ScriptValue.True;
+                }
+                return ScriptValue.False;
+            }
         }
         private class UserdataPairs : ScorpioHandle {
             readonly Script script;
@@ -92,9 +93,6 @@ namespace Scorpio.Library
                 }
                 return ScriptValue.False;
             }
-        }
-        private class GlobalPairs : KeyValuePairs<string> {
-            public GlobalPairs(Script script, ScriptMap itorResult, ScriptGlobal global) : base(script, itorResult, global.GetEnumerator()) { }
         }
         public static void Load(Script script) {
             script.SetGlobal("print", script.CreateFunction(new print(script)));
@@ -220,21 +218,19 @@ namespace Scorpio.Library
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
                 var itorResult = m_script.NewMapObject();
                 if (obj is ScriptArray) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, (ScriptArray)obj)));
-                } else if (obj is ScriptMapObject) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapObjectPairs(m_script, itorResult, (ScriptMapObject)obj)));
-                } else if (obj is ScriptMapString) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapStringPairs(m_script, itorResult, (ScriptMapString)obj)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, ((ScriptArray)obj).GetEnumerator())));
+                } else if (obj is ScriptMap) {
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapPairs(m_script, itorResult, ((ScriptMap)obj).GetEnumerator())));
                 } else if (obj is ScriptHashSet) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new HashSetPairs(itorResult, (ScriptHashSet)obj)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, ((ScriptHashSet)obj).GetEnumerator())));
                 } else if (obj is ScriptUserdata) {
                     itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new UserdataPairs(m_script, itorResult, (ScriptUserdata)obj)));
                 } else if (obj is ScriptInstance) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new InstancePairs(m_script, itorResult, (ScriptInstance)obj)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptInstance)obj).GetEnumerator())));
                 } else if (obj is ScriptType) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new TypePairs(m_script, itorResult, (ScriptType)obj)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptType)obj).GetEnumerator())));
                 } else if (obj is ScriptGlobal) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new GlobalPairs(m_script, itorResult, (ScriptGlobal)obj)));
+                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptGlobal)obj).GetEnumerator())));
                 } else {
                     throw new ExecutionException("pairs 必须用于 array, map, type, global 或者 继承 IEnumerable 的 userdata 类型");
                 }

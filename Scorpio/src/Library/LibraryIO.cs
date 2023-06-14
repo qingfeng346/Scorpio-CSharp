@@ -8,48 +8,54 @@ namespace Scorpio.Library {
         public const long BaseTime = 621355968000000000;                        //1970, 1, 1, 0, 0, 0, DateTimeKind.Utc
         public static long UnixNow => (DateTime.UtcNow.Ticks - BaseTime) / 10000;
         public static void Load(Script script) {
+            var functions = new (string, ScorpioHandle)[] {
+                ("unixNow", new unixNow()),
+                ("toString", new toString()),
+                ("toBytes", new toBytes(script)),
+                ("readAll", new readAll(script)),
+                ("writeAll", new writeAll()),
+                ("readAllString", new readAllString()),
+                ("writeAllString", new writeAllString()),
+                ("readAllLines", new readAllLines(script)),
+                ("writeAllLines", new writeAllLines()),
+                ("appendAllText", new appendAllText()),
+                ("appendAllLines", new appendAllLines()),
+                ("fileExist", new fileExist()),
+                ("pathExist", new pathExist()),
+                ("createPath", new createPath()),
+                ("deleteFile", new deleteFile()),
+                ("deletePath", new deletePath()),
+                ("copyFile", new copyFile()),
+                ("moveFile", new moveFile()),
+                ("movePath", new movePath()),
+                ("getFiles", new getFiles(script)),
+                ("getPaths", new getPaths(script)),
+                ("getCreationTime", new getCreationTime(script)),
+                ("getLastAccessTime", new getLastAccessTime(script)),
+                ("getLastWriteTime", new getLastWriteTime(script)),
+                ("setCreationTime", new setCreationTime()),
+                ("setLastAccessTime", new setLastAccessTime()),
+                ("setLastWriteTime", new setLastWriteTime()),
+                ("getExtension", new getExtension()),
+                ("getFileName", new getFileName()),
+                ("getDirectoryName", new getDirectoryName()),
+                ("changeExtension", new changeExtension()),
+                ("combine", new combine()),
+                ("getTempFileName", new getTempFileName()),
+                ("getTempPath", new getTempPath()),
+                ("md5", new md5()),
+                ("md5Bytes", new md5Bytes(script)),
+                ("md5HashToString", new md5HashToString()),
+                ("toBase64", new toBase64()),
+                ("fromBase64", new fromBase64(script)),
+                ("workPath", new workPath()),
+                ("lineArgs", new lineArgs(script)),
+            };
             var map = script.NewMapString();
-            map.SetValue("unixNow", script.CreateFunction(new unixNow()));
-            map.SetValue("toString", script.CreateFunction(new toString()));
-            map.SetValue("toBytes", script.CreateFunction(new toBytes(script)));
-            map.SetValue("readAll", script.CreateFunction(new readAll(script)));
-            map.SetValue("writeAll", script.CreateFunction(new writeAll()));
-            map.SetValue("readAllString", script.CreateFunction(new readAllString()));
-            map.SetValue("writeAllString", script.CreateFunction(new writeAllString()));
-            map.SetValue("readAllLines", script.CreateFunction(new readAllLines(script)));
-            map.SetValue("writeAllLines", script.CreateFunction(new writeAllLines()));
-            map.SetValue("appendAllText", script.CreateFunction(new appendAllText()));
-            map.SetValue("appendAllLines", script.CreateFunction(new appendAllLines()));
-            map.SetValue("fileExist", script.CreateFunction(new fileExist()));
-            map.SetValue("pathExist", script.CreateFunction(new pathExist()));
-            map.SetValue("createPath", script.CreateFunction(new createPath()));
-            map.SetValue("deleteFile", script.CreateFunction(new deleteFile()));
-            map.SetValue("deletePath", script.CreateFunction(new deletePath()));
-            map.SetValue("copyFile", script.CreateFunction(new copyFile()));
-            map.SetValue("moveFile", script.CreateFunction(new moveFile()));
-            map.SetValue("movePath", script.CreateFunction(new movePath()));
-            map.SetValue("getFiles", script.CreateFunction(new getFiles(script)));
-            map.SetValue("getPaths", script.CreateFunction(new getPaths(script)));
-            map.SetValue("getCreationTime", script.CreateFunction(new getCreationTime(script)));
-            map.SetValue("getLastAccessTime", script.CreateFunction(new getLastAccessTime(script)));
-            map.SetValue("getLastWriteTime", script.CreateFunction(new getLastWriteTime(script)));
-            map.SetValue("setCreationTime", script.CreateFunction(new setCreationTime()));
-            map.SetValue("setLastAccessTime", script.CreateFunction(new setLastAccessTime()));
-            map.SetValue("setLastWriteTime", script.CreateFunction(new setLastWriteTime()));
-            map.SetValue("getExtension", script.CreateFunction(new getExtension()));
-            map.SetValue("getFileName", script.CreateFunction(new getFileName()));
-            map.SetValue("getDirectoryName", script.CreateFunction(new getDirectoryName()));
-            map.SetValue("changeExtension", script.CreateFunction(new changeExtension()));
-            map.SetValue("combine", script.CreateFunction(new combine()));
-            map.SetValue("getTempFileName", script.CreateFunction(new getTempFileName()));
-            map.SetValue("getTempPath", script.CreateFunction(new getTempPath()));
-            map.SetValue("md5", script.CreateFunction(new md5()));
-            map.SetValue("md5Bytes", script.CreateFunction(new md5Bytes(script)));
-            map.SetValue("md5HashToString", script.CreateFunction(new md5HashToString()));
-            map.SetValue("toBase64", script.CreateFunction(new toBase64()));
-            map.SetValue("fromBase64", script.CreateFunction(new fromBase64(script)));
-            map.SetValue("workPath", script.CreateFunction(new workPath()));
-            map.SetValue("lineArgs", script.CreateFunction(new lineArgs(script)));
+            map.SetCapacity(functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             script.SetGlobal("io", map);
         }
         private class unixNow : ScorpioHandle {

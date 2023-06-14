@@ -4,8 +4,8 @@ using Scorpio.Library;
 using Scorpio.Tools;
 
 namespace Scorpio {
-    public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
-        internal Dictionary<string, ScriptValue> m_Values = new Dictionary<string, ScriptValue>();         //所有的数据(函数和数据都在一个数组)
+    public class ScriptInstance : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
+        internal ScorpioStringDictionary<ScriptValue> m_Values = new ScorpioStringDictionary<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptValue m_PrototypeValue;
         protected ScriptType m_Prototype = null;
         public ScriptInstance(Script script) : base(script, ObjectType.Instance) { }
@@ -18,6 +18,9 @@ namespace Scorpio {
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype => m_Prototype;
         public ScriptValue PrototypeValue => m_PrototypeValue;
+        public void SetCapacity(int capacity) {
+            m_Values.SetCapacity(capacity);
+        }
         protected void Release() {
             m_PrototypeValue.Free();
             m_Prototype = null;
@@ -48,8 +51,8 @@ namespace Scorpio {
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
-        public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
+        public IEnumerator<ScorpioKeyValue<string, ScriptValue>> GetEnumerator() => m_Values.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => m_Values.GetEnumerator();
         public override ScriptValue Plus(ScriptValue obj) {
             var func = m_Prototype.GetValue(ScriptOperator.Plus).Get<ScriptFunction>();
             if (func != null) {

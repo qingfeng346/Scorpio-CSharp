@@ -52,7 +52,7 @@ namespace Scorpio {
             genericMethodPool = new ScriptObjectsPool<ScriptGenericMethodFunction>(() => new ScriptGenericMethodFunction(this));
             staticMethodPool = new ScriptObjectsPool<ScriptStaticMethodFunction>(() => new ScriptStaticMethodFunction(this));
 
-            internalValuesPool = new ObjectsPool<InternalValue[]>(() => new InternalValue[128]);
+            internalValuesPool = new ObjectsPool<InternalValue[]>(() => new InternalValue[64]);
             internalValuePool = new ScriptObjectsPool<InternalValue>(() => new InternalValue(this));
 
             scorpioJsonSerializer = new ScorpioJsonSerializer();

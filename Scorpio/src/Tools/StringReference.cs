@@ -20,7 +20,7 @@ namespace Scorpio.Tools {
         private const int Stage = 8192;
         private static int length = 0;
         private static Dictionary<string, int> object2index = new Dictionary<string, int>();
-        public static Queue<int> pool = new Queue<int>();
+        public static Stack<int> pool = new Stack<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
         public static int Alloc(string value) {
@@ -29,7 +29,7 @@ namespace Scorpio.Tools {
                 return index;
             }
             if (pool.Count > 0) {
-                index = pool.Dequeue();
+                index = pool.Pop();
             } else {
                 index = length++;
                 if (length >= entities.Length) {
@@ -48,9 +48,11 @@ namespace Scorpio.Tools {
                 //添加到待释放列表
                 freeIndex.Add(index);
             }
+#if SCORPIO_DEBUG
             if (entities[index].referenceCount < 0) {
                 ScorpioLogger.error($"String 释放有问题,当前计数:{entities[index].referenceCount}  Index:{index} - {entities[index]}");
             }
+#endif
         }
         public static string GetValue(int index) {
             return entities[index].value;
@@ -68,7 +70,7 @@ namespace Scorpio.Tools {
                     entity = entities[index];
                     if (entity.referenceCount == 0) {
                         object2index.Remove(entity.value);
-                        pool.Enqueue(index);
+                        pool.Push(index);
                         entity.Clear();
                     }
                 }

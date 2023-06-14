@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace Scorpio.Tools {
     public static class ScorpioParameters {
@@ -24,15 +23,15 @@ namespace Scorpio.Tools {
                 Free(this);
             }
         }
-        private static Queue<Parameter> pool = new Queue<Parameter>();
+        private static Stack<Parameter> pool = new Stack<Parameter>();
         public static Parameter Get() {
             if (pool.Count == 0) {
                 return new Parameter();
             }
-            return pool.Dequeue();
+            return pool.Pop();
         }
         public static void Free(Parameter parameter) {
-            pool.Enqueue(parameter);
+            pool.Push(parameter);
         }
     }
 }

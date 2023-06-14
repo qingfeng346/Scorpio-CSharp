@@ -60,8 +60,8 @@ namespace Scorpio.Tools {
             Write(data.scriptInstructions.Length);
             Array.ForEach(data.scriptInstructions, (value) => {
                 Write((int)value.opcode);
-                Write(value.opvalue);
-                Write(value.line);
+                Write((int)value.opvalue);
+                Write((int)value.line);
             });
         }
         public void Write(ScriptClassData data) {

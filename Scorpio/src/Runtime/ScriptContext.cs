@@ -14,7 +14,7 @@ namespace Scorpio.Runtime {
             public ScriptValue[] stack;
         }
         internal const int ValueCacheLength = 128;          //函数最大调用层级,超过会堆栈溢出
-        internal const int StackValueLength = 256;          //堆栈数据最大数量
+        internal const int StackValueLength = 128;          //堆栈数据最大数量
         internal const int VariableValueLength = 128;       //局部变量最大数量
         internal const int TryStackLength = 16;             //最多可以嵌套多少层try catch
         
@@ -22,7 +22,7 @@ namespace Scorpio.Runtime {
         internal static ScriptValue[][] StackValues = new ScriptValue[ValueCacheLength][]; //堆栈数据
         internal static int[][] TryStackValues = new int[ValueCacheLength][]; //try catch数据
         internal static int VariableValueIndex = 0;
-        internal static Queue<AsyncValue> AsyncValueQueue = new Queue<AsyncValue>();
+        internal static Stack<AsyncValue> AsyncValueQueue = new Stack<AsyncValue>();
         static ScriptContext() {
             for (var i = 0; i < ValueCacheLength; ++i) {
                 StackValues[i] = new ScriptValue[StackValueLength];
@@ -33,13 +33,13 @@ namespace Scorpio.Runtime {
         private static AsyncValue AllocAsyncValue() {
             if (AsyncValueQueue.Count == 0)
                 return new AsyncValue() { variable = new ScriptValue[64], stack = new ScriptValue[64] };
-            return AsyncValueQueue.Dequeue();
+            return AsyncValueQueue.Pop();
         }
         private void FreeAsyncValue(AsyncValue value, InternalValue[] internalValues) {
             ScorpioUtil.Free(value.stack, value.stack.Length);
             ScorpioUtil.Free(value.variable, value.variable.Length);
             ScorpioUtil.Free(m_script, internalValues, internalCount);
-            AsyncValueQueue.Enqueue(value);
+            AsyncValueQueue.Push(value);
 
         }
         private void Free(ScriptValue[] variableObjects, ScriptValue[] stackObjects, InternalValue[] internalValues) {

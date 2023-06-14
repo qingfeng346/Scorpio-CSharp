@@ -74,7 +74,7 @@ namespace Scorpio {
         public override void gc() {
             Clear();
         }
-        void SetCapacity(int value) {
+        void SetArrayCapacity(int value) {
             if (value > 0) {
                 var array = new ScriptValue[value];
                 if (m_Length > 0) {
@@ -89,7 +89,7 @@ namespace Scorpio {
             if (m_Objects.Length < min) {
                 int num = (m_Objects.Length == 0) ? 8 : (m_Objects.Length * 2);
                 if (num > 2146435071) { num = 2146435071; } else if (num < min) { num = min; }
-                SetCapacity(num);
+                SetArrayCapacity(num);
             }
         }
         public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }

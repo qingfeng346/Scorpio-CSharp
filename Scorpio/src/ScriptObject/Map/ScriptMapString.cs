@@ -1,26 +1,21 @@
-using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Tools;
 
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapString : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
+    public class ScriptMapString : ScriptMap {
         //数组迭代器
-        public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
+        private struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
+            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
             internal Enumerator(ScriptMapString map) {
                 m_Enumerator = map.m_Values.GetEnumerator();
             }
             public bool MoveNext() {
                 return m_Enumerator.MoveNext();
             }
-            public KeyValuePair<object, ScriptValue> Current { 
-                get { 
-                    return new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value); 
-                }
-            }
-            object IEnumerator.Current { get { return m_Enumerator.Current; } }
+            public KeyValuePair<object, ScriptValue> Current => new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value);
+            object IEnumerator.Current => Current;
             public void Reset() { m_Enumerator.Reset(); }
             public void Dispose() { m_Enumerator.Dispose(); }
         }
@@ -37,7 +32,6 @@ namespace Scorpio {
             Clear();
         }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
-        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
         public override bool ContainsKey(object key) {
             if (!(key is string)) return false;
             return m_Values.ContainsKey(key as string);
@@ -52,23 +46,10 @@ namespace Scorpio {
             m_Values.Free();
         }
         public override void Remove(object key) {
-            m_Values.Remove(key as string);
-        }
-        public override ScriptArray GetKeys() {
-            var ret = m_Script.NewArray();
-            foreach (var pair in m_Values) {
-                using (var key = new ScriptValue(pair.Key)) {
-                    ret.Add(key);
-                }
+            if (m_Values.TryGetValue((string)key, out var result)) {
+                result.Free();
+                m_Values.Remove((string)key);
             }
-            return ret;
-        }
-        public override ScriptArray GetValues() {
-            var ret = m_Script.NewArray();
-            foreach (var pair in m_Values) {
-                ret.Add(pair.Value);
-            }
-            return ret;
         }
         public override ScriptMap NewCopy() {
             var ret = m_Script.NewMapString();

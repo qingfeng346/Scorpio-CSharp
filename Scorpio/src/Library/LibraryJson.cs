@@ -1,9 +1,15 @@
 namespace Scorpio.Library {
     public partial class LibraryJson {
         public static void Load(Script script) {
+            var functions = new (string, ScorpioHandle)[] {
+                ("encode", new encode(script)),
+                ("decode", new decode(script)),
+            };
             var map = script.NewMapString();
-            map.SetValue("encode", script.CreateFunction(new encode(script)));
-            map.SetValue("decode", script.CreateFunction(new decode(script)));
+            map.SetCapacity(functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             script.SetGlobal("json", map);
         }
         private class encode : ScorpioHandle {

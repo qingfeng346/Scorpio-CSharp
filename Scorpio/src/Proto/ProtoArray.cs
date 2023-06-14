@@ -2,42 +2,48 @@ namespace Scorpio.Proto {
     using Scorpio.Userdata;
     public class ProtoArray {
         public static ScriptType Load(Script script, ScriptType ret) {
-            ret.SetValue("length", script.CreateFunction(new length()));
-            ret.SetValue("count", script.CreateFunction(new length()));
-            ret.SetValue("insert", script.CreateFunction(new insert()));
-            ret.SetValue("add", script.CreateFunction(new add()));
-            ret.SetValue("push", script.CreateFunction(new add()));
-            ret.SetValue("addUnique", script.CreateFunction(new addUnique()));
-            ret.SetValue("remove", script.CreateFunction(new remove()));
-            ret.SetValue("removeAt", script.CreateFunction(new removeAt()));
-            ret.SetValue("clear", script.CreateFunction(new clear()));
-            ret.SetValue("contains", script.CreateFunction(new contains()));
-            ret.SetValue("sort", script.CreateFunction(new sort()));
-            ret.SetValue("indexOf", script.CreateFunction(new indexOf()));
-            ret.SetValue("lastIndexOf", script.CreateFunction(new lastIndexOf()));
-            ret.SetValue("find", script.CreateFunction(new find()));
-            ret.SetValue("findIndex", script.CreateFunction(new findIndex()));
-            ret.SetValue("findLast", script.CreateFunction(new findLast()));
-            ret.SetValue("findLastIndex", script.CreateFunction(new findLastIndex()));
-            ret.SetValue("findAll", script.CreateFunction(new findAll()));
-            ret.SetValue("findAllIndex", script.CreateFunction(new findAllIndex()));
-            ret.SetValue("findAllLast", script.CreateFunction(new findAllLast()));
-            ret.SetValue("findAllLastIndex", script.CreateFunction(new findAllLastIndex()));
-            ret.SetValue("forEach", script.CreateFunction(new forEach()));
-            ret.SetValue("forEachLast", script.CreateFunction(new forEachLast()));
-            ret.SetValue("convertAll", script.CreateFunction(new convertAll()));
-            ret.SetValue("map", script.CreateFunction(new convertAll()));
-            ret.SetValue("reverse", script.CreateFunction(new reverse()));
-            ret.SetValue("first", script.CreateFunction(new first()));
-            ret.SetValue("last", script.CreateFunction(new last()));
-            ret.SetValue("popFirst", script.CreateFunction(new popFirst()));
-            ret.SetValue("safePopFirst", script.CreateFunction(new safePopFirst()));
-            ret.SetValue("popLast", script.CreateFunction(new popLast()));
-            ret.SetValue("safePopLast", script.CreateFunction(new safePopLast()));
-            ret.SetValue("join", script.CreateFunction(new join()));
-            ret.SetValue("toArray", script.CreateFunction(new toArray()));
-            ret.SetValue("+", script.CreateFunction(new plus()));
-            ret.SetValue("-", script.CreateFunction(new minus()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("length", new length()),
+                ("count", new length()),
+                ("insert", new insert()),
+                ("add", new add()),
+                ("push", new add()),
+                ("addUnique", new addUnique()),
+                ("remove", new remove()),
+                ("removeAt", new removeAt()),
+                ("clear", new clear()),
+                ("contains", new contains()),
+                ("sort", new sort()),
+                ("indexOf", new indexOf()),
+                ("lastIndexOf", new lastIndexOf()),
+                ("find", new find()),
+                ("findIndex", new findIndex()),
+                ("findLast", new findLast()),
+                ("findLastIndex", new findLastIndex()),
+                ("findAll", new findAll()),
+                ("findAllIndex", new findAllIndex()),
+                ("findAllLast", new findAllLast()),
+                ("findAllLastIndex", new findAllLastIndex()),
+                ("forEach", new forEach()),
+                ("forEachLast", new forEachLast()),
+                ("convertAll", new convertAll()),
+                ("map", new convertAll()),
+                ("reverse", new reverse()),
+                ("first", new first()),
+                ("last", new last()),
+                ("popFirst", new popFirst()),
+                ("safePopFirst", new safePopFirst()),
+                ("popLast", new popLast()),
+                ("safePopLast", new safePopLast()),
+                ("join", new join()),
+                ("toArray", new toArray()),
+                ("+", new plus()),
+                ("-", new minus()),
+            };
+            ret.SetFunctionCapacity(functions.Length);
+            foreach (var (name, func) in functions) {
+                ret.SetValue(name, script.CreateFunction(func));
+            }
             return ret;
         }
         private class length : ScorpioHandle {
