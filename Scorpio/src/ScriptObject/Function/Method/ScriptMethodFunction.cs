@@ -9,5 +9,6 @@ namespace Scorpio.Function {
             Method = method;
             return this;
         }
+        public override void gc() { }
     }
 }

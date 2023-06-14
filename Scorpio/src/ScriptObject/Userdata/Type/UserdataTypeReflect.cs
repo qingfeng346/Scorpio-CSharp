@@ -98,7 +98,10 @@ namespace Scorpio.Userdata
         /// <summary> 设置一个类变量 </summary>
         public override void SetValue(object obj, string name, ScriptValue value) {
             var variable = GetVariable(name);
-            (variable != null).Assert($"SetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
+#if SCORPIO_ASSERT
+            if (variable == null)
+                throw new ExecutionException($"SetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
+#endif
             try {
                 variable.SetValue(obj, value.ChangeType(variable.FieldType));
             } catch (System.Exception e) {

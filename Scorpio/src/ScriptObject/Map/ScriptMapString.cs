@@ -33,6 +33,9 @@ namespace Scorpio {
             Clear();
             m_Script.Free(this);
         }
+        public override void gc() {
+            Clear();
+        }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
         IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
         public override bool ContainsKey(object key) {

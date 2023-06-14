@@ -19,6 +19,9 @@ namespace Scorpio.Userdata {
             m_Methods.Free();
             m_Script.Free(this);
         }
+        public override void gc() {
+            m_Methods.Free();
+        }
         public override ScriptValue GetValue(string key) {
             if (m_Methods.TryGetValue(key, out var value)) {
                 return value;

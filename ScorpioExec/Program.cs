@@ -246,6 +246,8 @@ namespace ScorpioExec
                     script.ReleaseAll();
                     script.Shutdown();
                     script.ReleaseAll();
+                    script.GCCollect();
+                    script.ReleaseAll();
                     script.CheckPool();
                     Logger.info ("=============================");
                     Logger.info ("return value : " + ret);

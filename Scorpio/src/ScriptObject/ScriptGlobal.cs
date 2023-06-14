@@ -44,6 +44,7 @@ namespace Scorpio {
             m_Size = 0;
         }
         public override void Free() { }
+        public override void gc() { }
         void SetCapacity(int value) {
             if (value > 0) {
                 var array = new ScriptValue[value];

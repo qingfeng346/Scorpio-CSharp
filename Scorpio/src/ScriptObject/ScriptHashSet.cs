@@ -20,6 +20,9 @@ namespace Scorpio {
             Clear();
             m_Script.Free(this);
         }
+        public override void gc() {
+            Clear();
+        }
         public void Add(ScriptValue item) {
             if (!m_Objects.Contains(item)) {
                 m_Objects.Add(item.Reference());

@@ -28,6 +28,8 @@ namespace Scorpio {
         }
         public virtual void Alloc() { }
         public abstract void Free();
+        //循环引用被回收掉
+        public abstract void gc();
         public ObjectType ObjectType { get; private set; }              //类型
         public virtual object Value => this;                            //值
         public virtual Type ValueType => GetType();                     //值类型

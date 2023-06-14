@@ -18,6 +18,9 @@ namespace Scorpio {
             Clear();
             m_Script.Free(this);
         }
+        public override void gc() {
+            Clear();
+        }
         public override ScriptValue GetValue(string key) {
             return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }

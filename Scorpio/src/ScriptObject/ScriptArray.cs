@@ -70,7 +70,9 @@ namespace Scorpio {
             Release();
             Clear();
             m_Script.Free(this);
-            m_Length = 0;
+        }
+        public override void gc() {
+            Clear();
         }
         void SetCapacity(int value) {
             if (value > 0) {

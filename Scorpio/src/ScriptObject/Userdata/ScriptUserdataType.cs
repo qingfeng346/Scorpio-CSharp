@@ -15,6 +15,9 @@ namespace Scorpio.Userdata {
         public override void Free() {
             m_Methods.Free();
         }
+        public override void gc() {
+            m_Methods.Free();
+        }
         public override Type ValueType => ScorpioUtil.TYPE_TYPE;
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return new ScriptValue(m_UserdataType.CreateInstance(m_Script, parameters, length));

@@ -32,6 +32,9 @@ namespace Scorpio {
             Release();
             m_Script.Free(this);
         }
+        public override void gc() {
+            Release();
+        }
         public void AddGetProperty(string key, ScriptFunction function) {
             if (m_GetProperties.TryGetValue(key, out var result)) {
                 result.Free();

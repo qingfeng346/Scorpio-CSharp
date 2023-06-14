@@ -2,8 +2,6 @@
 using Scorpio.Function;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Scorpio.Tools {
     public class ScriptObjectReference {
@@ -24,12 +22,24 @@ namespace Scorpio.Tools {
                 
             }
         }
+        public class GCHandle {
+            public int index;
+            public int count;
+            public HashSet<int> beCatch = new HashSet<int>();
+            public GCHandle Set(int index) {
+                this.index = index;
+                this.beCatch.Clear();
+                this.count = 0;
+                return this;
+            }
+        }
         private const int Stage = 8192;
         private static int length = 0;
         private static Dictionary<uint, int> object2index = new Dictionary<uint, int>();
         public static Queue<int> pool = new Queue<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
+
 #if PRINT_REFERENCE
         static bool Is(int index, Entity entity) {
             //return index == 296;
@@ -117,133 +127,87 @@ namespace Scorpio.Tools {
             }
             return isReleased;
         }
-        static void AddChildren(ScriptValue value, int originIndex, string from, HashSet<string> children, HashSet<int> childrenIndex) {
-            if (value.valueType == ScriptValue.stringValueType) {
-                children.Add($"{from}s{value.stringValueIndex}");
-            } else if (value.valueType == ScriptValue.scriptValueType) {
-                if (originIndex != value.scriptValueIndex && !childrenIndex.Contains(value.scriptValueIndex)) {
-                    childrenIndex.Add(value.scriptValueIndex);
-                    children.Add($"{from}{value.scriptValueIndex}");
-                    AddChildren(value.scriptValue, originIndex, $"{from}{value.scriptValueIndex}->", children, childrenIndex);
-                }
-            }
-        }
-        static void AddChildren(ScriptObject value, int originIndex, string from, HashSet<string> children, HashSet<int> childrenIndex) {
-            if (value is ScriptMap) {
-                foreach (var pair in (ScriptMap)value) {
-                    AddChildren(pair.Value, originIndex, $"{from}[k:{pair.Key}]", children, childrenIndex);
-                }
-            } else if (value is ScriptArray) {
-                var index = 0;
-                foreach (var element in (ScriptArray)value) {
-                    AddChildren(element, originIndex, $"{from}[i:{index}]", children, childrenIndex);
-                    ++index;
-                }
-            } else if (value is ScriptScriptBindFunctionBase) {
-                AddChildren(((ScriptScriptBindFunctionBase)value).BindObject, originIndex, $"{from}[b]", children, childrenIndex);
-            } else if (value is ScriptType) {
-                AddChildren((value as ScriptType).PrototypeValue, originIndex, $"{from}[p]", children, childrenIndex);
-            }
-            if (value is ScriptInstance) {
-                foreach (var pair in (value as ScriptInstance)) {
-                    AddChildren(pair.Value, originIndex, $"{from}[ik:{pair.Key}]", children, childrenIndex);
-                }
-                AddChildren((value as ScriptInstance).PrototypeValue, originIndex, $"{from}[t]", children, childrenIndex);
-            }
-        }
+        //检查未释放
         internal static void CheckPool() {
             for (var i = 0; i < entities.Length; ++i) {
                 if (entities[i].value != null) {
-                    var childrenIndex = new HashSet<int>();
-                    var children = new HashSet<string>();
-                    AddChildren(entities[i].value, i, "", children, childrenIndex);
-                    ScorpioLogger.error($"当前未释放Scirpt变量 索引:{i}  {entities[i]}, 持有对象:{string.Join(",", children.ToArray())}");
+                    ScorpioLogger.error($"当前未释放Scirpt变量 索引:{i}  {entities[i]}");
                 }
             }
         }
-        static void Collect(ScriptValue value, int originIndex, Dictionary<int, HashSet<int>> re, Dictionary<int, HashSet<int>> beRe) {
+
+        static ObjectsPool<GCHandle> gcHandlePool = new ObjectsPool<GCHandle>(() => new GCHandle());
+        static Dictionary<int, GCHandle> gcHandle = new Dictionary<int, GCHandle>();
+        static HashSet<int> canGC = new HashSet<int>();
+        static HashSet<int> stack = new HashSet<int>();
+        static void Collect(ScriptValue value, int originIndex) {
             if (value.valueType == ScriptValue.scriptValueType) {
                 var index = value.scriptValueIndex;
-                if (originIndex != index && (!re.TryGetValue(originIndex, out var set) || !set.Contains(index))) {
-                    if (set == null) {
-                        set = re[originIndex] = new HashSet<int>();
-                    }
-                    set.Add(index);
-                    if (!beRe.TryGetValue(index, out var beSet)) {
-                        beSet = beRe[index] = new HashSet<int>();
-                    }
-                    beSet.Add(originIndex);
-                    Collect(value.scriptValue, originIndex, re, beRe);
+                if (!gcHandle.TryGetValue(index, out var handle)) {
+                    handle = gcHandle[index] = gcHandlePool.Alloc().Set(index);
                 }
+                handle.count++;
+                handle.beCatch.Add(originIndex);
             }
         }
-        static void Collect(ScriptObject value, int originIndex, Dictionary<int, HashSet<int>> re, Dictionary<int, HashSet<int>> beRe) {
+        static void Collect(ScriptObject value, int originIndex) {
             if (value is ScriptMap) {
                 foreach (var pair in (ScriptMap)value) {
-                    Collect(pair.Value, originIndex, re, beRe);
+                    Collect(pair.Value, originIndex);
                 }
             } else if (value is ScriptArray) {
                 foreach (var element in (ScriptArray)value) {
-                    Collect(element, originIndex, re, beRe);
+                    Collect(element, originIndex);
                 }
             } else if (value is ScriptScriptBindFunctionBase) {
-                Collect(((ScriptScriptBindFunctionBase)value).BindObject, originIndex, re, beRe);
+                Collect(((ScriptScriptBindFunctionBase)value).BindObject, originIndex);
             } else if (value is ScriptType) {
-                Collect((value as ScriptType).PrototypeValue, originIndex, re, beRe);
+                Collect((value as ScriptType).PrototypeValue, originIndex);
             }
             if (value is ScriptInstance) {
                 foreach (var pair in (value as ScriptInstance)) {
-                    Collect(pair.Value, originIndex, re, beRe);
+                    Collect(pair.Value, originIndex);
                 }
-                Collect((value as ScriptInstance).PrototypeValue, originIndex, re, beRe);
+                Collect((value as ScriptInstance).PrototypeValue, originIndex);
             }
         }
-        static void Release(int index) {
-            //entities[index].referenceCount = 0;
-            //object2index.Remove(entities[index].value.Id);
-            //entities[index].value.Free();
-            //pool.Enqueue(index);
-            //entities[index] = DefaultEntity;
+        static bool CanGCRoot(GCHandle handle, HashSet<int> check) {
+            if (canGC.Contains(handle.index)) return true;
+            if (check.Contains(handle.index)) return true;
+            check.Add(handle.index);
+            //次数不同是被外部引用, c#对象或delegate或全局变量
+            if (handle.count != entities[handle.index].referenceCount) return false;
+            foreach (var index in handle.beCatch) {
+                if (!gcHandle.TryGetValue(index, out var parent))
+                    return false;
+                if (!CanGCRoot(parent, check))
+                    return false;
+            }
+            return true;
         }
         public static void GCCollect() {
-            var re = new Dictionary<int, HashSet<int>>();       //持有
-            var beRe = new Dictionary<int, HashSet<int>>();     //被持有
+            foreach (var pair in gcHandle) {
+                gcHandlePool.Free(pair.Value);
+            }
+            gcHandle.Clear();
             for (var i = 0; i < entities.Length; ++i) {
                 if (entities[i].value != null && entities[i].referenceCount > 0) {
-                    Collect(entities[i].value, i, re, beRe);
+                    Collect(entities[i].value, i);
                 }
             }
-            var dic = new Dictionary<int, int>();
-            foreach (var pair in beRe) {
-                Console.WriteLine($"{pair.Key} 被持有 : {string.Join(",", pair.Value.ToArray())}  {entities[pair.Key]}");
-                //被持有数量跟计数不同,重复持有判断有问题
-                if (pair.Value.Count == entities[pair.Key].referenceCount) {
-                    foreach (var index in pair.Value) {
-                        if (beRe.TryGetValue(index, out var set) && set.Contains(pair.Key)) {
-                            if (dic.ContainsKey(pair.Key)) {
-                                dic[pair.Key] += 1;
-                            } else {
-                                dic[pair.Key] = 1;
-                            }
-                        }
-                    }
+            canGC.Clear();
+            foreach (var pair in gcHandle) {
+                stack.Clear();
+                if (CanGCRoot(pair.Value, stack)) {
+                    canGC.Add(pair.Key);
                 }
             }
-            foreach (var pair in beRe) {
-                //
-                if (dic.TryGetValue(pair.Key, out var number) && pair.Value.Count == number) {
-                    Console.WriteLine("被释放 " + pair.Key);
+            if (canGC.Count > 0) {
+                //ScorpioLogger.error("回收对象 : " + canGC.Count);
+                foreach (var index in canGC) {
+                    entities[index].value.gc();
                 }
             }
-            //(entities[293].value as ScriptMap).Clear();
-            //(entities[294].value as ScriptMap).Clear();
-            //Release(293);
-            //Release(294);
-            //Release(295);
-            //Release(296);
-            //if () {
-            //    //添加到待释放列表
-            //}
         }
         public static void Shutdown() {
             object2index.Clear();

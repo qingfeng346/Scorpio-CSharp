@@ -13,6 +13,7 @@ namespace Scorpio.Userdata {
             
         }
         public override void Free() { }
+        public override void gc() { }
         public override Type ValueType => ScorpioUtil.TYPE_TYPE;
         public override string ToString() { return m_ValueType.Name; }
         public override ScriptValue GetValue(string key) {
@@ -26,13 +27,13 @@ namespace Scorpio.Userdata {
                 return value;
             throw new ExecutionException($"枚举[{m_ValueType}]不存在[{key}");
         }
-        //public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-        //    if (parameters[0].valueType == ScriptValue.stringValueType) {
-        //        var ignoreCase = length > 1 ? parameters[1].valueType == ScriptValue.trueValueType : false;
-        //        return ScriptValue.CreateValue(Enum.Parse(m_ValueType, parameters[0].stringValue, ignoreCase));
-        //    } else {
-        //        return ScriptValue.CreateValue(Enum.ToObject(m_ValueType, parameters[0].ToInt32()));
-        //    }
-        //}
+        public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+            if (parameters[0].valueType == ScriptValue.stringValueType) {
+                var ignoreCase = length > 1 ? parameters[1].valueType == ScriptValue.trueValueType : false;
+                return ScriptValue.CreateValue(m_Script, Enum.Parse(m_ValueType, parameters[0].stringValue, ignoreCase));
+            } else {
+                return ScriptValue.CreateValue(m_Script, Enum.ToObject(m_ValueType, parameters[0].ToInt32()));
+            }
+        }
     }
 }
