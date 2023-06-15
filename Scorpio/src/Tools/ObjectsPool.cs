@@ -7,24 +7,24 @@ namespace Scorpio.Tools {
         private int count = 0;
 #endif
         public Func<T> Generator;
-        private Stack<T> pool = new Stack<T>();
+        private Queue<T> pool = new Queue<T>();
         public ObjectsPool(Func<T> generator) {
             Generator = generator;
         }
         public T Alloc() {
 #if SCORPIO_DEBUG
             if (pool.Count > 0) {
-                return pool.Pop();
+                return pool.Dequeue();
             } else {
                 ++count;
                 return Generator();
             }
 #else
-            return pool.Count > 0 ? pool.Pop() : Generator();
+            return pool.Count > 0 ? pool.Dequeue() : Generator();
 #endif
         }
         public void Free(T item) {
-            pool.Push(item);
+            pool.Enqueue(item);
         }
         public int Check() {
 #if SCORPIO_DEBUG

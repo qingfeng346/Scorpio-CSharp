@@ -37,7 +37,7 @@ namespace Scorpio.Tools {
         private const int Stage = 8192;
         private static int length = 0;
         private static Dictionary<uint, int> object2index = new Dictionary<uint, int>();
-        public static Stack<int> pool = new Stack<int>();
+        public static Queue<int> pool = new Queue<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
 #if PRINT_REFERENCE
@@ -61,7 +61,7 @@ namespace Scorpio.Tools {
                 return index;
             }
             if (pool.Count > 0) {
-                index = pool.Pop();
+                index = pool.Dequeue();
             } else {
                 index = length++;
                 if (length == entities.Length) {
@@ -123,7 +123,7 @@ namespace Scorpio.Tools {
 #endif
                         object2index.Remove(entity.value.Id);
                         entity.value.Free();
-                        pool.Push(index);
+                        pool.Enqueue(index);
                         entity.Clear();
                     }
                 }

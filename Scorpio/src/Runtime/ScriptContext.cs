@@ -22,7 +22,7 @@ namespace Scorpio.Runtime {
         internal static ScriptValue[][] StackValues = new ScriptValue[ValueCacheLength][]; //堆栈数据
         internal static int[][] TryStackValues = new int[ValueCacheLength][]; //try catch数据
         internal static int VariableValueIndex = 0;
-        internal static Stack<AsyncValue> AsyncValueQueue = new Stack<AsyncValue>();
+        internal static Queue<AsyncValue> AsyncValueQueue = new Queue<AsyncValue>();
         static ScriptContext() {
             for (var i = 0; i < ValueCacheLength; ++i) {
                 StackValues[i] = new ScriptValue[StackValueLength];
@@ -33,13 +33,13 @@ namespace Scorpio.Runtime {
         private static AsyncValue AllocAsyncValue() {
             if (AsyncValueQueue.Count == 0)
                 return new AsyncValue() { variable = new ScriptValue[64], stack = new ScriptValue[64] };
-            return AsyncValueQueue.Pop();
+            return AsyncValueQueue.Dequeue();
         }
         private void FreeAsyncValue(AsyncValue value, InternalValue[] internalValues) {
             ScorpioUtil.Free(value.stack, value.stack.Length);
             ScorpioUtil.Free(value.variable, value.variable.Length);
             ScorpioUtil.Free(m_script, internalValues, internalCount);
-            AsyncValueQueue.Push(value);
+            AsyncValueQueue.Enqueue(value);
 
         }
         private void Free(ScriptValue[] variableObjects, ScriptValue[] stackObjects, InternalValue[] internalValues) {

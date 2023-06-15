@@ -11,7 +11,7 @@ namespace Scorpio.Tools {
         private int count = 0;
 #endif
         public Func<T> Generator;
-        private Stack<T> pool = new Stack<T>();
+        private Queue<T> pool = new Queue<T>();
         public ScriptObjectsPool(Func<T> generator) {
             Generator = generator;
         }
@@ -19,19 +19,19 @@ namespace Scorpio.Tools {
 #if SCORPIO_DEBUG
             T ret;
             if (pool.Count > 0) {
-                ret = pool.Pop();
+                ret = pool.Dequeue();
             } else {
                 ++count;
                 ret = Generator();
             }
 #else
-            var ret = pool.Count > 0 ? pool.Pop() : Generator();
+            var ret = pool.Count > 0 ? pool.Dequeue() : Generator();
 #endif
             ret.Alloc();
             return ret;
         }
         public void Free(T item) {
-            pool.Push(item);
+            pool.Enqueue(item);
         }
         public int Check() {
 #if SCORPIO_DEBUG

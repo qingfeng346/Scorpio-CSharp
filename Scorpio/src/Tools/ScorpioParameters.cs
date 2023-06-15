@@ -23,15 +23,15 @@ namespace Scorpio.Tools {
                 Free(this);
             }
         }
-        private static Stack<Parameter> pool = new Stack<Parameter>();
+        private static Queue<Parameter> pool = new Queue<Parameter>();
         public static Parameter Get() {
             if (pool.Count == 0) {
                 return new Parameter();
             }
-            return pool.Pop();
+            return pool.Dequeue();
         }
         public static void Free(Parameter parameter) {
-            pool.Push(parameter);
+            pool.Enqueue(parameter);
         }
     }
 }
