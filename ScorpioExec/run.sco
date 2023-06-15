@@ -1,10 +1,5 @@
-var a = {a: 1}
-alloc(a)
-alloc(a)
-alloc(a)
-free(a)
-free(a)
-free(a)
+var a = {}
+print("aaaaa ${a}")
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0

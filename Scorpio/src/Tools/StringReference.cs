@@ -5,6 +5,12 @@ namespace Scorpio.Tools {
         public class Entity {
             public string value;
             public int referenceCount;
+#if SCORPIO_DEBUG
+            public int index;
+            public Entity(int index) {
+                this.index = index;
+            }
+#endif
             public void Set(string value) {
                 this.value = value;
                 this.referenceCount = 1;
@@ -37,7 +43,11 @@ namespace Scorpio.Tools {
                     Array.Copy(entities, newEntities, entities.Length);
                     entities = newEntities;
                 }
+#if SCORPIO_DEBUG
+                entities[index] = new Entity(index);
+#else
                 entities[index] = new Entity();
+#endif
             }
             object2index.Add(value, index);
             entities[index].Set(value);
