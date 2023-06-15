@@ -98,6 +98,8 @@ namespace Scorpio.Library
             script.SetGlobal("print", script.CreateFunction(new print(script)));
             script.SetGlobal("printf", script.CreateFunction(new printf(script)));
             script.SetGlobal("pairs", script.CreateFunction(new pairs(script)));
+            script.SetGlobal("alloc", script.CreateFunction(new alloc()));
+            script.SetGlobal("free", script.CreateFunction(new free()));
             script.SetGlobal("gc", script.CreateFunction(new gc()));
 
             script.SetGlobal("isNull", script.CreateFunction(new isNull()));
@@ -235,6 +237,22 @@ namespace Scorpio.Library
                     throw new ExecutionException("pairs 必须用于 array, map, type, global 或者 继承 IEnumerable 的 userdata 类型");
                 }
                 return new ScriptValue(itorResult);
+            }
+        }
+        private class alloc : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                for (var i = 0; i < length; ++i) {
+                    args[i].Reference();
+                }
+                return ScriptValue.Null;
+            }
+        }
+        private class free : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                for (var i = 0; i < length; ++i) {
+                    args[i].Release();
+                }
+                return ScriptValue.Null;
             }
         }
         private class gc : ScorpioHandle {

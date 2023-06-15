@@ -131,6 +131,13 @@ namespace Scorpio
             }
             return this;
         }
+        internal void Release() {
+            if (_valueType == stringValueType) {
+                StringReference.Free(_index);
+            } else if (_valueType == scriptValueType) {
+                ScriptObjectReference.Free(_index);
+            }
+        }
         public void Free() {
             if (_valueType == stringValueType) {
                 StringReference.Free(_index);

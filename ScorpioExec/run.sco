@@ -1,9 +1,10 @@
-var a = StringMap()
-a["1111"] = 111
-a["2222"] = 222
-foreach (var pair in pairs(a)) {
-    print(pair.key + "  "  + pair.value)
-}
+var a = {a: 1}
+alloc(a)
+alloc(a)
+alloc(a)
+free(a)
+free(a)
+free(a)
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0
