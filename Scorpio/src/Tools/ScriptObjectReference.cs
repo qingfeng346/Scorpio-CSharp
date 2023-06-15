@@ -21,7 +21,7 @@ namespace Scorpio.Tools {
                 try {
                     return $"{value.ToFullString()} 计数:{referenceCount}";
                 } catch (System.Exception) {
-                    return $"{value?.GetType()}:  计数:{referenceCount}";
+                    return $"Exception:{value?.GetType()}:  计数:{referenceCount}";
                 }
             }
         }

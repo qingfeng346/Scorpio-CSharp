@@ -1,13 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Tools;
 
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapString : ScriptMap {
+    public class ScriptMapString : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
         //数组迭代器
-        private struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
-            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
+        public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
+            private IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
             internal Enumerator(ScriptMapString map) {
                 m_Enumerator = map.m_Values.GetEnumerator();
             }
@@ -32,6 +33,7 @@ namespace Scorpio {
             Clear();
         }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
+        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
         public override bool ContainsKey(object key) {
             if (!(key is string)) return false;
             return m_Values.ContainsKey(key as string);
@@ -50,6 +52,22 @@ namespace Scorpio {
                 result.Free();
                 m_Values.Remove((string)key);
             }
+        }
+        public override ScriptArray GetKeys() {
+            var ret = m_Script.NewArray();
+            foreach (var pair in m_Values) {
+                using (var key = new ScriptValue(pair.Key)) {
+                    ret.Add(key);
+                }
+            }
+            return ret;
+        }
+        public override ScriptArray GetValues() {
+            var ret = m_Script.NewArray();
+            foreach (var pair in m_Values) {
+                ret.Add(pair.Value);
+            }
+            return ret;
         }
         public override ScriptMap NewCopy() {
             var ret = m_Script.NewMapString();

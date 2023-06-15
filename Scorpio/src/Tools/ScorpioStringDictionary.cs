@@ -5,11 +5,11 @@ using Scorpio.Exception;
 
 namespace Scorpio.Tools {
     public class ScorpioStringDictionary<Value> : IEnumerable<ScorpioKeyValue<string, Value>> {
-        private static readonly ScorpioKeyValue<string, Value>[] EMPTY = new ScorpioKeyValue<string, Value>[0];
-        private struct Enumerator : IEnumerator<ScorpioKeyValue<string, Value>> {
-            private readonly int length;
-            private ScorpioStringDictionary<Value> dictionary;
+        public static readonly ScorpioKeyValue<string, Value>[] EMPTY = new ScorpioKeyValue<string, Value>[0];
+        public struct Enumerator : IEnumerator<ScorpioKeyValue<string, Value>>, IEnumerator {
+            private int length;
             private int index;
+            private ScorpioStringDictionary<Value> dictionary;
             private ScorpioKeyValue<string, Value> current;
             internal Enumerator(ScorpioStringDictionary<Value> dictionary) {
                 this.dictionary = dictionary;
@@ -23,6 +23,7 @@ namespace Scorpio.Tools {
                     index++;
                     return true;
                 }
+                current = default;
                 return false;
             }
             public ScorpioKeyValue<string, Value> Current => current;
@@ -31,9 +32,7 @@ namespace Scorpio.Tools {
                 index = 0;
                 current = default;
             }
-            public void Dispose() {
-                dictionary = null;
-            }
+            public void Dispose() { }
         }
         protected int mSize;
         protected ScorpioKeyValue<string, Value>[] mValues;

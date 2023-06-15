@@ -69,7 +69,7 @@ namespace Scorpio {
         public virtual bool Equals(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.scriptValue == this; }
         public bool EqualReference(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && ReferenceEquals(obj.scriptValue, this); }
         public override string ToString() { return base.ToString(); }
-        public virtual string ToFullString() { return ToString(); }
+        public virtual string ToFullString() { return $"[{GetType().Name}]{ToString()}"; }
 
         //运算符
         public virtual ScriptValue Plus(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [+] 运算"); }
