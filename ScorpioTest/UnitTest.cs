@@ -3,7 +3,6 @@ using Scorpio.Commons;
 using Scorpio;
 using System.Text;
 using Scorpio.Tools;
-using System.Reflection;
 using Scorpio.FastReflect;
 using System.Diagnostics;
 
@@ -72,6 +71,13 @@ namespace ScorpioTest {
             var output = "../../../../ScorpioTestLibrary/TestDelegateFactory.cs";
             FileUtil.CreateFile(output, generate.Generate());
             WriteLine($"生成Delegate仓库 {Path.GetFullPath(output)}");
+        }
+        [Fact]
+        public void CreateFast() {
+            var generate = new GenerateScorpioClass(typeof(TestClass));
+            var output = $"../../../../ScorpioTestLibrary/{generate.ScorpioClassName}.cs";
+            FileUtil.CreateFile(output, generate.Generate());
+            WriteLine($"生成快速反射 {Path.GetFullPath(output)}");
         }
     }
 }

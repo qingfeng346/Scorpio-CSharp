@@ -45,8 +45,9 @@ __methods_content
         private static UserdataMethodFastReflect _instance = null;
         public static UserdataMethodFastReflect GetInstance() {
             if (_instance != null) { return _instance; }
-            var methodInfos = new List<ScorpioFastReflectMethodInfo>();__getallmethod
-            return _instance = new UserdataMethodFastReflect(typeof(__fullname), ""__methodname"", methodInfos.ToArray(), new __name()); 
+            var methodInfos = new ScorpioFastReflectMethodInfo[] {__getallmethod
+            };
+            return _instance = new UserdataMethodFastReflect(typeof(__fullname), ""__methodname"", methodInfos, new __name()); 
         }
         public object Call(object obj, int methodIndex, object[] args) {
             switch (methodIndex) {__execute
@@ -148,11 +149,11 @@ __methods_content
             for (var i = 0; i < methods.Length; ++i) {
                 var method = methods[i];
                 builder.Append($@"
-            methodInfos.Add({GetScorpioMethod(method.IsStatic, method.GetParameters(), i)});");
+                {GetScorpioMethod(method.IsStatic, method.GetParameters(), i)},");
             }
             if (IsStruct) {
                 builder.Append($@"
-            methodInfos.Add({GetScorpioMethod(false, new ParameterInfo[0], methods.Length)});");
+                {GetScorpioMethod(false, new ParameterInfo[0], methods.Length)},");
             }
             return builder.ToString();
         }

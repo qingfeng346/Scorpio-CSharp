@@ -18,11 +18,11 @@ public class TestClass1 {
     }
 }
 public class TestClass {
-    public TestClass1 test1 = new TestClass1();
-    public byte[] Bytes {
-        get {
-            return Encoding.UTF8.GetBytes("{}");
-        }
+    public int TestFunc1() {
+        return 0;
+    }
+    public int TestFunc2(string arg1, int arg2) {
+        return 0;
     }
 }
 public static class TestStaticClass {
