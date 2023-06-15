@@ -1,5 +1,6 @@
-var a = {}
-print("aaaaa ${a}")
+
+    print(toString == null)
+
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0

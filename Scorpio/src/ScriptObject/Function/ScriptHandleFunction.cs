@@ -3,7 +3,9 @@ using Scorpio.Exception;
 namespace Scorpio.Function {
     public class ScriptHandleFunction : ScriptFunction {
         protected ScorpioHandle m_Handle;                                         //程序函数执行类
-        public ScriptHandleFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().FullName, handle) { }
+        public ScriptHandleFunction(Script script, ScorpioHandle handle) : this(script, handle.GetType().FullName, handle) {
+            SetPrototypeValue(script.TypeFunctionValue);
+        }
         public ScriptHandleFunction(Script script, string name, ScorpioHandle handle) : base(script) {
             m_Handle = handle;
             FunctionName = name;
