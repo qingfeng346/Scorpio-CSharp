@@ -1,6 +1,14 @@
+class ty {
+    aaa() {
 
-    print(toString == null)
+    }
+    bbb() {
 
+    }
+    get cccc() {
+        return null
+    }
+}
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0

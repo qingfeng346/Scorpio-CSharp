@@ -44,10 +44,11 @@ namespace Scorpio.Tools {
         public IEnumerator<ScorpioKeyValue<string, Value>> GetEnumerator() => new Enumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
         public void SetCapacity(int value) {
-            if (value < mSize) {
+            if (value > mSize) {
+                SetCapacity_impl(value);
+            } else if (value < mSize) {
                 throw new ExecutionException($"Capacity 不能小于当前size,  size:{mSize} capacity:{value}");
             }
-            SetCapacity_impl(value);
         }
         private void SetCapacity_impl(int value) {
             if (value > 0) {

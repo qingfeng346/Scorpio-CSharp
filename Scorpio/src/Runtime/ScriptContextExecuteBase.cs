@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using Scorpio.Exception;
-using Scorpio.Function;
 using Scorpio.Instruction;
 using Scorpio.Tools;
 namespace Scorpio.Runtime {
@@ -1444,35 +1443,49 @@ namespace Scorpio.Runtime {
                                 var classData = constClasses[opvalue];
                                 var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
                                 var className = constString[classData.name];
+                                string functionName;
                                 var type = m_script.NewType();
                                 type.Set(className, parentType);
                                 var functions = classData.functions;
-                                for (var j = 0; j < functions.Length; ++j) {
+                                var functionCount = 0;
+                                var functionLength = functions.Length;
+                                for (var j = 0 ; j < functionLength; ++j) {
+                                    if ((functions[j] & 0xf) != 2) {
+                                        functionCount++;
+                                    }
+                                }
+                                type.SetFunctionCapacity(functionCount);
+                                type.SetGetPropertyCapacity(functionLength - functionCount);
+                                for (var j = 0; j < functionLength; ++j) {
                                     var func = functions[j];
                                     var functionData = constContexts[(func & 0xffffffff) >> 4];
                                     var internals = functionData.m_FunctionData.internals;
                                     var funcType = func & 0xf;
+                                    functionName = constString[func >> 32];
                                     if (funcType == 0) {
                                         var function = m_script.NewFunction().SetContext(functionData);
+                                        function.FunctionName = $"{className}.{functionName}";
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
                                             function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                         }
-                                        type.SetValue(constString[func >> 32], function);
+                                        type.SetValue(functionName, function);
                                     } else if (funcType == 1) {
                                         var function = m_script.NewAsyncFunction().SetContext(functionData);
+                                        function.FunctionName = $"{className}.{functionName}";
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
                                             function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                         }
-                                        type.SetValue(constString[func >> 32], function);
+                                        type.SetValue(functionName, function);
                                     } else if (funcType == 2) {
                                         var function = m_script.NewFunction().SetContext(functionData);
+                                        function.FunctionName = $"{className}.{functionName}";
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
                                             function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
                                         }
-                                        type.AddGetProperty(constString[func >> 32], function);
+                                        type.AddGetProperty(functionName, function);
                                     }
                                 }
                                 stackObjects[++stackIndex].SetScriptValue(type);
