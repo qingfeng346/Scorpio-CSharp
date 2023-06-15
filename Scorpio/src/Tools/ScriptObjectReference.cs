@@ -75,7 +75,6 @@ namespace Scorpio.Tools {
 #else
                 entities[index] = new Entity();
 #endif
-
             }
             object2index.Add(value.Id, index);
             entities[index].Set(value);
@@ -150,28 +149,28 @@ namespace Scorpio.Tools {
                 handle.beCatch.Add(originIndex);
             }
         }
-        static void Collect(ScriptObject value, int index) {
+        static void Collect(ScriptObject value, int originIndex) {
             if (value is ScriptMap) {
                 foreach (var pair in (ScriptMap)value) {
-                    Collect(pair.Value, index);
+                    Collect(pair.Value, originIndex);
                 }
             } else if (value is ScriptArray) {
                 foreach (var element in (ScriptArray)value) {
-                    Collect(element, index);
+                    Collect(element, originIndex);
                 }
             } else if (value is ScriptScriptBindFunctionBase) {
-                Collect(((ScriptScriptBindFunctionBase)value).BindObject, index);
+                Collect(((ScriptScriptBindFunctionBase)value).BindObject, originIndex);
             } else if (value is ScriptType) {
-                Collect((value as ScriptType).PrototypeValue, index);
+                Collect((value as ScriptType).PrototypeValue, originIndex);
                 foreach (var pair in (value as ScriptType)) {
-                    Collect(pair.Value, index);
+                    Collect(pair.Value, originIndex);
                 }
             }
             if (value is ScriptInstance) {
                 foreach (var pair in (value as ScriptInstance)) {
-                    Collect(pair.Value, index);
+                    Collect(pair.Value, originIndex);
                 }
-                Collect((value as ScriptInstance).PrototypeValue, index);
+                Collect((value as ScriptInstance).PrototypeValue, originIndex);
             }
         }
         static bool CanGCRoot(GCHandle handle, HashSet<int> check) {
