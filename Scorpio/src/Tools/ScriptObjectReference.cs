@@ -1,4 +1,4 @@
-﻿//#define PRINT_REFERENCE
+﻿//#define SCORPIO_REFERENCE
 using Scorpio.Function;
 using System;
 using System.Collections.Generic;
@@ -46,23 +46,18 @@ namespace Scorpio.Tools {
         public static Stack<int> pool = new Stack<int>();
         public static Entity[] entities = new Entity[Stage];
         public static List<int> freeIndex = new List<int>();
-#if PRINT_REFERENCE
+        public static Func<int, Entity, bool> IsEntity;
+        public static Action<int, int, Entity> EntityReferenceChanged;
+#if SCORPIO_REFERENCE
         static bool Is(int index, Entity entity) {
-            //return index == 296;
-            if (entity.value is ScriptMapObject) {
-                return true;
-                //return ((ScriptMapObject)entity.value).ContainsKey("www");
-            }
-            return false;
+            return IsEntity?.Invoke(index, entity) ?? false;
         }
 #endif
         public static int Alloc(ScriptObject value) {
             if (object2index.TryGetValue(value.Id, out var index)) {
                 ++entities[index].referenceCount;
-#if PRINT_REFERENCE
-                if (Is(index, entities[index])) {
-                    logger.debug($"===================== Alloc重复  Index:{index} - {entities[index]}");
-                }
+#if SCORPIO_REFERENCE
+                if (Is(index, entities[index])) EntityReferenceChanged(1, index, entities[index]);
 #endif
                 return index;
             }
@@ -84,10 +79,8 @@ namespace Scorpio.Tools {
             }
             object2index.Add(value.Id, index);
             entities[index].Set(value);
-#if PRINT_REFERENCE
-            if (Is(index, entities[index])) {
-                logger.debug($"===================== Alloc新  Index:{index} - {entities[index]}");
-            }
+#if SCORPIO_REFERENCE
+            if (Is(index, entities[index])) EntityReferenceChanged(1, index, entities[index]);
 #endif
             return index;
         }
@@ -101,18 +94,14 @@ namespace Scorpio.Tools {
                 ScorpioLogger.error($"ScriptObject 释放有问题,当前计数:{entities[index].referenceCount}  Index:{index} - {entities[index]}");
             }
 #endif
-#if PRINT_REFERENCE
-            if (Is(index, entities[index])) {
-                logger.debug($"===================== Free  Index:{index} - {entities[index]}");
-            }
+#if SCORPIO_REFERENCE
+            if (Is(index, entities[index])) EntityReferenceChanged(0, index, entities[index]);
 #endif
         }
         public static void Reference(int index) {
             ++entities[index].referenceCount;
-#if PRINT_REFERENCE
-            if (Is(index, entities[index])) {
-                logger.debug($"===================== Reference  Index:{index} - {entities[index]}");
-            }
+#if SCORPIO_REFERENCE
+            if (Is(index, entities[index])) EntityReferenceChanged(2, index, entities[index]);
 #endif
         }
         public static ScriptObject GetValue(int index) {
@@ -127,10 +116,8 @@ namespace Scorpio.Tools {
                     index = freeIndex[i];
                     entity = entities[index];
                     if (entity.referenceCount == 0) {
-#if PRINT_REFERENCE
-                        if (Is(index, entities[index])) {
-                            logger.debug($"============Release  Index:{index} - {entities[index]}");
-                        }
+#if SCORPIO_REFERENCE
+                        if (Is(index, entities[index])) EntityReferenceChanged(3, index, entities[index]);
 #endif
                         object2index.Remove(entity.value.Id);
                         entity.value.Free();

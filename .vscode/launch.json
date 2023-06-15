@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/ScorpioExec/bin/Debug/net6.0/sco.dll",
-            "args": ["./test.sco", "--option", "./CompileOption.json"],
+            "args": ["./run.sco"],
             "cwd": "${workspaceFolder}/ScorpioExec",
             "console": "internalConsole",
             "stopAtEntry": false

@@ -200,11 +200,11 @@ namespace Scorpio {
 
         void Check<T>(ObjectsPool<T> pool) {
             var count = pool.Check();
-            if (count != 0) ScorpioLogger.error($"当前未释放{pool}变量 数量:{count}");
+            if (count != 0) ScorpioLogger.error($"褰撳墠鏈噴鏀緖pool}鍙橀噺 鏁伴噺:{count}");
         }
         void Check<T>(ScriptObjectsPool<T> pool) where T : IPool {
             var count = pool.Check();
-            if (count != 0) ScorpioLogger.error($"当前未释放{pool}变量 数量:{count}");
+            if (count != 0) ScorpioLogger.error($"褰撳墠鏈噴鏀緖pool}鍙橀噺 鏁伴噺:{count}");
         }
         public void GCCollect() {
             ScriptObjectReference.GCCollect();

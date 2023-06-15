@@ -13,6 +13,7 @@ class ty {
     }
 }
 ty.bbb()
+print(ty.bbb)
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0
