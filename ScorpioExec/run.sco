@@ -3,12 +3,16 @@ class ty {
 
     }
     bbb() {
+        var a = () => {
 
+        }
+        print(a)
     }
     get cccc() {
         return null
     }
 }
+ty.bbb()
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0
