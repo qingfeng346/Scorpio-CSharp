@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Scorpio.Function;
 using Scorpio.Tools;
 namespace Scorpio.Userdata {
     /// <summary> 普通Object Type类型 </summary>
@@ -13,6 +12,9 @@ namespace Scorpio.Userdata {
             this.m_UserdataType = type;
         }
         public override void Free() {
+            m_Value = null;
+            m_ValueType = null;
+            m_UserdataType = null;
             m_Methods.Free();
         }
         public override void gc() {

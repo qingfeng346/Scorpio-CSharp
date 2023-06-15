@@ -32,6 +32,8 @@ namespace Scorpio.Userdata
             return this;
         }
         public override void Free() {
+            m_Value = null;
+            m_ValueType = null;
             m_Script.Free(this);
         }
         public override void gc() { }
