@@ -1,19 +1,10 @@
 class ty {
-    aaa() {
-
-    }
-    bbb() {
-        var a = () => {
-
-        }
-        print(a)
-    }
     get cccc() {
-        return null
+        return "fewafaewfew"
     }
 }
-ty.bbb()
-print(ty.bbb)
+var t = ty()
+print(t.cccc)
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0

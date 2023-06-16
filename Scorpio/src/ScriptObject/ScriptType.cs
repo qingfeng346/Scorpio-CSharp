@@ -51,8 +51,11 @@ namespace Scorpio {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
-                using (var parameter = new ScriptValue(instance))
-                    return get.Get<ScriptFunction>().CallNoParameters(parameter);
+                using (var instanceValue = new ScriptValue(instance)) {
+                    using (var ret = get.Get<ScriptFunction>().Call(instanceValue, ScriptValue.EMPTY, 0)) {
+                        return ret;
+                    }
+                }
             }
             return m_Prototype.GetValue(key, instance);
         }
@@ -111,8 +114,11 @@ namespace Scorpio {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
-                using (var parameter = new ScriptValue(instance))
-                    return get.Get<ScriptFunction>().CallNoParameters(parameter);
+                using (var instanceValue = new ScriptValue(instance)) {
+                    using (var ret = get.Get<ScriptFunction>().Call(instanceValue, ScriptValue.EMPTY, 0)) {
+                        return ret;
+                    }
+                }
             }
             return ScriptValue.Null;
         }

@@ -92,8 +92,6 @@ namespace Scorpio {
                 return Call(thisObject, parameters.values, length);
             }
         }
-        //调用无参函数
-        public ScriptValue CallNoParameters(ScriptValue thisObject) { return Call(thisObject, ScriptValue.EMPTY, 0); }
         //调用函数
         public virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) { throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用"); }
         internal virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) { throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用"); }
