@@ -87,8 +87,9 @@ namespace Scorpio {
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
             using (var parameters = ScorpioParameters.Get()) {
+                //parameters释放会释放一次,不需要增加引用
                 for (var i = 0; i < length; ++i)
-                    parameters[i] = ScriptValue.CreateValue(m_Script, args[i]);
+                    parameters.values[i] = ScriptValue.CreateValue(m_Script, args[i]);
                 return Call(thisObject, parameters.values, length);
             }
         }
