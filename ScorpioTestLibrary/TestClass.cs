@@ -26,6 +26,9 @@ public class TestClass {
     }
 }
 public static class TestStaticClass {
+    public static void TestFunc3(this TestClass testClass) {
+
+    }
     //static ScriptValue wwww;
     public static TestClass www = new TestClass();
     //public static ScriptInstance AddComponent(this ScriptInstance instance) {

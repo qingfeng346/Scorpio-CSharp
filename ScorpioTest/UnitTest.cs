@@ -75,6 +75,7 @@ namespace ScorpioTest {
         [Fact]
         public void CreateFast() {
             var generate = new GenerateScorpioClass(typeof(TestClass));
+            generate.AddExtensionType(typeof(TestStaticClass));
             var output = $"../../../../ScorpioTestLibrary/{generate.ScorpioClassName}.cs";
             FileUtil.CreateFile(output, generate.Generate());
             WriteLine($"生成快速反射 {Path.GetFullPath(output)}");

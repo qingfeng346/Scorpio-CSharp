@@ -632,8 +632,9 @@ namespace Scorpio
                 case uint32ValueType:
                 case int64ValueType:
                 case uint64ValueType:
-                case charValueType:
                     return _longValue.ToString();
+                case charValueType:
+                    return ((char)_longValue).ToString();
                 case trueValueType: return "true";
                 case falseValueType: return "false";
                 case nullValueType: return "null";

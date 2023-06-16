@@ -1,9 +1,13 @@
-TestClass = importType("TestClass")
-var a = {}
-// var b = {}
-var t = new TestClass()
-a[toChar(100)] = "123"
-print(a[toChar(100)])
+var a = "avcew"
+print(a[0])
+// print(a)
+// print(main())
+// TestClass = importType("TestClass")
+// var a = {}
+// // var b = {}
+// var t = new TestClass()
+// a[toChar(100)] = "123"
+// print(a[toChar(100)])
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0
