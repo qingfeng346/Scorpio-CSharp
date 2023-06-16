@@ -3,6 +3,7 @@ using System.Collections;
 using Scorpio.Exception;
 using System.Runtime.InteropServices;
 using Scorpio.Tools;
+using Scorpio.Userdata;
 
 namespace Scorpio
 {
@@ -271,7 +272,14 @@ namespace Scorpio
                 case charValueType:
                 case trueValueType:
                 case falseValueType:
-                    return GetValue(Value);
+                    return GetValue(value.Value);
+                case scriptValueType: {
+                    var userdata = value.Get<ScriptUserdataObject>();
+                    if (userdata != null) {
+                        return GetValue(userdata.Value);
+                    }
+                    throw new ExecutionException($"不支持当前类型作为变量 : {value.ValueTypeName}");
+                }
                 default:
                     throw new ExecutionException($"不支持当前类型作为变量 : {value.ValueTypeName}");
             }
@@ -298,8 +306,16 @@ namespace Scorpio
                 case charValueType:
                 case trueValueType:
                 case falseValueType:
-                    SetValue(Value, value);
+                    SetValue(key.Value, value);
                     return;
+                case scriptValueType: {
+                    var userdata = key.Get<ScriptUserdataObject>();
+                    if (userdata != null) {
+                        SetValue(userdata.Value, value);
+                        return;
+                    }
+                    throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
+                }
                 default:
                     throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
             }
