@@ -1,10 +1,7 @@
-class ty {
-    get cccc() {
-        return "fewafaewfew"
-    }
-}
-var t = ty()
-print(t.cccc)
+var a= {}
+var b = {}
+a[100] = "123"
+print(a[100])
 // print(a.keys())
 // var str = "var functions = new (string, ScorpioHandle)[] {\n"
 // var count = 0

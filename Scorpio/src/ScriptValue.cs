@@ -260,10 +260,20 @@ namespace Scorpio
                     return GetValue(value.doubleValue);
                 case int64ValueType:
                     return GetValue(value.longValue);
-                case scriptValueType:
-                    return GetValue(scriptValue);
+                case floatValueType:
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case uint64ValueType:
+                case charValueType:
+                case trueValueType:
+                case falseValueType:
+                    return GetValue(Value);
                 default:
-                    throw new ExecutionException($"不支持当前类型获取变量 : {value.ValueTypeName}");
+                    throw new ExecutionException($"不支持当前类型作为变量 : {value.ValueTypeName}");
             }
         }
         internal void SetValue(ScriptValue key, ScriptValue value) {
@@ -273,13 +283,23 @@ namespace Scorpio
                     return;
                 case doubleValueType:
                     SetValue(key.doubleValue, value);
-                    break;
+                    return;
                 case int64ValueType:
                     SetValue(key.longValue, value);
-                    break;
-                case scriptValueType:
-                    SetValue(key.scriptValue, value);
-                    break;
+                    return;
+                case floatValueType:
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType:
+                case uint64ValueType:
+                case charValueType:
+                case trueValueType:
+                case falseValueType:
+                    SetValue(Value, value);
+                    return;
                 default:
                     throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
             }
