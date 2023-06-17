@@ -1,5 +1,28 @@
-var a = "avcew"
-print(a[0])
+class Test {
+    "+"(num) {
+        this.num += num
+        return this
+    }
+    toString() {
+        return "123123123"
+    }
+}
+var t = new Test()
+print(t)
+// TestClass = importType("TestClass")
+// var a = new TestClass() { num = 100 }
+// var b = new TestClass() { num = 200 }
+// var c = a + b
+// var d = a + b
+// print(c.num)
+// print(d.num)
+// print(c.num)
+// print(c.num)
+// t.func()
+// t.func()
+// t.func()
+// t.func()
+// t.func()
 // print(a)
 // print(main())
 // TestClass = importType("TestClass")

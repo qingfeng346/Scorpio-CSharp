@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Scorpio.Exception;
 using Scorpio.Library;
 using Scorpio.Tools;
 
@@ -8,6 +10,7 @@ namespace Scorpio {
         internal ScorpioStringDictionary<ScriptValue> m_Values = new ScorpioStringDictionary<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptValue m_PrototypeValue;
         protected ScriptType m_Prototype = null;
+        protected ScriptValue? m_thisValue = null;
         public ScriptInstance(Script script) : base(script, ObjectType.Instance) { }
         public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) { }
         public ScriptInstance SetPrototypeValue(ScriptValue prototypeValue) {
@@ -18,12 +21,23 @@ namespace Scorpio {
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype => m_Prototype;
         public ScriptValue PrototypeValue => m_PrototypeValue;
+        //ThisValue没有占用引用计数
+        private ScriptValue ThisValue {
+            get {
+                if (m_thisValue == null) {
+                    m_thisValue = new ScriptValue(this);
+                    m_thisValue?.Release();
+                }
+                return m_thisValue.Value;
+            }
+        }
         public void SetCapacity(int capacity) {
             m_Values.SetCapacity(capacity);
         }
         protected void Release() {
             m_PrototypeValue.Free();
             m_Prototype = null;
+            m_thisValue = null;
             m_Values.Free();
         }
         public override void Free() {
@@ -54,200 +68,109 @@ namespace Scorpio {
         public IEnumerator<ScorpioKeyValue<string, ScriptValue>> GetEnumerator() => m_Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => m_Values.GetEnumerator();
         public override ScriptValue Plus(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Plus).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.Plus(obj);
+            return CallOperator(ScriptOperator.Plus, obj);
         }
         public override ScriptValue Minus(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Minus).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.Minus(obj);
+            return CallOperator(ScriptOperator.Minus, obj);
         }
         public override ScriptValue Multiply(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Multiply).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.Multiply(obj);
+            return CallOperator(ScriptOperator.Multiply, obj);
         }
         public override ScriptValue Divide(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Divide).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.Divide(obj);
+            return CallOperator(ScriptOperator.Divide, obj);
         }
         public override ScriptValue Modulo(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Modulo).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.Modulo(obj);
+            return CallOperator(ScriptOperator.Modulo, obj);
         }
         public override ScriptValue InclusiveOr(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.InclusiveOr).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.InclusiveOr(obj);
+            return CallOperator(ScriptOperator.InclusiveOr, obj);
         }
         public override ScriptValue Combine(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Combine).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.Combine(obj);
+            return CallOperator(ScriptOperator.Combine, obj);
         }
         public override ScriptValue XOR(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.XOR).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.XOR(obj);
+            return CallOperator(ScriptOperator.XOR, obj);
         }
         public override ScriptValue Shi(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Shi).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.Shi(obj);
+            return CallOperator(ScriptOperator.Shi, obj);
         }
         public override ScriptValue Shr(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Shr).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1);
-                }
-            }
-            return base.Shr(obj);
+            return CallOperator(ScriptOperator.Shr, obj);
         }
         public override bool Greater(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Greater).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1).valueType == ScriptValue.trueValueType;
-                }
-            }
-            return base.Greater(obj);
+            return CallCompare(ScriptOperator.Greater, obj);
         }
         public override bool GreaterOrEqual(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.GreaterOrEqual).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1).valueType == ScriptValue.trueValueType;
-                }
-            }
-            return base.GreaterOrEqual(obj);
+            return CallCompare(ScriptOperator.GreaterOrEqual, obj);
         }
         public override bool Less(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.Less).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1).valueType == ScriptValue.trueValueType;
-                }
-            }
-            return base.Less(obj);
+            return CallCompare(ScriptOperator.Less, obj);
         }
         public override bool LessOrEqual(ScriptValue obj) {
-            var func = m_Prototype.GetValue(ScriptOperator.LessOrEqual).Get<ScriptFunction>();
-            if (func != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return func.Call(ThisValue, parameters.values, 1).valueType == ScriptValue.trueValueType;
-                }
-            }
-            return base.LessOrEqual(obj);
+            return CallCompare(ScriptOperator.LessOrEqual, obj);
         }
         public override bool Equals(ScriptValue obj) {
             if (m_Prototype.EqualFunction != null) {
-                using (var parameters = ScorpioParameters.Get()) {
-                    parameters[0] = obj;
-                    return m_Prototype.EqualFunction.Call(ThisValue, parameters.values, 1).valueType == ScriptValue.trueValueType;
-                }
+                var parameters = ScriptValue.Parameters;
+                parameters[0] = obj;
+                return m_Prototype.EqualFunction.Call(ThisValue, parameters, 1).valueType == ScriptValue.trueValueType;
             }
             return base.Equals(obj);
         }
+        bool CallCompare(string operatorIndex, ScriptValue obj) {
+            var func = m_Prototype.GetValue(operatorIndex).Get<ScriptFunction>();
+            if (func == null) throw new ExecutionException($"类型[{ValueTypeName}]不支持 [{operatorIndex}] 运算");
+            var parameters = ScriptValue.Parameters;
+            parameters[0] = obj;
+            return func.Call(ThisValue, parameters, 1).valueType == ScriptValue.trueValueType;
+        }
+        ScriptValue CallOperator(string operatorIndex, ScriptValue obj) {
+            var func = m_Prototype.GetValue(operatorIndex).Get<ScriptFunction>();
+            if (func == null) throw new ExecutionException($"类型[{ValueTypeName}]不支持 [{operatorIndex}] 运算");
+            var parameters = ScriptValue.Parameters;
+            parameters[0] = obj;
+            return func.Call(ThisValue, parameters, 1);
+        }
         public ScriptValue Call(ScriptValue parameter1) {
-            using (var parameters = ScorpioParameters.Get()) {
-                parameters[0] = parameter1;
-                return Call(ScriptValue.Null, parameters.values, 1);
-            }
+            var parameters = ScriptValue.Parameters;
+            parameters[0] = parameter1;
+            return Call(ScriptValue.Null, parameters, 1);
         }
         public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2) {
-            using (var parameters = ScorpioParameters.Get()) {
-                parameters[0] = parameter1;
-                parameters[1] = parameter2;
-                return Call(ScriptValue.Null, parameters.values, 2);
-            }
+            var parameters = ScriptValue.Parameters;
+            parameters[0] = parameter1;
+            parameters[1] = parameter2;
+            return Call(ScriptValue.Null, parameters, 2);
         }
         public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2, ScriptValue parameter3) {
-            using (var parameters = ScorpioParameters.Get()) {
-                parameters[0] = parameter1;
-                parameters[1] = parameter2;
-                parameters[2] = parameter3;
-                return Call(ScriptValue.Null, parameters.values, 3);
-            }
+            var parameters = ScriptValue.Parameters;
+            parameters[0] = parameter1;
+            parameters[1] = parameter2;
+            parameters[2] = parameter3;
+            return Call(ScriptValue.Null, parameters, 3);
         }
         public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2, ScriptValue parameter3, ScriptValue parameter4) {
-            using (var parameters = ScorpioParameters.Get()) {
-                parameters[0] = parameter1;
-                parameters[1] = parameter2;
-                parameters[2] = parameter3;
-                parameters[3] = parameter4;
-                return Call(ScriptValue.Null, parameters.values, 4);
-            }
+            var parameters = ScriptValue.Parameters;
+            parameters[0] = parameter1;
+            parameters[1] = parameter2;
+            parameters[2] = parameter3;
+            parameters[3] = parameter4;
+            return Call(ScriptValue.Null, parameters, 4);
         }
         public ScriptValue Call(ScriptValue[] parameters, int length) {
             return Call(ScriptValue.Null, parameters, length);
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             var func = m_Prototype.GetValue(ScriptOperator.Invoke).Get<ScriptFunction>();
-            if (func != null) {
-                return func.Call(ThisValue, parameters, length);
-            }
-            return base.Call(thisObject, parameters, length);
+            if (func == null) throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用");
+            return func.Call(ThisValue, parameters, length);
         }
         public override string ToString() {
             var func = m_Prototype.GetValueNoDefault(ScriptOperator.toString).Get<ScriptFunction>();
-            if (func != null) {
-                return func.Call(ThisValue, ScriptValue.EMPTY, 0).ToString();
-            }
-            return $"Object<{m_Prototype}>";
+            if (func == null) return $"Object<{m_Prototype}>";
+            var value = func.Call(ThisValue, ScriptValue.EMPTY, 0);
+            value.Release();
+            return value.ToString();
         }
         internal virtual void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;

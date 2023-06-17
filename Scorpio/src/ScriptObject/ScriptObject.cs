@@ -20,30 +20,22 @@ namespace Scorpio {
         private static uint AutomaticId = 0;
         protected Script m_Script;
         public uint Id { get; private set; }
+        public ObjectType ObjectType { get; private set; }              //类型
         // 构图函数
         public ScriptObject(Script script, ObjectType objectType) {
             m_Script = script;
             ObjectType = objectType;
             Id = AutomaticId++;
         }
-        public virtual void Alloc() { }
-        public abstract void Free();
-        //循环引用被回收掉
-        public abstract void gc();
-        public ObjectType ObjectType { get; private set; }              //类型
         public virtual object Value => this;                            //值
         public virtual Type ValueType => GetType();                     //值类型
         public virtual Type Type => GetType();                          //获取类型
         public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
         public Script script => m_Script;
-        //ThisValue没有占用引用计数
-        protected ScriptValue ThisValue {
-            get {
-                using (var ret = new ScriptValue(this))
-                    return ret;
-            }
-        }
-
+        public virtual void Alloc() { }
+        public abstract void Free();
+        //循环引用被回收掉
+        public abstract void gc();
         //SetValueByIndex GetValueByIndex 目前只有Global在用
         //获取变量
         public virtual ScriptValue GetValueByIndex(int key) { throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Index : {key}"); }
@@ -86,12 +78,13 @@ namespace Scorpio {
         //调用函数
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
-            using (var parameters = ScorpioParameters.Get()) {
-                //parameters释放会释放一次,不需要增加引用
-                for (var i = 0; i < length; ++i)
-                    parameters.values[i] = ScriptValue.CreateValue(m_Script, args[i]);
-                return Call(thisObject, parameters.values, length);
+            var parameters = ScriptValue.Parameters;
+            for (var i = 0; i < length; ++i) {
+                var value = ScriptValue.CreateValue(m_Script, args[i]);
+                value.Release();
+                parameters[i] = value;
             }
+            return Call(thisObject, parameters, length);
         }
         //调用函数
         public virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) { throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用"); }

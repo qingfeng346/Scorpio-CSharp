@@ -18,38 +18,46 @@ public class TestClass1 {
     }
 }
 public class TestClass {
+    public int num;
+    public static TestClass operator+(TestClass a, TestClass b) {
+        return new TestClass() { num = a.num + b.num };
+    }
     public int TestFunc1() {
-        return 0;
+        return 100;
     }
     public int TestFunc2(string arg1, int arg2) {
-        return 0;
+        return arg2;
     }
 }
 public static class TestStaticClass {
+    public static Action action1;
+    public static Func<string, string> func1;
+    private static LinkedList<(DateTime, Action)> timer = new LinkedList<(DateTime, Action)> ();
+    public static string TestDelegate(string str) {
+        action1?.Invoke();
+        return func1("func1 : " + str);
+    }
     public static void TestFunc3(this TestClass testClass) {
 
     }
-    //static ScriptValue wwww;
+    public static void AddTimer(float seconds, Action action) {
+        timer.AddLast((DateTime.Now.AddSeconds(seconds), action));
+    }
     public static TestClass www = new TestClass();
-    //public static ScriptInstance AddComponent(this ScriptInstance instance) {
-    //    wwww = new ScriptValue(instance);
-    //    wwww.Free();
-    //    return instance;
-    //}
-    static DateTime start;
-    static Action action1;
-    public static void Update() {
-        if (action1 != null && DateTime.Now > start) {
-            action1();
-            action1 = null;
+    public static bool Update() {
+        if (timer.Count > 0) {
+            var now = DateTime.Now;
+            foreach (var (time, action) in timer) {
+                if (now > time) {
+                    action();
+                    break;
+                }
+            }
+            return true;
         }
-        //wwww.GetValue("Update").call(wwww);
+        return false;
     }
     public static TestClass Get() {
         return new TestClass();
-    }
-    public static void Timer(float s, Action action) {
-        start = DateTime.Now.AddSeconds(s);
-        action1 = action;
     }
 }

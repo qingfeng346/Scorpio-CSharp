@@ -9,6 +9,8 @@ namespace Scorpio
 {
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public struct ScriptValue : IDisposable {
+        private const int ParameterLength = 128; //函数参数最大数量
+        public static readonly ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
         public static readonly ScriptValue[] EMPTY = new ScriptValue[0];
         public static readonly ScriptValue Null = new ScriptValue();
         public static readonly ScriptValue True = new ScriptValue(true);

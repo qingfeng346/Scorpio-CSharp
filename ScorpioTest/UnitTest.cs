@@ -47,10 +47,12 @@ namespace ScorpioTest {
         [Fact]
         public void Test1() {
             ScorpioLogger.ilog = new Logger();
+            TestDelegateFactory.Initialize();
             foreach (var file in FileUtil.GetFiles("../../../../ExampleScripts", new[] { "*.sco" }, SearchOption.TopDirectoryOnly)) {
                 WriteLine($"============================开始运行文件{file}============================");
                 var script = new Script();
                 script.LoadLibraryV1();
+                script.PushAssembly(typeof(TestClass));
                 script.SetGlobal("UnitTest", ScriptValue.CreateValue(script, typeof(UnitTest)));
                 script.SetGlobal("print", script.CreateFunction(new print(script)));
                 script.LoadFile(file);
@@ -68,6 +70,7 @@ namespace ScorpioTest {
             generate.AddType(typeof(Action));
             generate.AddType(typeof(Action<int, int, string>));
             generate.AddType(typeof(Func<int, int, string>));
+            generate.AddType(typeof(Func<string, string>));
             var output = "../../../../ScorpioTestLibrary/TestDelegateFactory.cs";
             FileUtil.CreateFile(output, generate.Generate());
             WriteLine($"生成Delegate仓库 {Path.GetFullPath(output)}");

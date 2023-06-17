@@ -13,17 +13,16 @@ namespace Scorpio {
                 this.func = func;
             }
             public int Compare(ScriptValue o1, ScriptValue o2) {
-                using (var parameter = ScorpioParameters.Get()) {
-                    parameter[0] = o1;
-                    parameter[1] = o2;
-                    var ret = func.Call(ScriptValue.Null, parameter.values, 2);
-                    switch (ret.valueType) {
-                        case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
-                        case ScriptValue.int64ValueType: return Convert.ToInt32(ret.longValue);
-                        case ScriptValue.trueValueType: return 1;
-                        case ScriptValue.falseValueType: return -1;
-                        default: throw new ExecutionException("数组排序返回值必须是Number或Bool类型");
-                    }
+                var parameters = ScriptValue.Parameters;
+                parameters[0] = o1;
+                parameters[1] = o2;
+                var ret = func.Call(ScriptValue.Null, parameters, 2);
+                switch (ret.valueType) {
+                    case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
+                    case ScriptValue.int64ValueType: return Convert.ToInt32(ret.longValue);
+                    case ScriptValue.trueValueType: return 1;
+                    case ScriptValue.falseValueType: return -1;
+                    default: throw new ExecutionException("数组排序返回值必须是Number或Bool类型");
                 }
             }
         }

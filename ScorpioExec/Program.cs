@@ -233,15 +233,12 @@ namespace ScorpioExec
                     using (var value = script.LoadFile(file, ParseOption(command.GetValueDefault(ParameterOption, ""), script.SearchPaths))) {
                         ret = value.ToString();
                     }
-                    while (script.Update()) {
-                        TestStaticClass.Update();
+                    while (true) {
+                        var flag = script.UpdateCoroutine();
+                        script.ReleaseAll();
+                        flag |= TestStaticClass.Update();
+                        if (!flag) break;
                     }
-                    //script.ReleaseAll();
-                    //script.CheckPool();
-                    //while (true) {
-                    //    script.ReleaseAll();
-                    //    TestStaticClass.Update();
-                    //}
                     script.ReleaseAll();
                     script.CheckGCCollect();
                     script.Shutdown();

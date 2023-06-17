@@ -18,6 +18,10 @@ public class TestDelegateFactory : IScorpioDelegateFactory {
             var value = new ScorpioDelegateReference(script, scriptValue);
             return new System.Func<System.Int32,System.Int32,System.String>( (arg0, arg1) => value.call(arg0, arg1).ToString() );
         }
+        if (delegateType == typeof(System.Func<System.String,System.String>)) {
+            var value = new ScorpioDelegateReference(script, scriptValue);
+            return new System.Func<System.String,System.String>( (arg0) => value.call(arg0).ToString() );
+        }
         throw new Exception("Delegate Type is not found : " + delegateType + "  scriptValue : " + scriptValue);
     }
 }

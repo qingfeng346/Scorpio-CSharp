@@ -53,12 +53,5 @@ namespace Scorpio {
             }
             return m_Coroutines.Count > 0;
         }
-        public bool Update() {
-            if (UpdateCoroutine()) {
-                ReleaseAll();
-                return true;
-            }
-            return false;
-        }
     }
 }
