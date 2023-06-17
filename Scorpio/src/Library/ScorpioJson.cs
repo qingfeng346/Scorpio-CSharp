@@ -169,9 +169,7 @@ namespace Scorpio.Library {
                         if (EatWhiteSpace != ':') {
                             throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                         }
-                        using (var value = ReadObject()) {
-                            map.SetValue(key, value);
-                        }
+                        map.SetValueNoReference(key, ReadObject());
                         break;
                     }
                     case '0':
@@ -190,9 +188,7 @@ namespace Scorpio.Library {
                         if (EatWhiteSpace != ':') {
                             throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                         }
-                        using (var value = ReadObject()) {
-                            map.SetValue(key, value);
-                        }
+                        map.SetValue(key, ReadObject());
                         break;
                     }
                     default: {
@@ -212,9 +208,7 @@ namespace Scorpio.Library {
                         throw new ExecutionException("Json解析, 未找到array结尾 ]");
                     default: {
                         --m_Index;
-                        using (var value = ReadObject()) {
-                            array.Add(value);
-                        }
+                        array.AddNoReference(ReadObject());
                         continue;
                     }
                 }

@@ -134,6 +134,7 @@ namespace Scorpio
             }
             return this;
         }
+        //只释放
         internal void Release() {
             if (_valueType == stringValueType) {
                 StringReference.Free(_index);
@@ -141,6 +142,7 @@ namespace Scorpio
                 ScriptObjectReference.Free(_index);
             }
         }
+        //释放并设置为null
         public void Free() {
             if (_valueType == stringValueType) {
                 StringReference.Free(_index);
@@ -148,17 +150,6 @@ namespace Scorpio
                 ScriptObjectReference.Free(_index);
             }
             _valueType = 0;
-        }
-        public ScriptValue(ScriptValue value) {
-            _valueType = value._valueType;
-            _index = value._index;
-            _doubleValue = value._doubleValue;
-            _longValue = value._longValue;
-            if (_valueType == stringValueType) {
-                StringReference.Reference(_index);
-            } else if (_valueType == scriptValueType) {
-                ScriptObjectReference.Reference(_index);
-            }
         }
         public ScriptValue(double value) {
             this._valueType = doubleValueType;
@@ -200,7 +191,7 @@ namespace Scorpio
             this._doubleValue = 0;
             this._longValue = value;
         }
-        internal ScriptValue(int value) {
+        private ScriptValue(int value) {
             this._valueType = int32ValueType;
             this._index = 0;
             this._doubleValue = 0;
@@ -254,7 +245,31 @@ namespace Scorpio
             this._longValue = 0;
             this._doubleValue = value;
         }
+        private ScriptValue(string value, bool noReference) {
+            this._doubleValue = 0;
+            this._longValue = 0;
+            if (value == null) {
+                this._valueType = nullValueType;
+                this._index = 0;
+            } else {
+                this._valueType = stringValueType;
+                this._index = StringReference.GetIndex(value);
+            }
+        }
+        internal ScriptValue(ScriptObject value, bool noReference) {
+            this._doubleValue = 0;
+            this._longValue = 0;
+            if (value == null) {
+                this._valueType = nullValueType;
+                this._index = 0;
+            } else {
+                this._valueType = scriptValueType;
+                this._index = ScriptObjectReference.GetIndex(value);
+            }
+        }
 
+
+        //此函数为运行时调用
         internal ScriptValue GetValue(ScriptValue value, Script script) {
             switch (value.valueType) {
                 case stringValueType:
@@ -286,6 +301,7 @@ namespace Scorpio
                     throw new ExecutionException($"不支持当前类型作为变量 : {value.ValueTypeName}");
             }
         }
+        //此函数为运行时调用
         internal void SetValue(ScriptValue key, ScriptValue value) {
             switch (key.valueType) {
                 case stringValueType:
@@ -428,7 +444,9 @@ namespace Scorpio
             }
         }
         //调用无参函数
-        public ScriptValue Call(ScriptValue thisObject) { return Call(thisObject, EMPTY, 0); }
+        public ScriptValue Call(ScriptValue thisObject) { 
+            return Call(thisObject, EMPTY, 0);
+        }
         //调用函数
         public ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             if (valueType == scriptValueType) {
@@ -712,7 +730,7 @@ namespace Scorpio
                 return Null;
             else if (value is ScriptValue)
                 //需要增加一次引用计数
-                return new ScriptValue((ScriptValue)value);
+                return ((ScriptValue)value).Reference();
             else if (value is bool)
                 return (bool)value ? True : False;
             else if (value is string)
@@ -729,7 +747,7 @@ namespace Scorpio
                 return new ScriptValue((ScriptObject)value);
             else if (value is Type)
                 //需要增加一次引用计数
-                return new ScriptValue(script.GetUserdataTypeValue((Type)value));
+                return script.GetUserdataTypeValue((Type)value).Reference();
             else if (value is Delegate)
                 return new ScriptValue(script.NewUserdataDelegate().Set((Delegate)value));
             else if (value is Enum)
@@ -737,6 +755,36 @@ namespace Scorpio
             else if (value is IList)
                 return new ScriptValue(script.NewUserdataArray().Set(script.GetUserdataType(value.GetType()), (IList)value));
             return new ScriptValue(script.NewUserdataObject().Set(script.GetUserdataType(value.GetType()), value));
+        }
+        //不占用引用的value,如果是新创建的scriptobject和string,创建后会立即加入释放列表
+        public static ScriptValue CreateValueNoReference(Script script, object value) {
+            if (value == null)
+                return Null;
+            else if (value is ScriptValue)
+                return (ScriptValue)value;
+            else if (value is bool)
+                return (bool)value ? True : False;
+            else if (value is string)
+                return new ScriptValue((string)value, true);
+            else if (value is double)
+                return new ScriptValue((double)value);
+            else if (value is int || value is float || value is byte || value is sbyte || value is short || value is ushort || value is uint)
+                return new ScriptValue(Convert.ToDouble(value));
+            else if (value is long)
+                return new ScriptValue((long)value);
+            else if (value is ulong)
+                return new ScriptValue((long)(ulong)value);
+            else if (value is ScriptObject)
+                return new ScriptValue((ScriptObject)value, true);
+            else if (value is Type)
+                return script.GetUserdataTypeValue((Type)value);
+            else if (value is Delegate)
+                return new ScriptValue(script.NewUserdataDelegate().Set((Delegate)value), true);
+            else if (value is Enum)
+                return new ScriptValue(Convert.ToInt64(value));
+            else if (value is IList)
+                return new ScriptValue(script.NewUserdataArray().Set(script.GetUserdataType(value.GetType()), (IList)value), true);
+            return new ScriptValue(script.NewUserdataObject().Set(script.GetUserdataType(value.GetType()), value), true);
         }
         public static ScriptValue CreateNumber(object value) {
             if (value is double)

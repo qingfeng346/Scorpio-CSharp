@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Exception;
@@ -22,15 +21,7 @@ namespace Scorpio {
         public ScriptType Prototype => m_Prototype;
         public ScriptValue PrototypeValue => m_PrototypeValue;
         //ThisValue没有占用引用计数
-        private ScriptValue ThisValue {
-            get {
-                if (m_thisValue == null) {
-                    m_thisValue = new ScriptValue(this);
-                    m_thisValue?.Release();
-                }
-                return m_thisValue.Value;
-            }
-        }
+        private ScriptValue ThisValue => m_thisValue ?? (m_thisValue = new ScriptValue(this, true)).Value;
         public void SetCapacity(int capacity) {
             m_Values.SetCapacity(capacity);
         }
@@ -47,13 +38,10 @@ namespace Scorpio {
         public override void gc() {
             Release();
         }
+
+        #region 重载 GetValue SetValue
         public override ScriptValue GetValue(string key) {
             return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key, this);
-        }
-        public void SetValue(string key, ScriptObject scriptObject) {
-            using (var value = new ScriptValue(scriptObject)) {
-                SetValue(key, value);
-            }
         }
         public override void SetValue(string key, ScriptValue value) {
             if (m_Values.TryGetValue(key, out var result)) {
@@ -61,6 +49,19 @@ namespace Scorpio {
             }
             //正常引用计数
             m_Values[key] = value.Reference();
+        }
+        #endregion
+        public virtual void SetValueNoReference(string key, ScriptValue value) {
+            if (m_Values.TryGetValue(key, out var result)) {
+                result.Free();
+            }
+            m_Values[key] = value;
+        }
+        public virtual void SetValueNoReference(object key, ScriptValue value) {
+            throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : {key}");
+        }
+        public void SetValue(string key, ScriptObject scriptObject) {
+            SetValueNoReference(key, new ScriptValue(scriptObject));
         }
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);

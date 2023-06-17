@@ -94,7 +94,7 @@ namespace Scorpio {
         public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
         public IEnumerator<ScriptValue> GetIterator() { return new Enumerator(this); }
-
+        #region 重载 GetValue SetValue
         public override ScriptValue GetValue(double index) {
             return this[(int)index];
         }
@@ -113,6 +113,7 @@ namespace Scorpio {
         public override void SetValue(object index, ScriptValue value) {
             this[Convert.ToInt32(index)] = value;
         }
+        #endregion
         public virtual ScriptValue this[int i] {
             get {
                 if (i < 0) throw new ExecutionException($"Array.get[] 索引小于0:{i}");
@@ -132,6 +133,12 @@ namespace Scorpio {
                 EnsureCapacity(m_Length + 1);
             }
             m_Objects[m_Length++].CopyFrom(value);
+        }
+        public void AddNoReference(ScriptValue value) {
+            if (m_Length == m_Objects.Length) {
+                EnsureCapacity(m_Length + 1);
+            }
+            m_Objects[m_Length++].Set(value);
         }
         public void AddUnique(ScriptValue value) {
             for (int i = 0; i < m_Length; ++i) {
@@ -241,14 +248,16 @@ namespace Scorpio {
         }
         public ScriptValue PopLast() {
             if (m_Length <= 0)  throw new ExecutionException($"Array.PopLast 数组长度为0");
-            using (var ret = m_Objects[--m_Length])
-                return ret;
+            var ret = m_Objects[--m_Length];
+            ret.Release();
+            return ret;
         }
         public ScriptValue SafePopLast() {
             if (m_Length == 0)
                 return ScriptValue.Null;
-            using (var ret = m_Objects[--m_Length])
-                return ret;
+            var ret = m_Objects[--m_Length];
+            ret.Release();
+            return ret;
         }
         //仅限于number和string
         public T[] ToArray<T>() {

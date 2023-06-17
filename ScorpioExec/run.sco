@@ -1,14 +1,18 @@
-class Test {
-    "+"(num) {
-        this.num += num
-        return this
-    }
-    toString() {
-        return "123123123"
-    }
+var arr = [100,200,300,400]
+foreach (var p in pairs(arr)) {
+    print("array : " + p.key + " = " + p.value)
 }
-var t = new Test()
-print(t)
+// class Test {
+//     "+"(num) {
+//         this.num += num
+//         return this
+//     }
+//     toString() {
+//         return "123123123"
+//     }
+// }
+// var t = new Test()
+// print(t)
 // TestClass = importType("TestClass")
 // var a = new TestClass() { num = 100 }
 // var b = new TestClass() { num = 200 }

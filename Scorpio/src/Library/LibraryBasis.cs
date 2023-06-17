@@ -41,8 +41,7 @@ namespace Scorpio.Library
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    using (var key = ScriptValue.CreateValue(script, value.Key))
-                        m_ItorResult.SetValue("key", key);
+                    m_ItorResult.SetValueNoReference("key", ScriptValue.CreateValue(script, value.Key));
                     m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
@@ -61,8 +60,7 @@ namespace Scorpio.Library
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
                     var value = m_Enumerator.Current;
-                    using (var key = ScriptValue.CreateValue(script, value.Key))
-                        m_ItorResult.SetValue("key", key);
+                    m_ItorResult.SetValueNoReference("key", ScriptValue.CreateValue(script, value.Key));
                     m_ItorResult.SetValue("value", value.Value);
                     return ScriptValue.True;
                 }
@@ -86,9 +84,7 @@ namespace Scorpio.Library
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (m_Enumerator.MoveNext()) {
-                    using (var value = ScriptValue.CreateValue(script, m_Enumerator.Current)) {
-                        m_ItorResult.SetValue("value", value);
-                    }
+                    m_ItorResult.SetValueNoReference("value", ScriptValue.CreateValue(script, m_Enumerator.Current));
                     return ScriptValue.True;
                 }
                 return ScriptValue.False;
@@ -334,6 +330,11 @@ namespace Scorpio.Library
                 return ScriptValue.CreateNumber(args[0].ToNumber<T>());
             }
         }
+        private class toInt32 : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return ScriptValue.CreateNumber(args[0].ToInt32());
+            }
+        }
         private class toBoolean : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return Convert.ToBoolean(args[0].Value) ? ScriptValue.True : ScriptValue.False;
@@ -344,11 +345,7 @@ namespace Scorpio.Library
                 return new ScriptValue(args[0].ToChar());
             }
         }
-        private class toInt32 : ScorpioHandle {
-            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(args[0].ToInt32());
-            }
-        }
+
         private class toInt64 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(args[0].ToLong());

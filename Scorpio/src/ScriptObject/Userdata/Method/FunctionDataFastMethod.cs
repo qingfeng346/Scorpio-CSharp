@@ -27,9 +27,7 @@ namespace Scorpio.Userdata {
             var ret = FastMethod.Call(obj, MethodIndex, Args);
             for (var i = 0; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
-                    using (var value = ScriptValue.CreateValue(script, Args[i])) {
-                        parameters[i].Get<ScriptInstance>().SetValue(RefOutValue, value);
-                    }
+                    parameters[i].Get<ScriptInstance>().SetValueNoReference(RefOutValue, ScriptValue.CreateValue(script, Args[i]));
                 }
             }
             return ret;

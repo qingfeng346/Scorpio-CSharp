@@ -163,9 +163,7 @@ namespace Scorpio.Proto {
                 var ret = array.script.NewHashSet();
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var value in array) {
-                    using (var v = func.Call(value)) {
-                        ret.Add(v);
-                    }
+                    ret.AddNoReference(func.Call(value));
                 }
                 return new ScriptValue(ret);
             }

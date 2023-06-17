@@ -21,6 +21,7 @@ namespace Scorpio {
         public override void gc() {
             Clear();
         }
+        #region 重载 GetValue SetValue
         public override ScriptValue GetValue(string key) {
             return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
@@ -61,7 +62,21 @@ namespace Scorpio {
             //正常引用计数
             m_Objects[key] = value.Reference();
         }
-
+        #endregion
+        public override void SetValueNoReference(string key, ScriptValue value) {
+            if (m_Objects.TryGetValue(key, out var result)) {
+                result.Free();
+            }
+            //不计数
+            m_Objects[key] = value;
+        }
+        public override void SetValueNoReference(object key, ScriptValue value) {
+            if (m_Objects.TryGetValue(key, out var result)) {
+                result.Free();
+            }
+            //不计数
+            m_Objects[key] = value;
+        }
         public override bool HasValue(string key) {
             return m_Objects.ContainsKey(key);
         }
@@ -87,9 +102,7 @@ namespace Scorpio {
         public override ScriptArray GetKeys() {
             var ret = m_Script.NewArray();
             foreach (var pair in m_Objects) {
-                using (var value = ScriptValue.CreateValue(m_Script, pair.Key)) {
-                    ret.Add(value);
-                }
+                ret.AddNoReference(ScriptValue.CreateValue(m_Script, pair.Key));
             }
             return ret;
         }

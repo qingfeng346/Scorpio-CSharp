@@ -33,8 +33,7 @@ namespace Scorpio.Userdata {
                 key = string.Intern(key);
                 return m_Methods[key] = new ScriptValue(m_Script.NewStaticMethod().Set(key, (UserdataMethod)ret));
             }
-            using (var v = ScriptValue.CreateValue(script, ret))
-                return v;
+            return ScriptValue.CreateValueNoReference(script, ret);
         }
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(null, key, value);

@@ -216,9 +216,7 @@ namespace Scorpio.Proto {
                 var strs = thisObject.stringValue.Split(splits, StringSplitOptions.RemoveEmptyEntries);
                 var ret = m_script.NewArray();
                 foreach (string str in strs) {
-                    using (var value = new ScriptValue(str)) {
-                        ret.Add(value);
-                    }
+                    ret.AddNoReference(new ScriptValue(str));
                 }
                 return new ScriptValue(ret);
             }

@@ -72,6 +72,7 @@ namespace Scorpio {
             SetValue(key, ScriptValue.Null);
             return m_Indexs[key];
         }
+        #region 重载 GetValue SetValue
         public override ScriptValue GetValue(string key) {
             return m_Indexs.TryGetValue(key, out var index) ? GetValueByIndex(index) : ScriptValue.Null;
         }
@@ -88,6 +89,17 @@ namespace Scorpio {
         public override void SetValueByIndex(int key, ScriptValue value) {
             m_Objects[key].CopyFrom(value);
         }
+        #endregion
+        public void SetValueNoReference(string key, ScriptValue value) {
+            if (m_Indexs.TryGetValue(key, out var index)) {
+                m_Objects[index].Set(value);
+                return;
+            }
+            m_Indexs[string.Intern(key)] = m_Size;
+            EnsureCapacity(m_Size + 1);
+            m_Objects[m_Size++].Set(value);
+        }
+
         public bool HasValue(string key) {
             return m_Indexs.ContainsKey(key);
         }

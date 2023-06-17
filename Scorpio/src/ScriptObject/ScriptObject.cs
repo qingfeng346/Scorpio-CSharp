@@ -57,7 +57,7 @@ namespace Scorpio {
         public virtual bool Greater(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [>] 运算"); }
         public virtual bool GreaterOrEqual(ScriptValue obj) { throw new ExecutionException($"类型[{ValueTypeName}]不支持 [>=] 运算"); }
         public override int GetHashCode() { return base.GetHashCode(); }
-        public override bool Equals(object obj) { using (var value = ScriptValue.CreateValue(m_Script, obj)) { return Equals(value); } }
+        public override bool Equals(object obj) { return Equals(ScriptValue.CreateValueNoReference(m_Script, obj)); }
         public virtual bool Equals(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.scriptValue == this; }
         public bool EqualReference(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && ReferenceEquals(obj.scriptValue, this); }
         public override string ToString() { return base.ToString(); }
@@ -80,9 +80,7 @@ namespace Scorpio {
             var length = args.Length;
             var parameters = ScriptValue.Parameters;
             for (var i = 0; i < length; ++i) {
-                var value = ScriptValue.CreateValue(m_Script, args[i]);
-                value.Release();
-                parameters[i] = value;
+                parameters[i] = ScriptValue.CreateValueNoReference(m_Script, args[i]);
             }
             return Call(thisObject, parameters, length);
         }

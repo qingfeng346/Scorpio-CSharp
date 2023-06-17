@@ -24,19 +24,13 @@ namespace Scorpio.Userdata {
             m_Script.Free(this);
         }
         public override ScriptValue GetValue(double index) {
-            using (var ret = ScriptValue.CreateValue(m_Script, m_Array[(int)index])) {
-                return ret;
-            }
+            return ScriptValue.CreateValueNoReference(m_Script, m_Array[(int)index]);
         }
         public override ScriptValue GetValue(long index) {
-            using (var ret = ScriptValue.CreateValue(m_Script, m_Array[(int)index])) {
-                return ret;
-            }
+            return ScriptValue.CreateValueNoReference(m_Script, m_Array[(int)index]);
         }
         public override ScriptValue GetValue(object index) {
-            using (var ret = ScriptValue.CreateValue(m_Script, Convert.ToInt32(index))) {
-                return ret;
-            }
+            return ScriptValue.CreateValueNoReference(m_Script, m_Array[Convert.ToInt32(index)]);
         }
         public override void SetValue(double index, ScriptValue value) {
             m_Array[(int)index] = value.ChangeType(m_ElementType);

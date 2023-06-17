@@ -41,7 +41,7 @@ namespace Scorpio.Userdata
         private ScriptValue GetNestedType(Script script, string name) {
             var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
             if (nestedType != null) {
-                return m_Values[string.Intern(name)] = new ScriptValue(script.GetUserdataTypeValue(nestedType));
+                return m_Values[string.Intern(name)] = script.GetUserdataTypeValue(nestedType).Reference();
             }
             return ScriptValue.Null;
         }

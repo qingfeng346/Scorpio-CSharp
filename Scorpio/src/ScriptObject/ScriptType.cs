@@ -51,11 +51,9 @@ namespace Scorpio {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
-                using (var instanceValue = new ScriptValue(instance)) {
-                    using (var ret = get.Get<ScriptFunction>().Call(instanceValue, ScriptValue.EMPTY, 0)) {
-                        return ret;
-                    }
-                }
+                var ret = get.Get<ScriptFunction>().Call(new ScriptValue(instance, true), ScriptValue.EMPTY, 0);
+                ret.Release();
+                return ret;
             }
             return m_Prototype.GetValue(key, instance);
         }
@@ -63,10 +61,9 @@ namespace Scorpio {
             return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValueNoDefault(key);
         }
         public void SetValue(string key, ScriptObject scriptObject) {
-            using (var value = new ScriptValue(scriptObject)) {
-                SetValue(key, value);
-            }
+            SetValueNoReference(key, new ScriptValue(scriptObject));
         }
+        #region GetValue SetValue 重载
         public override void SetValue(string key, ScriptValue value) {
             if (m_Values.TryGetValue(key, out var result)) {
                 result.Free();
@@ -79,11 +76,19 @@ namespace Scorpio {
         public override ScriptValue GetValue(string key) {
             return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
+        #endregion
+        public void SetValueNoReference(string key, ScriptValue value) {
+            if (m_Values.TryGetValue(key, out var result)) {
+                result.Free();
+            }
+            m_Values[key] = value;
+            if (key == ScriptOperator.Equal) {
+                m_EqualFunction = value.Get<ScriptFunction>();
+            }
+        }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             var instance = m_Script.NewInstance();
-            using (var value = new ScriptValue(this)) {
-                instance.SetPrototypeValue(value);
-            }
+            instance.SetPrototypeValue(new ScriptValue(this, true));
             var ret = new ScriptValue(instance);
             var constructor = GetValue(ScriptOperator.Constructor).Get<ScriptFunction>();
             if (constructor != null) {
@@ -114,11 +119,9 @@ namespace Scorpio {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
-                using (var instanceValue = new ScriptValue(instance)) {
-                    using (var ret = get.Get<ScriptFunction>().Call(instanceValue, ScriptValue.EMPTY, 0)) {
-                        return ret;
-                    }
-                }
+                var ret = get.Get<ScriptFunction>().Call(new ScriptValue(instance, true), ScriptValue.EMPTY, 0);
+                ret.Release();
+                return ret;
             }
             return ScriptValue.Null;
         }

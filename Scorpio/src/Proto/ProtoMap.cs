@@ -71,10 +71,9 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
-                    using (var key = ScriptValue.CreateValue(script, pair.Key)) {
-                        if (func.Call(key, pair.Value).valueType == ScriptValue.falseValueType) {
-                            return key.Reference();
-                        }
+                    var key = ScriptValue.CreateValueNoReference(script, pair.Key);
+                    if (func.Call(key, pair.Value).valueType == ScriptValue.falseValueType) {
+                        return key.Reference();
                     }
                 }
                 return ScriptValue.Null;
@@ -88,10 +87,9 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
-                    using (var key = ScriptValue.CreateValue(script, pair.Key)) {
-                        if (func.Call(pair.Value, key).valueType == ScriptValue.falseValueType) {
-                            return key.Reference();
-                        }
+                    var key = ScriptValue.CreateValueNoReference(script, pair.Key);
+                    if (func.Call(pair.Value, key).valueType == ScriptValue.falseValueType) {
+                        return key.Reference();
                     }
                 }
                 return ScriptValue.Null;
@@ -105,10 +103,9 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
-                    using (var key = ScriptValue.CreateValue(script, pair.Key)) {
-                        if (func.Call(key, pair.Value).IsTrue) {
-                            return key.Reference();
-                        }
+                    var key = ScriptValue.CreateValueNoReference(script, pair.Key);
+                    if (func.Call(key, pair.Value).IsTrue) {
+                        return key.Reference();
                     }
                 }
                 return ScriptValue.Null;
@@ -122,10 +119,8 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var func = args[0].Get<ScriptFunction>();
                 foreach (var pair in thisObject.Get<ScriptMap>()) {
-                    using (var key = ScriptValue.CreateValue(script, pair.Key)) {
-                        if (func.Call(key, pair.Value).IsTrue) {
-                            return pair.Value.Reference();
-                        }
+                    if (func.Call(ScriptValue.CreateValueNoReference(script, pair.Key), pair.Value).IsTrue) {
+                        return pair.Value.Reference();
                     }
                 }
                 return ScriptValue.Null;

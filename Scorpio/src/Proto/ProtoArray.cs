@@ -252,8 +252,7 @@ namespace Scorpio.Proto {
                 var ret = array.script.NewArray();
                 var func = args[0].Get<ScriptFunction>();
                 for (int i = 0, count = array.Length(); i < count; ++i) {
-                    using (var v = func.Call(array[i]))
-                        ret.Add(v);
+                    ret.AddNoReference(func.Call(array[i]));
                 }
                 return new ScriptValue(ret);
             }

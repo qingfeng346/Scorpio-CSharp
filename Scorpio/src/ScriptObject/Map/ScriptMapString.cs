@@ -56,9 +56,7 @@ namespace Scorpio {
         public override ScriptArray GetKeys() {
             var ret = m_Script.NewArray();
             foreach (var pair in m_Values) {
-                using (var key = new ScriptValue(pair.Key)) {
-                    ret.Add(key);
-                }
+                ret.AddNoReference(new ScriptValue(pair.Key));
             }
             return ret;
         }

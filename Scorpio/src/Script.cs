@@ -100,16 +100,9 @@ namespace Scorpio
             AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObjectValue), ref m_TypeValueStringBuilder);
             AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObjectValue), ref m_TypeValueHashSet);
 
-
-            using (var value = new ScriptValue(Global)) {
-                Global.SetValue(GLOBAL_NAME, value);
-            }
-            using (var value = ScriptValue.CreateValue(this, this)) {
-                Global.SetValue(GLOBAL_SCRIPT, value);
-            }
-            using (var value = ScriptValue.CreateValue(this, typeof(Version))) {
-                Global.SetValue(GLOBAL_VERSION, value);
-            }
+            Global.SetValueNoReference(GLOBAL_NAME, new ScriptValue(Global));
+            Global.SetValueNoReference(GLOBAL_SCRIPT, ScriptValue.CreateValue(this, this));
+            Global.SetValueNoReference(GLOBAL_VERSION, ScriptValue.CreateValue(this, typeof(Version)));
 
             ProtoObject.Load(this, TypeObject);
             ProtoBoolean.Load(this, TypeBoolean);
@@ -240,13 +233,15 @@ namespace Scorpio
         /// <param name="key">名字</param>
         /// <param name="value">值</param>
         public void SetGlobal(string key, ScriptObject value) {
-            SetGlobal(key, new ScriptValue(value));
+            Global.SetValueNoReference(key, new ScriptValue(value));
         }
         public void SetGlobal(string key, ScriptValue value) {
-            using (value) {
-                Global.SetValue(key, value);
-            }
+            Global.SetValue(key, value);
         }
+        public void SetGlobalNoReference(string key, ScriptValue value) {
+            Global.SetValueNoReference(key, value);
+        }
+
         /// <summary> 获得一个全局变量 </summary>
         /// <param name="key">名字</param>
         /// <returns>值</returns>

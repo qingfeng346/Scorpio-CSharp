@@ -27,7 +27,7 @@ namespace Scorpio
             if (type == null) {
                 return m_Objects[name] = new ScriptValue(new ScriptNamespace(m_Script, name));
             } else {
-                return m_Objects[name] = new ScriptValue(m_Script.GetUserdataTypeValue(type));
+                return m_Objects[name] = m_Script.GetUserdataTypeValue(type).Reference();
             }
         }
         public override string ToString() {

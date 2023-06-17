@@ -13,8 +13,9 @@ namespace Scorpio {
         }
         public ScriptValue call(params object[] args) {
             if (script.IsShutdown) return ScriptValue.Null;
-            using (var v = scriptValue.call(ScriptValue.Null, args))
-                return v;
+            var value = scriptValue.call(ScriptValue.Null, args);
+            value.Release();
+            return value;
         }
     }
     public class ScorpioDelegateFactoryManager {

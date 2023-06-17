@@ -18,15 +18,7 @@ namespace Scorpio.Userdata {
             return this;
         }
         //ThisValue没有占用引用计数
-        private ScriptValue ThisValue {
-            get {
-                if (m_thisValue == null) {
-                    m_thisValue = new ScriptValue(this);
-                    m_thisValue?.Release();
-                }
-                return m_thisValue.Value;
-            }
-        }
+        private ScriptValue ThisValue => m_thisValue ?? (m_thisValue = new ScriptValue(this, true)).Value;
         public override void Free() {
             m_Value = null;
             m_ValueType = null;
@@ -46,9 +38,7 @@ namespace Scorpio.Userdata {
             if (ret is UserdataMethod) {
                 return m_Methods[key] = new ScriptValue(m_Script.NewInstanceMethod().Set(key, (UserdataMethod)ret, m_Value));
             }
-            var value = ScriptValue.CreateValue(script, ret);
-            value.Release();
-            return value;
+            return ScriptValue.CreateValueNoReference(script, ret);
         }
         public override void SetValue(string key, ScriptValue value) { 
             m_UserdataType.SetValue(m_Value, key, value);
@@ -62,18 +52,14 @@ namespace Scorpio.Userdata {
             return GetValueInternal(new ScriptValue(index));
         }
         public override ScriptValue GetValue(object index) {
-            var key = ScriptValue.CreateValue(m_Script, index);
-            key.Release();
-            return GetValueInternal(key);
+            return GetValueInternal(ScriptValue.CreateValueNoReference(m_Script, index));
         }
         private ScriptValue GetValueInternal(ScriptValue key) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
             var parameters = ScriptValue.Parameters;
             parameters[0] = key;
-            var ret = ScriptValue.CreateValue(m_Script, func.Call(m_Script, false, m_Value, parameters, 1));
-            ret.Release();
-            return ret;
+            return ScriptValue.CreateValueNoReference(m_Script, func.Call(m_Script, false, m_Value, parameters, 1)); ;
         }
         public override void SetValue(double index, ScriptValue value) {
             SetValueInternal(new ScriptValue(index), value);
@@ -82,9 +68,7 @@ namespace Scorpio.Userdata {
             SetValueInternal(new ScriptValue(index), value);
         }
         public override void SetValue(object index, ScriptValue value) {
-            var key = ScriptValue.CreateValue(m_Script, index);
-            key.Release();
-            SetValueInternal(key, value);
+            SetValueInternal(ScriptValue.CreateValueNoReference(m_Script, index), value);
         }
         private void SetValueInternal(ScriptValue key, ScriptValue value) {
             var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);

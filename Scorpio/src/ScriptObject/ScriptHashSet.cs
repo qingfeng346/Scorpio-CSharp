@@ -28,6 +28,13 @@ namespace Scorpio {
                 m_Objects.Add(item.Reference());
             }
         }
+        public void AddNoReference(ScriptValue item) {
+            if (!m_Objects.Contains(item)) {
+                m_Objects.Add(item);
+            } else {
+                item.Release();
+            }
+        }
         public void Clear() {
             foreach (var value in m_Objects) {
                 value.Free();

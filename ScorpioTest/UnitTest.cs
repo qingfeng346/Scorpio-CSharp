@@ -53,7 +53,6 @@ namespace ScorpioTest {
                 var script = new Script();
                 script.LoadLibraryV1();
                 script.PushAssembly(typeof(TestClass));
-                script.SetGlobal("UnitTest", ScriptValue.CreateValue(script, typeof(UnitTest)));
                 script.SetGlobal("print", script.CreateFunction(new print(script)));
                 script.LoadFile(file);
                 script.Shutdown();

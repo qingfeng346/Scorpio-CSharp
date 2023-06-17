@@ -116,9 +116,7 @@ namespace Scorpio.Userdata {
             var ret = Method.Invoke(obj, Args);
             for (var i = 1; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
-                    using (var value = ScriptValue.CreateValue(script, Args[i])) {
-                        parameters[i - 1].Get<ScriptInstance>().SetValue(RefOutValue, value);
-                    }
+                    parameters[i - 1].Get<ScriptInstance>().SetValueNoReference(RefOutValue, ScriptValue.CreateValue(script, Args[i]));
                 }
             }
             return ret;

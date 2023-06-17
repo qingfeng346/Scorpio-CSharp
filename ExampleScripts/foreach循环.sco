@@ -1,6 +1,7 @@
 var arr = [100,200,300,400]
 // print(array.count(arr))			//1.0 语法
 print(arr.length())				//2.0 语法
+print(pairs)
 foreach (var p in pairs(arr)) {
     print("array : " + p.key + " = " + p.value)
 }

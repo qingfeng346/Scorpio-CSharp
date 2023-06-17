@@ -11,9 +11,9 @@ namespace Scorpio.Tools {
                 this.index = index;
             }
 #endif
-            public void Set(string value) {
+            public void Set(string value, int referenceCount) {
                 this.value = value;
-                this.referenceCount = 1;
+                this.referenceCount = referenceCount;
             }
             public void Clear() {
                 this.value = null;
@@ -50,7 +50,32 @@ namespace Scorpio.Tools {
 #endif
             }
             object2index.Add(value, index);
-            entities[index].Set(value);
+            entities[index].Set(value, 1);
+            return index;
+        }
+        //获取index,如果是新创建的立刻加入释放列表
+        public static int GetIndex(string value) {
+            if (object2index.TryGetValue(value, out var index)) {
+                return index;
+            }
+            if (pool.Count > 0) {
+                index = pool.Pop();
+            } else {
+                index = length++;
+                if (length == entities.Length) {
+                    var newEntities = new Entity[entities.Length + Stage];
+                    Array.Copy(entities, newEntities, entities.Length);
+                    entities = newEntities;
+                }
+#if SCORPIO_DEBUG
+                entities[index] = new Entity(index);
+#else
+                entities[index] = new Entity();
+#endif
+            }
+            object2index.Add(value, index);
+            entities[index].Set(value, 0);
+            freeIndex.Add(index);
             return index;
         }
         public static void Free(int index) {
