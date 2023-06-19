@@ -164,10 +164,10 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.LoadBase: {
-    #if EXECUTE_BASE
-                                stackObjects[++stackIndex] = new ScriptValue(baseType.Prototype);
-    #else
-                                stackObjects[++stackIndex] = new ScriptValue(thisObject.Get<ScriptInstance>().Prototype.Prototype);
+#if EXECUTE_BASE
+                                stackObjects[++stackIndex].CopyFrom(baseType.PrototypeValue);
+#else
+                                stackObjects[++stackIndex].CopyFrom(thisObject.Get<ScriptInstance>().Prototype.PrototypeValue);
     #endif
                                 continue;
                             }
@@ -1506,7 +1506,7 @@ namespace Scorpio.Runtime {
                     //主动throw的情况
                     } catch (ScriptException e) {
                         if (tryIndex > -1) {
-                            stackObjects[stackIndex = 0] = e.value;
+                            stackObjects[stackIndex = 0].CopyFrom(e.value);
                             iInstruction = tryStack[tryIndex--];
                             goto KeepOn;
                         } else {

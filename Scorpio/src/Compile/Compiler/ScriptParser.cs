@@ -1019,7 +1019,7 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeArray array: {
-                    if (array.Elements.Count > 120)
+                    if (array.Elements.Count > 240)
                         throw new ParserException(this, $"一次性申请Array变量不能超过240个,可是使用add或+代替:{array.Elements.Count}", PeekToken());
                     foreach (var ele in array.Elements) {
                         PushObject(ele);

@@ -85,7 +85,7 @@ namespace Scorpio.Runtime {
             int tempIndex; //临时存储
             ScriptInstruction instruction = null;
             Opcode opcode = Opcode.Nop;
-            int opvalue;
+            int opvalue = 0;
             try {
 #if !EXECUTE_COROUTINE
             KeepOn:
@@ -165,10 +165,10 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.LoadBase: {
-    #if EXECUTE_BASE
-                                stackObjects[++stackIndex] = new ScriptValue(baseType.Prototype);
-    #else
-                                stackObjects[++stackIndex] = new ScriptValue(thisObject.Get<ScriptInstance>().Prototype.Prototype);
+#if EXECUTE_BASE
+                                stackObjects[++stackIndex].CopyFrom(baseType.PrototypeValue);
+#else
+                                stackObjects[++stackIndex].CopyFrom(thisObject.Get<ScriptInstance>().Prototype.PrototypeValue);
     #endif
                                 continue;
                             }
@@ -1361,7 +1361,7 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.NewArray: {
-                                var array = m_script.NewArray();
+                                   var array = m_script.NewArray();
                                 for (var i = opvalue - 1; i >= 0; --i) {
                                     array.Add(stackObjects[stackIndex - i]);
                                 }
@@ -1507,7 +1507,7 @@ namespace Scorpio.Runtime {
                     //主动throw的情况
                     } catch (ScriptException e) {
                         if (tryIndex > -1) {
-                            stackObjects[stackIndex = 0] = e.value;
+                            stackObjects[stackIndex = 0].CopyFrom(e.value);
                             iInstruction = tryStack[tryIndex--];
                             goto KeepOn;
                         } else {
@@ -1531,7 +1531,7 @@ namespace Scorpio.Runtime {
                             iInstruction = tryStack[tryIndex--];
                             goto KeepOn;
                         } else {
-                            throw new ExecutionException($"{m_Breviary}:{instruction.line}({opcode})", e);
+                            throw new ExecutionException($"{m_Breviary}:{instruction.line}({opcode}:{opvalue})", e);
                         }
                     }
                 } catch (System.Exception) {
