@@ -229,10 +229,9 @@ namespace ScorpioExec
                     script.SetArgs (sArgs);
                     Logger.info ("=============================");
                     var watch = Stopwatch.StartNew ();
-                    var ret = "";
-                    using (var value = script.LoadFile(file, ParseOption(command.GetValueDefault(ParameterOption, ""), script.SearchPaths))) {
-                        ret = value.ToString();
-                    }
+                    var value = script.LoadFile(file, ParseOption(command.GetValueDefault(ParameterOption, ""), script.SearchPaths));
+                    value.Release();
+                    var ret = value.ToString();
                     while (true) {
                         var flag = script.UpdateCoroutine();
                         script.ReleaseAll();

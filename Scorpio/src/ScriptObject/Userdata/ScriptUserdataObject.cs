@@ -9,7 +9,7 @@ namespace Scorpio.Userdata {
     public class ScriptUserdataObject : ScriptUserdata {
         protected UserdataType m_UserdataType;
         protected Dictionary<string, ScriptValue> m_Methods = new Dictionary<string, ScriptValue>();
-        protected ScriptValue? m_thisValue = null;
+        protected ScriptValue m_thisValue;
         public ScriptUserdataObject(Script script) : base(script) { }
         public ScriptUserdataObject Set(UserdataType type, object value) {
             m_UserdataType = type;
@@ -18,12 +18,12 @@ namespace Scorpio.Userdata {
             return this;
         }
         //ThisValue没有占用引用计数
-        private ScriptValue ThisValue => m_thisValue ?? (m_thisValue = new ScriptValue(this, true)).Value;
+        private ScriptValue ThisValue => m_thisValue.valueType == ScriptValue.nullValueType ? (m_thisValue = new ScriptValue(this, true)) : m_thisValue;
         public override void Free() {
             m_Value = null;
             m_ValueType = null;
             m_UserdataType = null;
-            m_thisValue = null;
+            m_thisValue = ScriptValue.Null;
             m_Methods.Free();
             m_Script.Free(this);
         }

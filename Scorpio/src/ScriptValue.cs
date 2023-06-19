@@ -7,8 +7,8 @@ using Scorpio.Userdata;
 
 namespace Scorpio
 {
-    [StructLayout(LayoutKind.Explicit, Pack = 1)]
-    public struct ScriptValue : IDisposable {
+    [StructLayout(LayoutKind.Explicit, Pack = 4)]
+    public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量
         public static readonly ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
         public static readonly ScriptValue[] EMPTY = new ScriptValue[0];
@@ -135,7 +135,7 @@ namespace Scorpio
             return this;
         }
         //只释放
-        internal void Release() {
+        public void Release() {
             if (_valueType == stringValueType) {
                 StringReference.Free(_index);
             } else if (_valueType == scriptValueType) {
@@ -812,9 +812,6 @@ namespace Scorpio
             else if (value is float)
                 return new ScriptValue((float)value);
             throw new ExecutionException($"未知的Number类型:{value?.GetType()?.FullName}");
-        }
-        public void Dispose() {
-            Free();
         }
     }
 }

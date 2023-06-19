@@ -9,7 +9,7 @@ namespace Scorpio {
         internal ScorpioStringDictionary<ScriptValue> m_Values = new ScorpioStringDictionary<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptValue m_PrototypeValue;
         protected ScriptType m_Prototype = null;
-        protected ScriptValue? m_thisValue = null;
+        protected ScriptValue m_thisValue;
         public ScriptInstance(Script script) : base(script, ObjectType.Instance) { }
         public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) { }
         public ScriptInstance SetPrototypeValue(ScriptValue prototypeValue) {
@@ -21,14 +21,14 @@ namespace Scorpio {
         public ScriptType Prototype => m_Prototype;
         public ScriptValue PrototypeValue => m_PrototypeValue;
         //ThisValue没有占用引用计数
-        private ScriptValue ThisValue => m_thisValue ?? (m_thisValue = new ScriptValue(this, true)).Value;
+        private ScriptValue ThisValue => m_thisValue.valueType == ScriptValue.nullValueType ? (m_thisValue = new ScriptValue(this, true)) : m_thisValue;
         public void SetCapacity(int capacity) {
             m_Values.SetCapacity(capacity);
         }
         protected void Release() {
             m_PrototypeValue.Free();
             m_Prototype = null;
-            m_thisValue = null;
+            m_thisValue = ScriptValue.Null;
             m_Values.Free();
         }
         public override void Free() {
