@@ -14,9 +14,6 @@ namespace Scorpio {
             return scriptCoroutine;
         }
         public void StopCoroutine(ScriptCoroutine scriptCoroutine) {
-            scriptCoroutine.Stop();
-        }
-        internal void Remove(ScriptCoroutine scriptCoroutine) {
             m_DelCoroutines.Add(scriptCoroutine);
         }
         public void StopAllCoroutine() {
@@ -27,6 +24,7 @@ namespace Scorpio {
             if (m_DelCoroutines.Count > 0) {
                 var length = m_DelCoroutines.Count;
                 for (var i = 0; i < length; ++i) {
+                    m_DelCoroutines[i].Destroy();
                     m_Coroutines.Remove(m_DelCoroutines[i]);
                 }
                 m_DelCoroutines.Clear();

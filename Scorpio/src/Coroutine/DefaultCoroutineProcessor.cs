@@ -1,5 +1,4 @@
-﻿using System.Collections;
-namespace Scorpio.Coroutine {
+﻿namespace Scorpio.Coroutine {
     public class DefaultCoroutineProcessor : ICoroutineProcessor {
         ICoroutine coroutine;
         public void SetCurrent(object current) {

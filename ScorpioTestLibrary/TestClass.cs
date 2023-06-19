@@ -47,9 +47,10 @@ public static class TestStaticClass {
     public static bool Update() {
         if (timer.Count > 0) {
             var now = DateTime.Now;
-            foreach (var (time, action) in timer) {
-                if (now > time) {
-                    action();
+            for (var it = timer.First; it != null; it = it.Next) {
+                if (now > it.Value.Item1) {
+                    timer.Remove(it);
+                    it.Value.Item2();
                     break;
                 }
             }
