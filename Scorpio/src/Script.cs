@@ -170,6 +170,7 @@ namespace Scorpio
             m_Types.Clear();
             m_ExtensionType.Clear();
             m_Assembly.Clear();
+            CoroutineResult.Free();
         }
         public void RunOnMainThread(Action action) {
             if (IsShutdown) return;

@@ -6,17 +6,7 @@ namespace Scorpio {
         private LinkedList<ScriptCoroutine> m_Coroutines = new LinkedList<ScriptCoroutine>();
         private List<ScriptCoroutine> m_AddCoroutines = new List<ScriptCoroutine>();
         private List<ScriptCoroutine> m_DelCoroutines = new List<ScriptCoroutine>();
-        private ScriptValue coroutineResult = ScriptValue.Null;
-        public ScriptValue CoroutineResult {
-            internal set {
-                coroutineResult = value;
-            }
-            get {
-                var ret = coroutineResult;
-                coroutineResult = ScriptValue.Null;
-                return ret;
-            }
-        }
+        public ScriptValue CoroutineResult;
         public ICoroutineProcessor CoroutineProcessor { get; set; } = new DefaultCoroutineProcessor();
         public ScriptCoroutine StartCoroutine(IEnumerator enumerator) {
             var scriptCoroutine = new ScriptCoroutine(this, enumerator);
