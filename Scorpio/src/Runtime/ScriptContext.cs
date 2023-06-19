@@ -14,7 +14,7 @@ namespace Scorpio.Runtime {
         }
         internal const int ValueCacheLength = 128;          //函数最大调用层级,超过会堆栈溢出
         internal const int StackValueLength = 128;          //堆栈数据最大数量
-        internal const int VariableValueLength = 128;       //局部变量最大数量
+        internal const int VariableValueLength = 256;       //局部变量最大数量
         internal const int TryStackLength = 16;             //最多可以嵌套多少层try catch
         
         internal static ScriptValue[][] VariableValues = new ScriptValue[ValueCacheLength][]; //局部变量数据
