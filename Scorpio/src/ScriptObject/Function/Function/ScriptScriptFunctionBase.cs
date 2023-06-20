@@ -16,6 +16,7 @@ namespace Scorpio.Function {
         public override void Free() {
             ReleaseInternal();
             Release();
+            m_Context = null;
         }
         protected void ReleaseInternal() {
             ScorpioUtil.Free(m_Script, m_internalValues, m_Context.internalCount);
@@ -38,6 +39,7 @@ namespace Scorpio.Function {
             ReleaseInternal();
             Release();
             m_BindObject.Free();
+            m_Context = null;
         }
         public override ScriptValue BindObject => m_BindObject;
     }

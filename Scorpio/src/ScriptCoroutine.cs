@@ -17,6 +17,8 @@ namespace Scorpio {
             m_DelCoroutines.Add(scriptCoroutine);
         }
         public void StopAllCoroutine() {
+            m_AddCoroutines.ForEach(_ => _.Destroy());
+            m_AddCoroutines.Clear();
             m_DelCoroutines.AddRange(m_Coroutines);
         }
         //UpdateCoroutine 必须在 ReleaseAll前面

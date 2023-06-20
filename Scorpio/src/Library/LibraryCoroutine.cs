@@ -5,12 +5,12 @@ namespace Scorpio.Library {
     public class LibraryCoroutine {
         public static void Load(Script script) {
             var functions = new (string, ScorpioHandle)[] {
-                ("start", new start(script)),
-                ("stop", new stop()),
+                //("start", new start(script)),
+                //("stop", new stop()),
                 ("stopAll", new stopAll(script)),
-                ("poll", new poll(script)),
-                ("epoll", new epoll(script)),
-                ("done", new done()),
+                //("poll", new poll(script)),
+                //("epoll", new epoll(script)),
+                //("done", new done()),
             };
             var map = script.NewMapString();
             map.SetCapacity(functions.Length);

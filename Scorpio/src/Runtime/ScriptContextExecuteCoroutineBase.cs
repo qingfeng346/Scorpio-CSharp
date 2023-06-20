@@ -19,7 +19,7 @@ namespace Scorpio.Runtime {
 #else
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues) {
 #endif
-
+            #region 堆栈和线程判断
 #if SCORPIO_ASSERT
             //System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
             if (VariableValueIndex < 0 || VariableValueIndex >= ValueCacheLength) {
@@ -32,6 +32,8 @@ namespace Scorpio.Runtime {
                 throw new ExecutionException($"only run script on mainthread : {m_script.MainThreadId} - {currentThread.ManagedThreadId}({currentThread.Name})");
             }
 #endif
+            #endregion
+            #region 申请堆栈和局部变量
 #if EXECUTE_COROUTINE
             var asyncValue = AllocAsyncValue();             //空闲数据索引
             var variableObjects = asyncValue.variable;      //局部变量
@@ -40,8 +42,10 @@ namespace Scorpio.Runtime {
             var variableObjects = VariableValues[VariableValueIndex];   //局部变量
             var stackObjects = StackValues[VariableValueIndex];         //堆栈数据
             var tryStack = TryStackValues[VariableValueIndex++];        //try catch
+            var tryIndex = -1; //try索引
 #endif
-            variableObjects[0].CopyFrom(thisObject);
+            #endregion
+            #region 初始化内部变量
             InternalValue[] internalValues = null;
             if (internalCount > 0) {
                 internalValues = m_script.NewIntervalValues();          //内部变量，有外部引用
@@ -59,10 +63,10 @@ namespace Scorpio.Runtime {
                     }
                 }
             }
+            #endregion
+            #region 初始化参数和this
+            variableObjects[0].CopyFrom(thisObject);
             var stackIndex = -1; //堆栈索引
-#if !EXECUTE_COROUTINE
-            var tryIndex = -1; //try索引
-#endif
             var parameterCount = m_FunctionData.parameterCount; //参数数量
             //是否是变长参数
             if (m_FunctionData.param) {
@@ -79,6 +83,7 @@ namespace Scorpio.Runtime {
                     stackObjects[++stackIndex].CopyFrom(i >= length ? ScriptValue.Null : args[i]);
                 }
             }
+            #endregion
             var parameters = ScriptValue.Parameters; //传递参数
             var iInstruction = 0; //当前执行命令索引
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
@@ -88,11 +93,14 @@ namespace Scorpio.Runtime {
             Opcode opcode = Opcode.Nop;
             int opvalue = 0;
             try {
-#if !EXECUTE_COROUTINE
+#if EXECUTE_COROUTINE
+                //进函数先调用一次 MoveNext,否则 finally 无法正常调用,会导致泄漏
+                yield return null;
+#else
             KeepOn:
                 try {
 #endif
-                    while (iInstruction < iInstructionCount) {
+                while (iInstruction < iInstructionCount) {
                         instruction = m_scriptInstructions[iInstruction++];
                         opvalue = instruction.opvalue;
                         opcode = instruction.opcode;
@@ -170,7 +178,7 @@ namespace Scorpio.Runtime {
                                 stackObjects[++stackIndex].CopyFrom(baseType.PrototypeValue);
 #else
                                 stackObjects[++stackIndex].CopyFrom(thisObject.Get<ScriptInstance>().Prototype.PrototypeValue);
-    #endif
+#endif
                                 continue;
                             }
                             case Opcode.ToGlobal: {
@@ -1043,22 +1051,22 @@ namespace Scorpio.Runtime {
                                 }
                             }
                             case Opcode.RetNone: {
-    #if EXECUTE_COROUTINE
+#if EXECUTE_COROUTINE
                                 yield break;
-    #else
+#else
                                 Free(variableObjects, stackObjects, internalValues);
                                 return ScriptValue.Null;
-    #endif
+#endif
                             }
                             case Opcode.Ret: {
-    #if EXECUTE_COROUTINE
+#if EXECUTE_COROUTINE
                                 m_script.CoroutineResult.CopyFrom(stackObjects[stackIndex]);
                                 yield break;
-    #else
+#else
                                 var ret = stackObjects[stackIndex].Reference();
                                 Free(variableObjects, stackObjects, internalValues);
                                 return ret;
-    #endif
+#endif
                             }
                             case Opcode.CallUnfold: {
                                 var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
@@ -1355,8 +1363,8 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
 #endif
-                            #endregion
-                            #region New
+#endregion
+#region New
                             case Opcode.NewMap: {
                                 stackObjects[++stackIndex].SetScriptValue(m_script.NewMapObject());
                                 continue;
