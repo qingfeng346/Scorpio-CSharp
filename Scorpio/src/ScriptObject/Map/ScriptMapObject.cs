@@ -6,16 +6,19 @@ using Scorpio.Tools;
 namespace Scorpio {
     //脚本map类型
     public class ScriptMapObject : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
-        private Dictionary<object, ScriptValue> m_Objects = new Dictionary<object, ScriptValue>();  //所有的数据(函数和数据都在一个数组)
+        private Dictionary<object, ScriptValue> m_Objects;  //所有的数据(函数和数据都在一个数组)
         public ScriptMapObject(Script script) : base(script) { }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
         public override void Alloc() {
+            base.Alloc();
+            m_Objects = new Dictionary<object, ScriptValue>();
             SetPrototypeValue(script.TypeMapValue);
         }
         public override void Free() {
             Release();
             Clear();
+            m_Objects = null;
             m_Script.Free(this);
         }
         public override void gc() {

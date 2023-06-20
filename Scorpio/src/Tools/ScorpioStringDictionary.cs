@@ -32,7 +32,10 @@ namespace Scorpio.Tools {
                 index = 0;
                 current = default;
             }
-            public void Dispose() { }
+            public void Dispose() {
+                dictionary = null;
+                current = default;
+            }
         }
         protected int mSize;
         protected ScorpioKeyValue<string, Value>[] mValues;
@@ -107,7 +110,7 @@ namespace Scorpio.Tools {
         }
         public virtual void Clear() {
             mSize = 0;
-            Array.Clear(mValues, 0, mSize);
+            mValues = EMPTY;
         }
         public virtual void TrimCapacity() {
             if (mSize == mValues.Length) return;

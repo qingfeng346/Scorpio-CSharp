@@ -52,22 +52,25 @@ namespace Scorpio {
                 index = 0;
                 current = ScriptValue.Null;
             }
-            public void Dispose() { }
+            public void Dispose() {
+                values = null;
+            }
         }
         internal ScriptValue[] m_Objects;
         internal int m_Length;
         
-        public ScriptArray(Script script) : base(script, ObjectType.Array) {
-            m_Objects = ScriptValue.EMPTY;
-            m_Length = 0;
-        }
+        public ScriptArray(Script script) : base(script, ObjectType.Array) { }
         internal ScriptValue[] getObjects() { return m_Objects; }
         public override void Alloc() {
+            m_Objects = ScriptValue.EMPTY;
+            m_Length = 0;
             SetPrototypeValue(script.TypeArrayValue);
         }
         public override void Free() {
             Release();
             Clear();
+            m_Objects = ScriptValue.EMPTY;
+            m_Length = 0;
             m_Script.Free(this);
         }
         public override void gc() {

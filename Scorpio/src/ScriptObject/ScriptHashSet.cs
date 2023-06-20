@@ -8,16 +8,19 @@ using System.Linq;
 namespace Scorpio {
     public class ScriptHashSet : ScriptInstance, IEnumerable<ScriptValue> {
         private static List<ScriptValue> tempList = new List<ScriptValue>();
-        public HashSet<ScriptValue> m_Objects = new HashSet<ScriptValue>();
+        public HashSet<ScriptValue> m_Objects;
         public ScriptHashSet(Script script) : base(script, ObjectType.HashSet) { }
         public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
         public override void Alloc() {
+            base.Alloc();
+            m_Objects = new HashSet<ScriptValue>();
             SetPrototypeValue(script.TypeHashSetValue);
         }
         public override void Free() {
             Release();
             Clear();
+            m_Objects = null;
             m_Script.Free(this);
         }
         public override void gc() {

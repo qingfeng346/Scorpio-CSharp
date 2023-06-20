@@ -18,15 +18,16 @@ namespace Scorpio {
             public KeyValuePair<object, ScriptValue> Current => new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value);
             object IEnumerator.Current => Current;
             public void Reset() { m_Enumerator.Reset(); }
-            public void Dispose() { m_Enumerator.Dispose(); }
+            public void Dispose() { m_Enumerator.Dispose(); m_Enumerator = null; }
         }
         public ScriptMapString(Script script) : base(script) { }
         public override void Alloc() {
+            base.Alloc();
             SetPrototypeValue(script.TypeMapValue);
         }
         public override void Free() {
-            Release();
             Clear();
+            Release();
             m_Script.Free(this);
         }
         public override void gc() {
