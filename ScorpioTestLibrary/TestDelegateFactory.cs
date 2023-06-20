@@ -8,19 +8,19 @@ public class TestDelegateFactory : IScorpioDelegateFactory {
     public Delegate CreateDelegate(Script script, Type delegateType, ScriptValue scriptValue) {
         if (delegateType == typeof(System.Action)) {
             var value = new ScorpioDelegateReference(script, scriptValue);
-            return new System.Action( () => value.call() );
+            return new System.Action( () => { value.call(); } );
         }
         if (delegateType == typeof(System.Action<System.Int32,System.Int32,System.String>)) {
             var value = new ScorpioDelegateReference(script, scriptValue);
-            return new System.Action<System.Int32,System.Int32,System.String>( (arg0, arg1, arg2) => value.call(arg0, arg1, arg2) );
+            return new System.Action<System.Int32,System.Int32,System.String>( (arg0, arg1, arg2) => { value.call(arg0, arg1, arg2); } );
         }
         if (delegateType == typeof(System.Func<System.Int32,System.Int32,System.String>)) {
             var value = new ScorpioDelegateReference(script, scriptValue);
-            return new System.Func<System.Int32,System.Int32,System.String>( (arg0, arg1) => value.call(arg0, arg1).ToString() );
+            return new System.Func<System.Int32,System.Int32,System.String>( (arg0, arg1) => { return value.call(arg0, arg1).ToString(); } );
         }
         if (delegateType == typeof(System.Func<System.String,System.String>)) {
             var value = new ScorpioDelegateReference(script, scriptValue);
-            return new System.Func<System.String,System.String>( (arg0) => value.call(arg0).ToString() );
+            return new System.Func<System.String,System.String>( (arg0) => { return value.call(arg0).ToString(); } );
         }
         throw new Exception("Delegate Type is not found : " + delegateType + "  scriptValue : " + scriptValue);
     }

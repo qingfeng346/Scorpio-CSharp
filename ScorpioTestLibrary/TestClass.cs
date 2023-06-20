@@ -1,6 +1,12 @@
 ﻿using Scorpio;
 using System.Text;
 
+public interface TestInterface {
+    void Func1();
+    void Func2();
+    int Func3();
+    string Func4();
+}
 public enum TestEnum {
     Test1,
     Test2,

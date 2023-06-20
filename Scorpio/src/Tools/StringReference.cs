@@ -78,6 +78,9 @@ namespace Scorpio.Tools {
             freeIndex.Add(index);
             return index;
         }
+        public static int GetReferenceCount(int index) {
+            return entities[index].referenceCount;
+        }
         public static void Free(int index) {
             if ((--entities[index].referenceCount) == 0) {
                 //添加到待释放列表

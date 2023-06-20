@@ -82,5 +82,12 @@ namespace ScorpioTest {
             FileUtil.CreateFile(output, generate.Generate());
             WriteLine($"生成快速反射 {Path.GetFullPath(output)}");
         }
+        [Fact]
+        public void CreateInterface() {
+            var generate = new GenerateScorpioInterface(typeof(TestInterface));
+            var output = $"../../../../ScorpioTestLibrary/{generate.ScorpioClassName}.cs";
+            FileUtil.CreateFile(output, generate.Generate());
+            WriteLine($"生成interface {Path.GetFullPath(output)}");
+        }
     }
 }

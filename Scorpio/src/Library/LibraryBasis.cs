@@ -143,6 +143,8 @@ namespace Scorpio.Library
             script.SetGlobal("toEnumString", script.CreateFunction(new toEnumString(script)));
             script.SetGlobal("toString", script.CreateFunction(new toString(script)));
 
+            script.SetGlobal("toIndex", script.CreateFunction(new toIndex(script)));
+
             script.SetGlobal("typeOf", script.CreateFunction(new getPrototype(script)));
             //script.SetGlobal("setPrototype", script.CreateFunction(new setPrototype()));
             script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype(script)));
@@ -387,6 +389,22 @@ namespace Scorpio.Library
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(args[0].ToString());
+            }
+        }
+        private class toIndex : ScorpioHandle {
+            readonly Script script;
+            public toIndex(Script script) {
+                this.script = script;
+            }
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var value = args[0];
+                if (value.valueType == ScriptValue.scriptValueType) {
+                    return new ScriptValue($"{value.scriptValue}  index:{value.scriptValueIndex}  id:{value.scriptValue.Id}  count:{ScriptObjectReference.GetReferenceCount(value.stringValueIndex)}");
+                } else if (value.valueType == ScriptValue.stringValueType) {
+                    return new ScriptValue($"{value.stringValue}  index:{value.stringValueIndex}  count:{StringReference.GetReferenceCount(value.stringValueIndex)}");
+                } else {
+                    return new ScriptValue(value.ToString());
+                }
             }
         }
         private class clone : ScorpioHandle {

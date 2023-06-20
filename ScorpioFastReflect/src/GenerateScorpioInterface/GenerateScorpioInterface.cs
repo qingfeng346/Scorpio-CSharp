@@ -9,12 +9,21 @@ namespace Scorpio.FastReflect {
         public const string ClassTemplate = @"using System;
 using Scorpio;
 public class __class : __interface {
-    public ScriptValue Value { get; set; }
+    private ScriptValue m_value;
+    public ScriptValue Value {
+        get => m_value;
+        set { m_value.CopyFrom(value); }
+    }
+    public void Shutdown() {
+        m_value.Free();    
+    }
     public ScriptValue __Call(string functionName, params object[] args) {
-        var func = Value.GetValue(functionName);
+        var func = m_value.GetValue(functionName);
         if (func.valueType == ScriptValue.scriptValueType) {
             try {
-                return func.call(Value, args);
+                var value = func.call(m_value, args);
+                value.Release();
+                return value;
             } catch (System.Exception e) {
                 throw new System.Exception($""ScriptInterce Call is error Type:__class  Function:{functionName} error:{e.ToString()}"");
             }

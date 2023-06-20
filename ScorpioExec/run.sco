@@ -1,24 +1,27 @@
-class t0 {
-    constructor() {
-        print("t0")
+class tttt {
+    func() {
+        print("func")
     }
 }
-class t1 : t0 {
-    constructor() {
-        var c = "Feawfaewf"
-        base.constructor()
-        print("t1")
-    }
+function main1() {
+    var builder = new StringBuilder()
+    builder.append("123123123")
+    var t = new tttt()
+    t.func()
+    print(toIndex(t))
+    print(toIndex(builder))
 }
-class t2 : t1 {
-    constructor() {
-        var a = "123213213"
-        var b = "Fewfaewfaewf"
-        base.constructor()
-        print("t2")
-    }
+async function main() {
+    main1()
+    await sleep(1)
+    var t = new tttt()
+    t.func()
+    print(toIndex(t))
+    var builder = new StringBuilder()
+    builder.append("123123123")
+    print(toIndex(builder))
 }
-var a = t2()
+main()
 // // async function get1() {
 // //     return "Fewafawefaewf"
 // // }

@@ -72,7 +72,7 @@ public class __FactoryName : IScorpioDelegateFactory {
                 var invoke = $"value.call({pars})";
                 var call = ScorpioFastReflectUtil.ReturnString(invoke, InvokeMethod.ReturnType);
                 var func = $@"var value = new ScorpioDelegateReference(script, scriptValue);
-            return new {fullName}( ({pars}) => {call} );";
+            return new {fullName}( ({pars}) => {{ {call}; }} );";
                 if (option.buildType == 0) {
                     builder.Append($@"
         if (delegateType == typeof({fullName})) {{

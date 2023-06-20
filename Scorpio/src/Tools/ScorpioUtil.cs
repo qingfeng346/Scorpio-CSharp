@@ -207,12 +207,14 @@ namespace Scorpio.Tools {
             }
         }
         public static void Free(this ScorpioStringDictionary<ScriptValue> values) {
+            //if (values == null) return;
             foreach (var pair in values) {
                 pair.Value.Free();
             }
             values.Clear();
         }
         public static void Free<T>(this Dictionary<T, ScriptValue> values) {
+            //if (values == null) return;
             foreach (var pair in values) {
                 pair.Value.Free();
             }
