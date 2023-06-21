@@ -179,11 +179,6 @@ namespace Scorpio.Tools {
             }
             return builder.ToString();
         }
-        public static ScriptValue[] CloneParameters(this ScriptValue[] parameters, int length) {
-            var pars = new ScriptValue[length];
-            Array.Copy(parameters, pars, length);
-            return pars;
-        }
         public static ScriptValue GetArgs(this ScriptValue[] parameters, int index, int length) {
             return GetArgs(parameters, index, length, ScriptValue.Null);
         }
@@ -205,13 +200,6 @@ namespace Scorpio.Tools {
                     (ptr + i)->Free();
                 }
             }
-        }
-        public static void Free(this ScorpioStringDictionary<ScriptValue> values) {
-            //if (values == null) return;
-            foreach (var pair in values) {
-                pair.Value.Free();
-            }
-            values.Clear();
         }
         public static void Free<T>(this Dictionary<T, ScriptValue> values) {
             //if (values == null) return;

@@ -9,6 +9,7 @@ namespace Scorpio.Function {
         public ScriptHandleFunction(Script script, string name, ScorpioHandle handle) : base(script) {
             m_Handle = handle;
             FunctionName = name;
+            Alloc();
         }
         public override void Free() {
             Release();

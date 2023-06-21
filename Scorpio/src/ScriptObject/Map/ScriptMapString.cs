@@ -8,7 +8,7 @@ namespace Scorpio {
     public class ScriptMapString : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
         //数组迭代器
         public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
-            private IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
+            private IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
             internal Enumerator(ScriptMapString map) {
                 m_Enumerator = map.m_Values.GetEnumerator();
             }
@@ -46,13 +46,10 @@ namespace Scorpio {
             return m_Values.Count;
         }
         public override void Clear() {
-            m_Values.Free();
+            m_Values.Clear();
         }
         public override void Remove(object key) {
-            if (m_Values.TryGetValue((string)key, out var result)) {
-                result.Free();
-                m_Values.Remove((string)key);
-            }
+            m_Values.Remove((string)key);
         }
         public override ScriptArray GetKeys() {
             var ret = m_Script.NewArray();

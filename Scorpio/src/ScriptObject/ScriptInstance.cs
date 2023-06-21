@@ -5,15 +5,15 @@ using Scorpio.Library;
 using Scorpio.Tools;
 
 namespace Scorpio {
-    public class ScriptInstance : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
-        internal ScorpioStringDictionary<ScriptValue> m_Values = new ScorpioStringDictionary<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
+    public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
+        internal ScorpioStringDictionary m_Values;              //所有的数据(函数和数据都在一个数组)
         protected ScriptValue m_PrototypeValue;
         protected ScriptType m_Prototype = null;
         protected ScriptValue m_thisValue;
         public ScriptInstance(Script script) : base(script, ObjectType.Instance) { }
         public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) { }
         public override void Alloc() {
-            m_Values = new ScorpioStringDictionary<ScriptValue>();
+            m_Values = new ScorpioStringDictionary();
         }
         public ScriptInstance SetPrototypeValue(ScriptValue prototypeValue) {
             m_PrototypeValue.CopyFrom(prototypeValue);
@@ -32,7 +32,7 @@ namespace Scorpio {
             m_PrototypeValue.Free();
             m_Prototype = null;
             m_thisValue = ScriptValue.Null;
-            m_Values.Free();
+            m_Values.Clear();
             m_Values = null;
         }
         public override void Free() {
@@ -48,18 +48,11 @@ namespace Scorpio {
             return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key, this);
         }
         public override void SetValue(string key, ScriptValue value) {
-            if (m_Values.TryGetValue(key, out var result)) {
-                result.Free();
-            }
-            //正常引用计数
-            m_Values[key] = value.Reference();
+            m_Values[key] = value;
         }
         #endregion
         public virtual void SetValueNoReference(string key, ScriptValue value) {
-            if (m_Values.TryGetValue(key, out var result)) {
-                result.Free();
-            }
-            m_Values[key] = value;
+            m_Values.SetValue(key, value);
         }
         public virtual void SetValueNoReference(object key, ScriptValue value) {
             throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : {key}");
@@ -70,7 +63,7 @@ namespace Scorpio {
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
-        public IEnumerator<ScorpioKeyValue<string, ScriptValue>> GetEnumerator() => m_Values.GetEnumerator();
+        public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() => m_Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => m_Values.GetEnumerator();
         public override ScriptValue Plus(ScriptValue obj) {
             return CallOperator(ScriptOperator.Plus, obj);

@@ -51,8 +51,8 @@ namespace Scorpio.Library
         private class StringMapPairs : ScorpioHandle {
             readonly Script script;
             readonly ScriptMap m_ItorResult;
-            readonly IEnumerator<ScorpioKeyValue<string, ScriptValue>> m_Enumerator;
-            public StringMapPairs(Script script, ScriptMap itorResult, IEnumerator<ScorpioKeyValue<string, ScriptValue>> enumerator) {
+            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
+            public StringMapPairs(Script script, ScriptMap itorResult, IEnumerator<KeyValuePair<string, ScriptValue>> enumerator) {
                 this.script = script;
                 this.m_ItorResult = itorResult;
                 this.m_Enumerator = enumerator;

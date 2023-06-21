@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace Scorpio.Instruction {
     //不能使用 struct 编译时会稍后修改内部值 
     //单条指令

@@ -3,15 +3,15 @@ using Scorpio.Tools;
 using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
-    public class ScriptType : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
-        protected ScorpioStringDictionary<ScriptValue> m_Values;             //所有的函数
-        protected ScorpioStringDictionary<ScriptValue> m_GetProperties;      //所有的get函数
+    public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
+        protected ScorpioStringDictionary m_Values;             //所有的函数
+        protected ScorpioStringDictionary m_GetProperties;      //所有的get函数
         protected ScriptFunction m_EqualFunction;                       //==函数重载
         protected ScriptValue m_PrototypeValue;                         //基类
         protected ScriptType m_Prototype;                               //基类
         public ScriptType(Script script) : base(script, ObjectType.Type) {
-            m_Values = new ScorpioStringDictionary<ScriptValue>();
-            m_GetProperties = new ScorpioStringDictionary<ScriptValue>();
+            m_Values = new ScorpioStringDictionary();
+            m_GetProperties = new ScorpioStringDictionary();
         }
         public void Set(string typeName, ScriptValue parentValue) {
             TypeName = typeName;
@@ -31,8 +31,8 @@ namespace Scorpio {
         protected void Release() {
             m_PrototypeValue.Free();
             m_Prototype = null;
-            m_Values.Free();
-            m_GetProperties.Free();
+            m_Values.Clear();
+            m_GetProperties.Clear();
         }
         public override void Free() {
             Release();
@@ -42,10 +42,7 @@ namespace Scorpio {
             Release();
         }
         public void AddGetProperty(string key, ScriptFunction function) {
-            if (m_GetProperties.TryGetValue(key, out var result)) {
-                result.Free();
-            }
-            m_GetProperties[key] = new ScriptValue(function);
+            m_GetProperties.SetValue(key, new ScriptValue(function));
         }
         public virtual ScriptValue GetValue(string key, ScriptInstance instance) {
             if (m_Values.TryGetValue(key, out var value)) {
@@ -65,10 +62,7 @@ namespace Scorpio {
         }
         #region GetValue SetValue 重载
         public override void SetValue(string key, ScriptValue value) {
-            if (m_Values.TryGetValue(key, out var result)) {
-                result.Free();
-            }
-            m_Values[key] = value.Reference();
+            m_Values[key] = value;
             if (key == ScriptOperator.Equal) {
                 m_EqualFunction = value.Get<ScriptFunction>();
             }
@@ -78,10 +72,7 @@ namespace Scorpio {
         }
         #endregion
         public void SetValueNoReference(string key, ScriptValue value) {
-            if (m_Values.TryGetValue(key, out var result)) {
-                result.Free();
-            }
-            m_Values[key] = value;
+            m_Values.SetValue(key, value);
             if (key == ScriptOperator.Equal) {
                 m_EqualFunction = value.Get<ScriptFunction>();
             }
@@ -96,7 +87,7 @@ namespace Scorpio {
             }
             return ret;
         }
-        public IEnumerator<ScorpioKeyValue<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
+        public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
         public override string ToString() { return $"Class<{TypeName}>"; }
     }
