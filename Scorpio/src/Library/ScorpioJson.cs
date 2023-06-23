@@ -18,15 +18,17 @@ namespace Scorpio.Library {
         const string NULL = "null";
 
         const string WHITE_SPACE = " \t\n\r";
-        const string WORD_BREAK = " \t\n\r{}[],:\"";
+        const string WORD_BREAK = " ,:{}[]\"\t\n\r";
 
         private Script m_Script;
         private string m_Buffer;
         private bool m_SupportLong;         //是否支持 数字无[.]解析成long值
         private int m_Index;
         private int m_Length;
+        private StringBuilder m_Builder;
         public ScorpioJsonDeserializer(Script script) {
             m_Script = script;
+            m_Builder = new StringBuilder();
         }
 
         char Read() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index++]; }
@@ -51,14 +53,14 @@ namespace Scorpio.Library {
         }
         string NextWord {
             get {
-                var builder = new StringBuilder();
+                m_Builder.Clear();
                 while (WORD_BREAK.IndexOf(Peek()) == -1) {
-                    builder.Append(Read());
+                    m_Builder.Append(Read());
                     if (Peek() == END_CHAR) {
-                        return builder.ToString();
+                        return m_Builder.ToString();
                     }
                 }
-                return builder.ToString();
+                return m_Builder.ToString();
             }
         }
         ScriptValue ReadObject() {
@@ -98,7 +100,7 @@ namespace Scorpio.Library {
             }
         }
         string ParseString() {
-            var m_Builder = new StringBuilder();
+            m_Builder.Clear();
             while (true) {
                 if (Peek() == -1) {
                     return m_Builder.ToString();
@@ -128,7 +130,7 @@ namespace Scorpio.Library {
                                 for (int i = 0; i < 4; i++) {
                                     hex.Append(Read());
                                 }
-                                m_Builder.Append((char)System.Convert.ToUInt16(hex.ToString(), 16));
+                                m_Builder.Append((char)Convert.ToUInt16(hex.ToString(), 16));
                                 break;
                             }
                         }
@@ -151,7 +153,7 @@ namespace Scorpio.Library {
                 if (m_SupportLong || parsedLong < MinInt || parsedLong > MaxInt) {
                     return new ScriptValue(parsedLong);
                 } else {
-                    return new ScriptValue(System.Convert.ToDouble(parsedLong));
+                    return new ScriptValue(Convert.ToDouble(parsedLong));
                 }
             }
         }
@@ -188,7 +190,7 @@ namespace Scorpio.Library {
                         if (EatWhiteSpace != ':') {
                             throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                         }
-                        map.SetValue(key, ReadObject());
+                        map.SetValueNoReference(key.Value, ReadObject());
                         break;
                     }
                     default: {
@@ -216,6 +218,7 @@ namespace Scorpio.Library {
         }
         public void Dispose() {
             m_Buffer = null;
+            m_Builder.Clear();
         }
     }
     internal class ScorpioJsonSerializer : IDisposable {

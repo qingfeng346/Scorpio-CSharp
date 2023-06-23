@@ -41,7 +41,7 @@ public static class TestStaticClass {
     private static LinkedList<(DateTime, Action)> timer = new LinkedList<(DateTime, Action)> ();
     public static string TestDelegate(string str) {
         action1?.Invoke();
-        return func1("func1 : " + str);
+        return func1(str);
     }
     public static void TestFunc3(this TestClass testClass) {
 
