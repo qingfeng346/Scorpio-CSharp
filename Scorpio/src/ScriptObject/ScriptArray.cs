@@ -180,7 +180,7 @@ namespace Scorpio {
             m_Length--;
             //复制后续元素
             Array.Copy(m_Objects, index + 1, m_Objects, index, m_Length - index);
-            //不能调用SetNull 否则可能会调用一次释放
+            //不能调用SetNull 否则会调用一次释放
             m_Objects[m_Length] = ScriptValue.Null;
         }
         public bool Contains(ScriptValue obj) {

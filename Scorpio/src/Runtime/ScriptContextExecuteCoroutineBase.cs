@@ -89,9 +89,9 @@ namespace Scorpio.Runtime {
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
             byte tempValueType; //临时存储
             int tempIndex; //临时存储
-            ScriptInstruction instruction = null;
             Opcode opcode = Opcode.Nop;
             int opvalue = 0;
+            int line = 0;
             try {
 #if EXECUTE_COROUTINE
                 //进函数先调用一次 MoveNext,否则 finally 无法正常调用,会导致泄漏
@@ -100,10 +100,11 @@ namespace Scorpio.Runtime {
             KeepOn:
                 try {
 #endif
-                while (iInstruction < iInstructionCount) {
-                        instruction = m_scriptInstructions[iInstruction++];
+                    while (iInstruction < iInstructionCount) {
+                        ScriptInstruction instruction = m_scriptInstructions[iInstruction++];
                         opvalue = instruction.opvalue;
                         opcode = instruction.opcode;
+                        line = instruction.line;
                         switch (opcode) {
                             #region Load
                             case Opcode.LoadConstDouble: {
@@ -162,7 +163,7 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.LoadGlobalString: {
                                 stackObjects[++stackIndex].CopyFrom(m_global.GetValue(constString[opvalue]));
-                                instruction.SetOpcode(Opcode.LoadGlobal, m_global.GetIndex(constString[opvalue]));
+                                m_scriptInstructions[iInstruction - 1].Set(Opcode.LoadGlobal, m_global.GetIndex(constString[opvalue]));
                                 continue;
                             }
                             case Opcode.CopyStackTop: {
@@ -175,7 +176,7 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.LoadBase: {
 #if EXECUTE_BASE
-                                stackObjects[++stackIndex].CopyFrom(baseType.PrototypeValue);
+                            stackObjects[++stackIndex].CopyFrom(baseType.PrototypeValue);
 #else
                                 stackObjects[++stackIndex].CopyFrom(thisObject.Get<ScriptInstance>().Prototype.PrototypeValue);
 #endif
@@ -184,21 +185,21 @@ namespace Scorpio.Runtime {
                             case Opcode.ToGlobal: {
                                 tempIndex = m_global.GetIndex(stackObjects[stackIndex--].stringValue);
                                 m_global.SetValueByIndex(tempIndex, stackObjects[stackIndex]);
-                                instruction.SetOpcode(Opcode.LoadGlobal, tempIndex);
+                                m_scriptInstructions[iInstruction - 1].Set(Opcode.LoadGlobal, tempIndex);
                                 for (var i = 0; i < opvalue; ++i) {
-                                    m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.Nop);
+                                    m_scriptInstructions[iInstruction - i - 2].Set(Opcode.Nop);
                                 }
                                 continue;
                             }
                             case Opcode.ToGlobalFunction: {
                                 tempIndex = m_global.GetIndex(stackObjects[stackIndex--].stringValue);
                                 m_global.SetValueByIndex(tempIndex, stackObjects[stackIndex]);
-                                instruction.SetOpcode(Opcode.LoadGlobal, tempIndex);
+                                m_scriptInstructions[iInstruction - 1].Set(Opcode.LoadGlobal, tempIndex);
                                 for (var i = 0; i < opvalue; ++i) {
                                     if (i == 0) {
-                                        m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.LoadConstNull);
+                                        m_scriptInstructions[iInstruction - i - 2].Set(Opcode.LoadConstNull);
                                     } else {
-                                        m_scriptInstructions[iInstruction - i - 2].SetOpcode(Opcode.Nop);
+                                        m_scriptInstructions[iInstruction - i - 2].Set(Opcode.Nop);
                                     }
                                 }
                                 continue;
@@ -232,7 +233,7 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.StoreGlobalStringAssign: {
                                 m_global.SetValue(constString[opvalue], stackObjects[stackIndex]);
-                                instruction.SetOpcode(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]));
+                                m_scriptInstructions[iInstruction - 1].Set(Opcode.StoreGlobalAssign, m_global.GetIndex(constString[opvalue]));
                                 continue;
                             }
                             case Opcode.StoreValueAssign: {
@@ -273,7 +274,7 @@ namespace Scorpio.Runtime {
                                     function.FunctionName = constString[opvalue];
                                 }
                                 m_global.SetValue(constString[opvalue], globalValue);
-                                instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
+                                m_scriptInstructions[iInstruction - 1].Set(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
                                 continue;
                             }
                             #endregion
@@ -965,7 +966,7 @@ namespace Scorpio.Runtime {
                                 for (var i = opvalue - 1; i >= 0; --i) {
                                     parameters[i] = stackObjects[stackIndex--];
                                 }
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
+                                m_script.PushStackInfo(m_Breviary, line);
                                 try {
                                     stackObjects[stackIndex].Set(stackObjects[stackIndex].Call(ScriptValue.Null, parameters, opvalue));
                                 } finally {
@@ -979,7 +980,7 @@ namespace Scorpio.Runtime {
                                 }
                                 var func = stackObjects[stackIndex--];
                                 var parent = stackObjects[stackIndex--];
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
+                                m_script.PushStackInfo(m_Breviary, line);
                                 try {
                                     stackObjects[++stackIndex].Set(func.Call(parent, parameters, opvalue));
                                 } finally {
@@ -1052,7 +1053,7 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.RetNone: {
 #if EXECUTE_COROUTINE
-                                yield break;
+                            yield break;
 #else
                                 Free(variableObjects, stackObjects, internalValues);
                                 return ScriptValue.Null;
@@ -1060,8 +1061,8 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.Ret: {
 #if EXECUTE_COROUTINE
-                                m_script.CoroutineResult.CopyFrom(stackObjects[stackIndex]);
-                                yield break;
+                            m_script.CoroutineResult.CopyFrom(stackObjects[stackIndex]);
+                            yield break;
 #else
                                 var ret = stackObjects[stackIndex].Reference();
                                 Free(variableObjects, stackObjects, internalValues);
@@ -1093,7 +1094,7 @@ namespace Scorpio.Runtime {
                                 }
                                 stackIndex -= funcParameterCount;
                                 var func = stackObjects[stackIndex--]; //函数对象
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
+                                m_script.PushStackInfo(m_Breviary, line);
                                 try {
                                     stackObjects[++stackIndex].Set(func.Call(ScriptValue.Null, parameters, parameterIndex));
                                 } finally {
@@ -1127,7 +1128,7 @@ namespace Scorpio.Runtime {
                                 stackIndex -= funcParameterCount;
                                 var func = stackObjects[stackIndex--]; //函数对象
                                 var parent = stackObjects[stackIndex--]; //函数父级
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
+                                m_script.PushStackInfo(m_Breviary, line);
                                 try {
                                     stackObjects[++stackIndex].Set(func.Call(parent, parameters, parameterIndex));
                                 } finally {
@@ -1158,7 +1159,7 @@ namespace Scorpio.Runtime {
                                 }
                                 var func = stackObjects[stackIndex--];              //函数对象
                                 var prototype = stackObjects[stackIndex--];
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
+                                m_script.PushStackInfo(m_Breviary, line);
                                 try {
                                     stackObjects[++stackIndex].Set(func.Call(thisObject, parameters, opvalue, prototype.Get<ScriptType>()));
                                 } finally {
@@ -1192,7 +1193,7 @@ namespace Scorpio.Runtime {
                                 stackIndex -= funcParameterCount;
                                 var func = stackObjects[stackIndex--]; //函数对象
                                 var prototype = stackObjects[stackIndex--];
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
+                                m_script.PushStackInfo(m_Breviary, line);
                                 try {
                                     stackObjects[++stackIndex].Set(func.Call(thisObject, parameters, parameterIndex, prototype.Get<ScriptType>()));
                                 } finally {
@@ -1201,157 +1202,157 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
 #if EXECUTE_COROUTINE
-                            case Opcode.Await: {
-                                yield return stackObjects[stackIndex--].Value;
-                                continue;
+                        case Opcode.Await: {
+                            yield return stackObjects[stackIndex--].Value;
+                            continue;
+                        }
+                        case Opcode.NewAwait: {
+                            yield return stackObjects[stackIndex--].Value;
+                            stackObjects[++stackIndex].CopyFrom(m_script.CoroutineResult);
+                            m_script.CoroutineResult.SetNull();
+                            continue;
+                        }
+                        case Opcode.CallAsync: {
+                            for (var i = opvalue - 1; i >= 0; --i) {
+                                parameters[i] = stackObjects[stackIndex--];
                             }
-                            case Opcode.NewAwait: {
-                                yield return stackObjects[stackIndex--].Value;
-                                stackObjects[++stackIndex].CopyFrom(m_script.CoroutineResult);
-                                m_script.CoroutineResult.SetNull();
-                                continue;
+                            m_script.PushStackInfo(m_Breviary, line);
+                            try {
+                                stackObjects[stackIndex].Set(stackObjects[stackIndex].CallAsync(ScriptValue.Null, parameters, opvalue));
+                            } finally {
+                                m_script.PopStackInfo();
                             }
-                            case Opcode.CallAsync: {
-                                for (var i = opvalue - 1; i >= 0; --i) {
-                                    parameters[i] = stackObjects[stackIndex--];
-                                }
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
-                                try {
-                                    stackObjects[stackIndex].Set(stackObjects[stackIndex].CallAsync(ScriptValue.Null, parameters, opvalue));
-                                } finally {
-                                    m_script.PopStackInfo();
-                                }
-                                continue;
+                            continue;
+                        }
+                        case Opcode.CallViAsync: {
+                            for (var i = opvalue - 1; i >= 0; --i) {
+                                parameters[i] = stackObjects[stackIndex--];
                             }
-                            case Opcode.CallViAsync: {
-                                for (var i = opvalue - 1; i >= 0; --i) {
-                                    parameters[i] = stackObjects[stackIndex--];
-                                }
-                                var func = stackObjects[stackIndex--];
-                                var parent = stackObjects[stackIndex--];
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
-                                try {
-                                    stackObjects[++stackIndex].Set(func.CallAsync(parent, parameters, opvalue));
-                                } finally {
-                                    m_script.PopStackInfo();
-                                }
-                                continue;
+                            var func = stackObjects[stackIndex--];
+                            var parent = stackObjects[stackIndex--];
+                            m_script.PushStackInfo(m_Breviary, line);
+                            try {
+                                stackObjects[++stackIndex].Set(func.CallAsync(parent, parameters, opvalue));
+                            } finally {
+                                m_script.PopStackInfo();
                             }
-                            case Opcode.CallUnfoldAsync: {
-                                var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
-                                var unfold = value & 0xff; //折叠标志位
-                                var funcParameterCount = (int)(value >> 8); //参数个数
-                                var startIndex = stackIndex - funcParameterCount + 1;
-                                var parameterIndex = 0;
-                                for (var i = 0; i < funcParameterCount; ++i) {
-                                    var parameter = stackObjects[startIndex + i];
-                                    if ((unfold & (1L << i)) != 0) {
-                                        var array = parameter.Get<ScriptArray>();
-                                        if (array != null) {
-                                            var values = array.getObjects();
-                                            var valueLength = array.Length();
-                                            for (var j = 0; j < valueLength; ++j) {
-                                                parameters[parameterIndex++] = values[j];
-                                            }
-                                        } else {
-                                            parameters[parameterIndex++] = parameter;
+                            continue;
+                        }
+                        case Opcode.CallUnfoldAsync: {
+                            var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                            var unfold = value & 0xff; //折叠标志位
+                            var funcParameterCount = (int)(value >> 8); //参数个数
+                            var startIndex = stackIndex - funcParameterCount + 1;
+                            var parameterIndex = 0;
+                            for (var i = 0; i < funcParameterCount; ++i) {
+                                var parameter = stackObjects[startIndex + i];
+                                if ((unfold & (1L << i)) != 0) {
+                                    var array = parameter.Get<ScriptArray>();
+                                    if (array != null) {
+                                        var values = array.getObjects();
+                                        var valueLength = array.Length();
+                                        for (var j = 0; j < valueLength; ++j) {
+                                            parameters[parameterIndex++] = values[j];
                                         }
                                     } else {
                                         parameters[parameterIndex++] = parameter;
                                     }
+                                } else {
+                                    parameters[parameterIndex++] = parameter;
                                 }
-                                stackIndex -= funcParameterCount;
-                                var func = stackObjects[stackIndex--]; //函数对象
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
-                                try {
-                                    stackObjects[++stackIndex].Set(func.CallAsync(ScriptValue.Null, parameters, parameterIndex));
-                                } finally {
-                                    m_script.PopStackInfo();
-                                }
-                                continue;
                             }
-                            case Opcode.CallViUnfoldAsync: {
-                                var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
-                                var unfold = value & 0xff; //折叠标志位
-                                var funcParameterCount = (int)(value >> 8); //参数个数
-                                var startIndex = stackIndex - funcParameterCount + 1;
-                                var parameterIndex = 0;
-                                for (var i = 0; i < funcParameterCount; ++i) {
-                                    var parameter = stackObjects[startIndex + i];
-                                    if ((unfold & (1L << i)) != 0) {
-                                        var array = parameter.Get<ScriptArray>();
-                                        if (array != null) {
-                                            var values = array.getObjects();
-                                            var valueLength = array.Length();
-                                            for (var j = 0; j < valueLength; ++j) {
-                                                parameters[parameterIndex++] = values[j];
-                                            }
-                                        } else {
-                                            parameters[parameterIndex++] = parameter;
+                            stackIndex -= funcParameterCount;
+                            var func = stackObjects[stackIndex--]; //函数对象
+                            m_script.PushStackInfo(m_Breviary, line);
+                            try {
+                                stackObjects[++stackIndex].Set(func.CallAsync(ScriptValue.Null, parameters, parameterIndex));
+                            } finally {
+                                m_script.PopStackInfo();
+                            }
+                            continue;
+                        }
+                        case Opcode.CallViUnfoldAsync: {
+                            var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                            var unfold = value & 0xff; //折叠标志位
+                            var funcParameterCount = (int)(value >> 8); //参数个数
+                            var startIndex = stackIndex - funcParameterCount + 1;
+                            var parameterIndex = 0;
+                            for (var i = 0; i < funcParameterCount; ++i) {
+                                var parameter = stackObjects[startIndex + i];
+                                if ((unfold & (1L << i)) != 0) {
+                                    var array = parameter.Get<ScriptArray>();
+                                    if (array != null) {
+                                        var values = array.getObjects();
+                                        var valueLength = array.Length();
+                                        for (var j = 0; j < valueLength; ++j) {
+                                            parameters[parameterIndex++] = values[j];
                                         }
                                     } else {
                                         parameters[parameterIndex++] = parameter;
                                     }
+                                } else {
+                                    parameters[parameterIndex++] = parameter;
                                 }
-                                stackIndex -= funcParameterCount;
-                                var func = stackObjects[stackIndex--]; //函数对象
-                                var parent = stackObjects[stackIndex--]; //函数父级
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
-                                try {
-                                    stackObjects[++stackIndex].Set(func.CallAsync(parent, parameters, parameterIndex));
-                                } finally {
-                                    m_script.PopStackInfo();
-                                }
-                                continue;
                             }
-                            case Opcode.CallBaseAsync: {
-                                for (var i = opvalue - 1; i >= 0; --i) {
-                                    parameters[i] = stackObjects[stackIndex--];
-                                }
-                                var func = stackObjects[stackIndex--];              //函数对象
-                                var prototype = stackObjects[stackIndex--];
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
-                                try {
-                                    stackObjects[++stackIndex].Set(func.CallAsync(thisObject, parameters, opvalue, prototype.Get<ScriptType>()));
-                                } finally {
-                                    m_script.PopStackInfo();
-                                }
-                                continue;
+                            stackIndex -= funcParameterCount;
+                            var func = stackObjects[stackIndex--]; //函数对象
+                            var parent = stackObjects[stackIndex--]; //函数父级
+                            m_script.PushStackInfo(m_Breviary, line);
+                            try {
+                                stackObjects[++stackIndex].Set(func.CallAsync(parent, parameters, parameterIndex));
+                            } finally {
+                                m_script.PopStackInfo();
                             }
-                            case Opcode.CallBaseUnfoldAsync: {
-                                var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
-                                var unfold = value & 0xff; //折叠标志位
-                                var funcParameterCount = (int)(value >> 8); //参数个数
-                                var startIndex = stackIndex - funcParameterCount + 1;
-                                var parameterIndex = 0;
-                                for (var i = 0; i < funcParameterCount; ++i) {
-                                    var parameter = stackObjects[startIndex + i];
-                                    if ((unfold & (1L << i)) != 0) {
-                                        var array = parameter.Get<ScriptArray>();
-                                        if (array != null) {
-                                            var values = array.getObjects();
-                                            var valueLength = array.Length();
-                                            for (var j = 0; j < valueLength; ++j) {
-                                                parameters[parameterIndex++] = values[j];
-                                            }
-                                        } else {
-                                            parameters[parameterIndex++] = parameter;
+                            continue;
+                        }
+                        case Opcode.CallBaseAsync: {
+                            for (var i = opvalue - 1; i >= 0; --i) {
+                                parameters[i] = stackObjects[stackIndex--];
+                            }
+                            var func = stackObjects[stackIndex--];              //函数对象
+                            var prototype = stackObjects[stackIndex--];
+                            m_script.PushStackInfo(m_Breviary, line);
+                            try {
+                                stackObjects[++stackIndex].Set(func.CallAsync(thisObject, parameters, opvalue, prototype.Get<ScriptType>()));
+                            } finally {
+                                m_script.PopStackInfo();
+                            }
+                            continue;
+                        }
+                        case Opcode.CallBaseUnfoldAsync: {
+                            var value = constLong[opvalue]; //值 前8位为 参数个数  后56位标识 哪个参数需要展开
+                            var unfold = value & 0xff; //折叠标志位
+                            var funcParameterCount = (int)(value >> 8); //参数个数
+                            var startIndex = stackIndex - funcParameterCount + 1;
+                            var parameterIndex = 0;
+                            for (var i = 0; i < funcParameterCount; ++i) {
+                                var parameter = stackObjects[startIndex + i];
+                                if ((unfold & (1L << i)) != 0) {
+                                    var array = parameter.Get<ScriptArray>();
+                                    if (array != null) {
+                                        var values = array.getObjects();
+                                        var valueLength = array.Length();
+                                        for (var j = 0; j < valueLength; ++j) {
+                                            parameters[parameterIndex++] = values[j];
                                         }
                                     } else {
                                         parameters[parameterIndex++] = parameter;
                                     }
+                                } else {
+                                    parameters[parameterIndex++] = parameter;
                                 }
-                                stackIndex -= funcParameterCount;
-                                var func = stackObjects[stackIndex--]; //函数对象
-                                var prototype = stackObjects[stackIndex--];
-                                m_script.PushStackInfo(m_Breviary, instruction.line);
-                                try {
-                                    stackObjects[++stackIndex].Set(func.CallAsync(thisObject, parameters, parameterIndex, prototype.Get<ScriptType>()));
-                                } finally {
-                                    m_script.PopStackInfo();
-                                }
-                                continue;
                             }
+                            stackIndex -= funcParameterCount;
+                            var func = stackObjects[stackIndex--]; //函数对象
+                            var prototype = stackObjects[stackIndex--];
+                            m_script.PushStackInfo(m_Breviary, line);
+                            try {
+                                stackObjects[++stackIndex].Set(func.CallAsync(thisObject, parameters, parameterIndex, prototype.Get<ScriptType>()));
+                            } finally {
+                                m_script.PopStackInfo();
+                            }
+                            continue;
+                        }
 #else
                             case Opcode.TryTo: {
                                 tryStack[++tryIndex] = opvalue;
@@ -1363,14 +1364,14 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
 #endif
-#endregion
-#region New
+                            #endregion
+                            #region New
                             case Opcode.NewMap: {
                                 stackObjects[++stackIndex].SetScriptValue(m_script.NewMapObject());
                                 continue;
                             }
                             case Opcode.NewArray: {
-                                   var array = m_script.NewArray();
+                                var array = m_script.NewArray();
                                 for (var i = opvalue - 1; i >= 0; --i) {
                                     array.Add(stackObjects[stackIndex - i]);
                                 }
@@ -1384,7 +1385,7 @@ namespace Scorpio.Runtime {
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData);
 #if SCORPIO_DEBUG
-                                function.FunctionName = $"{m_Breviary}:{instruction.line}";
+                                function.FunctionName = $"{m_Breviary}:{line}";
 #endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
@@ -1399,7 +1400,7 @@ namespace Scorpio.Runtime {
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData, thisObject);
 #if SCORPIO_DEBUG
-                                function.FunctionName = $"{m_Breviary}:{instruction.line}";
+                                function.FunctionName = $"{m_Breviary}:{line}";
 #endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
@@ -1414,7 +1415,7 @@ namespace Scorpio.Runtime {
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData);
 #if SCORPIO_DEBUG
-                                function.FunctionName = $"{m_Breviary}:{instruction.line}";
+                                function.FunctionName = $"{m_Breviary}:{line}";
 #endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
@@ -1429,7 +1430,7 @@ namespace Scorpio.Runtime {
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData, thisObject);
 #if SCORPIO_DEBUG
-                                function.FunctionName = $"{m_Breviary}:{instruction.line}";
+                                function.FunctionName = $"{m_Breviary}:{line}";
 #endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
@@ -1448,7 +1449,7 @@ namespace Scorpio.Runtime {
                                 var functions = classData.functions;
                                 var functionCount = 0;
                                 var functionLength = functions.Length;
-                                for (var j = 0 ; j < functionLength; ++j) {
+                                for (var j = 0; j < functionLength; ++j) {
                                     if ((functions[j] & 0xf) != 2) {
                                         functionCount++;
                                     }
@@ -1520,12 +1521,12 @@ namespace Scorpio.Runtime {
                             iInstruction = tryStack[tryIndex--];
                             goto KeepOn;
                         } else {
-                            e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
+                            e.message = $"{m_Breviary}:{line}({opcode})\n  {e.message}";
                             throw;
                         }
                     //脚本系统错误
                     } catch (ExecutionException e) {
-                        e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
+                        e.message = $"{m_Breviary}:{line}({opcode})\n  {e.message}";
                         if (tryIndex > -1) {
                             stackObjects[stackIndex = 0].Set(ScriptValue.CreateValue(m_script, e));
                             iInstruction = tryStack[tryIndex--];
@@ -1540,7 +1541,7 @@ namespace Scorpio.Runtime {
                             iInstruction = tryStack[tryIndex--];
                             goto KeepOn;
                         } else {
-                            throw new ExecutionException($"{m_Breviary}:{instruction.line}({opcode}:{opvalue})", e);
+                            throw new ExecutionException($"{m_Breviary}:{line}({opcode}:{opvalue})", e);
                         }
                     }
                 } catch (System.Exception) {

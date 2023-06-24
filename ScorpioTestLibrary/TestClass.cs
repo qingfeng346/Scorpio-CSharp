@@ -5,7 +5,7 @@ public interface TestInterface {
     void Func1();
     void Func2();
     int Func3();
-    string Func4();
+    string Func4(string a,string b,string c);
 }
 public enum TestEnum {
     Test1,
@@ -38,10 +38,14 @@ public class TestClass {
 public static class TestStaticClass {
     public static Action action1;
     public static Func<string, string> func1;
+    public static TestInterface testInterface;
     private static LinkedList<(DateTime, Action)> timer = new LinkedList<(DateTime, Action)> ();
     public static string TestDelegate(string str) {
         action1?.Invoke();
         return func1(str);
+    }
+    public static string TestI(string a, string b, string c) {
+        return testInterface.Func4(a, b, c);
     }
     public static void TestFunc3(this TestClass testClass) {
 

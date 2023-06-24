@@ -1,11 +1,16 @@
 TestStaticClass = importType("TestStaticClass")
-TestStaticClass.func1 = (a) => {
-    print(a)
-    var b = json.decode(a)
-    print(b)
+ScorpioInterface_TestInterface = importType("ScorpioInterface_TestInterface")
+class Test {
+    Func4(a, b, c) {
+        print(a, b, c)
+    }
 }
+t = new Test()
+// t.fun()
 function main() {
-    TestStaticClass.TestDelegate(json.encode({a:"fawefwaefawe",b:"fweafweaf"}))
+    // TestStaticClass.TestDelegate(json.encode({a:"fawefwaefawe",b:"fweafweaf"}))
+    TestStaticClass.testInterface = new ScorpioInterface_TestInterface() { Value: t }
+    TestStaticClass.TestI("a", "b", "c")
 }
 main()
 // // async function get1() {
