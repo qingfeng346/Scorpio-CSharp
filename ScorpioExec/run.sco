@@ -1,25 +1,11 @@
-class tttt {
-    func() {
-        print("func")
-    }
+TestStaticClass = importType("TestStaticClass")
+TestStaticClass.func1 = (a) => {
+    print(a)
+    var b = json.decode(a)
+    print(b)
 }
-function main1() {
-    var builder = new StringBuilder()
-    builder.append("123123123")
-    var t = new tttt()
-    t.func()
-    print(toIndex(t))
-    print(toIndex(builder))
-}
-async function main() {
-    main1()
-    await sleep(1)
-    var t = new tttt()
-    t.func()
-    print(toIndex(t))
-    var builder = new StringBuilder()
-    builder.append("123123123")
-    print(toIndex(builder))
+function main() {
+    TestStaticClass.TestDelegate(json.encode({a:"fawefwaefawe",b:"fweafweaf"}))
 }
 main()
 // // async function get1() {
