@@ -9,15 +9,21 @@ namespace Scorpio.FastReflect {
         public const string ClassTemplate = @"using System;
 using Scorpio;
 public class __class : __interface {
+    private Script m_script;
     private ScriptValue m_value;
     public ScriptValue Value {
         get => m_value;
-        set { m_value.CopyFrom(value); }
+        set { 
+            m_value.CopyFrom(value);
+            m_script = m_value.Get<ScriptInstance>()?.script;
+        }
     }
     public void Shutdown() {
+        if (m_script == null || m_script.IsShutdown) return;
         m_value.Free();    
     }
     public ScriptValue __Call(string functionName, params object[] args) {
+        if (m_script == null || m_script.IsShutdown) return ScriptValue.Null;
         var func = m_value.GetValue(functionName);
         if (func.valueType == ScriptValue.scriptValueType) {
             try {
