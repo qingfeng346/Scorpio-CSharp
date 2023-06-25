@@ -13,14 +13,18 @@ public class __class : __interface {
     private ScriptValue m_value;
     public ScriptValue Value {
         get => m_value;
-        set { 
-            m_value.CopyFrom(value);
+        set {
+            Shutdown();
+            m_value = value.Reference();
             m_script = m_value.Get<ScriptInstance>()?.script;
         }
     }
     public void Shutdown() {
-        if (m_script == null || m_script.IsShutdown) return;
-        m_value.Free();    
+        if (m_script != null && !m_script.IsShutdown) {
+            m_value.Free();
+        } else {
+            m_value = ScriptValue.Null;
+        }
     }
     public ScriptValue __Call(string functionName, params object[] args) {
         if (m_script == null || m_script.IsShutdown) return ScriptValue.Null;
