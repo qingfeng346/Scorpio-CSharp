@@ -35,7 +35,7 @@ namespace Scorpio.Compile.Compiler {
     }
     //指令执行列表
     public class ScriptExecutable {
-        private List<ScriptInstructionCompiler> m_listScriptInstructions;                           //指令列表
+        private List<ScriptInstruction> m_listScriptInstructions;                           //指令列表
         private ScriptIndexs m_VariableIndexs;                                              //索引表
         private int m_StackIndex = 0;                                                       //当前层级
         private Dictionary<int, int> m_Stacks = new Dictionary<int, int>();                 //当前层级
@@ -53,7 +53,7 @@ namespace Scorpio.Compile.Compiler {
             m_Stacks[m_StackIndex] = 0;
             m_VariableIndexs = new ScriptIndexs();
             m_InternalIndexs = new ScriptIndexs();
-            m_listScriptInstructions = new List<ScriptInstructionCompiler>();
+            m_listScriptInstructions = new List<ScriptInstruction>();
             Blocks = new Stack<ExecutableBlock>();
             Blocks.Push(block);
             AddIndex("this");
@@ -102,9 +102,8 @@ namespace Scorpio.Compile.Compiler {
         }
         //添加一条指令
         ScriptInstructionCompiler AddScriptInstruction(ScriptInstruction instruction) {
-            var ret = new ScriptInstructionCompiler(m_listScriptInstructions.Count - 1, instruction);
-            m_listScriptInstructions.Add(ret);
-            return ret;
+            m_listScriptInstructions.Add(instruction);
+            return new ScriptInstructionCompiler() { instruction = instruction, index = m_listScriptInstructions.Count - 1};
         }
         public int AddIndex(string str) {
             int count = m_Stacks[m_StackIndex];
@@ -129,28 +128,23 @@ namespace Scorpio.Compile.Compiler {
         public int Count() {
             return m_listScriptInstructions.Count;
         }
-        public ScriptInstruction[] ScriptInstructions => m_listScriptInstructions.ConvertAll(_ => _.instruction).ToArray();
-        public int[] ScriptInternals => m_ParentInternal.ToArray();
+        public ScriptInstruction[] ScriptInstructions { get { return m_listScriptInstructions.ToArray(); } }
+        public int[] ScriptInternals { get { return m_ParentInternal.ToArray(); } }
         public void Finished() {
             //计算局部变量是否是内部引用变量，并修改为 内部变量赋值 Opcode
-            for (var i = 0; i < m_listScriptInstructions.Count; ++i) {
-                var instruction = m_listScriptInstructions[i].instruction;
+            foreach (var instruction in m_listScriptInstructions) {
                 if (m_VariableToInternal.TryGetValue(instruction.opvalue, out var internalValue)) {
                     if (instruction.opcode == Opcode.LoadLocal) {
-                        instruction = new ScriptInstruction(Opcode.LoadInternal, internalValue, instruction.line);
+                        instruction.SetOpcode(Opcode.LoadInternal, internalValue);
                     } else if (instruction.opcode == Opcode.StoreLocal) {
-                        instruction = new ScriptInstruction(Opcode.StoreInternal, internalValue, instruction.line);
+                        instruction.SetOpcode(Opcode.StoreInternal, internalValue);
                     } else if (instruction.opcode == Opcode.StoreLocalAssign) {
-                        instruction = new ScriptInstruction(Opcode.StoreInternalAssign, internalValue, instruction.line);
-                    } else {
-                        continue;
+                        instruction.SetOpcode(Opcode.StoreInternalAssign, internalValue);
                     }
-                    m_listScriptInstructions[i].instruction = instruction;
                 }
             }
             //重新计算操作局部变量 索引
-            for (var i = 0; i < m_listScriptInstructions.Count; ++i) {
-                var instruction = m_listScriptInstructions[i].instruction;
+            foreach (var instruction in m_listScriptInstructions) {
                 if (instruction.opcode == Opcode.LoadLocal || instruction.opcode == Opcode.StoreLocal || instruction.opcode == Opcode.StoreLocalAssign) {
                     var count = 0;
                     foreach (var pair in m_VariableToInternal) {
@@ -159,24 +153,10 @@ namespace Scorpio.Compile.Compiler {
                         }
                     }
                     if (count > 0) {
-                        m_listScriptInstructions[i].instruction = new ScriptInstruction(instruction.opcode, count, instruction.line);
-                        //instruction.opvalue -= count;
+                        instruction.opvalue -= count;
                     }
                 }
             }
-            //foreach (var instruction in m_listScriptInstructions) {
-            //    if (instruction.opcode == Opcode.LoadLocal || instruction.opcode == Opcode.StoreLocal || instruction.opcode == Opcode.StoreLocalAssign) {
-            //        var count = 0;
-            //        foreach (var pair in m_VariableToInternal) {
-            //            if (instruction.opvalue > pair.Key) {
-            //                ++count;
-            //            }
-            //        }
-            //        if (count > 0) {
-            //            instruction.opvalue -= count;
-            //        }
-            //    }
-            //}
         }
     }
 }
