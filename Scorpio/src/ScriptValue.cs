@@ -36,235 +36,210 @@ namespace Scorpio
         public const byte floatValueType = 20;      //
         public const byte doubleValueType = 21;     //double
 
-        [FieldOffset(0)] private double _doubleValue;
-        [FieldOffset(0)] private long _longValue;
-        [FieldOffset(0)] private int _index;
-        [FieldOffset(8)] public byte _valueType;
-        public byte valueType {
-            get => _valueType;
-            private set => _valueType = value;
-        }
-        public bool boolValue {
+        [FieldOffset(0)] public double doubleValue;
+        [FieldOffset(0)] public long longValue;
+        [FieldOffset(0)] public int index;
+        [FieldOffset(8)] public byte valueType;
+        public bool setBoolValue {
             set {
                 Free();
-                _valueType = value ? trueValueType : falseValueType;
-                _longValue = 0;
+                valueType = value ? trueValueType : falseValueType;
             }
         }
-        public double doubleValue {
-            get => _doubleValue;
+        public double setDoubleValue {
             set {
                 Free();
-                _valueType = doubleValueType;
-                _doubleValue = value;
+                valueType = doubleValueType;
+                doubleValue = value;
             }
         }
-        public long longValue {
-            get => _longValue;
+        public long setLongValue {
             set {
                 Free();
-                _valueType = int64ValueType;
-                _longValue = value;
+                valueType = int64ValueType;
+                longValue = value;
             }
         }
-        public int scriptValueIndex {
-            get => _index;
-            set {
-                Free();
-                _index = value;
-                _valueType = scriptValueType;
-                ScriptObjectReference.Reference(_index);
-            }
-        }
-        public int stringValueIndex {
-            get => _index;
-            set {
-                Free();
-                _index = value;
-                _valueType = stringValueType;
-                StringReference.Reference(_index);
-            }
-        }
-        public string stringValue => StringReference.GetValue(_index);
-        public ScriptObject scriptValue => ScriptObjectReference.GetValue(_index);
+        public string stringValue => StringReference.GetValue(index);
+        public ScriptObject scriptValue => ScriptObjectReference.GetValue(index);
         public void SetNull() {
             Free();
-            _valueType = nullValueType;
+            valueType = nullValueType;
         }
         public void SetTrue() {
             Free();
-            _valueType = trueValueType;
-            _longValue = 0;
+            valueType = trueValueType;
+            longValue = 0;
         }
         public void SetFalse() {
             Free();
-            _valueType = falseValueType;
-            _longValue = 0;
+            valueType = falseValueType;
+            longValue = 0;
         }
         public void SetScriptValue(ScriptObject value) {
             Free();
-            _valueType = scriptValueType;
-            _index = ScriptObjectReference.Alloc(value);
+            valueType = scriptValueType;
+            index = ScriptObjectReference.Alloc(value);
         }
         public void SetStringValue(string value) {
             Free();
-            _valueType = stringValueType;
-            _index = StringReference.Alloc(value);
+            valueType = stringValueType;
+            index = StringReference.Alloc(value);
         }
         public void CopyFrom(ScriptValue value) {
             Free();
-            _valueType = value._valueType;
-            _longValue = value._longValue;
-            if (_valueType == stringValueType) {
-                StringReference.Reference(_index);
-            } else if (_valueType == scriptValueType) {
-                ScriptObjectReference.Reference(_index);
+            valueType = value.valueType;
+            longValue = value.longValue;
+            if (valueType == stringValueType) {
+                StringReference.Reference(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Reference(index);
             }
         }
         public void Set(ScriptValue value) {
             Free();
-            _valueType = value._valueType;
-            _longValue = value._longValue;
+            valueType = value.valueType;
+            longValue = value.longValue;
         }
         public ScriptValue Reference() {
-            if (_valueType == stringValueType) {
-                StringReference.Reference(_index);
-            } else if (_valueType == scriptValueType) {
-                ScriptObjectReference.Reference(_index);
+            if (valueType == stringValueType) {
+                StringReference.Reference(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Reference(index);
             }
             return this;
         }
         //只释放
         public void Release() {
-            if (_valueType == stringValueType) {
-                StringReference.Free(_index);
-            } else if (_valueType == scriptValueType) {
-                ScriptObjectReference.Free(_index);
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
             }
         }
         //释放并设置为null
         public void Free() {
-            if (_valueType == stringValueType) {
-                StringReference.Free(_index);
-            } else if (_valueType == scriptValueType) {
-                ScriptObjectReference.Free(_index);
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
             }
-            _valueType = 0;
+            valueType = 0;
         }
         public ScriptValue(double value) {
-            this._valueType = doubleValueType;
-            this._index = 0;
-            this._longValue = 0;
-            this._doubleValue = value;
+            this.valueType = doubleValueType;
+            this.index = 0;
+            this.longValue = 0;
+            this.doubleValue = value;
         }
         public ScriptValue(long value) {
-            this._valueType = int64ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
+            this.valueType = int64ValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = value;
         }
         public ScriptValue(string value) {
-            this._doubleValue = 0;
-            this._longValue = 0;
+            this.doubleValue = 0;
+            this.longValue = 0;
             if (value == null) {
-                this._valueType = nullValueType;
-                this._index = 0;
+                this.valueType = nullValueType;
+                this.index = 0;
             } else {
-                this._valueType = stringValueType;
-                this._index = StringReference.Alloc(value);
+                this.valueType = stringValueType;
+                this.index = StringReference.Alloc(value);
             }
         }
         public ScriptValue(ScriptObject value) {
-            this._doubleValue = 0;
-            this._longValue = 0;
+            this.doubleValue = 0;
+            this.longValue = 0;
             if (value == null) {
-                this._valueType = nullValueType;
-                this._index = 0;
+                this.valueType = nullValueType;
+                this.index = 0;
             } else {
-                this._valueType = scriptValueType;
-                this._index = ScriptObjectReference.Alloc(value);
+                this.valueType = scriptValueType;
+                this.index = ScriptObjectReference.Alloc(value);
             }
         }
         internal ScriptValue(char value) {
-            this._valueType = charValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
+            this.valueType = charValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = value;
         }
         private ScriptValue(int value) {
-            this._valueType = int32ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
+            this.valueType = int32ValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = value;
         }
         private ScriptValue(bool value) {
-            this._valueType = value ? trueValueType : falseValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = 0;
+            this.valueType = value ? trueValueType : falseValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = 0;
         }
         private ScriptValue(sbyte value) {
-            this._valueType = int8ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
+            this.valueType = int8ValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = value;
         }
         private ScriptValue(byte value) {
-            this._valueType = uint8ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
+            this.valueType = uint8ValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = value;
         }
         private ScriptValue(short value) {
-            this._valueType = int16ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
+            this.valueType = int16ValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = value;
         }
         private ScriptValue(ushort value) {
-            this._valueType = uint16ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
+            this.valueType = uint16ValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = value;
         }
         private ScriptValue(uint value) {
-            this._valueType = uint32ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = value;
+            this.valueType = uint32ValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = value;
         }
         private ScriptValue(ulong value) {
-            this._valueType = uint64ValueType;
-            this._index = 0;
-            this._doubleValue = 0;
-            this._longValue = (long)value;
+            this.valueType = uint64ValueType;
+            this.index = 0;
+            this.doubleValue = 0;
+            this.longValue = (long)value;
         }
         private ScriptValue(float value) {
-            this._valueType = floatValueType;
-            this._index = 0;
-            this._longValue = 0;
-            this._doubleValue = value;
+            this.valueType = floatValueType;
+            this.index = 0;
+            this.longValue = 0;
+            this.doubleValue = value;
         }
         private ScriptValue(string value, bool noReference) {
-            this._doubleValue = 0;
-            this._longValue = 0;
+            this.doubleValue = 0;
+            this.longValue = 0;
             if (value == null) {
-                this._valueType = nullValueType;
-                this._index = 0;
+                this.valueType = nullValueType;
+                this.index = 0;
             } else {
-                this._valueType = stringValueType;
-                this._index = StringReference.GetIndex(value);
+                this.valueType = stringValueType;
+                this.index = StringReference.GetIndex(value);
             }
         }
         internal ScriptValue(ScriptObject value, bool noReference) {
-            this._doubleValue = 0;
-            this._longValue = 0;
+            this.doubleValue = 0;
+            this.longValue = 0;
             if (value == null) {
-                this._valueType = nullValueType;
-                this._index = 0;
+                this.valueType = nullValueType;
+                this.index = 0;
             } else {
-                this._valueType = scriptValueType;
-                this._index = ScriptObjectReference.GetIndex(value);
+                this.valueType = scriptValueType;
+                this.index = ScriptObjectReference.GetIndex(value);
             }
         }
 
@@ -486,22 +461,22 @@ namespace Scorpio
         public object Value {
             get {
                 switch (valueType) {
-                    case doubleValueType: return _doubleValue;
-                    case int64ValueType: return _longValue;
+                    case doubleValueType: return doubleValue;
+                    case int64ValueType: return longValue;
                     case nullValueType: return null;
                     case trueValueType: return true;
                     case falseValueType: return false;
                     case stringValueType: return stringValue;
                     case scriptValueType: return scriptValue.Value;
-                    case floatValueType: return (float)_doubleValue;
-                    case int8ValueType: return (sbyte)_longValue;
-                    case uint8ValueType: return (byte)_longValue;
-                    case int16ValueType: return (short)_longValue;
-                    case uint16ValueType: return (ushort)_longValue;
-                    case int32ValueType: return (int)_longValue;
-                    case uint32ValueType: return (uint)_longValue;
-                    case uint64ValueType: return (ulong)_longValue;
-                    case charValueType: return (char)_longValue;
+                    case floatValueType: return (float)doubleValue;
+                    case int8ValueType: return (sbyte)longValue;
+                    case uint8ValueType: return (byte)longValue;
+                    case int16ValueType: return (short)longValue;
+                    case uint16ValueType: return (ushort)longValue;
+                    case int32ValueType: return (int)longValue;
+                    case uint32ValueType: return (uint)longValue;
+                    case uint64ValueType: return (ulong)longValue;
+                    case charValueType: return (char)longValue;
                     default: throw new ExecutionException($"未知的数据类型 : {valueType}");
                 }
             }
@@ -537,7 +512,7 @@ namespace Scorpio
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
-                    return (T)Convert.ChangeType(_doubleValue, typeof(T));
+                    return (T)Convert.ChangeType(doubleValue, typeof(T));
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -547,7 +522,7 @@ namespace Scorpio
                 case int64ValueType:
                 case uint64ValueType:
                 case charValueType:
-                    return (T)Convert.ChangeType(_longValue, typeof(T));
+                    return (T)Convert.ChangeType(longValue, typeof(T));
                 default:
                     return (T)Convert.ChangeType(Value, typeof(T));
             }
@@ -556,7 +531,7 @@ namespace Scorpio
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
-                    return (int)_doubleValue;
+                    return (int)doubleValue;
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -566,7 +541,7 @@ namespace Scorpio
                 case int64ValueType:
                 case uint64ValueType:
                 case charValueType:
-                    return (int)_longValue;
+                    return (int)longValue;
                 default:
                     return Convert.ToInt32(Value);
             }
@@ -575,7 +550,7 @@ namespace Scorpio
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
-                    return _doubleValue;
+                    return doubleValue;
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -585,7 +560,7 @@ namespace Scorpio
                 case int64ValueType:
                 case uint64ValueType:
                 case charValueType:
-                    return _longValue;
+                    return longValue;
                 default:
                     return Convert.ToDouble(Value);
             }
@@ -594,7 +569,7 @@ namespace Scorpio
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
-                    return (long)_doubleValue;
+                    return (long)doubleValue;
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -604,7 +579,7 @@ namespace Scorpio
                 case int64ValueType:
                 case uint64ValueType:
                 case charValueType:
-                    return _longValue;
+                    return longValue;
                 default:
                     return Convert.ToInt64(Value);
             }
@@ -613,7 +588,7 @@ namespace Scorpio
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
-                    return (char)_doubleValue;
+                    return (char)doubleValue;
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -623,7 +598,7 @@ namespace Scorpio
                 case int64ValueType:
                 case uint64ValueType:
                 case charValueType:
-                    return (char)_longValue;
+                    return (char)longValue;
                 case stringValueType:
                     return stringValue[0];
                 default:
@@ -645,7 +620,7 @@ namespace Scorpio
                 case stringValueType: return stringValue;
                 case floatValueType:
                 case doubleValueType: 
-                    return _doubleValue.ToString();
+                    return doubleValue.ToString();
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -654,9 +629,9 @@ namespace Scorpio
                 case uint32ValueType:
                 case int64ValueType:
                 case uint64ValueType:
-                    return _longValue.ToString();
+                    return longValue.ToString();
                 case charValueType:
-                    return ((char)_longValue).ToString();
+                    return ((char)longValue).ToString();
                 case trueValueType: return "true";
                 case falseValueType: return "false";
                 case nullValueType: return "null";
@@ -671,7 +646,7 @@ namespace Scorpio
                 case falseValueType: return false.GetHashCode();
                 case floatValueType:
                 case doubleValueType: 
-                    return _doubleValue.GetHashCode();
+                    return doubleValue.GetHashCode();
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -681,7 +656,7 @@ namespace Scorpio
                 case int64ValueType:
                 case uint64ValueType:
                 case charValueType:
-                    return _longValue.GetHashCode();
+                    return longValue.GetHashCode();
                 case stringValueType: return stringValue.GetHashCode();
                 default: return scriptValue.GetHashCode();
             }
@@ -692,9 +667,9 @@ namespace Scorpio
             } else if (obj is ScriptValue) {
                 return Equals((ScriptValue)obj);
             } else if (obj is long) {
-                return valueType == int64ValueType && _longValue == (long)obj;
+                return valueType == int64ValueType && longValue == (long)obj;
             } else if (obj is double) {
-                return valueType == doubleValueType && _doubleValue == (double)obj;
+                return valueType == doubleValueType && doubleValue == (double)obj;
             } else if (obj is string) {
                 return valueType == stringValueType && stringValue == (string)obj;
             } else if (obj is bool) {
@@ -710,7 +685,7 @@ namespace Scorpio
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
-                    return _doubleValue == value._doubleValue;
+                    return doubleValue == value.doubleValue;
                 case int8ValueType:
                 case uint8ValueType:
                 case int16ValueType:
@@ -720,7 +695,7 @@ namespace Scorpio
                 case int64ValueType:
                 case uint64ValueType:
                 case charValueType:
-                    return _longValue == value._longValue;
+                    return longValue == value.longValue;
                 case stringValueType: return stringValue == value.stringValue;
                 case scriptValueType: return scriptValue.Equals(value);
                 default: return true;

@@ -1,11 +1,9 @@
-TestStaticClass = importType("TestStaticClass")
-wewe = TestStaticClass.TestFloat
-print(wewe / 100)
-// TestStaticClass.func1 = (a) => {
-//     print(a)
-//     var b = json.decode(a)
-//     print(b)
-// }
+function main() {
+    var a = "123"
+    var b = "12" + "34"
+    print(a == b)
+}
+main()
 // function main() {
 //     TestStaticClass.TestDelegate(json.encode({a:"fawefwaefawe",b:"fweafweaf"}))
 // }

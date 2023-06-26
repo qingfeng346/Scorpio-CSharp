@@ -201,7 +201,7 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
         }
         public object Call(object obj, int methodIndex, object[] args) {
             switch (methodIndex) {
-                case 0: { ((TestClass)obj).TestFunc3(); return null; }
+                //case 0: { ((TestClass)obj).TestFunc3(); return null; }
                 default: throw new ExecutionException("TestClass 找不到合适的函数 : TestFunc3    type : " + methodIndex);
             }
         }

@@ -44,8 +44,11 @@ public static class TestStaticClass {
         action1?.Invoke();
         return func1(str);
     }
-    public static void TestFunc3(this TestClass testClass) {
-
+    public static void TestFunc3() {
+        AddTimer(0.1f, () => {
+            func1("fewa");
+            TestFunc3();
+        });
     }
     public static void AddTimer(float seconds, Action action) {
         timer.AddLast((DateTime.Now.AddSeconds(seconds), action));

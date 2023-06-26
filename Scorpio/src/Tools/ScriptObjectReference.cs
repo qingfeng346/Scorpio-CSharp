@@ -169,9 +169,9 @@ namespace Scorpio.Tools {
         static HashSet<int> stack = new HashSet<int>();
         static void Collect(ScriptValue value, int originIndex) {
             if (value.valueType == ScriptValue.scriptValueType) {
-                var index = value.scriptValueIndex;
-                if (!gcHandle.TryGetValue(index, out var handle)) {
-                    handle = gcHandle[index] = new GCHandle(index);
+                var index = value.index;
+                if (!gcHandle.TryGetValue((int)index, out var handle)) {
+                    handle = gcHandle[(int)index] = new GCHandle((int)index);
                 }
                 handle.count++;
                 handle.beCatch.Add(originIndex);
@@ -250,10 +250,10 @@ namespace Scorpio.Tools {
         }
         static void CollectReference(ScriptValue value, int originIndex, int targetIndex, HashSet<int> set, bool isString) {
             if (isString) {
-                if (value.valueType == ScriptValue.stringValueType && value.stringValueIndex == targetIndex) {
+                if (value.valueType == ScriptValue.stringValueType && value.index == targetIndex) {
                     set.Add(originIndex);
                 }
-            } else if (value.valueType == ScriptValue.scriptValueType && value.scriptValueIndex == targetIndex) {
+            } else if (value.valueType == ScriptValue.scriptValueType && value.index == targetIndex) {
                 set.Add(originIndex);
             }
         }
