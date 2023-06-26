@@ -192,9 +192,9 @@ namespace Scorpio {
                 return scorpioJsonSerializer.ToJson(scriptObject);
             }
         }
-        public ScriptValue ParseJson(string buffer, bool supportLong) {
+        public ScriptValue ParseJson(string buffer, bool supportLong, bool supportIntern) {
             using (scorpioJsonDeserializer) {
-                return scorpioJsonDeserializer.Parse(buffer, supportLong);
+                return scorpioJsonDeserializer.Parse(buffer, supportLong, supportIntern);
             }
         }
 

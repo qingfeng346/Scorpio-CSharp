@@ -7,7 +7,7 @@ using Scorpio.Userdata;
 
 namespace Scorpio
 {
-    [StructLayout(LayoutKind.Explicit, Pack = 2)]
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量
         public static readonly ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
@@ -268,7 +268,7 @@ namespace Scorpio
             }
         }
 
-
+        #region GetValue SetValue
         //此函数为运行时调用
         internal ScriptValue GetValue(ScriptValue value, Script script) {
             switch (value.valueType) {
@@ -284,7 +284,7 @@ namespace Scorpio
                 case int16ValueType:
                 case uint16ValueType:
                 case int32ValueType:
-                case uint32ValueType:
+                //case uint32ValueType: uint32 用作string
                 case uint64ValueType:
                 case charValueType:
                 case trueValueType:
@@ -319,7 +319,7 @@ namespace Scorpio
                 case int16ValueType:
                 case uint16ValueType:
                 case int32ValueType:
-                case uint32ValueType:
+                //case uint32ValueType: //uint32 用作 string
                 case uint64ValueType:
                 case charValueType:
                 case trueValueType:
@@ -435,6 +435,8 @@ namespace Scorpio
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : [{key}]");
             }
         }
+        #endregion
+        #region Call
         //调用函数
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             if (valueType == scriptValueType) {
@@ -479,6 +481,7 @@ namespace Scorpio
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用");
             }
         }
+        #endregion
         //传入参数
         public object Value {
             get {
@@ -637,7 +640,6 @@ namespace Scorpio
         public bool IsString => valueType == stringValueType;
         public bool IsScriptObject => valueType == scriptValueType;
 
-        
         public override string ToString() {
             switch (valueType) {
                 case stringValueType: return stringValue;

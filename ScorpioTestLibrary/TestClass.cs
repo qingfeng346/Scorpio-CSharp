@@ -36,6 +36,7 @@ public class TestClass {
     }
 }
 public static class TestStaticClass {
+    public static float TestFloat = 1000;
     public static Action action1;
     public static Func<string, string> func1;
     private static LinkedList<(DateTime, Action)> timer = new LinkedList<(DateTime, Action)> ();

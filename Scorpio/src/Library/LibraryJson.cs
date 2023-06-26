@@ -27,7 +27,7 @@ namespace Scorpio.Library {
                 m_Script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return m_Script.ParseJson(args[0].ToString(), length > 1 ? args[1].IsTrue : true);
+                return m_Script.ParseJson(args[0].ToString(), length > 1 ? args[1].IsTrue : true, length > 2 ? args[2].IsTrue : false);
             }
         }
     }

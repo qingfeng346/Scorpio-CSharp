@@ -58,7 +58,7 @@ namespace Scorpio {
         }
         void EnsureCapacity(int min) {
             if (m_Objects.Length < min) {
-                var num = (m_Objects.Length == 0) ? 4 : (m_Objects.Length * 2);
+                var num = m_Objects.Length + 128;
                 if (num > 2146435071) { num = 2146435071; }
                 else if (num < min) { num = min; }
                 SetCapacity(num);

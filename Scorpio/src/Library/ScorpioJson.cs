@@ -23,6 +23,7 @@ namespace Scorpio.Library {
         private Script m_Script;
         private string m_Buffer;
         private bool m_SupportLong;         //是否支持 数字无[.]解析成long值
+        private bool m_SupportIntern;       //Map的key使用string.Intern
         private int m_Index;
         private int m_Length;
         private StringBuilder m_Builder;
@@ -33,11 +34,12 @@ namespace Scorpio.Library {
 
         char Read() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index++]; }
         char Peek() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index]; }
-        public ScriptValue Parse(string buffer, bool supportLong) {
+        public ScriptValue Parse(string buffer, bool supportLong, bool supportIntern) {
             m_Buffer = buffer;
             m_Index = 0;
             m_Length = buffer.Length;
             m_SupportLong = supportLong;
+            m_SupportIntern = supportIntern;
             return ReadObject();
         }
         char EatWhiteSpace {
@@ -171,7 +173,7 @@ namespace Scorpio.Library {
                         if (EatWhiteSpace != ':') {
                             throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                         }
-                        map.SetValueNoReference(key, ReadObject());
+                        map.SetValueNoReference(m_SupportIntern ? string.Intern(key) : key, ReadObject());
                         break;
                     }
                     case '0':
