@@ -65,7 +65,7 @@ namespace Scorpio.Runtime {
             }
             #endregion
             #region 初始化参数和this
-            variableObjects[0].CopyFrom(thisObject);
+            variableObjects[0] = thisObject.Reference();
             var stackIndex = -1; //堆栈索引
             var parameterCount = m_FunctionData.parameterCount; //参数数量
             //是否是变长参数
