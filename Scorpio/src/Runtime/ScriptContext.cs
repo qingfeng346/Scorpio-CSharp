@@ -1,6 +1,6 @@
 using Scorpio.Instruction;
 using Scorpio.Tools;
-using System.Collections.Generic;
+using System;
 
 namespace Scorpio.Runtime {
 
@@ -11,17 +11,24 @@ namespace Scorpio.Runtime {
         internal class AsyncValue {
             public ScriptValue[] variable;
             public ScriptValue[] stack;
+            public AsyncValue() {
+                variable = new ScriptValue[AsyncValueLength];
+                stack = new ScriptValue[AsyncValueLength];
+            }
         }
         internal const int ValueCacheLength = 128;          //函数最大调用层级,超过会堆栈溢出
         internal const int StackValueLength = 128;          //堆栈数据最大数量
         internal const int VariableValueLength = 256;       //局部变量最大数量
+        internal const int AsyncValueLength = 64;           //
         internal const int TryStackLength = 16;             //最多可以嵌套多少层try catch
         
         internal static ScriptValue[][] VariableValues = new ScriptValue[ValueCacheLength][]; //局部变量数据
         internal static ScriptValue[][] StackValues = new ScriptValue[ValueCacheLength][]; //堆栈数据
         internal static int[][] TryStackValues = new int[ValueCacheLength][]; //try catch数据
         internal static int VariableValueIndex = 0;
-        internal static Stack<AsyncValue> AsyncValueQueue = new Stack<AsyncValue>();
+
+        internal static int AsyncValuePoolLength = 0;
+        internal static AsyncValue[] AsyncValuePool = new AsyncValue[0];
         static ScriptContext() {
             for (var i = 0; i < ValueCacheLength; ++i) {
                 StackValues[i] = new ScriptValue[StackValueLength];
@@ -29,17 +36,16 @@ namespace Scorpio.Runtime {
                 TryStackValues[i] = new int[TryStackLength];
             }
         }
-        private static AsyncValue AllocAsyncValue() {
-            if (AsyncValueQueue.Count == 0)
-                return new AsyncValue() { variable = new ScriptValue[64], stack = new ScriptValue[64] };
-            return AsyncValueQueue.Pop();
-        }
         private void FreeAsyncValue(AsyncValue value, InternalValue[] internalValues) {
             ScorpioUtil.Free(value.stack, value.stack.Length);
             ScorpioUtil.Free(value.variable, value.variable.Length);
             ScorpioUtil.Free(m_script, internalValues, internalCount);
-            AsyncValueQueue.Push(value);
-
+            if (AsyncValuePoolLength == AsyncValuePool.Length) {
+                var newPool = new AsyncValue[AsyncValuePoolLength + AsyncValueLength];
+                Array.Copy(AsyncValuePool, newPool, AsyncValuePoolLength);
+                AsyncValuePool = newPool;
+            }
+            AsyncValuePool[AsyncValuePoolLength++] = value;
         }
         private void Free(ScriptValue[] variableObjects, ScriptValue[] stackObjects, InternalValue[] internalValues) {
             --VariableValueIndex;

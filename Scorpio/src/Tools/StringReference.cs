@@ -1,81 +1,111 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+#if SCRIPT_OBJECT
+using EntityValue = Scorpio.ScriptObject;
+#else
+using EntityValue = System.String;
+#endif
 namespace Scorpio.Tools {
-    public class StringReference {
-        public class Entity {
-            public string value;
+#if SCRIPT_OBJECT
+    public partial class ScriptObjectReference {
+#else
+    public partial class StringReference {
+#endif
+        public struct Entity {
+            public EntityValue value;
             public int referenceCount;
 #if SCORPIO_DEBUG
             public int index;
-            public Entity(int index) {
-                this.index = index;
-            }
 #endif
-            public void Set(string value, int referenceCount) {
-                this.value = value;
-                this.referenceCount = referenceCount;
-            }
-            public void Clear() {
-                this.value = null;
-                this.referenceCount = -1;
-            }
             public override string ToString() {
-                return $"{value}  引用计数:{referenceCount}";
+                try {
+                    return $"{value} 计数:{referenceCount}";
+                } catch (System.Exception) {
+                    return $"Exception:{value?.GetType()}:  计数:{referenceCount}";
+                }
             }
         }
-        private const int Stage = 8192;
-        private static int length = 0;
-        private static Dictionary<string, int> object2index = new Dictionary<string, int>();
-        public static Stack<int> pool = new Stack<int>();
+        public const int Stage = 8192;
+
+#if SCRIPT_OBJECT
+        public static Dictionary<uint, int> object2index = new Dictionary<uint, int>();
+#else
+        public static Dictionary<string, int> object2index = new Dictionary<string, int>();
+#endif
+        public static int entityLength = 0;
         public static Entity[] entities = new Entity[Stage];
-        public static List<int> freeIndex = new List<int>();
-        public static int Alloc(string value) {
+
+        public static int poolLength = 0;
+        public static int[] pool = new int[Stage];
+
+        public static int freeLength = 0;
+        public static int[] frees = new int[Stage];
+        public static int Alloc(EntityValue value) {
+#if SCRIPT_OBJECT
+            if (object2index.TryGetValue(value.Id, out var index)) {
+#else
             if (object2index.TryGetValue(value, out var index)) {
+#endif
                 ++entities[index].referenceCount;
                 return index;
             }
-            if (pool.Count > 0) {
-                index = pool.Pop();
+            if (poolLength > 0) {
+                index = pool[poolLength--];
             } else {
-                index = length++;
-                if (length >= entities.Length) {
-                    var newEntities = new Entity[entities.Length + Stage];
-                    Array.Copy(entities, newEntities, entities.Length);
+                if (entityLength == entities.Length) {
+                    var newEntities = new Entity[entityLength + Stage];
+                    Array.Copy(entities, newEntities, entityLength);
                     entities = newEntities;
                 }
+                index = entityLength++;
 #if SCORPIO_DEBUG
-                entities[index] = new Entity(index);
-#else
-                entities[index] = new Entity();
+                entities[index].index = index;
 #endif
             }
+#if SCRIPT_OBJECT
+            object2index.Add(value.Id, index);
+#else
             object2index.Add(value, index);
-            entities[index].Set(value, 1);
+#endif
+            entities[index].value = value;
+            entities[index].referenceCount = 1;
             return index;
         }
         //获取index,如果是新创建的立刻加入释放列表
-        public static int GetIndex(string value) {
+        public static int GetIndex(EntityValue value) {
+#if SCRIPT_OBJECT
+            if (object2index.TryGetValue(value.Id, out var index)) {
+#else
             if (object2index.TryGetValue(value, out var index)) {
+#endif
                 return index;
             }
-            if (pool.Count > 0) {
-                index = pool.Pop();
+            if (poolLength > 0) {
+                index = pool[--poolLength];
             } else {
-                index = length++;
-                if (length == entities.Length) {
-                    var newEntities = new Entity[entities.Length + Stage];
-                    Array.Copy(entities, newEntities, entities.Length);
+                if (entityLength == entities.Length) {
+                    var newEntities = new Entity[entityLength + Stage];
+                    Array.Copy(entities, newEntities, entityLength);
                     entities = newEntities;
                 }
+                index = entityLength++;
 #if SCORPIO_DEBUG
-                entities[index] = new Entity(index);
-#else
-                entities[index] = new Entity();
+                entities[index].index = index;
 #endif
             }
+#if SCRIPT_OBJECT
+            object2index.Add(value.Id, index);
+#else
             object2index.Add(value, index);
-            entities[index].Set(value, 0);
-            freeIndex.Add(index);
+#endif
+            entities[index].value = value;
+            entities[index].referenceCount = 0;
+            if (freeLength == frees.Length) {
+                var newFrees = new int[freeLength + Stage];
+                Array.Copy(frees, newFrees, freeLength);
+                frees = newFrees;
+            }
+            frees[freeLength++] = index;
             return index;
         }
         public static int GetReferenceCount(int index) {
@@ -84,50 +114,67 @@ namespace Scorpio.Tools {
         public static void Free(int index) {
             if ((--entities[index].referenceCount) == 0) {
                 //添加到待释放列表
-                freeIndex.Add(index);
+                if (freeLength == frees.Length) {
+                    var newFrees = new int[freeLength + Stage];
+                    Array.Copy(frees, newFrees, freeLength);
+                    frees = newFrees;
+                }
+                frees[freeLength++] = index;
             }
 #if SCORPIO_DEBUG
             if (entities[index].referenceCount < 0) {
-                ScorpioLogger.error($"String 释放有问题,当前计数:{entities[index].referenceCount}  Index:{index} - {entities[index]}");
+                ScorpioLogger.error($"{typeof(EntityValue)} 释放有问题,当前计数:{entities[index].referenceCount}  Index:{index} - {entities[index]}");
             }
 #endif
-        }
-        public static string GetValue(int index) {
-            return entities[index].value;
         }
         public static void Reference(int index) {
             ++entities[index].referenceCount;
         }
-        //释放index
-        public static void ReleaseAll() {
-            if (freeIndex.Count > 0) {
+        public static EntityValue GetValue(int index) {
+            return entities[index].value;
+        }
+        //释放
+        public static unsafe void ReleaseAll() {
+            if (freeLength > 0) {
                 int index;
                 Entity entity;
-                for (var i = 0; i < freeIndex.Count; ++i) {
-                    index = freeIndex[i];
+                for (var i = 0; i < freeLength; ++i) {
+                    index = frees[i];
                     entity = entities[index];
                     if (entity.referenceCount == 0) {
+#if SCRIPT_OBJECT
+                        object2index.Remove(entity.value.Id);
+                        entity.value.Free();
+#else
                         object2index.Remove(entity.value);
-                        pool.Push(index);
-                        entity.Clear();
+#endif
+                        if (poolLength == pool.Length) {
+                            var newPool = new int[poolLength + Stage];
+                            Array.Copy(pool, newPool, poolLength);
+                            pool = newPool;
+                        }
+                        pool[poolLength++] = index;
+                        entities[index].value = null;
+                        entities[index].referenceCount = -1;
                     }
                 }
-                freeIndex.Clear();
+                freeLength = 0;
             }
         }
-        internal static void CheckPool() {
-            for (var i = 0; i < length; ++i) {
+        //检查未释放
+        public static void CheckPool() {
+            for (var i = 0; i < entityLength; ++i) {
                 if (entities[i].value != null) {
-                    ScorpioLogger.error($"当前未释放String变量 索引:{i}  {entities[i]}");
+                    ScorpioLogger.error($"当前未释放{typeof(EntityValue)}变量 索引:{i}  {entities[i]}");
                 }
             }
         }
         public static void Shutdown() {
             object2index.Clear();
-            pool.Clear();
-            Array.Clear(entities, 0, length);
-            freeIndex.Clear();
-            length = 0;
+            Array.Clear(entities, 0, entityLength);
+            entityLength = 0;
+            poolLength = 0;
+            freeLength = 0;
         }
     }
 }

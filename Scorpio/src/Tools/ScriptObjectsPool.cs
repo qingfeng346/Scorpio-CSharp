@@ -1,18 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-
+#define SCRIPT_OBJECT
+using System;
 namespace Scorpio.Tools {
+#if SCRIPT_OBJECT
     public interface IPool {
         void Alloc();
         void Free();
     }
     public class ScriptObjectsPool<T> where T : IPool {
+#else
+    public class ObjectsPool<T> {
+#endif
 #if SCORPIO_DEBUG
         private int count = 0;
 #endif
+        public const int Stage = 8192;
+
         public Func<T> Generator;
-        private Stack<T> pool = new Stack<T>();
+        public int poolLength = 0;
+        public T[] pool = new T[0];
+#if SCRIPT_OBJECT
         public ScriptObjectsPool(Func<T> generator) {
+#else
+        public ObjectsPool(Func<T> generator) {
+#endif
             Generator = generator;
         }
         public T Alloc() {
@@ -25,13 +35,20 @@ namespace Scorpio.Tools {
                 ret = Generator();
             }
 #else
-            var ret = pool.Count > 0 ? pool.Pop() : Generator();
+            var ret = poolLength > 0 ? pool[--poolLength] : Generator();
 #endif
+#if SCRIPT_OBJECT
             ret.Alloc();
+#endif
             return ret;
         }
         public void Free(T item) {
-            pool.Push(item);
+            if (poolLength == pool.Length) {
+                var newPool = new T[poolLength + Stage];
+                Array.Copy(pool, newPool, poolLength);
+                pool = newPool;
+            }
+            pool[poolLength++] = item;
         }
         public int Check() {
 #if SCORPIO_DEBUG

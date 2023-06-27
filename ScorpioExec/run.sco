@@ -1,6 +1,6 @@
 function main() {
     var a = "123"
-    var b = "12" + "34"
+    var b = "12" + "3"
     print(a == b)
 }
 main()

@@ -34,7 +34,7 @@ namespace Scorpio.Runtime {
             #endregion
             #region 申请堆栈和局部变量
 #if EXECUTE_COROUTINE
-            var asyncValue = AllocAsyncValue();             //空闲数据索引
+            var asyncValue = AsyncValuePoolLength > 0 ? AsyncValuePool[--AsyncValuePoolLength] : new AsyncValue();
             var variableObjects = asyncValue.variable;      //局部变量
             var stackObjects = asyncValue.stack;            //堆栈数据
 #else

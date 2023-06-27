@@ -40,54 +40,88 @@ namespace Scorpio
         [FieldOffset(0)] public long longValue;
         [FieldOffset(0)] public int index;
         [FieldOffset(8)] public byte valueType;
+        public string stringValue => StringReference.GetValue(index);
+        public ScriptObject scriptValue => ScriptObjectReference.GetValue(index);
         public bool setBoolValue {
             set {
-                Free();
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
                 valueType = value ? trueValueType : falseValueType;
             }
         }
         public double setDoubleValue {
             set {
-                Free();
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
                 valueType = doubleValueType;
                 doubleValue = value;
             }
         }
         public long setLongValue {
             set {
-                Free();
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
                 valueType = int64ValueType;
                 longValue = value;
             }
         }
-        public string stringValue => StringReference.GetValue(index);
-        public ScriptObject scriptValue => ScriptObjectReference.GetValue(index);
         public void SetNull() {
-            Free();
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
+            }
             valueType = nullValueType;
         }
         public void SetTrue() {
-            Free();
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
+            }
             valueType = trueValueType;
-            longValue = 0;
         }
         public void SetFalse() {
-            Free();
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
+            }
             valueType = falseValueType;
-            longValue = 0;
         }
         public void SetScriptValue(ScriptObject value) {
-            Free();
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
+            }
             valueType = scriptValueType;
             index = ScriptObjectReference.Alloc(value);
         }
         public void SetStringValue(string value) {
-            Free();
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
+            }
             valueType = stringValueType;
             index = StringReference.Alloc(value);
         }
         public void CopyFrom(ScriptValue value) {
-            Free();
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
+            }
             valueType = value.valueType;
             longValue = value.longValue;
             if (valueType == stringValueType) {
@@ -97,7 +131,11 @@ namespace Scorpio
             }
         }
         public void Set(ScriptValue value) {
-            Free();
+            if (valueType == stringValueType) {
+                StringReference.Free(index);
+            } else if (valueType == scriptValueType) {
+                ScriptObjectReference.Free(index);
+            }
             valueType = value.valueType;
             longValue = value.longValue;
         }
