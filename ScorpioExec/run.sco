@@ -1,9 +1,44 @@
-function main() {
-    var a = "123"
-    var b = "12" + "3"
-    print(a == b)
+var a = {
+    activity: {
+        eventData: [
+            {
+                groupId: 7206
+            },
+            {
+                groupId: 7206
+            },
+            {
+                groupId: 7206
+            },
+            {
+                groupId: 7206
+            },
+            {
+                groupId: 7206
+            },
+            {
+                groupId: 7206
+            }
+        ]
+    }
 }
-main()
+print(json.encode(a))
+var b = json.decode(json.encode(a), false)
+var eventDatas = b?.activity?.eventData
+eventDatas.forEach((value) => {
+    if (value.groupId != null) {
+        print("true")
+    } else {
+        print("false")
+    }
+})
+eventDatas.forEach((value) => {
+    if (value.groupId != null) {
+        print("true")
+    } else {
+        print("false")
+    }
+})
 // function main() {
 //     TestStaticClass.TestDelegate(json.encode({a:"fawefwaefawe",b:"fweafweaf"}))
 // }

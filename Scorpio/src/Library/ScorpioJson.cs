@@ -155,7 +155,7 @@ namespace Scorpio.Library {
                 if (m_SupportLong || parsedLong < MinInt || parsedLong > MaxInt) {
                     return new ScriptValue(parsedLong);
                 } else {
-                    return new ScriptValue(Convert.ToDouble(parsedLong));
+                    return new ScriptValue((double)parsedLong);
                 }
             }
         }

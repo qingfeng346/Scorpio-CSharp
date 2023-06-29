@@ -27,8 +27,8 @@ namespace Scorpio.Tools {
         public T Alloc() {
 #if SCORPIO_DEBUG
             T ret;
-            if (pool.Count > 0) {
-                ret = pool.Pop();
+            if (poolLength > 0) {
+                ret = pool[--poolLength];
             } else {
                 ++count;
                 ret = Generator();
@@ -52,7 +52,7 @@ namespace Scorpio.Tools {
         public int Check() {
 #if SCORPIO_DEBUG
             //如果new的数量跟回收的数量不相同则有泄露
-            return count - pool.Count;
+            return count - pool.Length;
 #else
             return 0;
 #endif

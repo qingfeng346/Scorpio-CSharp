@@ -647,7 +647,7 @@ namespace Scorpio.Runtime {
                                                 stackObjects[tempIndex].valueType = stackObjects[tempIndex].doubleValue != stackObjects[stackIndex].longValue ? ScriptValue.trueValueType : ScriptValue.falseValueType;
                                                 break;
                                             default:
-                                                stackObjects[tempIndex].valueType = ScriptValue.falseValueType;
+                                                stackObjects[tempIndex].valueType = ScriptValue.trueValueType;
                                                 break;
                                         }
                                         --stackIndex;
