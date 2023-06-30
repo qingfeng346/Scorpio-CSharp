@@ -17,15 +17,14 @@ namespace Scorpio {
         Global,         //全局变量保存类,只有_G是这个类型
     }
     public abstract class ScriptObject : IPool {
-        private static uint AutomaticId = 0;
         protected Script m_Script;
-        public uint Id { get; private set; }
-        public ObjectType ObjectType { get; private set; }              //类型
+        public readonly uint Id;
+        public readonly ObjectType ObjectType;                          //类型
         // 构图函数
         public ScriptObject(Script script, ObjectType objectType) {
             m_Script = script;
             ObjectType = objectType;
-            Id = AutomaticId++;
+            Id = script.NewId;
         }
         public virtual object Value => this;                            //值
         public virtual Type ValueType => GetType();                     //值类型
