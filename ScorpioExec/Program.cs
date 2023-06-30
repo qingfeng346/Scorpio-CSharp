@@ -122,9 +122,10 @@ namespace ScorpioExec
             var source = perform.GetPath (ParameterSource);
             var output = perform.GetPath (ParameterOutput);
             var search = command.GetValueDefault (ParameterSearch, "");
-            var searchPaths = new List<string> (search.Split (";"));
-            searchPaths.Add (CurrentDirectory);
-            searchPaths.Add (Path.GetDirectoryName (source));
+            var searchPaths = new List<string>(search.Split(";")) {
+                CurrentDirectory,
+                Path.GetDirectoryName(source)
+            };
             var compileOption = ParseOption (command.GetValueDefault (ParameterOption, ""), searchPaths);
             File.WriteAllBytes (output, Serializer.SerializeBytes (
                 source,
@@ -207,29 +208,34 @@ namespace ScorpioExec
         static void Execute (Perform perform, CommandLine command, string[] args) {
             Scorpio.Commons.ScorpioUtil.PrintSystemInfo ();
             Logger.info ($"Version : {Scorpio.Version.version}[{Scorpio.Version.date}]");
-            var script = new Scorpio.Script ();
-            //script.LoadLibraryV1 ();
-            script.LoadLibraryExtend ();
-            script.PushAssembly (typeof (Program));
-            script.PushReferencedAssemblies (typeof (Program).Assembly);
-            script.PushAssembly (typeof(TestClass));
             TestDelegateFactory.Initialize();
-            LoadLibrary (script, Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
+                Script script = null;
                 try {
                     var file = Path.Combine (CurrentDirectory, args[0]);
                     if (!File.Exists (file)) {
                         Logger.info ($"文件 : {file} 不存在");
                         return;
                     }
-                    script.PushSearchPath (Path.GetDirectoryName (file));
-                    script.PushSearchPath (CurrentDirectory);
+                    var search = command.GetValueDefault(ParameterSearch, "");
+                    var searchPaths = new List<string>(search.Split(";")) {
+                        CurrentDirectory,
+                        Path.GetDirectoryName(file)
+                    };
+                    var option = ParseOption(command.GetValueDefault(ParameterOption, ""), searchPaths);
+                    script = new Script();
+                    LoadLibrary(script, Path.Combine(CurrentDirectory, "dll"));
+                    script.LoadLibraryV1();
+                    script.LoadLibraryExtend();
+                    script.PushAssembly(typeof(Program));
+                    script.PushReferencedAssemblies(typeof(Program).Assembly);
+                    script.PushAssembly(typeof(TestClass));
                     var sArgs = new string[args.Length - 1];
                     Array.Copy (args, 1, sArgs, 0, sArgs.Length);
                     script.SetArgs (sArgs);
                     Logger.info ("=============================");
                     var watch = Stopwatch.StartNew ();
-                    var value = script.LoadFile(file, ParseOption(command.GetValueDefault(ParameterOption, ""), script.SearchPaths));
+                    var value = script.LoadFile(file, option);
                     value.Release();
                     var ret = value.ToString();
                     while (true) {
@@ -247,10 +253,19 @@ namespace ScorpioExec
                     Logger.info ("return value : " + ret);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");
                 } catch (Exception e) {
-                    var stackInfo = script.GetStackInfo ();
-                    Logger.info ($"{stackInfo.Breviary}:{stackInfo.Line} {e}");
+                    if (script == null) {
+                        Logger.info(e.ToString());
+                    } else {
+                        var stackInfo = script.GetStackInfo();
+                        Logger.info($"{stackInfo.Breviary}:{stackInfo.Line} {e}");
+                    }
                 }
             } else {
+                var script = new Script();
+                script.LoadLibraryV1();
+                script.PushAssembly(typeof(Program));
+                script.PushReferencedAssemblies(typeof(Program).Assembly);
+                script.PushAssembly(typeof(TestClass));
                 while (true) {
                     try {
                         string str = Console.ReadLine ();
@@ -341,12 +356,14 @@ namespace ScorpioExec
                     foreach (var searchPath in scriptSearchPaths) {
                         var fullFileName = Path.Combine (searchPath, fileName);
                         if (File.Exists (fullFileName)) {
-                            var script = new Scorpio.Script ();
+                            var script = new Script ();
                             script.LoadLibraryV1 ();
                             foreach (var path in scriptSearchPaths) {
                                 script.PushSearchPath (path);
                             }
                             compileOption.scriptConst = script.LoadConst (fullFileName);
+                            script.Shutdown();
+                            script.ReleaseAll();
                             break;
                         }
                     }
