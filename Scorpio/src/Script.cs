@@ -31,8 +31,8 @@ namespace Scorpio
         /// <summary> 按文本读取时,文本文件的编码 </summary>
         public static Encoding Encoding { get; set; } = Encoding.UTF8;
 
-        private uint AutomaticId = 0;
-        public uint NewId => AutomaticId++;
+        private static uint AutomaticId = 0;
+        public static uint NewId => AutomaticId++;
         /// <summary> request文件的搜索路径集合 </summary>
         private string[] m_SearchPaths;
         public string[] SearchPaths => m_SearchPaths;
