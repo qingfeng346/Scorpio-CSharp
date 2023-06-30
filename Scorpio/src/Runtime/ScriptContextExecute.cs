@@ -267,10 +267,6 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.StoreGlobalString: {
                                 var globalValue = stackObjects[stackIndex--];
-                                var function = globalValue.Get<ScriptFunction>();
-                                if (function != null) {
-                                    function.FunctionName = constString[opvalue];
-                                }
                                 m_global.SetValue(constString[opvalue], globalValue);
                                 instruction.SetOpcode(Opcode.StoreGlobal, m_global.GetIndex(constString[opvalue]));
                                 continue;
@@ -1376,11 +1372,18 @@ namespace Scorpio.Runtime {
 #endregion
 #region New
                             case Opcode.NewMap: {
-                                stackObjects[++stackIndex].SetScriptValue(m_script.NewMapObject());
+                                var map = m_script.NewMapObject();
+#if SCORPIO_DEBUG
+                                map.Source = $"{m_Breviary}:{instruction.line}";
+#endif
+                                stackObjects[++stackIndex].SetScriptValue(map);
                                 continue;
                             }
                             case Opcode.NewArray: {
-                                   var array = m_script.NewArray();
+                                var array = m_script.NewArray();
+#if SCORPIO_DEBUG
+                                array.Source = $"{m_Breviary}:{instruction.line}";
+#endif
                                 for (var i = opvalue - 1; i >= 0; --i) {
                                     array.Add(stackObjects[stackIndex - i]);
                                 }
@@ -1394,7 +1397,7 @@ namespace Scorpio.Runtime {
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData);
 #if SCORPIO_DEBUG
-                                function.FunctionName = $"{m_Breviary}:{instruction.line}";
+                                function.Source = $"{m_Breviary}:{instruction.line}";
 #endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
@@ -1409,7 +1412,7 @@ namespace Scorpio.Runtime {
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData, thisObject);
 #if SCORPIO_DEBUG
-                                function.FunctionName = $"{m_Breviary}:{instruction.line}";
+                                function.Source = $"{m_Breviary}:{instruction.line}";
 #endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
@@ -1424,7 +1427,7 @@ namespace Scorpio.Runtime {
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData);
 #if SCORPIO_DEBUG
-                                function.FunctionName = $"{m_Breviary}:{instruction.line}";
+                                function.Source = $"{m_Breviary}:{instruction.line}";
 #endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
@@ -1439,7 +1442,7 @@ namespace Scorpio.Runtime {
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData, thisObject);
 #if SCORPIO_DEBUG
-                                function.FunctionName = $"{m_Breviary}:{instruction.line}";
+                                function.Source = $"{m_Breviary}:{instruction.line}";
 #endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
@@ -1454,6 +1457,9 @@ namespace Scorpio.Runtime {
                                 var className = constString[classData.name];
                                 string functionName;
                                 var type = m_script.NewType();
+#if SCORPIO_DEBUG
+                                type.Source = $"{m_Breviary}:{instruction.line}";
+#endif
                                 type.Set(className, parentType);
                                 var functions = classData.functions;
                                 var functionCount = 0;
@@ -1474,7 +1480,7 @@ namespace Scorpio.Runtime {
                                     if (funcType == 0) {
                                         var function = m_script.NewFunction().SetContext(functionData);
 #if SCORPIO_DEBUG
-                                        function.FunctionName = $"{className}.{functionName}";
+                                        function.Source = $"{className}.{functionName}";
 #endif
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
@@ -1484,7 +1490,7 @@ namespace Scorpio.Runtime {
                                     } else if (funcType == 1) {
                                         var function = m_script.NewAsyncFunction().SetContext(functionData);
 #if SCORPIO_DEBUG
-                                        function.FunctionName = $"{className}.{functionName}";
+                                        function.Source = $"{className}.{functionName}";
 #endif
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
@@ -1494,7 +1500,7 @@ namespace Scorpio.Runtime {
                                     } else if (funcType == 2) {
                                         var function = m_script.NewFunction().SetContext(functionData);
 #if SCORPIO_DEBUG
-                                        function.FunctionName = $"{className}.{functionName}";
+                                        function.Source = $"{className}.{functionName}";
 #endif
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];

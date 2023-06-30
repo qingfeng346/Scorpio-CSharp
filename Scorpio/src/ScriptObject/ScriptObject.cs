@@ -20,6 +20,9 @@ namespace Scorpio {
         protected Script m_Script;
         public readonly uint Id;
         public readonly ObjectType ObjectType;                          //类型
+#if SCORPIO_DEBUG
+        public string Source { get; set; }
+#endif
         // 构图函数
         public ScriptObject(Script script, ObjectType objectType) {
             m_Script = script;

@@ -14,11 +14,10 @@ namespace Scorpio.Function {
         public override ScriptFunction SetBindObject(ScriptValue obj) {
             return m_Script.NewBindFunction().SetContext(m_Context, obj);
         }
-        public override string ToString() { return $"Function<{FunctionName}>"; }
+        public override string ToString() { return $"Function"; }
     }
     public class ScriptScriptBindFunction : ScriptScriptBindFunctionBase {
-        public ScriptScriptBindFunction(Script script) : base(script) {
-        }
+        public ScriptScriptBindFunction(Script script) : base(script) { }
         public override void Free() {
             base.Free();
             m_Script.Free(this);
@@ -36,6 +35,6 @@ namespace Scorpio.Function {
         public override ScriptFunction SetBindObject(ScriptValue obj) {
             return m_Script.NewBindFunction().SetContext(m_Context, obj);
         }
-        public override string ToString() { return $"BindFunction<{FunctionName}>"; }
+        public override string ToString() { return $"BindFunction"; }
     }
 }
