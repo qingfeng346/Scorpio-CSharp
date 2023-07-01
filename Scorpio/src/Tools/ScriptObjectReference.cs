@@ -51,7 +51,7 @@ namespace Scorpio.Tools {
                 return index;
             }
             if (poolLength > 0) {
-                index = pool[poolLength--];
+                index = pool[--poolLength];
             } else {
                 if (entityLength == entities.Length) {
                     var newEntities = new Entity[entityLength + Stage];
