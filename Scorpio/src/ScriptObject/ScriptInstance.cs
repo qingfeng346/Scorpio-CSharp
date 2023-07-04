@@ -10,10 +10,13 @@ namespace Scorpio {
         protected ScriptValue m_PrototypeValue;
         protected ScriptType m_Prototype = null;
         protected ScriptValue m_thisValue;
-        public ScriptInstance(Script script) : base(script, ObjectType.Instance) { }
-        public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) { }
-        public override void Alloc() {
+        public ScriptInstance(Script script) : base(script, ObjectType.Instance) {
             m_Values = new ScorpioStringDictionary();
+        }
+        public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) {
+            m_Values = new ScorpioStringDictionary();
+        }
+        public override void Alloc() {
         }
         public ScriptInstance SetPrototypeValue(ScriptValue prototypeValue) {
             m_PrototypeValue.CopyFrom(prototypeValue);
@@ -33,7 +36,6 @@ namespace Scorpio {
             m_Prototype = null;
             m_thisValue = ScriptValue.Null;
             m_Values.Clear();
-            m_Values = null;
         }
         public override void Free() {
             Release();

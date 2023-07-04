@@ -117,9 +117,8 @@ namespace Scorpio.Tools {
         }
         public virtual void Clear() {
             ScorpioUtil.Free(mValues, mSize);
+            Array.Clear(mKeys, 0, mSize);
             mSize = 0;
-            mKeys = STRING_EMPTY;
-            mValues = ScriptValue.EMPTY;
         }
         public virtual void TrimCapacity() {
             if (mSize == mValues.Length) return;

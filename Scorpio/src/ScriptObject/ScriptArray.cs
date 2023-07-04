@@ -59,19 +59,17 @@ namespace Scorpio {
         internal ScriptValue[] m_Objects;
         internal int m_Length;
         
-        public ScriptArray(Script script) : base(script, ObjectType.Array) { }
+        public ScriptArray(Script script) : base(script, ObjectType.Array) {
+            m_Objects = ScriptValue.EMPTY;
+        }
         internal ScriptValue[] getObjects() { return m_Objects; }
         public override void Alloc() {
             base.Alloc();
-            m_Objects = ScriptValue.EMPTY;
-            m_Length = 0;
             SetPrototypeValue(script.TypeArrayValue);
         }
         public override void Free() {
             Release();
             Clear();
-            m_Objects = ScriptValue.EMPTY;
-            m_Length = 0;
             m_Script.Free(this);
         }
         public override void gc() {
@@ -287,7 +285,7 @@ namespace Scorpio {
         }
         public override ScriptObject Clone(bool deep) {
             var ret = m_Script.NewArray();
-            ret.EnsureCapacity(m_Length);
+            ret.SetCapacity_impl(m_Length);
             ret.m_Length = m_Length;
             if (deep) {
                 for (int i = 0; i < m_Length; ++i) {
@@ -312,7 +310,7 @@ namespace Scorpio {
         }
         public ScriptArray NewCopy() {
             var ret = m_Script.NewArray();
-            ret.EnsureCapacity(m_Length);
+            ret.SetCapacity_impl(m_Length);
             ret.m_Length = m_Length;
             for (int i = 0; i < m_Length; ++i) {
                 ret.m_Objects[i].CopyFrom(m_Objects[i]);
