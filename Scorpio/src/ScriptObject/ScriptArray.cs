@@ -77,7 +77,14 @@ namespace Scorpio {
         public override void gc() {
             Clear();
         }
-        void SetArrayCapacity(int value) {
+        public void SetArrayCapacity(int capacity) {
+            if (capacity > m_Length) {
+                SetCapacity_impl(capacity);
+            } else if (capacity < m_Length) {
+                throw new ExecutionException($"Capacity 不能小于当前size,  size:{m_Length} capacity:{capacity}");
+            }
+        }
+        void SetCapacity_impl(int value) {
             if (value > 0) {
                 var array = new ScriptValue[value];
                 if (m_Length > 0) {
@@ -90,9 +97,9 @@ namespace Scorpio {
         }
         void EnsureCapacity(int min) {
             if (m_Objects.Length < min) {
-                int num = (m_Objects.Length == 0) ? 8 : (m_Objects.Length * 2);
+                int num = m_Objects.Length + 8;
                 if (num > 2146435071) { num = 2146435071; } else if (num < min) { num = min; }
-                SetArrayCapacity(num);
+                SetCapacity_impl(num);
             }
         }
         public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }

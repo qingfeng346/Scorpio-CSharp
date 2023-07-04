@@ -1384,6 +1384,7 @@ namespace Scorpio.Runtime {
 #if SCORPIO_DEBUG
                                 array.Source = $"{m_Breviary}:{instruction.line}";
 #endif
+                                array.SetArrayCapacity(opvalue);
                                 for (var i = opvalue - 1; i >= 0; --i) {
                                     array.Add(stackObjects[stackIndex - i]);
                                 }

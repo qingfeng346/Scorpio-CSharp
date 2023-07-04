@@ -47,11 +47,11 @@ namespace Scorpio.Tools {
         }
         public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() => new Enumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
-        public void SetCapacity(int value) {
-            if (value > mSize) {
-                SetCapacity_impl(value);
-            } else if (value < mSize) {
-                throw new ExecutionException($"Capacity 不能小于当前size,  size:{mSize} capacity:{value}");
+        public void SetCapacity(int capacity) {
+            if (capacity > mSize) {
+                SetCapacity_impl(capacity);
+            } else if (capacity < mSize) {
+                throw new ExecutionException($"Capacity 不能小于当前size,  size:{mSize} capacity:{capacity}");
             }
         }
         private void SetCapacity_impl(int value) {
