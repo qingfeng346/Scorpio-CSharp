@@ -5,7 +5,6 @@ namespace Scorpio {
         public override void Free() {
             Release();
             Clear();
-            m_Objects = null;
             m_Script.Free(this);
         }
     }

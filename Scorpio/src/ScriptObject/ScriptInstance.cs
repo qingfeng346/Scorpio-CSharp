@@ -65,6 +65,9 @@ namespace Scorpio {
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
+        public virtual void ClearVariables() {
+            m_Values.Clear();
+        }
         public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() => m_Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => m_Values.GetEnumerator();
         public override ScriptValue Plus(ScriptValue obj) {

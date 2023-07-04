@@ -96,6 +96,10 @@ namespace Scorpio {
         public override void Clear() {
             m_Objects.Free();
         }
+        public override void ClearVariables() {
+            base.ClearVariables();
+            m_Objects.Free();
+        }
         public override void Remove(object key) {
             if (m_Objects.TryGetValue(key, out var result)) {
                 result.Free();
