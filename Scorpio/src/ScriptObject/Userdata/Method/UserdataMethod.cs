@@ -62,7 +62,7 @@ namespace Scorpio.Userdata {
             } catch (System.Exception e) {
                 throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] - {parameters.GetParametersString(length)} : {e}");
             } finally {
-                Array.Clear(method.Args);
+                Array.Clear(method.Args, 0, method.Args.Length);
             }
         }
         public bool CallNoThrow (Script script, bool isStatic, object obj, ScriptValue[] parameters, int length, out object result) {
@@ -96,7 +96,7 @@ namespace Scorpio.Userdata {
             } catch (System.Exception e) {
                 throw new ExecutionException($"类[{m_Type}] 调用函数出错 [{MethodName}] : {e}");
             } finally {
-                Array.Clear(method.Args);
+                Array.Clear(method.Args, 0, method.Args.Length);
             }
         }
     }
