@@ -3,5 +3,8 @@ namespace Scorpio.Exception {
     public struct StackInfo {
         public string Breviary;
         public int Line;
+        public override string ToString() {
+            return $"{Breviary}:{Line}";
+        }
     }
 }

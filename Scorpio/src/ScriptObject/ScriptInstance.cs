@@ -6,17 +6,15 @@ using Scorpio.Tools;
 
 namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
-        internal ScorpioStringDictionary m_Values;              //所有的数据(函数和数据都在一个数组)
+        protected ScriptValue m_thisValue;
         protected ScriptValue m_PrototypeValue;
         protected ScriptType m_Prototype = null;
-        protected ScriptValue m_thisValue;
+        protected ScorpioStringDictionary m_Values;              //所有的数据(函数和数据都在一个数组)
         public ScriptInstance(Script script) : base(script, ObjectType.Instance) {
             m_Values = new ScorpioStringDictionary();
         }
         public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) {
             m_Values = new ScorpioStringDictionary();
-        }
-        public override void Alloc() {
         }
         public ScriptInstance SetPrototypeValue(ScriptValue prototypeValue) {
             m_PrototypeValue.CopyFrom(prototypeValue);

@@ -7,7 +7,7 @@ using Scorpio.Userdata;
 
 namespace Scorpio
 {
-    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    [StructLayout(LayoutKind.Explicit, Pack = 2)]
     public struct ScriptValue {
         private const int ParameterLength = 128; //函数参数最大数量
         public static readonly ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
@@ -281,12 +281,12 @@ namespace Scorpio
             }
         }
 
-        #region GetValue SetValue
+        #region 运行时调用
         //此函数为运行时调用
-        internal ScriptValue GetValue(ScriptValue value, Script script) {
+        internal ScriptValue GetValueByScriptValue(ScriptValue value, Script script) {
             switch (value.valueType) {
                 case stringValueType:
-                    return GetValue(value.stringValue, script);
+                    return GetValueByString(value.stringValue, script);
                 case doubleValueType:
                     return GetValue(value.doubleValue);
                 case int64ValueType:
@@ -297,7 +297,7 @@ namespace Scorpio
                 case int16ValueType:
                 case uint16ValueType:
                 case int32ValueType:
-                //case uint32ValueType: uint32 用作string
+                case uint32ValueType: //uint32 用作string
                 case uint64ValueType:
                 case charValueType:
                 case trueValueType:
@@ -312,43 +312,6 @@ namespace Scorpio
                 }
                 default:
                     throw new ExecutionException($"不支持当前类型作为变量 : {value.ValueTypeName}");
-            }
-        }
-        //此函数为运行时调用
-        internal void SetValue(ScriptValue key, ScriptValue value) {
-            switch (key.valueType) {
-                case stringValueType:
-                    SetValue(key.stringValue, value);
-                    return;
-                case doubleValueType:
-                    SetValue(key.doubleValue, value);
-                    return;
-                case int64ValueType:
-                    SetValue(key.longValue, value);
-                    return;
-                case floatValueType:
-                case int8ValueType:
-                case uint8ValueType:
-                case int16ValueType:
-                case uint16ValueType:
-                case int32ValueType:
-                //case uint32ValueType: //uint32 用作 string
-                case uint64ValueType:
-                case charValueType:
-                case trueValueType:
-                case falseValueType:
-                    SetValue(key.Value, value);
-                    return;
-                case scriptValueType: {
-                    var userdata = key.Get<ScriptUserdataObject>();
-                    if (userdata != null) {
-                        SetValue(userdata.Value, value);
-                        return;
-                    }
-                    throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
-                }
-                default:
-                    throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
             }
         }
         //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
@@ -368,7 +331,7 @@ namespace Scorpio
             }
         }
         //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
-        internal ScriptValue GetValue(string key, Script script) {
+        internal ScriptValue GetValueByString(string key, Script script) {
             switch (valueType) {
                 case scriptValueType:
                     return scriptValue.GetValue(key);
@@ -386,6 +349,52 @@ namespace Scorpio
                     return script.TypeObject.GetValue(key);
             }
         }
+        //此函数为运行时调用
+        internal void SetValueByScriptValue(ScriptValue key, ScriptValue value) {
+            switch (key.valueType) {
+                case stringValueType:
+                    SetValue(key.stringValue, value);
+                    return;
+                case doubleValueType:
+                    SetValue(key.doubleValue, value);
+                    return;
+                case int64ValueType:
+                    SetValue(key.longValue, value);
+                    return;
+                case floatValueType:
+                case int8ValueType:
+                case uint8ValueType:
+                case int16ValueType:
+                case uint16ValueType:
+                case int32ValueType:
+                case uint32ValueType: //uint32 用作 string
+                case uint64ValueType:
+                case charValueType:
+                case trueValueType:
+                case falseValueType:
+                    SetValue(key.Value, value);
+                    return;
+                case scriptValueType: {
+                    var userdata = key.Get<ScriptUserdataObject>();
+                    if (userdata != null) {
+                        SetValue(userdata.Value, value);
+                        return;
+                    }
+                    throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
+                }
+                default:
+                    throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
+            }
+        }
+        internal void SetValueByIndex(int key, ScriptValue value) {
+            if (valueType == scriptValueType) {
+                scriptValue.SetValueByIndex(key, value);
+            } else {
+                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Index : [{key}]");
+            }
+        }
+        #endregion
+        #region GetValue SetValue
         public ScriptValue GetValue(string key) {
             if (valueType == scriptValueType) {
                 return scriptValue.GetValue(key);
@@ -413,13 +422,7 @@ namespace Scorpio
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
             }
         }
-        public void SetValueByIndex(int key, ScriptValue value) {
-            if (valueType == scriptValueType) {
-                scriptValue.SetValueByIndex(key, value);
-            } else {
-                throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Index : [{key}]");
-            }
-        }
+
         public void SetValue(string key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);

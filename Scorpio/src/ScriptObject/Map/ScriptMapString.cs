@@ -19,10 +19,6 @@ namespace Scorpio {
             public void Dispose() { m_Enumerator.Dispose(); m_Enumerator = null; }
         }
         public ScriptMapString(Script script) : base(script) { }
-        public override void Alloc() {
-            base.Alloc();
-            SetPrototypeValue(script.TypeMapValue);
-        }
         public override void Free() {
             Clear();
             Release();
@@ -35,7 +31,7 @@ namespace Scorpio {
         IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
         public override bool ContainsKey(object key) {
             if (!(key is string)) return false;
-            return m_Values.ContainsKey(key as string);
+            return m_Values.ContainsKey((string)key);
         }
         public override bool ContainsValue(ScriptValue value) {
             return m_Values.ContainsValue(value);
@@ -47,7 +43,8 @@ namespace Scorpio {
             m_Values.Clear();
         }
         public override void Remove(object key) {
-            m_Values.Remove((string)key);
+            if (key is string)
+                m_Values.Remove((string)key);
         }
         public override ScriptArray GetKeys() {
             var ret = m_Script.NewArray();

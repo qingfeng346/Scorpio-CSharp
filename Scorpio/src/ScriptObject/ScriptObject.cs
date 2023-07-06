@@ -18,11 +18,11 @@ namespace Scorpio {
     }
     public abstract class ScriptObject : IPool {
         protected Script m_Script;
-        public readonly uint Id;
-        public readonly ObjectType ObjectType;                          //类型
 #if SCORPIO_DEBUG
         public string Source { get; set; }
 #endif
+        public readonly uint Id;
+        public readonly ObjectType ObjectType;                          //类型
         // 构图函数
         public ScriptObject(Script script, ObjectType objectType) {
             m_Script = script;
@@ -34,7 +34,11 @@ namespace Scorpio {
         public virtual Type Type => GetType();                          //获取类型
         public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
         public Script script => m_Script;
-        public virtual void Alloc() { }
+        public virtual void Alloc() {
+#if SCORPIO_DEBUG
+            Source = null;
+#endif
+        }
         public abstract void Free();
         //循环引用被回收掉
         public abstract void gc();

@@ -147,20 +147,6 @@ namespace Scorpio.Tools {
             mKeys[mSize] = key;
             mValues[mSize++].Set(value);
         }
-        public string[] Keys {
-            get {
-                var keys = new string[mSize];
-                Array.Copy(mKeys, keys, mSize);
-                return keys;
-            }
-        }
-        public ScriptValue[] Values {
-            get {
-                var values = new ScriptValue[mSize];
-                Array.Copy(mValues, values, mSize);
-                return values;
-            }
-        }
         public virtual ScriptValue this[string key] {
             get {
                 for (int i = 0; i < mSize; ++i) {

@@ -144,16 +144,16 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.LoadValueString: {
-                                stackObjects[stackIndex].CopyFrom(stackObjects[stackIndex].GetValue(constString[opvalue], m_script));
+                                stackObjects[stackIndex].CopyFrom(stackObjects[stackIndex].GetValueByString(constString[opvalue], m_script));
                                 continue;
                             }
                             case Opcode.LoadValueObject: {
-                                stackObjects[stackIndex - 1].CopyFrom(stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex], m_script));
+                                stackObjects[stackIndex - 1].CopyFrom(stackObjects[stackIndex - 1].GetValueByScriptValue(stackObjects[stackIndex], m_script));
                                 --stackIndex;
                                 continue;
                             }
                             case Opcode.LoadValueObjectDup: {
-                                stackObjects[stackIndex + 1].CopyFrom(stackObjects[stackIndex - 1].GetValue(stackObjects[stackIndex], m_script));
+                                stackObjects[stackIndex + 1].CopyFrom(stackObjects[stackIndex - 1].GetValueByScriptValue(stackObjects[stackIndex], m_script));
                                 ++stackIndex;
                                 continue;
                             }
@@ -223,7 +223,7 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.StoreValueObjectAssign: {
                                 tempIndex = stackIndex;
-                                stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1], stackObjects[stackIndex]);
+                                stackObjects[stackIndex - 2].SetValueByScriptValue(stackObjects[stackIndex - 1], stackObjects[stackIndex]);
                                 stackObjects[stackIndex -= 2].CopyFrom(stackObjects[tempIndex]);
                                 continue;
                             }
@@ -259,7 +259,7 @@ namespace Scorpio.Runtime {
                                 continue;
                             }
                             case Opcode.StoreValueObject: {
-                                stackObjects[stackIndex - 2].SetValue(stackObjects[stackIndex - 1], stackObjects[stackIndex]);
+                                stackObjects[stackIndex - 2].SetValueByScriptValue(stackObjects[stackIndex - 1], stackObjects[stackIndex]);
                                 stackIndex -= 3;
                                 continue;
                             }

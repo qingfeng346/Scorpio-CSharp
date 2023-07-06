@@ -53,7 +53,7 @@ namespace Scorpio.Userdata
             FieldInfo fInfo = m_Type.GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
             PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
-            if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Type, pInfo);
+            if (pInfo != null) return m_Variables[name] = new UserdataProperty(pInfo);
             return null;
         }
         //添加一个扩展函数

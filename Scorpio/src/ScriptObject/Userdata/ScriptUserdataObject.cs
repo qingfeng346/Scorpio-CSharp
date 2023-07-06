@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Scorpio.Exception;
 using Scorpio.Tools;
 
@@ -59,7 +57,7 @@ namespace Scorpio.Userdata {
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
             var parameters = ScriptValue.Parameters;
             parameters[0] = key;
-            return ScriptValue.CreateValueNoReference(m_Script, func.Call(m_Script, false, m_Value, parameters, 1)); ;
+            return ScriptValue.CreateValueNoReference(m_Script, func.Call(m_Script, false, m_Value, parameters, 1));
         }
         public override void SetValue(double index, ScriptValue value) {
             SetValueInternal(new ScriptValue(index), value);

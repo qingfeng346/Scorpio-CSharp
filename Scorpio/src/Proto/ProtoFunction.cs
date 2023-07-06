@@ -1,3 +1,5 @@
+using System;
+
 namespace Scorpio.Proto {
     public class ProtoFunction {
         public static ScriptType Load(Script script, ScriptType ret) {
@@ -18,12 +20,9 @@ namespace Scorpio.Proto {
         }
         private class call : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var count = length - 1;
-                var pars = new ScriptValue[count];
-                for (var i = 0 ; i < count; ++i) {
-                    pars[i] = args[i + 1];
-                }
-                return thisObject.Call(args[0], pars, count);
+                var thisValue = args[0];
+                Array.Copy(args, 1, args, 0, length - 1);
+                return thisObject.Call(thisValue, args, length - 1);
             }
         }
     }

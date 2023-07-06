@@ -64,7 +64,9 @@ namespace Scorpio {
         }
         internal ScriptValue[] getObjects() { return m_Objects; }
         public override void Alloc() {
+#if SCORPIO_DEBUG
             base.Alloc();
+#endif
             SetPrototypeValue(script.TypeArrayValue);
         }
         public override void Free() {
