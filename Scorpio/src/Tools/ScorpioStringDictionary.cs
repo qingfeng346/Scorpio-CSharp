@@ -37,9 +37,9 @@ namespace Scorpio.Tools {
                 current = default;
             }
         }
-        protected int mSize;
-        protected string[] mKeys;
-        protected ScriptValue[] mValues;
+        public int mSize;
+        public string[] mKeys;
+        public ScriptValue[] mValues;
         public ScorpioStringDictionary() : this(0) { }
         public ScorpioStringDictionary(int capacity) {
             mSize = 0;
@@ -55,7 +55,10 @@ namespace Scorpio.Tools {
             }
         }
         private void SetCapacity_impl(int value) {
-            if (value > 0) {
+            if (value <= 0) {
+                mKeys = STRING_EMPTY;
+                mValues = ScriptValue.EMPTY;
+            } else if (value > mKeys.Length) {
                 var keyArray = new string[value];
                 var valueArray = new ScriptValue[value];
                 if (mSize > 0) {
@@ -64,17 +67,6 @@ namespace Scorpio.Tools {
                 }
                 mKeys = keyArray;
                 mValues = valueArray;
-            } else {
-                mKeys = STRING_EMPTY;
-                mValues = ScriptValue.EMPTY;
-            }
-        }
-        protected void EnsureCapacity(int min) {
-            if (mValues.Length < min) {
-                int num = mValues.Length + 8;
-                if (num > 2146435071) { num = 2146435071; }
-                if (num < min) { num = min; }
-                SetCapacity_impl(num);
             }
         }
         public int Count => mSize;
@@ -120,10 +112,6 @@ namespace Scorpio.Tools {
             Array.Clear(mKeys, 0, mSize);
             mSize = 0;
         }
-        public virtual void TrimCapacity() {
-            if (mSize == mValues.Length) return;
-            SetCapacity(mSize);
-        }
         public virtual bool TryGetValue(string key, out ScriptValue value) {
             for (int i = 0; i < mSize; ++i) {
                 if (mKeys[i] == key) {
@@ -142,7 +130,7 @@ namespace Scorpio.Tools {
                 }
             }
             if (mSize == mValues.Length) {
-                EnsureCapacity(mSize + 1);
+                SetCapacity_impl(mSize + 8);
             }
             mKeys[mSize] = key;
             mValues[mSize++].Set(value);
@@ -164,7 +152,7 @@ namespace Scorpio.Tools {
                     }
                 }
                 if (mSize == mValues.Length) {
-                    EnsureCapacity(mSize + 1);
+                    SetCapacity_impl(mSize + 8);
                 }
                 mKeys[mSize] = key;
                 mValues[mSize++].CopyFrom(value);

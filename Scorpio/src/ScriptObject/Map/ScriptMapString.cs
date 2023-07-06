@@ -62,30 +62,37 @@ namespace Scorpio {
         }
         public override ScriptMap NewCopy() {
             var ret = m_Script.NewMapString();
-            foreach (var pair in m_Values) {
-                ret.SetValue(pair.Key, pair.Value);
+            ret.SetCapacity(m_Values.mSize);
+            for (var i = 0; i < m_Values.mSize; ++i) {
+                ret.m_Values.mKeys[i] = m_Values.mKeys[i];
+                ret.m_Values.mValues[i] = m_Values.mValues[i].Reference();
             }
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
             var ret = m_Script.NewMapString();
+            ret.SetCapacity(m_Values.mSize);
             if (deep) {
-                foreach (var pair in m_Values) {
-                    var value = pair.Value;
+                for (var i = 0; i < m_Values.mSize; ++i) {
+                    var value = m_Values.mValues[i];
                     if (value.valueType == ScriptValue.scriptValueType) {
                         var scriptObject = value.scriptValue;
                         if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
-                            ret.m_Values[pair.Key] = new ScriptValue(scriptObject.Clone(true));
+                            ret.m_Values.mKeys[i] = m_Values.mKeys[i];
+                            ret.m_Values.mValues[i] = new ScriptValue(scriptObject.Clone(true));
                         } else {
-                            ret.SetValue(pair.Key, pair.Value);
+                            ret.m_Values.mKeys[i] = m_Values.mKeys[i];
+                            ret.m_Values.mValues[i] = m_Values.mValues[i].Reference();
                         }
                     } else {
-                        ret.SetValue(pair.Key, pair.Value);
+                        ret.m_Values.mKeys[i] = m_Values.mKeys[i];
+                        ret.m_Values.mValues[i] = m_Values.mValues[i].Reference();
                     }
                 }
             } else {
-                foreach (var pair in m_Values) {
-                    ret.SetValue(pair.Key, pair.Value);
+                for (var i = 0; i < m_Values.mSize; ++i) {
+                    ret.m_Values.mKeys[i] = m_Values.mKeys[i];
+                    ret.m_Values.mValues[i] = m_Values.mValues[i].Reference();
                 }
             }
             return ret;

@@ -45,26 +45,6 @@ namespace Scorpio {
         }
         public override void Free() { }
         public override void gc() { }
-        void SetCapacity(int value) {
-            if (value > 0) {
-                var array = new ScriptValue[value];
-                if (m_Size > 0) {
-                    Array.Copy(m_Objects, 0, array, 0, m_Size);
-                }
-                m_Objects = array;
-            } else {
-                m_Objects = ScriptValue.EMPTY;
-            }
-        }
-        void EnsureCapacity(int min) {
-            if (m_Objects.Length < min) {
-                var num = m_Objects.Length + 128;
-                if (num > 2146435071) { num = 2146435071; }
-                else if (num < min) { num = min; }
-                SetCapacity(num);
-            }
-        }
-
         public int GetIndex(string key) {
             if (m_Indexs.TryGetValue(key, out var value)) {
                 return value;
@@ -82,8 +62,14 @@ namespace Scorpio {
                 SetValueByIndex(index, value);
                 return;
             }
+            if (m_Size == m_Objects.Length) {
+                var array = new ScriptValue[m_Size + 128];
+                if (m_Size > 0) {
+                    Array.Copy(m_Objects, 0, array, 0, m_Size);
+                }
+                m_Objects = array;
+            }
             m_Indexs[string.Intern(key)] = m_Size;
-            EnsureCapacity(m_Size + 1);
             m_Objects[m_Size++].CopyFrom(value);
         }
         public override void SetValueByIndex(int key, ScriptValue value) {
@@ -95,8 +81,14 @@ namespace Scorpio {
                 m_Objects[index].Set(value);
                 return;
             }
+            if (m_Size == m_Objects.Length) {
+                var array = new ScriptValue[m_Size + 128];
+                if (m_Size > 0) {
+                    Array.Copy(m_Objects, 0, array, 0, m_Size);
+                }
+                m_Objects = array;
+            }
             m_Indexs[string.Intern(key)] = m_Size;
-            EnsureCapacity(m_Size + 1);
             m_Objects[m_Size++].Set(value);
         }
 

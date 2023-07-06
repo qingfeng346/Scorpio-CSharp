@@ -113,6 +113,7 @@ namespace Scorpio {
         }
         public override ScriptArray GetValues() {
             var ret = m_Script.NewArray();
+            ret.SetArrayCapacity(m_Objects.Count);
             foreach (var pair in m_Objects) {
                 ret.Add(pair.Value);
             }
@@ -121,7 +122,7 @@ namespace Scorpio {
         public override ScriptMap NewCopy() {
             var ret = m_Script.NewMapObject();
             foreach (var pair in m_Objects) {
-                ret.SetValue(pair.Key, pair.Value);
+                ret.m_Objects[pair.Key] = pair.Value.Reference();
             }
             return ret;
         }
@@ -135,15 +136,15 @@ namespace Scorpio {
                         if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
                             ret.m_Objects[pair.Key] = new ScriptValue(scriptObject.Clone(true));
                         } else {
-                            ret.SetValue(pair.Key, value);
+                            ret.m_Objects[pair.Key] = pair.Value.Reference();
                         }
                     } else {
-                        ret.SetValue(pair.Key, value);
+                        ret.m_Objects[pair.Key] = pair.Value.Reference();
                     }
                 }
             } else {
                 foreach (var pair in m_Objects) {
-                    ret.SetValue(pair.Key, pair.Value);
+                    ret.m_Objects[pair.Key] = pair.Value.Reference();
                 }
             }
             return ret;

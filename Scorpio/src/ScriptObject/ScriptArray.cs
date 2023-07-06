@@ -85,19 +85,19 @@ namespace Scorpio {
             }
         }
         void SetCapacity_impl(int value) {
-            if (value > 0) {
+            if (value <= 0) {
+                m_Objects = ScriptValue.EMPTY;
+            } else if (value > m_Objects.Length) {
                 var array = new ScriptValue[value];
                 if (m_Length > 0) {
                     Array.Copy(m_Objects, 0, array, 0, m_Length);
                 }
                 m_Objects = array;
-            } else {
-                m_Objects = ScriptValue.EMPTY;
             }
         }
         void EnsureCapacity(int min) {
             if (m_Objects.Length < min) {
-                int num = m_Objects.Length + 8;
+                int num = m_Objects.Length + 16;
                 if (num > 2146435071) { num = 2146435071; } else if (num < min) { num = min; }
                 SetCapacity_impl(num);
             }
