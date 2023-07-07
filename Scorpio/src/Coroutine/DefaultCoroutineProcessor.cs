@@ -6,17 +6,16 @@ namespace Scorpio.Coroutine {
             if (coroutine == current) { return; }
             coroutine = current as ICoroutine;
         }
-        public bool MoveNext(out object result) {
+        public bool MoveNext(out ScriptValue result) {
+            result = ScriptValue.Null;
             if (coroutine != null) {
                 if (!coroutine.IsDone) {
-                    result = null;
                     return true;
                 } else {
                     result = coroutine.Result;
                     return false;
                 }
             }
-            result = null;
             return false;
         }
     }

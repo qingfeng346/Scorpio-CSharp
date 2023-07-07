@@ -5,6 +5,6 @@
             Result = result;
         }
         public bool IsDone { get; private set; }
-        public object Result { get; private set; }
+        public ScriptValue Result { get; private set; }
     }
 }

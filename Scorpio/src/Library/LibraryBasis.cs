@@ -153,6 +153,7 @@ namespace Scorpio.Library {
             script.SetGlobal("printf", script.CreateFunction(new printf(script)));
             script.SetGlobal("pairs", script.CreateFunction(new pairs(script)));
             script.SetGlobal("gc", script.CreateFunction(new gc()));
+            script.SetGlobal("clearVariables", script.CreateFunction(new clearVariables()));
 
             script.SetGlobal("isNull", script.CreateFunction(new isNull()));
             script.SetGlobal("isBoolean", script.CreateFunction(new isBoolean()));
@@ -302,6 +303,11 @@ namespace Scorpio.Library {
                 }
                 ScriptContext.AsyncValueQueue.Clear();
                 GC.Collect();
+                return ScriptValue.Null;
+            }
+        }
+        private class clearVariables: ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return ScriptValue.Null;
             }
         }

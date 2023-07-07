@@ -8,7 +8,7 @@ namespace Scorpio.Coroutine {
             this.result = result;
         }
         public bool IsDone => function.Call(ScriptValue.Null).IsTrue;
-        public object Result => result.Call(ScriptValue.Null);
+        public ScriptValue Result => result.Call(ScriptValue.Null);
     }
     internal class CoroutineFuncPoll : ICoroutine {
         private Func<bool> function;
@@ -16,6 +16,6 @@ namespace Scorpio.Coroutine {
             this.function = function;
         }
         public bool IsDone => function();
-        public object Result => null;
+        public ScriptValue Result => ScriptValue.Null;
     }
 }
