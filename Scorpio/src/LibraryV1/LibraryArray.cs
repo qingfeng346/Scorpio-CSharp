@@ -1,7 +1,7 @@
 namespace Scorpio.LibraryV1 {
     public class LibraryArray {
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
+            var map = new ScriptMapStringPooling(script);
             map.SetValue("count", script.CreateFunction(new count()));
             map.SetValue("insert", script.CreateFunction(new insert()));
             map.SetValue("add", script.CreateFunction(new add()));

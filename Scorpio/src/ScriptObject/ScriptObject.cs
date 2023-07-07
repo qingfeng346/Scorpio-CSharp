@@ -1,5 +1,7 @@
 using System;
 using Scorpio.Exception;
+using Scorpio.Tools;
+
 namespace Scorpio {
     public enum ObjectType {
         Type,           //原表
@@ -16,16 +18,16 @@ namespace Scorpio {
     }
     public abstract class ScriptObject {
         private static ScriptValue CommonThisValue = new ScriptValue() { valueType = ScriptValue.scriptValueType };
-
+        protected ObjectType objectType;
         // 构图函数
         public ScriptObject(ObjectType objectType) {
-            ObjectType = objectType;
+            this.objectType = objectType;
         }
-        public ObjectType ObjectType { get; private set; }                              //类型
-        public virtual object Value { get { return this; } }                            //值
-        public virtual Type ValueType { get { return GetType(); } }                     //值类型
-        public virtual Type Type { get { return GetType(); } }                          //获取类型
-        public virtual string ValueTypeName { get { return ObjectType.ToString(); } }   //类型名称
+        public ObjectType ObjectType => objectType;                             //类型
+        public virtual object Value => this;                                    //值
+        public virtual Type ValueType { get { return GetType(); } }             //值类型
+        public virtual Type Type { get { return GetType(); } }                  //获取类型
+        public virtual string ValueTypeName => objectType.ToString();           //类型名称
         public ScriptValue ThisValue { 
             get {
                 CommonThisValue.scriptValue = this;
@@ -72,12 +74,12 @@ namespace Scorpio {
         //调用函数
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             for (var i = 0; i < length; ++i) parameters[i] = ScriptValue.CreateValue(args[i]);
             return Call(thisObject, parameters, length);
         }
         //调用无参函数
-        public ScriptValue CallNoParameters(ScriptValue thisObject) { return Call(thisObject, ScriptValue.EMPTY, 0); }
+        public ScriptValue CallNoParameters(ScriptValue thisObject) { return Call(thisObject, ScorpioUtil.VALUE_EMPTY, 0); }
         //调用函数
         public virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) { throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用"); }
         internal virtual ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) { throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用"); }
@@ -85,13 +87,13 @@ namespace Scorpio {
         internal virtual ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) { return Call(thisObject, parameters, length, baseType); }
         public virtual ScriptObject Clone(bool deep) { return this; }                   // 复制一个变量 是否深层复制
 
-        public bool IsFunction => ObjectType == ObjectType.Function;
-        public bool IsArray => ObjectType == ObjectType.Array;
-        public bool IsMap => ObjectType == ObjectType.Map;
-        public bool IsType => ObjectType == ObjectType.Type;
-        public bool IsInstance => ObjectType == ObjectType.Instance;
-        public bool IsEnum => ObjectType == ObjectType.Enum;
-        public bool IsUserData => ObjectType == ObjectType.UserData;
-        public bool IsStringBuilder => ObjectType == ObjectType.StringBuilder;
+        public bool IsFunction => objectType == ObjectType.Function;
+        public bool IsArray => objectType == ObjectType.Array;
+        public bool IsMap => objectType == ObjectType.Map;
+        public bool IsType => objectType == ObjectType.Type;
+        public bool IsInstance => objectType == ObjectType.Instance;
+        public bool IsEnum => objectType == ObjectType.Enum;
+        public bool IsUserData => objectType == ObjectType.UserData;
+        public bool IsStringBuilder => objectType == ObjectType.StringBuilder;
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using Scorpio.Tools;
-using Scorpio.Userdata;
 using System.Collections.Generic;
 namespace Scorpio {
     public class ScriptNamespace : ScriptObject {
@@ -17,7 +16,7 @@ namespace Scorpio {
                 return value;
             var name = $"{m_Value}.{key}";
             var type = ScorpioTypeManager.LoadType(name);
-            return m_Objects[name] = type == null ? new ScriptValue(new ScriptNamespace(name)) : ScorpioTypeManager.GetUserdataType(type);
+            return m_Objects[key] = type == null ? new ScriptValue(new ScriptNamespace(name)) : ScorpioTypeManager.GetUserdataType(type);
         }
         public override string ToString() {
             return $"Namespace<{m_Value}>";

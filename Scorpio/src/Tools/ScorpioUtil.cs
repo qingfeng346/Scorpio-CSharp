@@ -27,6 +27,11 @@ namespace Scorpio.Tools {
         public static readonly Type TYPE_DECIMAL = typeof (decimal);
         public static readonly Type TYPE_PARAMATTRIBUTE = typeof (ParamArrayAttribute); //不定参属性
         public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof (ExtensionAttribute); //扩展函数属性
+
+        public static readonly ScriptValue[] Parameters = new ScriptValue[128]; //函数调用共用数组
+        public static readonly string[] KEY_EMPTY = new string[0];
+        public static readonly ScriptValue[] VALUE_EMPTY = new ScriptValue[0];
+
         [Conditional("SCORPIO_DEBUG")]
         public static void Assert(this bool condition, string message) {
             if (!condition) throw new ExecutionException(message);

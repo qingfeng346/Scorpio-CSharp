@@ -2,7 +2,7 @@
 namespace Scorpio.LibraryV1 {
     public class LibraryTable {
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
+            var map = new ScriptMapStringPooling(script);
             map.SetValue("count", script.CreateFunction(new count()));
             map.SetValue("clear", script.CreateFunction(new clear()));
             map.SetValue("remove", script.CreateFunction(new remove()));

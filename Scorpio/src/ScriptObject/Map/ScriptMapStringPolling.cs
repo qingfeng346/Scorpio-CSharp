@@ -1,31 +1,23 @@
-using System.Text;
 using System.Collections;
 using System.Collections.Generic;
-using Scorpio.Tools;
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapString : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
-        //数组迭代器
+    public class ScriptMapStringPolling : ScriptMap {
         public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
-            readonly IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
-            internal Enumerator(ScriptMapString map) {
+            private IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
+            internal Enumerator(ScriptMapStringPolling map) {
                 m_Enumerator = map.m_Values.GetEnumerator();
             }
             public bool MoveNext() {
                 return m_Enumerator.MoveNext();
             }
-            public KeyValuePair<object, ScriptValue> Current { 
-                get { 
-                    return new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value); 
-                }
-            }
-            object IEnumerator.Current { get { return m_Enumerator.Current; } }
+            public KeyValuePair<object, ScriptValue> Current => new KeyValuePair<object, ScriptValue>(m_Enumerator.Current.Key, m_Enumerator.Current.Value);
+            object IEnumerator.Current => Current;
             public void Reset() { m_Enumerator.Reset(); }
-            public void Dispose() { m_Enumerator.Dispose(); }
+            public void Dispose() { m_Enumerator.Dispose(); m_Enumerator = null; }
         }
-        public ScriptMapString(Script script) : base(script) { }
+        public ScriptMapStringPolling(Script script) : base(script) { }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
-        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
         public override bool ContainsKey(object key) {
             if (!(key is string)) return false;
             return m_Values.ContainsKey(key as string);
@@ -57,14 +49,14 @@ namespace Scorpio {
             return ret;
         }
         public override ScriptMap NewCopy() {
-            var ret = new ScriptMapString(m_Script);
+            var ret = new ScriptMapStringPolling(m_Script);
             foreach (var pair in m_Values) {
                 ret.m_Values[pair.Key] = pair.Value;
             }
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptMapString(m_Script);
+            var ret = new ScriptMapStringPolling(m_Script);
             if (deep) {
                 foreach (var pair in m_Values) {
                     var value = pair.Value;

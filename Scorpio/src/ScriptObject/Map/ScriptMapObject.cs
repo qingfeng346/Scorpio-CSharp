@@ -1,15 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Library;
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapObject : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
+    public class ScriptMapObject : ScriptMap {
         private Dictionary<object, ScriptValue> m_Objects = new Dictionary<object, ScriptValue>();  //所有的数据(函数和数据都在一个数组)
         public ScriptMapObject(Script script) : base(script) { }
         internal ScriptMapObject(Script script, ScriptValue[] parameters, int length) : base(script) { }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
-
         public override ScriptValue GetValue(string key) {
             return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }

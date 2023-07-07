@@ -12,12 +12,12 @@ using Scorpio.Runtime;
 namespace Scorpio.Library {
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
+            private double m_Index;
             readonly ScriptMap m_ItorResult;
             readonly IEnumerator<ScriptValue> m_Enumerator;
-            double m_Index = 0;
-            public ArrayPairs(ScriptArray array, ScriptMap itorResult) {
+            public ArrayPairs(ScriptMap itorResult, IEnumerator<ScriptValue> enumerator) {
                 m_Index = 0;
-                m_Enumerator = array.GetEnumerator();
+                m_Enumerator = enumerator;
                 m_ItorResult = itorResult;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
@@ -26,6 +26,7 @@ namespace Scorpio.Library {
                     m_ItorResult.SetValue("value", m_Enumerator.Current);
                     return ScriptValue.True;
                 }
+                m_Enumerator.Dispose();
                 return ScriptValue.False;
             }
         }
@@ -48,7 +49,7 @@ namespace Scorpio.Library {
         private class MapStringPairs : ScorpioHandle {
             readonly ScriptMap m_ItorResult;
             readonly IEnumerator<KeyValuePair<object, ScriptValue>> m_Enumerator;
-            public MapStringPairs(ScriptMapString map, ScriptMap itorResult) {
+            public MapStringPairs(ScriptMapStringPolling map, ScriptMap itorResult) {
                 m_Enumerator = map.GetEnumerator();
                 m_ItorResult = itorResult;
             }
@@ -271,13 +272,13 @@ namespace Scorpio.Library {
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
-                var map = new ScriptMapString(m_script);
+                var map = new ScriptMapStringPolling(m_script);
                 if (obj is ScriptArray) {
                     map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs((ScriptArray)obj, map)));
                 } else if (obj is ScriptMapObject) {
                     map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapObjectPairs((ScriptMapObject)obj, map)));
-                } else if (obj is ScriptMapString) {
-                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapStringPairs((ScriptMapString)obj, map)));
+                } else if (obj is ScriptMapStringPolling) {
+                    map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapStringPairs((ScriptMapStringPolling)obj, map)));
                 } else if (obj is ScriptHashSet) {
                     map.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new HashSetPairs((ScriptHashSet)obj, map)));
                 } else if (obj is ScriptUserdata) {
@@ -296,7 +297,7 @@ namespace Scorpio.Library {
         }
         private class gc : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                Array.Clear(ScriptValue.Parameters, 0, ScriptValue.Parameters.Length);
+                Array.Clear(ScorpioUtil.Parameters, 0, ScorpioUtil.Parameters.Length);
                 for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
                     Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
                     Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);

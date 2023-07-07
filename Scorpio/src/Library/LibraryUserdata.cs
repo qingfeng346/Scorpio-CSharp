@@ -2,7 +2,7 @@ using Scorpio.Userdata;
 namespace Scorpio.Library {
     public partial class LibraryUserdata {
         public static void Load(Script script) {
-            var map = new ScriptMapString(script);
+            var map = new ScriptMapStringPooling(script);
             map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf()));
             map.SetValue("isType", script.CreateFunction(new isType()));
             map.SetValue("extend", script.CreateFunction(new extend()));

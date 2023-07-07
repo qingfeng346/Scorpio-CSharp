@@ -1,6 +1,7 @@
 #define EXECUTE_COROUTINE
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using Scorpio.Exception;
 using Scorpio.Function;
 using Scorpio.Instruction;
@@ -10,6 +11,7 @@ namespace Scorpio.Runtime {
     //注意事项:
     //所有调用另一个程序集的地方 都要new一个新的 否则递归调用会相互影响
     public partial class ScriptContext {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #if EXECUTE_COROUTINE && EXECUTE_BASE
         public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, ScriptType baseType) {
 #elif EXECUTE_COROUTINE
@@ -76,7 +78,7 @@ namespace Scorpio.Runtime {
                     stackObjects[++stackIndex] = i >= length ? ScriptValue.Null : args[i];
                 }
             }
-            var parameters = ScriptValue.Parameters; //传递参数
+            var parameters = ScorpioUtil.Parameters; //传递参数
             var iInstruction = 0; //当前执行命令索引
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
             byte tempValueType; //临时存储

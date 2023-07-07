@@ -35,12 +35,12 @@ namespace Scorpio {
                 values.Dispose();
             }
         }
-        private ScriptValue[] m_Objects = ScriptValue.EMPTY;                                //数据
+        private ScriptValue[] m_Objects = ScorpioUtil.VALUE_EMPTY;                                //数据
         private int m_Size = 0;                                                             //有效数据数量
         private Dictionary<string, int> m_Indexs = new Dictionary<string, int>();           //名字到索引的映射
         public ScriptGlobal() : base(ObjectType.Global) { }
         public void Shutdown() {
-            m_Objects = ScriptValue.EMPTY;
+            m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Indexs.Clear();
             m_Size = 0;
         }
@@ -52,7 +52,7 @@ namespace Scorpio {
                 }
                 m_Objects = array;
             } else {
-                m_Objects = ScriptValue.EMPTY;
+                m_Objects = ScorpioUtil.VALUE_EMPTY;
             }
         }
         void EnsureCapacity(int min) {

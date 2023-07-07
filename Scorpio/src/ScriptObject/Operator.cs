@@ -1,3 +1,4 @@
+using Scorpio.Exception;
 namespace Scorpio {
     //运算符重载
     public class ScriptOperator {
@@ -42,8 +43,29 @@ namespace Scorpio {
         public const int GetItemIndex = 15;                             //运算符重载 [] get
         public const int SetItemIndex = 16;                             //运算符重载 [] set
         public const int OperatorCount = 17;
-        
-        
+
+        public static string GetOperatorByIndex(int index) {
+            switch (index) {
+                case PlusIndex: return "+";
+                case MinusIndex: return "-";
+                case MultiplyIndex: return "*";
+                case DivideIndex: return "/";
+                case ModuloIndex: return "%";
+                case InclusiveOrIndex: return "|";
+                case CombineIndex: return "&";
+                case XORIndex: return "^";
+                case ShiIndex: return "<<";
+                case ShrIndex: return ">>";
+                case GreaterIndex: return ">";
+                case GreaterOrEqualIndex: return ">=";
+                case LessIndex: return "<";
+                case LessOrEqualIndex: return "<=";
+                case EqualIndex: return "==";
+                case GetItemIndex: return "[] get";
+                case SetItemIndex: return "[] set";
+                default: throw new ExecutionException($"未知的运算符索引 : {index}");
+            }
+        }
 
         public const string Plus = "op_Addition";                       //运算符重载 +
         public const string Minus = "op_Subtraction";                   //运算符重载 -

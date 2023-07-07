@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Library;
 namespace Scorpio {
@@ -8,7 +9,9 @@ namespace Scorpio {
             m_Script = script;
         }
         public Script getScript() { return m_Script; }
+        public Script script => m_Script;
         public abstract new IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
         public abstract bool ContainsKey(object key);
         public abstract bool ContainsValue(ScriptValue value);
         public abstract int Count();

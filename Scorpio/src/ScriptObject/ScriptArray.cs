@@ -13,9 +13,10 @@ namespace Scorpio {
                 this.func = func;
             }
             public int Compare(ScriptValue o1, ScriptValue o2) {
-                ScriptValue.Parameters[0] = o1;
-                ScriptValue.Parameters[1] = o2;
-                var ret = func.Call(ScriptValue.Null, ScriptValue.Parameters, 2);
+                var parameters = ScorpioUtil.Parameters;
+                parameters[0] = o1;
+                parameters[1] = o2;
+                var ret = func.Call(ScriptValue.Null, parameters, 2);
                 switch (ret.valueType) {
                     case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
                     case ScriptValue.longValueType: return Convert.ToInt32(ret.longValue);
@@ -59,7 +60,7 @@ namespace Scorpio {
         
         public ScriptArray(Script script) : base(ObjectType.Array, script.TypeArray) {
             m_Script = script;
-            m_Objects = ScriptValue.EMPTY;
+            m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Length = 0;
         }
         internal ScriptArray(Script script, ScriptValue[] parameters, int length) : this(script) {
@@ -68,24 +69,25 @@ namespace Scorpio {
             }
         }
         public Script getScript() { return m_Script; }
+        public Script script => m_Script;
         internal ScriptValue[] getObjects() { return m_Objects; }
-        void SetCapacity(int value) {
-            if (value > 0) {
-                var array = new ScriptValue[value];
+        void SetArrayCapacity(int capacity) {
+            if (capacity > m_Length) {
+                var array = new ScriptValue[capacity];
                 if (m_Length > 0) {
                     Array.Copy(m_Objects, 0, array, 0, m_Length);
                 }
                 m_Objects = array;
             } else {
-                m_Objects = ScriptValue.EMPTY;
+                m_Objects = ScorpioUtil.VALUE_EMPTY;
             }
         }
-        void EnsureCapacity(int min) {
-            if (m_Objects.Length < min) {
-                int num = (m_Objects.Length == 0) ? 4 : (m_Objects.Length * 2);
-                if (num > 2146435071) { num = 2146435071; } else if (num < min) { num = min; }
-                SetCapacity(num);
+        void ExpandCapacity() {
+            var array = new ScriptValue[m_Length + 8];
+            if (m_Length > 0) {
+                Array.Copy(m_Objects, 0, array, 0, m_Length);
             }
+            m_Objects = array;
         }
         public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
@@ -116,9 +118,9 @@ namespace Scorpio {
                 return i < m_Length ? m_Objects[i] : ScriptValue.Null;
             }
             set {
-                if (i < 0) throw new ExecutionException($"Array.set[] 索引小于0:{i}");
-                if (i >= m_Length) {
-                    EnsureCapacity(i + 1);
+                if (i < 0 || i > m_Length) throw new ExecutionException($"Array.set[] 索引小于0或超过当前长度:{i}  Length:{m_Length}");
+                if (i == m_Length) {
+                    ExpandCapacity();
                     m_Length = i + 1;
                 }
                 m_Objects[i] = value;
@@ -126,7 +128,7 @@ namespace Scorpio {
         }
         public void Add(ScriptValue value) {
             if (m_Length == m_Objects.Length) {
-                EnsureCapacity(m_Length + 1);
+                ExpandCapacity();
             }
             m_Objects[m_Length++] = value;
         }
@@ -137,14 +139,14 @@ namespace Scorpio {
                 }
             }
             if (m_Length == m_Objects.Length) {
-                EnsureCapacity(m_Length + 1);
+                ExpandCapacity();
             }
             m_Objects[m_Length++] = value;
         }
         public void Insert(int index, ScriptValue value) {
             if (index < 0 || index > m_Length) throw new ExecutionException($"Array.Insert 索引小于0或超过最大值 index:{index} length:{m_Length}");
             if (m_Length == m_Objects.Length) {
-                EnsureCapacity(m_Length + 1);
+                ExpandCapacity();
             }
             Array.Copy(m_Objects, index, m_Objects, index + 1, m_Length - index);
             m_Objects[index] = value;
@@ -187,16 +189,6 @@ namespace Scorpio {
                 }
             }
             return -1;
-        }
-        public void Resize(int length) {
-            if (length < 0)  throw new ExecutionException($"Array.Resize长度小于0:{length}");
-            if (length > m_Length) {
-                EnsureCapacity(length);
-                m_Length = length;
-            } else {
-                Array.Clear(m_Objects, length, m_Length - length);
-                m_Length = length;
-            }
         }
         public void Clear() {
             if (m_Length > 0) {

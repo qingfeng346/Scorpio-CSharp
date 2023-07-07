@@ -4,13 +4,11 @@ using Scorpio.Userdata;
 using Scorpio.Exception;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using Scorpio.Tools;
 
 namespace Scorpio {
     [StructLayout(LayoutKind.Explicit)]
     public struct ScriptValue {
-        private const int ParameterLength = 128; //函数参数最大数量
-        public static ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
-        public static readonly ScriptValue[] EMPTY = new ScriptValue[0];
         public static readonly ScriptValue Null = new ScriptValue();
         public static readonly ScriptValue True = new ScriptValue(true);
         public static readonly ScriptValue False = new ScriptValue(false);
@@ -273,12 +271,12 @@ namespace Scorpio {
         //调用函数
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
-            var parameters = Parameters;
+            var parameters = ScorpioUtil.Parameters;
             for (var i = 0; i < length; ++i) parameters[i] = CreateValue(args[i]);
             return Call(thisObject, parameters, length);
         }
         //调用无参函数
-        public ScriptValue Call(ScriptValue thisObject) { return Call(thisObject, EMPTY, 0); }
+        public ScriptValue Call(ScriptValue thisObject) { return Call(thisObject, ScorpioUtil.VALUE_EMPTY, 0); }
         //调用函数
         public ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             if (valueType == scriptValueType) {
