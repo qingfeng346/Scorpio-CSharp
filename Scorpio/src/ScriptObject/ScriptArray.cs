@@ -13,7 +13,7 @@ namespace Scorpio {
                 this.func = func;
             }
             public int Compare(ScriptValue o1, ScriptValue o2) {
-                var parameters = ScriptValue.Parameters;
+                var parameters = ScorpioUtil.Parameters;
                 parameters[0] = o1;
                 parameters[1] = o2;
                 var ret = func.Call(ScriptValue.Null, parameters, 2);
@@ -60,18 +60,16 @@ namespace Scorpio {
         internal int m_Length;
         
         public ScriptArray(Script script) : base(script, ObjectType.Array) {
-            m_Objects = ScriptValue.EMPTY;
+            m_Objects = ScorpioUtil.VALUE_EMPTY;
         }
         internal ScriptValue[] getObjects() { return m_Objects; }
         public override void Alloc() {
-#if SCORPIO_DEBUG
-            base.Alloc();
-#endif
             SetPrototypeValue(script.TypeArrayValue);
         }
         public override void Free() {
             Release();
             Clear();
+            m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Script.Free(this);
         }
         public override void gc() {
@@ -86,7 +84,7 @@ namespace Scorpio {
         }
         void SetCapacity_impl(int value) {
             if (value <= 0) {
-                m_Objects = ScriptValue.EMPTY;
+                m_Objects = ScorpioUtil.VALUE_EMPTY;
             } else if (value > m_Objects.Length) {
                 var array = new ScriptValue[value];
                 if (m_Length > 0) {

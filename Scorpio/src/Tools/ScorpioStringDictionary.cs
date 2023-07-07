@@ -5,7 +5,6 @@ using Scorpio.Exception;
 
 namespace Scorpio.Tools {
     public class ScorpioStringDictionary : IEnumerable<KeyValuePair<string, ScriptValue>> {
-        public static readonly string[] STRING_EMPTY = new string[0];
         public struct Enumerator : IEnumerator<KeyValuePair<string, ScriptValue>>, IEnumerator {
             private int length;
             private int index;
@@ -40,10 +39,10 @@ namespace Scorpio.Tools {
         public int mSize;
         public string[] mKeys;
         public ScriptValue[] mValues;
-        public ScorpioStringDictionary() : this(0) { }
-        public ScorpioStringDictionary(int capacity) {
+        public ScorpioStringDictionary() {
             mSize = 0;
-            SetCapacity_impl(capacity);
+            mKeys = ScorpioUtil.KEY_EMPTY;
+            mValues = ScorpioUtil.VALUE_EMPTY;
         }
         public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() => new Enumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
@@ -55,19 +54,14 @@ namespace Scorpio.Tools {
             }
         }
         private void SetCapacity_impl(int value) {
-            if (value <= 0) {
-                mKeys = STRING_EMPTY;
-                mValues = ScriptValue.EMPTY;
-            } else if (value > mKeys.Length) {
-                var keyArray = new string[value];
-                var valueArray = new ScriptValue[value];
-                if (mSize > 0) {
-                    Array.Copy(mKeys, 0, keyArray, 0, mSize);
-                    Array.Copy(mValues, 0, valueArray, 0, mSize);
-                }
-                mKeys = keyArray;
-                mValues = valueArray;
+            var keyArray = new string[value];
+            var valueArray = new ScriptValue[value];
+            if (mSize > 0) {
+                Array.Copy(mKeys, 0, keyArray, 0, mSize);
+                Array.Copy(mValues, 0, valueArray, 0, mSize);
             }
+            mKeys = keyArray;
+            mValues = valueArray;
         }
         public int Count => mSize;
         public virtual void Add(string key, ScriptValue value) {
@@ -109,7 +103,8 @@ namespace Scorpio.Tools {
         }
         public virtual void Clear() {
             ScorpioUtil.Free(mValues, mSize);
-            Array.Clear(mKeys, 0, mSize);
+            mValues = ScorpioUtil.VALUE_EMPTY;
+            mKeys = ScorpioUtil.KEY_EMPTY;
             mSize = 0;
         }
         public virtual bool TryGetValue(string key, out ScriptValue value) {
@@ -130,7 +125,14 @@ namespace Scorpio.Tools {
                 }
             }
             if (mSize == mValues.Length) {
-                SetCapacity_impl(mSize + 8);
+                var keyArray = new string[mSize + 8];
+                var valueArray = new ScriptValue[mSize + 8];
+                if (mSize > 0) {
+                    Array.Copy(mKeys, 0, keyArray, 0, mSize);
+                    Array.Copy(mValues, 0, valueArray, 0, mSize);
+                }
+                mKeys = keyArray;
+                mValues = valueArray;
             }
             mKeys[mSize] = key;
             mValues[mSize++].Set(value);
@@ -152,7 +154,14 @@ namespace Scorpio.Tools {
                     }
                 }
                 if (mSize == mValues.Length) {
-                    SetCapacity_impl(mSize + 8);
+                    var keyArray = new string[mSize + 8];
+                    var valueArray = new ScriptValue[mSize + 8];
+                    if (mSize > 0) {
+                        Array.Copy(mKeys, 0, keyArray, 0, mSize);
+                        Array.Copy(mValues, 0, valueArray, 0, mSize);
+                    }
+                    mKeys = keyArray;
+                    mValues = valueArray;
                 }
                 mKeys[mSize] = key;
                 mValues[mSize++].CopyFrom(value);

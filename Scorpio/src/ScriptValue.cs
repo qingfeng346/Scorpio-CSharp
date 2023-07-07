@@ -9,9 +9,6 @@ namespace Scorpio
 {
     [StructLayout(LayoutKind.Explicit, Pack = 2)]
     public struct ScriptValue {
-        private const int ParameterLength = 128; //函数参数最大数量
-        public static readonly ScriptValue[] Parameters = new ScriptValue[ParameterLength]; //函数调用共用数组
-        public static readonly ScriptValue[] EMPTY = new ScriptValue[0];
         public static readonly ScriptValue Null = new ScriptValue();
         public static readonly ScriptValue True = new ScriptValue(true);
         public static readonly ScriptValue False = new ScriptValue(false);
@@ -308,10 +305,10 @@ namespace Scorpio
                     if (userdata != null) {
                         return GetValue(userdata.Value);
                     }
-                    throw new ExecutionException($"不支持当前类型作为变量 : {value.ValueTypeName}");
+                    throw new ExecutionException($"类型[{ValueTypeName}]不支持以下类型作为变量 : {value.ValueTypeName}");
                 }
                 default:
-                    throw new ExecutionException($"不支持当前类型作为变量 : {value.ValueTypeName}");
+                    throw new ExecutionException($"类型[{ValueTypeName}]不支持以下类型作为变量 : {value.ValueTypeName}");
             }
         }
         //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
@@ -463,7 +460,7 @@ namespace Scorpio
         }
         //调用无参函数
         public ScriptValue Call(ScriptValue thisObject) { 
-            return Call(thisObject, EMPTY, 0);
+            return Call(thisObject, ScorpioUtil.VALUE_EMPTY, 0);
         }
         //调用函数
         public ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {

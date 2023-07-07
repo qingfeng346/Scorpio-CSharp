@@ -55,7 +55,7 @@ namespace Scorpio.Userdata {
         private ScriptValue GetValueInternal(ScriptValue key) {
             var func = m_UserdataType.GetOperator(UserdataOperator.GetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] get ]运算符重载");
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = key;
             return ScriptValue.CreateValueNoReference(m_Script, func.Call(m_Script, false, m_Value, parameters, 1));
         }
@@ -71,7 +71,7 @@ namespace Scorpio.Userdata {
         private void SetValueInternal(ScriptValue key, ScriptValue value) {
             var func = m_UserdataType.GetOperator(UserdataOperator.SetItemIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[ [] set ]运算符重载");
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = key;
             parameters[1] = value;
             func.Call(m_Script, false, m_Value, parameters, 2);
@@ -93,7 +93,7 @@ namespace Scorpio.Userdata {
         public override bool Equals(ScriptValue obj) {
             var func = m_UserdataType.GetOperator(UserdataOperator.EqualIndex);
             if (func != null) {
-                var parameters = ScriptValue.Parameters;
+                var parameters = ScorpioUtil.Parameters;
                 parameters[0] = ThisValue;
                 parameters[1] = obj;
                 if (func.CallNoThrow(m_Script, true, null, parameters, 2, out var result)) {
@@ -139,7 +139,7 @@ namespace Scorpio.Userdata {
         bool CallCompare(int operatorIndex, ScriptValue obj) {
             var func = m_UserdataType.GetOperator(operatorIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[{UserdataOperator.GetOperatorByIndex(operatorIndex)}]运算符重载");
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = ThisValue;
             parameters[1] = obj;
             return (bool)func.Call(m_Script, true, null, parameters, 2);
@@ -147,7 +147,7 @@ namespace Scorpio.Userdata {
         ScriptValue CallOperator(int operatorIndex, ScriptValue obj) {
             var func = m_UserdataType.GetOperator(operatorIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[{UserdataOperator.GetOperatorByIndex(operatorIndex)}]运算符重载");
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = ThisValue;
             parameters[1] = obj;
             return ScriptValue.CreateValue(m_Script, func.Call(m_Script, true, null, parameters, 2));

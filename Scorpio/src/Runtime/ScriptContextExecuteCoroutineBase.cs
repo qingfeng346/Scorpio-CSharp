@@ -85,7 +85,7 @@ namespace Scorpio.Runtime {
                 }
             }
             #endregion
-            var parameters = ScriptValue.Parameters; //传递参数
+            var parameters = ScorpioUtil.Parameters; //传递参数
             var iInstruction = 0; //当前执行命令索引
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
             byte tempValueType; //临时存储

@@ -48,7 +48,7 @@ namespace Scorpio {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
-                var ret = get.Get<ScriptFunction>().Call(new ScriptValue(instance, true), ScriptValue.EMPTY, 0);
+                var ret = get.Get<ScriptFunction>().Call(new ScriptValue(instance, true), ScorpioUtil.VALUE_EMPTY, 0);
                 ret.Release();
                 return ret;
             }
@@ -110,7 +110,7 @@ namespace Scorpio {
             if (m_Values.TryGetValue(key, out var value)) {
                 return value;
             } else if (m_GetProperties.Count > 0 && m_GetProperties.TryGetValue(key, out var get)) {
-                var ret = get.Get<ScriptFunction>().Call(new ScriptValue(instance, true), ScriptValue.EMPTY, 0);
+                var ret = get.Get<ScriptFunction>().Call(new ScriptValue(instance, true), ScorpioUtil.VALUE_EMPTY, 0);
                 ret.Release();
                 return ret;
             }

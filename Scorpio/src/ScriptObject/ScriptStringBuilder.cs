@@ -5,7 +5,6 @@ namespace Scorpio {
         public StringBuilder Builder { get; } = new StringBuilder();
         public ScriptStringBuilder(Script script) : base(script, ObjectType.StringBuilder) { }
         public override void Alloc() {
-            base.Alloc();
             SetPrototypeValue(script.TypeStringBuilderValue);
         }
         public override void Free() {

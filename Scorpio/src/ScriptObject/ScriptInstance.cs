@@ -112,7 +112,7 @@ namespace Scorpio {
         }
         public override bool Equals(ScriptValue obj) {
             if (m_Prototype.EqualFunction != null) {
-                var parameters = ScriptValue.Parameters;
+                var parameters = ScorpioUtil.Parameters;
                 parameters[0] = obj;
                 return m_Prototype.EqualFunction.Call(ThisValue, parameters, 1).valueType == ScriptValue.trueValueType;
             }
@@ -121,37 +121,37 @@ namespace Scorpio {
         bool CallCompare(string operatorIndex, ScriptValue obj) {
             var func = m_Prototype.GetValue(operatorIndex).Get<ScriptFunction>();
             if (func == null) throw new ExecutionException($"类型[{ValueTypeName}]不支持 [{operatorIndex}] 运算");
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = obj;
             return func.Call(ThisValue, parameters, 1).valueType == ScriptValue.trueValueType;
         }
         ScriptValue CallOperator(string operatorIndex, ScriptValue obj) {
             var func = m_Prototype.GetValue(operatorIndex).Get<ScriptFunction>();
             if (func == null) throw new ExecutionException($"类型[{ValueTypeName}]不支持 [{operatorIndex}] 运算");
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = obj;
             return func.Call(ThisValue, parameters, 1);
         }
         public ScriptValue Call(ScriptValue parameter1) {
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = parameter1;
             return Call(ScriptValue.Null, parameters, 1);
         }
         public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2) {
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = parameter1;
             parameters[1] = parameter2;
             return Call(ScriptValue.Null, parameters, 2);
         }
         public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2, ScriptValue parameter3) {
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = parameter1;
             parameters[1] = parameter2;
             parameters[2] = parameter3;
             return Call(ScriptValue.Null, parameters, 3);
         }
         public ScriptValue Call(ScriptValue parameter1, ScriptValue parameter2, ScriptValue parameter3, ScriptValue parameter4) {
-            var parameters = ScriptValue.Parameters;
+            var parameters = ScorpioUtil.Parameters;
             parameters[0] = parameter1;
             parameters[1] = parameter2;
             parameters[2] = parameter3;
@@ -169,7 +169,7 @@ namespace Scorpio {
         public override string ToString() {
             var func = m_Prototype.GetValueNoDefault(ScriptOperator.toString).Get<ScriptFunction>();
             if (func == null) return $"Object<{m_Prototype}>";
-            var value = func.Call(ThisValue, ScriptValue.EMPTY, 0);
+            var value = func.Call(ThisValue, ScorpioUtil.VALUE_EMPTY, 0);
             value.Release();
             return value.ToString();
         }

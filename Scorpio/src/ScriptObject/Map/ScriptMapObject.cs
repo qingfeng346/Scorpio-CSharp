@@ -15,8 +15,7 @@ namespace Scorpio {
         public override void Free() {
             Release();
             Clear();
-            if (m_Objects.Count > 512)
-                m_Objects = new Dictionary<object, ScriptValue>();
+            m_Objects = new Dictionary<object, ScriptValue>();
             m_Script.Free(this);
         }
         public override void gc() {

@@ -267,16 +267,11 @@ namespace Scorpio.Library
         }
         private class clearVariables : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var instance = thisObject.Get<ScriptInstance>();
-                if (instance != null) instance.ClearVariables();
+                for (var i = 0; i < length; ++i) {
+                    var instance = args[0].Get<ScriptInstance>();
+                    if (instance != null) instance.ClearVariables();
+                }
                 return ScriptValue.Null;
-                //for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
-                //    Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
-                //    Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
-                //}
-                //ScriptContext.AsyncValueQueue.Clear();
-                //GC.Collect();
-                //return ScriptValue.Null;
             }
         }
 

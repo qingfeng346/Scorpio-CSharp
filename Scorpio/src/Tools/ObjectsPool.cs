@@ -42,6 +42,10 @@ namespace Scorpio.Tools {
             return ret;
         }
         public void Free(T item) {
+#if SCORPIO_DEBUG
+            if (item is ScriptObject)
+                (item as ScriptObject).Source = null;
+#endif
             if (poolLength == pool.Length) {
                 var newPool = new T[poolLength + Stage];
                 Array.Copy(pool, newPool, poolLength);
