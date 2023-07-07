@@ -41,20 +41,24 @@ namespace Scorpio
         public ScriptObject scriptValue => ScriptObjectReference.GetValue(index);
         public bool setBoolValue {
             set {
-                if (valueType == stringValueType) {
-                    StringReference.Free(index);
-                } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                if (valueType > 30) {
+                    if (valueType == stringValueType) {
+                        StringReference.Free(index);
+                    } else if (valueType == scriptValueType) {
+                        ScriptObjectReference.Free(index);
+                    }
                 }
                 valueType = value ? trueValueType : falseValueType;
             }
         }
         public double setDoubleValue {
             set {
-                if (valueType == stringValueType) {
-                    StringReference.Free(index);
-                } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                if (valueType > 30) {
+                    if (valueType == stringValueType) {
+                        StringReference.Free(index);
+                    } else if (valueType == scriptValueType) {
+                        ScriptObjectReference.Free(index);
+                    }
                 }
                 valueType = doubleValueType;
                 doubleValue = value;
@@ -62,102 +66,125 @@ namespace Scorpio
         }
         public long setLongValue {
             set {
-                if (valueType == stringValueType) {
-                    StringReference.Free(index);
-                } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                if (valueType > 30) {
+                    if (valueType == stringValueType) {
+                        StringReference.Free(index);
+                    } else if (valueType == scriptValueType) {
+                        ScriptObjectReference.Free(index);
+                    }
                 }
                 valueType = int64ValueType;
                 longValue = value;
             }
         }
         public void SetNull() {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
             valueType = nullValueType;
         }
         public void SetTrue() {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
             valueType = trueValueType;
         }
         public void SetFalse() {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
             valueType = falseValueType;
         }
         public void SetScriptValue(ScriptObject value) {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
             valueType = scriptValueType;
             index = ScriptObjectReference.Alloc(value);
         }
         public void SetStringValue(string value) {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
             valueType = stringValueType;
             index = StringReference.Alloc(value);
         }
         public void CopyFrom(ScriptValue value) {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
-            valueType = value.valueType;
             longValue = value.longValue;
-            if (valueType == stringValueType) {
-                StringReference.Reference(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Reference(index);
+            if ((valueType = value.valueType) > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Reference(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Reference(index);
+                }
             }
         }
         public void Set(ScriptValue value) {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
             valueType = value.valueType;
             longValue = value.longValue;
         }
         public ScriptValue Reference() {
-            if (valueType == stringValueType) {
-                StringReference.Reference(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Reference(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Reference(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Reference(index);
+                }
             }
             return this;
         }
         //只释放
         public void Release() {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
         }
         //释放并设置为null
         public void Free() {
-            if (valueType == stringValueType) {
-                StringReference.Free(index);
-            } else if (valueType == scriptValueType) {
-                ScriptObjectReference.Free(index);
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Free(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Free(index);
+                }
             }
             valueType = 0;
         }

@@ -1061,7 +1061,24 @@ namespace Scorpio.Runtime {
 #if EXECUTE_COROUTINE
                                 yield break;
 #else
-                                Free(variableObjects, stackObjects, internalValues);
+                                --VariableValueIndex;
+                                for (var i = 0; i < variableObjects.Length; ++i) {
+                                    if (variableObjects[i].valueType > 30)
+                                        variableObjects[i].Free();
+                                }
+                                for (var i = 0; i < stackObjects.Length; ++i) {
+                                    if (stackObjects[i].valueType > 30)
+                                        stackObjects[i].Free();
+                                }
+                                if (internalValues != null) {
+                                    for (var i = 0; i < internalCount; ++i) {
+                                        if (internalValues[i] != null) {
+                                            internalValues[i].Release();
+                                            internalValues[i] = null;
+                                        }
+                                    }
+                                    m_script.Free(internalValues);
+                                }
                                 return ScriptValue.Null;
 #endif
                             }
@@ -1071,7 +1088,24 @@ namespace Scorpio.Runtime {
                                 yield break;
 #else
                                 var ret = stackObjects[stackIndex].Reference();
-                                Free(variableObjects, stackObjects, internalValues);
+                                --VariableValueIndex;
+                                for (var i = 0; i < variableObjects.Length; ++i) {
+                                    if (variableObjects[i].valueType > 30)
+                                        variableObjects[i].Free();
+                                }
+                                for (var i = 0; i < stackObjects.Length; ++i) {
+                                    if (stackObjects[i].valueType > 30)
+                                        stackObjects[i].Free();
+                                }
+                                if (internalValues != null) {
+                                    for (var i = 0; i < internalCount; ++i) {
+                                        if (internalValues[i] != null) {
+                                            internalValues[i].Release();
+                                            internalValues[i] = null;
+                                        }
+                                    }
+                                    m_script.Free(internalValues);
+                                }
                                 return ret;
 #endif
                             }
@@ -1522,7 +1556,24 @@ namespace Scorpio.Runtime {
                         }
                     }
 #if !EXECUTE_COROUTINE
-                    Free(variableObjects, stackObjects, internalValues);
+                    --VariableValueIndex;
+                    for (var i = 0; i < variableObjects.Length; ++i) {
+                        if (variableObjects[i].valueType > 30)
+                            variableObjects[i].Free();
+                    }
+                    for (var i = 0; i < stackObjects.Length; ++i) {
+                        if (stackObjects[i].valueType > 30)
+                            stackObjects[i].Free();
+                    }
+                    if (internalValues != null) {
+                        for (var i = 0; i < internalCount; ++i) {
+                            if (internalValues[i] != null) {
+                                internalValues[i].Release();
+                                internalValues[i] = null;
+                            }
+                        }
+                        m_script.Free(internalValues);
+                    }
 #endif
                     //正常执行命令到最后,判断堆栈是否清空 return 或 exception 不判断
 #if SCORPIO_ASSERT
@@ -1562,13 +1613,52 @@ namespace Scorpio.Runtime {
                         }
                     }
                 } catch (System.Exception) {
-                    Free(variableObjects, stackObjects, internalValues);
+                    --VariableValueIndex;
+                    for (var i = 0; i < variableObjects.Length; ++i) {
+                        if (variableObjects[i].valueType > 30)
+                            variableObjects[i].Free();
+                    }
+                    for (var i = 0; i < stackObjects.Length; ++i) {
+                        if (stackObjects[i].valueType > 30)
+                            stackObjects[i].Free();
+                    }
+                    if (internalValues != null) {
+                        for (var i = 0; i < internalCount; ++i) {
+                            if (internalValues[i] != null) {
+                                internalValues[i].Release();
+                                internalValues[i] = null;
+                            }
+                        }
+                        m_script.Free(internalValues);
+                    }
                     throw;
                 }
                 return ScriptValue.Null;
 #else
             } finally {
-                FreeAsyncValue(asyncValue, internalValues);
+                for (var i = 0; i < asyncValue.stack.Length; ++i) {
+                    if (asyncValue.stack[i].valueType > 30)
+                        asyncValue.stack[i].Free();
+                }
+                for (var i = 0; i < asyncValue.variable.Length; ++i) {
+                    if (asyncValue.variable[i].valueType > 30)
+                        asyncValue.variable[i].Free();
+                }
+                if (internalValues != null) {
+                    for (var i = 0; i < internalCount; ++i) {
+                        if (internalValues[i] != null) {
+                            internalValues[i].Release();
+                            internalValues[i] = null;
+                        }
+                    }
+                    m_script.Free(internalValues);
+                }
+                if (AsyncValuePoolLength == AsyncValuePool.Length) {
+                    var newPool = new AsyncValue[AsyncValuePoolLength + AsyncValueLength];
+                    Array.Copy(AsyncValuePool, newPool, AsyncValuePoolLength);
+                    AsyncValuePool = newPool;
+                }
+                AsyncValuePool[AsyncValuePoolLength++] = asyncValue;
             }
 #endif
         }
