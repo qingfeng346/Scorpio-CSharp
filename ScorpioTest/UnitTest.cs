@@ -53,7 +53,7 @@ namespace ScorpioTest {
                 var script = new Script();
                 script.LoadLibraryV1();
                 script.PushAssembly(typeof(TestClass));
-                script.SetValueNoReference("print", script.CreateFunction(new print(script)));
+                script.SetGlobalNoReference("print", script.CreateFunction(new print(script)));
                 script.LoadFile(file);
                 script.Shutdown();
                 script.ReleaseAll();

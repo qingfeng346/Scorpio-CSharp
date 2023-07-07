@@ -12,7 +12,7 @@ namespace Scorpio.Library
             foreach (var (name, func) in functions) {
                 map.SetValueNoReference(name, script.CreateFunction(func));
             }
-            script.SetValueNoReference("userdata", map);
+            script.SetGlobalNoReference("userdata", map);
         }
         private class fieldTypeOf : ScorpioHandle {
             private Script script;

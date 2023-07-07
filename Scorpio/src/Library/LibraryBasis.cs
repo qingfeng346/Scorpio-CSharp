@@ -91,80 +91,80 @@ namespace Scorpio.Library
             }
         }
         public static void Load(Script script) {
-            script.SetValueNoReference("print", script.CreateFunction(new print(script)));
-            script.SetValueNoReference("printf", script.CreateFunction(new printf(script)));
-            script.SetValueNoReference("pairs", script.CreateFunction(new pairs(script)));
-            script.SetValueNoReference("alloc", script.CreateFunction(new alloc()));
-            script.SetValueNoReference("free", script.CreateFunction(new free()));
-            script.SetValueNoReference("gc", script.CreateFunction(new gc()));
-            script.SetValueNoReference("clearVariables", script.CreateFunction(new clearVariables()));
+            script.SetGlobalNoReference("print", script.CreateFunction(new print(script)));
+            script.SetGlobalNoReference("printf", script.CreateFunction(new printf(script)));
+            script.SetGlobalNoReference("pairs", script.CreateFunction(new pairs(script)));
+            script.SetGlobalNoReference("alloc", script.CreateFunction(new alloc()));
+            script.SetGlobalNoReference("free", script.CreateFunction(new free()));
+            script.SetGlobalNoReference("gc", script.CreateFunction(new gc()));
+            script.SetGlobalNoReference("clearVariables", script.CreateFunction(new clearVariables()));
 
-            script.SetValueNoReference("isNull", script.CreateFunction(new isNull()));
-            script.SetValueNoReference("isBoolean", script.CreateFunction(new isBoolean()));
-            script.SetValueNoReference("isBool", script.CreateFunction(new isBoolean()));
-            script.SetValueNoReference("isNumber", script.CreateFunction(new isNumber()));
-            script.SetValueNoReference("isDouble", script.CreateFunction(new isDouble()));
-            script.SetValueNoReference("isLong", script.CreateFunction(new isLong()));
-            script.SetValueNoReference("isString", script.CreateFunction(new isString()));
-            script.SetValueNoReference("isFunction", script.CreateFunction(new isFunction()));
-            script.SetValueNoReference("isArray", script.CreateFunction(new isArray()));
-            script.SetValueNoReference("isMap", script.CreateFunction(new isMap()));
-            script.SetValueNoReference("isUserdata", script.CreateFunction(new isUserdata()));
-            script.SetValueNoReference("isType", script.CreateFunction(new isType()));
-            script.SetValueNoReference("isInstance", script.CreateFunction(new isInstance()));
+            script.SetGlobalNoReference("isNull", script.CreateFunction(new isNull()));
+            script.SetGlobalNoReference("isBoolean", script.CreateFunction(new isBoolean()));
+            script.SetGlobalNoReference("isBool", script.CreateFunction(new isBoolean()));
+            script.SetGlobalNoReference("isNumber", script.CreateFunction(new isNumber()));
+            script.SetGlobalNoReference("isDouble", script.CreateFunction(new isDouble()));
+            script.SetGlobalNoReference("isLong", script.CreateFunction(new isLong()));
+            script.SetGlobalNoReference("isString", script.CreateFunction(new isString()));
+            script.SetGlobalNoReference("isFunction", script.CreateFunction(new isFunction()));
+            script.SetGlobalNoReference("isArray", script.CreateFunction(new isArray()));
+            script.SetGlobalNoReference("isMap", script.CreateFunction(new isMap()));
+            script.SetGlobalNoReference("isUserdata", script.CreateFunction(new isUserdata()));
+            script.SetGlobalNoReference("isType", script.CreateFunction(new isType()));
+            script.SetGlobalNoReference("isInstance", script.CreateFunction(new isInstance()));
 
-            script.SetValueNoReference("toInt8", script.CreateFunction(new toNumber<sbyte>()));
-            script.SetValueNoReference("toUint8", script.CreateFunction(new toNumber<byte>()));
-            script.SetValueNoReference("toInt16", script.CreateFunction(new toNumber<short>()));
-            script.SetValueNoReference("toUint16", script.CreateFunction(new toNumber<ushort>()));
-            script.SetValueNoReference("toInt32", script.CreateFunction(new toInt32()));
-            script.SetValueNoReference("toUint32", script.CreateFunction(new toNumber<uint>()));
-            script.SetValueNoReference("toInt64", script.CreateFunction(new toInt64()));
-            script.SetValueNoReference("toUint64", script.CreateFunction(new toNumber<ulong>()));
-            script.SetValueNoReference("toFloat32", script.CreateFunction(new toNumber<float>()));
-            script.SetValueNoReference("toFloat64", script.CreateFunction(new toDouble()));
+            script.SetGlobalNoReference("toInt8", script.CreateFunction(new toNumber<sbyte>()));
+            script.SetGlobalNoReference("toUint8", script.CreateFunction(new toNumber<byte>()));
+            script.SetGlobalNoReference("toInt16", script.CreateFunction(new toNumber<short>()));
+            script.SetGlobalNoReference("toUint16", script.CreateFunction(new toNumber<ushort>()));
+            script.SetGlobalNoReference("toInt32", script.CreateFunction(new toInt32()));
+            script.SetGlobalNoReference("toUint32", script.CreateFunction(new toNumber<uint>()));
+            script.SetGlobalNoReference("toInt64", script.CreateFunction(new toInt64()));
+            script.SetGlobalNoReference("toUint64", script.CreateFunction(new toNumber<ulong>()));
+            script.SetGlobalNoReference("toFloat32", script.CreateFunction(new toNumber<float>()));
+            script.SetGlobalNoReference("toFloat64", script.CreateFunction(new toDouble()));
 
-            script.SetValueNoReference("toSbyte", script.CreateFunction(new toNumber<sbyte>()));
-            script.SetValueNoReference("toByte", script.CreateFunction(new toNumber<byte>()));
-            script.SetValueNoReference("toShort", script.CreateFunction(new toNumber<short>()));
-            script.SetValueNoReference("toUshort", script.CreateFunction(new toNumber<ushort>()));
-            script.SetValueNoReference("toInt", script.CreateFunction(new toInt32()));
-            script.SetValueNoReference("toUint", script.CreateFunction(new toNumber<uint>()));
-            script.SetValueNoReference("toLong", script.CreateFunction(new toInt64()));
-            script.SetValueNoReference("toUlong", script.CreateFunction(new toNumber<ulong>()));
-            script.SetValueNoReference("toFloat", script.CreateFunction(new toNumber<float>()));
-            script.SetValueNoReference("toDouble", script.CreateFunction(new toDouble()));
+            script.SetGlobalNoReference("toSbyte", script.CreateFunction(new toNumber<sbyte>()));
+            script.SetGlobalNoReference("toByte", script.CreateFunction(new toNumber<byte>()));
+            script.SetGlobalNoReference("toShort", script.CreateFunction(new toNumber<short>()));
+            script.SetGlobalNoReference("toUshort", script.CreateFunction(new toNumber<ushort>()));
+            script.SetGlobalNoReference("toInt", script.CreateFunction(new toInt32()));
+            script.SetGlobalNoReference("toUint", script.CreateFunction(new toNumber<uint>()));
+            script.SetGlobalNoReference("toLong", script.CreateFunction(new toInt64()));
+            script.SetGlobalNoReference("toUlong", script.CreateFunction(new toNumber<ulong>()));
+            script.SetGlobalNoReference("toFloat", script.CreateFunction(new toNumber<float>()));
+            script.SetGlobalNoReference("toDouble", script.CreateFunction(new toDouble()));
 
-            script.SetValueNoReference("toBool", script.CreateFunction(new toBoolean()));
-            script.SetValueNoReference("toBoolean", script.CreateFunction(new toBoolean()));
-            script.SetValueNoReference("toChar", script.CreateFunction(new toChar()));
-            script.SetValueNoReference("toNumber", script.CreateFunction(new toDouble()));
+            script.SetGlobalNoReference("toBool", script.CreateFunction(new toBoolean()));
+            script.SetGlobalNoReference("toBoolean", script.CreateFunction(new toBoolean()));
+            script.SetGlobalNoReference("toChar", script.CreateFunction(new toChar()));
+            script.SetGlobalNoReference("toNumber", script.CreateFunction(new toDouble()));
 
-            script.SetValueNoReference("toEnum", script.CreateFunction(new toEnum(script)));
-            script.SetValueNoReference("toEnumString", script.CreateFunction(new toEnumString(script)));
-            script.SetValueNoReference("toString", script.CreateFunction(new toString(script)));
+            script.SetGlobalNoReference("toEnum", script.CreateFunction(new toEnum(script)));
+            script.SetGlobalNoReference("toEnumString", script.CreateFunction(new toEnumString(script)));
+            script.SetGlobalNoReference("toString", script.CreateFunction(new toString(script)));
 
-            script.SetValueNoReference("toIndex", script.CreateFunction(new toIndex(script)));
+            script.SetGlobalNoReference("toIndex", script.CreateFunction(new toIndex(script)));
 
-            script.SetValueNoReference("typeOf", script.CreateFunction(new getPrototype(script)));
+            script.SetGlobalNoReference("typeOf", script.CreateFunction(new getPrototype(script)));
             //script.SetGlobal("setPrototype", script.CreateFunction(new setPrototype()));
-            script.SetValueNoReference("getPrototype", script.CreateFunction(new getPrototype(script)));
-            script.SetValueNoReference("setPropertys", script.CreateFunction(new setPropertys()));
-            script.SetValueNoReference("createArray", script.CreateFunction(new createArray()));
-            script.SetValueNoReference("getBase", script.CreateFunction(new getBase()));
-            script.SetValueNoReference("clone", script.CreateFunction(new clone()));
+            script.SetGlobalNoReference("getPrototype", script.CreateFunction(new getPrototype(script)));
+            script.SetGlobalNoReference("setPropertys", script.CreateFunction(new setPropertys()));
+            script.SetGlobalNoReference("createArray", script.CreateFunction(new createArray()));
+            script.SetGlobalNoReference("getBase", script.CreateFunction(new getBase()));
+            script.SetGlobalNoReference("clone", script.CreateFunction(new clone()));
 
-            script.SetValueNoReference("require", script.CreateFunction(new require(script)));
-            script.SetValueNoReference("setFastReflectClass", script.CreateFunction(new setFastReflectClass(script)));
-            script.SetValueNoReference("isFastReflectClass", script.CreateFunction(new isFastReflectClass(script)));
+            script.SetGlobalNoReference("require", script.CreateFunction(new require(script)));
+            script.SetGlobalNoReference("setFastReflectClass", script.CreateFunction(new setFastReflectClass(script)));
+            script.SetGlobalNoReference("isFastReflectClass", script.CreateFunction(new isFastReflectClass(script)));
 
-            script.SetValueNoReference("pushSearch", script.CreateFunction(new pushSearch(script)));
-            script.SetValueNoReference("pushAssembly", script.CreateFunction(new pushAssembly(script)));
-            script.SetValueNoReference("importType", script.CreateFunction(new importType(script)));
-            script.SetValueNoReference("importNamespace", script.CreateFunction(new importNamespace(script)));
-            script.SetValueNoReference("importExtension", script.CreateFunction(new importExtension(script)));
-            script.SetValueNoReference("genericType", script.CreateFunction(new genericType(script)));
-            script.SetValueNoReference("genericMethod", script.CreateFunction(new genericMethod(script)));
+            script.SetGlobalNoReference("pushSearch", script.CreateFunction(new pushSearch(script)));
+            script.SetGlobalNoReference("pushAssembly", script.CreateFunction(new pushAssembly(script)));
+            script.SetGlobalNoReference("importType", script.CreateFunction(new importType(script)));
+            script.SetGlobalNoReference("importNamespace", script.CreateFunction(new importNamespace(script)));
+            script.SetGlobalNoReference("importExtension", script.CreateFunction(new importExtension(script)));
+            script.SetGlobalNoReference("genericType", script.CreateFunction(new genericType(script)));
+            script.SetGlobalNoReference("genericMethod", script.CreateFunction(new genericMethod(script)));
         }
         private class print : ScorpioHandle {
             private Script script;

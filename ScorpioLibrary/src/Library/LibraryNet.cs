@@ -18,7 +18,7 @@ namespace ScorpioLibrary {
             map.SetValueNoReference("urldecode", script.CreateFunction(new urldecode()));
             map.SetValueNoReference("qpencode", script.CreateFunction(new qpencode()));
             map.SetValueNoReference("qpdecode", script.CreateFunction(new qpdecode()));
-            script.SetValueNoReference("net", map);
+            script.SetGlobalNoReference("net", map);
         }
         static HttpWebRequest CreateRequest(string url, string method) {
             //创建 SL/TLS 安全通道

@@ -1,7 +1,7 @@
 ﻿namespace Scorpio.Library {
     public class LibraryType {
         public static void Load(Script script) {
-            script.SetValueNoReference("StringMap", script.CreateFunction(new StringMap(script)));
+            script.SetGlobalNoReference("StringMap", script.CreateFunction(new StringMap(script)));
             //script.SetGlobal("PollingMap", script.CreateFunction(new PollingMap(script)));
         }
         private class StringMap : ScorpioHandle {

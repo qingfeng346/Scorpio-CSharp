@@ -17,8 +17,8 @@ namespace Scorpio.Library {
             foreach (var (name, func) in functions) {
                 map.SetValueNoReference(name, script.CreateFunction(func));
             }
-            script.SetValueNoReference("coroutine", map);
-            script.SetValueNoReference("sleep", script.CreateFunction(new sleep(script)));
+            script.SetGlobalNoReference("coroutine", map);
+            script.SetGlobalNoReference("sleep", script.CreateFunction(new sleep(script)));
         }
         private class start : ScorpioHandle {
             readonly Script script;

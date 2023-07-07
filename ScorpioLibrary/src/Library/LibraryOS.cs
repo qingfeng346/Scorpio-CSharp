@@ -19,7 +19,7 @@ namespace ScorpioLibrary {
             map.SetValueNoReference("setEnvironmentVariable", script.CreateFunction(new setEnvironmentVariable()));
             map.SetValueNoReference("getFolderPath", script.CreateFunction(new getFolderPath()));
             map.SetValueNoReference("process", script.CreateFunction(new process(script)));
-            script.SetValueNoReference("os", map);
+            script.SetGlobalNoReference("os", map);
         }
         private class platform : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {

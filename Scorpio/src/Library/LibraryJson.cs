@@ -10,7 +10,7 @@ namespace Scorpio.Library {
             foreach (var (name, func) in functions) {
                 map.SetValueNoReference(name, script.CreateFunction(func));
             }
-            script.SetValueNoReference("json", map);
+            script.SetGlobalNoReference("json", map);
         }
         private class encode : ScorpioHandle {
             private readonly Script m_Script;

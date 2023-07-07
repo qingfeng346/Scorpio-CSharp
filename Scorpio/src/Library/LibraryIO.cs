@@ -56,7 +56,7 @@ namespace Scorpio.Library {
             foreach (var (name, func) in functions) {
                 map.SetValueNoReference(name, script.CreateFunction(func));
             }
-            script.SetValueNoReference("io", map);
+            script.SetGlobalNoReference("io", map);
         }
         private class unixNow : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

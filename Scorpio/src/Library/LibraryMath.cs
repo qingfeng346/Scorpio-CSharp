@@ -39,7 +39,7 @@ namespace Scorpio.Library {
             map.SetValue("Deg2Rad", new ScriptValue(Deg2Rad));              //角度转弧度 角度*此值=弧度
             map.SetValue("Rad2Deg", new ScriptValue(Rad2Deg));              //弧度转角度 弧度*此值=角度
             map.SetValue("Epsilon", new ScriptValue(Epsilon));              //一个很小的浮点数
-            script.SetValueNoReference("math", map);
+            script.SetGlobalNoReference("math", map);
         }
         private class min : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
