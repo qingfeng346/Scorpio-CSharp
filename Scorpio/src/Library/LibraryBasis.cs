@@ -91,80 +91,80 @@ namespace Scorpio.Library
             }
         }
         public static void Load(Script script) {
-            script.SetGlobal("print", script.CreateFunction(new print(script)));
-            script.SetGlobal("printf", script.CreateFunction(new printf(script)));
-            script.SetGlobal("pairs", script.CreateFunction(new pairs(script)));
-            script.SetGlobal("alloc", script.CreateFunction(new alloc()));
-            script.SetGlobal("free", script.CreateFunction(new free()));
-            script.SetGlobal("gc", script.CreateFunction(new gc()));
-            script.SetGlobal("clearVariables", script.CreateFunction(new clearVariables()));
+            script.SetValueNoReference("print", script.CreateFunction(new print(script)));
+            script.SetValueNoReference("printf", script.CreateFunction(new printf(script)));
+            script.SetValueNoReference("pairs", script.CreateFunction(new pairs(script)));
+            script.SetValueNoReference("alloc", script.CreateFunction(new alloc()));
+            script.SetValueNoReference("free", script.CreateFunction(new free()));
+            script.SetValueNoReference("gc", script.CreateFunction(new gc()));
+            script.SetValueNoReference("clearVariables", script.CreateFunction(new clearVariables()));
 
-            script.SetGlobal("isNull", script.CreateFunction(new isNull()));
-            script.SetGlobal("isBoolean", script.CreateFunction(new isBoolean()));
-            script.SetGlobal("isBool", script.CreateFunction(new isBoolean()));
-            script.SetGlobal("isNumber", script.CreateFunction(new isNumber()));
-            script.SetGlobal("isDouble", script.CreateFunction(new isDouble()));
-            script.SetGlobal("isLong", script.CreateFunction(new isLong()));
-            script.SetGlobal("isString", script.CreateFunction(new isString()));
-            script.SetGlobal("isFunction", script.CreateFunction(new isFunction()));
-            script.SetGlobal("isArray", script.CreateFunction(new isArray()));
-            script.SetGlobal("isMap", script.CreateFunction(new isMap()));
-            script.SetGlobal("isUserdata", script.CreateFunction(new isUserdata()));
-            script.SetGlobal("isType", script.CreateFunction(new isType()));
-            script.SetGlobal("isInstance", script.CreateFunction(new isInstance()));
+            script.SetValueNoReference("isNull", script.CreateFunction(new isNull()));
+            script.SetValueNoReference("isBoolean", script.CreateFunction(new isBoolean()));
+            script.SetValueNoReference("isBool", script.CreateFunction(new isBoolean()));
+            script.SetValueNoReference("isNumber", script.CreateFunction(new isNumber()));
+            script.SetValueNoReference("isDouble", script.CreateFunction(new isDouble()));
+            script.SetValueNoReference("isLong", script.CreateFunction(new isLong()));
+            script.SetValueNoReference("isString", script.CreateFunction(new isString()));
+            script.SetValueNoReference("isFunction", script.CreateFunction(new isFunction()));
+            script.SetValueNoReference("isArray", script.CreateFunction(new isArray()));
+            script.SetValueNoReference("isMap", script.CreateFunction(new isMap()));
+            script.SetValueNoReference("isUserdata", script.CreateFunction(new isUserdata()));
+            script.SetValueNoReference("isType", script.CreateFunction(new isType()));
+            script.SetValueNoReference("isInstance", script.CreateFunction(new isInstance()));
 
-            script.SetGlobal("toInt8", script.CreateFunction(new toNumber<sbyte>()));
-            script.SetGlobal("toUint8", script.CreateFunction(new toNumber<byte>()));
-            script.SetGlobal("toInt16", script.CreateFunction(new toNumber<short>()));
-            script.SetGlobal("toUint16", script.CreateFunction(new toNumber<ushort>()));
-            script.SetGlobal("toInt32", script.CreateFunction(new toInt32()));
-            script.SetGlobal("toUint32", script.CreateFunction(new toNumber<uint>()));
-            script.SetGlobal("toInt64", script.CreateFunction(new toInt64()));
-            script.SetGlobal("toUint64", script.CreateFunction(new toNumber<ulong>()));
-            script.SetGlobal("toFloat32", script.CreateFunction(new toNumber<float>()));
-            script.SetGlobal("toFloat64", script.CreateFunction(new toDouble()));
+            script.SetValueNoReference("toInt8", script.CreateFunction(new toNumber<sbyte>()));
+            script.SetValueNoReference("toUint8", script.CreateFunction(new toNumber<byte>()));
+            script.SetValueNoReference("toInt16", script.CreateFunction(new toNumber<short>()));
+            script.SetValueNoReference("toUint16", script.CreateFunction(new toNumber<ushort>()));
+            script.SetValueNoReference("toInt32", script.CreateFunction(new toInt32()));
+            script.SetValueNoReference("toUint32", script.CreateFunction(new toNumber<uint>()));
+            script.SetValueNoReference("toInt64", script.CreateFunction(new toInt64()));
+            script.SetValueNoReference("toUint64", script.CreateFunction(new toNumber<ulong>()));
+            script.SetValueNoReference("toFloat32", script.CreateFunction(new toNumber<float>()));
+            script.SetValueNoReference("toFloat64", script.CreateFunction(new toDouble()));
 
-            script.SetGlobal("toSbyte", script.CreateFunction(new toNumber<sbyte>()));
-            script.SetGlobal("toByte", script.CreateFunction(new toNumber<byte>()));
-            script.SetGlobal("toShort", script.CreateFunction(new toNumber<short>()));
-            script.SetGlobal("toUshort", script.CreateFunction(new toNumber<ushort>()));
-            script.SetGlobal("toInt", script.CreateFunction(new toInt32()));
-            script.SetGlobal("toUint", script.CreateFunction(new toNumber<uint>()));
-            script.SetGlobal("toLong", script.CreateFunction(new toInt64()));
-            script.SetGlobal("toUlong", script.CreateFunction(new toNumber<ulong>()));
-            script.SetGlobal("toFloat", script.CreateFunction(new toNumber<float>()));
-            script.SetGlobal("toDouble", script.CreateFunction(new toDouble()));
+            script.SetValueNoReference("toSbyte", script.CreateFunction(new toNumber<sbyte>()));
+            script.SetValueNoReference("toByte", script.CreateFunction(new toNumber<byte>()));
+            script.SetValueNoReference("toShort", script.CreateFunction(new toNumber<short>()));
+            script.SetValueNoReference("toUshort", script.CreateFunction(new toNumber<ushort>()));
+            script.SetValueNoReference("toInt", script.CreateFunction(new toInt32()));
+            script.SetValueNoReference("toUint", script.CreateFunction(new toNumber<uint>()));
+            script.SetValueNoReference("toLong", script.CreateFunction(new toInt64()));
+            script.SetValueNoReference("toUlong", script.CreateFunction(new toNumber<ulong>()));
+            script.SetValueNoReference("toFloat", script.CreateFunction(new toNumber<float>()));
+            script.SetValueNoReference("toDouble", script.CreateFunction(new toDouble()));
 
-            script.SetGlobal("toBool", script.CreateFunction(new toBoolean()));
-            script.SetGlobal("toBoolean", script.CreateFunction(new toBoolean()));
-            script.SetGlobal("toChar", script.CreateFunction(new toChar()));
-            script.SetGlobal("toNumber", script.CreateFunction(new toDouble()));
+            script.SetValueNoReference("toBool", script.CreateFunction(new toBoolean()));
+            script.SetValueNoReference("toBoolean", script.CreateFunction(new toBoolean()));
+            script.SetValueNoReference("toChar", script.CreateFunction(new toChar()));
+            script.SetValueNoReference("toNumber", script.CreateFunction(new toDouble()));
 
-            script.SetGlobal("toEnum", script.CreateFunction(new toEnum(script)));
-            script.SetGlobal("toEnumString", script.CreateFunction(new toEnumString(script)));
-            script.SetGlobal("toString", script.CreateFunction(new toString(script)));
+            script.SetValueNoReference("toEnum", script.CreateFunction(new toEnum(script)));
+            script.SetValueNoReference("toEnumString", script.CreateFunction(new toEnumString(script)));
+            script.SetValueNoReference("toString", script.CreateFunction(new toString(script)));
 
-            script.SetGlobal("toIndex", script.CreateFunction(new toIndex(script)));
+            script.SetValueNoReference("toIndex", script.CreateFunction(new toIndex(script)));
 
-            script.SetGlobal("typeOf", script.CreateFunction(new getPrototype(script)));
+            script.SetValueNoReference("typeOf", script.CreateFunction(new getPrototype(script)));
             //script.SetGlobal("setPrototype", script.CreateFunction(new setPrototype()));
-            script.SetGlobal("getPrototype", script.CreateFunction(new getPrototype(script)));
-            script.SetGlobal("setPropertys", script.CreateFunction(new setPropertys()));
-            script.SetGlobal("createArray", script.CreateFunction(new createArray()));
-            script.SetGlobal("getBase", script.CreateFunction(new getBase()));
-            script.SetGlobal("clone", script.CreateFunction(new clone()));
+            script.SetValueNoReference("getPrototype", script.CreateFunction(new getPrototype(script)));
+            script.SetValueNoReference("setPropertys", script.CreateFunction(new setPropertys()));
+            script.SetValueNoReference("createArray", script.CreateFunction(new createArray()));
+            script.SetValueNoReference("getBase", script.CreateFunction(new getBase()));
+            script.SetValueNoReference("clone", script.CreateFunction(new clone()));
 
-            script.SetGlobal("require", script.CreateFunction(new require(script)));
-            script.SetGlobal("setFastReflectClass", script.CreateFunction(new setFastReflectClass(script)));
-            script.SetGlobal("isFastReflectClass", script.CreateFunction(new isFastReflectClass(script)));
+            script.SetValueNoReference("require", script.CreateFunction(new require(script)));
+            script.SetValueNoReference("setFastReflectClass", script.CreateFunction(new setFastReflectClass(script)));
+            script.SetValueNoReference("isFastReflectClass", script.CreateFunction(new isFastReflectClass(script)));
 
-            script.SetGlobal("pushSearch", script.CreateFunction(new pushSearch(script)));
-            script.SetGlobal("pushAssembly", script.CreateFunction(new pushAssembly(script)));
-            script.SetGlobal("importType", script.CreateFunction(new importType(script)));
-            script.SetGlobal("importNamespace", script.CreateFunction(new importNamespace(script)));
-            script.SetGlobal("importExtension", script.CreateFunction(new importExtension(script)));
-            script.SetGlobal("genericType", script.CreateFunction(new genericType(script)));
-            script.SetGlobal("genericMethod", script.CreateFunction(new genericMethod(script)));
+            script.SetValueNoReference("pushSearch", script.CreateFunction(new pushSearch(script)));
+            script.SetValueNoReference("pushAssembly", script.CreateFunction(new pushAssembly(script)));
+            script.SetValueNoReference("importType", script.CreateFunction(new importType(script)));
+            script.SetValueNoReference("importNamespace", script.CreateFunction(new importNamespace(script)));
+            script.SetValueNoReference("importExtension", script.CreateFunction(new importExtension(script)));
+            script.SetValueNoReference("genericType", script.CreateFunction(new genericType(script)));
+            script.SetValueNoReference("genericMethod", script.CreateFunction(new genericMethod(script)));
         }
         private class print : ScorpioHandle {
             private Script script;
@@ -219,19 +219,19 @@ namespace Scorpio.Library
                 var obj = args[0].valueType == ScriptValue.scriptValueType ? args[0].scriptValue : null;
                 var itorResult = m_script.NewMapObject();
                 if (obj is ScriptArray) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, ((ScriptArray)obj).GetEnumerator())));
+                    itorResult.SetValueNoReference(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, ((ScriptArray)obj).GetEnumerator())));
                 } else if (obj is ScriptMap) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapPairs(m_script, itorResult, ((ScriptMap)obj).GetEnumerator())));
+                    itorResult.SetValueNoReference(ScriptConstValue.IteratorNext, m_script.CreateFunction(new MapPairs(m_script, itorResult, ((ScriptMap)obj).GetEnumerator())));
                 } else if (obj is ScriptHashSet) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, ((ScriptHashSet)obj).GetEnumerator())));
+                    itorResult.SetValueNoReference(ScriptConstValue.IteratorNext, m_script.CreateFunction(new ArrayPairs(itorResult, ((ScriptHashSet)obj).GetEnumerator())));
                 } else if (obj is ScriptUserdata) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new UserdataPairs(m_script, itorResult, (ScriptUserdata)obj)));
+                    itorResult.SetValueNoReference(ScriptConstValue.IteratorNext, m_script.CreateFunction(new UserdataPairs(m_script, itorResult, (ScriptUserdata)obj)));
                 } else if (obj is ScriptInstance) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptInstance)obj).GetEnumerator())));
+                    itorResult.SetValueNoReference(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptInstance)obj).GetEnumerator())));
                 } else if (obj is ScriptType) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptType)obj).GetEnumerator())));
+                    itorResult.SetValueNoReference(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptType)obj).GetEnumerator())));
                 } else if (obj is ScriptGlobal) {
-                    itorResult.SetValue(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptGlobal)obj).GetEnumerator())));
+                    itorResult.SetValueNoReference(ScriptConstValue.IteratorNext, m_script.CreateFunction(new StringMapPairs(m_script, itorResult, ((ScriptGlobal)obj).GetEnumerator())));
                 } else {
                     throw new ExecutionException("pairs 必须用于 array, map, type, global 或者 继承 IEnumerable 的 userdata 类型");
                 }

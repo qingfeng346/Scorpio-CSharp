@@ -51,14 +51,14 @@ namespace Scorpio {
             m_Values[key] = value;
         }
         #endregion
+        public void SetValueNoReference(string key, ScriptObject scriptObject) {
+            SetValueNoReference(key, new ScriptValue(scriptObject));
+        }
         public virtual void SetValueNoReference(string key, ScriptValue value) {
             m_Values.SetValue(key, value);
         }
         public virtual void SetValueNoReference(object key, ScriptValue value) {
             throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : {key}");
-        }
-        public void SetValue(string key, ScriptObject scriptObject) {
-            SetValueNoReference(key, new ScriptValue(scriptObject));
         }
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);

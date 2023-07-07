@@ -7,19 +7,19 @@ namespace ScorpioLibrary {
     public class LibraryOS {
         public static void Load(Script script) {
             var map = script.NewMapString();
-            map.SetValue("platform", script.CreateFunction(new platform()));
-            map.SetValue("isWindows", script.CreateFunction(new isWindows()));
-            map.SetValue("isLinux", script.CreateFunction(new isLinux()));
-            map.SetValue("isOSX", script.CreateFunction(new isOSX()));
-            map.SetValue("machineName", script.CreateFunction(new machineName()));
-            map.SetValue("userName", script.CreateFunction(new userName()));
-            map.SetValue("dotnetVersion", script.CreateFunction(new dotnetVersion()));
-            map.SetValue("version", script.CreateFunction(new version()));
-            map.SetValue("getEnvironmentVariable", script.CreateFunction(new getEnvironmentVariable()));
-            map.SetValue("setEnvironmentVariable", script.CreateFunction(new setEnvironmentVariable()));
-            map.SetValue("getFolderPath", script.CreateFunction(new getFolderPath()));
-            map.SetValue("process", script.CreateFunction(new process(script)));
-            script.SetGlobal("os", map);
+            map.SetValueNoReference("platform", script.CreateFunction(new platform()));
+            map.SetValueNoReference("isWindows", script.CreateFunction(new isWindows()));
+            map.SetValueNoReference("isLinux", script.CreateFunction(new isLinux()));
+            map.SetValueNoReference("isOSX", script.CreateFunction(new isOSX()));
+            map.SetValueNoReference("machineName", script.CreateFunction(new machineName()));
+            map.SetValueNoReference("userName", script.CreateFunction(new userName()));
+            map.SetValueNoReference("dotnetVersion", script.CreateFunction(new dotnetVersion()));
+            map.SetValueNoReference("version", script.CreateFunction(new version()));
+            map.SetValueNoReference("getEnvironmentVariable", script.CreateFunction(new getEnvironmentVariable()));
+            map.SetValueNoReference("setEnvironmentVariable", script.CreateFunction(new setEnvironmentVariable()));
+            map.SetValueNoReference("getFolderPath", script.CreateFunction(new getFolderPath()));
+            map.SetValueNoReference("process", script.CreateFunction(new process(script)));
+            script.SetValueNoReference("os", map);
         }
         private class platform : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {

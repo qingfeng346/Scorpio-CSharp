@@ -24,7 +24,7 @@ namespace Scorpio.LibraryV1 {
             //map.SetValue("contains", script.CreateFunction(new contains()));
             //map.SetValue("split", script.CreateFunction(new split(script)));
             //map.SetValue("at", script.CreateFunction(new at()));
-            script.SetGlobal("string", map);
+            script.SetValueNoReference("string", map);
         }
         //private class length : ScorpioHandle {
         //    public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

@@ -54,9 +54,9 @@ namespace Scorpio.Library {
             var map = script.NewMapString();
             map.SetCapacity(functions.Length);
             foreach (var (name, func) in functions) {
-                map.SetValue(name, script.CreateFunction(func));
+                map.SetValueNoReference(name, script.CreateFunction(func));
             }
-            script.SetGlobal("io", map);
+            script.SetValueNoReference("io", map);
         }
         private class unixNow : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

@@ -234,15 +234,17 @@ namespace Scorpio
         /// <summary> 设置一个全局变量 </summary>
         /// <param name="key">名字</param>
         /// <param name="value">值</param>
-        public void SetGlobal(string key, ScriptObject value) {
+        public void SetValueNoReference(string key, ScriptObject value) {
             Global.SetValueNoReference(key, new ScriptValue(value));
-        }
-        public void SetGlobal(string key, ScriptValue value) {
-            Global.SetValue(key, value);
         }
         public void SetGlobalNoReference(string key, ScriptValue value) {
             Global.SetValueNoReference(key, value);
         }
+
+        public void SetGlobal(string key, ScriptValue value) {
+            Global.SetValue(key, value);
+        }
+
 
         /// <summary> 获得一个全局变量 </summary>
         /// <param name="key">名字</param>
@@ -261,7 +263,7 @@ namespace Scorpio
             for (var i = 0; i < args.Length; ++i) {
                 array.AddNoReference(new ScriptValue(args[i]));
             }
-            SetGlobal(GLOBAL_ARGS, array);
+            SetValueNoReference(GLOBAL_ARGS, array);
         }
         /// <summary> 创建一个Function </summary>
         /// <param name="value">ScorpioHandle</param>

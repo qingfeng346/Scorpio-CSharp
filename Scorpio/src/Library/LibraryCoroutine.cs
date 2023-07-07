@@ -15,10 +15,10 @@ namespace Scorpio.Library {
             var map = script.NewMapString();
             map.SetCapacity(functions.Length);
             foreach (var (name, func) in functions) {
-                map.SetValue(name, script.CreateFunction(func));
+                map.SetValueNoReference(name, script.CreateFunction(func));
             }
-            script.SetGlobal("coroutine", map);
-            script.SetGlobal("sleep", script.CreateFunction(new sleep(script)));
+            script.SetValueNoReference("coroutine", map);
+            script.SetValueNoReference("sleep", script.CreateFunction(new sleep(script)));
         }
         private class start : ScorpioHandle {
             readonly Script script;

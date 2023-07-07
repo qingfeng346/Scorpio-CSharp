@@ -10,9 +10,9 @@ namespace Scorpio.Library
             var map = script.NewMapString();
             map.SetCapacity(functions.Length);
             foreach (var (name, func) in functions) {
-                map.SetValue(name, script.CreateFunction(func));
+                map.SetValueNoReference(name, script.CreateFunction(func));
             }
-            script.SetGlobal("userdata", map);
+            script.SetValueNoReference("userdata", map);
         }
         private class fieldTypeOf : ScorpioHandle {
             private Script script;
