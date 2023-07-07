@@ -3,6 +3,8 @@ using System.Collections;
 using Scorpio.Userdata;
 using Scorpio.Exception;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+
 namespace Scorpio {
     [StructLayout(LayoutKind.Explicit)]
     public struct ScriptValue {
@@ -180,6 +182,7 @@ namespace Scorpio {
             }
         }
         //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal ScriptValue GetValue(string key, Script script) {
             switch (valueType) {
                 case scriptValueType:
@@ -204,6 +207,7 @@ namespace Scorpio {
             }
             throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]");
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ScriptValue GetValue(double key) {
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);
@@ -211,6 +215,7 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Double : [{key}]");
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ScriptValue GetValue(long key) {
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);
@@ -218,6 +223,7 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Long : [{key}]");
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ScriptValue GetValue(object key) {
             switch (valueType) {
                 case scriptValueType: return scriptValue.GetValue(key);
@@ -232,6 +238,7 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Index : [{key}]");
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetValue(string key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
@@ -239,6 +246,7 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 String : [{key}]");
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetValue(double key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
@@ -246,6 +254,7 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Double : [{key}]");
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetValue(long key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
@@ -253,6 +262,7 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Long : [{key}]");
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetValue(object key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValue(key, value);
