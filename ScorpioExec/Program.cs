@@ -249,6 +249,7 @@ namespace ScorpioExec
                     script.Shutdown();
                     script.ReleaseAll();
                     script.CheckPool();
+                    script.CheckValuePool();
                     Logger.info ("=============================");
                     Logger.info ("return value : " + ret);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");

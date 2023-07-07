@@ -43,6 +43,10 @@ namespace Scorpio.Tools {
             return ret;
         }
         public void Free(T item) {
+#if SCORPIO_DEBUG
+            if (item is ScriptObject)
+                (item as ScriptObject).Source = null;
+#endif
             if (poolLength == pool.Length) {
                 var newPool = new T[poolLength + Stage];
                 Array.Copy(pool, newPool, poolLength);
@@ -53,7 +57,7 @@ namespace Scorpio.Tools {
         public int Check() {
 #if SCORPIO_DEBUG
             //如果new的数量跟回收的数量不相同则有泄露
-            return count - pool.Length;
+            return count - poolLength;
 #else
             return 0;
 #endif

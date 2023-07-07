@@ -28,9 +28,7 @@ namespace Scorpio.Tools {
         }
         public const int Stage = 8192;
 
-#if SCRIPT_OBJECT
-        public static Dictionary<uint, int> object2index = new Dictionary<uint, int>();
-#else
+#if !SCRIPT_OBJECT
         public static Dictionary<string, int> object2index = new Dictionary<string, int>();
 #endif
         public static int entityLength = 0;
@@ -43,13 +41,17 @@ namespace Scorpio.Tools {
         public static int[] frees = new int[Stage];
         public static int Alloc(EntityValue value) {
 #if SCRIPT_OBJECT
-            if (object2index.TryGetValue(value.Id, out var index)) {
+            if (value.Index > 0) {
+                ++entities[value.Index].referenceCount;
+                return value.Index;
+            }
+            int index;
 #else
             if (object2index.TryGetValue(value, out var index)) {
-#endif
                 ++entities[index].referenceCount;
                 return index;
             }
+#endif
             if (poolLength > 0) {
                 index = pool[--poolLength];
             } else {
@@ -64,7 +66,7 @@ namespace Scorpio.Tools {
 #endif
             }
 #if SCRIPT_OBJECT
-            object2index.Add(value.Id, index);
+            value.Index = index;
 #else
             object2index.Add(value, index);
 #endif
@@ -75,12 +77,16 @@ namespace Scorpio.Tools {
         //获取index,如果是新创建的立刻加入释放列表
         public static int GetIndex(EntityValue value) {
 #if SCRIPT_OBJECT
-            if (object2index.TryGetValue(value.Id, out var index)) {
+            if (value.Index > 0) {
+                ++entities[value.Index].referenceCount;
+                return value.Index;
+            }
+            int index;
 #else
             if (object2index.TryGetValue(value, out var index)) {
-#endif
                 return index;
             }
+#endif
             if (poolLength > 0) {
                 index = pool[--poolLength];
             } else {
@@ -95,7 +101,7 @@ namespace Scorpio.Tools {
 #endif
             }
 #if SCRIPT_OBJECT
-            object2index.Add(value.Id, index);
+            value.Index = index;
 #else
             object2index.Add(value, index);
 #endif
@@ -144,7 +150,7 @@ namespace Scorpio.Tools {
                     entity = entities[index];
                     if (entity.referenceCount == 0) {
 #if SCRIPT_OBJECT
-                        object2index.Remove(entity.value.Id);
+                        entity.value.Index = -1;
                         entity.value.Free();
 #else
                         object2index.Remove(entity.value);
@@ -171,7 +177,9 @@ namespace Scorpio.Tools {
             }
         }
         public static void Shutdown() {
+#if !SCRIPT_OBJECT
             object2index.Clear();
+#endif
             Array.Clear(entities, 0, entityLength);
             entityLength = 0;
             poolLength = 0;

@@ -56,7 +56,7 @@ namespace Scorpio.Tools {
         public int Check() {
 #if SCORPIO_DEBUG
             //如果new的数量跟回收的数量不相同则有泄露
-            return count - pool.Length;
+            return count - poolLength;
 #else
             return 0;
 #endif

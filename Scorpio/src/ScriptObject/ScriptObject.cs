@@ -21,13 +21,12 @@ namespace Scorpio {
 #if SCORPIO_DEBUG
         public string Source { get; set; }
 #endif
-        public readonly uint Id;
+        public int Index = -1;
         public readonly ObjectType ObjectType;                          //类型
         // 构图函数
         public ScriptObject(Script script, ObjectType objectType) {
             m_Script = script;
             ObjectType = objectType;
-            Id = script.NewId;
         }
         public virtual object Value => this;                            //值
         public virtual Type ValueType => GetType();                     //值类型

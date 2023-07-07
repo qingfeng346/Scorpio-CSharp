@@ -409,7 +409,7 @@ namespace Scorpio.Library
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var value = args[0];
                 if (value.valueType == ScriptValue.scriptValueType) {
-                    return new ScriptValue($"{value.scriptValue}  index:{value.index}  id:{value.scriptValue.Id}  count:{ScriptObjectReference.GetReferenceCount(value.index)}");
+                    return new ScriptValue($"{value.scriptValue}  index:{value.index}  id:{value.scriptValue.Index}  count:{ScriptObjectReference.GetReferenceCount(value.index)}");
                 } else if (value.valueType == ScriptValue.stringValueType) {
                     return new ScriptValue($"{value.stringValue}  index:{value.index}  count:{StringReference.GetReferenceCount(value.index)}");
                 } else {
