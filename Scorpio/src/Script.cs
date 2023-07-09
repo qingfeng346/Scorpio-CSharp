@@ -9,7 +9,6 @@ using Scorpio.Function;
 using Scorpio.Library;
 using Scorpio.Runtime;
 using Scorpio.Proto;
-using Scorpio.Userdata;
 using Scorpio.Serialize;
 using Scorpio.Tools;
 using Scorpio.Compile.Compiler;
