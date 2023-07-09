@@ -16,10 +16,10 @@ namespace Scorpio {
                 var parameters = ScorpioUtil.Parameters;
                 parameters[0] = o1;
                 parameters[1] = o2;
-                var ret = func.Call(ScriptValue.Null, parameters, 2);
+                var ret = func.Call(default, parameters, 2);
                 switch (ret.valueType) {
-                    case ScriptValue.doubleValueType: return Convert.ToInt32(ret.doubleValue);
-                    case ScriptValue.longValueType: return Convert.ToInt32(ret.longValue);
+                    case ScriptValue.doubleValueType: return (int)ret.doubleValue;
+                    case ScriptValue.longValueType: return (int)ret.longValue;
                     case ScriptValue.trueValueType: return 1;
                     case ScriptValue.falseValueType: return -1;
                     default: throw new ExecutionException("数组排序返回值必须是Number或Bool类型");
@@ -52,7 +52,10 @@ namespace Scorpio {
                 index = 0;
                 current = default;
             }
-            public void Dispose() { }
+            public void Dispose() {
+                values = null;
+                current = default;
+            }
         }
         private Script m_Script;
         internal ScriptValue[] m_Objects;
@@ -62,6 +65,9 @@ namespace Scorpio {
             m_Script = script;
             m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Length = 0;
+#if SCORPIO_DEBUG
+            Source = script.GetStackInfo().ToString();
+#endif
         }
         internal ScriptArray(Script script, ScriptValue[] parameters, int length) : this(script) {
             for (var i = 0; i < length;++i) {
@@ -164,7 +170,7 @@ namespace Scorpio {
             if (index < 0 || index >= m_Length) throw new ExecutionException($"Array.RemoveAt 索引小于0或超过最大值 index:{index} length:{m_Length}");
             m_Length--;
             Array.Copy(m_Objects, index + 1, m_Objects, index, m_Length - index);
-            m_Objects[m_Length].valueType = ScriptValue.nullValueType;
+            m_Objects[m_Length] = default;
         }
         public bool Contains(ScriptValue obj) {
             for (int i = 0; i < m_Length; ++i) {
@@ -192,7 +198,7 @@ namespace Scorpio {
         }
         public void Clear() {
             if (m_Length > 0) {
-                Array.Clear(m_Objects, 0, m_Length);
+                m_Objects = ScorpioUtil.VALUE_EMPTY;
                 m_Length = 0;
             }
         }
@@ -200,7 +206,7 @@ namespace Scorpio {
             return m_Length;
         }
         public void Sort(ScriptFunction func) {
-            Array.Sort<ScriptValue>(m_Objects, 0, m_Length, new Comparer(func));
+            Array.Sort(m_Objects, 0, m_Length, new Comparer(func));
         }
         public ScriptValue First() {
             return m_Length > 0 ? m_Objects[0] : ScriptValue.Null;
@@ -268,19 +274,18 @@ namespace Scorpio {
             }
             return ret;
         }
-        public ScriptArray NewCopy() {
-            var ret = new ScriptArray(m_Script);
-            ret.m_Objects = new ScriptValue[m_Length];
-            ret.m_Length = m_Length;
+        public ScriptArray NewCopy(int length = 0) {
+            var ret = new ScriptArray(m_Script) {
+                m_Objects = new ScriptValue[m_Length + length],
+                m_Length = m_Length
+            };
             for (int i = 0; i < m_Length; ++i) {
                 ret.m_Objects[i] = m_Objects[i];
             }
             return ret;
         }
         public override string ToString() {
-            using (var serializer = new ScorpioJsonSerializer()) {
-                return serializer.ToJson(this);
-            }
+            return m_Script.ToJson(this);
         }
         internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;

@@ -79,7 +79,7 @@ namespace Scorpio {
             return new ScriptValue(new ScriptInstance(ObjectType.Type, m_Script.TypeObject));
         }
         public override ScriptValue GetValueNoDefault(string key) {
-            return ScriptValue.Null;
+            return default;
         }
         public override ScriptValue GetValue(string key, ScriptInstance instance) {
             if (m_Values.TryGetValue(key, out var value)) {
@@ -87,10 +87,10 @@ namespace Scorpio {
             } else if (m_GetProperties.TryGetValue(key, out var get)) {
                 return get.CallNoParameters(new ScriptValue(instance));
             }
-            return ScriptValue.Null;
+            return default;
         }
         public override ScriptValue GetValue(string key) {
-            return m_Values.TryGetValue(key, out var value) ? value : ScriptValue.Null;
+            return m_Values.TryGetValue(key, out var value) ? value : default;
         }
     }
     //自带基础类型的原表,不支持动态申请,只能已特定形式申请变量, number, string, bool, function 等

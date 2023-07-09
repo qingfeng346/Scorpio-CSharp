@@ -8,7 +8,9 @@ namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         protected ScorpioStringDictionary<ScriptValue> m_Values = new ScorpioStringDictionary<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptType m_Prototype = null;
-        protected ScriptInstance(ObjectType objectType) : base(objectType) { }
+#if SCORPIO_DEBUG
+        public string Source { get; set; }
+#endif
         public ScriptInstance(ObjectType objectType, ScriptType prototype) : base(objectType) {
             m_Prototype = prototype;
         }

@@ -258,6 +258,7 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var array = thisObject.Get<ScriptArray>();
                 var ret = new ScriptArray(array.getScript());
+                ret.SetArrayCapacity(ret.Length());
                 for (var i = array.Length() - 1; i >= 0; --i) {
                     ret.Add(array[i]);
                 }
@@ -313,10 +314,10 @@ namespace Scorpio.Proto {
         }
         private class plus : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var thisArray = thisObject.Get<ScriptArray>().NewCopy();
-                var array = args[0].Get<ScriptArray>();
-                if (array != null) {
-                    foreach (var value in array) {
+                var otherArray = args[0].Get<ScriptArray>();
+                var thisArray = thisObject.Get<ScriptArray>().NewCopy(otherArray != null ? otherArray.Length() : 1);
+                if (otherArray != null) {
+                    foreach (var value in otherArray) {
                         thisArray.Add(value);
                     }
                 } else {

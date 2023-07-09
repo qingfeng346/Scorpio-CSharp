@@ -8,7 +8,6 @@ using Scorpio.Userdata;
 using Scorpio.Tools;
 using System.Reflection;
 using Scorpio.Instruction;
-using Scorpio.Runtime;
 namespace Scorpio.Library {
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle {
@@ -93,7 +92,7 @@ namespace Scorpio.Library {
             script.SetGlobal("print", script.CreateFunction(new print(script)));
             script.SetGlobal("printf", script.CreateFunction(new printf(script)));
             script.SetGlobal("pairs", script.CreateFunction(new pairs(script)));
-            script.SetGlobal("gc", script.CreateFunction(new gc()));
+            script.SetGlobal("gc", script.CreateFunction(new gc(script)));
             script.SetGlobal("clearVariables", script.CreateFunction(new clearVariables()));
 
             script.SetGlobal("isNull", script.CreateFunction(new isNull()));
@@ -234,17 +233,13 @@ namespace Scorpio.Library {
             }
         }
         private class gc : ScorpioHandle {
+            private readonly Script m_script;
+            public gc(Script script) {
+                m_script = script;
+            }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var collect = args.GetArgs(0, length).IsTrue;
-                Array.Clear(ScorpioUtil.Parameters, 0, ScorpioUtil.Parameters.Length);
-                for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
-                    Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
-                    Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
-                }
-                for (var i = 0; i < ScriptContext.AsyncValuePool.Length; ++i) {
-                    Array.Clear(ScriptContext.AsyncValuePool[i].variable, 0, ScriptContext.AsyncValueLength);
-                    Array.Clear(ScriptContext.AsyncValuePool[i].stack, 0, ScriptContext.AsyncValueLength);
-                }
+                m_script.ClearStack();
                 if (collect) GC.Collect();
                 return ScriptValue.Null;
             }

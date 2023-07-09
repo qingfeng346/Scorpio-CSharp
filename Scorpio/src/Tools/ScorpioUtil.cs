@@ -37,10 +37,7 @@ namespace Scorpio.Tools {
         public static readonly bool[] BOOL_EMPTY = new bool[0];
         public static readonly object[] OBJECT_EMPTY = new object[0];
 
-        [Conditional("SCORPIO_DEBUG")]
-        public static void Assert(this bool condition, string message) {
-            if (!condition) throw new ExecutionException(message);
-        }
+
         public static int ReadBytes(this Stream stream, byte[] buffer) {
             int count = buffer.Length;
             int numRead = 0;

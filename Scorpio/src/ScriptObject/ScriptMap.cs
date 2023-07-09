@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
-using Scorpio.Library;
 namespace Scorpio {
     //脚本map类型
     public abstract class ScriptMap : ScriptInstance, IEnumerable<KeyValuePair<object, ScriptValue>> {
         protected Script m_Script;
         public ScriptMap(Script script) : base(ObjectType.Map, script.TypeMap) {
             m_Script = script;
+#if SCORPIO_DEBUG
+            Source = script.GetStackInfo().ToString();
+#endif
         }
         public Script getScript() { return m_Script; }
         public Script script => m_Script;
@@ -21,9 +23,7 @@ namespace Scorpio {
         public abstract ScriptArray GetValues();
         public abstract ScriptMap NewCopy();
         public override string ToString() {
-            using (var serializer = new ScorpioJsonSerializer()) {
-                return serializer.ToJson(this);
-            }
+            return m_Script.ToJson(this);
         }
     }
 }

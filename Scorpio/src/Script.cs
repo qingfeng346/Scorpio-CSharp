@@ -123,13 +123,6 @@ namespace Scorpio {
             LibraryCoroutine.Load(this);
             MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
-        public void Shutdown() {
-            if (IsShutdown) return;
-            IsShutdown = true;
-            m_Global.Shutdown();
-            m_TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = null;
-            m_TypeObjectValue = m_TypeValueBool = m_TypeValueNumber = m_TypeValueString = m_TypeValueArray = m_TypeValueMap = m_TypeValueFunction = m_TypeValueStringBuilder = default;
-        }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
             type = new ScriptTypePrimitive(name, m_TypeObject);
             typeValue = new ScriptValue(type);
@@ -145,6 +138,24 @@ namespace Scorpio {
                 map.SetValue(name, CreateFunction(func));
             }
             SetGlobal(libraryName, new ScriptValue(map)); 
+        }
+        public void Shutdown() {
+            if (IsShutdown) return;
+            IsShutdown = true;
+            m_Global.Shutdown();
+            m_TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = null;
+            m_TypeObjectValue = m_TypeValueBool = m_TypeValueNumber = m_TypeValueString = m_TypeValueArray = m_TypeValueMap = m_TypeValueFunction = m_TypeValueStringBuilder = default;
+        }
+        public void ClearStack() {
+            Array.Clear(ScorpioUtil.Parameters, 0, ScorpioUtil.Parameters.Length);
+            for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
+                Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
+                Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
+            }
+            for (var i = 0; i < ScriptContext.AsyncValuePool.Length; ++i) {
+                Array.Clear(ScriptContext.AsyncValuePool[i].variable, 0, ScriptContext.AsyncValuePool[i].variable.Length);
+                Array.Clear(ScriptContext.AsyncValuePool[i].stack, 0, ScriptContext.AsyncValuePool[i].stack.Length);
+            }
         }
         /// <summary> 压入一个搜索路径,使用 require 时会搜索此路径 </summary>
         /// <param name="path">绝对路径</param>

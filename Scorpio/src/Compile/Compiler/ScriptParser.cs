@@ -726,6 +726,8 @@ namespace Scorpio.Compile.Compiler {
             if (peek.Type == TokenType.LeftBrace) {
                 UndoToken();
             }
+            if (listParameters.Count > 128)
+                throw new ParserException(this, "函数参数超过最大数量128", token);
             BeginExecutable(ExecutableBlock.Function);
             foreach (var par in listParameters) {
                 AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.AddIndex(par), token.SourceLine);

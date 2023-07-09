@@ -19,7 +19,7 @@ namespace Scorpio.Runtime {
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
 #endif
             #region 堆栈和线程判断
-#if SCORPIO_DEBUG
+#if SCORPIO_ASSERT
             //System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
             if (VariableValueIndex < 0 || VariableValueIndex >= ValueCacheLength) {
                 throw new ExecutionException($"Stack overflow : {VariableValueIndex}");
@@ -1831,7 +1831,7 @@ namespace Scorpio.Runtime {
                     --VariableValueIndex;
 #endif
                     //正常执行命令到最后,判断堆栈是否清空 return 或 exception 不判断
-#if SCORPIO_DEBUG
+#if SCORPIO_ASSERT
                     if (stackIndex != -1) {
                         throw new ExecutionException($"堆栈数据未清空,有泄露情况,需要检查指令 : {stackIndex}");
                     }

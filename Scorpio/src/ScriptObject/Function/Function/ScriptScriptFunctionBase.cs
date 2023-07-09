@@ -12,6 +12,15 @@ namespace Scorpio.Function {
         public void SetInternal(int index, InternalValue value) {
             m_internalValues[index] = value;
         }
+#if SCORPIO_DEBUG
+        public ScriptContext Context {
+            get { return m_Context; }
+            set {
+                m_Context = value;
+                m_internalValues = new InternalValue[value.internalCount];
+            }
+        }
+#endif
     }
     public abstract class ScriptScriptBindFunctionBase : ScriptScriptFunctionBase {
         protected ScriptValue m_BindObject;

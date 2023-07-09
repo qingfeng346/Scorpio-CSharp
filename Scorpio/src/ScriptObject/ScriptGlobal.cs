@@ -38,7 +38,7 @@ namespace Scorpio {
         public ScriptGlobal() : base(ObjectType.Global) { }
         public void Shutdown() {
             m_Objects = ScorpioUtil.VALUE_EMPTY;
-            m_Indexs.Clear();
+            m_Indexs = null;
             m_Size = 0;
         }
 
