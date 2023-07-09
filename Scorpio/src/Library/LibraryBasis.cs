@@ -235,13 +235,17 @@ namespace Scorpio.Library {
         }
         private class gc : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var collect = args.GetArgs(0, length).IsTrue;
                 Array.Clear(ScorpioUtil.Parameters, 0, ScorpioUtil.Parameters.Length);
                 for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
                     Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
                     Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
                 }
-                ScriptContext.AsyncValueQueue.Clear();
-                GC.Collect();
+                for (var i = 0; i < ScriptContext.AsyncValuePool.Length; ++i) {
+                    Array.Clear(ScriptContext.AsyncValuePool[i].variable, 0, ScriptContext.AsyncValueLength);
+                    Array.Clear(ScriptContext.AsyncValuePool[i].stack, 0, ScriptContext.AsyncValueLength);
+                }
+                if (collect) GC.Collect();
                 return ScriptValue.Null;
             }
         }

@@ -5,6 +5,7 @@ using Scorpio.Compile.CodeDom;
 using Scorpio.Compile.CodeDom.Temp;
 using Scorpio.Compile.Exception;
 using Scorpio.Instruction;
+using Scorpio.Runtime;
 using Scorpio.Tools;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
@@ -1019,6 +1020,10 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeArray array: {
+                    //一次性申请array最大元素数量
+                    var maxElementCount = ScriptContext.StackValueLength - 20;
+                    if (array.Elements.Count > maxElementCount)
+                        throw new ParserException(this, $"一次性申请Array变量不能超过{maxElementCount}个,可是使用add或+代替:{array.Elements.Count}", PeekToken());
                     foreach (var ele in array.Elements) {
                         PushObject(ele);
                     }
