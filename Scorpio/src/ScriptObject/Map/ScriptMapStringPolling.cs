@@ -17,6 +17,9 @@ namespace Scorpio {
             public void Dispose() { m_Enumerator.Dispose(); m_Enumerator = null; }
         }
         public ScriptMapStringPolling(Script script) : base(script) { }
+        public ScriptMapStringPolling(Script script, int capacity) : base(script) {
+            SetCapacity(capacity);
+        }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
         public override bool ContainsKey(object key) {
             if (!(key is string)) return false;

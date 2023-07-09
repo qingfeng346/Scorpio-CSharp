@@ -102,7 +102,7 @@ namespace ScorpioLibrary {
                     process.EnableRaisingEvents = true;
                     if (length > 3) Parameters[3].call(ScriptValue.Null, process);
                     process.Start();
-                    var result = script.CreateMap();
+                    var result = new ScriptMapStringPolling(script, 2);
                     result.SetValue("output", new ScriptValue(process.StandardOutput.ReadToEnd()));
                     result.SetValue("exitCode", new ScriptValue((double)process.ExitCode));
                     return new ScriptValue(result);

@@ -18,23 +18,30 @@ namespace Scorpio.Library {
         const string NULL = "null";
 
         const string WHITE_SPACE = " \t\n\r";
-        const string WORD_BREAK = " \t\n\r{}[],:\"";
+        const string WORD_BREAK = " ,:{}[]\"\t\n\r";
 
         private Script m_Script;
         private string m_Buffer;
         private bool m_SupportLong;         //是否支持 数字无[.]解析成long值
+        private bool m_SupportIntern;       //Map的key使用string.Intern
         private int m_Index;
         private int m_Length;
-        public ScorpioJsonDeserializer(Script script, string buffer, bool supportLong) {
+        private StringBuilder m_Builder;
+        public ScorpioJsonDeserializer(Script script) {
             m_Script = script;
-            m_SupportLong = supportLong;
+            m_Builder = new StringBuilder();
+        }
+
+        char Read() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index++]; }
+        char Peek() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index]; }
+        public ScriptValue Parse(string buffer, bool supportLong, bool supportIntern) {
             m_Buffer = buffer;
             m_Index = 0;
             m_Length = buffer.Length;
+            m_SupportLong = supportLong;
+            m_SupportIntern = supportIntern;
+            return ReadObject();
         }
-        char Read() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index++]; }
-        char Peek() { return m_Index == m_Length ? END_CHAR : m_Buffer[m_Index]; }
-        public ScriptValue Parse() { return ReadObject(); }
         char EatWhiteSpace {
             get {
                 while (WHITE_SPACE.IndexOf(Peek()) != -1) {
@@ -48,14 +55,14 @@ namespace Scorpio.Library {
         }
         string NextWord {
             get {
-                var builder = new StringBuilder();
+                m_Builder.Length = 0;
                 while (WORD_BREAK.IndexOf(Peek()) == -1) {
-                    builder.Append(Read());
+                    m_Builder.Append(Read());
                     if (Peek() == END_CHAR) {
-                        return builder.ToString();
+                        return m_Builder.ToString();
                     }
                 }
-                return builder.ToString();
+                return m_Builder.ToString();
             }
         }
         ScriptValue ReadObject() {
@@ -64,7 +71,8 @@ namespace Scorpio.Library {
                 return ScriptValue.Null;
             }
             switch (ch) {
-                case QUOTES: return new ScriptValue(ParseString());
+                case QUOTES:
+                    return new ScriptValue(ParseString());
                 case '0':
                 case '1':
                 case '2':
@@ -78,8 +86,10 @@ namespace Scorpio.Library {
                 case '-':
                     --m_Index;
                     return ParseNumber();
-                case LEFT_BRACE: return ParseMap();
-                case LEFT_BRACKET: return ParseArray();
+                case LEFT_BRACE:
+                    return ParseMap();
+                case LEFT_BRACKET:
+                    return ParseArray();
                 default:
                     --m_Index;
                     var word = NextWord;
@@ -92,7 +102,7 @@ namespace Scorpio.Library {
             }
         }
         string ParseString() {
-            var m_Builder = new StringBuilder();
+            m_Builder.Length = 0;
             while (true) {
                 if (Peek() == -1) {
                     return m_Builder.ToString();
@@ -122,7 +132,7 @@ namespace Scorpio.Library {
                                 for (int i = 0; i < 4; i++) {
                                     hex.Append(Read());
                                 }
-                                m_Builder.Append((char)System.Convert.ToUInt16(hex.ToString(), 16));
+                                m_Builder.Append((char)Convert.ToUInt16(hex.ToString(), 16));
                                 break;
                             }
                         }
@@ -145,17 +155,16 @@ namespace Scorpio.Library {
                 if (m_SupportLong || parsedLong < MinInt || parsedLong > MaxInt) {
                     return new ScriptValue(parsedLong);
                 } else {
-                    return new ScriptValue(System.Convert.ToDouble(parsedLong));
+                    return new ScriptValue((double)parsedLong);
                 }
             }
         }
         ScriptValue ParseMap() {
             var map = new ScriptMapObject(m_Script);
-            var ret = new ScriptValue(map);
             while (true) {
                 var ch = EatWhiteSpace;
                 switch (ch) {
-                    case RIGHT_BRACE: return ret;
+                    case RIGHT_BRACE: return new ScriptValue(map);
                     case COMMA: continue;
                     case END_CHAR:
                         throw new ExecutionException("Json解析, 未找到 map 结尾 [}]");
@@ -164,7 +173,7 @@ namespace Scorpio.Library {
                         if (EatWhiteSpace != ':') {
                             throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                         }
-                        map.SetValue(key, ReadObject());
+                        map.SetValue(m_SupportIntern ? string.Intern(key) : key, ReadObject());
                         break;
                     }
                     case '0':
@@ -183,7 +192,7 @@ namespace Scorpio.Library {
                         if (EatWhiteSpace != ':') {
                             throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                         }
-                        map.SetValue(key, ReadObject());
+                        map.SetValue(key.Value, ReadObject());
                         break;
                     }
                     default: {
@@ -194,11 +203,10 @@ namespace Scorpio.Library {
         }
         ScriptValue ParseArray() {
             var array = new ScriptArray(m_Script);
-            var ret = new ScriptValue(array);
             while (true) {
                 var ch = EatWhiteSpace;
                 switch (ch) {
-                    case RIGHT_BRACKET: return ret;
+                    case RIGHT_BRACKET: return new ScriptValue(array);
                     case COMMA: continue;
                     case END_CHAR:
                         throw new ExecutionException("Json解析, 未找到array结尾 ]");
@@ -211,8 +219,8 @@ namespace Scorpio.Library {
             }
         }
         public void Dispose() {
-            m_Script = null;
             m_Buffer = null;
+            m_Builder.Clear();
         }
     }
     internal class ScorpioJsonSerializer : IDisposable {
@@ -249,9 +257,6 @@ namespace Scorpio.Library {
                     break;
                 case ScriptValue.stringValueType:
                     Serializer(value.stringValue);
-                    break;
-                case ScriptValue.objectValueType:
-                    Serializer(value.objectValue.ToString());
                     break;
                 case ScriptValue.scriptValueType:
                     Serializer(value.scriptValue);
@@ -303,8 +308,8 @@ namespace Scorpio.Library {
             }
         }
         public void Dispose() {
-            m_Builder = null;
-            m_Recurve = null;
+            m_Builder.Clear();
+            m_Recurve.Clear();
         }
     }
 }

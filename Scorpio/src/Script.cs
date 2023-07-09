@@ -13,6 +13,8 @@ using Scorpio.Userdata;
 using Scorpio.Serialize;
 using Scorpio.Tools;
 using Scorpio.Compile.Compiler;
+using System.Runtime.CompilerServices;
+
 namespace Scorpio {
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
@@ -24,13 +26,15 @@ namespace Scorpio {
         /// <summary> 按文本读取时,文本文件的编码 </summary>
         public static Encoding Encoding { get; set; } = Encoding.UTF8;
 
-
         /// <summary> request文件的搜索路径集合 </summary>
         private string[] m_SearchPaths;
         public string[] SearchPaths => m_SearchPaths;
         /// <summary> 所有类型的基类 </summary>
-        public ScriptType TypeObject { get; private set; }
-        public ScriptValue TypeObjectValue { get; private set; }
+        /// <summary> 所有类型的基类 </summary>
+        private ScriptType m_TypeObject;
+        private ScriptValue m_TypeObjectValue;
+        public ScriptType TypeObject => m_TypeObject;
+        public ScriptValue TypeObjectValue => m_TypeObjectValue;
 
         /// <summary> 所有基础类型数据 </summary>
         private ScriptType m_TypeBool, m_TypeNumber, m_TypeString, m_TypeArray, m_TypeMap, m_TypeFunction, m_TypeStringBuilder, m_TypeHashSet;
@@ -67,32 +71,35 @@ namespace Scorpio {
         public ScriptType TypeStringBuilder => m_TypeStringBuilder;
         public ScriptValue TypeStringBuilderValue => m_TypeValueStringBuilder;
 
+        private ScriptGlobal m_Global;
         /// <summary> 全局变量 </summary>
-        public ScriptGlobal Global { get; private set; }
-
+        public ScriptGlobal Global => m_Global;
         public int MainThreadId { get; private set; }
-
+        private ScorpioJsonSerializer m_JsonSerializer;
+        private ScorpioJsonDeserializer m_JsonDeserializer;
+        public bool IsShutdown { get; private set; }
         public Script() {
             m_SearchPaths = new string[0];
-            Global = new ScriptGlobal();
-            
-            TypeObject = new ScriptTypeObject(this, "Object");
-            TypeObjectValue = new ScriptValue(TypeObject);
-            Global.SetValue(TypeObject.TypeName, TypeObjectValue);
+            m_Global = new ScriptGlobal();
+            m_JsonSerializer = new ScorpioJsonSerializer();
+            m_JsonDeserializer = new ScorpioJsonDeserializer(this);
+            m_TypeObject = new ScriptTypeObject(this, "Object");
+            m_TypeObjectValue = new ScriptValue(TypeObject);
+            m_Global.SetValue(m_TypeObject.TypeName, m_TypeObjectValue);
 
             AddPrimitivePrototype("Bool", ref m_TypeBool, ref m_TypeValueBool);
             AddPrimitivePrototype("Number", ref m_TypeNumber, ref m_TypeValueNumber);
             AddPrimitivePrototype("String", ref m_TypeString, ref m_TypeValueString);
             AddPrimitivePrototype("Function", ref m_TypeFunction, ref m_TypeValueFunction);
 
-            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", TypeObject), ref m_TypeValueArray);
-            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", TypeObject), ref m_TypeValueMap);
-            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObject), ref m_TypeValueStringBuilder);
-            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObject), ref m_TypeValueHashSet);
+            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", m_TypeObject), ref m_TypeValueArray);
+            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", m_TypeObject), ref m_TypeValueMap);
+            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", m_TypeObject), ref m_TypeValueStringBuilder);
+            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", m_TypeObject), ref m_TypeValueHashSet);
 
-            Global.SetValue(GLOBAL_NAME, new ScriptValue(Global));
-            Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateValue(this));
-            Global.SetValue(GLOBAL_VERSION, ScriptValue.CreateValue(typeof(Version)));
+            m_Global.SetValue(GLOBAL_NAME, new ScriptValue(m_Global));
+            m_Global.SetValue(GLOBAL_SCRIPT, ScriptValue.CreateValue(this));
+            m_Global.SetValue(GLOBAL_VERSION, ScriptValue.CreateValue(typeof(Version)));
 
             ProtoObject.Load(this, TypeObject);
             ProtoBoolean.Load(this, TypeBoolean);
@@ -118,18 +125,27 @@ namespace Scorpio {
             MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
         public void Shutdown() {
-            Global.Shutdown();
-            TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = null;
-            TypeObjectValue = m_TypeValueBool = m_TypeValueNumber = m_TypeValueString = m_TypeValueArray = m_TypeValueMap = m_TypeValueFunction = m_TypeValueStringBuilder = default;
+            if (IsShutdown) return;
+            IsShutdown = true;
+            m_Global.Shutdown();
+            m_TypeObject = m_TypeBool = m_TypeNumber = m_TypeString = m_TypeArray = m_TypeMap = m_TypeFunction = m_TypeStringBuilder = null;
+            m_TypeObjectValue = m_TypeValueBool = m_TypeValueNumber = m_TypeValueString = m_TypeValueArray = m_TypeValueMap = m_TypeValueFunction = m_TypeValueStringBuilder = default;
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
-            type = new ScriptTypePrimitive(name, TypeObject);
+            type = new ScriptTypePrimitive(name, m_TypeObject);
             typeValue = new ScriptValue(type);
             Global.SetValue(name, typeValue);
         }
         void AddBasicPrototype(ScriptType type, ref ScriptValue typeValue) {
             typeValue = new ScriptValue(type);
-            Global.SetValue(type.TypeName, typeValue);
+            m_Global.SetValue(type.TypeName, typeValue);
+        }
+        public void AddLibrary(string libraryName, (string, ScorpioHandle)[] functions) {
+            var map = new ScriptMapStringPolling(this, functions.Length);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, CreateFunction(func));
+            }
+            SetGlobal(libraryName, new ScriptValue(map)); 
         }
         /// <summary> 压入一个搜索路径,使用 require 时会搜索此路径 </summary>
         /// <param name="path">绝对路径</param>
@@ -159,6 +175,7 @@ namespace Scorpio {
             }
             return null;
         }
+        /// <summary> 压入程序集 </summary>
         public void PushReferencedAssemblies(Assembly assembly) {
             foreach (var assemblyName in assembly.GetReferencedAssemblies ()) {
                 PushAssembly (Assembly.Load (assemblyName));
@@ -192,48 +209,30 @@ namespace Scorpio {
         /// <param name="key">名字</param>
         /// <param name="value">值</param>
         public void SetGlobal(string key, ScriptValue value) {
-            Global.SetValue(key, value);
+            m_Global.SetValue(key, value);
         }
         /// <summary> 获得一个全局变量 </summary>
         /// <param name="key">名字</param>
         /// <returns>值</returns>
         public ScriptValue GetGlobal(string key) {
-            return Global.GetValue(key);
+            return m_Global.GetValue(key);
         }
         /// <summary> 是否包含一个全局变量 </summary>
         /// <param name="key">名字</param>
         /// <returns>是否包含</returns>
         public bool HasGlobal(string key) {
-            return Global.HasValue(key);
+            return m_Global.HasValue(key);
         }
         public void SetArgs(string[] args) {
-            var array = CreateArray();
+            var array = new ScriptArray(this);
             for (var i = 0; i < args.Length; ++i) {
                 array.Add(new ScriptValue(args[i]));
             }
-            Global.SetValue(GLOBAL_ARGS, new ScriptValue(array));
+            m_Global.SetValue(GLOBAL_ARGS, new ScriptValue(array));
         }
-        /// <summary> 创建一个空的array </summary>
-        public ScriptArray CreateArray() { return new ScriptArray(this); }
-        /// <summary> 创建一个array </summary>
-        public ScriptArray CreateArray(System.Collections.IEnumerable list) { 
-            var array = new ScriptArray(this);
-            foreach (var item in list) {
-                array.Add(ScriptValue.CreateValue(item));
-            }
-            return array;
-        }
-        /// <summary> 创建一个空的map </summary>
-        public ScriptMap CreateMap() { return new ScriptMapObject(this); }
-        /// <summary> 创建一个类 </summary>
-        /// <param name="typeName">类名</param>
-        /// <param name="parentType">类数据</param>
-        public ScriptType CreateType(string typeName, ScriptType parentType) { return new ScriptType(typeName, parentType); }
         /// <summary> 创建一个Function </summary>
         /// <param name="value">ScorpioHandle</param>
         public ScriptValue CreateFunction(ScorpioHandle value) { return new ScriptValue(new ScriptHandleFunction(this, value)); }
-        /// <summary> 创建一个 Instance </summary>
-        public ScriptInstance CreateInstance() { return new ScriptInstance(ObjectType.Type, TypeObject); }
         /// <summary> 调用一个全局函数 </summary>
         /// <param name="name">函数名</param>
         /// <param name="args">参数</param>
@@ -249,7 +248,7 @@ namespace Scorpio {
         public ScriptValue Call(string name, ScriptValue[] args, int length) {
             return Global.GetValue(name).Call(ScriptValue.Null, args, length);
         }
-
+        #region Load
         /// <summary> 使用字符串方式加载文件 </summary>
         public ScriptValue LoadFileByString(string fileName) {
             return LoadFileByString(fileName, null);
@@ -413,6 +412,52 @@ namespace Scorpio {
             return result;
         }
         #endif
+        #endregion
+        #region Stack
+        private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
+        private StackInfo m_Stack = new StackInfo();
+        private int m_StackLength = 0;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void PushStackInfo(string breviary, int line) {
+            m_StackInfos[m_StackLength].Breviary = breviary;
+            m_StackInfos[m_StackLength++].Line = line;
+            m_Stack.Breviary = breviary;
+            m_Stack.Line = line;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void PopStackInfo() {
+            --m_StackLength;
+        }
+        /// <summary> 最近的堆栈调用 </summary>
+        public StackInfo GetStackInfo() {
+            return m_Stack;
+        }
+        /// <summary> 调用堆栈 </summary>
+        public StackInfo[] GetStackInfos() {
+            var stackInfos = new StackInfo[m_StackLength];
+            for (var i = m_StackLength - 1; i >= 0; --i) {
+                stackInfos[i] = m_StackInfos[i];
+            }
+            return stackInfos;
+        }
+        #endregion
+        #region Json
+        public string ToJson(ScriptValue scriptValue) {
+            using (m_JsonSerializer) {
+                return m_JsonSerializer.ToJson(scriptValue);
+            }
+        }
+        public string ToJson(ScriptObject scriptObject) {
+            using (m_JsonSerializer) {
+                return m_JsonSerializer.ToJson(scriptObject);
+            }
+        }
+        public ScriptValue ParseJson(string buffer, bool supportLong, bool supportIntern) {
+            using (m_JsonDeserializer) {
+                return m_JsonDeserializer.Parse(buffer, supportLong, supportIntern);
+            }
+        }
+        #endregion
         public ScriptConst LoadConst(string fileName) {
             var keys = new HashSet<string>(Global.GetKeys());
             LoadFile(fileName);
@@ -458,30 +503,6 @@ namespace Scorpio {
                 default:
                     throw new ExecutionException($"变量{key}不是基础常量:{value.ValueTypeName}");
             }
-        }
-        private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
-        private StackInfo m_Stack = new StackInfo();
-        private int m_StackLength = 0;
-        internal void PushStackInfo(string breviary, int line) {
-            m_StackInfos[m_StackLength].Breviary = breviary;
-            m_StackInfos[m_StackLength++].Line = line;
-            m_Stack.Breviary = breviary;
-            m_Stack.Line = line;
-        }
-        internal void PopStackInfo() {
-            --m_StackLength;
-        }
-        /// <summary> 最近的堆栈调用 </summary>
-        public StackInfo GetStackInfo() {
-            return m_Stack;
-        }
-        /// <summary> 调用堆栈 </summary>
-        public StackInfo[] GetStackInfos() {
-            var stackInfos = new StackInfo[m_StackLength];
-            for (var i = m_StackLength - 1; i >= 0; --i) {
-                stackInfos[i] = m_StackInfos[i];
-            }
-            return stackInfos;
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Scorpio.Userdata {
             var ret = m_UserdataType.GetValue(null, key);
             if (ret is UserdataMethod) {
                 key = string.Intern(key);
-                return m_Methods[key] = new ScriptValue(new ScriptStaticMethodFunction((UserdataMethod)ret, key));
+                return m_Methods[key] = new ScriptValue(new ScriptStaticMethodFunction((UserdataMethod)ret));
             }
             return ScriptValue.CreateValue(ret);
         }

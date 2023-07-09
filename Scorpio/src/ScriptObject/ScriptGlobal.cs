@@ -1,38 +1,35 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Scorpio.Tools;
 namespace Scorpio {
-    public class ScriptGlobal : ScriptObject, IEnumerable<ScorpioKeyValue<string, ScriptValue>> {
-        public struct Enumerator : IEnumerator<ScorpioKeyValue<string, ScriptValue>> {
-            private IEnumerator<string> keys;
-            private IEnumerator<int> values;
+    public class ScriptGlobal : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
+        public struct Enumerator : IEnumerator<KeyValuePair<string, ScriptValue>> {
+            private IEnumerator<KeyValuePair<string, int>> indexs;
             private ScriptValue[] objects;
-            private ScorpioKeyValue<string, ScriptValue> current;
+            private KeyValuePair<string, ScriptValue> current;
             internal Enumerator(ScriptGlobal global) {
-                this.keys = global.m_Indexs.Keys.GetEnumerator();
-                this.values = global.m_Indexs.Values.GetEnumerator();
-                this.objects = global.m_Objects;
-                this.current = new ScorpioKeyValue<string, ScriptValue>();
+                indexs = global.m_Indexs.GetEnumerator();
+                objects = global.m_Objects;
+                current = default;
             }
             public bool MoveNext() {
-                if (keys.MoveNext()) {
-                    values.MoveNext();
-                    current.Key = keys.Current;
-                    current.Value = objects[values.Current];
+                if (indexs.MoveNext()) {
+                    current = new KeyValuePair<string, ScriptValue>(indexs.Current.Key, objects[indexs.Current.Value]);
                     return true;
                 }
                 return false;
             }
-            public ScorpioKeyValue<string, ScriptValue> Current { get { return current; } }
-            object System.Collections.IEnumerator.Current { get { return current; } }
+            public KeyValuePair<string, ScriptValue> Current => current;
+            object IEnumerator.Current => current;
             public void Reset() {
-                keys.Reset();
-                values.Reset();
+                indexs.Reset();
             }
             public void Dispose() {
-                keys.Dispose();
-                values.Dispose();
+                indexs.Dispose();
+                objects = null;
+                current = default;
             }
         }
         private ScriptValue[] m_Objects = ScorpioUtil.VALUE_EMPTY;                                //数据
@@ -44,25 +41,6 @@ namespace Scorpio {
             m_Indexs.Clear();
             m_Size = 0;
         }
-        void SetCapacity(int value) {
-            if (value > 0) {
-                var array = new ScriptValue[value];
-                if (m_Size > 0) {
-                    Array.Copy(m_Objects, 0, array, 0, m_Size);
-                }
-                m_Objects = array;
-            } else {
-                m_Objects = ScorpioUtil.VALUE_EMPTY;
-            }
-        }
-        void EnsureCapacity(int min) {
-            if (m_Objects.Length < min) {
-                var num = (m_Objects.Length == 0) ? 4 : (m_Objects.Length * 2);
-                if (num > 2146435071) { num = 2146435071; }
-                else if (num < min) { num = min; }
-                SetCapacity(num);
-            }
-        }
 
         public int GetIndex(string key) {
             if (m_Indexs.TryGetValue(key, out var value)) {
@@ -71,17 +49,25 @@ namespace Scorpio {
             SetValue(key, ScriptValue.Null);
             return m_Indexs[key];
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override ScriptValue GetValue(string key) {
-            return m_Indexs.TryGetValue(key, out var index) ? GetValueByIndex(index) : ScriptValue.Null;
+            return m_Indexs.TryGetValue(key, out var index) ? GetValueByIndex(index) : default;
         }
         public override ScriptValue GetValueByIndex(int key) { return m_Objects[key]; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void SetValue(string key, ScriptValue value) {
             if (m_Indexs.TryGetValue(key, out var index)) {
-                SetValueByIndex(index, value);
+                m_Objects[index] = value;
                 return;
             }
+            if (m_Size == m_Objects.Length) {
+                var array = new ScriptValue[m_Size + 128];
+                if (m_Size > 0) {
+                    Array.Copy(m_Objects, 0, array, 0, m_Size);
+                }
+                m_Objects = array;
+            }
             m_Indexs[string.Intern(key)] = m_Size;
-            EnsureCapacity(m_Size + 1);
             m_Objects[m_Size++] = value;
         }
         public override void SetValueByIndex(int key, ScriptValue value) {
@@ -92,7 +78,7 @@ namespace Scorpio {
         }
         public IEnumerable<string> GetKeys() { return m_Indexs.Keys; }
 
-        public IEnumerator<ScorpioKeyValue<string, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
+        public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
         IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
     }
 }

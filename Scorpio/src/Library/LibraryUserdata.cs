@@ -2,11 +2,12 @@ using Scorpio.Userdata;
 namespace Scorpio.Library {
     public partial class LibraryUserdata {
         public static void Load(Script script) {
-            var map = new ScriptMapStringPooling(script);
-            map.SetValue("fieldTypeOf", script.CreateFunction(new fieldTypeOf()));
-            map.SetValue("isType", script.CreateFunction(new isType()));
-            map.SetValue("extend", script.CreateFunction(new extend()));
-            script.SetGlobal("userdata", new ScriptValue(map));
+            var functions = new (string, ScorpioHandle)[] {
+                ("fieldTypeOf", new fieldTypeOf()),
+                ("isType", new isType()),
+                ("extend", new extend()),
+            };
+            script.AddLibrary("userdata", functions);
         }
         private class fieldTypeOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

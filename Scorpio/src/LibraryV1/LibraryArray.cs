@@ -1,26 +1,27 @@
 namespace Scorpio.LibraryV1 {
     public class LibraryArray {
         public static void Load(Script script) {
-            var map = new ScriptMapStringPooling(script);
-            map.SetValue("count", script.CreateFunction(new count()));
-            map.SetValue("insert", script.CreateFunction(new insert()));
-            map.SetValue("add", script.CreateFunction(new add()));
-            map.SetValue("remove", script.CreateFunction(new remove()));
-            map.SetValue("removeat", script.CreateFunction(new removeat()));
-            map.SetValue("clear", script.CreateFunction(new clear()));
-            map.SetValue("contains", script.CreateFunction(new contains()));
-            map.SetValue("sort", script.CreateFunction(new sort()));
-            map.SetValue("indexof", script.CreateFunction(new indexof()));
-            map.SetValue("lastindexof", script.CreateFunction(new lastindexof()));
-            map.SetValue("first", script.CreateFunction(new first()));
-            map.SetValue("last", script.CreateFunction(new last()));
-            map.SetValue("pop", script.CreateFunction(new popfirst()));
-            map.SetValue("safepop", script.CreateFunction(new safepopfirst()));
-            map.SetValue("popfirst", script.CreateFunction(new popfirst()));
-            map.SetValue("safepopfirst", script.CreateFunction(new safepopfirst()));
-            map.SetValue("poplast", script.CreateFunction(new poplast()));
-            map.SetValue("safepoplast", script.CreateFunction(new safepoplast()));
-            script.SetGlobal("array", new ScriptValue(map));
+            var functions = new (string, ScorpioHandle)[] {
+                ("count", new count()),
+                ("insert", new insert()),
+                ("add", new add()),
+                ("remove", new remove()),
+                ("removeat", new removeat()),
+                ("clear", new clear()),
+                ("contains", new contains()),
+                ("sort", new sort()),
+                ("indexof", new indexof()),
+                ("lastindexof", new lastindexof()),
+                ("first", new first()),
+                ("last", new last()),
+                ("pop", new popfirst()),
+                ("safepop", new safepopfirst()),
+                ("popfirst", new popfirst()),
+                ("safepopfirst", new safepopfirst()),
+                ("poplast", new poplast()),
+                ("safepoplast", new safepoplast()),
+            };
+            script.AddLibrary("array", functions);
         }
         private class count : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

@@ -36,7 +36,7 @@ namespace Scorpio {
                 this.length = list.m_Length;
                 this.values = list.m_Objects;
                 this.index = 0;
-                this.current = ScriptValue.Null;
+                this.current = default;
             }
             public bool MoveNext() {
                 if (index < length) {
@@ -46,11 +46,11 @@ namespace Scorpio {
                 }
                 return false;
             }
-            public ScriptValue Current { get { return current; } }
-            object System.Collections.IEnumerator.Current { get { return current; } }
+            public ScriptValue Current => current;
+            object System.Collections.IEnumerator.Current => current;
             public void Reset() {
                 index = 0;
-                current = ScriptValue.Null;
+                current = default;
             }
             public void Dispose() { }
         }
@@ -71,7 +71,7 @@ namespace Scorpio {
         public Script getScript() { return m_Script; }
         public Script script => m_Script;
         internal ScriptValue[] getObjects() { return m_Objects; }
-        void SetArrayCapacity(int capacity) {
+        public void SetArrayCapacity(int capacity) {
             if (capacity > m_Length) {
                 var array = new ScriptValue[capacity];
                 if (m_Length > 0) {

@@ -3,26 +3,30 @@ using System;
 namespace Scorpio.LibraryV1 {
     public class LibraryString {
         public static void Load(Script script) {
+            var functions = new (string, ScorpioHandle)[] {
+                ("length", new length()),
+                ("substring", new substring()),
+                ("tolower", new tolower()),
+                ("toupper", new toupper()),
+                ("trim", new trim()),
+                ("replace", new replace()),
+                ("indexof", new indexof()),
+                ("lastindexof", new lastindexof()),
+                ("startswith", new startswith()),
+                ("endswith", new endswith()),
+                ("contains", new contains()),
+                ("split", new split(script)),
+                ("at", new at()),
+            };
+            var map = new ScriptMapStringPolling(script, functions.Length + 4);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             var protoString = script.TypeString;
-            var map = new ScriptMapStringPolling(script);
             map.SetValue("format", protoString.GetValue("format"));
             map.SetValue("cs_format", protoString.GetValue("csFormat"));
             map.SetValue("isnullorempty", protoString.GetValue("isNullOrEmpty"));
             map.SetValue("join", protoString.GetValue("join"));
-
-            map.SetValue("length", script.CreateFunction(new length()));
-            map.SetValue("substring", script.CreateFunction(new substring()));
-            map.SetValue("tolower", script.CreateFunction(new toLower()));
-            map.SetValue("toupper", script.CreateFunction(new toUpper()));
-            map.SetValue("trim", script.CreateFunction(new trim()));
-            map.SetValue("replace", script.CreateFunction(new replace()));
-            map.SetValue("indexof", script.CreateFunction(new indexOf()));
-            map.SetValue("lastindexof", script.CreateFunction(new lastIndexOf()));
-            map.SetValue("startswith", script.CreateFunction(new startsWith()));
-            map.SetValue("endswith", script.CreateFunction(new endsWith()));
-            map.SetValue("contains", script.CreateFunction(new contains()));
-            map.SetValue("split", script.CreateFunction(new split(script)));
-            map.SetValue("at", script.CreateFunction(new at()));
             script.SetGlobal("string", new ScriptValue(map));
         }
         private class length : ScorpioHandle {
@@ -35,12 +39,12 @@ namespace Scorpio.LibraryV1 {
                 return new ScriptValue((double)args[0].stringValue[args[1].ToInt32()]);
             }
         }
-        private class toLower : ScorpioHandle {
+        private class tolower : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(args[0].stringValue.ToLower());
             }
         }
-        private class toUpper : ScorpioHandle {
+        private class toupper : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return new ScriptValue(args[0].stringValue.ToUpper());
             }
@@ -55,7 +59,7 @@ namespace Scorpio.LibraryV1 {
                 return new ScriptValue(args[0].stringValue.Replace(args[1].ToString(), args[2].ToString()));
             }
         }
-        private class indexOf : ScorpioHandle {
+        private class indexof : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (length == 4) {
                     return new ScriptValue((double)args[0].stringValue.IndexOf(args[1].ToString(), args[2].ToInt32(), args[3].ToInt32()));
@@ -66,7 +70,7 @@ namespace Scorpio.LibraryV1 {
                 }
             }
         }
-        private class lastIndexOf : ScorpioHandle {
+        private class lastindexof : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (length == 4) {
                     return new ScriptValue((double)args[0].stringValue.LastIndexOf(args[1].ToString(), args[2].ToInt32(), args[3].ToInt32()));
@@ -77,12 +81,12 @@ namespace Scorpio.LibraryV1 {
                 }
             }
         }
-        private class startsWith : ScorpioHandle {
+        private class startswith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return args[0].stringValue.StartsWith(args[1].ToString()) ? ScriptValue.True : ScriptValue.False;
             }
         }
-        private class endsWith : ScorpioHandle {
+        private class endswith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 return args[0].stringValue.EndsWith(args[1].ToString()) ? ScriptValue.True : ScriptValue.False;
             }

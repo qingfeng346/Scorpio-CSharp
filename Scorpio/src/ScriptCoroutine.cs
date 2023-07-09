@@ -30,12 +30,15 @@ namespace Scorpio {
             m_DelCoroutines.Add(scriptCoroutine);
         }
         public void StopAllCoroutine() {
+            m_AddCoroutines.ForEach(_ => _.Destroy());
+            m_AddCoroutines.Clear();
             m_DelCoroutines.AddRange(m_Coroutines);
         }
         public bool UpdateCoroutine() {
             if (m_DelCoroutines.Count > 0) {
                 var length = m_DelCoroutines.Count;
                 for (var i = 0; i < length; ++i) {
+                    m_DelCoroutines[i].Destroy();
                     m_Coroutines.Remove(m_DelCoroutines[i]);
                 }
                 m_DelCoroutines.Clear();

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio.Coroutine {
     public class ScriptCoroutine {
@@ -18,9 +19,15 @@ namespace Scorpio.Coroutine {
                 Stop();
             }
         }
-        public void Stop() {
+        internal void Destroy() {
             IsDone = true;
-            m_script.Remove(this);
+            var disposable = m_routine as IDisposable;
+            if (disposable != null) disposable.Dispose();
+            m_routine = null;
+            m_processor = null;
+        }
+        public void Stop() {
+            m_script.StopCoroutine(this);
         }
         private bool ProcessIEnumeratorRecursive(IEnumerator enumerator) {
             var root = enumerator;
@@ -36,7 +43,7 @@ namespace Scorpio.Coroutine {
             } else {
                 m_processor.SetCurrent(enumerator.Current);
                 if (!m_processor.MoveNext(out var ret)) {
-                    m_script.CoroutineResult = ScriptValue.CreateValue(ret);
+                    m_script.CoroutineResult = ret;
                     result = enumerator.MoveNext();
                 } else {
                     result = true;

@@ -1,7 +1,5 @@
 using System;
 using System.Reflection;
-using Scorpio.Tools;
-using Scorpio.Exception;
 namespace Scorpio.Userdata {
     //普通反射函数
     public class FunctionDataReflectMethod : FunctionData {

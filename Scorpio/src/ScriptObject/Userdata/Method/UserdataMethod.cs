@@ -37,17 +37,18 @@ namespace Scorpio.Userdata {
             throw new ExecutionException ($"没有找到合适的泛型函数 : {MethodName}");
         }
         public object Call (bool isStatic, object obj, ScriptValue[] parameters, int length) {
+            FunctionData method = null;
             try {
                 //如果obj为null 则调用静态函数
                 var methods = isStatic ? m_StaticMethods : m_Methods;
                 var methodLength = methods.Length;
                 if (methodLength == 1) {
-                    var method = methods[0];
+                    method = methods[0];
                     method.SetArgs(parameters, length);
                     return method.Invoke(obj, parameters);
                 } else {
                     for (var i = 0; i < methodLength; ++i) {
-                        var method = methods[i];
+                        method = methods[i];
                         if (method.CheckNormalType(parameters, length)) {
                             return method.Invoke(obj, parameters);
                         } else if (method.CheckDefaultType(parameters, length)) {
@@ -60,21 +61,24 @@ namespace Scorpio.Userdata {
                 throw new ExecutionException ($"类[{m_Type}] 找不到合适的函数 [{MethodName}] - {parameters.GetParametersString(length)}");
             } catch (System.Exception e) {
                 throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] - {parameters.GetParametersString(length)} : {e}");
+            } finally {
+                Array.Clear(method.Args, 0, method.Args.Length);
             }
         }
         public bool CallNoThrow (bool isStatic, object obj, ScriptValue[] parameters, int length, out object result) {
+            FunctionData method = null;
             try {
                 //如果obj为null 则调用静态函数
                 var methods = isStatic ? m_StaticMethods : m_Methods;
                 var methodLength = methods.Length;
                 if (methodLength == 1) {
-                    var method = methods[0];
+                    method = methods[0];
                     method.SetArgs(parameters, length);
                     result = method.Invoke(obj, parameters);
                     return true;
                 } else {
                     for (var i = 0; i < methodLength; ++i) {
-                        var method = methods[i];
+                        method = methods[i];
                         if (method.CheckNormalType (parameters, length)) {
                             result = method.Invoke (obj, parameters);
                             return true;
@@ -91,6 +95,8 @@ namespace Scorpio.Userdata {
                 return false;
             } catch (System.Exception e) {
                 throw new ExecutionException($"类[{m_Type}] 调用函数出错 [{MethodName}] : {e}");
+            } finally {
+                Array.Clear(method.Args, 0, method.Args.Length);
             }
         }
     }

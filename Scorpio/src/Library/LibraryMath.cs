@@ -7,35 +7,35 @@ namespace Scorpio.Library {
         public const double Rad2Deg = 57.29578;                 //弧度转角度
         public const double Epsilon = 1.401298E-45;             //一个很小的浮点数
         public static void Load(Script script) {
-            var map = new ScriptMapStringPooling(script);
+            var functions = new (string, ScorpioHandle)[] {
+                ("min", new min()),
+                ("max", new max()),
+                ("abs", new abs()),
+                ("floor", new floor()),
+                ("ceil", new ceil()),
+                ("round", new round()),
+                ("clamp", new clamp()),
+                ("sqrt", new sqrt()),
+                ("pow", new pow()),
+                ("log", new log()),
+                ("sin", new sin()),
+                ("sinh", new sinh()),
+                ("asin", new asin()),
+                ("cos", new cos()),
+                ("cosh", new cosh()),
+                ("acos", new acos()),
+                ("tan", new tan()),
+                ("tanh", new tanh()),
+                ("atan", new atan()),
+            };
+            var map = new ScriptMapStringPolling(script, functions.Length + 4);
+            foreach (var (name, func) in functions) {
+                map.SetValue(name, script.CreateFunction(func));
+            }
             map.SetValue("PI", new ScriptValue(PI));
             map.SetValue("Deg2Rad", new ScriptValue(Deg2Rad));              //角度转弧度 角度*此值=弧度
             map.SetValue("Rad2Deg", new ScriptValue(Rad2Deg));              //弧度转角度 弧度*此值=角度
             map.SetValue("Epsilon", new ScriptValue(Epsilon));              //一个很小的浮点数
-            map.SetValue("min", script.CreateFunction(new min()));          //取最小值
-            map.SetValue("max", script.CreateFunction(new max()));          //取最大值
-            map.SetValue("abs", script.CreateFunction(new abs()));          //取绝对值
-            map.SetValue("floor", script.CreateFunction(new floor()));      //向下取整
-            map.SetValue("ceil", script.CreateFunction(new ceil()));        //向上取整
-            map.SetValue("round", script.CreateFunction(new round()));      //四舍五入
-            map.SetValue("clamp", script.CreateFunction(new clamp()));      //指定最大最小值取合适值
-            map.SetValue("sqrt", script.CreateFunction(new sqrt()));        //开平方根
-            map.SetValue("pow", script.CreateFunction(new pow()));          //幂运算
-            map.SetValue("log", script.CreateFunction(new log()));          //返回指定数字的对数
-
-            //三角函数
-            map.SetValue("sin", script.CreateFunction(new sin()));          //
-            map.SetValue("sinh", script.CreateFunction(new sinh()));        //
-            map.SetValue("asin", script.CreateFunction(new asin()));        //
-
-            map.SetValue("cos", script.CreateFunction(new cos()));          //
-            map.SetValue("cosh", script.CreateFunction(new cosh()));        //
-            map.SetValue("acos", script.CreateFunction(new acos()));        //
-
-            map.SetValue("tan", script.CreateFunction(new tan()));          //
-            map.SetValue("tanh", script.CreateFunction(new tanh()));        //
-            map.SetValue("atan", script.CreateFunction(new atan()));        //
-
             script.SetGlobal("math", new ScriptValue(map));
         }
         private class min : ScorpioHandle {

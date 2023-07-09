@@ -1,6 +1,8 @@
 using System;
 using System.Reflection;
 using Scorpio.Exception;
+using Scorpio.Tools;
+
 namespace Scorpio.Userdata {
     //反射构造函数
     public class FunctionDataConstructor : FunctionData {
@@ -35,7 +37,7 @@ namespace Scorpio.Userdata {
     //无参结构体构造函数
     public class FunctionDataStructConstructor : FunctionData {
         private Type m_Type;
-        public FunctionDataStructConstructor(Type type) : base(EmptyTypes, null, EmptyBool, 0, null) {
+        public FunctionDataStructConstructor(Type type) : base(ScorpioUtil.TYPE_EMPTY, null, ScorpioUtil.BOOL_EMPTY, 0, null) {
             m_Type = type;
         }
         public override object Invoke(object obj, ScriptValue[] parameters) {

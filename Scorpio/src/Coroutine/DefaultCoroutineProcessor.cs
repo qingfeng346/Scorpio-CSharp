@@ -7,7 +7,7 @@ namespace Scorpio.Coroutine {
             coroutine = current as ICoroutine;
         }
         public bool MoveNext(out ScriptValue result) {
-            result = ScriptValue.Null;
+            result = default;
             if (coroutine != null) {
                 if (!coroutine.IsDone) {
                     return true;

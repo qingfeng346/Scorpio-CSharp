@@ -1,36 +1,27 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Xml.Linq;
 using Scorpio.Exception;
 using Scorpio.Tools;
 namespace Scorpio.Userdata {
     //反射类管理
     public class UserdataTypeReflect : UserdataType {
         private UserdataMethod m_Constructor;                           //所有构造函数
-        private List<MethodInfo> m_Methods;                             //所有函数
+        private MethodInfo[] m_Methods;                                 //所有函数
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
         private Dictionary<string, UserdataMethodReflect> m_Functions;  //所有的函数
         public UserdataTypeReflect(Type type) : base(type) {
             m_Variables = new Dictionary<string, UserdataVariable>();
             m_Functions = new Dictionary<string, UserdataMethodReflect>();
-            InitializeConstructor();
-            InitializeFunctions();
-        }
-        //初始化构造函数
-        private void InitializeConstructor() {
             //GetConstructors 去掉 NonPublic 标识, 否则取函数会取出一些错误的函数例如类 System.Diagnostics.Process
-            var name = string.Intern(m_Type.ToString());
-            m_Constructor = new UserdataMethodReflect(m_Type, name, m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
-        }
-        //初始化所有函数
-        private void InitializeFunctions() {
-            m_Methods = new List<MethodInfo>(m_Type.GetMethods(Script.BindingFlag));
+            m_Constructor = new UserdataMethodReflect(m_Type, string.Intern(m_Type.ToString()), m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
+            m_Methods = m_Type.GetMethods(Script.BindingFlag);
         }
         //获取一个函数，名字相同返回值相同
         private UserdataMethodReflect GetFunction(string name) {
-            var methods = m_Methods.FindAll((method) => method.Name == name);
-            if (methods.Count > 0) {
+            var methods = Array.FindAll(m_Methods, method => method.Name == name);
+            if (methods.Length > 0) {
                 name = string.Intern(name);
                 return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
             }
@@ -52,7 +43,7 @@ namespace Scorpio.Userdata {
             FieldInfo fInfo = m_Type.GetField(name, Script.BindingFlag);
             if (fInfo != null) return m_Variables[name] = new UserdataField(fInfo);
             PropertyInfo pInfo = m_Type.GetProperty(name, Script.BindingFlag);
-            if (pInfo != null) return m_Variables[name] = new UserdataProperty(m_Type, pInfo);
+            if (pInfo != null) return m_Variables[name] = new UserdataProperty(pInfo);
             return null;
         }
         //添加一个扩展函数

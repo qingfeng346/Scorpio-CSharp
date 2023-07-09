@@ -1,20 +1,24 @@
 namespace Scorpio.Proto {
     public class ProtoMap {
         public static ScriptType Load(Script script, ScriptType ret) {
-            ret.SetValue("length", script.CreateFunction(new length()));
-            ret.SetValue("count", script.CreateFunction(new length()));
-            ret.SetValue("clear", script.CreateFunction(new clear()));
-            ret.SetValue("remove", script.CreateFunction(new remove()));
-            ret.SetValue("containsKey", script.CreateFunction(new containsKey()));
-            ret.SetValue("containsValue", script.CreateFunction(new containsValue()));
-            ret.SetValue("keys", script.CreateFunction(new keys()));
-            ret.SetValue("values", script.CreateFunction(new values()));
-            ret.SetValue("forEach", script.CreateFunction(new forEach()));
-            ret.SetValue("forEachValue", script.CreateFunction(new forEachValue()));
-            ret.SetValue("find", script.CreateFunction(new find()));
-            ret.SetValue("findValue", script.CreateFunction(new findValue()));
-            ret.SetValue("+", script.CreateFunction(new plus()));
-            ret.SetValue("-", script.CreateFunction(new minus()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("length", new length()),
+                ("count", new length()),
+                ("clear", new clear()),
+                ("remove", new remove()),
+                ("containsKey", new containsKey()),
+                ("containsValue", new containsValue()),
+                ("keys", new keys()),
+                ("values", new values()),
+                ("forEach", new forEach()),
+                ("forEachValue", new forEachValue()),
+                ("find", new find()),
+                ("findKey", new find()),
+                ("findValue", new findValue()),
+                ("+", new plus()),
+                ("-", new minus()),
+            };
+            ret.SetFunctions(script, functions);
             return ret;
         }
         private class length : ScorpioHandle {

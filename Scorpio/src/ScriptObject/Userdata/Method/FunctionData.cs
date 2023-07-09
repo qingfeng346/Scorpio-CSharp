@@ -4,8 +4,6 @@ namespace Scorpio.Userdata {
     //单个函数的所有数据
     public abstract class FunctionData {
         protected const string RefOutValue = "value";
-        protected readonly static Type[] EmptyTypes = new Type[0];
-        protected readonly static bool[] EmptyBool = new bool[0];
 
         public Type[] ParameterType; //所有参数类型
         public object[] DefaultParameter; //默认参数
@@ -26,7 +24,8 @@ namespace Scorpio.Userdata {
             this.RequiredNumber = requiredNumber;
             this.ParamType = paramType;
             this.ParameterCount = parameterType.Length;
-            this.Args = new object[parameterType.Length];
+            if (parameterType.Length > 0)
+                this.Args = new object[parameterType.Length];
             this.IsParams = paramType != null;
 
             //必须参数和总共参数不同证明有默认参数

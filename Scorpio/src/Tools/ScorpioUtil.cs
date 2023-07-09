@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Scorpio.Exception;
 using System.Diagnostics;
 using System.Text;
+using Scorpio.Runtime;
 namespace Scorpio.Tools {
     public static class ScorpioUtil {
         public static readonly Type TYPE_VOID = typeof (void);
@@ -31,6 +32,10 @@ namespace Scorpio.Tools {
         public static readonly ScriptValue[] Parameters = new ScriptValue[128]; //函数调用共用数组
         public static readonly string[] KEY_EMPTY = new string[0];
         public static readonly ScriptValue[] VALUE_EMPTY = new ScriptValue[0];
+        public static readonly InternalValue[] INTERNAL_EMPTY = new InternalValue[0];
+        public static readonly Type[] TYPE_EMPTY = new Type[0];
+        public static readonly bool[] BOOL_EMPTY = new bool[0];
+        public static readonly object[] OBJECT_EMPTY = new object[0];
 
         [Conditional("SCORPIO_DEBUG")]
         public static void Assert(this bool condition, string message) {
@@ -161,11 +166,6 @@ namespace Scorpio.Tools {
                 }
             }
             return builder.ToString();
-        }
-        public static ScriptValue[] CloneParameters(this ScriptValue[] parameters, int length) {
-            var pars = new ScriptValue[length];
-            Array.Copy(parameters, pars, length);
-            return pars;
         }
         public static ScriptValue GetArgs(this ScriptValue[] parameters, int index, int length) {
             return GetArgs(parameters, index, length, ScriptValue.Null);

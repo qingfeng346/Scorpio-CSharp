@@ -1,12 +1,14 @@
-using Scorpio.Userdata;
 namespace Scorpio.Proto {
     public class ProtoObject {
         public static ScriptType Load(Script script, ScriptType ret) {
-            ret.SetValue("toString", script.CreateFunction(new toString()));
-            ret.SetValue("getHashCode", script.CreateFunction(new getHashCode()));
-            ret.SetValue("instanceOf", script.CreateFunction(new instanceOf(script)));
-            ret.SetValue("referenceEquals", script.CreateFunction(new referenceEquals()));
-            ret.SetValue("addGetProperty", script.CreateFunction(new addGetProperty()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("toString", new toString()),
+                ("getHashCode", new getHashCode()),
+                ("instanceOf", new instanceOf(script)),
+                ("referenceEquals", new referenceEquals()),
+                ("addGetProperty", new addGetProperty()),
+            };
+            ret.SetFunctions(script, functions);
             return ret;
         }
         private class toString : ScorpioHandle {
@@ -39,14 +41,8 @@ namespace Scorpio.Proto {
                         type = m_Script.TypeStringValue;
                         break;
                     case ScriptValue.scriptValueType:
-                        if (thisObject.scriptValue is ScriptArray) {
-                            type = m_Script.TypeArrayValue;
-                        } else if (thisObject.scriptValue is ScriptMap) {
-                            type = m_Script.TypeMapValue;
-                        } else if (thisObject.scriptValue is ScriptFunction) {
-                            type = m_Script.TypeFunctionValue;
-                        } else if (thisObject.scriptValue is ScriptInstance) {
-                            type = new ScriptValue((thisObject.scriptValue as ScriptInstance).Prototype);
+                        if (thisObject.scriptValue is ScriptInstance) {
+                            type = new ScriptValue(((ScriptInstance)thisObject.scriptValue).Prototype);
                         } else if (thisObject.scriptValue is ScriptType) {
                             type = thisObject;
                         } else {

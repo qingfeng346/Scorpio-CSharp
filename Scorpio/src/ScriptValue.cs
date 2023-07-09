@@ -25,14 +25,13 @@ namespace Scorpio {
         public const byte stringValueType = 6;      //string
         public const byte objectValueType = 7;      //除了 double long 以外的number类型 和 枚举
 
-
-        [FieldOffset(0)] public byte valueType;
+        [FieldOffset(0)] public string stringValue;
+        [FieldOffset(0)] public ScriptObject scriptValue;
+        [FieldOffset(0)] public object objectValue;
         [FieldOffset(8)] public double doubleValue;
         [FieldOffset(8)] public long longValue;
-        [FieldOffset(16)] public string stringValue;
-        [FieldOffset(16)] public ScriptObject scriptValue;
-        [FieldOffset(16)] public object objectValue;
-
+        [FieldOffset(16)] public byte valueType;
+        #region 构造函数
         public ScriptValue(bool value) {
             this.valueType = value ? trueValueType : falseValueType;
             this.doubleValue = 0;
@@ -73,6 +72,8 @@ namespace Scorpio {
             this.objectValue = null;
             this.scriptValue = value;
         }
+        #endregion
+        #region 创建其他number类型和枚举
         internal ScriptValue(sbyte value) {
             this.valueType = objectValueType;
             this.doubleValue = 0;
@@ -162,8 +163,10 @@ namespace Scorpio {
             this.scriptValue = null;
             this.objectValue = value;
         }
-
+        #endregion
+        #region 仅运行时调用
         //此函数为运行时调用，传入script 可以获取 基础类型的原表变量
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal ScriptValue GetValueByIndex(int key, Script script) {
             switch (valueType) {
                 case scriptValueType:
@@ -199,6 +202,9 @@ namespace Scorpio {
                     return script.TypeObject.GetValue(key);
             }
         }
+        #endregion
+        #region GetValue SetValue
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ScriptValue GetValue(string key) {
             if (valueType == scriptValueType) {
                 return scriptValue.GetValue(key);
@@ -229,6 +235,7 @@ namespace Scorpio {
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
             }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetValueByIndex(int key, ScriptValue value) {
             if (valueType == scriptValueType) {
                 scriptValue.SetValueByIndex(key, value);
@@ -268,6 +275,7 @@ namespace Scorpio {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : [{key}]");
             }
         }
+        #endregion
         //调用函数
         public ScriptValue call(ScriptValue thisObject, params object[] args) {
             var length = args.Length;
@@ -390,12 +398,23 @@ namespace Scorpio {
         public ScriptObject Get() {
             return valueType == scriptValueType ? scriptValue : null;
         }
-        public bool IsNull { get { return valueType == nullValueType; } }
-        public bool IsTrue { get { return valueType == trueValueType; } }
-        public bool IsFalse { get { return valueType == falseValueType; } }
-        public bool IsNumber { get { return valueType == doubleValueType || valueType == longValueType; } }
-        public bool IsString { get { return valueType == stringValueType; } }
-        public bool IsScriptObject { get { return valueType == scriptValueType; } }
+        public T ToNumber<T>() where T : struct, IConvertible {
+            switch (valueType) {
+                case doubleValueType:
+                    return (T)Convert.ChangeType(doubleValue, typeof(T));
+                case longValueType:
+                    return (T)Convert.ChangeType(longValue, typeof(T));
+                default:
+                    return (T)Convert.ChangeType(Value, typeof(T));
+            }
+        }
+
+        public bool IsNull => valueType == nullValueType;
+        public bool IsTrue => valueType == trueValueType;
+        public bool IsFalse => valueType == falseValueType;
+        public bool IsNumber => valueType == doubleValueType || valueType == longValueType;
+        public bool IsString => valueType == stringValueType;
+        public bool IsScriptObject => valueType == scriptValueType;
 
         
         public override string ToString() {

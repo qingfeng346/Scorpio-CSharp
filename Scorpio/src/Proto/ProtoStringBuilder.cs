@@ -1,14 +1,17 @@
 namespace Scorpio.Proto {
     public class ProtoStringBuilder {
         public static ScriptType Load(Script script, ScriptType ret) {
-            ret.SetValue("length", script.CreateFunction(new length()));
-            ret.SetValue("setLength", script.CreateFunction(new setLength()));
-            ret.SetValue("clear", script.CreateFunction(new clear()));
-            ret.SetValue("append", script.CreateFunction(new append()));
-            ret.SetValue("appendFormat", script.CreateFunction(new appendFormat()));
-            ret.SetValue("insert", script.CreateFunction(new insert()));
-            ret.SetValue("remove", script.CreateFunction(new remove()));
-            ret.SetValue("replace", script.CreateFunction(new replace()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("length", new length()),
+                ("setLength", new setLength()),
+                ("clear", new clear()),
+                ("append", new append()),
+                ("appendFormat", new appendFormat()),
+                ("insert", new insert()),
+                ("remove", new remove()),
+                ("replace", new replace()),
+            };
+            ret.SetFunctions(script, functions);
             return ret;
         }
         private class length : ScorpioHandle {
