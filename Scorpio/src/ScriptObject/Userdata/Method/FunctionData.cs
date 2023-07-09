@@ -24,8 +24,7 @@ namespace Scorpio.Userdata {
             this.RequiredNumber = requiredNumber;
             this.ParamType = paramType;
             this.ParameterCount = parameterType.Length;
-            if (parameterType.Length > 0)
-                this.Args = new object[parameterType.Length];
+            this.Args = parameterType.Length > 0 ? new object[parameterType.Length] : ScorpioUtil.OBJECT_EMPTY;
             this.IsParams = paramType != null;
 
             //必须参数和总共参数不同证明有默认参数
