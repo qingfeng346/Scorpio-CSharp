@@ -47,17 +47,20 @@ namespace Scorpio.Tools {
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
         public void SetCapacity(int capacity) {
             if (capacity > mSize) {
-                var keyArray = new string[capacity];
-                var valueArray = new Value[capacity];
-                if (mSize > 0) {
-                    Array.Copy(mKeys, 0, keyArray, 0, mSize);
-                    Array.Copy(mValues, 0, valueArray, 0, mSize);
-                }
-                mKeys = keyArray;
-                mValues = valueArray;
+                SetCapacity_impl(capacity);
             } else if (capacity < mSize) {
                 throw new ExecutionException($"Capacity 不能小于当前size,  size:{mSize} capacity:{capacity}");
             }
+        }
+        private void SetCapacity_impl(int capacity) {
+            var keyArray = new string[capacity];
+            var valueArray = new Value[capacity];
+            if (mSize > 0) {
+                Array.Copy(mKeys, 0, keyArray, 0, mSize);
+                Array.Copy(mValues, 0, valueArray, 0, mSize);
+            }
+            mKeys = keyArray;
+            mValues = valueArray;
         }
         public void Add(string key, Value value) {
             this[key] = value;
@@ -142,14 +145,7 @@ namespace Scorpio.Tools {
                     }
                 }
                 if (mSize == mValues.Length) {
-                    var keyArray = new string[mSize + 8];
-                    var valueArray = new Value[mSize + 8];
-                    if (mSize > 0) {
-                        Array.Copy(mKeys, 0, keyArray, 0, mSize);
-                        Array.Copy(mValues, 0, valueArray, 0, mSize);
-                    }
-                    mKeys = keyArray;
-                    mValues = valueArray;
+                    SetCapacity_impl(mSize + 8);
                 }
                 mKeys[mSize] = key;
                 mValues[mSize++] = value;
