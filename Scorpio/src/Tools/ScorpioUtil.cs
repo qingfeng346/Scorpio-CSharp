@@ -36,7 +36,7 @@ namespace Scorpio.Tools {
         public static readonly Type[] TYPE_EMPTY = new Type[0];
         public static readonly bool[] BOOL_EMPTY = new bool[0];
         public static readonly object[] OBJECT_EMPTY = new object[0];
-
+        public static ScriptValue CommonThisValue = new ScriptValue() { valueType = ScriptValue.scriptValueType };
 
         public static int ReadBytes(this Stream stream, byte[] buffer) {
             int count = buffer.Length;
@@ -157,7 +157,7 @@ namespace Scorpio.Tools {
             var builder = new StringBuilder();
             for (var i = 0; i < length; ++i) {
                 try {
-                    builder.Append($"[{parameters[i].valueType}-{parameters[i]}]");
+                    builder.Append($"[{parameters[i]}]");
                 } catch (System.Exception) {
                     builder.Append($"[toString Error]");
                 }

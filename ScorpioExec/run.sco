@@ -1,25 +1,33 @@
-function sleep1(seconds) {
-    var end = io.unixNow() + seconds * 1000
-    return coroutine.poll(function() {
-        return io.unixNow() >= end
-    }, function() {
-        return "poll123123123123"
-    })
+function main() {
+    return json.encode({a:100,b:100})
 }
-function sleep2(seconds) {
-    //coroutine.epoll 回调, 调用 coroutine.done 时跳出
-    var ret = coroutine.epoll()
-    done(ret, seconds, "epoll")
-    return ret 
-}
-async function done(ret, seconds, result) {
-    await sleep1(seconds)
-    coroutine.done(ret, result)
-}
-async function main() {
-    await sleep1(2)
-}
-main()
+var a = json.decode(main())
+var b = 12123
+a = b
+print(a)
+
+// function sleep1(seconds) {
+//     var end = io.unixNow() + seconds * 1000
+//     return coroutine.poll(function() {
+//         return io.unixNow() >= end
+//     }, function() {
+//         return "poll123123123123"
+//     })
+// }
+// function sleep2(seconds) {
+//     //coroutine.epoll 回调, 调用 coroutine.done 时跳出
+//     var ret = coroutine.epoll()
+//     done(ret, seconds, "epoll")
+//     return ret 
+// }
+// async function done(ret, seconds, result) {
+//     await sleep1(seconds)
+//     coroutine.done(ret, result)
+// }
+// async function main() {
+//     await sleep1(2)
+// }
+// main()
 
 // #if !DA_GLOBAL
 

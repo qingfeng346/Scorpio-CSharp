@@ -17,7 +17,6 @@ namespace Scorpio {
         Global,         //全局变量保存类,只有_G是这个类型
     }
     public abstract class ScriptObject {
-        private static ScriptValue CommonThisValue = new ScriptValue() { valueType = ScriptValue.scriptValueType };
         protected ObjectType objectType;
         // 构图函数
         public ScriptObject(ObjectType objectType) {
@@ -30,8 +29,8 @@ namespace Scorpio {
         public virtual string ValueTypeName => objectType.ToString();           //类型名称
         public ScriptValue ThisValue { 
             get {
-                CommonThisValue.scriptValue = this;
-                return CommonThisValue;
+                ScorpioUtil.CommonThisValue.scriptValue = this;
+                return ScorpioUtil.CommonThisValue;
             }
         }
         //获取变量
