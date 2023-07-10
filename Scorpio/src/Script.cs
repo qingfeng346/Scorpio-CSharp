@@ -152,7 +152,7 @@ namespace Scorpio {
                 Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
                 Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
             }
-            for (var i = 0; i <= ScriptContext.AsyncValuePoolLength; ++i) {
+            for (var i = 0; i < ScriptContext.AsyncValuePoolLength; ++i) {
                 Array.Clear(ScriptContext.AsyncValuePool[i].variable, 0, ScriptContext.AsyncValuePool[i].variable.Length);
                 Array.Clear(ScriptContext.AsyncValuePool[i].stack, 0, ScriptContext.AsyncValuePool[i].stack.Length);
             }
