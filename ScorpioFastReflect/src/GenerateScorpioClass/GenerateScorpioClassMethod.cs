@@ -136,7 +136,7 @@ namespace Scorpio.FastReflect {
                 builder.AppendFormat(@"
                 case {0}: {{ {1} }}", index, execute);
                 allMethodBuilder.Append($@"
-            methodInfos.Add({GetScorpioMethod(false, fPars, index)});");
+                {GetScorpioMethod(false, fPars, index)},");
             }
             var str = MethodTemplate;
             str = str.Replace("__getallmethod", allMethodBuilder.ToString());

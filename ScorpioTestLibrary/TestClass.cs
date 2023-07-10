@@ -35,6 +35,14 @@ public class TestClass {
         return arg2;
     }
 }
+public static class TestExtends {
+    public static void TestFunc1(this TestClass t, int a, int b) {
+
+    }
+    public static void TestExtendFun1(this TestClass t) {
+
+    }
+}
 public static class TestStaticClass {
     public static float TestFloat = 1000;
     public static Action action1;

@@ -30,6 +30,7 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
             case "GetType": return ScorpioClass_TestClass_GetType.GetInstance();
             case "op_Addition": return ScorpioClass_TestClass_op_Addition.GetInstance();
             case "ReferenceEquals": return ScorpioClass_TestClass_ReferenceEquals.GetInstance();
+            case "TestExtendFun1": return ScorpioClass_TestClass_TestExtendFun1.GetInstance();
             case "TestFunc1": return ScorpioClass_TestClass_TestFunc1.GetInstance();
             case "TestFunc2": return ScorpioClass_TestClass_TestFunc2.GetInstance();
             case "ToString": return ScorpioClass_TestClass_ToString.GetInstance();
@@ -44,6 +45,7 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
             case "GetType": value = ScorpioClass_TestClass_GetType.GetInstance(); return true;
             case "op_Addition": value = ScorpioClass_TestClass_op_Addition.GetInstance(); return true;
             case "ReferenceEquals": value = ScorpioClass_TestClass_ReferenceEquals.GetInstance(); return true;
+            case "TestExtendFun1": value = ScorpioClass_TestClass_TestExtendFun1.GetInstance(); return true;
             case "TestFunc1": value = ScorpioClass_TestClass_TestFunc1.GetInstance(); return true;
             case "TestFunc2": value = ScorpioClass_TestClass_TestFunc2.GetInstance(); return true;
             case "ToString": value = ScorpioClass_TestClass_ToString.GetInstance(); return true;
@@ -156,18 +158,36 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
             }
         }
     }
-    public class ScorpioClass_TestClass_TestFunc1 : IScorpioFastReflectMethod {
+    public class ScorpioClass_TestClass_TestExtendFun1 : IScorpioFastReflectMethod {
         private static UserdataMethodFastReflect _instance = null;
         public static UserdataMethodFastReflect GetInstance() {
             if (_instance != null) { return _instance; }
             var methodInfos = new ScorpioFastReflectMethodInfo[] {
                 new ScorpioFastReflectMethodInfo(false, new Type[]{}, new bool[]{}, null, 0),
             };
+            return _instance = new UserdataMethodFastReflect(typeof(TestClass), "TestExtendFun1", methodInfos, new ScorpioClass_TestClass_TestExtendFun1()); 
+        }
+        public object Call(object obj, int methodIndex, object[] args) {
+            switch (methodIndex) {
+                case 0: { ((TestClass)obj).TestExtendFun1(); return null; }
+                default: throw new ExecutionException("TestClass 找不到合适的函数 : TestExtendFun1    type : " + methodIndex);
+            }
+        }
+    }
+    public class ScorpioClass_TestClass_TestFunc1 : IScorpioFastReflectMethod {
+        private static UserdataMethodFastReflect _instance = null;
+        public static UserdataMethodFastReflect GetInstance() {
+            if (_instance != null) { return _instance; }
+            var methodInfos = new ScorpioFastReflectMethodInfo[] {
+                new ScorpioFastReflectMethodInfo(false, new Type[]{}, new bool[]{}, null, 0),
+                new ScorpioFastReflectMethodInfo(false, new Type[]{typeof(System.Int32),typeof(System.Int32)}, new bool[]{false,false}, null, 1),
+            };
             return _instance = new UserdataMethodFastReflect(typeof(TestClass), "TestFunc1", methodInfos, new ScorpioClass_TestClass_TestFunc1()); 
         }
         public object Call(object obj, int methodIndex, object[] args) {
             switch (methodIndex) {
                 case 0: { return ((TestClass)obj).TestFunc1(); }
+                case 1: { ((TestClass)obj).TestFunc1((System.Int32)args[0], (System.Int32)args[1]); return null; }
                 default: throw new ExecutionException("TestClass 找不到合适的函数 : TestFunc1    type : " + methodIndex);
             }
         }
