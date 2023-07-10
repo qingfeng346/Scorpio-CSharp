@@ -36,6 +36,7 @@ namespace Scorpio.Proto {
                 ("safePopLast", new safePopLast()),
                 ("join", new join()),
                 ("toArray", new toArray()),
+                ("trim", new trim()),
                 ("+", new plus()),
                 ("-", new minus()),
             };
@@ -310,6 +311,12 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var type = args[0].Get<Scorpio.Userdata.ScriptUserdataType>();
                 return type == null ? ScriptValue.Null : ScriptValue.CreateValue(thisObject.Get<ScriptArray>().ToArray(type.Type));
+            }
+        }
+        private class trim : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                thisObject.Get<ScriptArray>().TrimCapacity();
+                return default;    
             }
         }
         private class plus : ScorpioHandle {
