@@ -79,21 +79,25 @@ namespace Scorpio {
         internal ScriptValue[] getObjects() { return m_Objects; }
         public void SetArrayCapacity(int capacity) {
             if (capacity > m_Length) {
-                var array = new ScriptValue[capacity];
-                if (m_Length > 0) {
-                    Array.Copy(m_Objects, 0, array, 0, m_Length);
-                }
-                m_Objects = array;
+                SetCapacity_impl(capacity);
             } else {
                 m_Objects = ScorpioUtil.VALUE_EMPTY;
             }
         }
-        void ExpandCapacity() {
-            var array = new ScriptValue[m_Length + 8];
+        void SetCapacity_impl(int capacity) {
+            var array = new ScriptValue[capacity];
             if (m_Length > 0) {
                 Array.Copy(m_Objects, 0, array, 0, m_Length);
             }
             m_Objects = array;
+        }
+        void ExpandCapacity() {
+            SetCapacity_impl(m_Length + 8);
+        }
+        public void TrimCapacity() {
+            if (m_Length != m_Objects.Length) {
+                SetCapacity_impl(m_Length);
+            }
         }
         public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
