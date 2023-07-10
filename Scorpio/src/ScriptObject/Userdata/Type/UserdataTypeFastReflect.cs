@@ -3,7 +3,7 @@ using Scorpio.Exception;
 
 namespace Scorpio.Userdata {
     //单个去反射函数的信息
-    public class ScorpioFastReflectMethodInfo {
+    public struct ScorpioFastReflectMethodInfo {
         public bool IsStatic;           //是否是静态函数
         public Type[] ParameterType;    //参数类型列表
         public bool[] RefOut;           //ref out
