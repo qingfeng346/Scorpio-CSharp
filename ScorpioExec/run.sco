@@ -1,11 +1,14 @@
+a = 0
+b = 0
+c = 100
 function main() {
-    return json.encode({a:100,b:100})
+    print(c)
 }
-var a = json.decode(main())
-var b = 12123
-a = b
-print(a)
-
+main()
+// Base64String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
+// var builder = new StringBuilder()
+// builder.append("123")
+// print(Base64String.indexOf(builder[2]))
 // function sleep1(seconds) {
 //     var end = io.unixNow() + seconds * 1000
 //     return coroutine.poll(function() {

@@ -28,15 +28,11 @@ namespace Scorpio.Library {
                 ("tanh", new tanh()),
                 ("atan", new atan()),
             };
-            var map = new ScriptMapStringPolling(script, functions.Length + 4);
-            foreach (var (name, func) in functions) {
-                map.SetValue(name, script.CreateFunction(func));
-            }
+            var map = script.AddLibrary("math", functions, 4);
             map.SetValue("PI", new ScriptValue(PI));
             map.SetValue("Deg2Rad", new ScriptValue(Deg2Rad));              //角度转弧度 角度*此值=弧度
             map.SetValue("Rad2Deg", new ScriptValue(Rad2Deg));              //弧度转角度 弧度*此值=角度
             map.SetValue("Epsilon", new ScriptValue(Epsilon));              //一个很小的浮点数
-            script.SetGlobal("math", new ScriptValue(map));
         }
         private class min : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

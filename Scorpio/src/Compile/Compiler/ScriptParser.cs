@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Scorpio.Compile.CodeDom;
@@ -16,8 +18,9 @@ namespace Scorpio.Compile.Compiler {
             public long funcType; //函数类型 0 普通函数 1 async 函数 2 get函数
         }
         public List<double> ConstDouble { get; private set; } = new List<double>(); //所有的常量 double
-        public List<long> ConstLong { get; private set; } = new List<long>(); //所有的常量 long
+        public List<long> ConstLong { get; private set; } = new List<long>();       //所有的常量 long
         public List<string> ConstString { get; private set; } = new List<string>(); //所有的常量 string
+        public byte[] NoContext = new byte[0];                                      //在非Context域是否使用标识
         public ScriptFunctionData Context { get; private set; } //解析后主执行
         public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>(); //定义的所有 function
         public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>(); //定义的所有 class
@@ -81,13 +84,18 @@ namespace Scorpio.Compile.Compiler {
             }
             return executable;
         }
+        
         /// <summary> 获取一个double常量的索引 </summary>
         int GetConstDouble(double value) {
             var index = ConstDouble.IndexOf(value);
             if (index < 0) {
                 index = ConstDouble.Count;
                 ConstDouble.Add(value);
-                return index;
+                if (NoContext.Length < ConstDouble.Count)
+                    Array.Resize(ref NoContext, ConstDouble.Count);
+            }
+            if (m_scriptExecutable.Block != ExecutableBlock.Context) {
+                NoContext[index] |= 1 << 0;
             }
             return index;
         }
@@ -97,7 +105,11 @@ namespace Scorpio.Compile.Compiler {
             if (index < 0) {
                 index = ConstLong.Count;
                 ConstLong.Add(value);
-                return index;
+                if (NoContext.Length < ConstLong.Count)
+                    Array.Resize(ref NoContext, ConstLong.Count);
+            }
+            if (m_scriptExecutable.Block != ExecutableBlock.Context) {
+                NoContext[index] |= 1 << 1;
             }
             return index;
         }
@@ -107,7 +119,11 @@ namespace Scorpio.Compile.Compiler {
             if (index < 0) {
                 index = ConstString.Count;
                 ConstString.Add(value);
-                return index;
+                if (NoContext.Length < ConstString.Count)
+                    Array.Resize(ref NoContext, ConstString.Count);
+            }
+            if (m_scriptExecutable.Block != ExecutableBlock.Context) {
+                NoContext[index] |= 1 << 2;
             }
             return index;
         }

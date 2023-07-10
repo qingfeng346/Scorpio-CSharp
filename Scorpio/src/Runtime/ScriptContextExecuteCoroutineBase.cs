@@ -17,8 +17,15 @@ namespace Scorpio.Runtime {
         public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
 #elif EXECUTE_BASE
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, ScriptType baseType) {
+#elif EXECUTE_CONTEXT
+        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, string[] constString) {
 #else
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
+#endif
+            var constDouble = this.constDouble;
+            var constLong = this.constLong;
+#if !EXECUTE_CONTEXT
+            var constString = m_script.ConstString;
 #endif
             #region 堆栈和线程判断
 #if SCORPIO_ASSERT
@@ -33,8 +40,8 @@ namespace Scorpio.Runtime {
                 throw new ExecutionException($"only run script on mainthread : {m_script.MainThreadId} - {currentThread.ManagedThreadId}({currentThread.Name})");
             }
 #endif
-            #endregion
-            #region 申请堆栈和局部变量
+#endregion
+#region 申请堆栈和局部变量
 #if EXECUTE_COROUTINE
             var asyncValue = AsyncValuePoolLength > 0 ? AsyncValuePool[--AsyncValuePoolLength] : new AsyncValue();
             var variableObjects = asyncValue.variable;      //局部变量
@@ -45,8 +52,9 @@ namespace Scorpio.Runtime {
             var tryStack = TryStackValues[VariableValueIndex++];        //try catch
             var tryIndex = -1; //try索引
 #endif
-            #endregion
+#endregion
             variableObjects[0] = thisObject;
+            var internalCount = m_FunctionData.internalCount;
             InternalValue[] internalObjects = null;
             if (internalCount > 0) {
                 internalObjects = new InternalValue[internalCount]; //内部变量，有外部引用
@@ -80,7 +88,9 @@ namespace Scorpio.Runtime {
             }
             var parameters = ScorpioUtil.Parameters; //传递参数
             var iInstruction = 0; //当前执行命令索引
+            var m_scriptInstructions = m_FunctionData.scriptInstructions;
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
+            var m_global = m_script.Global;
             byte tempValueType; //临时存储
             int tempIndex; //临时存储
             ScriptInstruction instruction = null;

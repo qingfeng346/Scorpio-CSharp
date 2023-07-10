@@ -18,6 +18,7 @@ namespace Scorpio {
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+        public const int StringFlag = 1 << 2;
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
@@ -77,6 +78,9 @@ namespace Scorpio {
         private ScorpioJsonSerializer m_JsonSerializer;
         private ScorpioJsonDeserializer m_JsonDeserializer;
         public bool IsShutdown { get; private set; }
+        private int ConstStringIndex = 0;
+        public string[] ConstString;
+        public Dictionary<string, int> StringIndex;
         public Script() {
             m_SearchPaths = new string[0];
             m_Global = new ScriptGlobal();
@@ -122,6 +126,8 @@ namespace Scorpio {
             LibraryIO.Load(this);
             LibraryCoroutine.Load(this);
             MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+            ConstString = new string[512];
+            StringIndex = new Dictionary<string, int>();
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
             type = new ScriptTypePrimitive(name, m_TypeObject);
@@ -132,12 +138,13 @@ namespace Scorpio {
             typeValue = new ScriptValue(type);
             m_Global.SetValue(type.TypeName, typeValue);
         }
-        public void AddLibrary(string libraryName, (string, ScorpioHandle)[] functions) {
-            var map = new ScriptMapStringPolling(this, functions.Length);
+        public ScriptMap AddLibrary(string libraryName, (string, ScorpioHandle)[] functions, int number = 0) {
+            var map = new ScriptMapStringPolling(this, functions.Length + number);
             foreach (var (name, func) in functions) {
                 map.SetValue(name, CreateFunction(func));
             }
-            SetGlobal(libraryName, new ScriptValue(map)); 
+            SetGlobal(libraryName, new ScriptValue(map));
+            return map;
         }
         public void Shutdown() {
             if (IsShutdown) return;
@@ -392,17 +399,70 @@ namespace Scorpio {
                 return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), m_SearchPaths, compileOption));
             }
         }
+        void ParseConstString(SerializeData data) {
+            var length = data.ConstString.Length;
+            for (var i = 0; i < length; ++i) {
+                if ((data.NoContext[i] & StringFlag) != 0) {
+                    var str = data.ConstString[i];
+                    if (!StringIndex.ContainsKey(str)) {
+                        if (ConstStringIndex == ConstString.Length) {
+                            Array.Resize(ref ConstString, ConstStringIndex + 512);
+                        }
+                        StringIndex[str] = ConstStringIndex;
+                        ConstString[ConstStringIndex++] = str;
+                    }
+                }
+            }
+            length = data.Functions.Length;
+            for (var i = 0; i < length; ++i) {
+                var func = data.Functions[i];
+                for (var j = 0; j < func.scriptInstructions.Length; ++j) {
+                    var instruction = func.scriptInstructions[j];
+                    switch (instruction.opcode) {
+                        case Opcode.LoadConstString:
+                        case Opcode.LoadValueString:
+                        case Opcode.LoadGlobalString:
+                        case Opcode.StoreValueStringAssign:
+                        case Opcode.StoreGlobalStringAssign:
+                        case Opcode.StoreValueString:
+                        case Opcode.StoreGlobalString:
+                            if ((data.NoContext[instruction.opvalue] & StringFlag) != 0) {
+                                instruction.opvalue = StringIndex[data.ConstString[instruction.opvalue]];
+                            }
+                        break;
+                    }
+                }
+            }
+            length = data.Classes.Length;
+            for (var i = 0; i < length; ++i) {
+                var cl = data.Classes[i];
+                if ((data.NoContext[cl.name] & StringFlag) != 0) {
+                    cl.name = StringIndex[data.ConstString[cl.name]];
+                }
+                if (cl.parent > 0 && (data.NoContext[cl.parent] & StringFlag) != 0) {
+                    cl.parent = StringIndex[data.ConstString[cl.parent]];
+                }
+                for (var j = 0; j < cl.functions.Length; ++j) {
+                    var func = cl.functions[j];
+                    if ((data.NoContext[func >> 32] & StringFlag) != 0) {
+                        long index = StringIndex[data.ConstString[func >> 32]];
+                        cl.functions[j] = (index << 32) | (func & 0xFFFFFFFFL);
+                    }
+                }
+            }
+        }
         /// <summary> 执行IL </summary>
         public ScriptValue Execute(SerializeData[] datas) {
             ScriptValue result = ScriptValue.Null;
             int length = datas.Length;
             for (var j = 0; j < length; ++j) {
                 SerializeData data = datas[j];
+                ParseConstString(data);
                 var contexts = new ScriptContext[data.Functions.Length];
                 for (int i = 0; i < data.Functions.Length; ++i) {
-                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, contexts, data.Classes);
                 }
-                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
+                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null, data.ConstString);
             }
             return result;
         }
@@ -412,12 +472,13 @@ namespace Scorpio {
             int length = datas.Length;
             for (var j = 0; j < length; ++j) {
                 SerializeData data = datas[j];
+                ParseConstString(data);
                 var contexts = new ScriptContext[data.Functions.Length];
                 for (int i = 0; i < data.Functions.Length; ++i) {
-                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, contexts, data.Classes);
                 }
                 refContexts.Add(contexts);
-                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
+                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null, data.ConstString);
             }
             return result;
         }

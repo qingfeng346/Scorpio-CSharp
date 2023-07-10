@@ -35,37 +35,29 @@ namespace Scorpio.Runtime {
             }
         }
         public Script m_script; //脚本类
-        private ScriptGlobal m_global; //global
 
         private readonly double[] constDouble; //double常量
         private readonly long[] constLong; //long常量
-        private readonly string[] constString; //string常量
         private readonly ScriptContext[] constContexts; //所有定义的函数
         private readonly ScriptClassData[] constClasses; //定义所有的类
-        public readonly int internalCount; //内部变量数量
+        public readonly ScriptFunctionData m_FunctionData; //函数数据
 
         private readonly string m_Breviary; //摘要
-        private readonly ScriptFunctionData m_FunctionData; //函数数据
-        private readonly ScriptInstruction[] m_scriptInstructions; //指令集
+        
 
-        public ScriptContext(Script script, string breviary, ScriptFunctionData functionData, double[] constDouble, long[] constLong, string[] constString, ScriptContext[] constContexts, ScriptClassData[] constClasses) {
+        public ScriptContext(Script script, string breviary, ScriptFunctionData functionData, double[] constDouble, long[] constLong, ScriptContext[] constContexts, ScriptClassData[] constClasses) {
             m_script = script;
-            m_global = script.Global;
             this.constDouble = constDouble;
             this.constLong = constLong;
-            this.constString = constString;
             this.constContexts = constContexts;
             this.constClasses = constClasses;
-            this.internalCount = functionData.internalCount;
 
             m_Breviary = breviary;
             m_FunctionData = functionData;
-            m_scriptInstructions = functionData.scriptInstructions;
         }
 #if SCORPIO_DEBUG
         public void SetScript(Script script) {
             m_script = script;
-            m_global = script.Global;
         }
 #endif
     }

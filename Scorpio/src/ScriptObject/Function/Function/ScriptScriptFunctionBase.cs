@@ -5,8 +5,8 @@ namespace Scorpio.Function {
         protected InternalValue[] m_internalValues;               //父级内部变量
         public ScriptScriptFunctionBase(ScriptContext context) : base(context.m_script) {
             m_Context = context;
-            if (context.internalCount > 0) {
-                m_internalValues = new InternalValue[context.internalCount];
+            if (context.m_FunctionData.internalCount > 0) {
+                m_internalValues = new InternalValue[context.m_FunctionData.internalCount];
             }
         }
         public void SetInternal(int index, InternalValue value) {
@@ -17,7 +17,7 @@ namespace Scorpio.Function {
             get { return m_Context; }
             set {
                 m_Context = value;
-                m_internalValues = new InternalValue[value.internalCount];
+                m_internalValues = new InternalValue[value.m_FunctionData.internalCount];
             }
         }
 #endif
