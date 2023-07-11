@@ -34,6 +34,10 @@ namespace Scorpio.Tools {
         public static readonly ScriptValue[] Parameters = new ScriptValue[128]; //函数调用共用数组
         public static readonly ScriptValue[] VALUE_EMPTY = new ScriptValue[0];
         public static readonly string[] KEY_EMPTY = new string[0];
+        public static readonly Type[] TYPE_EMPTY = new Type[0];
+        public static readonly bool[] BOOL_EMPTY = new bool[0];
+        public static readonly object[] OBJECT_EMPTY = new object[0];
+
         public static ScriptValue CommonThisValue = new ScriptValue() { valueType = ScriptValue.scriptValueType };
 
         [Conditional("SCORPIO_ASSERT")]
