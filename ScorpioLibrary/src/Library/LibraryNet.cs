@@ -19,15 +19,7 @@ namespace ScorpioLibrary {
                 ("qpencode", new qpencode()),
                 ("qpdecode", new qpdecode()),
             };
-
-            var map = new ScriptMapStringPolling(script);
-            map.SetValue("get", script.CreateFunction(new get()));
-            map.SetValue("post", script.CreateFunction(new post()));
-            map.SetValue("urlencode", script.CreateFunction(new urlencode()));
-            map.SetValue("urldecode", script.CreateFunction(new urldecode()));
-            map.SetValue("qpencode", script.CreateFunction(new qpencode()));
-            map.SetValue("qpdecode", script.CreateFunction(new qpdecode()));
-            script.SetGlobal("net", new ScriptValue(map));
+            script.AddLibrary("net", functions);
         }
         static HttpWebRequest CreateRequest(string url, string method) {
             //创建 SL/TLS 安全通道

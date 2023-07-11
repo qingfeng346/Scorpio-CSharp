@@ -1,8 +1,7 @@
-a = 0
-b = 0
-c = 100
+
 function main() {
-    print(c)
+    var a = 100
+    var b = 200
 }
 main()
 // Base64String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";

@@ -19,6 +19,7 @@ namespace Scorpio {
         /// <summary> 反射获取变量和函数的属性 </summary>
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         public const int StringFlag = 1 << 2;
+        public const int StringStage = 256;
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
@@ -126,7 +127,7 @@ namespace Scorpio {
             LibraryIO.Load(this);
             LibraryCoroutine.Load(this);
             MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
-            ConstString = new string[512];
+            ConstString = new string[StringStage];
             StringIndex = new Dictionary<string, int>();
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
@@ -406,7 +407,7 @@ namespace Scorpio {
                     var str = data.ConstString[i];
                     if (!StringIndex.ContainsKey(str)) {
                         if (ConstStringIndex == ConstString.Length) {
-                            Array.Resize(ref ConstString, ConstStringIndex + 512);
+                            Array.Resize(ref ConstString, ConstStringIndex + StringStage);
                         }
                         StringIndex[str] = ConstStringIndex;
                         ConstString[ConstStringIndex++] = str;
