@@ -78,7 +78,6 @@ namespace Scorpio.Tools {
         public static int GetIndex(EntityValue value) {
 #if SCRIPT_OBJECT
             if (value.Index > 0) {
-                ++entities[value.Index].referenceCount;
                 return value.Index;
             }
             int index;

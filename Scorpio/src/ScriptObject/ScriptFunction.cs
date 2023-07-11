@@ -10,7 +10,7 @@ namespace Scorpio
         public virtual ScriptValue BindObject => ScriptValue.Null;
         public abstract ScriptFunction SetBindObject(ScriptValue obj);
         public override void Alloc() {
-            SetPrototypeValue(script.TypeFunctionValue);
+            SetPrototype(script.TypeFunction);
         }
         public abstract override void Free();
         public override string ToString() { return $"Function"; }

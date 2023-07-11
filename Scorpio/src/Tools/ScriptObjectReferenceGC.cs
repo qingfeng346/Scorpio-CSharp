@@ -18,13 +18,15 @@ namespace Scorpio.Tools {
         static HashSet<int> stack = new HashSet<int>();
         static void Collect(ScriptValue value, int originIndex) {
             if (value.valueType == ScriptValue.scriptValueType) {
-                var index = value.index;
-                if (!gcHandle.TryGetValue((int)index, out var handle)) {
-                    handle = gcHandle[(int)index] = new GCHandle((int)index);
-                }
-                handle.count++;
-                handle.beCatch.Add(originIndex);
+                Collect(value.index, originIndex);
             }
+        }
+        static void Collect(int index, int originIndex) {
+            if (!gcHandle.TryGetValue(index, out var handle)) {
+                handle = gcHandle[index] = new GCHandle((int)index);
+            }
+            handle.count++;
+            handle.beCatch.Add(originIndex);
         }
         static void Collect(ScriptObject value, int originIndex) {
             if (value is ScriptMap) {
@@ -38,7 +40,8 @@ namespace Scorpio.Tools {
             } else if (value is ScriptScriptBindFunctionBase) {
                 Collect(((ScriptScriptBindFunctionBase)value).BindObject, originIndex);
             } else if (value is ScriptType) {
-                Collect((value as ScriptType).PrototypeValue, originIndex);
+                var protoType = ((ScriptType)value).Prototype;
+                if (protoType != null) Collect(protoType.Index, originIndex);
                 foreach (var pair in (value as ScriptType)) {
                     Collect(pair.Value, originIndex);
                 }
@@ -47,7 +50,7 @@ namespace Scorpio.Tools {
                 foreach (var pair in (value as ScriptInstance)) {
                     Collect(pair.Value, originIndex);
                 }
-                Collect((value as ScriptInstance).PrototypeValue, originIndex);
+                Collect((value as ScriptInstance).Prototype.Index, originIndex);
             }
         }
         static bool CanGCRoot(GCHandle handle, HashSet<int> check) {
@@ -106,6 +109,11 @@ namespace Scorpio.Tools {
                 set.Add(originIndex);
             }
         }
+        static void CollectReference(int index, int originIndex, int targetIndex, HashSet<int> set, bool isString) {
+            if (!isString && index == targetIndex) {
+                set.Add(originIndex);
+            }
+        }
         static void CollectReference(ScriptObject value, int originIndex, int targetIndex, HashSet<int> set, bool isString) {
             if (value is ScriptMap) {
                 foreach (var pair in (ScriptMap)value) {
@@ -118,7 +126,7 @@ namespace Scorpio.Tools {
             } else if (value is ScriptScriptBindFunctionBase) {
                 CollectReference(((ScriptScriptBindFunctionBase)value).BindObject, originIndex, targetIndex, set, isString);
             } else if (value is ScriptType) {
-                CollectReference((value as ScriptType).PrototypeValue, originIndex, targetIndex, set, isString);
+                CollectReference((value as ScriptType).Prototype.Index, originIndex, targetIndex, set, isString);
                 foreach (var pair in (value as ScriptType)) {
                     CollectReference(pair.Value, originIndex, targetIndex, set, isString);
                 }
@@ -131,7 +139,7 @@ namespace Scorpio.Tools {
                 foreach (var pair in (value as ScriptInstance)) {
                     CollectReference(pair.Value, originIndex, targetIndex, set, isString);
                 }
-                CollectReference((value as ScriptInstance).PrototypeValue, originIndex, targetIndex, set, isString);
+                CollectReference((value as ScriptInstance).Prototype.Index, originIndex, targetIndex, set, isString);
             }
         }
         public static HashSet<int> GetReference(int index, bool isString) {

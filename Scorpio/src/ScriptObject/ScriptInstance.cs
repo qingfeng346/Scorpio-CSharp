@@ -6,8 +6,6 @@ using Scorpio.Tools;
 
 namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
-        protected ScriptValue m_thisValue;
-        protected ScriptValue m_PrototypeValue;
         protected ScriptType m_Prototype = null;
         protected ScorpioStringDictionary m_Values;              //所有的数据(函数和数据都在一个数组)
         public ScriptInstance(Script script) : base(script, ObjectType.Instance) {
@@ -16,23 +14,26 @@ namespace Scorpio {
         public ScriptInstance(Script script, ObjectType objectType) : base(script, objectType) {
             m_Values = new ScorpioStringDictionary();
         }
-        public ScriptInstance SetPrototypeValue(ScriptValue prototypeValue) {
-            m_PrototypeValue.CopyFrom(prototypeValue);
-            m_Prototype = prototypeValue.Get<ScriptType>();
+        public ScriptInstance SetPrototype(ScriptType protoType) {
+            m_Prototype = protoType;
+            ScriptObjectReference.Reference(m_Prototype.Index);
             return this;
         }
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype => m_Prototype;
-        public ScriptValue PrototypeValue => m_PrototypeValue;
         //ThisValue没有占用引用计数
-        private ScriptValue ThisValue => m_thisValue.valueType == ScriptValue.nullValueType ? (m_thisValue = new ScriptValue(this, true)) : m_thisValue;
+        public ScriptValue ThisValue {
+            get {
+                ScorpioUtil.CommonThisValue.index = Index;
+                return ScorpioUtil.CommonThisValue;
+            }
+        }
         public void SetCapacity(int capacity) {
             m_Values.SetCapacity(capacity);
         }
         protected void Release() {
-            m_PrototypeValue.Free();
+            ScriptObjectReference.Free(m_Prototype.Index);
             m_Prototype = null;
-            m_thisValue = ScriptValue.Null;
             m_Values.Clear();
         }
         public override void Free() {

@@ -287,24 +287,14 @@ namespace Scorpio
         private ScriptValue(string value, bool noReference) {
             this.doubleValue = 0;
             this.longValue = 0;
-            if (value == null) {
-                this.valueType = nullValueType;
-                this.index = 0;
-            } else {
-                this.valueType = stringValueType;
-                this.index = StringReference.GetIndex(value);
-            }
+            this.valueType = stringValueType;
+            this.index = StringReference.GetIndex(value);
         }
-        internal ScriptValue(ScriptObject value, bool noReference) {
+        private ScriptValue(ScriptObject value, bool noReference) {
             this.doubleValue = 0;
             this.longValue = 0;
-            if (value == null) {
-                this.valueType = nullValueType;
-                this.index = 0;
-            } else {
-                this.valueType = scriptValueType;
-                this.index = ScriptObjectReference.GetIndex(value);
-            }
+            this.valueType = scriptValueType;
+            this.index = ScriptObjectReference.GetIndex(value);
         }
 
         #region 运行时调用

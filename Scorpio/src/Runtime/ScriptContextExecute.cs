@@ -184,9 +184,9 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.LoadBase: {
 #if EXECUTE_BASE
-                                stackObjects[++stackIndex].CopyFrom(baseType.PrototypeValue);
+                                stackObjects[++stackIndex].SetScriptValue(baseType.Prototype);
 #else
-                                stackObjects[++stackIndex].CopyFrom(thisObject.Get<ScriptInstance>().Prototype.PrototypeValue);
+                                stackObjects[++stackIndex].SetScriptValue(thisObject.Get<ScriptInstance>().Prototype.Prototype);
 #endif
                                 continue;
                             }
@@ -1482,14 +1482,14 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.NewType: {
                                 var classData = constClasses[opvalue];
-                                var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]) : m_script.TypeObjectValue;
+                                var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]).Get<ScriptType>() : m_script.TypeObject;
                                 var className = constString[classData.name];
                                 string functionName;
                                 var type = m_script.NewType();
 #if SCORPIO_DEBUG
                                 type.Source = $"{m_Breviary}:{instruction.line}";
 #endif
-                                type.Set(className, parentType);
+                                type.Set(className, parentType ?? m_script.TypeObject);
                                 var functions = classData.functions;
                                 var functionCount = 0;
                                 var functionLength = functions.Length;

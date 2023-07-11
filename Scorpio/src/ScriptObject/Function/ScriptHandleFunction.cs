@@ -2,9 +2,8 @@ namespace Scorpio.Function {
     public class ScriptHandleFunction : ScriptFunction {
         protected ScorpioHandle m_Handle;                                         //程序函数执行类
         public ScriptHandleFunction(Script script, ScorpioHandle handle) : base(script) {
-            SetPrototypeValue(script.TypeFunctionValue);
+            SetPrototype(script.TypeFunction);
             m_Handle = handle;
-            Alloc();
         }
         public override void Free() {
             Release();

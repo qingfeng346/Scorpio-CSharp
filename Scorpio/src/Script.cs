@@ -101,10 +101,10 @@ namespace Scorpio
             AddPrimitivePrototype("String", ref m_TypeString, ref m_TypeValueString);
             AddPrimitivePrototype("Function", ref m_TypeFunction, ref m_TypeValueFunction);
 
-            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", TypeObjectValue), ref m_TypeValueArray);
-            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", TypeObjectValue), ref m_TypeValueMap);
-            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", TypeObjectValue), ref m_TypeValueStringBuilder);
-            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", TypeObjectValue), ref m_TypeValueHashSet);
+            AddBasicPrototype(m_TypeArray = new ScriptTypeBasicArray(this, "Array", m_TypeObject), ref m_TypeValueArray);
+            AddBasicPrototype(m_TypeMap = new ScriptTypeBasicMap(this, "Map", m_TypeObject), ref m_TypeValueMap);
+            AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", m_TypeObject), ref m_TypeValueStringBuilder);
+            AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", m_TypeObject), ref m_TypeValueHashSet);
 
             Global.SetValueNoReference(GLOBAL_NAME, new ScriptValue(Global));
             Global.SetValueNoReference(GLOBAL_SCRIPT, ScriptValue.CreateValue(this, this));
@@ -196,7 +196,7 @@ namespace Scorpio
             MainSynchronizationContext.Post(_ => action(), null);
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
-            type = new ScriptTypePrimitive(this, name, TypeObjectValue);
+            type = new ScriptTypePrimitive(this, name, m_TypeObject);
             typeValue = new ScriptValue(type);
             Global.SetValue(name, typeValue);
         }

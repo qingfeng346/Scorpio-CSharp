@@ -484,9 +484,9 @@ namespace Scorpio.Library
                         return script.TypeStringValue.Reference();
                     case ScriptValue.scriptValueType:
                         if (value.scriptValue is ScriptInstance) {
-                            return (value.scriptValue as ScriptInstance).PrototypeValue.Reference();
+                            return new ScriptValue((value.scriptValue as ScriptInstance).Prototype);
                         } else if (value.scriptValue is ScriptType) {
-                            return (value.scriptValue as ScriptType).PrototypeValue.Reference();
+                            return new ScriptValue((value.scriptValue as ScriptType).Prototype);
                         } else {
                             return script.GetUserdataTypeValue(value.scriptValue.Type).Reference();
                         }
@@ -523,9 +523,9 @@ namespace Scorpio.Library
                 var value = args[0];
                 if (value.valueType == ScriptValue.scriptValueType) {
                     if (value.scriptValue is ScriptInstance) {
-                        return (value.scriptValue as ScriptInstance).Prototype.PrototypeValue.Reference();
+                        return new ScriptValue((value.scriptValue as ScriptInstance).Prototype.Prototype);
                     } else if (value.scriptValue is ScriptType) {
-                        return (value.scriptValue as ScriptType).PrototypeValue.Reference();
+                        return new ScriptValue((value.scriptValue as ScriptType).Prototype);
                     }
                 }
                 return ScriptValue.Null;

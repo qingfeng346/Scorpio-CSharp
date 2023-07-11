@@ -48,7 +48,9 @@ namespace ScorpioTest {
         public void Test1() {
             ScorpioLogger.ilog = new Logger();
             TestDelegateFactory.Initialize();
-            foreach (var file in FileUtil.GetFiles("../../../../ExampleScripts", new[] { "*.sco" }, SearchOption.TopDirectoryOnly)) {
+            var files = new List<string>(FileUtil.GetFiles("../../../../ExampleScripts", new[] { "*.sco" }, SearchOption.TopDirectoryOnly));
+            files.Sort();
+            foreach (var file in files) {
                 WriteLine($"============================开始运行文件{file}============================");
                 var script = new Script();
                 script.LoadLibraryV1();
