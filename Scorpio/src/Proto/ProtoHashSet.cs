@@ -2,27 +2,30 @@
 namespace Scorpio.Proto {
     public class ProtoHashSet {
         public static ScriptType Load(Script script, ScriptType ret) {
-            ret.SetValue("add", script.CreateFunction(new add()));
-            ret.SetValue("remove", script.CreateFunction(new remove()));
-            ret.SetValue("removeWhere", script.CreateFunction(new removeWhere()));
-            ret.SetValue("contains", script.CreateFunction(new contains()));
-            ret.SetValue("clear", script.CreateFunction(new clear()));
-            ret.SetValue("length", script.CreateFunction(new length()));
-            ret.SetValue("unionWith", script.CreateFunction(new unionWith()));
-            ret.SetValue("exceptWith", script.CreateFunction(new exceptWith()));
-            ret.SetValue("intersectWith", script.CreateFunction(new intersectWith()));
-            ret.SetValue("isProperSubsetOf", script.CreateFunction(new isProperSubsetOf()));
-            ret.SetValue("isProperSupersetOf", script.CreateFunction(new isProperSupersetOf()));
-            ret.SetValue("isSubsetOf", script.CreateFunction(new isSubsetOf()));
-            ret.SetValue("isSupersetOf", script.CreateFunction(new isSupersetOf()));
-            ret.SetValue("overlaps", script.CreateFunction(new overlaps()));
-            ret.SetValue("setEquals", script.CreateFunction(new setEquals()));
-            ret.SetValue("symmetricExceptWith", script.CreateFunction(new symmetricExceptWith()));
-            ret.SetValue("trimExcess", script.CreateFunction(new trimExcess()));
-            ret.SetValue("forEach", script.CreateFunction(new forEach()));
-            ret.SetValue("find", script.CreateFunction(new find()));
-            ret.SetValue("toArray", script.CreateFunction(new toArray(script)));
-            ret.SetValue("convertAll", script.CreateFunction(new convertAll()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("add", new add()),
+                ("remove", new remove()),
+                ("removeWhere", new removeWhere()),
+                ("contains", new contains()),
+                ("clear", new clear()),
+                ("length", new length()),
+                ("unionWith", new unionWith()),
+                ("exceptWith", new exceptWith()),
+                ("intersectWith", new intersectWith()),
+                ("isProperSubsetOf", new isProperSubsetOf()),
+                ("isProperSupersetOf", new isProperSupersetOf()),
+                ("isSubsetOf", new isSubsetOf()),
+                ("isSupersetOf", new isSupersetOf()),
+                ("overlaps", new overlaps()),
+                ("setEquals", new setEquals()),
+                ("symmetricExceptWith", new symmetricExceptWith()),
+                ("trimExcess", new trimExcess()),
+                ("forEach", new forEach()),
+                ("find", new find()),
+                ("toArray", new toArray(script)),
+                ("convertAll", new convertAll()),
+            };
+            ret.SetFunctions(script, functions);
             return ret;
         }
         private class add : ScorpioHandle {

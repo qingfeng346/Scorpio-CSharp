@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapString : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
+    public class ScriptMapStringPolling : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
         //数组迭代器
         public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
             private IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
-            internal Enumerator(ScriptMapString map) {
+            internal Enumerator(ScriptMapStringPolling map) {
                 m_Enumerator = map.m_Values.GetEnumerator();
             }
             public bool MoveNext() {
@@ -18,7 +18,7 @@ namespace Scorpio {
             public void Reset() { m_Enumerator.Reset(); }
             public void Dispose() { m_Enumerator.Dispose(); m_Enumerator = null; }
         }
-        public ScriptMapString(Script script) : base(script) { }
+        public ScriptMapStringPolling(Script script) : base(script) { }
         public override void Free() {
             Clear();
             Release();
@@ -61,7 +61,7 @@ namespace Scorpio {
             return ret;
         }
         public override ScriptMap NewCopy() {
-            var ret = m_Script.NewMapString();
+            var ret = m_Script.NewMapStringPolling();
             ret.SetCapacity(m_Values.mSize);
             for (var i = 0; i < m_Values.mSize; ++i) {
                 ret.m_Values.mKeys[i] = m_Values.mKeys[i];
@@ -70,7 +70,7 @@ namespace Scorpio {
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = m_Script.NewMapString();
+            var ret = m_Script.NewMapStringPolling();
             ret.SetCapacity(m_Values.mSize);
             if (deep) {
                 for (var i = 0; i < m_Values.mSize; ++i) {

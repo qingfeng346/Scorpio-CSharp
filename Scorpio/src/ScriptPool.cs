@@ -9,8 +9,7 @@ namespace Scorpio {
         private ScriptObjectsPool<ScriptInstance> instancePool;
         private ScriptObjectsPool<ScriptArray> arrayPool;
         private ScriptObjectsPool<ScriptMapObject> mapObjectPool;
-        private ScriptObjectsPool<ScriptMapString> mapStringPool;
-        private ScriptObjectsPool<ScriptMapPolling> mapPollingPool;
+        private ScriptObjectsPool<ScriptMapStringPolling> mapStringPollingPool;
         private ScriptObjectsPool<ScriptHashSet> hashSetPool;
         private ScriptObjectsPool<ScriptStringBuilder> stringBuilderPool;
         private ScriptObjectsPool<ScriptScriptFunction> functionPool;
@@ -35,8 +34,7 @@ namespace Scorpio {
             instancePool = new ScriptObjectsPool<ScriptInstance>(() => new ScriptInstance(this));
             arrayPool = new ScriptObjectsPool<ScriptArray>(() => new ScriptArray(this));
             mapObjectPool = new ScriptObjectsPool<ScriptMapObject>(() => new ScriptMapObject(this));
-            mapStringPool = new ScriptObjectsPool<ScriptMapString>(() => new ScriptMapString(this));
-            mapPollingPool = new ScriptObjectsPool<ScriptMapPolling>(() => new ScriptMapPolling(this));
+            mapStringPollingPool = new ScriptObjectsPool<ScriptMapStringPolling>(() => new ScriptMapStringPolling(this));
 
             hashSetPool = new ScriptObjectsPool<ScriptHashSet>(() => new ScriptHashSet(this));
             stringBuilderPool = new ScriptObjectsPool<ScriptStringBuilder>(() => new ScriptStringBuilder(this));
@@ -88,11 +86,8 @@ namespace Scorpio {
             return mapObjectPool.Alloc();
 #endif
         }
-        public ScriptMapString NewMapString() {
-            return mapStringPool.Alloc();
-        }
-        public ScriptMapPolling NewMapPolling() {
-            return mapPollingPool.Alloc();
+        public ScriptMapStringPolling NewMapStringPolling() {
+            return mapStringPollingPool.Alloc();
         }
         public ScriptHashSet NewHashSet() {
             return hashSetPool.Alloc();
@@ -157,11 +152,8 @@ namespace Scorpio {
         public void Free(ScriptMapObject value) {
             mapObjectPool.Free(value);
         }
-        public void Free(ScriptMapString value) {
-            mapStringPool.Free(value);
-        }
-        public void Free(ScriptMapPolling value) {
-            mapPollingPool.Free(value);
+        public void Free(ScriptMapStringPolling value) {
+            mapStringPollingPool.Free(value);
         }
         public void Free(ScriptHashSet value) {
             hashSetPool.Free(value);
@@ -245,8 +237,7 @@ namespace Scorpio {
             Check(instancePool);
             Check(arrayPool);
             Check(mapObjectPool);
-            Check(mapStringPool);
-            Check(mapPollingPool);
+            Check(mapStringPollingPool);
             Check(hashSetPool);
             Check(stringBuilderPool);
             Check(functionPool);

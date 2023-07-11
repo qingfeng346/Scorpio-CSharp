@@ -5,12 +5,7 @@ namespace Scorpio.Library {
                 ("encode", new encode(script)),
                 ("decode", new decode(script)),
             };
-            var map = script.NewMapString();
-            map.SetCapacity(functions.Length);
-            foreach (var (name, func) in functions) {
-                map.SetValueNoReference(name, script.CreateFunction(func));
-            }
-            script.SetGlobalNoReference("json", map);
+            script.AddLibrary("json", functions);
         }
         private class encode : ScorpioHandle {
             private readonly Script m_Script;

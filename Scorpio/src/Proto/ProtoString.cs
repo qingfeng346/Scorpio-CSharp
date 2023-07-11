@@ -4,41 +4,43 @@ using System.Text;
 namespace Scorpio.Proto {
     public class ProtoString {
         public static ScriptType Load(Script script, ScriptType ret) {
-            ret.SetValue("format", script.CreateFunction(new format()));
-            ret.SetValue("csFormat", script.CreateFunction(new csFormat()));
-            ret.SetValue("isNullOrEmpty", script.CreateFunction(new isNullOrEmpty()));
-            ret.SetValue("join", script.CreateFunction(new join()));
-            ret.SetValue("fromCharCode", script.CreateFunction(new fromCharCode()));
-            ret.SetValue("toCharCode", script.CreateFunction(new toCharCode(script)));
-            ret.SetValue("isInterned", script.CreateFunction(new isInterned()));
-            ret.SetValue("intern", script.CreateFunction(new intern()));
-
-            ret.SetValue("length", script.CreateFunction(new length()));
-            ret.SetValue("count", script.CreateFunction(new length()));
-            ret.SetValue("at", script.CreateFunction(new at()));
-            ret.SetValue("charCodeAt", script.CreateFunction(new at()));
-            ret.SetValue("insert", script.CreateFunction(new insert()));
-            ret.SetValue("remove", script.CreateFunction(new remove()));
-            ret.SetValue("toLower", script.CreateFunction(new toLower()));
-            ret.SetValue("toUpper", script.CreateFunction(new toUpper()));
-            ret.SetValue("toOneLower", script.CreateFunction(new toOneLower()));
-            ret.SetValue("toOneUpper", script.CreateFunction(new toOneUpper()));
-            ret.SetValue("trim", script.CreateFunction(new trim()));
-            ret.SetValue("trimStart", script.CreateFunction(new trimStart()));
-            ret.SetValue("trimEnd", script.CreateFunction(new trimEnd()));
-            ret.SetValue("replace", script.CreateFunction(new replace()));
-            ret.SetValue("indexOf", script.CreateFunction(new indexOf()));
-            ret.SetValue("lastIndexOf", script.CreateFunction(new lastIndexOf()));
-            ret.SetValue("indexOfChar", script.CreateFunction(new indexOfChar()));
-            ret.SetValue("lastIndexOfChar", script.CreateFunction(new lastIndexOfChar()));
-            ret.SetValue("startsWith", script.CreateFunction(new startsWith()));
-            ret.SetValue("endsWith", script.CreateFunction(new endsWith()));
-            ret.SetValue("contains", script.CreateFunction(new contains()));
-            ret.SetValue("padLeft", script.CreateFunction(new padLeft()));
-            ret.SetValue("padRight", script.CreateFunction(new padRight()));
-            ret.SetValue("compareTo", script.CreateFunction(new compareTo()));
-            ret.SetValue("sub", script.CreateFunction(new sub()));
-            ret.SetValue("split", script.CreateFunction(new split(script)));
+            var functions = new (string, ScorpioHandle)[] {
+                ("format", new format()),
+                ("csFormat", new csFormat()),
+                ("isNullOrEmpty", new isNullOrEmpty()),
+                ("join", new join()),
+                ("fromCharCode", new fromCharCode()),
+                ("toCharCode", new toCharCode(script)),
+                ("isInterned", new isInterned()),
+                ("intern", new intern()),
+                ("length", new length()),
+                ("count", new length()),
+                ("at", new at()),
+                ("charCodeAt", new at()),
+                ("insert", new insert()),
+                ("remove", new remove()),
+                ("toLower", new toLower()),
+                ("toUpper", new toUpper()),
+                ("toOneLower", new toOneLower()),
+                ("toOneUpper", new toOneUpper()),
+                ("trim", new trim()),
+                ("trimStart", new trimStart()),
+                ("trimEnd", new trimEnd()),
+                ("replace", new replace()),
+                ("indexOf", new indexOf()),
+                ("lastIndexOf", new lastIndexOf()),
+                ("indexOfChar", new indexOfChar()),
+                ("lastIndexOfChar", new lastIndexOfChar()),
+                ("startsWith", new startsWith()),
+                ("endsWith", new endsWith()),
+                ("contains", new contains()),
+                ("padLeft", new padLeft()),
+                ("padRight", new padRight()),
+                ("compareTo", new compareTo()),
+                ("sub", new sub()),
+                ("split", new split(script)),
+            };
+            ret.SetFunctions(script, functions);
             return ret;
         }
         private class length : ScorpioHandle {

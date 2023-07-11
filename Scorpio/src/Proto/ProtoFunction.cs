@@ -3,9 +3,12 @@ using System;
 namespace Scorpio.Proto {
     public class ProtoFunction {
         public static ScriptType Load(Script script, ScriptType ret) {
-            ret.SetValue("bind", script.CreateFunction(new bind()));
-            ret.SetValue("bindObject", script.CreateFunction(new bindObject()));
-            ret.SetValue("call", script.CreateFunction(new call()));
+            var functions = new (string, ScorpioHandle)[] {
+                ("bind", new bind()),
+                ("bindObject", new bindObject()),
+                ("call", new call()),
+            };
+            ret.SetFunctions(script, functions);
             return ret;
         }
         private class bind : ScorpioHandle {

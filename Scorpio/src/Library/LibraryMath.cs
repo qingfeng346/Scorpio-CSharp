@@ -29,17 +29,11 @@ namespace Scorpio.Library {
                 ("tanh", new tanh()),
                 ("atan", new atan()),
             };
-
-            var map = script.NewMapString();
-            map.SetCapacity(functions.Length + 4);
-            foreach (var (name, func) in functions) {
-                map.SetValueNoReference(name, script.CreateFunction(func));
-            }
-            map.SetValue("PI", new ScriptValue(PI));
-            map.SetValue("Deg2Rad", new ScriptValue(Deg2Rad));              //角度转弧度 角度*此值=弧度
-            map.SetValue("Rad2Deg", new ScriptValue(Rad2Deg));              //弧度转角度 弧度*此值=角度
-            map.SetValue("Epsilon", new ScriptValue(Epsilon));              //一个很小的浮点数
-            script.SetGlobalNoReference("math", map);
+            var map = script.AddLibrary("math", functions, 4);
+            map.SetValueNoReference("PI", new ScriptValue(PI));
+            map.SetValueNoReference("Deg2Rad", new ScriptValue(Deg2Rad));              //角度转弧度 角度*此值=弧度
+            map.SetValueNoReference("Rad2Deg", new ScriptValue(Rad2Deg));              //弧度转角度 弧度*此值=角度
+            map.SetValueNoReference("Epsilon", new ScriptValue(Epsilon));              //一个很小的浮点数
         }
         private class min : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {

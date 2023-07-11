@@ -18,6 +18,12 @@ namespace Scorpio {
             m_PrototypeValue.CopyFrom(parentValue);
             m_Prototype = parentValue.Get<ScriptType>();
         }
+        internal void SetFunctions(Script script, (string, ScorpioHandle)[] functions) {
+            SetFunctionCapacity(functions.Length);
+            foreach (var (name, func) in functions) {
+                SetValue(name, script.CreateFunction(func));
+            }
+        }
         public void SetFunctionCapacity(int capacity) {
             m_Values.SetCapacity(capacity);
         }

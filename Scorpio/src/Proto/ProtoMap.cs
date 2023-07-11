@@ -18,10 +18,7 @@ namespace Scorpio.Proto {
                 ("+", new plus()),
                 ("-", new minus()),
             };
-            ret.SetFunctionCapacity(functions.Length);
-            foreach (var (name, func) in functions) {
-                ret.SetValue(name, script.CreateFunction(func));
-            }
+            ret.SetFunctions(script, functions);
             return ret;
         }
         private class length : ScorpioHandle {

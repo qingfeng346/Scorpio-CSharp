@@ -45,8 +45,7 @@ namespace Scorpio.Library {
         char EatWhiteSpace {
             get {
                 while (WHITE_SPACE.IndexOf(Peek()) != -1) {
-                    ++m_Index;
-                    if (Peek() == END_CHAR) {
+                    if (++m_Index == m_Length) {
                         return END_CHAR;
                     }
                 }
@@ -58,7 +57,7 @@ namespace Scorpio.Library {
                 m_Builder.Clear();
                 while (WORD_BREAK.IndexOf(Peek()) == -1) {
                     m_Builder.Append(Read());
-                    if (Peek() == END_CHAR) {
+                    if (m_Index == m_Length) {
                         return m_Builder.ToString();
                     }
                 }

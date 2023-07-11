@@ -12,12 +12,7 @@ namespace Scorpio.Library {
                 //("epoll", new epoll(script)),
                 //("done", new done()),
             };
-            var map = script.NewMapString();
-            map.SetCapacity(functions.Length);
-            foreach (var (name, func) in functions) {
-                map.SetValueNoReference(name, script.CreateFunction(func));
-            }
-            script.SetGlobalNoReference("coroutine", map);
+            script.AddLibrary("coroutine", functions);
             script.SetGlobalNoReference("sleep", script.CreateFunction(new sleep(script)));
         }
         private class start : ScorpioHandle {

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace ScorpioLibrary {
     public class LibraryOS {
         public static void Load(Script script) {
-            var map = script.NewMapString();
+            var map = script.NewMapStringPolling();
             map.SetValueNoReference("platform", script.CreateFunction(new platform()));
             map.SetValueNoReference("isWindows", script.CreateFunction(new isWindows()));
             map.SetValueNoReference("isLinux", script.CreateFunction(new isLinux()));

@@ -186,6 +186,15 @@ namespace Scorpio
             typeValue = new ScriptValue(type);
             Global.SetValue(type.TypeName, typeValue);
         }
+        public ScriptMap AddLibrary(string libraryName, (string, ScorpioHandle)[] functions, int number = 0) {
+            var map = NewMapStringPolling();
+            map.SetCapacity(functions.Length + number);
+            foreach (var (name, func) in functions) {
+                map.SetValueNoReference(name, CreateFunction(func));
+            }
+            SetGlobalNoReference(libraryName, new ScriptValue(map));
+            return map;
+        }
         /// <summary> 压入一个搜索路径,使用 require 时会搜索此路径 </summary>
         /// <param name="path">绝对路径</param>
         public void PushSearchPath(string path) {
