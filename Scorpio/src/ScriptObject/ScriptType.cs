@@ -32,6 +32,7 @@ namespace Scorpio {
             m_GetProperties.SetCapacity(capacity);
         }
         public string TypeName { get; private set; }        //Type名称
+        public override string ValueTypeName => TypeName;   //类型名称
         public virtual ScriptType Prototype => m_Prototype;
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype?.EqualFunction;
         protected void Release() {

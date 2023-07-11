@@ -20,6 +20,7 @@ namespace Scorpio {
         }
         public ScriptMapStringPolling(Script script) : base(script) { }
         public override void Free() {
+            base.Free();
             Release();
             m_Script.Free(this);
         }

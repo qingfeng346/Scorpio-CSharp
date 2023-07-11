@@ -17,9 +17,11 @@ namespace Scorpio {
         Global,         //全局变量保存类,只有_G是这个类型
     }
     public abstract class ScriptObject : IPool {
+        private static uint AutoId = 0;
         protected Script m_Script;
 #if SCORPIO_DEBUG
-        public string Source { get; set; }
+        private string Source;
+        private uint Id;
 #endif
         public int Index = -1;
         public readonly ObjectType ObjectType;                          //类型
@@ -33,8 +35,19 @@ namespace Scorpio {
         public virtual Type Type => GetType();                          //获取类型
         public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
         public Script script => m_Script;
-        public virtual void Alloc() { }
-        public abstract void Free();
+        public virtual void Alloc() {
+#if SCORPIO_DEBUG
+            Id = AutoId++;
+            Source = $"Type:{ValueTypeName} {m_Script.RecordStack}";
+            m_Script.AddRecord(Source, Id);
+#endif
+        }
+        public virtual void Free() {
+#if SCORPIO_DEBUG
+            m_Script.DelRecord(Source, Id);
+            Source = null;
+#endif
+        }
         //循环引用被回收掉
         public abstract void gc();
         //SetValueByIndex GetValueByIndex 目前只有Global在用

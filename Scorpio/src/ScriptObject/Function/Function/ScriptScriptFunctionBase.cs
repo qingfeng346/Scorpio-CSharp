@@ -14,6 +14,7 @@ namespace Scorpio.Function {
             return this;
         }
         public override void Free() {
+            base.Free();
             ReleaseInternal();
             Release();
             m_Context = null;
@@ -36,6 +37,7 @@ namespace Scorpio.Function {
             return this;
         }
         public override void Free() {
+            base.Free();
             ReleaseInternal();
             Release();
             m_BindObject.Free();

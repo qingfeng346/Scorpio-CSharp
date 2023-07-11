@@ -5,6 +5,7 @@ namespace Scorpio {
         public ScriptMap(Script script) : base(script, ObjectType.Map) { }
         public abstract new IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator();
         public override void Alloc() {
+            base.Alloc();
             SetPrototype(script.TypeMap);
         }
         public abstract bool ContainsKey(object key);

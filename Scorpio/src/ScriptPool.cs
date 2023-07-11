@@ -60,31 +60,13 @@ namespace Scorpio {
             return typePool.Alloc();
         }
         public ScriptInstance NewInstance() {
-#if SCORPIO_DEBUG
-            var ret = instancePool.Alloc();
-            ret.Source = GetStackInfo().ToString();
-            return ret;
-#else
             return instancePool.Alloc();
-#endif
         }
         public ScriptArray NewArray() {
-#if SCORPIO_DEBUG
-            var ret = arrayPool.Alloc();
-            ret.Source = GetStackInfo().ToString();
-            return ret;
-#else
             return arrayPool.Alloc();
-#endif
         }
         public ScriptMapObject NewMapObject() {
-#if SCORPIO_DEBUG
-            var ret = mapObjectPool.Alloc();
-            ret.Source = GetStackInfo().ToString();
-            return ret;
-#else
             return mapObjectPool.Alloc();
-#endif
         }
         public ScriptMapStringPolling NewMapStringPolling() {
             return mapStringPollingPool.Alloc();
@@ -109,13 +91,7 @@ namespace Scorpio {
         }
 
         public ScriptUserdataObject NewUserdataObject() {
-#if SCORPIO_DEBUG
-            var ret = userdataObjectPool.Alloc();
-            ret.Source = GetStackInfo().ToString();
-            return ret;
-#else
             return userdataObjectPool.Alloc();
-#endif
         }
         public ScriptUserdataArray NewUserdataArray() {
             return userdataArrayPool.Alloc();

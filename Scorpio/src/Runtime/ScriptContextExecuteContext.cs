@@ -114,6 +114,8 @@ namespace Scorpio.Runtime {
                         instruction = m_scriptInstructions[iInstruction++];
                         opvalue = instruction.opvalue;
                         opcode = instruction.opcode;
+                        m_script.RecordStack.Breviary = m_Breviary;
+                        m_script.RecordStack.Line = instruction.line;
                         switch (opcode) {
                             #region Load
                             case Opcode.LoadConstDouble: {
@@ -1402,17 +1404,11 @@ namespace Scorpio.Runtime {
 #region New
                             case Opcode.NewMap: {
                                 var map = m_script.NewMapObject();
-#if SCORPIO_DEBUG
-                                map.Source = $"{m_Breviary}:{instruction.line}";
-#endif
                                 stackObjects[++stackIndex].SetScriptValue(map);
                                 continue;
                             }
                             case Opcode.NewArray: {
                                 var array = m_script.NewArray();
-#if SCORPIO_DEBUG
-                                array.Source = $"{m_Breviary}:{instruction.line}";
-#endif
                                 array.SetArrayCapacity(opvalue);
                                 for (var i = opvalue - 1; i >= 0; --i) {
                                     array.Add(stackObjects[stackIndex - i]);
@@ -1426,9 +1422,6 @@ namespace Scorpio.Runtime {
                                 var functionData = constContexts[opvalue];
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData);
-#if SCORPIO_DEBUG
-                                function.Source = $"{m_Breviary}:{instruction.line}";
-#endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
                                     function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
@@ -1441,9 +1434,6 @@ namespace Scorpio.Runtime {
                                 var functionData = constContexts[opvalue];
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData, thisObject);
-#if SCORPIO_DEBUG
-                                function.Source = $"{m_Breviary}:{instruction.line}";
-#endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
                                     function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
@@ -1456,9 +1446,6 @@ namespace Scorpio.Runtime {
                                 var functionData = constContexts[opvalue];
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData);
-#if SCORPIO_DEBUG
-                                function.Source = $"{m_Breviary}:{instruction.line}";
-#endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
                                     function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
@@ -1471,9 +1458,6 @@ namespace Scorpio.Runtime {
                                 var functionData = constContexts[opvalue];
                                 var internals = functionData.m_FunctionData.internals;
                                 function.SetContext(functionData, thisObject);
-#if SCORPIO_DEBUG
-                                function.Source = $"{m_Breviary}:{instruction.line}";
-#endif
                                 for (var i = 0; i < internals.Length; ++i) {
                                     var internalIndex = internals[i];
                                     function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
@@ -1486,9 +1470,6 @@ namespace Scorpio.Runtime {
                                 var parentType = classData.parent >= 0 ? m_global.GetValue(constScriptString[classData.parent]).Get<ScriptType>() : m_script.TypeObject;
                                 var className = constScriptString[classData.name];
                                 var type = m_script.NewType();
-#if SCORPIO_DEBUG
-                                type.Source = $"{m_Breviary}:{instruction.line}";
-#endif
                                 type.Set(className, parentType ?? m_script.TypeObject);
                                 var functions = classData.functions;
                                 var functionCount = 0;
@@ -1508,9 +1489,6 @@ namespace Scorpio.Runtime {
                                     var functionName = constScriptString[func >> 32];
                                     if (funcType == 0) {
                                         var function = m_script.NewFunction().SetContext(functionData);
-#if SCORPIO_DEBUG
-                                        function.Source = $"{className}.{functionName}";
-#endif
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
                                             function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
@@ -1518,9 +1496,6 @@ namespace Scorpio.Runtime {
                                         type.SetValue(functionName, function);
                                     } else if (funcType == 1) {
                                         var function = m_script.NewAsyncFunction().SetContext(functionData);
-#if SCORPIO_DEBUG
-                                        function.Source = $"{className}.{functionName}";
-#endif
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
                                             function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);
@@ -1528,9 +1503,6 @@ namespace Scorpio.Runtime {
                                         type.SetValue(functionName, function);
                                     } else if (funcType == 2) {
                                         var function = m_script.NewFunction().SetContext(functionData);
-#if SCORPIO_DEBUG
-                                        function.Source = $"{className}.{functionName}";
-#endif
                                         for (var i = 0; i < internals.Length; ++i) {
                                             var internalIndex = internals[i];
                                             function.SetInternal(internalIndex & 0xffff, internalValues[internalIndex >> 16]);

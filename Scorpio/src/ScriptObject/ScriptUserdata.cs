@@ -7,6 +7,7 @@ namespace Scorpio {
         public override Type ValueType => m_ValueType;      //值类型，如果是Type则返回 typeof(Type)
         public override Type Type => m_ValueType;           //获取类型
         public override object Value => m_Value;            //值
+        public override string ValueTypeName => m_ValueType.ToString();   //类型名称
         public override int GetHashCode() { return m_Value.GetHashCode(); }
         public ScriptUserdata(Script script) : base(script, ObjectType.UserData) { }
     }

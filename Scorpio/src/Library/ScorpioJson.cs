@@ -160,9 +160,6 @@ namespace Scorpio.Library {
         }
         ScriptValue ParseMap() {
             var map = m_Script.NewMapObject();
-#if SCORPIO_DEBUG
-            map.Source = $"JsonMap:{m_Script.GetStackInfo()}";
-#endif
             while (true) {
                 var ch = EatWhiteSpace;
                 switch (ch) {
@@ -205,9 +202,6 @@ namespace Scorpio.Library {
         }
         ScriptValue ParseArray() {
             var array = m_Script.NewArray();
-#if SCORPIO_DEBUG
-            array.Source = $"JsonArray:{m_Script.GetStackInfo()}";
-#endif
             while (true) {
                 var ch = EatWhiteSpace;
                 switch (ch) {

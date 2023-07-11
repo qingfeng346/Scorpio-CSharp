@@ -18,6 +18,7 @@ using Scorpio.Serialize;
 using Scorpio.Tools;
 using Scorpio.Compile.Compiler;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Scorpio
 {
@@ -560,6 +561,7 @@ namespace Scorpio
         }
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
         private StackInfo m_Stack = new StackInfo();
+        public StackInfo RecordStack = new StackInfo();
         private int m_StackLength = 0;
         internal void PushStackInfo(string breviary, int line) {
             m_StackInfos[m_StackLength].Breviary = breviary;
@@ -585,6 +587,33 @@ namespace Scorpio
         public void ReleaseAll() {
             ScriptObjectReference.ReleaseAll();
             StringReference.ReleaseAll();
+        }
+
+        public bool IsRecord = false;
+        public Dictionary<string, HashSet<uint>> Record = new Dictionary<string, HashSet<uint>>();
+        public void StartRecord() {
+            IsRecord = true;
+            Record.Clear();
+        }
+        public void AddRecord(string source, uint id) {
+            if (!IsRecord) { return; }
+            if (!Record.ContainsKey(source)) {
+                Record[source] = new HashSet<uint>();
+            }
+            Record[source].Add(id);
+        }
+        public void DelRecord(string source, uint id) {
+            if (!IsRecord) { return; }
+            if (Record.TryGetValue(source, out var set)) {
+                set.Remove(id);
+            }
+        }
+        public void EndRecord() {
+            ClearStack();
+            ReleaseAll();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            IsRecord = false;
         }
     }
 }
