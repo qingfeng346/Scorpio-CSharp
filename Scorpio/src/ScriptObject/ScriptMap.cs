@@ -10,7 +10,6 @@ namespace Scorpio {
             Source = script.GetStackInfo().ToString();
 #endif
         }
-        public Script getScript() { return m_Script; }
         public Script script => m_Script;
         public abstract new IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }

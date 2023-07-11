@@ -1487,8 +1487,8 @@ namespace Scorpio.Runtime {
                                             if ((unfold & (1L << i)) != 0) {
                                                 var array = parameter.Get<ScriptArray>();
                                                 if (array != null) {
-                                                    var values = array.getObjects();
-                                                    var valueLength = array.Length();
+                                                    var values = array.m_Objects;
+                                                    var valueLength = array.m_Length;
                                                     for (var j = 0; j < valueLength; ++j) {
                                                         parameters[parameterIndex++] = values[j];
                                                     }
@@ -1520,8 +1520,8 @@ namespace Scorpio.Runtime {
                                             if ((unfold & (1L << i)) != 0) {
                                                 var array = parameter.Get<ScriptArray>();
                                                 if (array != null) {
-                                                    var values = array.getObjects();
-                                                    var valueLength = array.Length();
+                                                    var values = array.m_Objects;
+                                                    var valueLength = array.m_Length;
                                                     for (var j = 0; j < valueLength; ++j) {
                                                         parameters[parameterIndex++] = values[j];
                                                     }
@@ -1585,8 +1585,8 @@ namespace Scorpio.Runtime {
                                             if ((unfold & (1L << i)) != 0) {
                                                 var array = parameter.Get<ScriptArray>();
                                                 if (array != null) {
-                                                    var values = array.getObjects();
-                                                    var valueLength = array.Length();
+                                                    var values = array.m_Objects;
+                                                    var valueLength = array.m_Length;
                                                     for (var j = 0; j < valueLength; ++j) {
                                                         parameters[parameterIndex++] = values[j];
                                                     }
@@ -1655,8 +1655,8 @@ namespace Scorpio.Runtime {
                                             if ((unfold & (1L << i)) != 0) {
                                                 var array = parameter.Get<ScriptArray>();
                                                 if (array != null) {
-                                                    var values = array.getObjects();
-                                                    var valueLength = array.Length();
+                                                    var values = array.m_Objects;
+                                                    var valueLength = array.m_Length;
                                                     for (var j = 0; j < valueLength; ++j) {
                                                         parameters[parameterIndex++] = values[j];
                                                     }
@@ -1688,8 +1688,8 @@ namespace Scorpio.Runtime {
                                             if ((unfold & (1L << i)) != 0) {
                                                 var array = parameter.Get<ScriptArray>();
                                                 if (array != null) {
-                                                    var values = array.getObjects();
-                                                    var valueLength = array.Length();
+                                                    var values = array.m_Objects;
+                                                    var valueLength = array.m_Length;
                                                     for (var j = 0; j < valueLength; ++j) {
                                                         parameters[parameterIndex++] = values[j];
                                                     }
@@ -1736,8 +1736,8 @@ namespace Scorpio.Runtime {
                                             if ((unfold & (1L << i)) != 0) {
                                                 var array = parameter.Get<ScriptArray>();
                                                 if (array != null) {
-                                                    var values = array.getObjects();
-                                                    var valueLength = array.Length();
+                                                    var values = array.m_Objects;
+                                                    var valueLength = array.m_Length;
                                                     for (var j = 0; j < valueLength; ++j) {
                                                         parameters[parameterIndex++] = values[j];
                                                     }

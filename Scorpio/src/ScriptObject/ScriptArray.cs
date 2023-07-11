@@ -74,9 +74,7 @@ namespace Scorpio {
                 Add(parameters[i]);
             }
         }
-        public Script getScript() { return m_Script; }
         public Script script => m_Script;
-        internal ScriptValue[] getObjects() { return m_Objects; }
         public void SetArrayCapacity(int capacity) {
             if (capacity > m_Length) {
                 SetCapacity_impl(capacity);
