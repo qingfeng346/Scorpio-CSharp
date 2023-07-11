@@ -436,18 +436,14 @@ namespace Scorpio {
             length = data.Classes.Length;
             for (var i = 0; i < length; ++i) {
                 var cl = data.Classes[i];
-                if ((data.NoContext[cl.name] & StringFlag) != 0) {
-                    cl.name = StringIndex[data.ConstString[cl.name]];
-                }
-                if (cl.parent > 0 && (data.NoContext[cl.parent] & StringFlag) != 0) {
+                cl.name = StringIndex[data.ConstString[cl.name]];
+                if (cl.parent > 0) {
                     cl.parent = StringIndex[data.ConstString[cl.parent]];
                 }
                 for (var j = 0; j < cl.functions.Length; ++j) {
                     var func = cl.functions[j];
-                    if ((data.NoContext[func >> 32] & StringFlag) != 0) {
-                        long index = StringIndex[data.ConstString[func >> 32]];
-                        cl.functions[j] = (index << 32) | (func & 0xFFFFFFFFL);
-                    }
+                    long index = StringIndex[data.ConstString[func >> 32]];
+                    cl.functions[j] = (index << 32) | (func & 0xFFFFFFFFL);
                 }
             }
         }

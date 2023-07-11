@@ -114,7 +114,7 @@ namespace Scorpio.Compile.Compiler {
             return index;
         }
         /// <summary> 获取一个string常量的索引 </summary>
-        int GetConstString(string value) {
+        int GetConstString(string value, bool force = false) {
             var index = ConstString.IndexOf(value);
             if (index < 0) {
                 index = ConstString.Count;
@@ -122,7 +122,7 @@ namespace Scorpio.Compile.Compiler {
                 if (NoContext.Length < ConstString.Count)
                     Array.Resize(ref NoContext, ConstString.Count);
             }
-            if (m_scriptExecutable.Block != ExecutableBlock.Context) {
+            if (m_scriptExecutable.Block != ExecutableBlock.Context || force) {
                 NoContext[index] |= 1 << 2;
             }
             return index;
@@ -653,7 +653,7 @@ namespace Scorpio.Compile.Compiler {
                     if (next.Type == TokenType.LeftPar || next.Type == TokenType.LeftBrace) {
                         UndoToken();
                         UndoToken();
-                        nameIndex = GetConstString(token.Lexeme.ToString());
+                        nameIndex = GetConstString(token.Lexeme.ToString(), true);
                         funcIndex = ParseFunctionContent(false, out _);
                     } else {
                         throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
@@ -661,7 +661,7 @@ namespace Scorpio.Compile.Compiler {
                 } else if (token.Type == TokenType.Function) {
                     UndoToken();
                     funcIndex = ParseFunctionContent(true, out var functionName);
-                    nameIndex = GetConstString(functionName);
+                    nameIndex = GetConstString(functionName, true);
                 } else {
                     throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
                 }
@@ -674,7 +674,7 @@ namespace Scorpio.Compile.Compiler {
             }
             var index = Classes.Count;
             Classes.Add(new ScriptClassData() {
-                name = GetConstString(className),
+                name = GetConstString(className, true),
                 parent = parent.Length == 0 ? -1 : GetConstString(parent),
                 functions = funs.ToArray(),
             });
