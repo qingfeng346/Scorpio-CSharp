@@ -1482,9 +1482,8 @@ namespace Scorpio.Runtime {
                             }
                             case Opcode.NewType: {
                                 var classData = constClasses[opvalue];
-                                var parentType = classData.parent >= 0 ? m_global.GetValue(constString[classData.parent]).Get<ScriptType>() : m_script.TypeObject;
-                                var className = constString[classData.name];
-                                string functionName;
+                                var parentType = classData.parent >= 0 ? m_global.GetValue(constScriptString[classData.parent]).Get<ScriptType>() : m_script.TypeObject;
+                                var className = constScriptString[classData.name];
                                 var type = m_script.NewType();
 #if SCORPIO_DEBUG
                                 type.Source = $"{m_Breviary}:{instruction.line}";
@@ -1505,7 +1504,7 @@ namespace Scorpio.Runtime {
                                     var functionData = constContexts[(func & 0xffffffff) >> 4];
                                     var internals = functionData.m_FunctionData.internals;
                                     var funcType = func & 0xf;
-                                    functionName = constString[func >> 32];
+                                    var functionName = constScriptString[func >> 32];
                                     if (funcType == 0) {
                                         var function = m_script.NewFunction().SetContext(functionData);
 #if SCORPIO_DEBUG

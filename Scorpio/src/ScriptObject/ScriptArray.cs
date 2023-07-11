@@ -82,23 +82,15 @@ namespace Scorpio {
                 throw new ExecutionException($"Capacity 不能小于当前size,  size:{m_Length} capacity:{capacity}");
             }
         }
-        void SetCapacity_impl(int value) {
-            if (value <= 0) {
-                m_Objects = ScorpioUtil.VALUE_EMPTY;
-            } else if (value > m_Objects.Length) {
-                var array = new ScriptValue[value];
-                if (m_Length > 0) {
-                    Array.Copy(m_Objects, 0, array, 0, m_Length);
-                }
-                m_Objects = array;
+        void SetCapacity_impl(int capacity) {
+            var array = new ScriptValue[capacity];
+            if (m_Length > 0) {
+                Array.Copy(m_Objects, 0, array, 0, m_Length);
             }
+            m_Objects = array;
         }
-        void EnsureCapacity(int min) {
-            if (m_Objects.Length < min) {
-                int num = m_Objects.Length + 16;
-                if (num > 2146435071) { num = 2146435071; } else if (num < min) { num = min; }
-                SetCapacity_impl(num);
-            }
+        void ExpandCapacity() {
+            SetCapacity_impl(m_Length + 8);
         }
         public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
@@ -129,9 +121,9 @@ namespace Scorpio {
                 return i < m_Length ? m_Objects[i] : ScriptValue.Null;
             }
             set {
-                if (i < 0) throw new ExecutionException($"Array.set[] 索引小于0:{i}");
-                if (i >= m_Length) {
-                    EnsureCapacity(i + 1);
+                if (i < 0 || i > m_Length) throw new ExecutionException($"Array.set[] 索引小于0或超过当前长度:{i}  Length:{m_Length}");
+                if (i == m_Length) {
+                    ExpandCapacity();
                     m_Length = i + 1;
                 }
                 m_Objects[i].CopyFrom(value);
@@ -139,13 +131,13 @@ namespace Scorpio {
         }
         public void Add(ScriptValue value) {
             if (m_Length == m_Objects.Length) {
-                EnsureCapacity(m_Length + 1);
+                ExpandCapacity();
             }
             m_Objects[m_Length++].CopyFrom(value);
         }
         public void AddNoReference(ScriptValue value) {
             if (m_Length == m_Objects.Length) {
-                EnsureCapacity(m_Length + 1);
+                ExpandCapacity();
             }
             m_Objects[m_Length++].Set(value);
         }
@@ -156,14 +148,14 @@ namespace Scorpio {
                 }
             }
             if (m_Length == m_Objects.Length) {
-                EnsureCapacity(m_Length + 1);
+                ExpandCapacity();
             }
             m_Objects[m_Length++].CopyFrom(value);
         }
         public void Insert(int index, ScriptValue value) {
             if (index < 0 || index > m_Length) throw new ExecutionException($"Array.Insert 索引小于0或超过最大值 index:{index} length:{m_Length}");
             if (m_Length == m_Objects.Length) {
-                EnsureCapacity(m_Length + 1);
+                ExpandCapacity();
             }
             Array.Copy(m_Objects, index, m_Objects, index + 1, m_Length - index);
             //直接赋值 不需要释放
@@ -215,7 +207,7 @@ namespace Scorpio {
         public void Resize(int length) {
             if (length < 0)  throw new ExecutionException($"Array.Resize长度小于0:{length}");
             if (length > m_Length) {
-                EnsureCapacity(length);
+                SetCapacity_impl(length);
                 m_Length = length;
             } else {
                 for (var i = length; i < m_Length; ++i) {
@@ -285,7 +277,8 @@ namespace Scorpio {
         }
         public override ScriptObject Clone(bool deep) {
             var ret = m_Script.NewArray();
-            ret.SetCapacity_impl(m_Length);
+            if (ret.m_Objects.Length < m_Length)
+                ret.m_Objects = new ScriptValue[m_Length];
             ret.m_Length = m_Length;
             if (deep) {
                 for (int i = 0; i < m_Length; ++i) {
@@ -310,7 +303,8 @@ namespace Scorpio {
         }
         public ScriptArray NewCopy() {
             var ret = m_Script.NewArray();
-            ret.SetCapacity_impl(m_Length);
+            if (ret.m_Objects.Length < m_Length)
+                ret.m_Objects = new ScriptValue[m_Length];
             ret.m_Length = m_Length;
             for (int i = 0; i < m_Length; ++i) {
                 ret.m_Objects[i].CopyFrom(m_Objects[i]);
