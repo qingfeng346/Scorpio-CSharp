@@ -1,3 +1,4 @@
+#define EXECUTE_CONTEXT
 using System;
 using System.Collections;
 using Scorpio.Exception;

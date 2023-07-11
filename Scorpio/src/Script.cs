@@ -24,6 +24,8 @@ namespace Scorpio
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+        public const int StringFlag = 1 << 2;
+        public const int StringStage = 256;
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
@@ -82,6 +84,9 @@ namespace Scorpio
         public bool IsShutdown { get; private set; }
         public int MainThreadId { get; private set; }
         public SynchronizationContext MainSynchronizationContext { get; private set; }
+        private int ConstStringIndex = 0;
+        public string[] ConstString;
+        public Dictionary<string, int> StringIndex;
         public Script() {
             m_SearchPaths = new string[0];
             InitPool();
@@ -128,10 +133,13 @@ namespace Scorpio
             LibraryCoroutine.Load(this);
             MainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
             MainSynchronizationContext = SynchronizationContext.Current;
+            ConstString = new string[StringStage];
+            StringIndex = new Dictionary<string, int>();
         }
         public void Shutdown() {
             if (IsShutdown) return;
             IsShutdown = true;
+            ClearStack();
             Global.Shutdown();
             m_TypeValueObject.Free();
             m_TypeValueBool.Free();
@@ -172,6 +180,16 @@ namespace Scorpio
             m_ExtensionType.Clear();
             m_Assembly.Clear();
             CoroutineResult.Free();
+        }
+        public void ClearStack() {
+            for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
+                ScorpioUtil.Free(ScriptContext.VariableValues[i]);
+                ScorpioUtil.Free(ScriptContext.StackValues[i]);
+            }
+            for (var i = 0; i < ScriptContext.AsyncValuePoolLength; ++i) {
+                ScorpioUtil.Free(ScriptContext.AsyncValuePool[i].variable);
+                ScorpioUtil.Free(ScriptContext.AsyncValuePool[i].stack);
+            }
         }
         public void RunOnMainThread(Action action) {
             if (IsShutdown) return;
@@ -430,17 +448,66 @@ namespace Scorpio
                 return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), m_SearchPaths, compileOption));
             }
         }
+        void ParseConstString(SerializeData data) {
+            var length = data.ConstString.Length;
+            for (var i = 0; i < length; ++i) {
+                if ((data.NoContext[i] & StringFlag) != 0) {
+                    var str = data.ConstString[i];
+                    if (!StringIndex.ContainsKey(str)) {
+                        if (ConstStringIndex == ConstString.Length) {
+                            Array.Resize(ref ConstString, ConstStringIndex + StringStage);
+                        }
+                        StringIndex[str] = ConstStringIndex;
+                        ConstString[ConstStringIndex++] = str;
+                    }
+                }
+            }
+            length = data.Functions.Length;
+            for (var i = 0; i < length; ++i) {
+                var func = data.Functions[i];
+                for (var j = 0; j < func.scriptInstructions.Length; ++j) {
+                    var instruction = func.scriptInstructions[j];
+                    switch (instruction.opcode) {
+                        case Opcode.LoadConstString:
+                        case Opcode.LoadValueString:
+                        case Opcode.LoadGlobalString:
+                        case Opcode.StoreValueStringAssign:
+                        case Opcode.StoreGlobalStringAssign:
+                        case Opcode.StoreValueString:
+                        case Opcode.StoreGlobalString:
+                            if ((data.NoContext[instruction.opvalue] & StringFlag) != 0) {
+                                instruction.opvalue = StringIndex[data.ConstString[instruction.opvalue]];
+                            }
+                            break;
+                    }
+                }
+            }
+            length = data.Classes.Length;
+            for (var i = 0; i < length; ++i) {
+                var cl = data.Classes[i];
+                cl.name = StringIndex[data.ConstString[cl.name]];
+                if (cl.parent > 0) {
+                    cl.parent = StringIndex[data.ConstString[cl.parent]];
+                }
+                for (var j = 0; j < cl.functions.Length; ++j) {
+                    var func = cl.functions[j];
+                    long index = StringIndex[data.ConstString[func >> 32]];
+                    cl.functions[j] = (index << 32) | (func & 0xFFFFFFFFL);
+                }
+            }
+        }
         /// <summary> 执行IL </summary>
         public ScriptValue Execute(SerializeData[] datas) {
             ScriptValue result = ScriptValue.Null;
             int length = datas.Length;
             for (var j = 0; j < length; ++j) {
                 SerializeData data = datas[j];
+                ParseConstString(data);
                 var contexts = new ScriptContext[data.Functions.Length];
                 for (int i = 0; i < data.Functions.Length; ++i) {
-                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
+                    contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, contexts, data.Classes);
                 }
-                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
+                result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null, data.ConstString);
             }
             return result;
         }

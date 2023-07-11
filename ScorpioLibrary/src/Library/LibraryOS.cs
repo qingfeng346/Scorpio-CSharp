@@ -6,20 +6,21 @@ using System.Runtime.InteropServices;
 namespace ScorpioLibrary {
     public class LibraryOS {
         public static void Load(Script script) {
-            var map = script.NewMapStringPolling();
-            map.SetValueNoReference("platform", script.CreateFunction(new platform()));
-            map.SetValueNoReference("isWindows", script.CreateFunction(new isWindows()));
-            map.SetValueNoReference("isLinux", script.CreateFunction(new isLinux()));
-            map.SetValueNoReference("isOSX", script.CreateFunction(new isOSX()));
-            map.SetValueNoReference("machineName", script.CreateFunction(new machineName()));
-            map.SetValueNoReference("userName", script.CreateFunction(new userName()));
-            map.SetValueNoReference("dotnetVersion", script.CreateFunction(new dotnetVersion()));
-            map.SetValueNoReference("version", script.CreateFunction(new version()));
-            map.SetValueNoReference("getEnvironmentVariable", script.CreateFunction(new getEnvironmentVariable()));
-            map.SetValueNoReference("setEnvironmentVariable", script.CreateFunction(new setEnvironmentVariable()));
-            map.SetValueNoReference("getFolderPath", script.CreateFunction(new getFolderPath()));
-            map.SetValueNoReference("process", script.CreateFunction(new process(script)));
-            script.SetGlobalNoReference("os", map);
+            var functions = new (string, ScorpioHandle)[] {
+                ("platform", new platform()),
+                ("isWindows", new isWindows()),
+                ("isLinux", new isLinux()),
+                ("isOSX", new isOSX()),
+                ("machineName", new machineName()),
+                ("userName", new userName()),
+                ("dotnetVersion", new dotnetVersion()),
+                ("version", new version()),
+                ("getEnvironmentVariable", new getEnvironmentVariable()),
+                ("setEnvironmentVariable", new setEnvironmentVariable()),
+                ("getFolderPath", new getFolderPath()),
+                ("process", new process(script)),
+            };
+            script.AddLibrary("os", functions);
         }
         private class platform : ScorpioHandle {
             public ScriptValue Call(ScriptValue obj, ScriptValue[] Parameters, int length) {

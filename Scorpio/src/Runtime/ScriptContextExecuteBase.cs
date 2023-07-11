@@ -15,9 +15,17 @@ namespace Scorpio.Runtime {
         public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues) {
 #elif EXECUTE_BASE
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues, ScriptType baseType) {
+#elif EXECUTE_CONTEXT
+        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues, string[] constString) {
 #else
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] parentInternalValues) {
 #endif
+            var constDouble = this.constDouble;
+            var constLong = this.constLong;
+#if !EXECUTE_CONTEXT
+            var constString = m_script.ConstString;
+#endif
+            var constScriptString = m_script.ConstString;
             #region 堆栈和线程判断
 #if SCORPIO_ASSERT
             //System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
@@ -45,6 +53,7 @@ namespace Scorpio.Runtime {
 #endif
             #endregion
             #region 初始化内部变量
+            var internalCount = m_FunctionData.internalCount;
             InternalValue[] internalValues = null;
             if (internalCount > 0) {
                 internalValues = m_script.NewIntervalValues();          //内部变量，有外部引用
@@ -64,7 +73,7 @@ namespace Scorpio.Runtime {
             }
             #endregion
             #region 初始化参数和this
-            variableObjects[0] = thisObject.Reference();
+            variableObjects[0].CopyFrom(thisObject);
             var stackIndex = -1; //堆栈索引
             var parameterCount = m_FunctionData.parameterCount; //参数数量
             //是否是变长参数
@@ -73,20 +82,21 @@ namespace Scorpio.Runtime {
                 for (var i = parameterCount - 1; i < length; ++i) {
                     array.Add(args[i]);
                 }
-                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
-                stackObjects[stackIndex].index = ScriptObjectReference.Alloc(array);
+                stackObjects[++stackIndex].SetScriptValue(array);
                 for (var i = parameterCount - 2; i >= 0; --i) {
-                    stackObjects[++stackIndex] = i >= length ? ScriptValue.Null : args[i].Reference();
+                    stackObjects[++stackIndex].CopyFrom(i >= length ? ScriptValue.Null : args[i]);
                 }
             } else {
                 for (var i = parameterCount - 1; i >= 0; --i) {
-                    stackObjects[++stackIndex] = i >= length ? ScriptValue.Null : args[i].Reference();
+                    stackObjects[++stackIndex].CopyFrom(i >= length ? ScriptValue.Null : args[i]);
                 }
             }
             #endregion
             var parameters = ScorpioUtil.Parameters; //传递参数
             var iInstruction = 0; //当前执行命令索引
+            var m_scriptInstructions = m_FunctionData.scriptInstructions;
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
+            var m_global = m_script.Global;
             byte tempValueType; //临时存储
             int tempIndex; //临时存储
             ScriptInstruction instruction = null;
@@ -1062,14 +1072,6 @@ namespace Scorpio.Runtime {
                                 yield break;
 #else
                                 --VariableValueIndex;
-                                for (var i = 0; i < variableObjects.Length; ++i) {
-                                    if (variableObjects[i].valueType > 30)
-                                        variableObjects[i].Free();
-                                }
-                                for (var i = 0; i < stackObjects.Length; ++i) {
-                                    if (stackObjects[i].valueType > 30)
-                                        stackObjects[i].Free();
-                                }
                                 if (internalValues != null) {
                                     for (var i = 0; i < internalCount; ++i) {
                                         if (internalValues[i] != null) {
@@ -1089,14 +1091,6 @@ namespace Scorpio.Runtime {
 #else
                                 var ret = stackObjects[stackIndex].Reference();
                                 --VariableValueIndex;
-                                for (var i = 0; i < variableObjects.Length; ++i) {
-                                    if (variableObjects[i].valueType > 30)
-                                        variableObjects[i].Free();
-                                }
-                                for (var i = 0; i < stackObjects.Length; ++i) {
-                                    if (stackObjects[i].valueType > 30)
-                                        stackObjects[i].Free();
-                                }
                                 if (internalValues != null) {
                                     for (var i = 0; i < internalCount; ++i) {
                                         if (internalValues[i] != null) {
@@ -1557,14 +1551,6 @@ namespace Scorpio.Runtime {
                     }
 #if !EXECUTE_COROUTINE
                     --VariableValueIndex;
-                    for (var i = 0; i < variableObjects.Length; ++i) {
-                        if (variableObjects[i].valueType > 30)
-                            variableObjects[i].Free();
-                    }
-                    for (var i = 0; i < stackObjects.Length; ++i) {
-                        if (stackObjects[i].valueType > 30)
-                            stackObjects[i].Free();
-                    }
                     if (internalValues != null) {
                         for (var i = 0; i < internalCount; ++i) {
                             if (internalValues[i] != null) {
@@ -1614,14 +1600,6 @@ namespace Scorpio.Runtime {
                     }
                 } catch (System.Exception) {
                     --VariableValueIndex;
-                    for (var i = 0; i < variableObjects.Length; ++i) {
-                        if (variableObjects[i].valueType > 30)
-                            variableObjects[i].Free();
-                    }
-                    for (var i = 0; i < stackObjects.Length; ++i) {
-                        if (stackObjects[i].valueType > 30)
-                            stackObjects[i].Free();
-                    }
                     if (internalValues != null) {
                         for (var i = 0; i < internalCount; ++i) {
                             if (internalValues[i] != null) {
@@ -1636,14 +1614,6 @@ namespace Scorpio.Runtime {
                 return ScriptValue.Null;
 #else
             } finally {
-                for (var i = 0; i < asyncValue.stack.Length; ++i) {
-                    if (asyncValue.stack[i].valueType > 30)
-                        asyncValue.stack[i].Free();
-                }
-                for (var i = 0; i < asyncValue.variable.Length; ++i) {
-                    if (asyncValue.variable[i].valueType > 30)
-                        asyncValue.variable[i].Free();
-                }
                 if (internalValues != null) {
                     for (var i = 0; i < internalCount; ++i) {
                         if (internalValues[i] != null) {

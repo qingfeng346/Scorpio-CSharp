@@ -1,4 +1,5 @@
 using System;
+using Scorpio.Compile.Compiler;
 using Scorpio.Tools;
 namespace Scorpio.Instruction {
     public class SerializeData {
@@ -6,22 +7,24 @@ namespace Scorpio.Instruction {
         public double[] ConstDouble { get; private set; }
         public long[] ConstLong { get; private set; }
         public string[] ConstString { get; private set; }
+        public byte[] NoContext { get; private set; }
         public ScriptFunctionData Context { get; private set; }
         public ScriptFunctionData[] Functions { get; private set; }     //定义的所有 function
         public ScriptClassData[] Classes { get; private set; }          //定义的所有class
         public SerializeData(string breviary) {
             this.Breviary = string.Intern(breviary);
         }
-        public SerializeData(string breviary, double[] constDouble, long[] constLong, string[] constString, ScriptFunctionData context, ScriptFunctionData[] functions, ScriptClassData[] classes) {
-            this.Breviary = string.Intern(breviary);
-            this.ConstDouble = constDouble;
-            this.ConstLong = constLong;
-            this.ConstString = constString;
-            this.Context = context;
-            this.Functions = functions;
-            this.Classes = classes;
+        public SerializeData(ScriptParser parser) {
+            this.Breviary = parser.Breviary;
+            this.ConstDouble = parser.ConstDouble.ToArray();
+            this.ConstLong = parser.ConstLong.ToArray();
+            this.ConstString = parser.ConstString.ToArray();
+            this.Context = parser.Context;
+            this.Functions = parser.Functions.ToArray();
+            this.Classes = parser.Classes.ToArray();
+            this.NoContext = parser.NoContext;
         }
-        public SerializeData Serialize(ScorpioWriter writer) {
+        public SerializeData Serialize(ScorpioWriter writer, short version) {
             writer.Write(ConstDouble.Length);
             Array.ForEach(ConstDouble, (value) => writer.Write(value));
             writer.Write(ConstLong.Length);
@@ -33,9 +36,13 @@ namespace Scorpio.Instruction {
             Array.ForEach(Functions, (value) => writer.Write(value));
             writer.Write(Classes.Length);
             Array.ForEach(Classes, (value) => writer.Write(value));
+            if (version > 2) {
+                writer.Write(NoContext.Length);
+                Array.ForEach(NoContext, (value) => writer.Write(value));
+            }
             return this;
         }
-        public SerializeData Deserialize(ScorpioReader reader) {
+        public SerializeData Deserialize(ScorpioReader reader, short version) {
             ConstDouble = new double[reader.ReadInt32()];
             for (var i = 0; i < ConstDouble.Length; ++i) {
                 ConstDouble[i] = reader.ReadDouble();
@@ -46,8 +53,7 @@ namespace Scorpio.Instruction {
             }
             ConstString = new string[reader.ReadInt32()];
             for (var i = 0; i < ConstString.Length; ++i) {
-                //string.Intern 减少内存
-                ConstString[i] = string.Intern(reader.ReadString());
+                ConstString[i] = reader.ReadString();
             }
             Context = reader.ReadFunction();
             Functions = new ScriptFunctionData[reader.ReadInt32()];
@@ -57,6 +63,12 @@ namespace Scorpio.Instruction {
             Classes = new ScriptClassData[reader.ReadInt32()];
             for (var i = 0; i < Classes.Length; ++i) {
                 Classes[i] = reader.ReadClass();
+            }
+            if (version > 2) {
+                NoContext = new byte[reader.ReadInt32()];
+                for (var i = 0; i < NoContext.Length; ++i) {
+                    NoContext[i] = reader.ReadByte();
+                }
             }
             return this;
         }

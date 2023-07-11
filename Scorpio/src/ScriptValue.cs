@@ -16,10 +16,9 @@ namespace Scorpio
         public static readonly ScriptValue InvalidIndex = new ScriptValue((double)-1);
 
         public const byte nullValueType = 0;        //null
-        public const byte scriptValueType = 1;      //脚本变量
-        public const byte trueValueType = 2;        //true
-        public const byte falseValueType = 3;       //false
-        public const byte stringValueType = 4;      //string
+        public const byte trueValueType = 1;        //true
+        public const byte falseValueType = 2;       //false
+        
         public const byte int8ValueType = 11;       //
         public const byte uint8ValueType = 12;      //
         public const byte int16ValueType = 13;      //
@@ -32,6 +31,9 @@ namespace Scorpio
 
         public const byte floatValueType = 20;      //
         public const byte doubleValueType = 21;     //double
+
+        public const byte scriptValueType = 31;      //脚本变量
+        public const byte stringValueType = 32;      //string
 
         [FieldOffset(0)] public double doubleValue;
         [FieldOffset(0)] public long longValue;

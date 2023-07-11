@@ -199,6 +199,9 @@ namespace Scorpio.Tools {
             }
             throw new ExecutionException($"参数个数少于要获取的索引 index:{index} length:{length}");
         }
+        public static void Free(ScriptValue[] values) {
+            Free(values, values.Length);
+        }
         public unsafe static void Free(ScriptValue[] values, int length) {
             fixed (ScriptValue* ptr = values) {
                 for (var i = 0; i < length; i++) {

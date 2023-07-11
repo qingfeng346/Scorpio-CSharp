@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Scorpio.Compile.CodeDom;
 using Scorpio.Compile.CodeDom.Temp;
 using Scorpio.Compile.Exception;
 using Scorpio.Instruction;
+using Scorpio.Runtime;
 using Scorpio.Tools;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
@@ -15,8 +18,9 @@ namespace Scorpio.Compile.Compiler {
             public long funcType; //函数类型 0 普通函数 1 async 函数 2 get函数
         }
         public List<double> ConstDouble { get; private set; } = new List<double>(); //所有的常量 double
-        public List<long> ConstLong { get; private set; } = new List<long>(); //所有的常量 long
+        public List<long> ConstLong { get; private set; } = new List<long>();       //所有的常量 long
         public List<string> ConstString { get; private set; } = new List<string>(); //所有的常量 string
+        public byte[] NoContext = new byte[0];                                      //在非Context域是否使用标识
         public ScriptFunctionData Context { get; private set; } //解析后主执行
         public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>(); //定义的所有 function
         public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>(); //定义的所有 class
@@ -80,13 +84,18 @@ namespace Scorpio.Compile.Compiler {
             }
             return executable;
         }
+
         /// <summary> 获取一个double常量的索引 </summary>
         int GetConstDouble(double value) {
             var index = ConstDouble.IndexOf(value);
             if (index < 0) {
                 index = ConstDouble.Count;
                 ConstDouble.Add(value);
-                return index;
+                if (NoContext.Length < ConstDouble.Count)
+                    Array.Resize(ref NoContext, ConstDouble.Count);
+            }
+            if (m_scriptExecutable.Block != ExecutableBlock.Context) {
+                NoContext[index] |= 1 << 0;
             }
             return index;
         }
@@ -96,17 +105,25 @@ namespace Scorpio.Compile.Compiler {
             if (index < 0) {
                 index = ConstLong.Count;
                 ConstLong.Add(value);
-                return index;
+                if (NoContext.Length < ConstLong.Count)
+                    Array.Resize(ref NoContext, ConstLong.Count);
+            }
+            if (m_scriptExecutable.Block != ExecutableBlock.Context) {
+                NoContext[index] |= 1 << 1;
             }
             return index;
         }
         /// <summary> 获取一个string常量的索引 </summary>
-        int GetConstString(string value) {
+        int GetConstString(string value, bool force = false) {
             var index = ConstString.IndexOf(value);
             if (index < 0) {
                 index = ConstString.Count;
                 ConstString.Add(value);
-                return index;
+                if (NoContext.Length < ConstString.Count)
+                    Array.Resize(ref NoContext, ConstString.Count);
+            }
+            if (m_scriptExecutable.Block != ExecutableBlock.Context || force) {
+                NoContext[index] |= 1 << 2;
             }
             return index;
         }
@@ -226,13 +243,13 @@ namespace Scorpio.Compile.Compiler {
                 tokenType = ReadToken().Type;
                 if (tokenType == finished) { break; }
                 UndoToken();
-                ParseStatement(block);
+                ParseStatement();
             }
             return EndExecutable(block);
         }
         #region 解析块内容
         /// <summary> 解析单句代码内容 </summary>
-        void ParseStatement(ExecutableBlock block) {
+        void ParseStatement() {
             var token = ReadToken();
             switch (token.Type) {
                 case TokenType.Var:
@@ -636,7 +653,7 @@ namespace Scorpio.Compile.Compiler {
                     if (next.Type == TokenType.LeftPar || next.Type == TokenType.LeftBrace) {
                         UndoToken();
                         UndoToken();
-                        nameIndex = GetConstString(token.Lexeme.ToString());
+                        nameIndex = GetConstString(token.Lexeme.ToString(), true);
                         funcIndex = ParseFunctionContent(false, out _);
                     } else {
                         throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
@@ -644,7 +661,7 @@ namespace Scorpio.Compile.Compiler {
                 } else if (token.Type == TokenType.Function) {
                     UndoToken();
                     funcIndex = ParseFunctionContent(true, out var functionName);
-                    nameIndex = GetConstString(functionName);
+                    nameIndex = GetConstString(functionName, true);
                 } else {
                     throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
                 }
@@ -657,7 +674,7 @@ namespace Scorpio.Compile.Compiler {
             }
             var index = Classes.Count;
             Classes.Add(new ScriptClassData() {
-                name = GetConstString(className),
+                name = GetConstString(className, true),
                 parent = parent.Length == 0 ? -1 : GetConstString(parent),
                 functions = funs.ToArray(),
             });
@@ -725,6 +742,8 @@ namespace Scorpio.Compile.Compiler {
             if (peek.Type == TokenType.LeftBrace) {
                 UndoToken();
             }
+            if (listParameters.Count > 128)
+                throw new ParserException(this, "函数参数超过最大数量128", token);
             BeginExecutable(ExecutableBlock.Function);
             foreach (var par in listParameters) {
                 AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.AddIndex(par), token.SourceLine);
@@ -1019,8 +1038,10 @@ namespace Scorpio.Compile.Compiler {
                     break;
                 }
                 case CodeArray array: {
-                    if (array.Elements.Count > 240)
-                        throw new ParserException(this, $"一次性申请Array变量不能超过240个,可是使用add或+代替:{array.Elements.Count}", PeekToken());
+                    //一次性申请array最大元素数量
+                    var maxElementCount = ScriptContext.StackValueLength - 20;
+                    if (array.Elements.Count > maxElementCount)
+                        throw new ParserException(this, $"一次性申请Array变量不能超过{maxElementCount}个,可是使用add或+代替:{array.Elements.Count}", PeekToken());
                     foreach (var ele in array.Elements) {
                         PushObject(ele);
                     }

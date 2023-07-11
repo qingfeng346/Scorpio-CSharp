@@ -11,14 +11,15 @@ namespace ScorpioLibrary {
         static byte[] READ_BYTES = new byte[READ_LENGTH];
         static Encoding DEFAULT_ENCODING = Encoding.UTF8;
         public static void Load(Script script) {
-            var map = script.NewMapStringPolling();
-            map.SetValueNoReference("get", script.CreateFunction(new get(script)));
-            map.SetValueNoReference("post", script.CreateFunction(new post(script)));
-            map.SetValueNoReference("urlencode", script.CreateFunction(new urlencode()));
-            map.SetValueNoReference("urldecode", script.CreateFunction(new urldecode()));
-            map.SetValueNoReference("qpencode", script.CreateFunction(new qpencode()));
-            map.SetValueNoReference("qpdecode", script.CreateFunction(new qpdecode()));
-            script.SetGlobalNoReference("net", map);
+            var functions = new (string, ScorpioHandle)[] {
+                ("get", new get(script)),
+                ("post", new post(script)),
+                ("urlencode", new urlencode()),
+                ("urldecode", new urldecode()),
+                ("qpencode", new qpencode()),
+                ("qpdecode", new qpdecode()),
+            };
+            script.AddLibrary("net", functions);
         }
         static HttpWebRequest CreateRequest(string url, string method) {
             //创建 SL/TLS 安全通道
