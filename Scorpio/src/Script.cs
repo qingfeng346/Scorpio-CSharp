@@ -131,7 +131,7 @@ namespace Scorpio {
             StringIndex = new Dictionary<string, int>();
         }
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
-            type = new ScriptTypePrimitive(name, m_TypeObject);
+            type = new ScriptTypePrimitive(name, m_TypeObject, this);
             typeValue = new ScriptValue(type);
             Global.SetValue(name, typeValue);
         }
