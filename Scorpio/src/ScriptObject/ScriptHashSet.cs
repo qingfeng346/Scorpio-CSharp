@@ -13,7 +13,7 @@ namespace Scorpio {
         public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
         public override void Alloc() {
-            base.Alloc();
+            AddRecord();
             SetPrototype(script.TypeHashSet);
         }
         public override void Free() {

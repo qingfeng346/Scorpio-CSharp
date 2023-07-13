@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Scorpio.Exception;
 using Scorpio.Tools;
 using Scorpio.Library;
-using Newtonsoft.Json;
 
 namespace Scorpio {
     //脚本数组类型
@@ -66,7 +65,7 @@ namespace Scorpio {
         }
         internal ScriptValue[] getObjects() { return m_Objects; }
         public override void Alloc() {
-            base.Alloc();
+            AddRecord();
             SetPrototype(script.TypeArray);
         }
         public override void Free() {

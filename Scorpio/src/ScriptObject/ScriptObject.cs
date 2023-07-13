@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Scorpio.Exception;
 using Scorpio.Tools;
 
@@ -37,14 +38,19 @@ namespace Scorpio {
         public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
         public Script script => m_Script;
         public virtual void Alloc() {
+            AddRecord();
+        }
+        public abstract void Free();
+
+        [Conditional("SCORPIO_DEBUG")]
+        public void AddRecord() {
 #if SCORPIO_DEBUG
-           Id = AutoId++;
-           Source = m_Script.RecordStack.ToString();
-           m_Script.AddRecord(Source, Id, this);
+            Id = AutoId++;
+            Source = m_Script.RecordStack.ToString();
+            m_Script.AddRecord(Source, Id, this);
 #endif
         }
-        public virtual void Free() {
-        }
+        [Conditional("SCORPIO_DEBUG")]
         public void DelRecord() {
 #if SCORPIO_DEBUG
            m_Script.DelRecord(Source, Id, this);

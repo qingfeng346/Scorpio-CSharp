@@ -245,7 +245,7 @@ namespace ScorpioExec
                         if (!flag) break;
                     }
                     script.ReleaseAll();
-                    script.CheckGCCollect();
+                    //script.CheckGCCollect();
                     script.Shutdown();
                     script.ReleaseAll();
                     script.CheckPool();

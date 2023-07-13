@@ -11,7 +11,7 @@ namespace Scorpio
         public abstract ScriptFunction SetBindObject(ScriptValue obj);
         public string MethodName;
         public override void Alloc() {
-            base.Alloc();
+            AddRecord();
             MethodName = m_Script.RecordStack.ToString();
             SetPrototype(script.TypeFunction);
         }
