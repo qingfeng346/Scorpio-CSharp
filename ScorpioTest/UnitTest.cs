@@ -78,11 +78,15 @@ namespace ScorpioTest {
         }
         [Fact]
         public void CreateFast() {
-            var generate = new GenerateScorpioClass(typeof(TestClass));
-            generate.AddExtensionType(typeof(TestStaticClass));
-            var output = $"../../../../ScorpioTestLibrary/{generate.ScorpioClassName}.cs";
-            FileUtil.CreateFile(output, generate.Generate());
-            WriteLine($"生成快速反射 {Path.GetFullPath(output)}");
+            var types = new Type[] {typeof(TestClass) };
+            foreach (var type in types) {
+                var generate = new GenerateScorpioClass(type);
+                generate.AddExtensionType(typeof(TestStaticClass));
+                generate.AddExtensionType(typeof(TestExtend));
+                var output = $"../../../../ScorpioTestLibrary/{generate.ScorpioClassName}.cs";
+                FileUtil.CreateFile(output, generate.Generate());
+                WriteLine($"生成快速反射 {Path.GetFullPath(output)}");
+            }
         }
         [Fact]
         public void CreateInterface() {

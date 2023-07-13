@@ -98,6 +98,7 @@ namespace Scorpio.Library
             script.SetGlobalNoReference("free", script.CreateFunction(new free()));
             script.SetGlobalNoReference("gc", script.CreateFunction(new gc()));
             script.SetGlobalNoReference("clearVariables", script.CreateFunction(new clearVariables()));
+            script.SetGlobalNoReference("deleteVariables", script.CreateFunction(new deleteVariables()));
 
             script.SetGlobalNoReference("isNull", script.CreateFunction(new isNull()));
             script.SetGlobalNoReference("isBoolean", script.CreateFunction(new isBoolean()));
@@ -271,6 +272,13 @@ namespace Scorpio.Library
                     var instance = args[0].Get<ScriptInstance>();
                     if (instance != null) instance.ClearVariables();
                 }
+                return ScriptValue.Null;
+            }
+        }
+        private class deleteVariables : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                var instance = args.GetArgs(0, length).Get<ScriptInstance>();
+                instance.DelValue(args.GetArgs(1, length).ToString());
                 return ScriptValue.Null;
             }
         }

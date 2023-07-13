@@ -64,6 +64,9 @@ namespace Scorpio {
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
+        public virtual void DelValue(string key) {
+            m_Values.Remove(key);
+        }
         public virtual void ClearVariables() {
             m_Values.Clear();
         }

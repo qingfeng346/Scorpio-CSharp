@@ -23,6 +23,14 @@ public class TestClass1 {
 
     }
 }
+public struct TestStruct {
+    public int TestFunc1() {
+        return 100;
+    }
+    public int TestFunc3(string arg1, int arg2 = 2, int arg3 = 3, string arg4 = "123123") {
+        return 100;
+    }
+}
 public class TestClass {
     public int num;
     public static TestClass operator+(TestClass a, TestClass b) {
@@ -31,8 +39,16 @@ public class TestClass {
     public int TestFunc1() {
         return 100;
     }
-    public int TestFunc2(string arg1, int arg2) {
+    public int TestFunc2(string arg1, int arg2, params object[] args) {
         return arg2;
+    }
+    public int TestFunc3(string arg1, int arg2=2, int arg3=3, string arg4="123123") {
+        return 100;
+    }
+}
+public static class TestExtend {
+    public static void TestExtend1(this TestClass testClass, string arg1 = "arg1", int arg2 = 2) {
+
     }
 }
 public static class TestStaticClass {

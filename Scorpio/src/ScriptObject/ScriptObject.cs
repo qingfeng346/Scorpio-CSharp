@@ -36,17 +36,17 @@ namespace Scorpio {
         public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
         public Script script => m_Script;
         public virtual void Alloc() {
-#if SCORPIO_DEBUG
-            Id = AutoId++;
-            Source = $"Type:{ValueTypeName} {m_Script.RecordStack}";
-            m_Script.AddRecord(Source, Id);
-#endif
+//#if SCORPIO_DEBUG
+//            Id = AutoId++;
+//            Source = $"Type:{ValueTypeName} {m_Script.RecordStack}";
+//            m_Script.AddRecord(Source, Id);
+//#endif
         }
         public virtual void Free() {
-#if SCORPIO_DEBUG
-            m_Script.DelRecord(Source, Id);
-            Source = null;
-#endif
+//#if SCORPIO_DEBUG
+//            m_Script.DelRecord(Source, Id);
+//            Source = null;
+//#endif
         }
         //循环引用被回收掉
         public abstract void gc();

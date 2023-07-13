@@ -13,7 +13,6 @@ namespace Scorpio {
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
         public override void Free() {
-            base.Free();
             Release();
             Clear();
             m_Objects = new Dictionary<object, ScriptValue>();

@@ -68,7 +68,6 @@ namespace Scorpio {
             SetPrototype(script.TypeArray);
         }
         public override void Free() {
-            base.Free();
             Release();
             Clear();
             m_Objects = ScorpioUtil.VALUE_EMPTY;

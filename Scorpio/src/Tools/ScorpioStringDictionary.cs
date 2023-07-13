@@ -93,12 +93,13 @@ namespace Scorpio.Tools {
             int index = IndexOf(key);
             if (index < 0) { return false; }
             mSize--;
+            mValues[index].Free();
             if (index < mSize) {
                 mKeys[index] = mKeys[mSize];
                 mValues[index] = mValues[mSize];
             }
             mKeys[mSize] = null;
-            mValues[mSize].Free();
+            mValues[mSize] = default;
             return true;
         }
         public virtual void Clear() {

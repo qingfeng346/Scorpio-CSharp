@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using Scorpio.Tools;
 using System.Linq;
 using System;
 
@@ -21,25 +20,68 @@ namespace Scorpio.FastReflect {
             {"op_Equality", "=="},
             {"op_Inequality", "!="},
         };
+        private class ScorpioMethod {
+            public bool IsStatic { get; private set; }
+            public MethodBase method;
+            public ParameterInfo[] parameterInfos;
+            public ScorpioMethod(MethodBase method) {
+                this.method = method;
+                if (method != null) {
+                    IsStatic = method.IsStatic;
+                }
+            }
+            public ParameterInfo[] GetParameters() {
+                return parameterInfos;
+            }
+            public bool IsSpecialName => method.IsSpecialName;
+            public string Name => method.Name;
+            public Type ReturnType => ((MethodInfo)method).ReturnType;
+            public RuntimeMethodHandle MethodHandle => ((MethodInfo)method).MethodHandle;
+        }
+        private List<ScorpioMethod> GetMethods(MethodBase method) {
+            var ret = new List<ScorpioMethod>();
+            var pars = new List<ParameterInfo>();
+            var parameters = method.GetParameters();
+            for (var i = 0; i < parameters.Length; i++) {
+                var param = parameters[i];
+                if (param.HasDefaultValue) {
+                    ret.Add(new ScorpioMethod(method) { parameterInfos = pars.ToArray() });
+                }
+                pars.Add(param);
+            }
+            ret.Add(new ScorpioMethod(method) { parameterInfos = pars.ToArray() });
+            return ret;
+        }
+        //默认参数会直接分为两个函数
+        private List<ScorpioMethod> GetMethods(MethodBase[] methods) {
+            var ret = new List<ScorpioMethod>();
+            foreach (var method in methods) {
+                ret.AddRange(GetMethods(method));
+            }
+            return ret;
+        }
         //获得构造函数
         private string GenerateConstructor() {
-            var Constructors = m_Type.GetConstructors(ScorpioFastReflectUtil.BindingFlag);
+            var methods = GetMethods(m_Type.GetConstructors(ScorpioFastReflectUtil.BindingFlag));
+            if (IsStruct) {
+                methods.Add(new ScorpioMethod(null) { parameterInfos = new ParameterInfo[0] });
+            }
             var builder = new StringBuilder();
-            for (var i = 0; i < Constructors.Length; ++i) {
-                var con = Constructors[i];
-                var pars = con.GetParameters();
+            for (var i = 0; i < methods.Count; ++i) {
+                var method = methods[i];
+                var pars = method.parameterInfos;
                 var call = $"new __fullname({GetScorpioMethodCall(pars)})";
                 builder.AppendFormat(@"
                 case {0}: {{ {1} }}", i, GetExecuteMethod(pars, true, call));
             }
-            if (IsStruct) {
-                var pars = new ParameterInfo[0];
-                var call = $"new __fullname({GetScorpioMethodCall(pars)})";
-                builder.AppendFormat(@"
-                case {0}: {{ {1} }}", Constructors.Length, GetExecuteMethod(pars, true, call));
-            }
+            //if (IsStruct) {
+            //    var pars = new ParameterInfo[0];
+            //    var call = $"new __fullname({GetScorpioMethodCall(pars)})";
+            //    builder.AppendFormat(@"
+            //    case {0}: {{ {1} }}", Constructors.Length, GetExecuteMethod(pars, true, call));
+            //}
             string str = MethodTemplate;
-            str = str.Replace("__getallmethod", GetAllMethod(Constructors));
+            str = str.Replace("__getallmethod", GetAllMethod(methods));
             str = str.Replace("__name", ScorpioClassName + "_Constructor");
             str = str.Replace("__methodname", "Constructor");
             str = str.Replace("__execute", builder.ToString());
@@ -53,7 +95,7 @@ namespace Scorpio.FastReflect {
             return builder.ToString();
         }
         //运算符重载函数 + - * / [] 等
-        private string GetSpeciaMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
+        private string GetSpeciaMethodExecute(ScorpioMethod method, string variable, ParameterInfo[] pars) {
             if (!method.IsSpecialName) { return ""; }
             string name = method.Name;
             if (Operators.ContainsKey(name)) {
@@ -71,7 +113,7 @@ namespace Scorpio.FastReflect {
             }
             return "";
         }
-        private string GetEventMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
+        private string GetEventMethodExecute(ScorpioMethod method, string variable, ParameterInfo[] pars) {
             foreach (var eve in AllEvents) {
                 if (eve.GetAddMethod().MethodHandle == method.MethodHandle) {
                     return string.Format("{0}.{1} += {2}; return null;", variable, eve.Name, GetScorpioMethodArgs(pars, 0));
@@ -81,7 +123,7 @@ namespace Scorpio.FastReflect {
             }
             return "";
         }
-        private string GetPropertyMethodExecute(MethodInfo method, string variable, ParameterInfo[] pars) {
+        private string GetPropertyMethodExecute(ScorpioMethod method, string variable, ParameterInfo[] pars) {
             foreach (var property in AllPropertys) {
                 if (property.GetGetMethod()?.MethodHandle == method.MethodHandle) {
                     return string.Format("return {0}.{1};", variable, property.Name);
@@ -102,8 +144,8 @@ namespace Scorpio.FastReflect {
         //生成一个函数的类
         private string GenerateMethodExecute(string name) {
             var builder = new StringBuilder();
-            var methods = m_Methods.Where(_ => _.Name == name).ToArray();
-            for (var i = 0; i < methods.Length; ++i) {
+            var methods = GetMethods(m_Methods.Where(_ => _.Name == name).ToArray());
+            for (var i = 0; i < methods.Count; ++i) {
                 var method = methods[i];
                 var variable = method.IsStatic ? FullName : $"(({FullName})obj)";
                 var pars = method.GetParameters();
@@ -122,10 +164,10 @@ namespace Scorpio.FastReflect {
                 builder.AppendFormat(@"
                 case {0}: {{ {1} }}", i, execute);
             }
-            var allMethodBuilder = new StringBuilder(GetAllMethod(methods.ToArray()));
-            var extensionMethods = m_ExtensionMethods.Where(_ => _.Name == name).ToArray();
-            for (var i = 0; i < extensionMethods.Length; ++i) {
-                var index = methods.Length + i;
+            var allMethodBuilder = new StringBuilder(GetAllMethod(methods));
+            var extensionMethods = GetMethods(m_ExtensionMethods.Where(_ => _.Name == name).ToArray());
+            for (var i = 0; i < extensionMethods.Count; ++i) {
+                var index = methods.Count + i;
                 var method = extensionMethods[i];
                 var variable = $"(({FullName})obj)";
                 var pars = method.GetParameters();

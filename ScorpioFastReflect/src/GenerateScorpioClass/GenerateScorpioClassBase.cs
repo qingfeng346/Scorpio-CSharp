@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using Scorpio.Tools;
@@ -144,16 +145,12 @@ __methods_content
         private string GetScorpioVariable(bool IsStatic, string name) {
             return (IsStatic ? FullName : $"(({FullName})obj)") + "." + name;
         }
-        private string GetAllMethod(MethodBase[] methods) {
+        private string GetAllMethod(List<ScorpioMethod> methods) {
             var builder = new StringBuilder();
-            for (var i = 0; i < methods.Length; ++i) {
+            for (var i = 0; i < methods.Count; ++i) {
                 var method = methods[i];
                 builder.Append($@"
-                {GetScorpioMethod(method.IsStatic, method.GetParameters(), i)},");
-            }
-            if (IsStruct) {
-                builder.Append($@"
-                {GetScorpioMethod(false, new ParameterInfo[0], methods.Length)},");
+                {GetScorpioMethod(method.IsStatic, method.parameterInfos, i)},");
             }
             return builder.ToString();
         }
