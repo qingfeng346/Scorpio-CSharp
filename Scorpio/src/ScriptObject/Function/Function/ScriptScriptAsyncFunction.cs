@@ -34,7 +34,7 @@ namespace Scorpio.Function {
         public override ScriptFunction SetBindObject(ScriptValue obj) {
             return m_Script.NewAsyncBindFunction().SetContext(m_Context, obj);
         }
-        public override string ToString() { return $"AsyncFunction"; }
+        public override string ToString() { return $"AsyncFunction<{MethodName}>"; }
     }
     public class ScriptScriptAsyncBindFunction : ScriptScriptBindFunctionBase {
         public ScriptScriptAsyncBindFunction(Script script) : base(script) { }
@@ -66,13 +66,9 @@ namespace Scorpio.Function {
         internal override ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return ScriptValue.CreateValue(m_Script, Execute(parameters, length, baseType));
         }
-        public override bool Equals(ScriptValue obj) {
-            var func = obj.Get<ScriptScriptAsyncBindFunction>();
-            return func != null && ReferenceEquals(m_Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);
-        }
         public override ScriptFunction SetBindObject(ScriptValue obj) {
             return m_Script.NewAsyncBindFunction().SetContext(m_Context, obj);
         }
-        public override string ToString() { return $"AsyncBindFunction"; }
+        public override string ToString() { return $"AsyncBindFunction<{MethodName}>"; }
     }
 }

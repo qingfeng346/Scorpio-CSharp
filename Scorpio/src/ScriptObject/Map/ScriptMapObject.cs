@@ -13,15 +13,15 @@ namespace Scorpio {
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
         public override void Free() {
+            DelRecord();
             Release();
             Clear();
-            m_Objects = new Dictionary<object, ScriptValue>();
             m_Script.Free(this);
         }
         public override void gc() {
             Clear();
         }
-        #region 重载 GetValue SetValue
+        #region GetValue SetValue 重载
         public override ScriptValue GetValue(string key) {
             return m_Objects.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key);
         }
@@ -63,6 +63,7 @@ namespace Scorpio {
             m_Objects[key] = value.Reference();
         }
         #endregion
+        #region ScriptInstance 重载
         public override void SetValueNoReference(string key, ScriptValue value) {
             if (m_Objects.TryGetValue(key, out var result)) {
                 result.Free();
@@ -80,6 +81,15 @@ namespace Scorpio {
         public override bool HasValue(string key) {
             return m_Objects.ContainsKey(key);
         }
+        public override void ClearVariables() {
+            base.ClearVariables();
+            m_Objects.Free();
+        }
+        public override void DelValue(string key) {
+            Remove(key);
+        }
+        #endregion
+        #region ScriptMap重载
         public override bool ContainsKey(object key) {
             if (key == null) return false;
             return m_Objects.ContainsKey(key);
@@ -91,10 +101,6 @@ namespace Scorpio {
             return m_Objects.Count;
         }
         public override void Clear() {
-            m_Objects.Free();
-        }
-        public override void ClearVariables() {
-            base.ClearVariables();
             m_Objects.Free();
         }
         public override void Remove(object key) {
@@ -125,6 +131,7 @@ namespace Scorpio {
             }
             return ret;
         }
+        #endregion
         public override ScriptObject Clone(bool deep) {
             var ret = m_Script.NewMapObject();
             if (deep) {
@@ -147,18 +154,6 @@ namespace Scorpio {
                 }
             }
             return ret;
-        }
-        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
-            builder.Append("{");
-            var first = true;
-            foreach (var pair in m_Objects) {
-                if (first) { first = false; } else { builder.Append(","); }
-                jsonSerializer.Serializer(pair.Key.ToString());
-                builder.Append(":");
-                jsonSerializer.Serializer(pair.Value);
-            }
-            builder.Append("}");
         }
     }
 }

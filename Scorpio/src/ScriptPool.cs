@@ -3,6 +3,8 @@ using Scorpio.Library;
 using Scorpio.Tools;
 using Scorpio.Userdata;
 using Scorpio.Runtime;
+using System.Collections.Generic;
+
 namespace Scorpio {
     public partial class Script {
         private ScriptObjectsPool<ScriptType> typePool;
@@ -10,13 +12,15 @@ namespace Scorpio {
         private ScriptObjectsPool<ScriptArray> arrayPool;
         private ScriptObjectsPool<ScriptMapObject> mapObjectPool;
         private ScriptObjectsPool<ScriptMapStringPolling> mapStringPollingPool;
+        private ScriptObjectsPool<ScriptEnumerator> enumeratorPool;
+
         private ScriptObjectsPool<ScriptHashSet> hashSetPool;
         private ScriptObjectsPool<ScriptStringBuilder> stringBuilderPool;
         private ScriptObjectsPool<ScriptScriptFunction> functionPool;
         private ScriptObjectsPool<ScriptScriptBindFunction> bindFunctionPool;
         private ScriptObjectsPool<ScriptScriptAsyncFunction> asyncFunctionPool;
         private ScriptObjectsPool<ScriptScriptAsyncBindFunction> asyncBindFunctionPool;
-
+        private ScriptObjectsPool<ScriptHandleFunction> handleFunctionPool;
 
         private ScriptObjectsPool<ScriptUserdataObject> userdataObjectPool;
         private ScriptObjectsPool<ScriptUserdataArray> userdataArrayPool;
@@ -29,15 +33,18 @@ namespace Scorpio {
         private ScriptObjectsPool<InternalValue> internalValuePool;
         private ScorpioJsonSerializer scorpioJsonSerializer;
         private ScorpioJsonDeserializer scorpioJsonDeserializer;
+        private ScorpioStringSerializer scorpioStringSerializer;
         private void InitPool() {
             typePool = new ScriptObjectsPool<ScriptType>(() => new ScriptType(this));
             instancePool = new ScriptObjectsPool<ScriptInstance>(() => new ScriptInstance(this));
             arrayPool = new ScriptObjectsPool<ScriptArray>(() => new ScriptArray(this));
             mapObjectPool = new ScriptObjectsPool<ScriptMapObject>(() => new ScriptMapObject(this));
             mapStringPollingPool = new ScriptObjectsPool<ScriptMapStringPolling>(() => new ScriptMapStringPolling(this));
+            enumeratorPool = new ScriptObjectsPool<ScriptEnumerator>(() => new ScriptEnumerator(this));
 
             hashSetPool = new ScriptObjectsPool<ScriptHashSet>(() => new ScriptHashSet(this));
             stringBuilderPool = new ScriptObjectsPool<ScriptStringBuilder>(() => new ScriptStringBuilder(this));
+            handleFunctionPool = new ScriptObjectsPool<ScriptHandleFunction>(() => new ScriptHandleFunction(this));
             functionPool = new ScriptObjectsPool<ScriptScriptFunction>(() => new ScriptScriptFunction(this));
             bindFunctionPool = new ScriptObjectsPool<ScriptScriptBindFunction>(() => new ScriptScriptBindFunction(this));
             asyncFunctionPool = new ScriptObjectsPool<ScriptScriptAsyncFunction>(() => new ScriptScriptAsyncFunction(this));
@@ -55,6 +62,7 @@ namespace Scorpio {
 
             scorpioJsonSerializer = new ScorpioJsonSerializer();
             scorpioJsonDeserializer = new ScorpioJsonDeserializer(this);
+            scorpioStringSerializer = new ScorpioStringSerializer();
         }
         public ScriptType NewType() {
             return typePool.Alloc();
@@ -71,11 +79,17 @@ namespace Scorpio {
         public ScriptMapStringPolling NewMapStringPolling() {
             return mapStringPollingPool.Alloc();
         }
+        public ScriptEnumerator NewEnumerator() {
+            return enumeratorPool.Alloc();
+        }
         public ScriptHashSet NewHashSet() {
             return hashSetPool.Alloc();
         }
         public ScriptStringBuilder NewStringBuilder() {
             return stringBuilderPool.Alloc();
+        }
+        public ScriptHandleFunction NewHandleFunction() {
+            return handleFunctionPool.Alloc();
         }
         public ScriptScriptFunction NewFunction() {
             return functionPool.Alloc();
@@ -131,11 +145,17 @@ namespace Scorpio {
         public void Free(ScriptMapStringPolling value) {
             mapStringPollingPool.Free(value);
         }
+        public void Free(ScriptEnumerator value) {
+            enumeratorPool.Free(value);
+        }
         public void Free(ScriptHashSet value) {
             hashSetPool.Free(value);
         }
         public void Free(ScriptStringBuilder value) {
             stringBuilderPool.Free(value);
+        }
+        public void Free(ScriptHandleFunction value) {
+            handleFunctionPool.Free(value);
         }
         public void Free(ScriptScriptFunction value) {
             functionPool.Free(value);
@@ -189,6 +209,11 @@ namespace Scorpio {
                 return scorpioJsonDeserializer.Parse(buffer, supportLong, supportIntern);
             }
         }
+        public string ToString(ScriptObject scriptObject) {
+            using (scorpioStringSerializer) {
+                return scorpioStringSerializer.ToString(scriptObject);
+            }
+        }
 
         void Check<T>(ObjectsPool<T> pool) {
             var count = pool.Check();
@@ -201,8 +226,8 @@ namespace Scorpio {
         public void GCCollect() {
             ScriptObjectReference.GCCollect();
         }
-        public void CheckGCCollect() {
-            ScriptObjectReference.CheckGCCollect(out _, out _);
+        public void CollectGCInfos(out HashSet<int> gc, out Dictionary<int, GCHandle> handles) {
+            ScriptObjectReference.CollectGCInfos(out gc, out handles);
         }
         public void CheckPool() {
             StringReference.CheckPool();

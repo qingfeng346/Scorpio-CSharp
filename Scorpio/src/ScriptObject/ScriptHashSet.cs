@@ -13,12 +13,13 @@ namespace Scorpio {
         public new IEnumerator<ScriptValue> GetEnumerator() { return m_Objects.GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() { return m_Objects.GetEnumerator(); }
         public override void Alloc() {
+            base.Alloc();
             SetPrototype(script.TypeHashSet);
         }
         public override void Free() {
+            DelRecord();
             Release();
             Clear();
-            m_Objects = new HashSet<ScriptValue>();
             m_Script.Free(this);
         }
         public override void gc() {
@@ -137,15 +138,25 @@ namespace Scorpio {
             return array;
         }
         public override string ToString() {
-            return m_Script.ToJson(this);
+            return m_Script.ToString(this);
         }
-        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
+        internal override void ToString(ScorpioStringSerializer serializer) {
+            var builder = serializer.m_Builder;
             builder.Append("[");
             var first = true;
             foreach (var value in m_Objects) {
                 if (first) { first = false; } else { builder.Append(","); }
-                jsonSerializer.Serializer(value);
+                serializer.Serializer(value);
+            }
+            builder.Append("]");
+        }
+        internal override void ToJson(ScorpioJsonSerializer serializer) {
+            var builder = serializer.m_Builder;
+            builder.Append("[");
+            var first = true;
+            foreach (var value in m_Objects) {
+                if (first) { first = false; } else { builder.Append(","); }
+                serializer.Serializer(value);
             }
             builder.Append("]");
         }

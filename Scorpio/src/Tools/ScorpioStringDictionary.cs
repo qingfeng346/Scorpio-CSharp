@@ -104,8 +104,7 @@ namespace Scorpio.Tools {
         }
         public virtual void Clear() {
             ScorpioUtil.Free(mValues, mSize);
-            mValues = ScorpioUtil.VALUE_EMPTY;
-            mKeys = ScorpioUtil.KEY_EMPTY;
+            Array.Clear(mKeys, 0, mKeys.Length);
             mSize = 0;
         }
         public virtual bool TryGetValue(string key, out ScriptValue value) {

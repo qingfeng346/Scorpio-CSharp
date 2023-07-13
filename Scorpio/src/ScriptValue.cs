@@ -224,6 +224,19 @@ namespace Scorpio
                 this.index = ScriptObjectReference.Alloc(value);
             }
         }
+        private ScriptValue(ScriptValue value) {
+            this.doubleValue = 0;
+            this.index = 0;
+            this.valueType = value.valueType;
+            this.longValue = value.longValue;
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    StringReference.Reference(index);
+                } else if (valueType == scriptValueType) {
+                    ScriptObjectReference.Reference(index);
+                }
+            }
+        }
         internal ScriptValue(char value) {
             this.valueType = charValueType;
             this.index = 0;
@@ -764,7 +777,7 @@ namespace Scorpio
                 return Null;
             else if (value is ScriptValue)
                 //需要增加一次引用计数
-                return ((ScriptValue)value).Reference();
+                return new ScriptValue((ScriptValue)value);
             else if (value is bool)
                 return (bool)value ? True : False;
             else if (value is string)

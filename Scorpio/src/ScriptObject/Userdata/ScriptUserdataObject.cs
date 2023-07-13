@@ -22,7 +22,7 @@ namespace Scorpio.Userdata {
             }
         }
         public override void Free() {
-            base.Free();
+            DelRecord();
             m_Value = null;
             m_ValueType = null;
             m_UserdataType = null;

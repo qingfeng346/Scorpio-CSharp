@@ -1,29 +1,30 @@
 ﻿using Scorpio.Function;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Scorpio.Tools {
-    public partial class ScriptObjectReference {
-        public class GCHandle {
-            public int index;
-            public int count;
-            public HashSet<int> beCatch = new HashSet<int>();
-            public GCHandle(int index) {
-                this.index = index;
-                this.count = 0;
-            }
+    public class GCHandle {
+        public int index;               //当前索引
+        public int count;               //被计算到的引用的次数
+        public HashSet<int> beCatch;    //被引用的索引列表
+        public GCHandle(int index) {
+            this.index = index;
+            this.count = 0;
+            beCatch = new HashSet<int>();
         }
-        static Dictionary<int, GCHandle> gcHandle = new Dictionary<int, GCHandle>();
+    }
+    public partial class ScriptObjectReference {
+        //每个索引的数据
+        static Dictionary<int, GCHandle> gcHandles = new Dictionary<int, GCHandle>();
+        //可以被释放的索引列表
         static HashSet<int> canGC = new HashSet<int>();
-        static HashSet<int> stack = new HashSet<int>();
-        static void Collect(ScriptValue value, int originIndex) {
+        static void Collect(ScriptValue value, int parentIndex) {
             if (value.valueType == ScriptValue.scriptValueType) {
-                Collect(value.index, originIndex);
+                Collect(value.index, parentIndex);
             }
         }
         static void Collect(int index, int originIndex) {
-            if (!gcHandle.TryGetValue(index, out var handle)) {
-                handle = gcHandle[index] = new GCHandle((int)index);
+            if (!gcHandles.TryGetValue(index, out var handle)) {
+                handle = gcHandles[index] = new GCHandle(index);
             }
             handle.count++;
             handle.beCatch.Add(originIndex);
@@ -52,6 +53,16 @@ namespace Scorpio.Tools {
                 }
                 Collect((value as ScriptInstance).Prototype.Index, originIndex);
             }
+            if (value is ScriptScriptFunctionBase) {
+                var internalValues = ((ScriptScriptFunctionBase)value).InternalValues;
+                if (internalValues != null) {
+                    for (var i = 0; i < internalValues.Length; ++i) {
+                        var internalValue = internalValues[i];
+                        if (internalValue == null) { continue; }
+                        Collect(internalValue.value, originIndex);
+                    }
+                }
+            }
         }
         static bool CanGCRoot(GCHandle handle, HashSet<int> check) {
             if (canGC.Contains(handle.index)) return true;
@@ -60,46 +71,46 @@ namespace Scorpio.Tools {
             //次数不同是被外部引用, c#对象或delegate或全局变量
             if (handle.count != entities[handle.index].referenceCount) return false;
             foreach (var index in handle.beCatch) {
-                if (!gcHandle.TryGetValue(index, out var parent))
+                if (!gcHandles.TryGetValue(index, out var parent))
                     return false;
                 if (!CanGCRoot(parent, check))
                     return false;
             }
             return true;
         }
-        static void CollectGC() {
-            gcHandle.Clear();
+        //计算所有的GCHandle
+        static void CollectGCHandle() {
+            gcHandles.Clear();
             for (var i = 0; i < entityLength; ++i) {
                 if (entities[i].value != null && entities[i].referenceCount > 0) {
                     Collect(entities[i].value, i);
                 }
             }
             canGC.Clear();
-            foreach (var pair in gcHandle) {
+            var stack = new HashSet<int>();
+            foreach (var pair in gcHandles) {
                 stack.Clear();
                 if (CanGCRoot(pair.Value, stack)) {
                     canGC.Add(pair.Key);
                 }
             }
         }
+        //收集可以被GC的索引
+        public static void CollectGCInfos(out HashSet<int> gc, out Dictionary<int, GCHandle> handles) {
+            CollectGCHandle();
+            gc = canGC;
+            handles = gcHandles;
+        }
+        //收集可以被GC的对象并调用gc
         public static void GCCollect() {
-            CollectGC();
-            if (canGC.Count > 0) {
-                foreach (var index in canGC) {
+            CollectGCInfos(out var gc, out _);
+            if (gc.Count > 0) {
+                foreach (var index in gc) {
                     entities[index].value.gc();
                 }
             }
         }
-        public static void CheckGCCollect(out HashSet<int> gc, out Dictionary<int, GCHandle> h) {
-            CollectGC();
-            if (canGC.Count > 0) {
-                foreach (var index in canGC) {
-                    ScorpioLogger.error($"[{index}] 可以被释放,被持有列表:{string.Join(",", gcHandle[index].beCatch.ToArray())}  内容:{entities[index]}");
-                }
-            }
-            gc = canGC;
-            h = gcHandle;
-        }
+
         static void CollectReference(ScriptValue value, int originIndex, int targetIndex, HashSet<int> set, bool isString) {
             if (isString) {
                 if (value.valueType == ScriptValue.stringValueType && value.index == targetIndex) {
@@ -126,7 +137,8 @@ namespace Scorpio.Tools {
             } else if (value is ScriptScriptBindFunctionBase) {
                 CollectReference(((ScriptScriptBindFunctionBase)value).BindObject, originIndex, targetIndex, set, isString);
             } else if (value is ScriptType) {
-                CollectReference((value as ScriptType).Prototype.Index, originIndex, targetIndex, set, isString);
+                var protoType = ((ScriptType)value).Prototype;
+                if (protoType != null) CollectReference(protoType.Index, originIndex, targetIndex, set, isString);
                 foreach (var pair in (value as ScriptType)) {
                     CollectReference(pair.Value, originIndex, targetIndex, set, isString);
                 }
@@ -142,14 +154,15 @@ namespace Scorpio.Tools {
                 CollectReference((value as ScriptInstance).Prototype.Index, originIndex, targetIndex, set, isString);
             }
         }
-        public static HashSet<int> GetReference(int index, bool isString) {
-            var set = new HashSet<int>();
+        //计算被引用的对象
+        public static void GetReference(int index, bool isString, out HashSet<int> set, out int referenceCount) {
+            set = new HashSet<int>();
+            referenceCount = isString ? StringReference.GetReferenceCount(index) : GetReferenceCount(index);
             for (var i = 0; i < entityLength; ++i) {
                 if (entities[i].value != null) {
                     CollectReference(entities[i].value, i, index, set, isString);
                 }
             }
-            return set;
         }
     }
 }

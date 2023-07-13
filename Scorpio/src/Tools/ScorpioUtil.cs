@@ -182,7 +182,9 @@ namespace Scorpio.Tools {
             var builder = new StringBuilder();
             for (var i = 0; i < length; ++i) {
                 try {
-                    builder.Append($"[{parameters[i].valueType}-{parameters[i]}]");
+                    var str = parameters[i].ToString();
+                    if (str.Length > 32) str = str.Substring(0, 32);
+                    builder.Append($"[{str}]");
                 } catch (System.Exception) {
                     builder.Append($"[toString Error]");
                 }

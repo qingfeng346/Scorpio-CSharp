@@ -15,12 +15,13 @@ namespace Scorpio {
         Namespace,      //namespace
         UserData,       //普通类
         Global,         //全局变量保存类,只有_G是这个类型
+        Enumerator,     //迭代器专用
     }
     public abstract class ScriptObject : IPool {
         private static uint AutoId = 0;
         protected Script m_Script;
 #if SCORPIO_DEBUG
-        private string Source;
+        public string Source;
         private uint Id;
 #endif
         public int Index = -1;
@@ -36,17 +37,19 @@ namespace Scorpio {
         public virtual string ValueTypeName => ObjectType.ToString();   //类型名称
         public Script script => m_Script;
         public virtual void Alloc() {
-//#if SCORPIO_DEBUG
-//            Id = AutoId++;
-//            Source = $"Type:{ValueTypeName} {m_Script.RecordStack}";
-//            m_Script.AddRecord(Source, Id);
-//#endif
+#if SCORPIO_DEBUG
+           Id = AutoId++;
+           Source = m_Script.RecordStack.ToString();
+           m_Script.AddRecord(Source, Id, this);
+#endif
         }
         public virtual void Free() {
-//#if SCORPIO_DEBUG
-//            m_Script.DelRecord(Source, Id);
-//            Source = null;
-//#endif
+        }
+        public void DelRecord() {
+#if SCORPIO_DEBUG
+           m_Script.DelRecord(Source, Id, this);
+           Source = null;
+#endif
         }
         //循环引用被回收掉
         public abstract void gc();
@@ -75,7 +78,6 @@ namespace Scorpio {
         public virtual bool Equals(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.scriptValue == this; }
         public bool EqualReference(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && ReferenceEquals(obj.scriptValue, this); }
         public override string ToString() { return base.ToString(); }
-        public virtual string ToFullString() { return $"[{GetType().Name}]{ToString()}"; }
 
         //运算符
         public virtual ScriptValue Plus(ScriptValue obj) { throw new ExecutionException($"Object类型[{ValueTypeName}]不支持 [+] 运算"); }

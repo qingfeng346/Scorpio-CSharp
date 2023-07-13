@@ -60,7 +60,7 @@ namespace Scorpio.Userdata {
                 }
                 throw new ExecutionException ($"类[{m_Type}] 找不到合适的函数 [{MethodName}] - {parameters.GetParametersString(length)}");
             } catch (System.Exception e) {
-                throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] - {parameters.GetParametersString(length)} : {e}");
+                throw new ExecutionException ($"类[{m_Type}] 调用函数出错 [{MethodName}] - {parameters.GetParametersString(length)} ---> {e.Message}\n{e.StackTrace}");
             } finally {
                 Array.Clear(method.Args, 0, method.Args.Length);
             }
@@ -98,6 +98,9 @@ namespace Scorpio.Userdata {
             } finally {
                 Array.Clear(method.Args, 0, method.Args.Length);
             }
+        }
+        public override string ToString() {
+            return $"{m_Type.FullName} : {MethodName}";
         }
     }
 }

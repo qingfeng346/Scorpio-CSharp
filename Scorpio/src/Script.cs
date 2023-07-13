@@ -18,7 +18,6 @@ using Scorpio.Serialize;
 using Scorpio.Tools;
 using Scorpio.Compile.Compiler;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Scorpio
 {
@@ -295,7 +294,7 @@ namespace Scorpio
         }
         /// <summary> 创建一个Function </summary>
         /// <param name="value">ScorpioHandle</param>
-        public ScriptHandleFunction CreateFunction(ScorpioHandle value) { return new ScriptHandleFunction(this, value); }
+        public ScriptHandleFunction CreateFunction(ScorpioHandle value) { return NewHandleFunction().SetHandle(value); }
         /// <summary> 调用一个全局函数 </summary>
         /// <param name="name">函数名</param>
         /// <param name="args">参数</param>
@@ -590,29 +589,53 @@ namespace Scorpio
         }
 
         public bool IsRecord = false;
-        public Dictionary<string, HashSet<uint>> Record = new Dictionary<string, HashSet<uint>>();
+        public int objEntityLength = 0, objPoolLength = 0;
+        public int strEntityLength = 0, strPoolLength = 0;
+        public Dictionary<string, Dictionary<uint, ScriptObject>> Record = new Dictionary<string, Dictionary<uint, ScriptObject>> ();
+        public Dictionary<string, List<string>> RecordDestroy = new Dictionary<string, List<string>>();
+        public Dictionary<Type, uint> NewTypes = new Dictionary<Type, uint>();
         public void StartRecord() {
+            if (IsRecord) return;
             IsRecord = true;
+            RecordDestroy.Clear();
             Record.Clear();
+            NewTypes.Clear();
+            objEntityLength = ScriptObjectReference.entityLength;
+            objPoolLength = ScriptObjectReference.poolLength;
+            strEntityLength = StringReference.entityLength;
+            strPoolLength = StringReference.poolLength;
         }
-        public void AddRecord(string source, uint id) {
+        public void NewType(Type type) {
+            if (!NewTypes.ContainsKey(type)) {
+                NewTypes[type] = 1;
+                return;
+            }
+            NewTypes[type]++;
+        }
+        public void AddRecord(string source, uint id, ScriptObject scriptObject) {
             if (!IsRecord) { return; }
             if (!Record.ContainsKey(source)) {
-                Record[source] = new HashSet<uint>();
+                Record[source] = new Dictionary<uint, ScriptObject>();
             }
-            Record[source].Add(id);
+            Record[source][id] = scriptObject;
         }
-        public void DelRecord(string source, uint id) {
+        public void DelRecord(string source, uint id, ScriptObject scriptObject) {
             if (!IsRecord) { return; }
-            if (Record.TryGetValue(source, out var set)) {
-                set.Remove(id);
+            if (Record.TryGetValue(source, out var dic)) {
+                if (dic.ContainsKey(id)) {
+                    dic.Remove(id);
+                    return;
+                }
             }
+            if (!RecordDestroy.TryGetValue(source, out var list)) {
+                RecordDestroy[source] = list = new List<string>();
+            }
+            // var str = scriptObject.ToString();
+            // if (str.Length > 512) str = str.Substring(0, 512);
+            list.Add($"{scriptObject.GetType()}");
         }
         public void EndRecord() {
-            ClearStack();
-            ReleaseAll();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            if (!IsRecord) return;
             IsRecord = false;
         }
     }

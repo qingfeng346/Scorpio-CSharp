@@ -20,6 +20,7 @@ namespace Scorpio {
         }
         public ScriptMapStringPolling(Script script) : base(script) { }
         public override void Free() {
+            DelRecord();
             Release();
             m_Script.Free(this);
         }
@@ -28,6 +29,7 @@ namespace Scorpio {
         }
         public override IEnumerator<KeyValuePair<object, ScriptValue>> GetEnumerator() { return new Enumerator(this); }
         IEnumerator IEnumerable.GetEnumerator() { return this.GetEnumerator(); }
+        #region ScriptMap重载
         public override bool ContainsKey(object key) {
             if (!(key is string)) return false;
             return m_Values.ContainsKey((string)key);
@@ -68,6 +70,7 @@ namespace Scorpio {
             }
             return ret;
         }
+        #endregion
         public override ScriptObject Clone(bool deep) {
             var ret = m_Script.NewMapStringPolling();
             ret.SetCapacity(m_Values.mSize);

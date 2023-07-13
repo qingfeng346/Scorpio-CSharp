@@ -9,9 +9,13 @@ namespace Scorpio.Function {
             return ScriptValue.CreateValue(m_Script, Method.Call(m_Script, true, thisValue, parameters, length - 1));
         }
         public override void Free() {
+            DelRecord();
             MethodName = null;
             Method = null;
             m_Script.Free(this);
+        }
+        public override string ToString() {
+            return $"模板函数 {Method}";
         }
     }
 }

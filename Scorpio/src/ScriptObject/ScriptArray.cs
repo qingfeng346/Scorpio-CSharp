@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Scorpio.Exception;
 using Scorpio.Tools;
 using Scorpio.Library;
+using Newtonsoft.Json;
+
 namespace Scorpio {
     //脚本数组类型
     public class ScriptArray : ScriptInstance, IEnumerable<ScriptValue> {
@@ -68,9 +70,9 @@ namespace Scorpio {
             SetPrototype(script.TypeArray);
         }
         public override void Free() {
+            DelRecord();
             Release();
             Clear();
-            m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Script.Free(this);
         }
         public override void gc() {
@@ -315,12 +317,21 @@ namespace Scorpio {
         public override string ToString() {
             return m_Script.ToJson(this);
         }
-        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
+        internal override void ToString(ScorpioStringSerializer serializer) {
+            var builder = serializer.m_Builder;
             builder.Append("[");
             for (int i = 0; i < m_Length; ++i) {
                 if (i != 0) builder.Append(",");
-                jsonSerializer.Serializer(m_Objects[i]);
+                serializer.Serializer(m_Objects[i]);
+            }
+            builder.Append("]");
+        }
+        internal override void ToJson(ScorpioJsonSerializer serializer) {
+            var builder = serializer.m_Builder;
+            builder.Append("[");
+            for (int i = 0; i < m_Length; ++i) {
+                if (i != 0) builder.Append(",");
+                serializer.Serializer(m_Objects[i]);
             }
             builder.Append("]");
         }

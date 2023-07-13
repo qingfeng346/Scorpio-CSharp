@@ -37,6 +37,7 @@ namespace Scorpio {
             m_Values.Clear();
         }
         public override void Free() {
+            DelRecord();
             Release();
             m_Script.Free(this);
         }
@@ -176,6 +177,9 @@ namespace Scorpio {
             var value = func.Call(ThisValue, ScorpioUtil.VALUE_EMPTY, 0);
             value.Release();
             return value.ToString();
+        }
+        internal virtual void ToString(ScorpioStringSerializer jsonSerializer) {
+            jsonSerializer.m_Builder.Append($"\"{ToString()}\"");
         }
         internal virtual void ToJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;

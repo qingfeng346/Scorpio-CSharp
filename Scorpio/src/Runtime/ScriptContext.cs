@@ -15,7 +15,6 @@ namespace Scorpio.Runtime {
             }
         }
         internal const int AsyncValueLength = 64;           //异步函数的最大栈和局部变量最大数量
-
         internal const int ValueCacheLength = 64;           //函数最大调用层级,超过会堆栈溢出
         internal const int StackValueLength = 256;          //堆栈数据最大数量
         internal const int VariableValueLength = 128;       //局部变量最大数量
@@ -24,7 +23,7 @@ namespace Scorpio.Runtime {
         internal static ScriptValue[][] VariableValues = new ScriptValue[ValueCacheLength][]; //局部变量数据
         internal static ScriptValue[][] StackValues = new ScriptValue[ValueCacheLength][]; //堆栈数据
         internal static int[][] TryStackValues = new int[ValueCacheLength][]; //try catch数据
-        internal static int VariableValueIndex = 0;
+        public static int VariableValueIndex = 0;
 
         internal static int AsyncValuePoolLength = 0;
         internal static AsyncValue[] AsyncValuePool = new AsyncValue[0];

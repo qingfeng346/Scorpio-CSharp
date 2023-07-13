@@ -311,4 +311,89 @@ namespace Scorpio.Library {
             m_Recurve.Clear();
         }
     }
+    internal class ScorpioStringSerializer : IDisposable {
+        internal StringBuilder m_Builder;
+        private HashSet<ScriptObject> m_Recurve;
+        public ScorpioStringSerializer() {
+            m_Builder = new StringBuilder();
+            m_Recurve = new HashSet<ScriptObject>();
+        }
+        public string ToString(ScriptObject scriptObject) {
+            Serializer(scriptObject);
+            return m_Builder.ToString();
+        }
+        internal void Serializer(ScriptValue value) {
+            switch (value.valueType) {
+                case ScriptValue.nullValueType:
+                    m_Builder.Append("null");
+                    break;
+                case ScriptValue.trueValueType:
+                    m_Builder.Append("true");
+                    break;
+                case ScriptValue.falseValueType:
+                    m_Builder.Append("false");
+                    break;
+                case ScriptValue.doubleValueType:
+                    m_Builder.Append(value.doubleValue);
+                    break;
+                case ScriptValue.int64ValueType:
+                    m_Builder.Append(value.longValue);
+                    break;
+                case ScriptValue.stringValueType:
+                    Serializer(value.stringValue);
+                    break;
+                case ScriptValue.scriptValueType:
+                    Serializer(value.scriptValue);
+                    break;
+            }
+        }
+        internal void Serializer(string value) {
+            m_Builder.Append('\"');
+            foreach (var c in value.ToCharArray()) {
+                switch (c) {
+                    case '"':
+                        m_Builder.Append("\\\"");
+                        break;
+                    case '\\':
+                        m_Builder.Append("\\\\");
+                        break;
+                    case '\b':
+                        m_Builder.Append("\\b");
+                        break;
+                    case '\f':
+                        m_Builder.Append("\\f");
+                        break;
+                    case '\n':
+                        m_Builder.Append("\\n");
+                        break;
+                    case '\r':
+                        m_Builder.Append("\\r");
+                        break;
+                    case '\t':
+                        m_Builder.Append("\\t");
+                        break;
+                    default:
+                        m_Builder.Append(c);
+                        break;
+                }
+            }
+            m_Builder.Append('\"');
+        }
+        internal void Serializer(ScriptObject scriptObject) {
+            if (scriptObject is ScriptInstance) {
+                if (!m_Recurve.Contains(scriptObject)) {
+                    m_Recurve.Add(scriptObject);
+                    ((ScriptInstance)scriptObject).ToString(this);
+                } else {
+                    m_Builder.Append("\"Inline\"");
+                }
+            } else {
+                Serializer(scriptObject.ToString());
+            }
+        }
+        public void Dispose() {
+            m_Builder.Clear();
+            m_Recurve.Clear();
+        }
+    }
 }
