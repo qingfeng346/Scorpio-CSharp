@@ -1,2 +1,1 @@
-var a = []
-print(a.contains(null))
+AAA = import_type("TestClass").Instance

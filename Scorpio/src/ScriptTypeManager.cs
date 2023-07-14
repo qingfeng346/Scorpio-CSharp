@@ -7,8 +7,8 @@ namespace Scorpio {
     public partial class Script {
         private List<Assembly> m_Assembly = new List<Assembly>();                                                //所有代码集合
         private List<Type> m_ExtensionType = new List<Type>();                                                   //所有扩展类
-        private Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                   //所有的类集合
-        private Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();             //所有的类集合
+        internal Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                   //所有的类集合
+        internal Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();             //所有的类集合
         private void LoadExtension(Type type, UserdataTypeReflect userdataType) {
             foreach (var extensionType in m_ExtensionType) {
                 var methods = extensionType.GetMethods(Script.BindingFlag);

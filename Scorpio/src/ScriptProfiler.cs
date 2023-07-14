@@ -55,7 +55,7 @@ namespace Scorpio {
             IsRecord = false;
         }
         public void CollectLeak(out HashSet<int> set) {
-            ScriptObjectReference.CollectLeak(m_global, out set);
+            ScriptObjectReference.CollectLeak(this, out set);
         }
     }
 }

@@ -230,11 +230,19 @@ namespace Scorpio.Tools {
             }
         }
         //搜集泄漏对象,暂时判断没有在global里就算泄漏
-        public static void CollectLeak(ScriptGlobal global, out HashSet<int> set) {
+        public static void CollectLeak(Script script, out HashSet<int> set) {
             set = new HashSet<int>();
             var globalIndex = new HashSet<int>();
-            foreach (var pair in global) {
+            foreach (var pair in script.Global) {
                 CollectGlobal(pair.Value, globalIndex);
+            }
+            foreach (var pair in script.m_UserdataTypes) {
+                CollectGlobal(pair.Value, globalIndex);
+            }
+            foreach (var pair in script.m_Types) {
+                foreach (var v in pair.Value.m_Values) {
+                    CollectGlobal(v.Value, globalIndex);
+                }
             }
             for (var i = 0; i < entityLength;++i) {
                 if (entities[i].value != null && !globalIndex.Contains(i)) {
