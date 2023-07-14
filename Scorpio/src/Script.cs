@@ -80,7 +80,8 @@ namespace Scorpio
         public ScriptValue TypeStringBuilderValue => m_TypeValueStringBuilder;
 
         /// <summary> 全局变量 </summary>
-        public ScriptGlobal Global { get; private set; }
+        internal ScriptGlobal m_global;
+        public ScriptGlobal Global => m_global;
         public bool IsShutdown { get; private set; }
         public int MainThreadId { get; private set; }
         public SynchronizationContext MainSynchronizationContext { get; private set; }
@@ -90,11 +91,11 @@ namespace Scorpio
         public Script() {
             m_SearchPaths = new string[0];
             InitPool();
-            Global = new ScriptGlobal(this);
+            m_global = new ScriptGlobal(this);
 
             m_TypeObject = new ScriptTypeObject(this, "Object");
             m_TypeValueObject = new ScriptValue(TypeObject);
-            Global.SetValue(TypeObject.TypeName, TypeObjectValue);
+            m_global.SetValue(TypeObject.TypeName, TypeObjectValue);
 
             AddPrimitivePrototype("Bool", ref m_TypeBool, ref m_TypeValueBool);
             AddPrimitivePrototype("Number", ref m_TypeNumber, ref m_TypeValueNumber);
@@ -106,9 +107,9 @@ namespace Scorpio
             AddBasicPrototype(m_TypeStringBuilder = new ScriptTypeBasicStringBuilder(this, "StringBuilder", m_TypeObject), ref m_TypeValueStringBuilder);
             AddBasicPrototype(m_TypeHashSet = new ScriptTypeBasicHashSet(this, "HashSet", m_TypeObject), ref m_TypeValueHashSet);
 
-            Global.SetValueNoReference(GLOBAL_NAME, new ScriptValue(Global));
-            Global.SetValueNoReference(GLOBAL_SCRIPT, ScriptValue.CreateValue(this, this));
-            Global.SetValueNoReference(GLOBAL_VERSION, ScriptValue.CreateValue(this, typeof(Version)));
+            m_global.SetValueNoReference(GLOBAL_NAME, new ScriptValue(m_global));
+            m_global.SetValueNoReference(GLOBAL_SCRIPT, ScriptValue.CreateValue(this, this));
+            m_global.SetValueNoReference(GLOBAL_VERSION, ScriptValue.CreateValue(this, typeof(Version)));
 
             ProtoObject.Load(this, TypeObject);
             ProtoBoolean.Load(this, TypeBoolean);
@@ -140,7 +141,7 @@ namespace Scorpio
             if (IsShutdown) return;
             IsShutdown = true;
             ClearStack();
-            Global.Shutdown();
+            m_global.Shutdown();
             m_TypeValueObject.Free();
             m_TypeValueBool.Free();
             m_TypeValueNumber.Free();
@@ -198,11 +199,11 @@ namespace Scorpio
         void AddPrimitivePrototype(string name, ref ScriptType type, ref ScriptValue typeValue) {
             type = new ScriptTypePrimitive(this, name, m_TypeObject);
             typeValue = new ScriptValue(type);
-            Global.SetValue(name, typeValue);
+            m_global.SetValue(name, typeValue);
         }
         void AddBasicPrototype(ScriptType type, ref ScriptValue typeValue) {
             typeValue = new ScriptValue(type);
-            Global.SetValue(type.TypeName, typeValue);
+            m_global.SetValue(type.TypeName, typeValue);
         }
         public ScriptMap AddLibrary(string libraryName, (string, ScorpioHandle)[] functions, int number = 0) {
             var map = NewMapStringPolling();
@@ -262,14 +263,14 @@ namespace Scorpio
         /// <param name="key">名字</param>
         /// <param name="value">值</param>
         public void SetGlobalNoReference(string key, ScriptObject value) {
-            Global.SetValueNoReference(key, new ScriptValue(value));
+            m_global.SetValueNoReference(key, new ScriptValue(value));
         }
         public void SetGlobalNoReference(string key, ScriptValue value) {
-            Global.SetValueNoReference(key, value);
+            m_global.SetValueNoReference(key, value);
         }
 
         public void SetGlobal(string key, ScriptValue value) {
-            Global.SetValue(key, value);
+            m_global.SetValue(key, value);
         }
 
 
@@ -277,13 +278,13 @@ namespace Scorpio
         /// <param name="key">名字</param>
         /// <returns>值</returns>
         public ScriptValue GetGlobal(string key) {
-            return Global.GetValue(key);
+            return m_global.GetValue(key);
         }
         /// <summary> 是否包含一个全局变量 </summary>
         /// <param name="key">名字</param>
         /// <returns>是否包含</returns>
         public bool HasGlobal(string key) {
-            return Global.HasValue(key);
+            return m_global.HasValue(key);
         }
         public void SetArgs(string[] args) {
             var array = NewArray();
@@ -300,7 +301,7 @@ namespace Scorpio
         /// <param name="args">参数</param>
         /// <returns>函数返回值</returns>
         public ScriptValue call(string name, params object[] args) {
-            return Global.GetValue(name).call(ScriptValue.Null, args);
+            return m_global.GetValue(name).call(ScriptValue.Null, args);
         }
         /// <summary> 调用一个全局函数 </summary>
         /// <param name="name">函数名</param>
@@ -308,7 +309,7 @@ namespace Scorpio
         /// <param name="length">参数个数</param>
         /// <returns>函数返回值</returns>
         public ScriptValue Call(string name, ScriptValue[] args, int length) {
-            return Global.GetValue(name).Call(ScriptValue.Null, args, length);
+            return m_global.GetValue(name).Call(ScriptValue.Null, args, length);
         }
 
         #region LoadFile LoadString
@@ -457,6 +458,7 @@ namespace Scorpio
                         if (ConstStringIndex == ConstString.Length) {
                             Array.Resize(ref ConstString, ConstStringIndex + StringStage);
                         }
+                        str = string.Intern(str);
                         StringIndex[str] = ConstStringIndex;
                         ConstString[ConstStringIndex++] = str;
                     }
@@ -513,10 +515,10 @@ namespace Scorpio
         }
         #endregion
         public ScriptConst LoadConst(string fileName) {
-            var keys = new HashSet<string>(Global.GetKeys());
+            var keys = new HashSet<string>(m_global.GetKeys());
             LoadFile(fileName);
             var scriptConst = new ScriptConst();
-            foreach (var pair in Global) {
+            foreach (var pair in m_global) {
                 if (keys.Contains(pair.Key)) { continue; }
                 AddConst(scriptConst, pair.Key, pair.Value);
             }
@@ -586,57 +588,6 @@ namespace Scorpio
         public void ReleaseAll() {
             ScriptObjectReference.ReleaseAll();
             StringReference.ReleaseAll();
-        }
-
-        public bool IsRecord = false;
-        public int objEntityLength = 0, objPoolLength = 0;
-        public int strEntityLength = 0, strPoolLength = 0;
-        public Dictionary<string, Dictionary<uint, ScriptObject>> Record = new Dictionary<string, Dictionary<uint, ScriptObject>> ();
-        public Dictionary<string, List<string>> RecordDestroy = new Dictionary<string, List<string>>();
-        public Dictionary<Type, uint> NewTypes = new Dictionary<Type, uint>();
-        public void StartRecord() {
-            if (IsRecord) return;
-            IsRecord = true;
-            RecordDestroy.Clear();
-            Record.Clear();
-            NewTypes.Clear();
-            objEntityLength = ScriptObjectReference.entityLength;
-            objPoolLength = ScriptObjectReference.poolLength;
-            strEntityLength = StringReference.entityLength;
-            strPoolLength = StringReference.poolLength;
-        }
-        public void NewType(Type type) {
-            if (!NewTypes.ContainsKey(type)) {
-                NewTypes[type] = 1;
-                return;
-            }
-            NewTypes[type]++;
-        }
-        public void AddRecord(string source, uint id, ScriptObject scriptObject) {
-            if (!IsRecord) { return; }
-            if (!Record.ContainsKey(source)) {
-                Record[source] = new Dictionary<uint, ScriptObject>();
-            }
-            Record[source][id] = scriptObject;
-        }
-        public void DelRecord(string source, uint id, ScriptObject scriptObject) {
-            if (!IsRecord) { return; }
-            if (Record.TryGetValue(source, out var dic)) {
-                if (dic.ContainsKey(id)) {
-                    dic.Remove(id);
-                    return;
-                }
-            }
-            if (!RecordDestroy.TryGetValue(source, out var list)) {
-                RecordDestroy[source] = list = new List<string>();
-            }
-            // var str = scriptObject.ToString();
-            // if (str.Length > 512) str = str.Substring(0, 512);
-            list.Add($"{scriptObject.GetType()}");
-        }
-        public void EndRecord() {
-            if (!IsRecord) return;
-            IsRecord = false;
         }
     }
 }

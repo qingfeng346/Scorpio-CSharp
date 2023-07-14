@@ -7,14 +7,11 @@ namespace Scorpio.Userdata
 {
     /// <summary> 一个c#类的所有数据 </summary>
     public abstract class UserdataType {
-        private static int AutomaticId = 0;
         protected Type m_Type;                                                                          //Type
         protected UserdataMethod[] m_Operators = new UserdataMethod[UserdataOperator.OperatorCount];    //所有重载函数
         protected bool[] m_InitOperators = new bool[UserdataOperator.OperatorCount];                    //是否初始化过重载函数
         protected Dictionary<string, ScriptValue> m_Values;                                             //所有的内部数据,内部类,脚本扩展函数
-        public int Id { get; private set; }
         public UserdataType(Type type) {
-            Id = AutomaticId++;
             m_Type = type;
             m_Values = new Dictionary<string, ScriptValue>();
         }

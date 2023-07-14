@@ -178,10 +178,10 @@ namespace Scorpio {
             value.Release();
             return value.ToString();
         }
-        internal virtual void ToString(ScorpioStringSerializer jsonSerializer) {
+        internal virtual void SerializerString(ScorpioStringSerializer jsonSerializer) {
             jsonSerializer.m_Builder.Append($"\"{ToString()}\"");
         }
-        internal virtual void ToJson(ScorpioJsonSerializer jsonSerializer) {
+        internal virtual void SerializerJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("{");
             var first = true;

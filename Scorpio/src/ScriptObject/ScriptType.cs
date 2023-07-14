@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Scorpio {
     public class ScriptType : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         protected ScorpioStringDictionary m_Values;             //所有的函数
-        protected ScorpioStringDictionary m_GetProperties;      //所有的get函数
+        public ScorpioStringDictionary m_GetProperties;      //所有的get函数
         protected ScriptFunction m_EqualFunction;                       //==函数重载
         protected ScriptType m_Prototype;                               //基类
         public ScriptType(Script script) : base(script, ObjectType.Type) {

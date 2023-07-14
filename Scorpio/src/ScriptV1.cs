@@ -8,7 +8,7 @@ namespace Scorpio {
             LibraryTable.Load(this);
         }
         public void NewNameGlobal(string name, string newName) {
-            Global.SetValue(newName, Global.GetValue(name));
+            m_global.SetValue(newName, m_global.GetValue(name));
         }
     }
 }

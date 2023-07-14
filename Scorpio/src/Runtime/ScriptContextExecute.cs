@@ -95,7 +95,7 @@ namespace Scorpio.Runtime {
             var iInstruction = 0; //当前执行命令索引
             var m_scriptInstructions = m_FunctionData.scriptInstructions;
             var iInstructionCount = m_scriptInstructions.Length; //指令数量
-            var m_global = m_script.Global;
+            var m_global = m_script.m_global;
             byte tempValueType; //临时存储
             int tempIndex; //临时存储
             ScriptInstruction instruction = null;

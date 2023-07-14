@@ -298,7 +298,7 @@ namespace Scorpio.Library {
             if (scriptObject is ScriptInstance) {
                 if (!m_Recurve.Contains(scriptObject)) {
                     m_Recurve.Add(scriptObject);
-                    ((ScriptInstance)scriptObject).ToJson(this);
+                    ((ScriptInstance)scriptObject).SerializerJson(this);
                 } else {
                     m_Builder.Append("\"Inline\"");
                 }
@@ -383,7 +383,7 @@ namespace Scorpio.Library {
             if (scriptObject is ScriptInstance) {
                 if (!m_Recurve.Contains(scriptObject)) {
                     m_Recurve.Add(scriptObject);
-                    ((ScriptInstance)scriptObject).ToString(this);
+                    ((ScriptInstance)scriptObject).SerializerString(this);
                 } else {
                     m_Builder.Append("\"Inline\"");
                 }

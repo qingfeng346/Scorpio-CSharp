@@ -140,7 +140,7 @@ namespace Scorpio {
         public override string ToString() {
             return m_Script.ToString(this);
         }
-        internal override void ToString(ScorpioStringSerializer serializer) {
+        internal override void SerializerString(ScorpioStringSerializer serializer) {
             var builder = serializer.m_Builder;
             builder.Append("[");
             var first = true;
@@ -150,7 +150,7 @@ namespace Scorpio {
             }
             builder.Append("]");
         }
-        internal override void ToJson(ScorpioJsonSerializer serializer) {
+        internal override void SerializerJson(ScorpioJsonSerializer serializer) {
             var builder = serializer.m_Builder;
             builder.Append("[");
             var first = true;

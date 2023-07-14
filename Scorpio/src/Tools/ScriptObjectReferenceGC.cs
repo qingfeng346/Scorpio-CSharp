@@ -1,4 +1,5 @@
 ﻿using Scorpio.Function;
+using Scorpio.Userdata;
 using System.Collections.Generic;
 
 namespace Scorpio.Tools {
@@ -13,6 +14,7 @@ namespace Scorpio.Tools {
         }
     }
     public partial class ScriptObjectReference {
+        #region 搜集GC对象
         //每个索引的数据
         static Dictionary<int, GCHandle> gcHandles = new Dictionary<int, GCHandle>();
         //可以被释放的索引列表
@@ -36,6 +38,10 @@ namespace Scorpio.Tools {
                 }
             } else if (value is ScriptArray) {
                 foreach (var element in (ScriptArray)value) {
+                    Collect(element, originIndex);
+                }
+            } else if (value is ScriptHashSet) {
+                foreach (var element in (ScriptHashSet)value) {
                     Collect(element, originIndex);
                 }
             } else if (value is ScriptScriptBindFunctionBase) {
@@ -110,7 +116,8 @@ namespace Scorpio.Tools {
                 }
             }
         }
-
+        #endregion
+        #region 查找每个对象的引用关系
         static void CollectReference(ScriptValue value, int originIndex, int targetIndex, HashSet<int> set, bool isString) {
             if (isString) {
                 if (value.valueType == ScriptValue.stringValueType && value.index == targetIndex) {
@@ -161,6 +168,77 @@ namespace Scorpio.Tools {
             for (var i = 0; i < entityLength; ++i) {
                 if (entities[i].value != null) {
                     CollectReference(entities[i].value, i, index, set, isString);
+                }
+            }
+        }
+        #endregion
+        static void CollectGlobal(ScriptValue value, HashSet<int> global) {
+            if (value.valueType != ScriptValue.scriptValueType) { return; }
+            CollectGlobal(value.scriptValue, global);
+        }
+        static void CollectGlobal(ScriptObject value, HashSet<int> global) {
+            if (value == null) return;
+            var index = value.Index;
+            if (global.Contains(index)) { return; }
+            global.Add(index);
+            if (value is ScriptMap) {
+                foreach (var pair in (ScriptMap)value) {
+                    CollectGlobal(pair.Value, global);
+                }
+            } else if (value is ScriptArray) {
+                foreach (var element in (ScriptArray)value) {
+                    CollectGlobal(element, global);
+                }
+            } else if (value is ScriptHashSet) {
+                foreach (var element in (ScriptHashSet)value) {
+                    CollectGlobal(element, global);
+                }
+            } else if (value is ScriptScriptBindFunctionBase) {
+                CollectGlobal(((ScriptScriptBindFunctionBase)value).BindObject, global);
+            } else if (value is ScriptType) {
+                CollectGlobal(((ScriptType)value).Prototype, global);
+                foreach (var pair in (ScriptType)value) {
+                    CollectGlobal(pair.Value, global);
+                }
+                foreach (var pair in ((ScriptType)value).m_GetProperties) {
+                    CollectGlobal(pair.Value, global);
+                }
+            } else if (value is ScriptUserdataObject) {
+                foreach (var pair in ((ScriptUserdataObject)value).m_Methods) {
+                    CollectGlobal(pair.Value, global);
+                }
+            } else if (value is ScriptUserdataType) {
+                foreach (var pair in ((ScriptUserdataType)value).m_Methods) {
+                    CollectGlobal(pair.Value, global);
+                }
+            }
+            if (value is ScriptInstance) {
+                foreach (var pair in (value as ScriptInstance)) {
+                    CollectGlobal(pair.Value, global);
+                }
+                CollectGlobal(((ScriptInstance)value).Prototype, global);
+            }
+            if (value is ScriptScriptFunctionBase) {
+                var internalValues = ((ScriptScriptFunctionBase)value).InternalValues;
+                if (internalValues != null) {
+                    for (var i = 0; i < internalValues.Length; ++i) {
+                        var internalValue = internalValues[i];
+                        if (internalValue == null) { continue; }
+                        CollectGlobal(internalValue.value, global);
+                    }
+                }
+            }
+        }
+        //搜集泄漏对象,暂时判断没有在global里就算泄漏
+        public static void CollectLeak(ScriptGlobal global, out HashSet<int> set) {
+            set = new HashSet<int>();
+            var globalIndex = new HashSet<int>();
+            foreach (var pair in global) {
+                CollectGlobal(pair.Value, globalIndex);
+            }
+            for (var i = 0; i < entityLength;++i) {
+                if (entities[i].value != null && !globalIndex.Contains(i)) {
+                    set.Add(i);
                 }
             }
         }

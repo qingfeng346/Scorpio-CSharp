@@ -10,7 +10,6 @@ namespace Scorpio.Userdata {
         public ScriptUserdataEnumType(Script script, Type value) : base(script) {
             this.m_Value = value;
             this.m_ValueType = value;
-            
         }
         public override void Free() { }
         public override void gc() { }
