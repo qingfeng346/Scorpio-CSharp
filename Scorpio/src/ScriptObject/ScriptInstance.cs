@@ -34,7 +34,9 @@ namespace Scorpio {
         protected void Release() {
             ScriptObjectReference.Free(m_Prototype.Index);
             m_Prototype = null;
+            var clear = m_Values.mKeys.Length > ScorpioUtil.EMPTY_LIMIT;
             m_Values.Clear();
+            if (clear) m_Values.Release();
         }
         public override void Free() {
             DelRecord();

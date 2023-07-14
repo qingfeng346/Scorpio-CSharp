@@ -64,10 +64,10 @@ namespace Scorpio.Tools {
             mValues = valueArray;
         }
         public int Count => mSize;
-        public virtual void Add(string key, ScriptValue value) {
+        public void Add(string key, ScriptValue value) {
             this[key] = value;
         }
-        public virtual int IndexOf(string index) {
+        public int IndexOf(string index) {
             for (int i = 0; i < mSize; ++i) {
                 if (mKeys[i] == index) {
                     return i;
@@ -75,7 +75,7 @@ namespace Scorpio.Tools {
             }
             return -1;
         }
-        public virtual int IndexOfValue(ScriptValue value) {
+        public int IndexOfValue(ScriptValue value) {
             for (int i = 0; i < mSize; ++i) {
                 if (mValues[i].Equals(value)) {
                     return i;
@@ -83,13 +83,13 @@ namespace Scorpio.Tools {
             }
             return -1;
         }
-        public virtual bool ContainsKey(string key) {
+        public bool ContainsKey(string key) {
             return IndexOf(key) > -1;
         }
-        public virtual bool ContainsValue(ScriptValue value) {
+        public bool ContainsValue(ScriptValue value) {
             return IndexOfValue(value) > -1;
         }
-        public virtual bool Remove(string key) {
+        public bool Remove(string key) {
             int index = IndexOf(key);
             if (index < 0) { return false; }
             mSize--;
@@ -102,12 +102,17 @@ namespace Scorpio.Tools {
             mValues[mSize] = default;
             return true;
         }
-        public virtual void Clear() {
+        public void Clear() {
             ScorpioUtil.Free(mValues, mSize);
-            Array.Clear(mKeys, 0, mKeys.Length);
+            Array.Clear(mKeys, 0, mSize);
             mSize = 0;
         }
-        public virtual bool TryGetValue(string key, out ScriptValue value) {
+        public void Release() {
+            mKeys = ScorpioUtil.KEY_EMPTY;
+            mValues = ScorpioUtil.VALUE_EMPTY;
+        }
+        
+        public bool TryGetValue(string key, out ScriptValue value) {
             for (int i = 0; i < mSize; ++i) {
                 if (mKeys[i] == key) {
                     value = mValues[i];

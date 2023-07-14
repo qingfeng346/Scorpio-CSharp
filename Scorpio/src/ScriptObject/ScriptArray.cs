@@ -71,7 +71,9 @@ namespace Scorpio {
         public override void Free() {
             DelRecord();
             Release();
+            var clear = m_Objects.Length > ScorpioUtil.EMPTY_LIMIT;
             Clear();
+            if (clear) m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Script.Free(this);
         }
         public override void gc() {

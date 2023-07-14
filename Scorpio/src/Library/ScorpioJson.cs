@@ -54,7 +54,7 @@ namespace Scorpio.Library {
         }
         string NextWord {
             get {
-                m_Builder.Clear();
+                m_Builder.Length = 0;
                 while (WORD_BREAK.IndexOf(Peek()) == -1) {
                     m_Builder.Append(Read());
                     if (m_Index == m_Length) {
@@ -101,7 +101,7 @@ namespace Scorpio.Library {
             }
         }
         string ParseString() {
-            m_Builder.Clear();
+            m_Builder.Length = 0;
             while (true) {
                 if (Peek() == -1) {
                     return m_Builder.ToString();
@@ -219,7 +219,7 @@ namespace Scorpio.Library {
         }
         public void Dispose() {
             m_Buffer = null;
-            m_Builder.Clear();
+            m_Builder.Length = 0;
         }
     }
     internal class ScorpioJsonSerializer : IDisposable {
@@ -264,7 +264,9 @@ namespace Scorpio.Library {
         }
         internal void Serializer(string value) {
             m_Builder.Append('\"');
-            foreach (var c in value.ToCharArray()) {
+            var length = value.Length;
+            for (var i = 0; i < length; ++i) {
+                var c = value[i];
                 switch (c) {
                     case '"':
                         m_Builder.Append("\\\"");

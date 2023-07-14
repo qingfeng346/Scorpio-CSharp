@@ -14,7 +14,9 @@ namespace Scorpio {
         public override void Free() {
             DelRecord();
             Release();
+            var clear = m_Objects.Count > ScorpioUtil.EMPTY_LIMIT;
             Clear();
+            if (clear) m_Objects = new Dictionary<object, ScriptValue>();
             m_Script.Free(this);
         }
         public override void gc() {

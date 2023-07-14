@@ -1,3 +1,4 @@
+#if SCORPIO_DEBUG
 using Scorpio.Tools;
 using System.Collections.Generic;
 using System;
@@ -59,3 +60,4 @@ namespace Scorpio {
         }
     }
 }
+#endif

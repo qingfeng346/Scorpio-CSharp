@@ -15,37 +15,13 @@ namespace Scorpio.Userdata
         public UserdataTypeReflect(Type type) : base(type) {
             m_Variables = new Dictionary<string, UserdataVariable>();
             m_Functions = new Dictionary<string, UserdataMethodReflect>();
-            InitializeConstructor();
-            InitializeFunctions();
-        }
-        //初始化构造函数
-        private void InitializeConstructor() {
             //GetConstructors 去掉 NonPublic 标识, 否则取函数会取出一些错误的函数例如类 System.Diagnostics.Process
-            var name = string.Intern(m_Type.ToString());
-            m_Constructor = new UserdataMethodReflect(m_Type, name, m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
-        }
-        //初始化所有函数
-        private void InitializeFunctions() {
+            //初始化构造函数
+            m_Constructor = new UserdataMethodReflect(m_Type, "构造函数", m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
+            //初始化所有函数
             m_Methods = new List<MethodInfo>(m_Type.GetMethods(Script.BindingFlag));
         }
-        //获取一个函数，名字相同返回值相同
-        private UserdataMethodReflect GetFunction(string name) {
-            var methods = m_Methods.FindAll((method) => method.Name == name);
-            if (methods.Count > 0) {
-                name = string.Intern(name);
-                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
-            }
-            return null;
-        }
-        //获取一个内部类
-        private ScriptValue GetNestedType(Script script, string name) {
-            var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
-            if (nestedType != null) {
-                return m_Values[string.Intern(name)] = script.GetUserdataTypeValue(nestedType).Reference();
-            }
-            return ScriptValue.Null;
-        }
-        //获取一个变量
+        //获取一个Field或Property
         private UserdataVariable GetVariable(string name) {
             if (m_Variables.TryGetValue(name, out var value))
                 return value;
@@ -56,6 +32,26 @@ namespace Scorpio.Userdata
             if (pInfo != null) return m_Variables[name] = new UserdataProperty(pInfo);
             return null;
         }
+        //获取一个内部类
+        private ScriptValue GetNestedType(Script script, string name) {
+            var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
+            if (nestedType != null) {
+                return m_Values[string.Intern(name)] = script.GetUserdataTypeValue(nestedType).Reference();
+            }
+            return ScriptValue.Null;
+        }
+
+
+        //获取一个函数，名字相同返回值相同
+        private UserdataMethodReflect GetFunction(string name) {
+            var methods = m_Methods.FindAll((method) => method.Name == name);
+            if (methods.Count > 0) {
+                name = string.Intern(name);
+                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
+            }
+            return null;
+        }
+  
         //添加一个扩展函数
         public void AddExtensionMethod(MethodInfo method) {
             var name = method.Name;

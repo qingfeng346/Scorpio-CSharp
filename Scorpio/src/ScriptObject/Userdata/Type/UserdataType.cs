@@ -10,14 +10,20 @@ namespace Scorpio.Userdata
         protected Type m_Type;                                                                          //Type
         protected UserdataMethod[] m_Operators = new UserdataMethod[UserdataOperator.OperatorCount];    //所有重载函数
         protected bool[] m_InitOperators = new bool[UserdataOperator.OperatorCount];                    //是否初始化过重载函数
-        internal Dictionary<string, ScriptValue> m_Values;                                             //所有的内部数据,内部类,脚本扩展函数
+        internal Dictionary<string, ScriptValue> m_StaticMethods;                                       //所有静态函数,类型 获取返回,不一定是真的静态函数
+        internal Dictionary<string, ScriptValue> m_InstanceMethods;                                     //所有实例函数,实例 获取返回,不一定是真的实例函数
+        internal Dictionary<string, ScriptValue> m_Values;                                              //所有的内部数据,内部类,脚本扩展函数
         public UserdataType(Type type) {
             m_Type = type;
             m_Values = new Dictionary<string, ScriptValue>();
+            m_StaticMethods = new Dictionary<string, ScriptValue>();
+            m_InstanceMethods = new Dictionary<string, ScriptValue>();
         }
         public Type Type => m_Type;
         public void Free() {
             m_Values.Free();
+            m_StaticMethods.Free();
+            m_InstanceMethods.Free();
         }
         //创建一个模板类
         public ScriptValue MakeGenericType(Script script, Type[] parameters) {
@@ -60,6 +66,7 @@ namespace Scorpio.Userdata
             }
             return m_Operators[operate] = GetMethod(operatorName);
         }
+        //设置变量,一般是脚本扩展函数
         public void SetValue(string name, ScriptValue value) {
             if (m_Values.TryGetValue(name, out var result)) {
                 result.Free();
@@ -67,6 +74,8 @@ namespace Scorpio.Userdata
             //正常引用计数
             m_Values[name] = value.Reference();
         }
+         
+
         /// <summary> 创建一个实例 </summary>
         public abstract ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length);
         /// <summary> 获取函数 </summary>

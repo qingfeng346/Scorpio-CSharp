@@ -19,12 +19,12 @@ namespace Scorpio {
         Enumerator,     //迭代器专用
     }
     public abstract class ScriptObject : IPool {
-        private static uint AutoId = 0;
-        protected Script m_Script;
 #if SCORPIO_DEBUG
+        private static uint AutoId = 0;
         public string Source;
         private uint Id;
 #endif
+        protected Script m_Script;
         public int Index = -1;
         public readonly ObjectType ObjectType;                          //类型
         // 构图函数
