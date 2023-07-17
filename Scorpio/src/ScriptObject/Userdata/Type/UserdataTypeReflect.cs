@@ -32,25 +32,6 @@ namespace Scorpio.Userdata
             if (pInfo != null) return m_Variables[name] = new UserdataProperty(pInfo);
             return null;
         }
-        //获取一个内部类
-        private ScriptValue GetNestedType(Script script, string name) {
-            var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
-            if (nestedType != null) {
-                return m_Values[string.Intern(name)] = script.GetUserdataTypeValue(nestedType).Reference();
-            }
-            return ScriptValue.Null;
-        }
-
-
-        //获取一个函数，名字相同返回值相同
-        private UserdataMethodReflect GetFunction(string name) {
-            var methods = m_Methods.FindAll((method) => method.Name == name);
-            if (methods.Count > 0) {
-                name = string.Intern(name);
-                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
-            }
-            return null;
-        }
   
         //添加一个扩展函数
         public void AddExtensionMethod(MethodInfo method) {
@@ -66,30 +47,30 @@ namespace Scorpio.Userdata
         public override ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length) {
             return script.NewUserdataObject().Set(this, m_Constructor.Call(script, false, null, parameters, length));
         }
-        /// <summary> 获得函数 </summary>
+        /// <summary> 获取一个函数，名字相同返回值相同 </summary>
         protected override UserdataMethod GetMethod(string name) {
             if (m_Functions.TryGetValue(name, out var userdataMethod))
                 return userdataMethod;
-            return GetFunction(name);
+            var methods = m_Methods.FindAll((method) => method.Name == name);
+            if (methods.Count > 0) {
+                name = string.Intern(name);
+                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
+            }
+            return null;
         }
         //获得一个变量的类型
         public override Type GetVariableType(string name) {
             var variable = GetVariable(name);
             return variable != null ? variable.FieldType : null;
         }
-        /// <summary> 获得一个类变量 </summary>
-        public override object GetValue(Script script, object obj, string name) {
-            if (m_Functions.TryGetValue(name, out var userdataMethod)) 
-                return userdataMethod;
-            if (m_Values.TryGetValue(name, out var value)) 
-                return value;
+        protected override bool TryGetValue(object obj, string name, out object value) {
             var variable = GetVariable(name);
-            if (variable != null) return variable.GetValue(obj);
-            userdataMethod = GetFunction(name);
-            if (userdataMethod != null) return userdataMethod;
-            value = GetNestedType(script, name);
-            if (value.valueType != ScriptValue.nullValueType) return value;
-            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
+            if (variable == null) {
+                value = null;
+                return false;
+            }
+            value = variable.GetValue(obj);
+            return true;
         }
         /// <summary> 设置一个类变量 </summary>
         public override void SetValue(object obj, string name, ScriptValue value) {

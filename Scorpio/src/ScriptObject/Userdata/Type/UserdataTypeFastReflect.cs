@@ -1,5 +1,5 @@
-using System;
 using Scorpio.Exception;
+using System;
 
 namespace Scorpio.Userdata {
     //单个去反射函数的信息
@@ -25,6 +25,7 @@ namespace Scorpio.Userdata {
             m_FastReflectClass = value;
             m_Constructor = value.GetConstructor();
         }
+        public IScorpioFastReflectClass FastReflectClass => m_FastReflectClass;
         public override ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length) {
             return script.NewUserdataObject().Set(this, m_Constructor.Call(script, false, null, parameters, length));
         }
@@ -34,16 +35,12 @@ namespace Scorpio.Userdata {
         protected override UserdataMethod GetMethod(string name) {
             return m_FastReflectClass.GetMethod(name);
         }
-        public override object GetValue(Script script, object obj, string name) {
-            if (m_FastReflectClass.GetValue(obj, name, out var output))
-                return output;
-            if (m_Values.TryGetValue(name, out var value))
-                return value;
-            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
+        protected override bool TryGetValue(object obj, string name, out object value) {
+            return m_FastReflectClass.TryGetValue(obj, name, out value);
         }
         public override void SetValue(object obj, string name, ScriptValue value) {
             m_FastReflectClass.SetValue(obj, name, value);
         }
-        public IScorpioFastReflectClass FastReflectClass { get { return m_FastReflectClass; } }
+
     }
 }

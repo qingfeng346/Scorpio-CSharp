@@ -12,7 +12,9 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
     public Type GetVariableType(string name) {
         switch (name) {
             case "num": return typeof(System.Int32);
+            case "Instance": return typeof(TestClass);
             case "Equals": return typeof(System.Boolean);
+            case "get_Instance": return typeof(TestClass);
             case "GetHashCode": return typeof(System.Int32);
             case "GetType": return typeof(System.Type);
             case "op_Addition": return typeof(TestClass);
@@ -27,6 +29,7 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
     public UserdataMethod GetMethod(string name) {
         switch (name) {
             case "Equals": return ScorpioClass_TestClass_Equals.GetInstance();
+            case "get_Instance": return ScorpioClass_TestClass_get_Instance.GetInstance();
             case "GetHashCode": return ScorpioClass_TestClass_GetHashCode.GetInstance();
             case "GetType": return ScorpioClass_TestClass_GetType.GetInstance();
             case "op_Addition": return ScorpioClass_TestClass_op_Addition.GetInstance();
@@ -39,19 +42,10 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
             default: return null;
         }
     }
-    public bool GetValue(object obj, string name, out object value) {
+    public bool TryGetValue(object obj, string name, out object value) {
         switch (name) {
             case "num": value = ((TestClass)obj).num; return true;
-            case "Equals": value = ScorpioClass_TestClass_Equals.GetInstance(); return true;
-            case "GetHashCode": value = ScorpioClass_TestClass_GetHashCode.GetInstance(); return true;
-            case "GetType": value = ScorpioClass_TestClass_GetType.GetInstance(); return true;
-            case "op_Addition": value = ScorpioClass_TestClass_op_Addition.GetInstance(); return true;
-            case "ReferenceEquals": value = ScorpioClass_TestClass_ReferenceEquals.GetInstance(); return true;
-            case "TestExtend1": value = ScorpioClass_TestClass_TestExtend1.GetInstance(); return true;
-            case "TestFunc1": value = ScorpioClass_TestClass_TestFunc1.GetInstance(); return true;
-            case "TestFunc2": value = ScorpioClass_TestClass_TestFunc2.GetInstance(); return true;
-            case "TestFunc3": value = ScorpioClass_TestClass_TestFunc3.GetInstance(); return true;
-            case "ToString": value = ScorpioClass_TestClass_ToString.GetInstance(); return true;
+            case "Instance": value = TestClass.Instance; return true;
             default: value = null; return false;
         }
     }
@@ -94,6 +88,22 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
                 case 0: { return ((TestClass)obj).Equals((System.Object)args[0]); }
                 case 1: { return TestClass.Equals((System.Object)args[0], (System.Object)args[1]); }
                 default: throw new ExecutionException("TestClass 找不到合适的函数 : Equals    type : " + methodIndex);
+            }
+        }
+    }
+    public class ScorpioClass_TestClass_get_Instance : IScorpioFastReflectMethod {
+        private static UserdataMethodFastReflect _instance = null;
+        public static UserdataMethodFastReflect GetInstance() {
+            if (_instance != null) { return _instance; }
+            var methodInfos = new ScorpioFastReflectMethodInfo[] {
+                new ScorpioFastReflectMethodInfo(true, new Type[]{}, new bool[]{}, null, 0),
+            };
+            return _instance = new UserdataMethodFastReflect(typeof(TestClass), "get_Instance", methodInfos, new ScorpioClass_TestClass_get_Instance()); 
+        }
+        public object Call(object obj, int methodIndex, object[] args) {
+            switch (methodIndex) {
+                case 0: { return TestClass.Instance; }
+                default: throw new ExecutionException("TestClass 找不到合适的函数 : get_Instance    type : " + methodIndex);
             }
         }
     }

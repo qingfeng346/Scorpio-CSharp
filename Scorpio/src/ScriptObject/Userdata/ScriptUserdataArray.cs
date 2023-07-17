@@ -21,7 +21,6 @@ namespace Scorpio.Userdata {
             m_Value = null;
             m_ValueType = null;
             m_UserdataType = null;
-            m_Methods.Free();
             m_Script.Free(this);
         }
         public override ScriptValue GetValue(double index) {

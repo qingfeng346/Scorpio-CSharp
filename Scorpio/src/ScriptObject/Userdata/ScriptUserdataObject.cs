@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Scorpio.Exception;
 using Scorpio.Tools;
 
@@ -6,7 +5,6 @@ namespace Scorpio.Userdata {
     /// <summary> 普通Object类型 </summary>
     public class ScriptUserdataObject : ScriptUserdata {
         protected UserdataType m_UserdataType;
-        internal Dictionary<string, ScriptValue> m_Methods = new Dictionary<string, ScriptValue>();
         public ScriptUserdataObject(Script script) : base(script) { }
         public ScriptUserdataObject Set(UserdataType type, object value) {
             m_UserdataType = type;
@@ -26,21 +24,12 @@ namespace Scorpio.Userdata {
             m_Value = null;
             m_ValueType = null;
             m_UserdataType = null;
-            m_Methods.Free();
             m_Script.Free(this);
         }
         public override void gc() {
-            m_Methods.Free();
         }
         public override ScriptValue GetValue(string key) {
-            if (m_Methods.TryGetValue(key, out var method)) {
-                return method;
-            }
-            var ret = m_UserdataType.GetValue(m_Script, m_Value, key);
-            if (ret is UserdataMethod) {
-                return m_Methods[key] = new ScriptValue(m_Script.NewInstanceMethod().Set(key, (UserdataMethod)ret, m_Value));
-            }
-            return ScriptValue.CreateValueNoReference(script, ret);
+            return ScriptValue.CreateValueNoReference(m_Script, m_UserdataType.GetInstanceValue(m_Script, key, m_Value));
         }
         public override void SetValue(string key, ScriptValue value) { 
             m_UserdataType.SetValue(m_Value, key, value);

@@ -27,7 +27,7 @@ public class __class : IScorpioFastReflectClass {__reflect_content
             default: return null;
         }
     }
-    public bool GetValue(object obj, string name, out object value) {
+    public bool TryGetValue(object obj, string name, out object value) {
         switch (name) {__getvalue_content
             default: value = null; return false;
         }

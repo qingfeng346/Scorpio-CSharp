@@ -203,14 +203,6 @@ namespace Scorpio.Tools {
                 foreach (var pair in ((ScriptType)value).m_GetProperties) {
                     CollectGlobal(pair.Value, global);
                 }
-            } else if (value is ScriptUserdataObject) {
-                foreach (var pair in ((ScriptUserdataObject)value).m_Methods) {
-                    CollectGlobal(pair.Value, global);
-                }
-            } else if (value is ScriptUserdataType) {
-                foreach (var pair in ((ScriptUserdataType)value).m_Methods) {
-                    CollectGlobal(pair.Value, global);
-                }
             }
             if (value is ScriptInstance) {
                 foreach (var pair in (value as ScriptInstance)) {
@@ -241,6 +233,12 @@ namespace Scorpio.Tools {
             }
             foreach (var pair in script.m_Types) {
                 foreach (var v in pair.Value.m_Values) {
+                    CollectGlobal(v.Value, globalIndex);
+                }
+                foreach (var v in pair.Value.m_InstanceMethods) {
+                    CollectGlobal(v.Value, globalIndex);
+                }
+                foreach (var v in pair.Value.m_StaticMethods) {
                     CollectGlobal(v.Value, globalIndex);
                 }
             }

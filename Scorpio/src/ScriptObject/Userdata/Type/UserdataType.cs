@@ -40,6 +40,16 @@ namespace Scorpio.Userdata
             }
             throw new ExecutionException($"类 {m_Type.FullName} 不是未定义的泛型类");
         }
+        //获取一个内部类
+        protected bool TryGetNestedType(Script script, string name, out ScriptValue value) {
+            var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
+            if (nestedType == null) {
+                value = default;
+                return false;
+            }
+            m_Values[string.Intern(name)] = value = script.GetUserdataTypeValue(nestedType).Reference();
+            return true;
+        }
         //获得操作符重载函数
         public UserdataMethod GetOperator(int operate) {
             if (m_InitOperators[operate]) return m_Operators[operate];
@@ -74,16 +84,34 @@ namespace Scorpio.Userdata
             //正常引用计数
             m_Values[name] = value.Reference();
         }
-         
+        //获取静态变量
+        public object GetStaticValue(Script script, string name) {
+            if (m_StaticMethods.TryGetValue(name, out var value)) return value;
+            if (m_Values.TryGetValue(name, out value)) return value;
+            if (TryGetValue(null, name, out var val)) return val;
+            var userdataMethod = GetMethod(name);
+            if (userdataMethod != null) return m_StaticMethods[name] = new ScriptValue(script.NewStaticMethod().Set(name, userdataMethod));
+            if (TryGetNestedType(script, name, out value)) return value;
+            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 静态变量:[{name}]不存在");
+        }
+        //获取实例变量
+        public object GetInstanceValue(Script script, string name, object obj) {
+            if (m_InstanceMethods.TryGetValue(name, out var value)) return value;
+            if (m_Values.TryGetValue(name, out value)) return value;
+            if (TryGetValue(obj, name, out var val)) return val;
+            var userdataMethod = GetMethod(name);
+            if (userdataMethod != null) return m_InstanceMethods[name] = new ScriptValue(script.NewInstanceMethod().Set(name, userdataMethod));
+            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 实例变量:[{name}]不存在");
+        }
 
-        /// <summary> 创建一个实例 </summary>
-        public abstract ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length);
+
         /// <summary> 获取函数 </summary>
         protected abstract UserdataMethod GetMethod(string name);
+        /// <summary> 创建一个实例 </summary>
+        public abstract ScriptUserdata CreateInstance(Script script, ScriptValue[] parameters, int length);
         /// <summary> 获取一个变量的类型,只能获取 Field Property Event </summary>
         public abstract Type GetVariableType(string name);
-        /// <summary> 获得一个类变量 </summary>
-        public abstract object GetValue(Script script, object obj, string name);
+        protected abstract bool TryGetValue(object obj, string name, out object value);
         /// <summary> 设置一个类变量 </summary>
         public abstract void SetValue(object obj, string name, ScriptValue value);
     }

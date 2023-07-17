@@ -9,6 +9,9 @@ namespace Scorpio.Function {
             Method = method;
             return this;
         }
+        public ScriptInstanceBindMethodFunction Bind(ScriptValue scriptValue) {
+            return m_Script.NewInstanceBindMethod().Set(MethodName, Method, scriptValue.Value);
+        }
         public override void gc() { }
     }
 }

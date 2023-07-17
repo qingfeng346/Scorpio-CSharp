@@ -645,7 +645,7 @@ namespace Scorpio.Library
                 if (method.IsStatic) {
                     return new ScriptValue(script.NewStaticMethod().Set(method.MethodName, method));
                 } else {
-                    return new ScriptValue(script.NewGenericMethod().Set(method.MethodName, method));
+                    return new ScriptValue(script.NewInstanceMethod().Set(method.MethodName, method));
                 }
             }
         }

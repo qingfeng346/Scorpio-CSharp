@@ -37,9 +37,9 @@ namespace Scorpio.FastReflect {
                 }
             }
             //所有的函数
-            foreach (var name in m_MethodNames) {
-                builder.AppendFormat(methodStr, name, ScorpioClassName + "_" + name);
-            }
+            //foreach (var name in m_MethodNames) {
+            //    builder.AppendFormat(methodStr, name, ScorpioClassName + "_" + name);
+            //}
             return builder.ToString();
         }
         //生成SetValue函数

@@ -26,8 +26,8 @@ namespace Scorpio {
         private ScriptObjectsPool<ScriptUserdataArray> userdataArrayPool;
         private ScriptObjectsPool<ScriptUserdataDelegate> userdataDelegatePool;
         private ScriptObjectsPool<ScriptInstanceMethodFunction> instanceMethodPool;
-        private ScriptObjectsPool<ScriptGenericMethodFunction> genericMethodPool;
         private ScriptObjectsPool<ScriptStaticMethodFunction> staticMethodPool;
+        private ScriptObjectsPool<ScriptInstanceBindMethodFunction> instanceBindMethodPool;
 
         private ObjectsPool<InternalValue[]> internalValuesPool;
         private ScriptObjectsPool<InternalValue> internalValuePool;
@@ -54,8 +54,8 @@ namespace Scorpio {
             userdataArrayPool = new ScriptObjectsPool<ScriptUserdataArray>(() => new ScriptUserdataArray(this));
             userdataDelegatePool = new ScriptObjectsPool<ScriptUserdataDelegate>(() => new ScriptUserdataDelegate(this));
             instanceMethodPool = new ScriptObjectsPool<ScriptInstanceMethodFunction>(() => new ScriptInstanceMethodFunction(this));
-            genericMethodPool = new ScriptObjectsPool<ScriptGenericMethodFunction>(() => new ScriptGenericMethodFunction(this));
             staticMethodPool = new ScriptObjectsPool<ScriptStaticMethodFunction>(() => new ScriptStaticMethodFunction(this));
+            instanceBindMethodPool = new ScriptObjectsPool<ScriptInstanceBindMethodFunction>(() => new ScriptInstanceBindMethodFunction(this));
 
             internalValuesPool = new ObjectsPool<InternalValue[]>(() => new InternalValue[64]);
             internalValuePool = new ScriptObjectsPool<InternalValue>(() => new InternalValue(this));
@@ -116,11 +116,11 @@ namespace Scorpio {
         public ScriptInstanceMethodFunction NewInstanceMethod() {
             return instanceMethodPool.Alloc();
         }
-        public ScriptGenericMethodFunction NewGenericMethod() {
-            return genericMethodPool.Alloc();
-        }
         public ScriptStaticMethodFunction NewStaticMethod() {
             return staticMethodPool.Alloc();
+        }
+        public ScriptInstanceBindMethodFunction NewInstanceBindMethod() {
+            return instanceBindMethodPool.Alloc();
         }
         public InternalValue[] NewIntervalValues() {
             return internalValuesPool.Alloc();
@@ -181,11 +181,11 @@ namespace Scorpio {
         public void Free(ScriptInstanceMethodFunction value) {
             instanceMethodPool.Free(value);
         }
-        public void Free(ScriptGenericMethodFunction value) {
-            genericMethodPool.Free(value);
-        }
         public void Free(ScriptStaticMethodFunction value) {
             staticMethodPool.Free(value);
+        }
+        public void Free(ScriptInstanceBindMethodFunction value) {
+            instanceBindMethodPool.Free(value);
         }
         public void Free(InternalValue[] internalValues) {
             internalValuesPool.Free(internalValues);
@@ -250,7 +250,6 @@ namespace Scorpio {
             Check(userdataArrayPool);
             Check(userdataDelegatePool);
             Check(instanceMethodPool);
-            Check(genericMethodPool);
             Check(staticMethodPool);
 
             Check(internalValuesPool);

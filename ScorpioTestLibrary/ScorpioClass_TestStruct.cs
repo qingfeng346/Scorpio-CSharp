@@ -33,15 +33,8 @@ public class ScorpioClass_TestStruct : IScorpioFastReflectClass {
             default: return null;
         }
     }
-    public bool GetValue(object obj, string name, out object value) {
+    public bool TryGetValue(object obj, string name, out object value) {
         switch (name) {
-            case "Equals": value = ScorpioClass_TestStruct_Equals.GetInstance(); return true;
-            case "GetHashCode": value = ScorpioClass_TestStruct_GetHashCode.GetInstance(); return true;
-            case "GetType": value = ScorpioClass_TestStruct_GetType.GetInstance(); return true;
-            case "ReferenceEquals": value = ScorpioClass_TestStruct_ReferenceEquals.GetInstance(); return true;
-            case "TestFunc1": value = ScorpioClass_TestStruct_TestFunc1.GetInstance(); return true;
-            case "TestFunc3": value = ScorpioClass_TestStruct_TestFunc3.GetInstance(); return true;
-            case "ToString": value = ScorpioClass_TestStruct_ToString.GetInstance(); return true;
             default: value = null; return false;
         }
     }

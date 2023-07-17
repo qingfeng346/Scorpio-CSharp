@@ -78,7 +78,7 @@ namespace ScorpioTest {
         }
         [Fact]
         public void CreateFast() {
-            var types = new Type[] {typeof(TestClass) };
+            var types = new Type[] { typeof(TestClass), typeof(TestStruct) };
             foreach (var type in types) {
                 var generate = new GenerateScorpioClass(type);
                 generate.AddExtensionType(typeof(TestStaticClass));
