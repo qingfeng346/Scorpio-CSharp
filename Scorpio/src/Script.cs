@@ -183,7 +183,7 @@ namespace Scorpio
             CoroutineResult.Free();
         }
         public void ClearStack() {
-            for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
+            for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.MaxVariableValueIndex; ++i) {
                 ScorpioUtil.Free(ScriptContext.VariableValues[i]);
                 ScorpioUtil.Free(ScriptContext.StackValues[i]);
             }

@@ -50,6 +50,9 @@ namespace Scorpio.Runtime {
             var stackObjects = StackValues[VariableValueIndex];         //堆栈数据
             var tryStack = TryStackValues[VariableValueIndex++];        //try catch
             var tryIndex = -1; //try索引
+            if (VariableValueIndex > MaxVariableValueIndex) {
+                MaxVariableValueIndex = VariableValueIndex;
+            }
 #endif
             #endregion
             #region 初始化内部变量
