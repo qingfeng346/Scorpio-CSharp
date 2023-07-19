@@ -1,6 +1,6 @@
 ﻿using Scorpio.Function;
-using Scorpio.Userdata;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Scorpio.Tools {
     public class GCHandle {
@@ -17,6 +17,7 @@ namespace Scorpio.Tools {
         #region 搜集GC对象
         //每个索引的数据
         static Dictionary<int, GCHandle> gcHandles = new Dictionary<int, GCHandle>();
+        static Dictionary<int, List<string>> customReference = new Dictionary<int, List<string>>();
         //可以被释放的索引列表
         static HashSet<int> canGC = new HashSet<int>();
         static void Collect(ScriptValue value, int parentIndex) {
@@ -162,13 +163,27 @@ namespace Scorpio.Tools {
             }
         }
         //计算被引用的对象
-        public static void GetReference(int index, bool isString, out HashSet<int> set, out int referenceCount) {
+        public static void GetReference(int index, bool isString, out HashSet<int> set, out List<string> custom, out int referenceCount) {
             set = new HashSet<int>();
             referenceCount = isString ? StringReference.GetReferenceCount(index) : GetReferenceCount(index);
             for (var i = 0; i < entityLength; ++i) {
                 if (entities[i].value != null) {
                     CollectReference(entities[i].value, i, index, set, isString);
                 }
+            }
+            customReference.TryGetValue(index, out custom);
+        }
+        [Conditional("SCORPIO_DEBUG")]
+        public static void AddCustomReference(int index, string str) {
+            if (!customReference.TryGetValue(index, out var value)) {
+                customReference[index] = value = new List<string>();
+            }
+            value.Add(str);
+        }
+        [Conditional("SCORPIO_DEBUG")]
+        public static void DelCustomReference(int index, string str) {
+            if (customReference.TryGetValue(index, out var value)) {
+                value.Remove(str);
             }
         }
         #endregion

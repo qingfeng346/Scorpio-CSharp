@@ -1,15 +1,32 @@
 //#define SCORPIO_DYNAMIC_DELEGATE
+using Scorpio.Tools;
 using System;
 namespace Scorpio {
     public class ScorpioDelegateReference {
         private Script script;
         private ScriptValue scriptValue;
+#if SCORPIO_DEBUG
+        private string from;
+#endif
         public ScorpioDelegateReference(Script script, ScriptValue scriptValue) {
             this.script = script;
             this.scriptValue = scriptValue.Reference();
         }
+#if SCORPIO_DEBUG
+        public ScorpioDelegateReference(Script script, ScriptValue scriptValue, Type type) {
+            this.script = script;
+            this.scriptValue = scriptValue.Reference();
+            this.from = $"Delegate : {type.FullName}";
+            ScriptObjectReference.AddCustomReference(scriptValue.index, from);
+        }
+#endif
         ~ScorpioDelegateReference() {
-            script.RunOnMainThread(() => scriptValue.Free());
+            script.RunOnMainThread(() => {
+#if SCORPIO_DEBUG
+                ScriptObjectReference.DelCustomReference(scriptValue.index, from);
+#endif
+                scriptValue.Free();
+            });
         }
         public ScriptValue call(params object[] args) {
             if (script.IsShutdown) return ScriptValue.Null;
