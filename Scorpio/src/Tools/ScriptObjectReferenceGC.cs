@@ -161,6 +161,16 @@ namespace Scorpio.Tools {
                 }
                 CollectReference((value as ScriptInstance).Prototype.Index, originIndex, targetIndex, set, isString);
             }
+            if (value is ScriptScriptFunction) {
+                var internalValues = ((ScriptScriptFunctionBase)value).InternalValues;
+                if (internalValues != null) {
+                    for (var i = 0; i < internalValues.Length; ++i) {
+                        var internalValue = internalValues[i];
+                        if (internalValue == null) { continue; }
+                        CollectReference(internalValue.value, originIndex, targetIndex, set, isString);
+                    }
+                }
+            }
         }
         //计算被引用的对象
         public static void GetReference(int index, bool isString, out HashSet<int> set, out List<string> custom, out int referenceCount) {
