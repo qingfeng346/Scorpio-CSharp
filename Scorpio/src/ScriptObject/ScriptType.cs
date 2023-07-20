@@ -39,6 +39,7 @@ namespace Scorpio {
             if (m_Prototype != null)
                 ScriptObjectReference.Free(m_Prototype.Index);
             m_Prototype = null;
+            m_EqualFunction = null;
             m_Values.Clear();
             m_GetProperties.Clear();
         }

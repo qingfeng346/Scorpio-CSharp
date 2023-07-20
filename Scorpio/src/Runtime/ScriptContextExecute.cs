@@ -116,8 +116,10 @@ namespace Scorpio.Runtime {
                         instruction = m_scriptInstructions[iInstruction++];
                         opvalue = instruction.opvalue;
                         opcode = instruction.opcode;
+#if SCORPIO_DEBUG
                         m_script.RecordStack.Breviary = m_Breviary;
                         m_script.RecordStack.Line = instruction.line;
+#endif
                         switch (opcode) {
                             #region Load
                             case Opcode.LoadConstDouble: {
