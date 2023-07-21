@@ -78,6 +78,11 @@ namespace ScorpioTest {
         }
         [Fact]
         public void CreateFast() {
+            var builder = new StringBuilder();
+            builder.Append(@"using Scorpio;
+public class TestFastClassManager {
+    public static void Initialize(Script script) {
+");
             var types = new Type[] { typeof(TestClass), typeof(TestStruct) };
             foreach (var type in types) {
                 var generate = new GenerateScorpioClass(type);
@@ -86,7 +91,12 @@ namespace ScorpioTest {
                 var output = $"../../../../ScorpioTestLibrary/{generate.ScorpioClassName}.cs";
                 FileUtil.CreateFile(output, generate.Generate());
                 WriteLine($"生成快速反射 {Path.GetFullPath(output)}");
+                builder.AppendFormat("        script.SetFastReflectClass(typeof({0}), new {1}());\n", ScorpioFastReflectUtil.GetFullName(type), generate.ScorpioClassName);
             }
+            builder.Append(@"   }
+}
+");
+            FileUtil.CreateFile($"../../../../ScorpioTestLibrary/TestFastClassManager.cs", builder.ToString(), Encoding.UTF8);
         }
         [Fact]
         public void CreateInterface() {

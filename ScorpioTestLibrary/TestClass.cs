@@ -41,6 +41,8 @@ public class TestClass {
         return new TestClass() { num = a.num + b.num };
     }
     public int TestFunc1() {
+        string s = null;
+        Console.WriteLine(s.Length);
         return 100;
     }
     public int TestFunc2(string arg1, int arg2, params object[] args) {

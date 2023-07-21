@@ -230,6 +230,7 @@ namespace ScorpioExec
                     script.PushAssembly(typeof(Program));
                     script.PushReferencedAssemblies(typeof(Program).Assembly);
                     script.PushAssembly(typeof(TestClass));
+                    TestFastClassManager.Initialize(script);
                     var sArgs = new string[args.Length - 1];
                     Array.Copy (args, 1, sArgs, 0, sArgs.Length);
                     script.SetArgs (sArgs);
@@ -245,7 +246,6 @@ namespace ScorpioExec
                         if (!flag) break;
                     }
                     script.ReleaseAll();
-                    //script.CheckGCCollect();
                     script.Shutdown();
                     script.ReleaseAll();
                     script.CheckPool();
