@@ -31,6 +31,9 @@ namespace Scorpio {
         public ScriptObject(Script script, ObjectType objectType) {
             m_Script = script;
             ObjectType = objectType;
+#if SCORPIO_DEBUG
+            m_Script.AddNewType(GetType());
+#endif
         }
         public virtual object Value => this;                            //值
         public virtual Type ValueType => GetType();                     //值类型

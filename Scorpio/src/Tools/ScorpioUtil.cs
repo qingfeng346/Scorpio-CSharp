@@ -31,6 +31,7 @@ namespace Scorpio.Tools {
         public static readonly Type TYPE_PARAMATTRIBUTE = typeof (ParamArrayAttribute); //不定参属性
         public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof (ExtensionAttribute); //扩展函数属性
 
+        public const int MAX_PARAMETER_LENGTH = 64;
         public const int EMPTY_LIMIT = 128;
         public static readonly ScriptValue[] Parameters = new ScriptValue[128]; //函数调用共用数组
         public static readonly ScriptValue[] VALUE_EMPTY = new ScriptValue[0];
@@ -184,7 +185,7 @@ namespace Scorpio.Tools {
             for (var i = 0; i < length; ++i) {
                 try {
                     var str = parameters[i].ToString();
-                    if (str.Length > 32) str = str.Substring(0, 32);
+                    if (str.Length > MAX_PARAMETER_LENGTH) str = str.Substring(0, MAX_PARAMETER_LENGTH);
                     builder.Append($"[{str}]");
                 } catch (System.Exception) {
                     builder.Append($"[toString Error]");

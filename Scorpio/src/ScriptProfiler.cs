@@ -1,10 +1,10 @@
-#if SCORPIO_DEBUG
 using Scorpio.Tools;
 using System.Collections.Generic;
 using System;
 
 namespace Scorpio {
     public partial class Script {
+#if SCORPIO_DEBUG
         public bool IsRecord = false;
         public int objEntityLength = 0, objPoolLength = 0;
         public int strEntityLength = 0, strPoolLength = 0;
@@ -22,7 +22,8 @@ namespace Scorpio {
             strEntityLength = StringReference.entityLength;
             strPoolLength = StringReference.poolLength;
         }
-        public void NewType(Type type) {
+        public void AddNewType(Type type) {
+            if (!IsRecord) { return; }
             if (!NewTypes.ContainsKey(type)) {
                 NewTypes[type] = 1;
                 return;
@@ -55,9 +56,9 @@ namespace Scorpio {
             if (!IsRecord) return;
             IsRecord = false;
         }
+#endif
         public void CollectLeak(out HashSet<int> set) {
             ScriptObjectReference.CollectLeak(this, out set);
         }
     }
 }
-#endif
