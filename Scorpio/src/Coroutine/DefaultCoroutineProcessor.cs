@@ -6,9 +6,9 @@
             coroutine = current as ICoroutine;
         }
         public bool MoveNext(out ScriptValue result) {
+            result = default;
             if (coroutine != null) {
                 if (!coroutine.IsDone) {
-                    result = ScriptValue.Null;
                     return true;
                 } else {
                     result = coroutine.Result;
@@ -16,7 +16,6 @@
                     return false;
                 }
             }
-            result = ScriptValue.Null;
             return false;
         }
     }
