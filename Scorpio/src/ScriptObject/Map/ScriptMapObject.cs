@@ -14,9 +14,7 @@ namespace Scorpio {
         public override void Free() {
             DelRecord();
             Release();
-            var clear = m_Objects.Count > ScorpioUtil.EMPTY_LIMIT;
             Clear();
-            if (clear) m_Objects = new Dictionary<object, ScriptValue>();
             m_Script.Free(this);
         }
         public override void gc() {
@@ -84,7 +82,7 @@ namespace Scorpio {
         }
         public override void ClearVariables() {
             base.ClearVariables();
-            m_Objects.Free();
+            this.Clear();
         }
         public override void DelValue(string key) {
             Remove(key);
@@ -102,7 +100,11 @@ namespace Scorpio {
             return m_Objects.Count;
         }
         public override void Clear() {
-            m_Objects.Free();
+            if (m_Objects.Count > 0) {
+                var clear = m_Objects.Count > ScorpioUtil.EMPTY_LIMIT;
+                m_Objects.Free();
+                if (clear) m_Objects = new Dictionary<object, ScriptValue>();
+            }
         }
         public override void Remove(object key) {
             if (m_Objects.TryGetValue(key, out var result)) {

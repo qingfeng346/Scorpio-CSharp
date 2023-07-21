@@ -103,13 +103,16 @@ namespace Scorpio.Tools {
             return true;
         }
         public void Clear() {
-            ScorpioUtil.Free(mValues, mSize);
-            Array.Clear(mKeys, 0, mSize);
-            mSize = 0;
-        }
-        public void Release() {
-            mKeys = ScorpioUtil.KEY_EMPTY;
-            mValues = ScorpioUtil.VALUE_EMPTY;
+            if (mSize > 0) {
+                ScorpioUtil.Free(mValues, mSize);
+                if (mSize > ScorpioUtil.EMPTY_LIMIT) {
+                    mKeys = ScorpioUtil.KEY_EMPTY;
+                    mValues = ScorpioUtil.VALUE_EMPTY;
+                } else {
+                    Array.Clear(mKeys, 0, mSize);
+                }
+                mSize = 0;
+            }
         }
         
         public bool TryGetValue(string key, out ScriptValue value) {

@@ -9,10 +9,12 @@ namespace Scorpio
         public ScriptFunction(Script script) : base(script, ObjectType.Function) { }
         public virtual ScriptValue BindObject => ScriptValue.Null;
         public abstract ScriptFunction SetBindObject(ScriptValue obj);
-        public string MethodName;
+        public string MethodName = "";
         public override void Alloc() {
             AddRecord();
+#if SCORPIO_DEBUG
             MethodName = m_Script.RecordStack.ToString();
+#endif
             SetPrototype(script.TypeFunction);
         }
         public override string ToString() { return $"Function<{MethodName}>"; }

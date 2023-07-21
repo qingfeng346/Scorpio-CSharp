@@ -21,9 +21,7 @@ namespace Scorpio {
         public override void Free() {
             DelRecord();
             Release();
-            var clear = m_Objects.Count > ScorpioUtil.EMPTY_LIMIT;
             Clear();
-            if (clear) m_Objects = new HashSet<ScriptValue>();
             m_Script.Free(this);
         }
         public override void gc() {
@@ -45,7 +43,11 @@ namespace Scorpio {
             foreach (var value in m_Objects) {
                 value.Free();
             }
-            m_Objects.Clear();
+            if (m_Objects.Count > ScorpioUtil.EMPTY_LIMIT) {
+                m_Objects = new HashSet<ScriptValue>();
+            } else {
+                m_Objects.Clear();
+            }
         }
         public bool Contains(ScriptValue item) {
             return m_Objects.Contains(item);

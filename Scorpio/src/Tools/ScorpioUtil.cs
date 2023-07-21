@@ -31,7 +31,7 @@ namespace Scorpio.Tools {
         public static readonly Type TYPE_PARAMATTRIBUTE = typeof (ParamArrayAttribute); //不定参属性
         public static readonly Type TYPE_EXTENSIONATTRIBUTE = typeof (ExtensionAttribute); //扩展函数属性
 
-        public const int EMPTY_LIMIT = 100;
+        public const int EMPTY_LIMIT = 128;
         public static readonly ScriptValue[] Parameters = new ScriptValue[128]; //函数调用共用数组
         public static readonly ScriptValue[] VALUE_EMPTY = new ScriptValue[0];
         public static readonly string[] KEY_EMPTY = new string[0];
@@ -218,7 +218,6 @@ namespace Scorpio.Tools {
             }
         }
         public static void Free<T>(this Dictionary<T, ScriptValue> values) {
-            //if (values == null) return;
             foreach (var pair in values) {
                 pair.Value.Free();
             }
