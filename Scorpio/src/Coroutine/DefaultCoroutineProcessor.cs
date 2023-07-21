@@ -12,6 +12,7 @@
                     return true;
                 } else {
                     result = coroutine.Result;
+                    coroutine.Dispose();
                     return false;
                 }
             }
