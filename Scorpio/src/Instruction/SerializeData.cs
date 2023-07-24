@@ -69,6 +69,8 @@ namespace Scorpio.Instruction {
                 for (var i = 0; i < NoContext.Length; ++i) {
                     NoContext[i] = reader.ReadByte();
                 }
+            } else {
+                NoContext = new byte[0];
             }
             return this;
         }

@@ -451,8 +451,9 @@ namespace Scorpio
         }
         void ParseConstString(SerializeData data) {
             var length = data.ConstString.Length;
+            var flagLength = data.NoContext.Length;
             for (var i = 0; i < length; ++i) {
-                if ((data.NoContext[i] & StringFlag) != 0) {
+                if (flagLength == 0 || (data.NoContext[i] & StringFlag) != 0) {
                     var str = data.ConstString[i];
                     if (!StringIndex.ContainsKey(str)) {
                         if (ConstStringIndex == ConstString.Length) {
@@ -477,7 +478,7 @@ namespace Scorpio
                         case Opcode.StoreGlobalStringAssign:
                         case Opcode.StoreValueString:
                         case Opcode.StoreGlobalString:
-                            if ((data.NoContext[instruction.opvalue] & StringFlag) != 0) {
+                            if (flagLength == 0 || (data.NoContext[instruction.opvalue] & StringFlag) != 0) {
                                 instruction.opvalue = StringIndex[data.ConstString[instruction.opvalue]];
                             }
                             break;
