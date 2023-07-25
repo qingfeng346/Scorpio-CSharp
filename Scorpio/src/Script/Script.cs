@@ -24,8 +24,8 @@ namespace Scorpio
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
-        public const int StringFlag = 1 << 2;
-        public const int StringStage = 256;
+        private const int StringStage = 256;
+        private const int Stage = 8192;
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
@@ -453,7 +453,7 @@ namespace Scorpio
             var length = data.ConstString.Length;
             var flagLength = data.NoContext.Length;
             for (var i = 0; i < length; ++i) {
-                if (flagLength == 0 || (data.NoContext[i] & StringFlag) != 0) {
+                if (flagLength == 0 || (data.NoContext[i] & ScriptConstValue.StringFlag) != 0) {
                     var str = data.ConstString[i];
                     if (!StringIndex.ContainsKey(str)) {
                         if (ConstStringIndex == ConstString.Length) {
@@ -478,7 +478,7 @@ namespace Scorpio
                         case Opcode.StoreGlobalStringAssign:
                         case Opcode.StoreValueString:
                         case Opcode.StoreGlobalString:
-                            if (flagLength == 0 || (data.NoContext[instruction.opvalue] & StringFlag) != 0) {
+                            if (flagLength == 0 || (data.NoContext[instruction.opvalue] & ScriptConstValue.StringFlag) != 0) {
                                 instruction.opvalue = StringIndex[data.ConstString[instruction.opvalue]];
                             }
                             break;

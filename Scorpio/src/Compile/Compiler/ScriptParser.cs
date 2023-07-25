@@ -10,9 +10,6 @@ using Scorpio.Tools;
 namespace Scorpio.Compile.Compiler {
     /// <summary> 编译脚本 </summary>
     public partial class ScriptParser {
-        public const int DoubleFlag = 1 << 0;
-        public const int LongFlag = 1 << 1;
-        public const int StringFlag = 1 << 2;
         private struct TypeFunction {
             public long nameIndex;
             public long funcIndex;
@@ -96,7 +93,7 @@ namespace Scorpio.Compile.Compiler {
                     Array.Resize(ref NoContext, ConstDouble.Count);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context) {
-                NoContext[index] |= DoubleFlag;
+                NoContext[index] |= ScriptConstValue.DoubleFlag;
             }
             return index;
         }
@@ -110,7 +107,7 @@ namespace Scorpio.Compile.Compiler {
                     Array.Resize(ref NoContext, ConstLong.Count);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context) {
-                NoContext[index] |= LongFlag;
+                NoContext[index] |= ScriptConstValue.LongFlag;
             }
             return index;
         }
@@ -124,7 +121,7 @@ namespace Scorpio.Compile.Compiler {
                     Array.Resize(ref NoContext, ConstString.Count);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context || force) {
-                NoContext[index] |= StringFlag;
+                NoContext[index] |= ScriptConstValue.StringFlag;
             }
             return index;
         }
