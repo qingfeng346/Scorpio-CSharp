@@ -1,4 +1,4 @@
-using Scorpio.Userdata;
+using Scorpio.Function;
 namespace Scorpio.Library {
     public partial class LibraryUserdata {
         public static void Load(Script script) {
@@ -6,6 +6,7 @@ namespace Scorpio.Library {
                 ("fieldTypeOf", new fieldTypeOf()),
                 ("isType", new isType()),
                 ("extend", new extend()),
+                ("bind", new bind()),
             };
             script.AddLibrary("userdata", functions);
         }
@@ -26,6 +27,11 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 ScorpioTypeManager.GetType(args[0].scriptValue.Type).SetValue(args[1].ToString(), args[2]);
                 return ScriptValue.Null;
+            }
+        }
+        private class bind : ScorpioHandle {
+            public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
+                return new ScriptValue(args[0].Get<ScriptMethodFunction>().Bind(args[1]));
             }
         }
     }

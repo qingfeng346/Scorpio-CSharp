@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using Scorpio.Compile.CodeDom;
 using Scorpio.Compile.CodeDom.Temp;
 using Scorpio.Compile.Exception;
@@ -84,7 +82,7 @@ namespace Scorpio.Compile.Compiler {
             }
             return executable;
         }
-        
+
         /// <summary> 获取一个double常量的索引 </summary>
         int GetConstDouble(double value) {
             var index = ConstDouble.IndexOf(value);
@@ -95,7 +93,7 @@ namespace Scorpio.Compile.Compiler {
                     Array.Resize(ref NoContext, ConstDouble.Count);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context) {
-                NoContext[index] |= 1 << 0;
+                NoContext[index] |= ScriptConstValue.DoubleFlag;
             }
             return index;
         }
@@ -109,7 +107,7 @@ namespace Scorpio.Compile.Compiler {
                     Array.Resize(ref NoContext, ConstLong.Count);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context) {
-                NoContext[index] |= 1 << 1;
+                NoContext[index] |= ScriptConstValue.LongFlag;
             }
             return index;
         }
@@ -123,7 +121,7 @@ namespace Scorpio.Compile.Compiler {
                     Array.Resize(ref NoContext, ConstString.Count);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context || force) {
-                NoContext[index] |= 1 << 2;
+                NoContext[index] |= ScriptConstValue.StringFlag;
             }
             return index;
         }
@@ -675,7 +673,7 @@ namespace Scorpio.Compile.Compiler {
             var index = Classes.Count;
             Classes.Add(new ScriptClassData() {
                 name = GetConstString(className, true),
-                parent = parent.Length == 0 ? -1 : GetConstString(parent),
+                parent = parent.Length == 0 ? -1 : GetConstString(parent, true),
                 functions = funs.ToArray(),
             });
             return index;

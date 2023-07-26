@@ -5,5 +5,8 @@ namespace Scorpio.Function {
         public ScriptMethodFunction(UserdataMethod method) : base(ObjectType.Function) {
             Method = method;
         }
+        public ScriptInstanceBindMethodFunction Bind(ScriptValue scriptValue) {
+            return new ScriptInstanceBindMethodFunction(Method, scriptValue.Value);
+        }
     }
 }

@@ -3,6 +3,7 @@ namespace Scorpio.Function {
     public abstract class ScriptScriptFunctionBase : ScriptFunction {
         protected ScriptContext m_Context;
         protected InternalValue[] m_internalValues;               //父级内部变量
+        public InternalValue[] InternalValues => m_internalValues;
         public ScriptScriptFunctionBase(ScriptContext context) : base(context.m_script) {
             m_Context = context;
             if (context.m_FunctionData.internalCount > 0) {

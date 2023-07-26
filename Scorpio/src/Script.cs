@@ -18,7 +18,6 @@ namespace Scorpio {
     public partial class Script {
         /// <summary> 反射获取变量和函数的属性 </summary>
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
-        public const int StringFlag = 1 << 2;
         public const int StringStage = 256;
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
@@ -156,14 +155,16 @@ namespace Scorpio {
         }
         public void ClearStack() {
             Array.Clear(ScorpioUtil.Parameters, 0, ScorpioUtil.Parameters.Length);
-            for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.ValueCacheLength; ++i) {
+            for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.MaxVariableValueIndex; ++i) {
                 Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
                 Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
             }
-            for (var i = 0; i < ScriptContext.AsyncValuePoolLength; ++i) {
+            for (var i = ScriptContext.MinAsyncValueIndex; i < ScriptContext.AsyncValuePoolLength; ++i) {
                 Array.Clear(ScriptContext.AsyncValuePool[i].variable, 0, ScriptContext.AsyncValuePool[i].variable.Length);
                 Array.Clear(ScriptContext.AsyncValuePool[i].stack, 0, ScriptContext.AsyncValuePool[i].stack.Length);
             }
+            ScriptContext.MaxVariableValueIndex = 0;
+            ScriptContext.MinAsyncValueIndex = int.MaxValue;
         }
         /// <summary> 压入一个搜索路径,使用 require 时会搜索此路径 </summary>
         /// <param name="path">绝对路径</param>
@@ -402,13 +403,15 @@ namespace Scorpio {
         }
         void ParseConstString(SerializeData data) {
             var length = data.ConstString.Length;
+            var flagLength = data.NoContext.Length;
             for (var i = 0; i < length; ++i) {
-                if ((data.NoContext[i] & StringFlag) != 0) {
+                if (flagLength == 0 || (data.NoContext[i] & ScriptConstValue.StringFlag) != 0) {
                     var str = data.ConstString[i];
                     if (!StringIndex.ContainsKey(str)) {
                         if (ConstStringIndex == ConstString.Length) {
                             Array.Resize(ref ConstString, ConstStringIndex + StringStage);
                         }
+                        str = string.Intern(str);
                         StringIndex[str] = ConstStringIndex;
                         ConstString[ConstStringIndex++] = str;
                     }
@@ -427,10 +430,10 @@ namespace Scorpio {
                         case Opcode.StoreGlobalStringAssign:
                         case Opcode.StoreValueString:
                         case Opcode.StoreGlobalString:
-                            if ((data.NoContext[instruction.opvalue] & StringFlag) != 0) {
+                            if (flagLength == 0 || (data.NoContext[instruction.opvalue] & ScriptConstValue.StringFlag) != 0) {
                                 instruction.opvalue = StringIndex[data.ConstString[instruction.opvalue]];
                             }
-                        break;
+                            break;
                     }
                 }
             }
@@ -479,9 +482,10 @@ namespace Scorpio {
             }
             return result;
         }
-        #endif
+#endif
         #endregion
         #region Stack
+        public StackInfo RecordStack = new StackInfo();
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
         private StackInfo m_Stack = new StackInfo();
         private int m_StackLength = 0;

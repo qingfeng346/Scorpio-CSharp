@@ -1,27 +1,17 @@
-using System.Collections.Generic;
 using Scorpio.Exception;
-using Scorpio.Function;
 using Scorpio.Tools;
 
 namespace Scorpio.Userdata {
     /// <summary> 普通Object类型 </summary>
     public class ScriptUserdataObject : ScriptUserdata {
         protected UserdataType m_UserdataType;
-        protected Dictionary<string, ScriptValue> m_Methods = new Dictionary<string, ScriptValue>();
         public ScriptUserdataObject(object value, UserdataType type) {
             this.m_Value = value;
             this.m_ValueType = value.GetType();
             this.m_UserdataType = type;
         }
         public override ScriptValue GetValue(string key) {
-            if (m_Methods.TryGetValue(key, out var value)) {
-                return value;
-            }
-            var ret = m_UserdataType.GetValue(m_Value, key);
-            if (ret is UserdataMethod) {
-                return m_Methods[key] = new ScriptValue(new ScriptInstanceMethodFunction((UserdataMethod)ret, m_Value));
-            }
-            return ScriptValue.CreateValue(ret);
+            return ScriptValue.CreateValue(m_UserdataType.GetInstanceValue(key, m_Value));
         }
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(m_Value, key, value);

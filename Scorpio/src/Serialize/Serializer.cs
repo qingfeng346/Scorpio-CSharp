@@ -15,7 +15,7 @@ namespace Scorpio.Serialize {
             return datas;
         }
         public static byte[] SerializeBytes(string breviary, string buffer, IEnumerable<string> searchPaths, CompileOption compileOption) {
-            short version = 3;
+            short version = 2;
             using (var stream = new MemoryStream()) {
                 using (var writer = new ScorpioWriter(stream)) {
                     writer.Write((byte)0);      //Õ¼Î»·û

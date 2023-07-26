@@ -1,12 +1,12 @@
 using Scorpio.Userdata;
 namespace Scorpio.Function {
     public class ScriptInstanceMethodFunction : ScriptMethodFunction {
-        private object m_Object;
-        public ScriptInstanceMethodFunction(UserdataMethod method, object obj) : base(method) {
-            m_Object = obj;
-        }
+        public ScriptInstanceMethodFunction(UserdataMethod method) : base(method) { }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return ScriptValue.CreateValue(Method.Call(false, m_Object, parameters, length));
+            return ScriptValue.CreateValue(Method.Call(false, thisObject.Value, parameters, length));
+        }
+        public override string ToString() {
+            return $"实例函数 {Method}";
         }
     }
 }

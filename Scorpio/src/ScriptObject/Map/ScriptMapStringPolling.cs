@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapStringPolling : ScriptMap {
+    public class ScriptMapStringPolling : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
         public struct Enumerator : IEnumerator<KeyValuePair<object, ScriptValue>> {
             private IEnumerator<KeyValuePair<string, ScriptValue>> m_Enumerator;
             internal Enumerator(ScriptMapStringPolling map) {

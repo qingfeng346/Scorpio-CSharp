@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Scorpio.Exception;
 namespace Scorpio.Tools {
@@ -43,8 +44,8 @@ namespace Scorpio.Tools {
             mValues = VALUE_EMPTY;
         }
         public int Count => mSize;
-        public IEnumerator<KeyValuePair<string, Value>> GetEnumerator() { return new Enumerator(this); }
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
+        public IEnumerator<KeyValuePair<string, Value>> GetEnumerator() => new Enumerator(this);
+        IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
         public void SetCapacity(int capacity) {
             if (capacity > mSize) {
                 SetCapacity_impl(capacity);

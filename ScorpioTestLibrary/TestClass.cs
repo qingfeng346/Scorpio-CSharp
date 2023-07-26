@@ -23,23 +23,37 @@ public class TestClass1 {
 
     }
 }
+public struct TestStruct {
+    public int TestFunc1() {
+        return 100;
+    }
+    public int TestFunc3(string arg1, int arg2 = 2, int arg3 = 3, string arg4 = "123123") {
+        return 100;
+    }
+}
 public class TestClass {
+    public class TestClassInternal {
+
+    }
+    public static TestClass Instance { get; } = new TestClass();
     public int num;
     public static TestClass operator+(TestClass a, TestClass b) {
         return new TestClass() { num = a.num + b.num };
     }
     public int TestFunc1() {
+        string s = null;
+        Console.WriteLine(s.Length);
         return 100;
     }
-    public int TestFunc2(string arg1, int arg2) {
+    public int TestFunc2(string arg1, int arg2, params object[] args) {
         return arg2;
     }
-}
-public static class TestExtends {
-    public static void TestFunc1(this TestClass t, int a, int b) {
-
+    public int TestFunc3(string arg1, int arg2=2, int arg3=3, string arg4="123123") {
+        return 100;
     }
-    public static void TestExtendFun1(this TestClass t) {
+}
+public static class TestExtend {
+    public static void TestExtend1(this TestClass testClass, string arg1 = "arg1", int arg2 = 2) {
 
     }
 }

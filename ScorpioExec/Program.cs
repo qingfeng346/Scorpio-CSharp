@@ -120,9 +120,10 @@ namespace ScorpioExec {
             var source = perform.GetPath (ParameterSource);
             var output = perform.GetPath (ParameterOutput);
             var search = command.GetValueDefault (ParameterSearch, "");
-            var searchPaths = new List<string> (search.Split (";"));
-            searchPaths.Add (CurrentDirectory);
-            searchPaths.Add (Path.GetDirectoryName (source));
+            var searchPaths = new List<string>(search.Split(";")) {
+                CurrentDirectory,
+                Path.GetDirectoryName(source)
+            };
             var compileOption = ParseOption (command.GetValueDefault (ParameterOption, ""), searchPaths);
             File.WriteAllBytes (output, Serializer.SerializeBytes (
                 source,
@@ -227,6 +228,7 @@ namespace ScorpioExec {
                     var watch = Stopwatch.StartNew ();
                     var value = script.LoadFile (file, ParseOption (command.GetValueDefault (ParameterOption, ""), script.SearchPaths));
                     while (script.UpdateCoroutine ()) { }
+                    script.CollectLeak(out var set, out var count);
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");

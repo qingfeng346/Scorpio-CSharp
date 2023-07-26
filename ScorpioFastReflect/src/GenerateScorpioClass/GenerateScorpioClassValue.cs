@@ -25,8 +25,8 @@ namespace Scorpio.FastReflect {
         private string GenerateGetValue() {
             var fieldStr = @"
             case ""{0}"": value = {1}; return true;";
-            var methodStr = @"
-            case ""{0}"": value = {1}.GetInstance(); return true;";
+            //var methodStr = @"
+            //case ""{0}"": value = {1}.GetInstance(); return true;";
             var builder = new StringBuilder();
             //所有类变量
             m_Fields.ForEach((field) => builder.AppendFormat(fieldStr, field.Name, GetScorpioVariable(field.IsStatic, field.Name)) );
@@ -37,9 +37,9 @@ namespace Scorpio.FastReflect {
                 }
             }
             //所有的函数
-            foreach (var name in m_MethodNames) {
-                builder.AppendFormat(methodStr, name, ScorpioClassName + "_" + name);
-            }
+            //foreach (var name in m_MethodNames) {
+            //    builder.AppendFormat(methodStr, name, ScorpioClassName + "_" + name);
+            //}
             return builder.ToString();
         }
         //生成SetValue函数

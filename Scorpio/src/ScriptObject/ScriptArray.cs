@@ -57,24 +57,18 @@ namespace Scorpio {
                 current = default;
             }
         }
-        private Script m_Script;
         internal ScriptValue[] m_Objects;
         internal int m_Length;
         
-        public ScriptArray(Script script) : base(ObjectType.Array, script.TypeArray) {
-            m_Script = script;
+        public ScriptArray(Script script) : base(script, ObjectType.Array, script.TypeArray) {
             m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Length = 0;
-#if SCORPIO_DEBUG
-            Source = script.GetStackInfo().ToString();
-#endif
         }
         internal ScriptArray(Script script, ScriptValue[] parameters, int length) : this(script) {
             for (var i = 0; i < length;++i) {
                 Add(parameters[i]);
             }
         }
-        public Script script => m_Script;
         public void SetArrayCapacity(int capacity) {
             if (capacity > m_Length) {
                 SetCapacity_impl(capacity);

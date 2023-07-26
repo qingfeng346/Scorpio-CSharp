@@ -5,12 +5,10 @@ namespace Scorpio {
     }
     /// <summary> 函数类型 </summary>
     public abstract class ScriptFunction : ScriptInstance {
-        protected Script m_Script;
-        public ScriptFunction(Script script) : base(ObjectType.Function, script.TypeFunction) {
-            m_Script = script;
-        }
+        public string MethodName = "";
+        public ScriptFunction(Script script) : base(script, ObjectType.Function, script.TypeFunction) { }
         public virtual ScriptValue BindObject => default;
         public abstract ScriptFunction SetBindObject(ScriptValue obj);
-        public override string ToString() { return $"Function"; }
+        public override string ToString() { return $"Function<{MethodName}>"; }
     }
 }

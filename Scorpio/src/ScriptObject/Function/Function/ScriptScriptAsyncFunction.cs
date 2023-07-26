@@ -1,5 +1,4 @@
 using Scorpio.Runtime;
-using Scorpio.Tools;
 using System.Collections;
 namespace Scorpio.Function {
     public class ScriptScriptAsyncFunction : ScriptScriptFunctionBase {

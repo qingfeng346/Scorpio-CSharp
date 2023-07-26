@@ -7,32 +7,17 @@ namespace Scorpio.Userdata {
     //反射类管理
     public class UserdataTypeReflect : UserdataType {
         private UserdataMethod m_Constructor;                           //所有构造函数
-        private MethodInfo[] m_Methods;                                 //所有函数
+        private List<MethodInfo> m_Methods;                             //所有函数
         private Dictionary<string, UserdataVariable> m_Variables;       //所有的变量 FieldInfo,PropertyInfo,EventInfo
         private Dictionary<string, UserdataMethodReflect> m_Functions;  //所有的函数
         public UserdataTypeReflect(Type type) : base(type) {
             m_Variables = new Dictionary<string, UserdataVariable>();
             m_Functions = new Dictionary<string, UserdataMethodReflect>();
             //GetConstructors 去掉 NonPublic 标识, 否则取函数会取出一些错误的函数例如类 System.Diagnostics.Process
-            m_Constructor = new UserdataMethodReflect(m_Type, string.Intern(m_Type.ToString()), m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
-            m_Methods = m_Type.GetMethods(Script.BindingFlag);
-        }
-        //获取一个函数，名字相同返回值相同
-        private UserdataMethodReflect GetFunction(string name) {
-            var methods = Array.FindAll(m_Methods, method => method.Name == name);
-            if (methods.Length > 0) {
-                name = string.Intern(name);
-                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
-            }
-            return null;
-        }
-        //获取一个内部类
-        private ScriptValue GetNestedType(string name) {
-            var nestedType = m_Type.GetNestedType(name, Script.BindingFlag);
-            if (nestedType != null) {
-                return m_Values[string.Intern(name)] = ScorpioTypeManager.GetUserdataType(nestedType);
-            }
-            return ScriptValue.Null;
+            //初始化构造函数
+            m_Constructor = new UserdataMethodReflect(m_Type, "构造函数", m_Type.GetConstructors(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy));
+            //初始化所有函数
+            m_Methods = new List<MethodInfo>(m_Type.GetMethods(Script.BindingFlag));
         }
         //获取一个变量
         private UserdataVariable GetVariable(string name) {
@@ -63,26 +48,26 @@ namespace Scorpio.Userdata {
         protected override UserdataMethod GetMethod(string name) {
             if (m_Functions.TryGetValue(name, out var userdataMethod))
                 return userdataMethod;
-            return GetFunction(name);
+            var methods = m_Methods.FindAll((method) => method.Name == name);
+            if (methods.Count > 0) {
+                name = string.Intern(name);
+                return m_Functions[name] = new UserdataMethodReflect(m_Type, name, methods);
+            }
+            return null;
         }
         //获得一个变量的类型
         public override Type GetVariableType(string name) {
             var variable = GetVariable(name);
             return variable != null ? variable.FieldType : null;
         }
-        /// <summary> 获得一个类变量 </summary>
-        public override object GetValue(object obj, string name) {
-            if (m_Functions.TryGetValue(name, out var userdataMethod)) 
-                return userdataMethod;
-            if (m_Values.TryGetValue(name, out var value)) 
-                return value;
+        protected override bool TryGetValue(object obj, string name, out object value) {
             var variable = GetVariable(name);
-            if (variable != null) return variable.GetValue(obj);
-            userdataMethod = GetFunction(name);
-            if (userdataMethod != null) return userdataMethod;
-            value = GetNestedType(name);
-            if (value.valueType != ScriptValue.nullValueType) return value;
-            throw new ExecutionException($"GetValue Type:[{m_Type.FullName}] 变量:[{name}]不存在");
+            if (variable == null) {
+                value = null;
+                return false;
+            }
+            value = variable.GetValue(obj);
+            return true;
         }
         /// <summary> 设置一个类变量 </summary>
         public override void SetValue(object obj, string name, ScriptValue value) {

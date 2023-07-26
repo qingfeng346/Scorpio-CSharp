@@ -8,12 +8,20 @@ namespace Scorpio {
     public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
         protected ScorpioStringDictionary<ScriptValue> m_Values = new ScorpioStringDictionary<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
         protected ScriptType m_Prototype = null;
-#if SCORPIO_DEBUG
-        public string Source { get; set; }
-#endif
-        public ScriptInstance(ObjectType objectType, ScriptType prototype) : base(objectType) {
+        protected Script m_Script;
+        public ScriptInstance(Script script, ObjectType objectType, ScriptType prototype) : base(objectType) {
             m_Prototype = prototype;
+            m_Script = script;
+#if SCORPIO_DEBUG
+            m_Script.AddRecord(Id, script.RecordStack.ToString(), this);
+#endif
         }
+#if SCORPIO_DEBUG
+        ~ScriptInstance() {
+            m_Script.DelRecord(Id);
+        }
+#endif
+        public Script script => m_Script;
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
         public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
@@ -24,12 +32,8 @@ namespace Scorpio {
         public virtual bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
-        public ScriptArray GetKeys(Script script) {
-            var ret = new ScriptArray(script);
-            foreach (var pair in m_Values) {
-                ret.Add(ScriptValue.CreateValue(pair.Key));
-            }
-            return ret;
+        public virtual void DelValue(string key) {
+            m_Values.Remove(key);
         }
         public virtual void ClearVariables() {
             m_Values.Clear();

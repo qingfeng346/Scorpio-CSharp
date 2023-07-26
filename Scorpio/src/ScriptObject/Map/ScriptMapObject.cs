@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using Scorpio.Library;
 namespace Scorpio {
     //脚本map类型
-    public class ScriptMapObject : ScriptMap {
+    public class ScriptMapObject : ScriptMap, IEnumerable<KeyValuePair<object, ScriptValue>> {
         private Dictionary<object, ScriptValue> m_Objects = new Dictionary<object, ScriptValue>();  //所有的数据(函数和数据都在一个数组)
         public ScriptMapObject(Script script) : base(script) { }
         internal ScriptMapObject(Script script, ScriptValue[] parameters, int length) : base(script) { }
@@ -47,6 +46,13 @@ namespace Scorpio {
         }
         public override void Clear() {
             m_Objects.Clear();
+        }
+        public override void DelValue(string key) {
+            Remove(key);
+        }
+        public override void ClearVariables() {
+            base.ClearVariables();
+            this.Clear();
         }
         public override void Remove(object key) {
             m_Objects.Remove(key);
@@ -94,18 +100,6 @@ namespace Scorpio {
                 }
             }
             return ret;
-        }
-        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
-            builder.Append("{");
-            var first = true;
-            foreach (var pair in m_Objects) {
-                if (first) { first = false; } else { builder.Append(","); }
-                jsonSerializer.Serializer(pair.Key.ToString());
-                builder.Append(":");
-                jsonSerializer.Serializer(pair.Value);
-            }
-            builder.Append("}");
         }
     }
 }

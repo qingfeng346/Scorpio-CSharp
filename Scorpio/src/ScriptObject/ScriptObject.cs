@@ -3,7 +3,7 @@ using Scorpio.Exception;
 using Scorpio.Tools;
 
 namespace Scorpio {
-    public enum ObjectType {
+    public enum ObjectType : byte {
         Type,           //原表
         Array,          //数组
         Map,            //MAP
@@ -15,12 +15,20 @@ namespace Scorpio {
         Namespace,      //namespace
         UserData,       //普通类
         Global,         //全局变量保存类,只有_G是这个类型
+        Enumerator,     //迭代器专用
     }
     public abstract class ScriptObject {
+#if SCORPIO_DEBUG
+        private static ulong AutoId = 0;
+        public readonly ulong Id;
+#endif
         protected ObjectType objectType;
         // 构图函数
         public ScriptObject(ObjectType objectType) {
             this.objectType = objectType;
+#if SCORPIO_DEBUG
+            Id = AutoId++;
+#endif
         }
         public ObjectType ObjectType => objectType;                             //类型
         public virtual object Value => this;                                    //值

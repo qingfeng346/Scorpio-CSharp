@@ -25,7 +25,9 @@ namespace Scorpio.Runtime {
         internal static ScriptValue[][] StackValues = new ScriptValue[ValueCacheLength][]; //堆栈数据
         internal static int[][] TryStackValues = new int[ValueCacheLength][]; //try catch数据
         internal static int VariableValueIndex = 0;
+        internal static int MaxVariableValueIndex = 0;
 
+        internal static int MinAsyncValueIndex = int.MaxValue;
         internal static int AsyncValuePoolLength = 0;
         internal static AsyncValue[] AsyncValuePool = new AsyncValue[0];
         static ScriptContext() {

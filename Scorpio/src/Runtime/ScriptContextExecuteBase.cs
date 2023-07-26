@@ -40,8 +40,8 @@ namespace Scorpio.Runtime {
                 throw new ExecutionException($"only run script on mainthread : {m_script.MainThreadId} - {currentThread.ManagedThreadId}({currentThread.Name})");
             }
 #endif
-#endregion
-#region 申请堆栈和局部变量
+            #endregion
+            #region 申请堆栈和局部变量
 #if EXECUTE_COROUTINE
             var asyncValue = AsyncValuePoolLength > 0 ? AsyncValuePool[--AsyncValuePoolLength] : new AsyncValue();
             var variableObjects = asyncValue.variable;      //局部变量
@@ -51,6 +51,8 @@ namespace Scorpio.Runtime {
             var stackObjects = StackValues[VariableValueIndex];         //堆栈数据
             var tryStack = TryStackValues[VariableValueIndex++];        //try catch
             var tryIndex = -1; //try索引
+            if (VariableValueIndex > MaxVariableValueIndex)
+                MaxVariableValueIndex = VariableValueIndex;
 #endif
 #endregion
             variableObjects[0] = thisObject;
@@ -108,6 +110,10 @@ namespace Scorpio.Runtime {
                         instruction = instructions[iInstruction++];
                         opvalue = instruction.opvalue;
                         opcode = instruction.opcode;
+#if SCORPIO_DEBUG
+                        m_script.RecordStack.Breviary = m_Breviary;
+                        m_script.RecordStack.Line = instruction.line;
+#endif
                         switch (instruction.optype) {
                             case OpcodeType.Load:
                                 switch (opcode) {
@@ -1943,6 +1949,8 @@ namespace Scorpio.Runtime {
                     Array.Copy(AsyncValuePool, newPool, AsyncValuePoolLength);
                     AsyncValuePool = newPool;
                 }
+                if (MinAsyncValueIndex > AsyncValuePoolLength)
+                    MinAsyncValueIndex = AsyncValuePoolLength;
                 AsyncValuePool[AsyncValuePoolLength++] = asyncValue;
             }
 #endif

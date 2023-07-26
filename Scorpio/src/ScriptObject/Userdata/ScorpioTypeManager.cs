@@ -7,8 +7,8 @@ namespace Scorpio {
     public static class ScorpioTypeManager {
         private static List<Assembly> m_Assembly = new List<Assembly>();                                                //所有代码集合
         private static List<Type> m_ExtensionType = new List<Type>();                                                   //所有扩展类
-        private static Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                   //所有的类集合
-        private static Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();             //所有的类集合
+        internal static Dictionary<Type, UserdataType> m_Types = new Dictionary<Type, UserdataType>();                   //所有的类集合
+        internal static Dictionary<Type, ScriptValue> m_UserdataTypes = new Dictionary<Type, ScriptValue>();             //所有的类集合
         public static UserdataType GetType(Type type) {
             if (m_Types.TryGetValue(type, out var value)) {
                 return value;
