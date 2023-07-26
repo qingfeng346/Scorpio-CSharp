@@ -15,7 +15,7 @@ namespace Scorpio {
         public abstract ScriptArray GetKeys();
         public abstract ScriptArray GetValues();
         public abstract ScriptMap NewCopy();
-        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
+        internal override void SerializerJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("{");
             var first = true;

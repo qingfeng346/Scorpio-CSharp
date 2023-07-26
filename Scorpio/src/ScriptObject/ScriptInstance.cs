@@ -145,7 +145,7 @@ namespace Scorpio {
             }
             return $"Object<{m_Prototype}>";
         }
-        internal virtual void ToJson(ScorpioJsonSerializer jsonSerializer) {
+        internal virtual void SerializerJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("{");
             var first = true;

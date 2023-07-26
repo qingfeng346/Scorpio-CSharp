@@ -283,7 +283,7 @@ namespace Scorpio {
         public override string ToString() {
             return m_Script.ToJson(this);
         }
-        internal override void ToJson(ScorpioJsonSerializer jsonSerializer) {
+        internal override void SerializerJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;
             builder.Append("[");
             for (int i = 0; i < m_Length; ++i) {
