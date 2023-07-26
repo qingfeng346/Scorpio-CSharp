@@ -1,7 +1,15 @@
 
-function main() {
-    var a = 100
-    var b = 200
+async function main1() {
+    return "weeeeeeeeeeeeeeeee"
+}
+async function main2() {
+    return
+}
+async function main() {
+    var a = await main1()
+    print(a)
+    a = await main2()
+    print(a)
 }
 main()
 // Base64String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";

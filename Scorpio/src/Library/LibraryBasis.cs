@@ -7,7 +7,6 @@ using Scorpio.Function;
 using Scorpio.Userdata;
 using Scorpio.Tools;
 using System.Reflection;
-using Scorpio.Instruction;
 namespace Scorpio.Library {
     public partial class LibraryBasis {
         private class ArrayPairs : ScorpioHandle, IDisposable {

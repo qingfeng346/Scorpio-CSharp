@@ -4,8 +4,8 @@ using System;
 using Scorpio.Tools;
 namespace Scorpio {
     public partial class Script {
-        public void CollectLeak(out HashSet<(WeakReference, string)> set, out int count) {
-            ScorpioProfiler.CollectLeak(this, out set, out count);
+        public void CollectLeak(out HashSet<(WeakReference, string)> leak, out int globalCount, out int total) {
+            ScorpioProfiler.CollectLeak(this, out leak, out globalCount, out total);
         }
     }
 }

@@ -228,7 +228,7 @@ namespace ScorpioExec {
                     var watch = Stopwatch.StartNew ();
                     var value = script.LoadFile (file, ParseOption (command.GetValueDefault (ParameterOption, ""), script.SearchPaths));
                     while (script.UpdateCoroutine ()) { }
-                    script.CollectLeak(out var set, out var count);
+                    script.CollectLeak(out var set, out var count, out var total);
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");
