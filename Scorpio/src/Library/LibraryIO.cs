@@ -61,7 +61,7 @@ namespace Scorpio.Library {
         private class toString : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var encoding = length > 1 ? Encoding.GetEncoding(args[1].ToString()) : DefaultEncoding;
-                return new ScriptValue(encoding.GetString((byte[])args[0].Value));
+                return new ScriptValue(encoding.GetString((byte[])args[0].GetValue));
             }
         }
         private class toBytes : ScorpioHandle {
@@ -85,7 +85,7 @@ namespace Scorpio.Library {
         }
         private class writeAll : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                File.WriteAllBytes(args[0].ToString(), args[1].Value as byte[]);
+                File.WriteAllBytes(args[0].ToString(), args[1].GetValue as byte[]);
                 return ScriptValue.Null;
             }
         }
@@ -269,7 +269,7 @@ namespace Scorpio.Library {
         private class setCreationTime : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var path = args[0].ToString();
-                var time = (DateTime)args[1].Value;
+                var time = (DateTime)args[1].GetValue;
                 var isDirectory = length > 2 ? args[2].IsTrue : false;
                 if (length > 3 ? args[3].IsTrue : false) {
                     if (isDirectory) {
@@ -290,7 +290,7 @@ namespace Scorpio.Library {
         private class setLastAccessTime : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var path = args[0].ToString();
-                var time = (DateTime)args[1].Value;
+                var time = (DateTime)args[1].GetValue;
                 var isDirectory = length > 2 ? args[2].IsTrue : false;
                 if (length > 3 ? args[3].IsTrue : false) {
                     if (isDirectory) {
@@ -311,7 +311,7 @@ namespace Scorpio.Library {
         private class setLastWriteTime : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var path = args[0].ToString();
-                var time = (DateTime)args[1].Value;
+                var time = (DateTime)args[1].GetValue;
                 var isDirectory = length > 2 ? args[2].IsTrue : false;
                 if (length > 3 ? args[3].IsTrue : false) {
                     if (isDirectory) {
@@ -377,14 +377,14 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType == ScriptValue.stringValueType) {
                     if (length > 1 && args[1].IsTrue) {
-                        using (var fileStream = File.OpenRead(args[0].stringValue)) {
+                        using (var fileStream = File.OpenRead(args[0].GetStringValue)) {
                             return new ScriptValue(ScorpioMD5.GetMd5String(fileStream));
                         }
                     } else {
-                        return new ScriptValue(ScorpioMD5.GetMd5String(args[0].stringValue));
+                        return new ScriptValue(ScorpioMD5.GetMd5String(args[0].GetStringValue));
                     }
                 } else {
-                    var value = args[0].scriptValue.Value;
+                    var value = args[0].GetScriptValue.Value;
                     if (value is Stream) {
                         return new ScriptValue(ScorpioMD5.GetMd5String((Stream)value));
                     } else if (value is byte[]) {
@@ -404,14 +404,14 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType == ScriptValue.stringValueType) {
                     if (length > 1 && args[1].IsTrue) {
-                        using (var fileStream = File.OpenRead(args[0].stringValue)) {
+                        using (var fileStream = File.OpenRead(args[0].GetStringValue)) {
                             return ScriptValue.CreateValue(script, ScorpioMD5.GetMd5Bytes(fileStream));
                         }
                     } else {
-                        return ScriptValue.CreateValue(script, ScorpioMD5.GetMd5Bytes(args[0].stringValue));
+                        return ScriptValue.CreateValue(script, ScorpioMD5.GetMd5Bytes(args[0].GetStringValue));
                     }
                 } else {
-                    var value = args[0].scriptValue.Value;
+                    var value = args[0].GetScriptValue.Value;
                     if (value is Stream) {
                         return ScriptValue.CreateValue(script, ScorpioMD5.GetMd5Bytes((Stream)value));
                     } else if (value is byte[]) {
@@ -425,15 +425,15 @@ namespace Scorpio.Library {
         }
         private class md5HashToString: ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(ScorpioMD5.HashToString((byte[])args[0].Value));
+                return new ScriptValue(ScorpioMD5.HashToString((byte[])args[0].GetValue));
             }
         }
         private class toBase64 : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (args[0].valueType == ScriptValue.stringValueType) {
-                    return new ScriptValue(Convert.ToBase64String(DefaultEncoding.GetBytes(args[0].stringValue)));
+                    return new ScriptValue(Convert.ToBase64String(DefaultEncoding.GetBytes(args[0].GetStringValue)));
                 } else {
-                    var bytes = args[0].scriptValue.Value as byte[];
+                    var bytes = args[0].GetScriptValue.Value as byte[];
                     return new ScriptValue(Convert.ToBase64String(bytes, length > 1 ? args[1].ToInt32() : 0, length > 2 ? args[2].ToInt32() : bytes.Length));
                 }
             }

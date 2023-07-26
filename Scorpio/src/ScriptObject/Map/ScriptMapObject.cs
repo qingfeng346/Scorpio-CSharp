@@ -141,7 +141,7 @@ namespace Scorpio {
                 foreach (var pair in m_Objects) {
                     var value = pair.Value;
                     if (value.valueType == ScriptValue.scriptValueType) {
-                        var scriptObject = value.scriptValue;
+                        var scriptObject = value.GetScriptValue;
                         if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
                             ret.m_Objects[pair.Key] = new ScriptValue(scriptObject.Clone(true));
                         } else {

@@ -29,7 +29,7 @@ namespace Scorpio.Userdata {
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             if (parameters[0].valueType == ScriptValue.stringValueType) {
                 var ignoreCase = length > 1 ? parameters[1].valueType == ScriptValue.trueValueType : false;
-                return ScriptValue.CreateValue(m_Script, Enum.Parse(m_ValueType, parameters[0].stringValue, ignoreCase));
+                return ScriptValue.CreateValue(m_Script, Enum.Parse(m_ValueType, parameters[0].GetStringValue, ignoreCase));
             } else {
                 return ScriptValue.CreateValue(m_Script, Enum.ToObject(m_ValueType, parameters[0].ToInt32()));
             }

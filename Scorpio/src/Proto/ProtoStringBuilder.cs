@@ -35,7 +35,7 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var builder = thisObject.Get<ScriptStringBuilder>().Builder;
                 for (var i = 0; i < length; ++i) {
-                    builder.Append(args[i].Value);
+                    builder.Append(args[i].GetValue);
                 }
                 return thisObject.Reference();
             }
@@ -44,7 +44,7 @@ namespace Scorpio.Proto {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var objs = new object[length - 1];
                 for (var i = 1; i < length; ++i) {
-                    objs[i - 1] = args[i].Value;
+                    objs[i - 1] = args[i].GetValue;
                 }
                 thisObject.Get<ScriptStringBuilder>().Builder.AppendFormat(args[0].ToString(), objs);
                 return thisObject.Reference();
@@ -52,7 +52,7 @@ namespace Scorpio.Proto {
         }
         private class insert : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                thisObject.Get<ScriptStringBuilder>().Builder.Insert(args[0].ToInt32(), args[1].Value);
+                thisObject.Get<ScriptStringBuilder>().Builder.Insert(args[0].ToInt32(), args[1].GetValue);
                 return thisObject.Reference();
             }
         }

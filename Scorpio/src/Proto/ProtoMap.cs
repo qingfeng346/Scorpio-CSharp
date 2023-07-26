@@ -35,14 +35,14 @@ namespace Scorpio.Proto {
         private class remove : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 for (var i = 0; i < length; ++i) {
-                    thisObject.Get<ScriptMap>().Remove(args[i].Value);
+                    thisObject.Get<ScriptMap>().Remove(args[i].GetValue);
                 }
                 return thisObject.Reference();
             }
         }
         private class containsKey : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptMap>().ContainsKey(args[0].Value) ? ScriptValue.True : ScriptValue.False;
+                return thisObject.Get<ScriptMap>().ContainsKey(args[0].GetValue) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class containsValue : ScorpioHandle {
@@ -139,10 +139,10 @@ namespace Scorpio.Proto {
                 var array = args[0].Get<ScriptArray>();
                 if (array != null) {
                     foreach (var value in array) {
-                        thisMap.Remove(value.Value);
+                        thisMap.Remove(value.GetValue);
                     }
                 } else {
-                    thisMap.Remove(args[0].Value);
+                    thisMap.Remove(args[0].GetValue);
                 }
                 return new ScriptValue(thisMap);
             }

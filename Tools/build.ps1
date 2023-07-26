@@ -17,11 +17,17 @@ namespace Scorpio {
 "@
 Set-Content -Path ../Scorpio/src/Version.cs -Value $fileData -Encoding utf8NoBOM -NoNewline
 
+$contextExcute = Get-Content -Path ../Scorpio/src/Script/ScriptStringReference.cs
+$contextExcute = $contextExcute.Replace("stringEntityLength", "objectEntityLength")
+$contextExcute = $contextExcute.Replace("stringEntities", "objectEntities")
+$contextExcute = $contextExcute.Replace("stringPoolLength", "objectPoolLength")
+$contextExcute = $contextExcute.Replace("stringPool", "objectPool")
+$contextExcute = $contextExcute.Replace("stringFreeLength", "objectFreeLength")
+$contextExcute = $contextExcute.Replace("stringFrees", "objectFrees")
+Set-Content -Path ../Scorpio/src/Script/ScriptObjectReference.cs -Value "#define SCRIPT_OBJECT",$contextExcute -Encoding utf8NoBOM
+
 $contextExcute = Get-Content -Path ../Scorpio/src/Tools/ObjectsPool.cs
 Set-Content -Path ../Scorpio/src/Tools/ScriptObjectsPool.cs -Value "#define SCRIPT_OBJECT",$contextExcute -Encoding utf8NoBOM
-
-$contextExcute = Get-Content -Path ../Scorpio/src/Tools/StringReference.cs
-Set-Content -Path ../Scorpio/src/Tools/ScriptObjectReference.cs -Value "#define SCRIPT_OBJECT",$contextExcute -Encoding utf8NoBOM
 
 $contextExcute = Get-Content -Path ../Scorpio/src/Runtime/ScriptContextExecute.cs
 Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteContext.cs -Value "#define EXECUTE_CONTEXT",$contextExcute -Encoding utf8NoBOM

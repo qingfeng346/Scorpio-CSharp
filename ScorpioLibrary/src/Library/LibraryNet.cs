@@ -56,7 +56,7 @@ namespace ScorpioLibrary {
                 var request = CreateRequest(Parameters[0].ToString(), "GET");
                 if (length > 1) Parameters[1].call(ScriptValue.Null, request);
                 if (length > 2) {
-                    ReadStream(request, Parameters[2].Value as Stream);
+                    ReadStream(request, Parameters[2].GetValue as Stream);
                     return ScriptValue.Null;
                 } else {
                     using (var stream = new MemoryStream()) {
@@ -76,13 +76,13 @@ namespace ScorpioLibrary {
                 if (length > 1) {
                     using (var stream = request.GetRequestStream()) {
                         var value = Parameters[1];
-                        var buffer = value.valueType == ScriptValue.stringValueType ? DEFAULT_ENCODING.GetBytes(value.ToString()) : value.Value as byte[];
+                        var buffer = value.valueType == ScriptValue.stringValueType ? DEFAULT_ENCODING.GetBytes(value.ToString()) : value.GetValue as byte[];
                         stream.Write(buffer, 0, buffer.Length);
                     }
                 }
                 if (length > 2 ) Parameters[2].call(ScriptValue.Null, request);
                 if (length > 3) {
-                    ReadStream(request, Parameters[3].Value as Stream);
+                    ReadStream(request, Parameters[3].GetValue as Stream);
                     return ScriptValue.Null;
                 } else {
                     using (var stream = new MemoryStream()) {

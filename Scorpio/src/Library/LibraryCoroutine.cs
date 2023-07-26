@@ -21,14 +21,14 @@ namespace Scorpio.Library {
                 this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var enumerator = args[0].Value as IEnumerator;
+                var enumerator = args[0].GetValue as IEnumerator;
                 if (enumerator != null) return ScriptValue.CreateValue(script, script.StartCoroutine(enumerator));
                 return ScriptValue.Null;
             }
         }
         private class stop : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var scriptCoroutine = args[0].Value as ScriptCoroutine;
+                var scriptCoroutine = args[0].GetValue as ScriptCoroutine;
                 if (scriptCoroutine != null) scriptCoroutine.Stop();
                 return ScriptValue.Null;
             }
@@ -63,7 +63,7 @@ namespace Scorpio.Library {
         }
         private class done : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var coroutineCallback = args[0].Value as CoroutineEpoll;
+                var coroutineCallback = args[0].GetValue as CoroutineEpoll;
                 if (coroutineCallback != null) {
                     coroutineCallback.Done(args.GetArgs(1, length));
                 }

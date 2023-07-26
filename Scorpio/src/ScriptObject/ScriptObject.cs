@@ -82,10 +82,8 @@ namespace Scorpio {
         public virtual bool LessOrEqual(ScriptValue obj) { throw new ExecutionException($"Object类型[{ValueTypeName}]不支持 [<=] 运算"); }
         public virtual bool Greater(ScriptValue obj) { throw new ExecutionException($"Object类型[{ValueTypeName}]不支持 [>] 运算"); }
         public virtual bool GreaterOrEqual(ScriptValue obj) { throw new ExecutionException($"Object类型[{ValueTypeName}]不支持 [>=] 运算"); }
-        public override int GetHashCode() { return base.GetHashCode(); }
-        public override bool Equals(object obj) { return Equals(ScriptValue.CreateValueNoReference(m_Script, obj)); }
-        public virtual bool Equals(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.scriptValue == this; }
-        public bool EqualReference(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && ReferenceEquals(obj.scriptValue, this); }
+        public virtual bool Equals(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.index == Index; }
+        public bool EqualReference(ScriptValue obj) { return obj.valueType == ScriptValue.scriptValueType && obj.index == Index; }
         public override string ToString() { return base.ToString(); }
 
         //运算符

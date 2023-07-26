@@ -39,7 +39,7 @@ public class ScorpioInterface_TestInterface : TestInterface {
         __Call("Func2");
     }
     public System.Int32 Func3() {
-        return (System.Int32)Convert.ChangeType(__Call("Func3").Value, typeof(System.Int32));
+        return (System.Int32)Convert.ChangeType(__Call("Func3").GetValue, typeof(System.Int32));
     }
     public System.String Func4() {
         return __Call("Func4").ToString();

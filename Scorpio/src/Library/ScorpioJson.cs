@@ -191,7 +191,7 @@ namespace Scorpio.Library {
                         if (EatWhiteSpace != ':') {
                             throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                         }
-                        map.SetValueNoReference(key.Value, ReadObject());
+                        map.SetValueNoReference(key.GetValue, ReadObject());
                         break;
                     }
                     default: {
@@ -255,10 +255,10 @@ namespace Scorpio.Library {
                     m_Builder.Append(value.longValue);
                     break;
                 case ScriptValue.stringValueType:
-                    Serializer(value.stringValue);
+                    Serializer(value.GetStringValue);
                     break;
                 case ScriptValue.scriptValueType:
-                    Serializer(value.scriptValue);
+                    Serializer(value.GetScriptValue);
                     break;
             }
         }
@@ -342,10 +342,10 @@ namespace Scorpio.Library {
                     m_Builder.Append(value.longValue);
                     break;
                 case ScriptValue.stringValueType:
-                    Serializer(value.stringValue);
+                    Serializer(value.GetStringValue);
                     break;
                 case ScriptValue.scriptValueType:
-                    Serializer(value.scriptValue);
+                    Serializer(value.GetScriptValue);
                     break;
             }
         }

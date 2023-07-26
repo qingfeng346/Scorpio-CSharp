@@ -54,8 +54,8 @@ namespace Scorpio.Userdata
             return ScriptValue.CreateValue(m_Script, Delegate.Combine((Delegate)m_Value, (Delegate)value.ChangeType(m_ValueType)));
         }
         public override ScriptValue Minus(ScriptValue value) {
-            if (value.valueType == ScriptValue.scriptValueType && value.scriptValue is ScriptUserdataDelegate) {
-                return ScriptValue.CreateValue(m_Script, Delegate.Remove((Delegate)m_Value, (Delegate)(value.scriptValue as ScriptUserdataDelegate).Value));
+            if (value.valueType == ScriptValue.scriptValueType && value.GetScriptValue is ScriptUserdataDelegate) {
+                return ScriptValue.CreateValue(m_Script, Delegate.Remove((Delegate)m_Value, (Delegate)(value.GetScriptValue as ScriptUserdataDelegate).Value));
             }
             return base.Minus(value);
         }

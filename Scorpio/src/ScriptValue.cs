@@ -39,153 +39,151 @@ namespace Scorpio
         [FieldOffset(0)] public long longValue;
         [FieldOffset(0)] public int index;
         [FieldOffset(8)] public byte valueType;
-        public string stringValue => StringReference.GetValue(index);
-        public ScriptObject scriptValue => ScriptObjectReference.GetValue(index);
-        public bool setBoolValue {
-            set {
-                if (valueType > 30) {
-                    if (valueType == stringValueType) {
-                        StringReference.Free(index);
-                    } else if (valueType == scriptValueType) {
-                        ScriptObjectReference.Free(index);
-                    }
-                }
-                valueType = value ? trueValueType : falseValueType;
-            }
+        public string GetStringValue(Script script) {
+            return script.GetStringValue(index);
         }
-        public double setDoubleValue {
-            set {
-                if (valueType > 30) {
-                    if (valueType == stringValueType) {
-                        StringReference.Free(index);
-                    } else if (valueType == scriptValueType) {
-                        ScriptObjectReference.Free(index);
-                    }
-                }
-                valueType = doubleValueType;
-                doubleValue = value;
-            }
+        public ScriptObject GetScriptValue(Script script) {
+            return script.GetObjectValue(index);
         }
-        public long setLongValue {
-            set {
-                if (valueType > 30) {
-                    if (valueType == stringValueType) {
-                        StringReference.Free(index);
-                    } else if (valueType == scriptValueType) {
-                        ScriptObjectReference.Free(index);
-                    }
-                }
-                valueType = int64ValueType;
-                longValue = value;
-            }
-        }
-        public void SetNull() {
+        public void SetBoolValue(bool value, Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
+                }
+            }
+            valueType = value ? trueValueType : falseValueType;
+        }
+        public void SetDoubleValue(double value, Script script) {
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    script.FreeString(index);
+                } else if (valueType == scriptValueType) {
+                    script.FreeObject(index);
+                }
+            }
+            valueType = doubleValueType;
+            doubleValue = value;
+        }
+        public void SetLongValue(long value, Script script) {
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    script.FreeString(index);
+                } else if (valueType == scriptValueType) {
+                    script.FreeObject(index);
+                }
+            }
+            valueType = int64ValueType;
+            longValue = value;
+        }
+        public void SetNull(Script script) {
+            if (valueType > 30) {
+                if (valueType == stringValueType) {
+                    script.FreeString(index);
+                } else if (valueType == scriptValueType) {
+                    script.FreeObject(index);
                 }
             }
             valueType = nullValueType;
         }
-        public void SetTrue() {
+        public void SetTrue(Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
                 }
             }
             valueType = trueValueType;
         }
-        public void SetFalse() {
+        public void SetFalse(Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
                 }
             }
             valueType = falseValueType;
         }
-        public void SetScriptValue(ScriptObject value) {
+        public void SetScriptValue(ScriptObject value, Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
                 }
             }
             valueType = scriptValueType;
             index = ScriptObjectReference.Alloc(value);
         }
-        public void SetStringValue(string value) {
+        public void SetStringValue(string value, Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
                 }
             }
             valueType = stringValueType;
-            index = StringReference.Alloc(value);
+            index = script.Alloc(value);
         }
-        public void CopyFrom(ScriptValue value) {
+        public void CopyFrom(ScriptValue value, Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
                 }
             }
             longValue = value.longValue;
             if ((valueType = value.valueType) > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Reference(index);
+                    script.ReferenceString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Reference(index);
+                    script.ReferenceObject(index);
                 }
             }
         }
-        public void Set(ScriptValue value) {
+        public void Set(ScriptValue value, Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
                 }
             }
             valueType = value.valueType;
             longValue = value.longValue;
         }
-        public ScriptValue Reference() {
+        public ScriptValue Reference(Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Reference(index);
+                    script.ReferenceString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Reference(index);
+                    script.ReferenceObject(index);
                 }
             }
             return this;
         }
         //只释放
-        public void Release() {
+        public void Release(Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
                 }
             }
         }
         //释放并设置为null
-        public void Free() {
+        public void Free(Script script) {
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Free(index);
+                    script.FreeString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Free(index);
+                    script.FreeObject(index);
                 }
             }
             valueType = 0;
@@ -202,7 +200,7 @@ namespace Scorpio
             this.doubleValue = 0;
             this.longValue = value;
         }
-        public ScriptValue(string value) {
+        public ScriptValue(string value, Script script) {
             this.doubleValue = 0;
             this.longValue = 0;
             if (value == null) {
@@ -210,10 +208,10 @@ namespace Scorpio
                 this.index = 0;
             } else {
                 this.valueType = stringValueType;
-                this.index = StringReference.Alloc(value);
+                this.index = script.Alloc(value);
             }
         }
-        public ScriptValue(ScriptObject value) {
+        public ScriptValue(ScriptObject value, Script script) {
             this.doubleValue = 0;
             this.longValue = 0;
             if (value == null) {
@@ -221,19 +219,19 @@ namespace Scorpio
                 this.index = 0;
             } else {
                 this.valueType = scriptValueType;
-                this.index = ScriptObjectReference.Alloc(value);
+                this.index = script.Alloc(value);
             }
         }
-        private ScriptValue(ScriptValue value) {
+        private ScriptValue(ScriptValue value, Script script) {
             this.doubleValue = 0;
             this.index = 0;
             this.valueType = value.valueType;
             this.longValue = value.longValue;
             if (valueType > 30) {
                 if (valueType == stringValueType) {
-                    StringReference.Reference(index);
+                    script.ReferenceString(index);
                 } else if (valueType == scriptValueType) {
-                    ScriptObjectReference.Reference(index);
+                    script.ReferenceObject(index);
                 }
             }
         }
@@ -297,17 +295,17 @@ namespace Scorpio
             this.longValue = 0;
             this.doubleValue = value;
         }
-        private ScriptValue(string value, bool noReference) {
+        private ScriptValue(string value, bool noReference, Script script) {
             this.doubleValue = 0;
             this.longValue = 0;
             this.valueType = stringValueType;
-            this.index = StringReference.GetIndex(value);
+            this.index = script.GetIndex(value);
         }
-        private ScriptValue(ScriptObject value, bool noReference) {
+        private ScriptValue(ScriptObject value, bool noReference, Script script) {
             this.doubleValue = 0;
             this.longValue = 0;
             this.valueType = scriptValueType;
-            this.index = ScriptObjectReference.GetIndex(value);
+            this.index = script.GetIndex(value);
         }
 
         #region 运行时调用
@@ -315,11 +313,11 @@ namespace Scorpio
         internal ScriptValue GetValueByScriptValue(ScriptValue value, Script script) {
             switch (value.valueType) {
                 case stringValueType:
-                    return GetValueByString(value.stringValue, script);
+                    return GetValueByString(value.GetStringValue(script), script);
                 case doubleValueType:
-                    return GetValue(value.doubleValue);
+                    return GetValue(value.doubleValue, script);
                 case int64ValueType:
-                    return GetValue(value.longValue);
+                    return GetValue(value.longValue, script);
                 case floatValueType:
                 case int8ValueType:
                 case uint8ValueType:
@@ -331,12 +329,10 @@ namespace Scorpio
                 case charValueType:
                 case trueValueType:
                 case falseValueType:
-                    return GetValue(value.Value);
+                    return GetValue(value.GetObject(script), script);
                 case scriptValueType: {
-                    var userdata = value.Get<ScriptUserdataObject>();
-                    if (userdata != null) {
-                        return GetValue(userdata.Value);
-                    }
+                    var userdata = value.Get<ScriptUserdataObject>(script);
+                    if (userdata != null) return GetValue(userdata.Value, script);
                     throw new ExecutionException($"类型[{ValueTypeName}]不支持以下类型作为变量 : {value.ValueTypeName}");
                 }
                 default:
@@ -347,7 +343,7 @@ namespace Scorpio
         internal ScriptValue GetValueByIndex(int key, Script script) {
             switch (valueType) {
                 case scriptValueType:
-                    return scriptValue.GetValueByIndex(key);
+                    return GetScriptValue(script).GetValueByIndex(key);
                 case doubleValueType:
                 case int64ValueType:
                     return script.TypeNumber.GetValueByIndex(key);
@@ -363,7 +359,7 @@ namespace Scorpio
         internal ScriptValue GetValueByString(string key, Script script) {
             switch (valueType) {
                 case scriptValueType:
-                    return scriptValue.GetValue(key);
+                    return GetScriptValue(script).GetValue(key);
                 case doubleValueType:
                 case int64ValueType:
                     return script.TypeNumber.GetValue(key);
@@ -379,16 +375,16 @@ namespace Scorpio
             }
         }
         //此函数为运行时调用
-        internal void SetValueByScriptValue(ScriptValue key, ScriptValue value) {
+        internal void SetValueByScriptValue(ScriptValue key, ScriptValue value, Script script) {
             switch (key.valueType) {
                 case stringValueType:
-                    SetValue(key.stringValue, value);
+                    SetValue(key.GetStringValue(script), value, script);
                     return;
                 case doubleValueType:
-                    SetValue(key.doubleValue, value);
+                    SetValue(key.doubleValue, value, script);
                     return;
                 case int64ValueType:
-                    SetValue(key.longValue, value);
+                    SetValue(key.longValue, value, script);
                     return;
                 case floatValueType:
                 case int8ValueType:
@@ -401,12 +397,12 @@ namespace Scorpio
                 case charValueType:
                 case trueValueType:
                 case falseValueType:
-                    SetValue(key.Value, value);
+                    SetValue(key.GetObject(script), value, script);
                     return;
                 case scriptValueType: {
-                    var userdata = key.Get<ScriptUserdataObject>();
+                    var userdata = key.Get<ScriptUserdataObject>(script);
                     if (userdata != null) {
-                        SetValue(userdata.Value, value);
+                        SetValue(userdata.Value, value, script);
                         return;
                     }
                     throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
@@ -415,67 +411,67 @@ namespace Scorpio
                     throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量:{key.ValueTypeName}");
             }
         }
-        internal void SetValueByIndex(int key, ScriptValue value) {
+        internal void SetValueByIndex(int key, ScriptValue value, Script script) {
             if (valueType == scriptValueType) {
-                scriptValue.SetValueByIndex(key, value);
+                GetScriptValue(script).SetValueByIndex(key, value);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Index : [{key}]");
             }
         }
         #endregion
         #region GetValue SetValue
-        public ScriptValue GetValue(string key) {
+        public ScriptValue GetValue(string key, Script script) {
             if (valueType == scriptValueType) {
-                return scriptValue.GetValue(key);
+                return GetScriptValue(script).GetValue(key);
             }
             throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 String : [{key}]");
         }
-        public ScriptValue GetValue(double key) {
+        public ScriptValue GetValue(double key, Script script) {
             switch (valueType) {
-                case scriptValueType: return scriptValue.GetValue(key);
-                case stringValueType: return new ScriptValue(stringValue[(int)key]);
+                case scriptValueType: return GetScriptValue(script).GetValue(key);
+                case stringValueType: return new ScriptValue(GetStringValue(script)[(int)key]);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Double : [{key}]");
             }
         }
-        public ScriptValue GetValue(long key) {
+        public ScriptValue GetValue(long key, Script script) {
             switch (valueType) {
-                case scriptValueType: return scriptValue.GetValue(key);
-                case stringValueType: return new ScriptValue(stringValue[(int)key]);
+                case scriptValueType: return GetScriptValue(script).GetValue(key);
+                case stringValueType: return new ScriptValue(GetStringValue(script)[(int)key]);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Long : [{key}]");
             }
         }
-        public ScriptValue GetValue(object key) {
+        public ScriptValue GetValue(object key, Script script) {
             switch (valueType) {
-                case scriptValueType: return scriptValue.GetValue(key);
-                case stringValueType: return new ScriptValue(stringValue[Convert.ToInt32(key)]);
+                case scriptValueType: return GetScriptValue(script).GetValue(key);
+                case stringValueType: return new ScriptValue(GetStringValue(script)[Convert.ToInt32(key)]);
                 default: throw new ExecutionException($"类型[{ValueTypeName}]不支持获取变量 Object : [{key}]");
             }
         }
 
-        public void SetValue(string key, ScriptValue value) {
+        public void SetValue(string key, ScriptValue value, Script script) {
             if (valueType == scriptValueType) {
-                scriptValue.SetValue(key, value);
+                GetScriptValue(script).SetValue(key, value);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 String : [{key}]");
             }
         }
-        public void SetValue(double key, ScriptValue value) {
+        public void SetValue(double key, ScriptValue value, Script script) {
             if (valueType == scriptValueType) {
-                scriptValue.SetValue(key, value);
+                GetScriptValue(script).SetValue(key, value);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Double : [{key}]");
             }
         }
-        public void SetValue(long key, ScriptValue value) {
+        public void SetValue(long key, ScriptValue value, Script script) {
             if (valueType == scriptValueType) {
-                scriptValue.SetValue(key, value);
+                GetScriptValue(script).SetValue(key, value);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Long : [{key}]");
             }
         }
-        public void SetValue(object key, ScriptValue value) {
+        public void SetValue(object key, ScriptValue value, Script script) {
             if (valueType == scriptValueType) {
-                scriptValue.SetValue(key, value);
+                GetScriptValue(script).SetValue(key, value);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持设置变量 Object : [{key}]");
             }
@@ -483,72 +479,70 @@ namespace Scorpio
         #endregion
         #region Call
         //调用函数
-        public ScriptValue call(ScriptValue thisObject, params object[] args) {
+        public ScriptValue call(Script script, ScriptValue thisObject, params object[] args) {
             if (valueType == scriptValueType) {
-                return scriptValue.call(thisObject, args);
+                return GetScriptValue(script).call(thisObject, args);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用");
             }
         }
         //调用无参函数
-        public ScriptValue Call(ScriptValue thisObject) { 
-            return Call(thisObject, ScorpioUtil.VALUE_EMPTY, 0);
+        public ScriptValue Call(Script script, ScriptValue thisObject) { 
+            return Call(script, thisObject, ScorpioUtil.VALUE_EMPTY, 0);
         }
         //调用函数
-        public ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+        public ScriptValue Call(Script script, ScriptValue thisObject, ScriptValue[] parameters, int length) {
             if (valueType == scriptValueType) {
-                return scriptValue.Call(thisObject, parameters, length);
+                return GetScriptValue(script).Call(thisObject, parameters, length);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用");
             }
         }
         //调用base函数
-        internal ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+        internal ScriptValue Call(Script script, ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             if (valueType == scriptValueType) {
-                return scriptValue.Call(thisObject, parameters, length, baseType);
+                return GetScriptValue(script).Call(thisObject, parameters, length, baseType);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用");
             }
         }
         //await 调用异步函数
-        internal ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length) {
+        internal ScriptValue CallAsync(Script script, ScriptValue thisObject, ScriptValue[] parameters, int length) {
             if (valueType == scriptValueType) {
-                return scriptValue.CallAsync(thisObject, parameters, length);
+                return GetScriptValue(script).CallAsync(thisObject, parameters, length);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持函数调用");
             }
         }
         //await 调用异步base函数
-        internal ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
+        internal ScriptValue CallAsync(Script script, ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             if (valueType == scriptValueType) {
-                return scriptValue.CallAsync(thisObject, parameters, length, baseType);
+                return GetScriptValue(script).CallAsync(thisObject, parameters, length, baseType);
             } else {
                 throw new ExecutionException($"类型[{ValueTypeName}]不支持base函数调用");
             }
         }
         #endregion
         //传入参数
-        public object Value {
-            get {
-                switch (valueType) {
-                    case doubleValueType: return doubleValue;
-                    case int64ValueType: return longValue;
-                    case nullValueType: return null;
-                    case trueValueType: return true;
-                    case falseValueType: return false;
-                    case stringValueType: return stringValue;
-                    case scriptValueType: return scriptValue.Value;
-                    case floatValueType: return (float)doubleValue;
-                    case int8ValueType: return (sbyte)longValue;
-                    case uint8ValueType: return (byte)longValue;
-                    case int16ValueType: return (short)longValue;
-                    case uint16ValueType: return (ushort)longValue;
-                    case int32ValueType: return (int)longValue;
-                    case uint32ValueType: return (uint)longValue;
-                    case uint64ValueType: return (ulong)longValue;
-                    case charValueType: return (char)longValue;
-                    default: throw new ExecutionException($"未知的数据类型 : {valueType}");
-                }
+        public object GetObject(Script script) {
+            switch (valueType) {
+                case doubleValueType: return doubleValue;
+                case int64ValueType: return longValue;
+                case nullValueType: return null;
+                case trueValueType: return true;
+                case falseValueType: return false;
+                case stringValueType: return GetStringValue(script);
+                case scriptValueType: return GetScriptValue(script).Value;
+                case floatValueType: return (float)doubleValue;
+                case int8ValueType: return (sbyte)longValue;
+                case uint8ValueType: return (byte)longValue;
+                case int16ValueType: return (short)longValue;
+                case uint16ValueType: return (ushort)longValue;
+                case int32ValueType: return (int)longValue;
+                case uint32ValueType: return (uint)longValue;
+                case uint64ValueType: return (ulong)longValue;
+                case charValueType: return (char)longValue;
+                default: throw new ExecutionException($"未知的数据类型 : {valueType}");
             }
         }
         public string ValueTypeName {
@@ -574,11 +568,11 @@ namespace Scorpio
                     case stringValueType:
                         return "String";
                     default:
-                        return scriptValue.ValueTypeName;
+                        return "ScriptObject";
                 }
             }
         }
-        public T ToNumber<T>() where T : struct, IConvertible {
+        public T ToNumber<T>(Script script) where T : struct, IConvertible {
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
@@ -594,10 +588,10 @@ namespace Scorpio
                 case charValueType:
                     return (T)Convert.ChangeType(longValue, typeof(T));
                 default:
-                    return (T)Convert.ChangeType(Value, typeof(T));
+                    return (T)Convert.ChangeType(GetObject(script), typeof(T));
             }
         }
-        public int ToInt32() {
+        public int ToInt32(Script script) {
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
@@ -613,10 +607,10 @@ namespace Scorpio
                 case charValueType:
                     return (int)longValue;
                 default:
-                    return Convert.ToInt32(Value);
+                    return Convert.ToInt32(GetObject(script));
             }
         }
-        public double ToDouble() {
+        public double ToDouble(Script script) {
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
@@ -632,10 +626,10 @@ namespace Scorpio
                 case charValueType:
                     return longValue;
                 default:
-                    return Convert.ToDouble(Value);
+                    return Convert.ToDouble(GetObject(script));
             }
         }
-        public long ToLong() {
+        public long ToLong(Script script) {
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
@@ -651,10 +645,10 @@ namespace Scorpio
                 case charValueType:
                     return longValue;
                 default:
-                    return Convert.ToInt64(Value);
+                    return Convert.ToInt64(GetObject(script));
             }
         }
-        public char ToChar() {
+        public char ToChar(Script script) {
             switch (valueType) {
                 case floatValueType:
                 case doubleValueType:
@@ -670,13 +664,13 @@ namespace Scorpio
                 case charValueType:
                     return (char)longValue;
                 case stringValueType:
-                    return stringValue[0];
+                    return GetStringValue(script)[0];
                 default:
-                    return Convert.ToChar(Value);
+                    return Convert.ToChar(GetObject(script));
             }
         }
-        public T Get<T>() where T : ScriptObject {
-            return valueType == scriptValueType ? (scriptValue as T) : null;
+        public T Get<T>(Script script) where T : ScriptObject { 
+            return valueType == scriptValueType ? (script.GetObjectValue(index) as T) : null;
         }
         public bool IsNull => valueType == nullValueType;
         public bool IsTrue => valueType == trueValueType;
@@ -685,9 +679,9 @@ namespace Scorpio
         public bool IsString => valueType == stringValueType;
         public bool IsScriptObject => valueType == scriptValueType;
 
-        public override string ToString() {
+        public string ToString(Script script) {
             switch (valueType) {
-                case stringValueType: return stringValue;
+                case stringValueType: return GetStringValue(script);
                 case floatValueType:
                 case doubleValueType: 
                     return doubleValue.ToString();
@@ -705,11 +699,11 @@ namespace Scorpio
                 case trueValueType: return "true";
                 case falseValueType: return "false";
                 case nullValueType: return "null";
-                case scriptValueType: return scriptValue.ToString();
+                case scriptValueType: return GetScriptValue(script).ToString();
                 default: return "";
             }
         }
-        public override int GetHashCode() {
+        public int GetHashCode(Script script) {
             switch (valueType) {
                 case nullValueType: return 0;
                 case trueValueType: return true.GetHashCode();
@@ -727,30 +721,11 @@ namespace Scorpio
                 case uint64ValueType:
                 case charValueType:
                     return longValue.GetHashCode();
-                case stringValueType: return stringValue.GetHashCode();
-                default: return scriptValue.GetHashCode();
+                case stringValueType: return GetStringValue(script).GetHashCode();
+                default: return GetScriptValue(script).GetHashCode();
             }
         }
-        public override bool Equals(object obj) {
-            if (obj == null) { 
-                return valueType == nullValueType;
-            } else if (obj is ScriptValue) {
-                return Equals((ScriptValue)obj);
-            } else if (obj is long) {
-                return valueType == int64ValueType && longValue == (long)obj;
-            } else if (obj is double) {
-                return valueType == doubleValueType && doubleValue == (double)obj;
-            } else if (obj is string) {
-                return valueType == stringValueType && stringValue == (string)obj;
-            } else if (obj is bool) {
-                return (bool)obj ? valueType == trueValueType : valueType == falseValueType;
-            } else if (obj is ScriptObject) {
-                return valueType == scriptValueType && scriptValue.Value.Equals(obj);
-            } else {
-                return false;
-            }
-        }
-        public bool Equals(ScriptValue value) {
+        public bool Equals(ScriptValue value, Script script) {
             if (valueType != value.valueType) { return false; }
             switch (valueType) {
                 case floatValueType:
@@ -766,8 +741,8 @@ namespace Scorpio
                 case uint64ValueType:
                 case charValueType:
                     return longValue == value.longValue;
-                case stringValueType: return stringValue == value.stringValue;
-                case scriptValueType: return scriptValue.Equals(value);
+                case stringValueType: return index == value.index;
+                case scriptValueType: return index == value.index || GetScriptValue(script).Equals(value);
                 default: return true;
             }
         }
@@ -777,11 +752,11 @@ namespace Scorpio
                 return Null;
             else if (value is ScriptValue)
                 //需要增加一次引用计数
-                return new ScriptValue((ScriptValue)value);
+                return new ScriptValue((ScriptValue)value, script);
             else if (value is bool)
                 return (bool)value ? True : False;
             else if (value is string)
-                return new ScriptValue((string)value);
+                return new ScriptValue((string)value, script);
             else if (value is double)
                 return new ScriptValue((double)value);
             else if (value is int || value is float || value is byte || value is sbyte || value is short || value is ushort || value is uint)
@@ -791,17 +766,17 @@ namespace Scorpio
             else if (value is ulong)
                 return new ScriptValue((long)(ulong)value);
             else if (value is ScriptObject)
-                return new ScriptValue((ScriptObject)value);
+                return new ScriptValue((ScriptObject)value, script);
             else if (value is Type)
                 //需要增加一次引用计数
-                return script.GetUserdataTypeValue((Type)value).Reference();
+                return script.GetUserdataTypeValue((Type)value).Reference(script);
             else if (value is Delegate)
-                return new ScriptValue(script.NewUserdataDelegate().Set((Delegate)value));
+                return new ScriptValue(script.NewUserdataDelegate().Set((Delegate)value), script);
             else if (value is Enum)
                 return new ScriptValue(Convert.ToInt64(value));
             else if (value is IList)
-                return new ScriptValue(script.NewUserdataArray().Set(script.GetUserdataType(value.GetType()), (IList)value));
-            return new ScriptValue(script.NewUserdataObject().Set(script.GetUserdataType(value.GetType()), value));
+                return new ScriptValue(script.NewUserdataArray().Set(script.GetUserdataType(value.GetType()), (IList)value), script);
+            return new ScriptValue(script.NewUserdataObject().Set(script.GetUserdataType(value.GetType()), value), script);
         }
         //不占用引用的value,如果是新创建的scriptobject和string,创建后会立即加入释放列表
         public static ScriptValue CreateValueNoReference(Script script, object value) {
@@ -812,7 +787,7 @@ namespace Scorpio
             else if (value is bool)
                 return (bool)value ? True : False;
             else if (value is string)
-                return new ScriptValue((string)value, true);
+                return new ScriptValue((string)value, true, script);
             else if (value is double)
                 return new ScriptValue((double)value);
             else if (value is int || value is float || value is byte || value is sbyte || value is short || value is ushort || value is uint)
@@ -822,16 +797,16 @@ namespace Scorpio
             else if (value is ulong)
                 return new ScriptValue((long)(ulong)value);
             else if (value is ScriptObject)
-                return new ScriptValue((ScriptObject)value, true);
+                return new ScriptValue((ScriptObject)value, true, script);
             else if (value is Type)
                 return script.GetUserdataTypeValue((Type)value);
             else if (value is Delegate)
-                return new ScriptValue(script.NewUserdataDelegate().Set((Delegate)value), true);
+                return new ScriptValue(script.NewUserdataDelegate().Set((Delegate)value), true, script);
             else if (value is Enum)
                 return new ScriptValue(Convert.ToInt64(value));
             else if (value is IList)
-                return new ScriptValue(script.NewUserdataArray().Set(script.GetUserdataType(value.GetType()), (IList)value), true);
-            return new ScriptValue(script.NewUserdataObject().Set(script.GetUserdataType(value.GetType()), value), true);
+                return new ScriptValue(script.NewUserdataArray().Set(script.GetUserdataType(value.GetType()), (IList)value), true, script);
+            return new ScriptValue(script.NewUserdataObject().Set(script.GetUserdataType(value.GetType()), value), true, script);
         }
         public static ScriptValue CreateNumber(object value) {
             if (value is double)

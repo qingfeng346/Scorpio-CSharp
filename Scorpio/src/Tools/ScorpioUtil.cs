@@ -111,16 +111,16 @@ namespace Scorpio.Tools {
                 case ScriptValue.nullValueType: return null;
                 case ScriptValue.trueValueType: return true;
                 case ScriptValue.falseValueType: return false;
-                case ScriptValue.stringValueType: return value.stringValue;
+                case ScriptValue.stringValueType: return value.GetStringValue;
                 case ScriptValue.scriptValueType: {
                     if (TYPE_DELEGATE.IsAssignableFrom(type)) {
                         var func = value.Get<ScriptFunction>();
                         if (func != null) return ScorpioDelegateFactoryManager.CreateDelegate(func.script, type, value);
                     }
-                    return value.scriptValue.Value;
+                    return value.GetScriptValue.Value;
                 }
                 default:
-                    return value.Value;
+                    return value.GetValue;
             }
         }
         public static bool CanChangeTypeRefOut (this ScriptValue value, Type type) {
@@ -137,7 +137,7 @@ namespace Scorpio.Tools {
                 case ScriptValue.stringValueType:
                     return ReferenceEquals(type, TYPE_STRING);
                 case ScriptValue.scriptValueType:
-                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom(value.scriptValue.ValueType);
+                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.GetScriptValue is ScriptFunction : type.IsAssignableFrom(value.GetScriptValue.ValueType);
                 case ScriptValue.floatValueType:
                 case ScriptValue.int8ValueType:
                 case ScriptValue.uint8ValueType:
@@ -165,7 +165,7 @@ namespace Scorpio.Tools {
                 case ScriptValue.nullValueType:
                     return !type.IsValueType;
                 case ScriptValue.scriptValueType:
-                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.scriptValue is ScriptFunction : type.IsAssignableFrom(value.scriptValue.ValueType);
+                    return TYPE_DELEGATE.IsAssignableFrom(type) ? value.GetScriptValue is ScriptFunction : type.IsAssignableFrom(value.GetScriptValue.ValueType);
                 case ScriptValue.floatValueType:
                 case ScriptValue.int8ValueType:
                 case ScriptValue.uint8ValueType:

@@ -18,13 +18,13 @@ namespace Scorpio.Library
                 this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return script.GetUserdataTypeValue(script.GetUserdataType(args[0].scriptValue.Type).GetVariableType(args[1].ToString())).Reference();
+                return script.GetUserdataTypeValue(script.GetUserdataType(args[0].GetScriptValue.Type).GetVariableType(args[1].ToString())).Reference();
             }
         }
         private class isType : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 if (length > 1 && args[0].valueType == ScriptValue.scriptValueType && args[1].valueType == ScriptValue.scriptValueType) {
-                    return args[1].scriptValue.Type.IsAssignableFrom(args[0].scriptValue.Type) ? ScriptValue.True : ScriptValue.False;
+                    return args[1].GetScriptValue.Type.IsAssignableFrom(args[0].GetScriptValue.Type) ? ScriptValue.True : ScriptValue.False;
                 }
                 return ScriptValue.False;
             }
@@ -35,7 +35,7 @@ namespace Scorpio.Library
                 this.script = script;
             }
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                script.GetUserdataType(args[0].scriptValue.Type).SetValue(args[1].ToString(), args[2]);
+                script.GetUserdataType(args[0].GetScriptValue.Type).SetValue(args[1].ToString(), args[2]);
                 return ScriptValue.Null;
             }
         }

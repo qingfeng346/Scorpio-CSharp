@@ -44,7 +44,7 @@ namespace Scorpio.Library {
                     if (min.valueType == arg.valueType) {
                         switch (min.valueType) {
                             case ScriptValue.scriptValueType: {
-                                if (arg.scriptValue.Less(min)) {
+                                if (arg.GetScriptValue.Less(min)) {
                                     min = arg;
                                 }
                                 break;
@@ -77,7 +77,7 @@ namespace Scorpio.Library {
                     if (max.valueType == arg.valueType) {
                         switch (max.valueType) {
                             case ScriptValue.scriptValueType: {
-                                if (arg.scriptValue.Greater(max)) {
+                                if (arg.GetScriptValue.Greater(max)) {
                                     max = arg;
                                 }
                                 break;
@@ -144,16 +144,16 @@ namespace Scorpio.Library {
                 var value = args[0];
                 switch (value.valueType) {
                     case ScriptValue.doubleValueType: {
-                        var min = Convert.ToDouble(args[1].Value);
+                        var min = Convert.ToDouble(args[1].GetValue);
                         if (value.doubleValue < min) return new ScriptValue(min);
-                        var max = Convert.ToDouble(args[2].Value);
+                        var max = Convert.ToDouble(args[2].GetValue);
                         if (value.doubleValue > max) return new ScriptValue(max);
                         return value;
                     }
                     case ScriptValue.int64ValueType: {
-                        var min = Convert.ToInt64(args[1].Value);
+                        var min = Convert.ToInt64(args[1].GetValue);
                         if (value.longValue < min) return new ScriptValue(min);
-                        var max = Convert.ToInt64(args[2].Value);
+                        var max = Convert.ToInt64(args[2].GetValue);
                         if (value.longValue > max) return new ScriptValue(max);
                         return value;
                     }
@@ -163,64 +163,64 @@ namespace Scorpio.Library {
         }
         private class sqrt : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Sqrt(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Sqrt(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class pow : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var value = Convert.ToDouble(args[0].Value);
-                var p = Convert.ToDouble(args[1].Value);
+                var value = Convert.ToDouble(args[0].GetValue);
+                var p = Convert.ToDouble(args[1].GetValue);
                 return new ScriptValue(Math.Pow(value, p));
             }
         }
         private class log : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Log(Convert.ToDouble(args[0].Value), Convert.ToDouble(args[1].Value)));
+                return new ScriptValue(Math.Log(Convert.ToDouble(args[0].GetValue), Convert.ToDouble(args[1].GetValue)));
             }
         }
         private class sin : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Sin(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Sin(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class sinh : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Sinh(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Sinh(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class asin : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Asin(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Asin(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class cos : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Cos(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Cos(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class cosh : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Cosh(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Cosh(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class acos : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Acos(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Acos(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class tan : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Tan(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Tan(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class tanh : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Tanh(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Tanh(Convert.ToDouble(args[0].GetValue)));
             }
         }
         private class atan : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return new ScriptValue(Math.Atan(Convert.ToDouble(args[0].Value)));
+                return new ScriptValue(Math.Atan(Convert.ToDouble(args[0].GetValue)));
             }
         }
     }

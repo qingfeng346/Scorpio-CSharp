@@ -42,25 +42,25 @@ namespace Scorpio.Proto
                         type = m_Script.TypeStringValue;
                         break;
                     case ScriptValue.scriptValueType:
-                        if (thisObject.scriptValue is ScriptArray) {
+                        if (thisObject.GetScriptValue is ScriptArray) {
                             type = m_Script.TypeArrayValue;
-                        } else if (thisObject.scriptValue is ScriptMap) {
+                        } else if (thisObject.GetScriptValue is ScriptMap) {
                             type = m_Script.TypeMapValue;
-                        } else if (thisObject.scriptValue is ScriptFunction) {
+                        } else if (thisObject.GetScriptValue is ScriptFunction) {
                             type = m_Script.TypeFunctionValue;
-                        } else if (thisObject.scriptValue is ScriptInstance) {
-                            type = new ScriptValue((thisObject.scriptValue as ScriptInstance).Prototype);
-                        } else if (thisObject.scriptValue is ScriptType) {
+                        } else if (thisObject.GetScriptValue is ScriptInstance) {
+                            type = new ScriptValue((thisObject.GetScriptValue as ScriptInstance).Prototype);
+                        } else if (thisObject.GetScriptValue is ScriptType) {
                             type = thisObject;
                         } else {
-                            type = m_Script.GetUserdataTypeValue(thisObject.scriptValue.Type);
+                            type = m_Script.GetUserdataTypeValue(thisObject.GetScriptValue.Type);
                         }
                         break;
                     default:
                         type = m_Script.TypeObjectValue;
                         break;
                 }
-                var scriptObject = type.scriptValue;
+                var scriptObject = type.GetScriptValue;
                 if (scriptObject is ScriptType) {
                     var scriptType = scriptObject as ScriptType;
                     var parentType = args[0];
@@ -81,7 +81,7 @@ namespace Scorpio.Proto
         }
         private class referenceEquals : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return object.ReferenceEquals(args[0].Value, args[1].Value) ? ScriptValue.True : ScriptValue.False;
+                return object.ReferenceEquals(args[0].GetValue, args[1].GetValue) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class addGetProperty : ScorpioHandle {

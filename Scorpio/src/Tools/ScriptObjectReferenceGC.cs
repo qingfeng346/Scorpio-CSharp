@@ -199,7 +199,7 @@ namespace Scorpio.Tools {
         #endregion
         static void CollectGlobal(ScriptValue value, HashSet<int> global) {
             if (value.valueType != ScriptValue.scriptValueType) { return; }
-            CollectGlobal(value.scriptValue, global);
+            CollectGlobal(value.GetScriptValue, global);
         }
         static void CollectGlobal(ScriptObject value, HashSet<int> global) {
             if (value == null) return;

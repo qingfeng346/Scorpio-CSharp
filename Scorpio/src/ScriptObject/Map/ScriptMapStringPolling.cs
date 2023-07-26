@@ -78,7 +78,7 @@ namespace Scorpio {
                 for (var i = 0; i < m_Values.mSize; ++i) {
                     var value = m_Values.mValues[i];
                     if (value.valueType == ScriptValue.scriptValueType) {
-                        var scriptObject = value.scriptValue;
+                        var scriptObject = value.GetScriptValue;
                         if (scriptObject != this && (scriptObject is ScriptArray || scriptObject is ScriptMap)) {
                             ret.m_Values.mKeys[i] = m_Values.mKeys[i];
                             ret.m_Values.mValues[i] = new ScriptValue(scriptObject.Clone(true));

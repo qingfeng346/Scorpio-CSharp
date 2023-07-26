@@ -26,14 +26,14 @@ namespace Scorpio.LibraryV1 {
         private class remove : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 for (var i = 1; i < length; ++i) {
-                    args[0].Get<ScriptMap>().Remove(args[i].Value);
+                    args[0].Get<ScriptMap>().Remove(args[i].GetValue);
                 }
                 return args[0];
             }
         }
         private class containskey : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return args[0].Get<ScriptMap>().ContainsKey(args[0].Value) ? ScriptValue.True : ScriptValue.False;
+                return args[0].Get<ScriptMap>().ContainsKey(args[0].GetValue) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class keys : ScorpioHandle {

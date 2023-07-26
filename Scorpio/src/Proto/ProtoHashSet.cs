@@ -68,55 +68,55 @@ namespace Scorpio.Proto {
         }
         private class unionWith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                thisObject.Get<ScriptHashSet>().UnionWith(args[0].Value as IEnumerable<ScriptValue>);
+                thisObject.Get<ScriptHashSet>().UnionWith(args[0].GetValue as IEnumerable<ScriptValue>);
                 return thisObject.Reference();
             }
         }
         private class exceptWith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                thisObject.Get<ScriptHashSet>().ExceptWith(args[0].Value as IEnumerable<ScriptValue>);
+                thisObject.Get<ScriptHashSet>().ExceptWith(args[0].GetValue as IEnumerable<ScriptValue>);
                 return thisObject.Reference();
             }
         }
         private class intersectWith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                thisObject.Get<ScriptHashSet>().IntersectWith(args[0].Value as IEnumerable<ScriptValue>);
+                thisObject.Get<ScriptHashSet>().IntersectWith(args[0].GetValue as IEnumerable<ScriptValue>);
                 return thisObject.Reference();
             }
         }
         private class isProperSubsetOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptHashSet>().IsProperSubsetOf(args[0].Value as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
+                return thisObject.Get<ScriptHashSet>().IsProperSubsetOf(args[0].GetValue as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isProperSupersetOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptHashSet>().IsProperSupersetOf(args[0].Value as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
+                return thisObject.Get<ScriptHashSet>().IsProperSupersetOf(args[0].GetValue as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isSubsetOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptHashSet>().IsSubsetOf(args[0].Value as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
+                return thisObject.Get<ScriptHashSet>().IsSubsetOf(args[0].GetValue as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class isSupersetOf : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptHashSet>().IsSupersetOf(args[0].Value as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
+                return thisObject.Get<ScriptHashSet>().IsSupersetOf(args[0].GetValue as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class overlaps : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptHashSet>().Overlaps(args[0].Value as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
+                return thisObject.Get<ScriptHashSet>().Overlaps(args[0].GetValue as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class setEquals : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return thisObject.Get<ScriptHashSet>().SetEquals(args[0].Value as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
+                return thisObject.Get<ScriptHashSet>().SetEquals(args[0].GetValue as IEnumerable<ScriptValue>) ? ScriptValue.True : ScriptValue.False;
             }
         }
         private class symmetricExceptWith : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                thisObject.Get<ScriptHashSet>().SymmetricExceptWith(args[0].Value as IEnumerable<ScriptValue>);
+                thisObject.Get<ScriptHashSet>().SymmetricExceptWith(args[0].GetValue as IEnumerable<ScriptValue>);
                 return thisObject.Reference();
             }
         }

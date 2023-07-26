@@ -26,6 +26,20 @@ namespace Scorpio
         public const BindingFlags BindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
         private const int StringStage = 256;
         private const int Stage = 8192;
+        public struct Entity<T> where T : class {
+            public T value;
+            public int referenceCount;
+#if SCORPIO_DEBUG
+            public int index;
+#endif
+            public override string ToString() {
+                try {
+                    return $"{value} 计数:{referenceCount}";
+                } catch (System.Exception) {
+                    return $"Exception:{value?.GetType()}:  计数:{referenceCount}";
+                }
+            }
+        }
         private const string GLOBAL_NAME = "_G";                        //全局对象
         private const string GLOBAL_SCRIPT = "_SCRIPT";                 //Script对象
         private const string GLOBAL_VERSION = "_VERSION";               //版本号
@@ -543,7 +557,7 @@ namespace Scorpio
                     scriptConst.Add(key, value.longValue);
                     break;
                 case ScriptValue.stringValueType:
-                    scriptConst.Add(key, value.stringValue);
+                    scriptConst.Add(key, value.GetStringValue);
                     break;
                 case ScriptValue.scriptValueType:
                     var map = value.Get<ScriptMap>();

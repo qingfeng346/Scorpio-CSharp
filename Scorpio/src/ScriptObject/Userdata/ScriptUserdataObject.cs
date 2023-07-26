@@ -95,7 +95,7 @@ namespace Scorpio.Userdata {
             }
             switch (obj.valueType) {
                 case ScriptValue.nullValueType: return false;
-                case ScriptValue.scriptValueType: return m_Value == obj.scriptValue.Value;
+                case ScriptValue.scriptValueType: return m_Value == obj.GetScriptValue.Value;
                 default: return false;
             }
         }
