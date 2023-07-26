@@ -3,6 +3,8 @@ using Scorpio.Exception;
 using System.Collections.Generic;
 using System;
 using Scorpio.Function;
+using System.Reflection;
+
 namespace Scorpio.Tools {
     public static class ScorpioProfiler {
         public static StackInfo RecordStack;
@@ -35,6 +37,71 @@ namespace Scorpio.Tools {
             if (!IsRecord) return;
             IsRecord = false;
         }
+        #region 查找对象引用
+        static void CollectReference(WeakReference weak, ulong targetId, HashSet<WeakReference> set) {
+            if (!weak.IsAlive) { return; }
+            void CollectReferenceObject(ScriptObject scriptObject) {
+                if (scriptObject == null || scriptObject.Id != targetId) return;
+                set.Add(weak);
+            }
+            void CollectReferenceValue(ScriptValue scriptValue) {
+                if (scriptValue.valueType == ScriptValue.scriptValueType) {
+                    CollectReferenceObject(scriptValue.scriptValue);
+                }
+            }
+            var value = (ScriptObject)weak.Target;
+            if (value is ScriptMap) {
+                foreach (var pair in (ScriptMap)value) {
+                    CollectReferenceValue(pair.Value);
+                }
+            } else if (value is ScriptArray) {
+                foreach (var element in (ScriptArray)value) {
+                    CollectReferenceValue(element);
+                }
+            } else if (value is ScriptScriptBindFunctionBase) {
+                CollectReferenceValue(((ScriptScriptBindFunctionBase)value).BindObject);
+            } else if (value is ScriptType) {
+                var type = (ScriptType)value;
+                CollectReferenceObject(type.Prototype);
+                foreach (var pair in type.m_Values) {
+                    CollectReferenceValue(pair.Value);
+                }
+                foreach (var pair in type.m_GetProperties) {
+                    CollectReferenceObject(pair.Value);
+                }
+            } else if (value is ScriptGlobal) {
+                foreach (var pair in (value as ScriptGlobal)) {
+                    CollectReferenceValue(pair.Value);
+                }
+            }
+            if (value is ScriptInstance) {
+                var instance = (ScriptInstance)value;
+                foreach (var pair in instance) {
+                    CollectReferenceValue(pair.Value);
+                }
+                CollectReferenceObject(instance.Prototype);
+            }
+            if (value is ScriptScriptFunctionBase) {
+                var internalValues = ((ScriptScriptFunctionBase)value).InternalValues;
+                if (internalValues != null) {
+                    for (var i = 0; i < internalValues.Length; ++i) {
+                        var internalValue = internalValues[i];
+                        if (internalValue == null) { continue; }
+                        CollectReferenceValue(internalValue.value);
+                    }
+                }
+            }
+        }
+        public static void FindReference(ulong id, out HashSet<WeakReference> set) {
+            lock (sync) {
+                set = new HashSet<WeakReference>();
+                foreach (var pair in AllObjects) {
+                    CollectReference(pair.Value.Item1, id, set);
+                }
+            }
+        }
+        #endregion
+        #region 检测泄漏
         private static void CollectGlobal(ScriptValue value, HashSet<ulong> globalIndex) {
             if (value.valueType != ScriptValue.scriptValueType) { return; }
             CollectGlobal(value.scriptValue, globalIndex);
@@ -114,6 +181,7 @@ namespace Scorpio.Tools {
                 }
             }
         }
+        #endregion
     }
 }
 #endif

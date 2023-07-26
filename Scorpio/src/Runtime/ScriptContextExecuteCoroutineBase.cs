@@ -119,14 +119,14 @@ namespace Scorpio.Runtime {
                             case OpcodeType.Load:
                                 switch (opcode) {
                                     case Opcode.LoadConstDouble: {
-                                        stackObjects[++stackIndex].doubleValue = constDouble[opvalue];
-                                        stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
+                                        stackObjects[++stackIndex].valueType = ScriptValue.doubleValueType;
                                         stackObjects[stackIndex].scriptValue = null;
+                                        stackObjects[stackIndex].doubleValue = constDouble[opvalue];
                                         continue;
                                     }
                                     case Opcode.LoadConstString: {
-                                        stackObjects[++stackIndex].stringValue = constString[opvalue];
-                                        stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
+                                        stackObjects[++stackIndex].valueType = ScriptValue.stringValueType;
+                                        stackObjects[stackIndex].stringValue = constString[opvalue];
                                         continue;
                                     }
                                     case Opcode.LoadConstNull: {
@@ -145,21 +145,21 @@ namespace Scorpio.Runtime {
                                         continue;
                                     }
                                     case Opcode.LoadConstLong: {
-                                        stackObjects[++stackIndex].longValue = constLong[opvalue];
-                                        stackObjects[stackIndex].valueType = ScriptValue.longValueType;
+                                        stackObjects[++stackIndex].valueType = ScriptValue.longValueType;
                                         stackObjects[stackIndex].scriptValue = null;
+                                        stackObjects[stackIndex].longValue = constLong[opvalue];
                                         continue;
                                     }
                                     case Opcode.LoadLocal: {
                                         switch (variableObjects[opvalue].valueType) {
                                             case ScriptValue.scriptValueType:
-                                                stackObjects[++stackIndex].scriptValue = variableObjects[opvalue].scriptValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.scriptValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                                stackObjects[stackIndex].scriptValue = variableObjects[opvalue].scriptValue;
                                                 continue;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[++stackIndex].doubleValue = variableObjects[opvalue].doubleValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.doubleValueType;
                                                 stackObjects[stackIndex].scriptValue = null;
+                                                stackObjects[stackIndex].doubleValue = variableObjects[opvalue].doubleValue;
                                                 continue;
                                             case ScriptValue.nullValueType:
                                                 stackObjects[++stackIndex].valueType = ScriptValue.nullValueType;
@@ -174,17 +174,17 @@ namespace Scorpio.Runtime {
                                                 stackObjects[stackIndex].scriptValue = null;
                                                 continue;
                                             case ScriptValue.stringValueType:
-                                                stackObjects[++stackIndex].stringValue = variableObjects[opvalue].stringValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.stringValueType;
+                                                stackObjects[stackIndex].stringValue = variableObjects[opvalue].stringValue;
                                                 continue;
                                             case ScriptValue.longValueType:
-                                                stackObjects[++stackIndex].longValue = variableObjects[opvalue].longValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.longValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.longValueType;
                                                 stackObjects[stackIndex].scriptValue = null;
+                                                stackObjects[stackIndex].longValue = variableObjects[opvalue].longValue;
                                                 continue;
                                             case ScriptValue.objectValueType:
-                                                stackObjects[++stackIndex].objectValue = variableObjects[opvalue].objectValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.objectValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.objectValueType;
+                                                stackObjects[stackIndex].objectValue = variableObjects[opvalue].objectValue;
                                                 continue;
                                             default:
                                                 throw new ExecutionException($"LoadLocal : 未知错误数据类型 : {variableObjects[opvalue].ValueTypeName}");
@@ -193,13 +193,13 @@ namespace Scorpio.Runtime {
                                     case Opcode.LoadInternal: {
                                         switch (internalObjects[opvalue].value.valueType) {
                                             case ScriptValue.scriptValueType:
-                                                stackObjects[++stackIndex].scriptValue = internalObjects[opvalue].value.scriptValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.scriptValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;
+                                                stackObjects[stackIndex].scriptValue = internalObjects[opvalue].value.scriptValue;
                                                 continue;
                                             case ScriptValue.doubleValueType:
-                                                stackObjects[++stackIndex].doubleValue = internalObjects[opvalue].value.doubleValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.doubleValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.doubleValueType;
                                                 stackObjects[stackIndex].scriptValue = null;
+                                                stackObjects[stackIndex].doubleValue = internalObjects[opvalue].value.doubleValue;
                                                 continue;
                                             case ScriptValue.nullValueType:
                                                 stackObjects[++stackIndex].valueType = ScriptValue.nullValueType;
@@ -214,17 +214,17 @@ namespace Scorpio.Runtime {
                                                 stackObjects[stackIndex].scriptValue = null;
                                                 continue;
                                             case ScriptValue.stringValueType:
-                                                stackObjects[++stackIndex].stringValue = internalObjects[opvalue].value.stringValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.stringValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.stringValueType;
+                                                stackObjects[stackIndex].stringValue = internalObjects[opvalue].value.stringValue;
                                                 continue;
                                             case ScriptValue.longValueType:
-                                                stackObjects[++stackIndex].longValue = internalObjects[opvalue].value.longValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.longValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.longValueType;
                                                 stackObjects[stackIndex].scriptValue = null;
+                                                stackObjects[stackIndex].longValue = internalObjects[opvalue].value.longValue;
                                                 continue;
                                             case ScriptValue.objectValueType:
-                                                stackObjects[++stackIndex].objectValue = internalObjects[opvalue].value.objectValue;
-                                                stackObjects[stackIndex].valueType = ScriptValue.objectValueType;
+                                                stackObjects[++stackIndex].valueType = ScriptValue.objectValueType;
+                                                stackObjects[stackIndex].objectValue = internalObjects[opvalue].value.objectValue;
                                                 continue;
                                             default:
                                                 throw new ExecutionException($"LoadInternal : 未知错误数据类型 : {internalObjects[opvalue].value.valueType}");
@@ -343,9 +343,9 @@ namespace Scorpio.Runtime {
                                                 variableObjects[opvalue].valueType = ScriptValue.scriptValueType;
                                                 continue;
                                             case ScriptValue.doubleValueType:
-                                                variableObjects[opvalue].doubleValue = stackObjects[stackIndex].doubleValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.doubleValueType;
                                                 variableObjects[opvalue].scriptValue = null;
+                                                variableObjects[opvalue].doubleValue = stackObjects[stackIndex].doubleValue;
                                                 continue;
                                             case ScriptValue.nullValueType:
                                                 variableObjects[opvalue].valueType = ScriptValue.nullValueType;
@@ -360,17 +360,17 @@ namespace Scorpio.Runtime {
                                                 variableObjects[opvalue].scriptValue = null;
                                                 continue;
                                             case ScriptValue.stringValueType:
-                                                variableObjects[opvalue].stringValue = stackObjects[stackIndex].stringValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.stringValueType;
+                                                variableObjects[opvalue].stringValue = stackObjects[stackIndex].stringValue;
                                                 continue;
                                             case ScriptValue.longValueType:
-                                                variableObjects[opvalue].longValue = stackObjects[stackIndex].longValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.longValueType;
                                                 variableObjects[opvalue].scriptValue = null;
+                                                variableObjects[opvalue].longValue = stackObjects[stackIndex].longValue;
                                                 continue;
                                             case ScriptValue.objectValueType:
-                                                variableObjects[opvalue].objectValue = stackObjects[stackIndex].objectValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.objectValueType;
+                                                variableObjects[opvalue].objectValue = stackObjects[stackIndex].objectValue;
                                                 continue;
                                             default:
                                                 throw new ExecutionException($"StoreLocalAssign : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
@@ -379,13 +379,13 @@ namespace Scorpio.Runtime {
                                     case Opcode.StoreInternalAssign: {
                                         switch (stackObjects[stackIndex].valueType) {
                                             case ScriptValue.scriptValueType:
-                                                internalObjects[opvalue].value.scriptValue = stackObjects[stackIndex].scriptValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
+                                                internalObjects[opvalue].value.scriptValue = stackObjects[stackIndex].scriptValue;
                                                 continue;
                                             case ScriptValue.doubleValueType:
-                                                internalObjects[opvalue].value.doubleValue = stackObjects[stackIndex].doubleValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
                                                 internalObjects[opvalue].value.scriptValue = null;
+                                                internalObjects[opvalue].value.doubleValue = stackObjects[stackIndex].doubleValue;
                                                 continue;
                                             case ScriptValue.nullValueType:
                                                 internalObjects[opvalue].value.valueType = ScriptValue.nullValueType;
@@ -400,17 +400,17 @@ namespace Scorpio.Runtime {
                                                 internalObjects[opvalue].value.scriptValue = null;
                                                 continue;
                                             case ScriptValue.stringValueType:
-                                                internalObjects[opvalue].value.stringValue = stackObjects[stackIndex].stringValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
+                                                internalObjects[opvalue].value.stringValue = stackObjects[stackIndex].stringValue;
                                                 continue;
                                             case ScriptValue.longValueType:
-                                                internalObjects[opvalue].value.longValue = stackObjects[stackIndex].longValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
                                                 internalObjects[opvalue].value.scriptValue = null;
+                                                internalObjects[opvalue].value.longValue = stackObjects[stackIndex].longValue;
                                                 continue;
                                             case ScriptValue.objectValueType:
-                                                internalObjects[opvalue].value.objectValue = stackObjects[stackIndex].objectValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
+                                                internalObjects[opvalue].value.objectValue = stackObjects[stackIndex].objectValue;
                                                 continue;
                                             default:
                                                 throw new ExecutionException("StoreInternalAssign : 未知错误数据类型 : " + stackObjects[stackIndex].valueType);
@@ -467,13 +467,13 @@ namespace Scorpio.Runtime {
                                         tempIndex = stackIndex--;
                                         switch (stackObjects[tempIndex].valueType) {
                                             case ScriptValue.scriptValueType:
-                                                variableObjects[opvalue].scriptValue = stackObjects[tempIndex].scriptValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.scriptValueType;
+                                                variableObjects[opvalue].scriptValue = stackObjects[tempIndex].scriptValue;
                                                 continue;
                                             case ScriptValue.doubleValueType:
-                                                variableObjects[opvalue].doubleValue = stackObjects[tempIndex].doubleValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.doubleValueType;
                                                 variableObjects[opvalue].scriptValue = null;
+                                                variableObjects[opvalue].doubleValue = stackObjects[tempIndex].doubleValue;
                                                 continue;
                                             case ScriptValue.nullValueType:
                                                 variableObjects[opvalue].valueType = ScriptValue.nullValueType;
@@ -488,17 +488,17 @@ namespace Scorpio.Runtime {
                                                 variableObjects[opvalue].scriptValue = null;
                                                 continue;
                                             case ScriptValue.stringValueType:
-                                                variableObjects[opvalue].stringValue = stackObjects[tempIndex].stringValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.stringValueType;
+                                                variableObjects[opvalue].stringValue = stackObjects[tempIndex].stringValue;
                                                 continue;
                                             case ScriptValue.longValueType:
-                                                variableObjects[opvalue].longValue = stackObjects[tempIndex].longValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.longValueType;
                                                 variableObjects[opvalue].scriptValue = null;
+                                                variableObjects[opvalue].longValue = stackObjects[tempIndex].longValue;
                                                 continue;
                                             case ScriptValue.objectValueType:
-                                                variableObjects[opvalue].objectValue = stackObjects[tempIndex].objectValue;
                                                 variableObjects[opvalue].valueType = ScriptValue.objectValueType;
+                                                variableObjects[opvalue].objectValue = stackObjects[tempIndex].objectValue;
                                                 continue;
                                             default:
                                                 throw new ExecutionException($"StoreLocal : 未知错误数据类型 : {stackObjects[stackIndex].ValueTypeName}");
@@ -508,13 +508,13 @@ namespace Scorpio.Runtime {
                                         tempIndex = stackIndex--;
                                         switch (stackObjects[tempIndex].valueType) {
                                             case ScriptValue.scriptValueType:
-                                                internalObjects[opvalue].value.scriptValue = stackObjects[tempIndex].scriptValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.scriptValueType;
+                                                internalObjects[opvalue].value.scriptValue = stackObjects[tempIndex].scriptValue;
                                                 continue;
                                             case ScriptValue.doubleValueType:
-                                                internalObjects[opvalue].value.doubleValue = stackObjects[tempIndex].doubleValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.doubleValueType;
                                                 internalObjects[opvalue].value.scriptValue = null;
+                                                internalObjects[opvalue].value.doubleValue = stackObjects[tempIndex].doubleValue;
                                                 continue;
                                             case ScriptValue.nullValueType:
                                                 internalObjects[opvalue].value.valueType = ScriptValue.nullValueType;
@@ -529,17 +529,17 @@ namespace Scorpio.Runtime {
                                                 internalObjects[opvalue].value.scriptValue = null;
                                                 continue;
                                             case ScriptValue.stringValueType:
-                                                internalObjects[opvalue].value.stringValue = stackObjects[tempIndex].stringValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.stringValueType;
+                                                internalObjects[opvalue].value.stringValue = stackObjects[tempIndex].stringValue;
                                                 continue;
                                             case ScriptValue.longValueType:
-                                                internalObjects[opvalue].value.longValue = stackObjects[tempIndex].longValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.longValueType;
                                                 internalObjects[opvalue].value.scriptValue = null;
+                                                internalObjects[opvalue].value.longValue = stackObjects[tempIndex].longValue;
                                                 continue;
                                             case ScriptValue.objectValueType:
-                                                internalObjects[opvalue].value.objectValue = stackObjects[tempIndex].objectValue;
                                                 internalObjects[opvalue].value.valueType = ScriptValue.objectValueType;
+                                                internalObjects[opvalue].value.objectValue = stackObjects[tempIndex].objectValue;
                                                 continue;
                                             default:
                                                 throw new ExecutionException("StoreInternal : 未知错误数据类型 : " + stackObjects[tempIndex].valueType);
@@ -602,8 +602,8 @@ namespace Scorpio.Runtime {
                                             }
                                             default: {
                                                 if (stackObjects[stackIndex].valueType == ScriptValue.stringValueType) {
-                                                    stackObjects[tempIndex].stringValue = stackObjects[tempIndex].ToString() + stackObjects[stackIndex].stringValue;
                                                     stackObjects[tempIndex].valueType = ScriptValue.stringValueType;
+                                                    stackObjects[tempIndex].stringValue = stackObjects[tempIndex].ToString() + stackObjects[stackIndex].stringValue;
                                                 } else {
                                                     if (tempValueType == ScriptValue.doubleValueType) {
                                                         if (stackObjects[stackIndex].valueType == ScriptValue.doubleValueType) {
@@ -617,8 +617,8 @@ namespace Scorpio.Runtime {
                                                                 stackObjects[tempIndex].longValue += stackObjects[stackIndex].longValue;
                                                                 break;
                                                             case ScriptValue.doubleValueType:
-                                                                stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue + stackObjects[stackIndex].doubleValue;
                                                                 stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
+                                                                stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue + stackObjects[stackIndex].doubleValue;
                                                                 break;
                                                             default:
                                                                 stackObjects[tempIndex].longValue += stackObjects[stackIndex].ToLong();
@@ -656,8 +656,8 @@ namespace Scorpio.Runtime {
                                                         stackObjects[tempIndex].longValue -= stackObjects[stackIndex].longValue;
                                                         break;
                                                     case ScriptValue.doubleValueType:
-                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue - stackObjects[stackIndex].doubleValue;
                                                         stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
+                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue - stackObjects[stackIndex].doubleValue;
                                                         break;
                                                     default:
                                                         stackObjects[tempIndex].longValue += stackObjects[stackIndex].ToLong();
@@ -693,8 +693,8 @@ namespace Scorpio.Runtime {
                                                         stackObjects[tempIndex].longValue *= stackObjects[stackIndex].longValue;
                                                         break;
                                                     case ScriptValue.doubleValueType:
-                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue * stackObjects[stackIndex].doubleValue;
                                                         stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
+                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue * stackObjects[stackIndex].doubleValue;
                                                         break;
                                                     default:
                                                         stackObjects[tempIndex].longValue *= stackObjects[stackIndex].ToLong();
@@ -730,8 +730,8 @@ namespace Scorpio.Runtime {
                                                         stackObjects[tempIndex].longValue /= stackObjects[stackIndex].longValue;
                                                         break;
                                                     case ScriptValue.doubleValueType:
-                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue / stackObjects[stackIndex].doubleValue;
                                                         stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
+                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue / stackObjects[stackIndex].doubleValue;
                                                         break;
                                                     default:
                                                         stackObjects[tempIndex].longValue /= stackObjects[stackIndex].ToLong();
@@ -767,8 +767,8 @@ namespace Scorpio.Runtime {
                                                         stackObjects[tempIndex].longValue %= stackObjects[stackIndex].longValue;
                                                         break;
                                                     case ScriptValue.doubleValueType:
-                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue % stackObjects[stackIndex].doubleValue;
                                                         stackObjects[tempIndex].valueType = ScriptValue.doubleValueType;
+                                                        stackObjects[tempIndex].doubleValue = stackObjects[tempIndex].longValue % stackObjects[stackIndex].doubleValue;
                                                         break;
                                                     default:
                                                         stackObjects[tempIndex].longValue %= stackObjects[stackIndex].ToLong();

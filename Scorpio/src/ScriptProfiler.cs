@@ -7,6 +7,9 @@ namespace Scorpio {
         public void CollectLeak(out HashSet<(WeakReference, string)> leak, out int globalCount, out int total) {
             ScorpioProfiler.CollectLeak(this, out leak, out globalCount, out total);
         }
+        public void FindReference(ulong id, out HashSet<WeakReference> set) {
+            ScorpioProfiler.FindReference(id, out set);
+        }
     }
 }
 #endif
