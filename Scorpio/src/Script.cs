@@ -485,7 +485,6 @@ namespace Scorpio {
 #endif
         #endregion
         #region Stack
-        public StackInfo RecordStack = new StackInfo();
         private StackInfo[] m_StackInfos = new StackInfo[128];          //堆栈信息
         private StackInfo m_Stack = new StackInfo();
         private int m_StackLength = 0;

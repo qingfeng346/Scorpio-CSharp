@@ -28,8 +28,14 @@ namespace Scorpio {
             this.objectType = objectType;
 #if SCORPIO_DEBUG
             Id = AutoId++;
+            ScorpioProfiler.AddRecord(Id, this);
 #endif
         }
+#if SCORPIO_DEBUG
+        ~ScriptObject() {
+            ScorpioProfiler.DelRecord(Id);
+        }
+#endif
         public ObjectType ObjectType => objectType;                             //类型
         public virtual object Value => this;                                    //值
         public virtual Type ValueType { get { return GetType(); } }             //值类型

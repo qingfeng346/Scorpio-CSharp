@@ -30,6 +30,7 @@ namespace Scorpio.Function {
         internal override ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return ScriptValue.CreateValue(Execute(thisObject, parameters, length, baseType));
         }
+        public override string ToString() { return $"AsyncFunction<{MethodName}>"; }
     }
     public class ScriptScriptAsyncBindFunction : ScriptScriptBindFunctionBase {
         public ScriptScriptAsyncBindFunction(ScriptContext context, ScriptValue bindObject) : base(context, bindObject) { }
@@ -60,5 +61,6 @@ namespace Scorpio.Function {
         internal override ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return ScriptValue.CreateValue(Execute(parameters, length, baseType));
         }
+        public override string ToString() { return $"AsyncBindFunction<{MethodName}>"; }
     }
 }

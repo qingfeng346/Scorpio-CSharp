@@ -1,3 +1,5 @@
+using Scorpio.Tools;
+
 namespace Scorpio {
     //C#类执行
     public interface ScorpioHandle {
@@ -6,7 +8,11 @@ namespace Scorpio {
     /// <summary> 函数类型 </summary>
     public abstract class ScriptFunction : ScriptInstance {
         public string MethodName = "";
-        public ScriptFunction(Script script) : base(script, ObjectType.Function, script.TypeFunction) { }
+        public ScriptFunction(Script script) : base(script, ObjectType.Function, script.TypeFunction) {
+#if SCORPIO_DEBUG
+            MethodName = ScorpioProfiler.RecordStack.ToString();
+#endif
+        }
         public virtual ScriptValue BindObject => default;
         public abstract ScriptFunction SetBindObject(ScriptValue obj);
         public override string ToString() { return $"Function<{MethodName}>"; }

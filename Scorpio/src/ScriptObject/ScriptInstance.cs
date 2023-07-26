@@ -12,15 +12,7 @@ namespace Scorpio {
         public ScriptInstance(Script script, ObjectType objectType, ScriptType prototype) : base(objectType) {
             m_Prototype = prototype;
             m_Script = script;
-#if SCORPIO_DEBUG
-            m_Script.AddRecord(Id, script.RecordStack.ToString(), this);
-#endif
         }
-#if SCORPIO_DEBUG
-        ~ScriptInstance() {
-            m_Script.DelRecord(Id);
-        }
-#endif
         public Script script => m_Script;
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }

@@ -110,8 +110,8 @@ namespace Scorpio.Runtime {
                         opvalue = instruction.opvalue;
                         opcode = instruction.opcode;
 #if SCORPIO_DEBUG
-                        m_script.RecordStack.Breviary = m_Breviary;
-                        m_script.RecordStack.Line = instruction.line;
+                        ScorpioProfiler.RecordStack.Breviary = m_Breviary;
+                        ScorpioProfiler.RecordStack.Line = instruction.line;
 #endif
                         switch (instruction.optype) {
                             case OpcodeType.Load:

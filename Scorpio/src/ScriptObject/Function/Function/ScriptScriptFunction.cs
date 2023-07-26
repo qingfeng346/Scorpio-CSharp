@@ -11,6 +11,7 @@ namespace Scorpio.Function {
         internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return m_Context.Execute(thisObject, parameters, length, m_internalValues, baseType);
         }
+        public override string ToString() { return $"Function<{MethodName}>"; }
     }
     public class ScriptScriptBindFunction : ScriptScriptBindFunctionBase {
         public ScriptScriptBindFunction(ScriptContext context, ScriptValue bindObject) : base(context, bindObject) { }
@@ -23,5 +24,6 @@ namespace Scorpio.Function {
         internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
             return m_Context.Execute(m_BindObject, parameters, length, m_internalValues, baseType);
         }
+        public override string ToString() { return $"BindFunction<{MethodName}>"; }
     }
 }
