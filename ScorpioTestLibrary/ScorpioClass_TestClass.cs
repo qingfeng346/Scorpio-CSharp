@@ -62,12 +62,18 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
             if (_instance != null) { return _instance; }
             var methodInfos = new ScorpioFastReflectMethodInfo[] {
                 new ScorpioFastReflectMethodInfo(false, new Type[]{}, new bool[]{}, null, 0),
+                new ScorpioFastReflectMethodInfo(false, new Type[]{typeof(System.Int32)}, new bool[]{false}, null, 1),
+                new ScorpioFastReflectMethodInfo(false, new Type[]{typeof(System.Int32),typeof(System.String)}, new bool[]{false,false}, null, 2),
+                new ScorpioFastReflectMethodInfo(false, new Type[]{typeof(System.Int32),typeof(System.String),typeof(System.Int32)}, new bool[]{false,false,false}, null, 3),
             };
             return _instance = new UserdataMethodFastReflect(typeof(TestClass), "Constructor", methodInfos, new ScorpioClass_TestClass_Constructor()); 
         }
         public object Call(object obj, int methodIndex, object[] args) {
             switch (methodIndex) {
                 case 0: { return new TestClass(); }
+                case 1: { return new TestClass((System.Int32)args[0]); }
+                case 2: { return new TestClass((System.Int32)args[0], (System.String)args[1]); }
+                case 3: { return new TestClass((System.Int32)args[0], (System.String)args[1], (System.Int32)args[2]); }
                 default: throw new ExecutionException("TestClass 找不到合适的函数 : Constructor    type : " + methodIndex);
             }
         }

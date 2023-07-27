@@ -35,6 +35,9 @@ public class TestClass {
     public class TestClassInternal {
 
     }
+    public TestClass(int a = 0, string b = "", int c = 100) {
+
+    }
     public static TestClass Instance { get; } = new TestClass();
     public int num;
     public static TestClass operator+(TestClass a, TestClass b) {
