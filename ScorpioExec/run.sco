@@ -1,17 +1,9 @@
-
-async function main1() {
-    return "weeeeeeeeeeeeeeeee"
-}
-async function main2() {
-    return
-}
-async function main() {
-    var a = await main1()
-    print(a)
-    a = await main2()
-    print(a)
-}
-main()
+var a = {}
+var b = 100
+print(b.toString())
+print(b + "")
+a[b.toString()] = "123123123"
+print(a[b+""])
 // Base64String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
 // var builder = new StringBuilder()
 // builder.append("123")
