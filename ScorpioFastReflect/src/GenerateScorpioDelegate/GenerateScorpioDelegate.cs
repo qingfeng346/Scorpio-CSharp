@@ -71,11 +71,18 @@ public class __FactoryName : IScorpioDelegateFactory {
                 }
                 var invoke = parameters.Length == 0 ? $"scriptObject.call(ScriptValue.Null)" : $"scriptObject.call(ScriptValue.Null,{pars})";
                 var call = ScorpioFastReflectUtil.ReturnString(invoke, InvokeMethod.ReturnType);
-                var func = $"return new {fullName}( ({pars}) => {{ {call}; }} );";
+                var callDebug = ScorpioFastReflectUtil.ReturnString($"value.call({pars})", InvokeMethod.ReturnType);
+                var func = $@"#if SCORPIO_DEBUG
+            var value = new ScorpioDelegateReference(scriptObject, typeof({fullName}));
+            return new {fullName}( ({pars}) => {{ {callDebug}; }} );
+            #else
+            return new {fullName}( ({pars}) => {{ {call}; }} );
+            #endif";
                 if (option.buildType == 0) {
                     builder.Append($@"
-        if (delegateType == typeof({fullName}))
-            {func}");
+        if (delegateType == typeof({fullName})) {{
+            {func}
+        }}");
                 } else {
                     builder.Append($@"
         delegates[typeof({fullName})] = (scriptObject) => {{ {func} }};");

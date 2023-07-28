@@ -209,8 +209,9 @@ namespace ScorpioExec {
             var script = new Scorpio.Script ();
             script.LoadLibraryV1 ();
             script.LoadLibraryExtend ();
-            script.PushAssembly (typeof (Program));
-            script.PushReferencedAssemblies (typeof (Program).Assembly);
+            script.PushAssembly(typeof(Program));
+            script.PushAssembly(typeof(TestClass));
+            script.PushReferencedAssemblies(typeof(Program).Assembly);
             LoadLibrary (Path.Combine (CurrentDirectory, "dll"));
             if (args.Length >= 1) {
                 try {

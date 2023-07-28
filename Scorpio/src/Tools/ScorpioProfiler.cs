@@ -3,15 +3,15 @@ using Scorpio.Exception;
 using System.Collections.Generic;
 using System;
 using Scorpio.Function;
-using System.Reflection;
-
 namespace Scorpio.Tools {
     public static class ScorpioProfiler {
+        private static ulong AutoId = 0;
         public static StackInfo RecordStack;
         private static bool IsRecord = false;
         private static object sync = new object();
         public static Dictionary<ulong, (WeakReference, string)> AllObjects = new Dictionary<ulong, (WeakReference, string)>();
         public static Dictionary<ulong, (WeakReference, string)> Record = new Dictionary<ulong, (WeakReference, string)>();
+        public static Dictionary<ulong, Dictionary<ulong, string>> CustomReference = new Dictionary<ulong, Dictionary<ulong, string>>();
         public static void StartRecord() {
             if (IsRecord) return;
             IsRecord = true;
@@ -36,6 +36,23 @@ namespace Scorpio.Tools {
         public static void EndRecord() {
             if (!IsRecord) return;
             IsRecord = false;
+        }
+        public static ulong AddCustomReference(ulong id, string str) {
+            lock (sync) {
+                if (!CustomReference.TryGetValue(id, out var value)) {
+                    CustomReference[id] = value = new Dictionary<ulong, string>();
+                }
+                var index = AutoId++;
+                value[index] = str;
+                return index;
+            }
+        }
+        public static void DelCustomReference(ulong id, ulong index) {
+            lock (sync) {
+                if (CustomReference.TryGetValue(id, out var value)) {
+                    value.Remove(index);
+                }
+            }
         }
         #region 查找对象引用
         static void CollectReference(WeakReference weak, ulong targetId, HashSet<WeakReference> set) {
@@ -92,11 +109,15 @@ namespace Scorpio.Tools {
                 }
             }
         }
-        public static void FindReference(ulong id, out HashSet<WeakReference> set) {
+        public static void FindReference(ulong id, out HashSet<WeakReference> set, out List<string> custom) {
             lock (sync) {
                 set = new HashSet<WeakReference>();
+                custom = new List<string>();
                 foreach (var pair in AllObjects) {
                     CollectReference(pair.Value.Item1, id, set);
+                }
+                if (CustomReference.TryGetValue(id, out var v)) {
+                    custom.AddRange(v.Values);
                 }
             }
         }

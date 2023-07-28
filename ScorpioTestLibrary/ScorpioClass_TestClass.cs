@@ -203,12 +203,14 @@ public class ScorpioClass_TestClass : IScorpioFastReflectClass {
             if (_instance != null) { return _instance; }
             var methodInfos = new ScorpioFastReflectMethodInfo[] {
                 new ScorpioFastReflectMethodInfo(false, new Type[]{}, new bool[]{}, null, 0),
+                new ScorpioFastReflectMethodInfo(false, new Type[]{typeof(System.Nullable<System.Int32>)}, new bool[]{false}, null, 1),
             };
             return _instance = new UserdataMethodFastReflect(typeof(TestClass), "TestFunc1", methodInfos, new ScorpioClass_TestClass_TestFunc1()); 
         }
         public object Call(object obj, int methodIndex, object[] args) {
             switch (methodIndex) {
                 case 0: { return ((TestClass)obj).TestFunc1(); }
+                case 1: { return ((TestClass)obj).TestFunc1((System.Nullable<System.Int32>)args[0]); }
                 default: throw new ExecutionException("TestClass 找不到合适的函数 : TestFunc1    type : " + methodIndex);
             }
         }

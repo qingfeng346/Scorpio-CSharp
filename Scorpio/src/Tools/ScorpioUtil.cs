@@ -3,7 +3,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Scorpio.Exception;
-using System.Diagnostics;
 using System.Text;
 using Scorpio.Runtime;
 namespace Scorpio.Tools {

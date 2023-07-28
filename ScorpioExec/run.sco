@@ -1,9 +1,8 @@
-var a = {}
-var b = 100
-print(b.toString())
-print(b + "")
-a[b.toString()] = "123123123"
-print(a[b+""])
+TestClass = importType("TestClass")
+var a = new TestClass()
+// a.TestFunc1(111)
+a.num = 200
+print(a.num)
 // Base64String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
 // var builder = new StringBuilder()
 // builder.append("123")

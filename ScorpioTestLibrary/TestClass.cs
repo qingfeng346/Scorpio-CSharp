@@ -39,13 +39,14 @@ public class TestClass {
 
     }
     public static TestClass Instance { get; } = new TestClass();
-    public int num;
+    public int? num;
     public static TestClass operator+(TestClass a, TestClass b) {
         return new TestClass() { num = a.num + b.num };
     }
-    public int TestFunc1() {
-        string s = null;
-        Console.WriteLine(s.Length);
+    public int TestFunc1(int? num = null) {
+        //string s = null;
+        Console.WriteLine(num == null);
+        Console.WriteLine(num);
         return 100;
     }
     public int TestFunc2(string arg1, int arg2, params object[] args) {
