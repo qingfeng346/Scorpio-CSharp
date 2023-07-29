@@ -16,7 +16,6 @@ namespace Scorpio.Userdata {
         public override void SetValue(string key, ScriptValue value) {
             m_UserdataType.SetValue(m_Value, key, value);
         }
-        public override string ToString() { return m_Value.ToString(); }
         #region [] get set 重载
         public override ScriptValue GetValue(double index) {
             return GetValueInternal(new ScriptValue(index));
