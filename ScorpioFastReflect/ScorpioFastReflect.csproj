@@ -6,6 +6,13 @@
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\Scorpio\Scorpio.csproj" />

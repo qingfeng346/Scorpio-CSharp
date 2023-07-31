@@ -155,13 +155,17 @@ namespace Scorpio {
         }
         public void ClearStack() {
             Array.Clear(ScorpioUtil.Parameters, 0, ScorpioUtil.Parameters.Length);
-            for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.MaxVariableValueIndex; ++i) {
-                Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
-                Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
+            if (ScriptContext.MaxVariableValueIndex > ScriptContext.VariableValueIndex) {
+                for (var i = ScriptContext.VariableValueIndex; i < ScriptContext.MaxVariableValueIndex; ++i) {
+                    Array.Clear(ScriptContext.VariableValues[i], 0, ScriptContext.VariableValues[i].Length);
+                    Array.Clear(ScriptContext.StackValues[i], 0, ScriptContext.StackValues[i].Length);
+                }
             }
-            for (var i = ScriptContext.MinAsyncValueIndex; i < ScriptContext.AsyncValuePoolLength; ++i) {
-                Array.Clear(ScriptContext.AsyncValuePool[i].variable, 0, ScriptContext.AsyncValuePool[i].variable.Length);
-                Array.Clear(ScriptContext.AsyncValuePool[i].stack, 0, ScriptContext.AsyncValuePool[i].stack.Length);
+            if (ScriptContext.AsyncValuePoolLength > ScriptContext.MinAsyncValueIndex) {
+                for (var i = ScriptContext.MinAsyncValueIndex; i < ScriptContext.AsyncValuePoolLength; ++i) {
+                    Array.Clear(ScriptContext.AsyncValuePool[i].variable, 0, ScriptContext.AsyncValuePool[i].variable.Length);
+                    Array.Clear(ScriptContext.AsyncValuePool[i].stack, 0, ScriptContext.AsyncValuePool[i].stack.Length);
+                }
             }
             ScriptContext.MaxVariableValueIndex = 0;
             ScriptContext.MinAsyncValueIndex = int.MaxValue;

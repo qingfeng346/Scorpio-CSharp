@@ -1,4 +1,4 @@
-$version = "2.6.0"
+$version = "2.7.0"
 $name = "sco"
 
 $today = Get-Date
@@ -32,7 +32,7 @@ $aipPath = ".\Install.aip"
 foreach ($platform in $platforms) {
     Write-Host "正在打包 $platform 版本..."
     $pathName = "$name-$platform"
-    dotnet publish ../ScorpioExec/ScorpioExec.csproj --self-contained -c release -o ../bin/$pathName -r $platform /p:DefineConstants="SCORPIO_STACK" /p:AssemblyVersion=$version | Out-Null
+    dotnet publish ../ScorpioExec/ScorpioExec.csproj --self-contained -c release -o ../bin/$pathName -r $platform -p:AssemblyVersion=$version -p:PublishSingleFile=true
     Write-Host "正在压缩 $platform ..."
     $fileName = "$name-$version-$platform"
     Compress-Archive ../bin/$pathName/* ../bin/$fileName.zip -Force

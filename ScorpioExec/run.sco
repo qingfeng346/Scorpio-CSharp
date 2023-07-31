@@ -1,8 +1,17 @@
-TestClass = importType("TestClass")
-var a = new TestClass()
-// a.TestFunc1(111)
-a.num = 200
-print(a.num)
+async function main1() {
+    await main3()
+}
+async function main3() {
+
+}
+function main2() {
+
+}
+function main() {
+    main1()
+    main2()
+}
+main()
 // Base64String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
 // var builder = new StringBuilder()
 // builder.append("123")

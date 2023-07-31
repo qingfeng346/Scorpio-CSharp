@@ -1,4 +1,3 @@
-#define SCORPIO_DEBUG
 using System;
 using System.Collections.Generic;
 using Scorpio;

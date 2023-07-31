@@ -229,7 +229,10 @@ namespace ScorpioExec {
                     var watch = Stopwatch.StartNew ();
                     var value = script.LoadFile (file, ParseOption (command.GetValueDefault (ParameterOption, ""), script.SearchPaths));
                     while (script.UpdateCoroutine ()) { }
+                    script.ClearStack();
+#if SCORPIO_DEBUG
                     script.CollectLeak(out var set, out var count, out var total);
+#endif
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
                     Logger.info ("the execution time : " + watch.ElapsedMilliseconds + " ms");
