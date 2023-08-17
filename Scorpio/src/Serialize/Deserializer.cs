@@ -4,7 +4,10 @@ using Scorpio.Tools;
 namespace Scorpio.Serialize {
     public static class Deserializer {
         public static SerializeData[] Deserialize(byte[] data) {
-            using (var stream = new MemoryStream(data)) {
+            return Deserialize(data, 0, data.Length);
+        }
+        public static SerializeData[] Deserialize(byte[] data, int index, int count) {
+            using (var stream = new MemoryStream(data, index, count)) {
                 return Deserialize(stream);
             }
         }

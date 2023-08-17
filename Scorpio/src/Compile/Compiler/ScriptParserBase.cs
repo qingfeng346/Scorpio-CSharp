@@ -20,7 +20,8 @@ namespace Scorpio.Compile.Compiler {
             this.searchPaths = searchPaths;
             this.allSearchPaths = new List<string>(searchPaths ?? EmptyArrayString);
             this.allSearchPaths.AddRange(this.compileOption.searchPaths);
-            this.allSearchPaths.Add(Path.GetDirectoryName(this.Breviary));
+            if (!string.IsNullOrEmpty(Breviary) && Directory.Exists(Breviary)) 
+                allSearchPaths.Add(Path.GetDirectoryName(Breviary));
             this.allDefines = new HashSet<string>(this.compileOption.defines);
         }
         /// <summary> 当前解析的脚本摘要 </summary>

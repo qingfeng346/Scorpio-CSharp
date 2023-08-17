@@ -273,11 +273,7 @@ namespace Scorpio {
         }
         #region Load
         /// <summary> 使用字符串方式加载文件 </summary>
-        public ScriptValue LoadFileByString(string fileName) {
-            return LoadFileByString(fileName, null);
-        }
-        /// <summary> 使用字符串方式加载文件 </summary>
-        public ScriptValue LoadFileByString(string fileName, CompileOption compileOption) {
+        public ScriptValue LoadFileByString(string fileName, CompileOption compileOption = null) {
             var fullFileName = SearchFile(fileName, compileOption);
             if (fullFileName == null) {
                 throw new System.Exception($"can't found file : {fileName}");
@@ -286,11 +282,8 @@ namespace Scorpio {
                 return LoadStreamByString(fileName, stream, (int)stream.Length, compileOption);
             }
         }
-        public ScriptValue LoadFileByIL(string fileName) {
-            return LoadFileByIL(fileName, null);
-        }
         /// <summary> 使用字节码方式加载文件 </summary>
-        public ScriptValue LoadFileByIL(string fileName, CompileOption compileOption) {
+        public ScriptValue LoadFileByIL(string fileName, CompileOption compileOption = null) {
             var fullFileName = SearchFile(fileName, compileOption);
             if (fullFileName == null) {
                 throw new System.Exception($"can't found file : {fileName}");
@@ -300,69 +293,42 @@ namespace Scorpio {
             }
         }
         /// <summary> 使用字符串方式二进制 </summary>
-        public ScriptValue LoadBufferByString(string breviary, byte[] buffer) {
-            return LoadBufferByString(breviary, buffer, 0, buffer.Length, null);
-        }
-        /// <summary> 使用字符串方式二进制 </summary>
-        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, CompileOption compileOption) {
+        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, CompileOption compileOption = null) {
             return LoadBufferByString(breviary, buffer, 0, buffer.Length, compileOption);
         }
         /// <summary> 使用字符串方式二进制 </summary>
-        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int index, int count) {
-            return LoadBufferByString(breviary, buffer, index, count, null);
+        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int index, int count, CompileOption compileOption = null) {
+            return LoadString(breviary, Encoding.GetString(buffer, index, count), compileOption);
         }
-        /// <summary> 使用字符串方式二进制 </summary>
-        public ScriptValue LoadBufferByString(string breviary, byte[] buffer, int index, int count, CompileOption compileOption) {
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), m_SearchPaths, compileOption));
-        }
-        /// <summary> 使用字节码方式二进制 </summary>
+        /// <summary> 使用字节码方式二进制,IL不需要breviary和compileOption </summary>
         public ScriptValue LoadBufferByIL(byte[] buffer) {
             return LoadBufferByIL(buffer, 0, buffer.Length);
         }
         /// <summary> 使用字节码方式二进制 </summary>
         public ScriptValue LoadBufferByIL(byte[] buffer, int index, int count) {
-            using (var stream = new MemoryStream(buffer, index, count)) {
-                return LoadStreamByIL(stream);
-            }
-        }
-        /// <summary> 使用字符串方式加载流 </summary>
-        public ScriptValue LoadStreamByString(string breviary, Stream stream, int count) {
-            return LoadStreamByString(breviary, stream, count, null);
-        }
-        /// <summary> 使用字符串方式加载流 </summary>
-        public ScriptValue LoadStreamByString(string breviary, Stream stream, int count, CompileOption compileOption) {
-            var buffer = new byte[count];
-            stream.ReadBytes(buffer);
-            return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer), m_SearchPaths, compileOption));
+            return Execute(Deserializer.Deserialize(buffer, index, count));
         }
         /// <summary> 使用字节码方式加载流 </summary>
         public ScriptValue LoadStreamByIL(Stream stream) {
             return Execute(Deserializer.Deserialize(stream));
         }
-        /// <summary> 加载一段文本 </summary>
-        public ScriptValue LoadString(string buffer) {
-            return LoadString(null, buffer, null);
+        /// <summary> 使用字符串方式加载流 </summary>
+        public ScriptValue LoadStreamByString(string breviary, Stream stream, int count, CompileOption compileOption = null) {
+            var buffer = new byte[count];
+            stream.ReadBytes(buffer);
+            return LoadString(breviary, Encoding.GetString(buffer), compileOption);
         }
         /// <summary> 加载一段文本 </summary>
-        public ScriptValue LoadString(string buffer, CompileOption compileOption) {
+        public ScriptValue LoadString(string buffer, CompileOption compileOption = null) {
             return LoadString(null, buffer, compileOption);
         }
         /// <summary> 加载一段文本 </summary>
-        public ScriptValue LoadString(string breviary, string buffer) {
-            return LoadString(breviary, buffer, null);
-        }
-        /// <summary> 加载一段文本 </summary>
-        public ScriptValue LoadString(string breviary, string buffer, CompileOption compileOption) {
+        public ScriptValue LoadString(string breviary, string buffer, CompileOption compileOption = null) {
             if (buffer == null || buffer.Length == 0) { return ScriptValue.Null; }
             return Execute(Serializer.Serialize(breviary, buffer, m_SearchPaths, compileOption));
         }
-
-        /// <summary> 加载一个文件 </summary>
-        public ScriptValue LoadFile(string fileName) {
-            return LoadFile(fileName, null);
-        }
-        /// <summary> 加载一个文件 </summary>
-        public ScriptValue LoadFile(string fileName, CompileOption compileOption) {
+        /// <summary> 加载一个文件,自动判断是IL或String </summary>
+        public ScriptValue LoadFile(string fileName, CompileOption compileOption = null) {
             var fullFileName = SearchFile(fileName, compileOption);
             if (fullFileName == null) {
                 throw new System.Exception($"can't found file : {fileName}");
@@ -373,36 +339,26 @@ namespace Scorpio {
                 return LoadBuffer(fileName, buffer, compileOption);
             }
         }
-        /// <summary> 加载一段数据 </summary>
-        public ScriptValue LoadBuffer(byte[] buffer) {
-            return LoadBuffer(null, buffer, null);
-        }
-        /// <summary> 加载一段数据 </summary>
-        public ScriptValue LoadBuffer(byte[] buffer, CompileOption compileOption) {
+        /// <summary> 加载一段数据,自动判断是IL或String </summary>
+        public ScriptValue LoadBuffer(byte[] buffer, CompileOption compileOption = null) {
             return LoadBuffer(null, buffer, compileOption);
         }
-        /// <summary> 加载一段数据 </summary>
-        public ScriptValue LoadBuffer(string breviary, byte[] buffer) {
-            return LoadBuffer(breviary, buffer, 0, buffer.Length, null);
+        /// <summary> 加载一段数据,自动判断是IL或String </summary>
+        public ScriptValue LoadBuffer(byte[] buffer, int index, int count, CompileOption compileOption = null) {
+            return LoadBuffer(null, buffer, index, count, compileOption);
         }
-        /// <summary> 加载一段数据 </summary>
-        public ScriptValue LoadBuffer(string breviary, byte[] buffer, CompileOption compileOption) {
+        /// <summary> 加载一段数据,自动判断是IL或String </summary>
+        public ScriptValue LoadBuffer(string breviary, byte[] buffer, CompileOption compileOption = null) {
             return LoadBuffer(breviary, buffer, 0, buffer.Length, compileOption);
         }
-        /// <summary> 加载一段数据 </summary>
-        public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count) {
-            return LoadBuffer(breviary, buffer, index, count, null);
-        }
-        /// <summary> 加载一段数据 </summary>
-        public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count, CompileOption compileOption) {
+        /// <summary> 加载一段数据,自动判断是IL或String </summary>
+        public ScriptValue LoadBuffer(string breviary, byte[] buffer, int index, int count, CompileOption compileOption = null) {
             if (count <= 0) { 
                 return ScriptValue.Null;
             } else if (count > 6 && buffer[index] == 0 && BitConverter.ToInt32(buffer, index + 1) == int.MaxValue) {
-                using (var stream = new MemoryStream(buffer, index, count)) {
-                    return Execute(Deserializer.Deserialize(stream));
-                }
+                return LoadBufferByIL(buffer, index, count);
             } else {
-                return Execute(Serializer.Serialize(breviary, Encoding.GetString(buffer, index, count), m_SearchPaths, compileOption));
+                return LoadBufferByString(breviary, buffer, index, count, compileOption);
             }
         }
         void ParseConstString(SerializeData data) {
