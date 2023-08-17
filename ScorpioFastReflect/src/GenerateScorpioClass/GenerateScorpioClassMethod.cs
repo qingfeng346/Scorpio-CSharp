@@ -16,7 +16,9 @@ namespace Scorpio.FastReflect {
             {"op_BitwiseAnd", "&"},
             {"op_ExclusiveOr", "^"},
             {"op_GreaterThan", ">"},
+            {"op_GreaterThanOrEqual", ">="},
             {"op_LessThan", "<"},
+            {"op_LessThanOrEqual", "<="},
             {"op_Equality", "=="},
             {"op_Inequality", "!="},
         };
