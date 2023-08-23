@@ -84,7 +84,7 @@ namespace Scorpio {
             m_Objects = array;
         }
         void ExpandCapacity() {
-            SetCapacity_impl(m_Length + 8);
+            SetCapacity_impl(m_Length == 0 ? 4 : m_Length * 2);
         }
         public void TrimCapacity() {
             if (m_Length != m_Objects.Length) {
