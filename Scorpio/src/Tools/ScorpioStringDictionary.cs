@@ -146,7 +146,7 @@ namespace Scorpio.Tools {
                     }
                 }
                 if (mSize == mValues.Length) {
-                    SetCapacity_impl(mSize + 8);
+                    SetCapacity_impl(mSize == 0 ? 4 : mSize * 2);
                 }
                 mKeys[mSize] = key;
                 mValues[mSize++] = value;

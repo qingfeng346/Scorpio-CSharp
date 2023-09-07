@@ -15,17 +15,12 @@ namespace Scorpio.Runtime {
         public IEnumerator ExecuteCoroutine(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
 #elif EXECUTE_BASE
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, ScriptType baseType) {
-#elif EXECUTE_CONTEXT
-        public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues, string[] constString) {
 #else
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
 #endif
             var constDouble = this.constDouble;
             var constLong = this.constLong;
-#if !EXECUTE_CONTEXT
-            var constString = m_script.ConstString;
-#endif
-            var constScriptString = m_script.ConstString;
+            var constString = this.constString;
             #region 堆栈和线程判断
 #if SCORPIO_ASSERT
             //System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");
@@ -1845,8 +1840,8 @@ namespace Scorpio.Runtime {
                                     }
                                     case Opcode.NewType: {
                                         var classData = constClasses[opvalue];
-                                        var parentType = classData.parent >= 0 ? global.GetValue(constScriptString[classData.parent]).Get<ScriptType>() : m_script.TypeObject;
-                                        var className = constScriptString[classData.name];
+                                        var parentType = classData.parent >= 0 ? global.GetValue(constString[classData.parent]).Get<ScriptType>() : m_script.TypeObject;
+                                        var className = constString[classData.name];
                                         var type = new ScriptType(className, parentType ?? m_script.TypeObject, m_script);
                                         var functions = classData.functions;
                                         var functionCount = 0;
@@ -1869,21 +1864,21 @@ namespace Scorpio.Runtime {
                                                     var internalIndex = internals[i];
                                                     function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                                 }
-                                                type.SetValue(constScriptString[func >> 32], new ScriptValue(function));
+                                                type.SetValue(constString[func >> 32], new ScriptValue(function));
                                             } else if (funcType == 1) {
                                                 var function = new ScriptScriptAsyncFunction(functionData);
                                                 for (var i = 0; i < internals.Length; ++i) {
                                                     var internalIndex = internals[i];
                                                     function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                                 }
-                                                type.SetValue(constScriptString[func >> 32], new ScriptValue(function));
+                                                type.SetValue(constString[func >> 32], new ScriptValue(function));
                                             } else if (funcType == 2) {
                                                 var function = new ScriptScriptFunction(functionData);
                                                 for (var i = 0; i < internals.Length; ++i) {
                                                     var internalIndex = internals[i];
                                                     function.SetInternal(internalIndex & 0xffff, internalObjects[internalIndex >> 16]);
                                                 }
-                                                type.AddGetProperty(constScriptString[func >> 32], function);
+                                                type.AddGetProperty(constString[func >> 32], function);
                                             }
                                         }
                                         stackObjects[++stackIndex].valueType = ScriptValue.scriptValueType;

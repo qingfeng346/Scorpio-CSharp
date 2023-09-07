@@ -18,7 +18,6 @@ namespace Scorpio {
 Set-Content -Path ../Scorpio/src/Version.cs -Value $fileData -Encoding utf8NoBOM -NoNewline
 
 $contextExcute = Get-Content -Path ../Scorpio/src/Runtime/ScriptContextExecute.cs
-Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteContext.cs -Value "#define EXECUTE_CONTEXT",$contextExcute -Encoding utf8NoBOM
 Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteBase.cs -Value "#define EXECUTE_BASE",$contextExcute -Encoding utf8NoBOM
 Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteCoroutine.cs -Value "#define EXECUTE_COROUTINE",$contextExcute -Encoding utf8NoBOM
 Set-Content -Path ../Scorpio/src/Runtime/ScriptContextExecuteCoroutineBase.cs -Value "#define EXECUTE_COROUTINE","#define EXECUTE_BASE",$contextExcute -Encoding utf8NoBOM

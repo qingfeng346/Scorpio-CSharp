@@ -43,30 +43,45 @@ namespace Scorpio.Instruction {
             return this;
         }
         public SerializeData Deserialize(ScorpioReader reader, short version) {
-            ConstDouble = new double[reader.ReadInt32()];
-            for (var i = 0; i < ConstDouble.Length; ++i) {
-                ConstDouble[i] = reader.ReadDouble();
+            var length = reader.ReadInt32();
+            var constDouble = new double[length];
+            for (var i = 0; i < length; ++i) {
+                constDouble[i] = reader.ReadDouble();
             }
-            ConstLong = new long[reader.ReadInt32()];
-            for (var i = 0; i < ConstLong.Length; ++i) {
-                ConstLong[i] = reader.ReadInt64();
+            ConstDouble = constDouble;
+
+            length = reader.ReadInt32();
+            var constLong = new long[length];
+            for (var i = 0; i < length; ++i) {
+                constLong[i] = reader.ReadInt64();
             }
-            ConstString = new string[reader.ReadInt32()];
-            for (var i = 0; i < ConstString.Length; ++i) {
-                ConstString[i] = reader.ReadString();
+            ConstLong = constLong;
+
+            length = reader.ReadInt32();
+            var constString = new string[length];
+            for (var i = 0; i < length; ++i) {
+                constString[i] = reader.ReadString();
             }
+            ConstString = constString;
+
             Context = reader.ReadFunction();
-            Functions = new ScriptFunctionData[reader.ReadInt32()];
-            for (var i = 0; i < Functions.Length; ++i) {
-                Functions[i] = reader.ReadFunction();
+            length = reader.ReadInt32();
+            var functions = new ScriptFunctionData[length];
+            for (var i = 0; i < length; ++i) {
+                functions[i] = reader.ReadFunction();
             }
-            Classes = new ScriptClassData[reader.ReadInt32()];
-            for (var i = 0; i < Classes.Length; ++i) {
-                Classes[i] = reader.ReadClass();
+            Functions = functions;
+
+            length = reader.ReadInt32();
+            var classes = new ScriptClassData[length];
+            for (var i = 0; i < length; ++i) {
+                classes[i] = reader.ReadClass();
             }
+            Classes = classes;
             if (version > 2) {
-                NoContext = new byte[reader.ReadInt32()];
-                for (var i = 0; i < NoContext.Length;++i) {
+                length = reader.ReadInt32();
+                NoContext = new byte[length];
+                for (var i = 0; i < length; ++i) {
                     NoContext[i] = reader.ReadByte();
                 }
             } else {
