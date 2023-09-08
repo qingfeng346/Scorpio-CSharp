@@ -14,10 +14,10 @@ namespace Scorpio {
         public void SetCapacity(int capacity) {
             m_Values.SetCapacity(capacity);
         }
-        public bool HasValue(string key) {
+        public override bool HasValue(string key) {
             return m_Values.ContainsKey(key);
         }
-        public void DelValue(string key) {
+        public override void DelValue(string key) {
             m_Values.Remove(key);
         }
         public override void ClearVariables() {

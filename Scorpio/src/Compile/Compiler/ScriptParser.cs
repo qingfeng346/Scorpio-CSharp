@@ -16,10 +16,14 @@ namespace Scorpio.Compile.Compiler {
             public long funcType; //函数类型 0 普通函数 1 async 函数 2 get函数
         }
         public List<double> ConstDouble { get; private set; } = new List<double>(); //所有的常量 double
+        private Dictionary<double, int> DoubleMaps = new Dictionary<double, int>();
         public List<long> ConstLong { get; private set; } = new List<long>();       //所有的常量 long
+        private Dictionary<long, int> LongMaps = new Dictionary<long, int>();
         public List<string> ConstString { get; private set; } = new List<string>(); //所有的常量 string
-        public byte[] NoContext = new byte[0];                                      //在非Context域是否使用标识
-        public ScriptFunctionData Context { get; private set; } //解析后主执行
+        private Dictionary<string, int> StringMaps = new Dictionary<string, int>();
+        private byte[] NoContext = new byte[1024];                                  //在非Context域是否使用标识
+        private int NoContextLength = 0;
+        public ScriptFunctionData Context { get; private set; }                     //解析后主执行
         public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>(); //定义的所有 function
         public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>(); //定义的所有 class
         private Stack<List<ScriptInstructionCompiler>> m_Breaks = new Stack<List<ScriptInstructionCompiler>>(); //breaks
@@ -82,15 +86,26 @@ namespace Scorpio.Compile.Compiler {
             }
             return executable;
         }
-
+        public byte[] GetNoContext() {
+            var bytes = new byte[NoContextLength];
+            Array.Copy(NoContext, 0, bytes, 0, NoContextLength);
+            return bytes;
+        }
+        void ResizeNoContext(int count) {
+            if (NoContext.Length < count) {
+                Array.Resize(ref NoContext, Math.Max(NoContext.Length * 2, count));
+            }
+            if (NoContextLength < count) {
+                NoContextLength = count;
+            }
+        }
         /// <summary> 获取一个double常量的索引 </summary>
         int GetConstDouble(double value) {
-            var index = ConstDouble.IndexOf(value);
-            if (index < 0) {
+            if (!DoubleMaps.TryGetValue(value, out var index)) {
                 index = ConstDouble.Count;
                 ConstDouble.Add(value);
-                if (NoContext.Length < ConstDouble.Count)
-                    Array.Resize(ref NoContext, ConstDouble.Count);
+                DoubleMaps[value] = index;
+                ResizeNoContext(index + 1);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context) {
                 NoContext[index] |= ScriptConstValue.DoubleFlag;
@@ -99,12 +114,11 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 获取一个long常量的索引 </summary>
         int GetConstLong(long value) {
-            var index = ConstLong.IndexOf(value);
-            if (index < 0) {
+            if (LongMaps.TryGetValue(value, out var index)) {
                 index = ConstLong.Count;
                 ConstLong.Add(value);
-                if (NoContext.Length < ConstLong.Count)
-                    Array.Resize(ref NoContext, ConstLong.Count);
+                LongMaps[value] = index;
+                ResizeNoContext(index + 1);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context) {
                 NoContext[index] |= ScriptConstValue.LongFlag;
@@ -113,12 +127,11 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 获取一个string常量的索引 </summary>
         int GetConstString(string value, bool force = false) {
-            var index = ConstString.IndexOf(value);
-            if (index < 0) {
+            if (!StringMaps.TryGetValue(value, out var index)) {
                 index = ConstString.Count;
                 ConstString.Add(value);
-                if (NoContext.Length < ConstString.Count)
-                    Array.Resize(ref NoContext, ConstString.Count);
+                StringMaps[value] = index;
+                ResizeNoContext(index + 1);
             }
             if (m_scriptExecutable.Block != ExecutableBlock.Context || force) {
                 NoContext[index] |= ScriptConstValue.StringFlag;

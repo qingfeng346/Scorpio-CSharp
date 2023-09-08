@@ -2,7 +2,7 @@
 async function main() {
     var str = io.readAllString("C:/Users/qingf/Desktop/common_prefabs.bytes")
     // var str = json.encode({a :{a:1}})
-    await sleep(3)
+    // await sleep(3)
     var now = io.unixNow()
     var b = json.decode(str, false)
     print("======== ${io.unixNow() - now}")

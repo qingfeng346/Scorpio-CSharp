@@ -22,7 +22,7 @@ namespace Scorpio.Instruction {
             this.Context = parser.Context;
             this.Functions = parser.Functions.ToArray();
             this.Classes = parser.Classes.ToArray();
-            this.NoContext = parser.NoContext;
+            this.NoContext = parser.GetNoContext();
         }
         public SerializeData Serialize(ScorpioWriter writer, short version) {
             writer.Write(ConstDouble.Length);

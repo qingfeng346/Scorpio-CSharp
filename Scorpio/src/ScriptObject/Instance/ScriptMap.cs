@@ -13,8 +13,6 @@ namespace Scorpio {
         public abstract int Count();
         public abstract void Clear();
 
-        public abstract bool HasValue(string key);
-        public abstract void DelValue(string key);
         public abstract void Remove(object key);
         public abstract ScriptArray GetKeys();
         public abstract ScriptArray GetValues();

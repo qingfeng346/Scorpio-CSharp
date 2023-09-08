@@ -15,7 +15,14 @@ namespace Scorpio {
         public Script script => m_Prototype.script;
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
         public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value ?? script.TypeObject; } }
+        public virtual bool HasValue(string key) { return false; }
+        public virtual void DelValue(string key) { }
         public virtual void ClearVariables() { }
+        #region GetValue SetValue重载
+        public override ScriptValue GetValue(string key) {
+            return m_Prototype.GetValue(key, this);
+        }
+        #endregion
         #region 运算符重载
         public override ScriptValue Plus(ScriptValue obj) {
             return CallOperator(ScriptOperator.Plus, obj);
