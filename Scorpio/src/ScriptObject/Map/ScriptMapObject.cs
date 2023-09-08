@@ -30,10 +30,6 @@ namespace Scorpio {
         public override void SetValue(object key, ScriptValue value) {
             m_Objects[key] = value;
         }
-
-        public override bool HasValue(string key) {
-            return m_Objects.ContainsKey(key);
-        }
         public override bool ContainsKey(object key) {
             if (key == null) return false;
             return m_Objects.ContainsKey(key);
@@ -47,39 +43,42 @@ namespace Scorpio {
         public override void Clear() {
             m_Objects.Clear();
         }
+
+        public override bool HasValue(string key) {
+            return m_Objects.ContainsKey(key);
+        }
         public override void DelValue(string key) {
             Remove(key);
         }
         public override void ClearVariables() {
-            base.ClearVariables();
-            this.Clear();
+            Clear();
         }
         public override void Remove(object key) {
             m_Objects.Remove(key);
         }
         public override ScriptArray GetKeys() {
-            var ret = new ScriptArray(m_Script);
+            var ret = new ScriptArray(script);
             foreach (var pair in m_Objects) {
                 ret.Add(ScriptValue.CreateValue(pair.Key));
             }
             return ret;
         }
         public override ScriptArray GetValues() {
-            var ret = new ScriptArray(m_Script);
+            var ret = new ScriptArray(script);
             foreach (var pair in m_Objects) {
                 ret.Add(pair.Value);
             }
             return ret;
         }
         public override ScriptMap NewCopy() {
-            var ret = new ScriptMapObject(m_Script);
+            var ret = new ScriptMapObject(script);
             foreach (var pair in m_Objects) {
                 ret.m_Objects[pair.Key] = pair.Value;
             }
             return ret;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptMapObject(m_Script);
+            var ret = new ScriptMapObject(script);
             if (deep) {
                 foreach (var pair in m_Objects) {
                     var value = pair.Value;

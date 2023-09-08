@@ -300,7 +300,7 @@ namespace Scorpio.Runtime {
 #if EXECUTE_BASE
                                         stackObjects[++stackIndex] = new ScriptValue(baseType.Prototype);
 #else
-                                        stackObjects[++stackIndex] = new ScriptValue(thisObject.Get<ScriptInstance>().Prototype.Prototype);
+                                        stackObjects[++stackIndex] = new ScriptValue(thisObject.Get<ScriptInstanceBase>().Prototype.Prototype);
 #endif
                                         continue;
                                     }

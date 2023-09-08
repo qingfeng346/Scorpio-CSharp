@@ -1,43 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using Scorpio.Exception;
 using Scorpio.Library;
 using Scorpio.Tools;
 
 namespace Scorpio {
-    public class ScriptInstance : ScriptObject, IEnumerable<KeyValuePair<string, ScriptValue>> {
-        protected ScorpioStringDictionary<ScriptValue> m_Values = new ScorpioStringDictionary<ScriptValue>();         //所有的数据(函数和数据都在一个数组)
-        protected ScriptType m_Prototype = null;
-        protected Script m_Script;
-        public ScriptInstance(Script script, ObjectType objectType, ScriptType prototype) : base(objectType) {
+    public abstract class ScriptInstanceBase : ScriptObject {
+        protected ScriptType m_Prototype;
+        public ScriptInstanceBase(ScriptType prototype)
+#if SCORPIO_DEBUG
+            : base()
+#endif
+            {
             m_Prototype = prototype;
-            m_Script = script;
         }
-        public Script script => m_Script;
+        public Script script => m_Prototype.script;
         public override string ValueTypeName => $"Object<{m_Prototype}>";            //变量名称
-        public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value; } }
-        public IEnumerator<KeyValuePair<string, ScriptValue>> GetEnumerator() { return m_Values.GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() { return m_Values.GetEnumerator(); }
-        public void SetCapacity(int capacity) {
-            m_Values.SetCapacity(capacity);
-        }
-        public virtual bool HasValue(string key) {
-            return m_Values.ContainsKey(key);
-        }
-        public virtual void DelValue(string key) {
-            m_Values.Remove(key);
-        }
-        public virtual void ClearVariables() {
-            m_Values.Clear();
-        }
-        #region GetValue SetValue重载
-        public override ScriptValue GetValue(string key) {
-            return m_Values.TryGetValue(key, out var value) ? value : m_Prototype.GetValue(key, this);
-        }
-        public override void SetValue(string key, ScriptValue value) {
-            m_Values[key] = value;
-        }
-        #endregion
+        public ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value ?? script.TypeObject; } }
+        public virtual void ClearVariables() { }
         #region 运算符重载
         public override ScriptValue Plus(ScriptValue obj) {
             return CallOperator(ScriptOperator.Plus, obj);
@@ -145,17 +123,6 @@ namespace Scorpio {
             }
             return $"Object<{m_Prototype}>";
         }
-        internal virtual void SerializerJson(ScorpioJsonSerializer jsonSerializer) {
-            var builder = jsonSerializer.m_Builder;
-            builder.Append("{");
-            var first = true;
-            foreach (var pair in m_Values) {
-                if (first) { first = false; } else { builder.Append(","); }
-                jsonSerializer.Serializer(pair.Key);
-                builder.Append(":");
-                jsonSerializer.Serializer(pair.Value);
-            }
-            builder.Append("}");
-        }
+        internal abstract void SerializerJson(ScorpioJsonSerializer jsonSerializer);
     }
 }

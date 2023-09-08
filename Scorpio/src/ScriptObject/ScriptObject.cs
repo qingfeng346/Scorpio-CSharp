@@ -1,46 +1,24 @@
 using System;
 using Scorpio.Exception;
 using Scorpio.Tools;
-
 namespace Scorpio {
-    public enum ObjectType : byte {
-        Type,           //原表
-        Array,          //数组
-        Map,            //MAP
-        Function,       //函数
-        StringBuilder,  //StringBuilder
-        HashSet,        //HashSet
-        Instance,       //原表实例
-        Enum,           //枚举
-        Namespace,      //namespace
-        UserData,       //普通类
-        Global,         //全局变量保存类,只有_G是这个类型
-        Enumerator,     //迭代器专用
-    }
     public abstract class ScriptObject {
 #if SCORPIO_DEBUG
         private static ulong AutoId = 0;
         public readonly ulong Id;
-#endif
-        protected ObjectType objectType;
-        // 构图函数
-        public ScriptObject(ObjectType objectType) {
-            this.objectType = objectType;
-#if SCORPIO_DEBUG
+        // 构造函数
+        public ScriptObject() {
             Id = AutoId++;
             ScorpioProfiler.AddRecord(Id, this);
-#endif
         }
-#if SCORPIO_DEBUG
         ~ScriptObject() {
             ScorpioProfiler.DelRecord(Id);
         }
 #endif
-        public ObjectType ObjectType => objectType;                             //类型
-        public virtual object Value => this;                                    //值
-        public virtual Type ValueType { get { return GetType(); } }             //值类型
-        public virtual Type Type { get { return GetType(); } }                  //获取类型
-        public virtual string ValueTypeName => objectType.ToString();           //类型名称
+        public virtual object Value => this;                        //值
+        public virtual Type ValueType => GetType();                 //值类型
+        public virtual Type Type => GetType();                      //获取类型
+        public virtual string ValueTypeName => GetType().Name;      //类型名称
         public ScriptValue ThisValue { 
             get {
                 ScorpioUtil.CommonThisValue.scriptValue = this;
@@ -99,14 +77,5 @@ namespace Scorpio {
         internal virtual ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length) { return Call(thisObject, parameters, length); }
         internal virtual ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) { return Call(thisObject, parameters, length, baseType); }
         public virtual ScriptObject Clone(bool deep) { return this; }                   // 复制一个变量 是否深层复制
-
-        public bool IsFunction => objectType == ObjectType.Function;
-        public bool IsArray => objectType == ObjectType.Array;
-        public bool IsMap => objectType == ObjectType.Map;
-        public bool IsType => objectType == ObjectType.Type;
-        public bool IsInstance => objectType == ObjectType.Instance;
-        public bool IsEnum => objectType == ObjectType.Enum;
-        public bool IsUserData => objectType == ObjectType.UserData;
-        public bool IsStringBuilder => objectType == ObjectType.StringBuilder;
     }
 }

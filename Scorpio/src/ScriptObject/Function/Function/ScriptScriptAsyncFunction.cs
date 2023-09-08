@@ -19,10 +19,10 @@ namespace Scorpio.Function {
             return enumerator;
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return ScriptValue.CreateValue(m_Script.StartCoroutine(Execute(thisObject, parameters, length)));
+            return ScriptValue.CreateValue(script.StartCoroutine(Execute(thisObject, parameters, length)));
         }
         internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
-            return ScriptValue.CreateValue(m_Script.StartCoroutine(Execute(thisObject, parameters, length, baseType)));
+            return ScriptValue.CreateValue(script.StartCoroutine(Execute(thisObject, parameters, length, baseType)));
         }
         internal override ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return ScriptValue.CreateValue(Execute(thisObject, parameters, length));
@@ -50,10 +50,10 @@ namespace Scorpio.Function {
             return enumerator;
         }
         public override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length) {
-            return ScriptValue.CreateValue(m_Script.StartCoroutine(Execute(parameters, length)));
+            return ScriptValue.CreateValue(script.StartCoroutine(Execute(parameters, length)));
         }
         internal override ScriptValue Call(ScriptValue thisObject, ScriptValue[] parameters, int length, ScriptType baseType) {
-            return ScriptValue.CreateValue(m_Script.StartCoroutine(Execute(parameters, length, baseType)));
+            return ScriptValue.CreateValue(script.StartCoroutine(Execute(parameters, length, baseType)));
         }
         internal override ScriptValue CallAsync(ScriptValue thisObject, ScriptValue[] parameters, int length) {
             return ScriptValue.CreateValue(Execute(parameters, length));

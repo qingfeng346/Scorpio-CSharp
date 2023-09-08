@@ -1,9 +1,11 @@
 ﻿using Scorpio.Exception;
 using System;
 using System.Text;
-using System.Collections.Generic;
 namespace Scorpio.Library {
-    internal class ScorpioJsonDeserializer : IDisposable {
+    internal class ScorpioJsonDeserializer2 : IDisposable {
+        private ScriptValue[] CacheValues = new ScriptValue[8192];
+        private int CacheLength = 8192;
+        private int CacheIndex = 0;
         const long MinInt = int.MinValue;
         const long MaxInt = int.MaxValue;
         const char END_CHAR = (char)0;
@@ -27,7 +29,7 @@ namespace Scorpio.Library {
         private int m_Index;
         private int m_Length;
         private StringBuilder m_Builder;
-        public ScorpioJsonDeserializer(Script script) {
+        public ScorpioJsonDeserializer2(Script script) {
             m_Script = script;
             m_Builder = new StringBuilder();
         }
@@ -40,7 +42,13 @@ namespace Scorpio.Library {
             m_Length = buffer.Length;
             m_SupportLong = supportLong;
             m_SupportIntern = supportIntern;
-            return ReadObject();
+            CacheIndex = 0;
+            try {
+                ReadObject();
+                return CacheValues[--CacheIndex];
+            } finally {
+                Array.Clear(CacheValues, 0, CacheLength);
+            }
         }
         char EatWhiteSpace {
             get {
@@ -64,14 +72,69 @@ namespace Scorpio.Library {
                 return m_Builder.ToString();
             }
         }
-        ScriptValue ReadObject() {
+        void AddNull() {
+            if (CacheIndex == CacheLength) {
+                CacheLength *= 2;
+                Array.Resize(ref CacheValues, CacheLength);
+            }
+            CacheValues[CacheIndex++].valueType = ScriptValue.nullValueType;
+        }
+        void AddTrue() {
+            if (CacheIndex == CacheLength) {
+                CacheLength *= 2;
+                Array.Resize(ref CacheValues, CacheLength);
+            }
+            CacheValues[CacheIndex++].valueType = ScriptValue.trueValueType;
+        }
+        void AddFalse() {
+            if (CacheIndex == CacheLength) {
+                CacheLength *= 2;
+                Array.Resize(ref CacheValues, CacheLength);
+            }
+            CacheValues[CacheIndex++].valueType = ScriptValue.falseValueType;
+        }
+        void AddString(string value) {
+            if (CacheIndex == CacheLength) {
+                CacheLength *= 2;
+                Array.Resize(ref CacheValues, CacheLength);
+            }
+            CacheValues[CacheIndex].valueType = ScriptValue.stringValueType;
+            CacheValues[CacheIndex++].stringValue = value;
+        }
+        void AddDouble(double value) {
+            if (CacheIndex == CacheLength) {
+                CacheLength *= 2;
+                Array.Resize(ref CacheValues, CacheLength);
+            }
+            CacheValues[CacheIndex].valueType = ScriptValue.doubleValueType;
+            CacheValues[CacheIndex++].doubleValue = value;
+        }
+        void AddLong(long value) {
+            if (CacheIndex == CacheLength) {
+                CacheLength *= 2;
+                Array.Resize(ref CacheValues, CacheLength);
+            }
+            CacheValues[CacheIndex].valueType = ScriptValue.longValueType;
+            CacheValues[CacheIndex++].longValue = value;
+        }
+        void AddScriptValue(ScriptObject value) {
+            if (CacheIndex == CacheLength) {
+                CacheLength *= 2;
+                Array.Resize(ref CacheValues, CacheLength);
+            }
+            CacheValues[CacheIndex].valueType = ScriptValue.scriptValueType;
+            CacheValues[CacheIndex++].scriptValue = value;
+        }
+        void ReadObject() {
             var ch = EatWhiteSpace;
             if (ch == END_CHAR) {
-                return ScriptValue.Null;
+                AddNull();
+                return;
             }
             switch (ch) {
                 case QUOTES:
-                    return new ScriptValue(ParseString());
+                    AddString(ParseString());
+                    return;
                 case '0':
                 case '1':
                 case '2':
@@ -84,18 +147,27 @@ namespace Scorpio.Library {
                 case '9':
                 case '-':
                     --m_Index;
-                    return ParseNumber();
+                    ParseNumber();
+                    return;
                 case LEFT_BRACE:
-                    return ParseMap();
+                    ParseMap();
+                    return;
                 case LEFT_BRACKET:
-                    return ParseArray();
+                    ParseArray();
+                    return;
                 default:
                     --m_Index;
                     var word = NextWord;
                     switch (word) {
-                        case TRUE: return ScriptValue.True;
-                        case FALSE: return ScriptValue.False;
-                        case NULL: return ScriptValue.Null;
+                        case TRUE:
+                            AddTrue();
+                            return;
+                        case FALSE:
+                            AddFalse();
+                            return;
+                        case NULL:
+                            AddNull();
+                            return;
                         default: throw new ExecutionException("Json解析, 未知标识符 : " + word);
                     }
             }
@@ -103,9 +175,9 @@ namespace Scorpio.Library {
         string ParseString() {
             m_Builder.Length = 0;
             while (true) {
-                //if (Peek() == -1) {
-                //    return m_Builder.ToString();
-                //}
+                if (Peek() == -1) {
+                    return m_Builder.ToString();
+                }
                 var ch = Read();
                 if (ch == QUOTES) {
                     return m_Builder.ToString();
@@ -127,13 +199,13 @@ namespace Scorpio.Library {
                             case '0': m_Builder.Append('\0'); break;
                             case '/': m_Builder.Append("/"); break;
                             case 'u': {
-                                var hex = new StringBuilder();
-                                for (int i = 0; i < 4; i++) {
-                                    hex.Append(Read());
+                                    var hex = new StringBuilder();
+                                    for (int i = 0; i < 4; i++) {
+                                        hex.Append(Read());
+                                    }
+                                    m_Builder.Append((char)Convert.ToUInt16(hex.ToString(), 16));
+                                    break;
                                 }
-                                m_Builder.Append((char)Convert.ToUInt16(hex.ToString(), 16));
-                                break;
-                            }
                         }
                         break;
                     default:
@@ -142,170 +214,88 @@ namespace Scorpio.Library {
                 }
             }
         }
-        ScriptValue ParseNumber() {
+        void ParseNumber() {
             var number = NextWord;
             if (number.IndexOf('.') >= 0) {
-                return new ScriptValue(double.Parse(number));
+                AddDouble(double.Parse(number));
             } else {
                 var parsedLong = long.Parse(number);
                 if (m_SupportLong || parsedLong < MinInt || parsedLong > MaxInt) {
-                    return new ScriptValue(parsedLong);
+                    AddLong(parsedLong);
                 } else {
-                    return new ScriptValue((double)parsedLong);
+                    AddDouble(parsedLong);
                 }
             }
         }
-        ScriptValue ParseMap() {
+        void ParseMap() {
             var map = new ScriptMapObject(m_Script);
             while (true) {
                 var ch = EatWhiteSpace;
                 switch (ch) {
-                    case RIGHT_BRACE: return new ScriptValue(map);
+                    case RIGHT_BRACE:
+                        AddScriptValue(map);
+                        return;
                     case COMMA: continue;
                     case END_CHAR:
                         throw new ExecutionException("Json解析, 未找到 map 结尾 [}]");
-                    case QUOTES: {
+                    case QUOTES:
                         var key = ParseString();
                         if (EatWhiteSpace != ':') {
                             throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
                         }
-                        map.SetValue(m_SupportIntern ? string.Intern(key) : key, ReadObject());
+                        ReadObject();
+                        map.SetValue(key, CacheValues[--CacheIndex]);
                         break;
-                    }
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-                    case '-': {
-                        --m_Index;
-                        var key = ParseNumber();
-                        if (EatWhiteSpace != ':') {
-                            throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
-                        }
-                        map.SetValue(key.Value, ReadObject());
-                        break;
-                    }
-                    default: {
-                        throw new ExecutionException("Json解析, key值 未知符号 : " + ch);
-                    }
+                    //case '0':
+                    //case '1':
+                    //case '2':
+                    //case '3':
+                    //case '4':
+                    //case '5':
+                    //case '6':
+                    //case '7':
+                    //case '8':
+                    //case '9':
+                    //case '-': {
+                    //        --m_Index;
+                    //        var key = ParseNumber();
+                    //        if (EatWhiteSpace != ':') {
+                    //            throw new ExecutionException("Json解析, key值后必须跟 [:] 赋值");
+                    //        }
+                    //        map.SetValue(key.Value, ReadObject());
+                    //        break;
+                    //    }
+                    default: throw new ExecutionException("Json解析, key值 未知符号 : " + ch);
                 }
             }
         }
-        ScriptValue ParseArray() {
+        void ParseArray() {
             var array = new ScriptArray(m_Script);
+            var index = CacheIndex;
             while (true) {
                 var ch = EatWhiteSpace;
                 switch (ch) {
-                    case RIGHT_BRACKET: return new ScriptValue(array);
+                    case RIGHT_BRACKET:
+                        array.SetArrayCapacity(CacheIndex - index);
+                        for (var i = index; i <= CacheIndex; ++i) {
+                            array.Add(CacheValues[i]);
+                        }
+                        CacheIndex = index;
+                        AddScriptValue(array);
+                        return;
                     case COMMA: continue;
                     case END_CHAR:
                         throw new ExecutionException("Json解析, 未找到array结尾 ]");
-                    default: {
+                    default:
                         --m_Index;
-                        array.Add(ReadObject());
+                        ReadObject();
                         continue;
-                    }
                 }
             }
         }
         public void Dispose() {
             m_Buffer = null;
             m_Builder.Clear();
-        }
-    }
-    internal class ScorpioJsonSerializer : IDisposable {
-        internal StringBuilder m_Builder;
-        private HashSet<ScriptObject> m_Recurve;
-        public ScorpioJsonSerializer() {
-            m_Builder = new StringBuilder();
-            m_Recurve = new HashSet<ScriptObject>();
-        }
-        public string ToJson(ScriptValue value) {
-            Serializer(value);
-            return m_Builder.ToString();
-        }
-        public string ToJson(ScriptObject scriptObject) {
-            Serializer(scriptObject);
-            return m_Builder.ToString();
-        }
-        internal void Serializer(ScriptValue value) {
-            switch (value.valueType) {
-                case ScriptValue.nullValueType:
-                    m_Builder.Append("null");
-                    break;
-                case ScriptValue.trueValueType:
-                    m_Builder.Append("true");
-                    break;
-                case ScriptValue.falseValueType:
-                    m_Builder.Append("false");
-                    break;
-                case ScriptValue.doubleValueType:
-                    m_Builder.Append(value.doubleValue);
-                    break;
-                case ScriptValue.longValueType:
-                    m_Builder.Append(value.longValue);
-                    break;
-                case ScriptValue.stringValueType:
-                    Serializer(value.stringValue);
-                    break;
-                case ScriptValue.scriptValueType:
-                    Serializer(value.scriptValue);
-                    break;
-            }
-        }
-        internal void Serializer(string value) {
-            m_Builder.Append('\"');
-            foreach (var c in value.ToCharArray()) {
-                switch (c) {
-                    case '"':
-                        m_Builder.Append("\\\"");
-                        break;
-                    case '\\':
-                        m_Builder.Append("\\\\");
-                        break;
-                    case '\b':
-                        m_Builder.Append("\\b");
-                        break;
-                    case '\f':
-                        m_Builder.Append("\\f");
-                        break;
-                    case '\n':
-                        m_Builder.Append("\\n");
-                        break;
-                    case '\r':
-                        m_Builder.Append("\\r");
-                        break;
-                    case '\t':
-                        m_Builder.Append("\\t");
-                        break;
-                    default:
-                        m_Builder.Append(c);
-                        break;
-                }
-            }
-            m_Builder.Append('\"');
-        }
-        internal void Serializer(ScriptObject scriptObject) {
-            if (scriptObject is ScriptInstanceBase) {
-                if (!m_Recurve.Contains(scriptObject)) {
-                    m_Recurve.Add(scriptObject);
-                    ((ScriptInstanceBase)scriptObject).SerializerJson(this);
-                } else {
-                    m_Builder.Append("\"Inline\"");
-                }
-            } else {
-                Serializer(scriptObject.ToString());
-            }
-        }
-        public void Dispose() {
-            m_Builder.Clear();
-            m_Recurve.Clear();
         }
     }
 }

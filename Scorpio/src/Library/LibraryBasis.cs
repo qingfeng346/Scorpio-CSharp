@@ -264,7 +264,7 @@ namespace Scorpio.Library {
         private class clearVariables: ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 for (var i = 0; i < length; ++i) {
-                    var instance = args[0].Get<ScriptInstance>();
+                    var instance = args[0].Get<ScriptInstanceBase>();
                     if (instance != null) instance.ClearVariables();
                 }
                 return ScriptValue.Null;
@@ -330,7 +330,7 @@ namespace Scorpio.Library {
         }
         private class isInstance : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue.GetType() == typeof(ScriptInstance)) ? ScriptValue.True : ScriptValue.False;
+                return (args[0].valueType == ScriptValue.scriptValueType && args[0].scriptValue is ScriptInstance) ? ScriptValue.True : ScriptValue.False;
             }
         }
 
@@ -506,8 +506,8 @@ namespace Scorpio.Library {
                 }
                 if (scriptObject is ScriptType) {
                     ((ScriptType)scriptObject).Prototype = scriptType;
-                } else if (scriptObject is ScriptInstance) {
-                    ((ScriptInstance)scriptObject).Prototype = scriptType;
+                } else if (scriptObject is ScriptInstanceBase) {
+                    ((ScriptInstanceBase)scriptObject).Prototype = scriptType;
                 }
                 return ScriptValue.Null;
             }
@@ -529,8 +529,8 @@ namespace Scorpio.Library {
                     case ScriptValue.stringValueType:
                         return m_Script.TypeStringValue;
                     case ScriptValue.scriptValueType:
-                        if (value.scriptValue is ScriptInstance) {
-                            return new ScriptValue(((ScriptInstance)value.scriptValue).Prototype);
+                        if (value.scriptValue is ScriptInstanceBase) {
+                            return new ScriptValue(((ScriptInstanceBase)value.scriptValue).Prototype);
                         } else if (value.scriptValue is ScriptType) {
                             return new ScriptValue(((ScriptType)value.scriptValue).Prototype);
                         } else {
@@ -542,17 +542,13 @@ namespace Scorpio.Library {
         }
         private class setPropertys : ScorpioHandle {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
-                var source = args[0].Get<ScriptInstance>();
-                var target = args[1].Get<ScriptInstance>();
-                if (target is ScriptMap) {
-                    foreach (var pair in (target as ScriptMap)) {
+                var source = args[0].Get<ScriptInstanceBase>();
+                var target = args[1].Get<ScriptMap>();
+                if (target != null) {
+                    foreach (var pair in target) {
                         if (pair.Key is string) {
                             source.SetValue((string)pair.Key, pair.Value);
                         }
-                    }
-                } else {
-                    foreach (var pair in target) {
-                        source.SetValue(pair.Key, pair.Value);
                     }
                 }
                 return args[0];
@@ -567,8 +563,8 @@ namespace Scorpio.Library {
             public ScriptValue Call(ScriptValue thisObject, ScriptValue[] args, int length) {
                 var value = args[0];
                 if (value.valueType == ScriptValue.scriptValueType) {
-                    if (value.scriptValue is ScriptInstance) {
-                        return new ScriptValue(((ScriptInstance)value.scriptValue).Prototype.Prototype);
+                    if (value.scriptValue is ScriptInstanceBase) {
+                        return new ScriptValue(((ScriptInstanceBase)value.scriptValue).Prototype.Prototype);
                     } else if (value.scriptValue is ScriptType) {
                         return new ScriptValue(((ScriptType)value.scriptValue).Prototype);
                     }

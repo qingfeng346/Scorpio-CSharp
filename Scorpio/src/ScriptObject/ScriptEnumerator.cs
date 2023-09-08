@@ -8,7 +8,11 @@ namespace Scorpio {
         private ScriptValue m_Key;
         private ScriptValue m_Value;
         private Script m_Script;
-        public ScriptEnumerator(Script script) : base(ObjectType.Enumerator) {
+        public ScriptEnumerator(Script script)
+#if SCORPIO_DEBUG
+            : base()
+#endif
+            {
             m_Script = script;
         }
         public void SetNext(ScorpioHandle next) {

@@ -41,8 +41,8 @@ namespace Scorpio.Proto {
                         type = m_Script.TypeStringValue;
                         break;
                     case ScriptValue.scriptValueType:
-                        if (thisObject.scriptValue is ScriptInstance) {
-                            type = new ScriptValue(((ScriptInstance)thisObject.scriptValue).Prototype);
+                        if (thisObject.scriptValue is ScriptInstanceBase) {
+                            type = new ScriptValue(((ScriptInstanceBase)thisObject.scriptValue).Prototype);
                         } else if (thisObject.scriptValue is ScriptType) {
                             type = thisObject;
                         } else {

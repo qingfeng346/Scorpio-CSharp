@@ -24,7 +24,7 @@ namespace Scorpio.Userdata {
             var ret = Method.Invoke(obj, Args);
             for (var i = 0; i < RequiredNumber; ++i) {
                 if (RefOuts[i]) {
-                    parameters[i].Get<ScriptInstance>().SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
+                    parameters[i].Get<ScriptInstanceBase>().SetValue(RefOutValue, ScriptValue.CreateValue(Args[i]));
                 }
             }
             return ret;

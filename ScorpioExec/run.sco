@@ -1,17 +1,18 @@
-async function main1() {
-    await main3()
-}
-async function main3() {
 
-}
-function main2() {
-
-}
-function main() {
+async function main() {
+    var str = io.readAllString("C:/Users/qingf/Desktop/common_prefabs.bytes")
+    // var str = json.encode({a :{a:1}})
+    await sleep(3)
+    var now = io.unixNow()
+    var b = json.decode(str, false)
+    print("======== ${io.unixNow() - now}")
     main1()
-    main2()
+}
+async function main1() {
+    await sleep(50)
 }
 main()
+
 // Base64String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
 // var builder = new StringBuilder()
 // builder.append("123")

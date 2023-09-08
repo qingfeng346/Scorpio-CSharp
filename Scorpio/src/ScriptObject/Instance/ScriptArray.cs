@@ -5,7 +5,7 @@ using Scorpio.Tools;
 using Scorpio.Library;
 namespace Scorpio {
     //脚本数组类型
-    public class ScriptArray : ScriptInstance, IEnumerable<ScriptValue> {
+    public class ScriptArray : ScriptInstanceBase, IEnumerable<ScriptValue> {
         //排序
         public struct Comparer : IComparer<ScriptValue> {
             ScriptFunction func;
@@ -60,7 +60,7 @@ namespace Scorpio {
         internal ScriptValue[] m_Objects;
         internal int m_Length;
         
-        public ScriptArray(Script script) : base(script, ObjectType.Array, script.TypeArray) {
+        public ScriptArray(Script script) : base(script.TypeArray) {
             m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Length = 0;
         }
@@ -91,7 +91,7 @@ namespace Scorpio {
                 SetCapacity_impl(m_Length);
             }
         }
-        public new IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
+        public IEnumerator<ScriptValue> GetEnumerator() { return new Enumerator(this); }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(this); }
         public IEnumerator<ScriptValue> GetIterator() { return new Enumerator(this); }
 
@@ -246,7 +246,7 @@ namespace Scorpio {
             return array;
         }
         public override ScriptObject Clone(bool deep) {
-            var ret = new ScriptArray(m_Script);
+            var ret = new ScriptArray(script);
             ret.m_Objects = new ScriptValue[m_Length];
             ret.m_Length = m_Length;
             if (deep) {
@@ -271,7 +271,7 @@ namespace Scorpio {
             return ret;
         }
         public ScriptArray NewCopy(int length = 0) {
-            var ret = new ScriptArray(m_Script) {
+            var ret = new ScriptArray(script) {
                 m_Objects = new ScriptValue[m_Length + length],
                 m_Length = m_Length
             };
@@ -281,7 +281,7 @@ namespace Scorpio {
             return ret;
         }
         public override string ToString() {
-            return m_Script.ToJson(this);
+            return script.ToJson(this);
         }
         internal override void SerializerJson(ScorpioJsonSerializer jsonSerializer) {
             var builder = jsonSerializer.m_Builder;

@@ -35,7 +35,6 @@ namespace Scorpio {
         private ScriptValue[] m_Objects = ScorpioUtil.VALUE_EMPTY;                                //数据
         private int m_Size = 0;                                                             //有效数据数量
         private Dictionary<string, int> m_Indexs = new Dictionary<string, int>();           //名字到索引的映射
-        public ScriptGlobal() : base(ObjectType.Global) { }
         public void Shutdown() {
             m_Objects = ScorpioUtil.VALUE_EMPTY;
             m_Indexs = null;

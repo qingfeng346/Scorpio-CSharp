@@ -1,9 +1,10 @@
+using Scorpio.Library;
 using System;
 using System.Text;
 namespace Scorpio {
-    public class ScriptStringBuilder : ScriptInstance {
+    public class ScriptStringBuilder : ScriptInstanceBase {
         public StringBuilder Builder { get; } = new StringBuilder();
-        public ScriptStringBuilder(Script script) : base(script, ObjectType.StringBuilder, script.TypeStringBuilder) { }
+        public ScriptStringBuilder(Script script) : base(script.TypeStringBuilder) { }
         internal ScriptStringBuilder(Script script, ScriptValue[] parameters, int length) : this(script) {
             for (var i = 0; i < length; ++i) {
                 Builder.Append(parameters[i]);
@@ -29,6 +30,9 @@ namespace Scorpio {
         }
         public override string ToString() {
             return Builder.ToString();
+        }
+        internal override void SerializerJson(ScorpioJsonSerializer jsonSerializer) {
+            jsonSerializer.Serializer(Builder.ToString());
         }
     }
 }

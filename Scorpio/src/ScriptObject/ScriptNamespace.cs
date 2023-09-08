@@ -8,7 +8,7 @@ namespace Scorpio {
         public override Type ValueType { get { return ScorpioUtil.TYPE_STRING; } } //值类型，如果是Type则返回 typeof(Type)
         public override Type Type { get { return ScorpioUtil.TYPE_STRING; } }      //获取类型
         public override object Value { get { return m_Value; } }            //值
-        public ScriptNamespace(string name) : base(ObjectType.Namespace) {
+        public ScriptNamespace(string name) {
             m_Value = name;
         }
         public override ScriptValue GetValue(string key) {

@@ -9,6 +9,10 @@ namespace Scorpio {
         public override object Value => m_Value;            //值
         public override int GetHashCode() { return m_Value.GetHashCode(); }
         public override string ToString() { return m_Value.ToString(); }
-        public ScriptUserdata() : base(ObjectType.UserData) { }
+        public ScriptUserdata()
+#if SCORPIO_DEBUG
+            : base()
+#endif
+        { }
     }
 }
