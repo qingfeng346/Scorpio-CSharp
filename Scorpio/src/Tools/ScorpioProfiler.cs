@@ -3,6 +3,8 @@ using Scorpio.Exception;
 using System.Collections.Generic;
 using System;
 using Scorpio.Function;
+using Scorpio.Userdata;
+
 namespace Scorpio.Tools {
     public static class ScorpioProfiler {
         private static ulong AutoId = 0;
@@ -123,42 +125,61 @@ namespace Scorpio.Tools {
         }
         #endregion
         #region 检测泄漏
-        private static void CollectGlobal(ScriptValue value, HashSet<ulong> globalIndex) {
+        private static void CollectGlobal(ScriptValue value, Dictionary<string, Dictionary<string, int>> globalObjects, HashSet<ulong> globalIndex) {
             if (value.valueType != ScriptValue.scriptValueType) { return; }
-            CollectGlobal(value.scriptValue, globalIndex);
+            CollectGlobal(value.scriptValue, globalObjects, globalIndex);
         }
-        private static void CollectGlobal(ScriptObject value, HashSet<ulong> globalIndex) {
+        private static void CollectGlobal(ScriptObject value, Dictionary<string, Dictionary<string, int>> globalObjects, HashSet<ulong> globalIndex) {
             if (value == null) return;
             if (globalIndex.Contains(value.Id)) { return; }
             globalIndex.Add(value.Id);
+            if (AllObjects.TryGetValue(value.Id, out var obj)) {
+                var name = "";
+                if (value is ScriptInstanceBase) {
+                    name = ((ScriptInstanceBase)value).Prototype.TypeName;
+                } else if (value is ScriptUserdataObject) {
+                    name = ((ScriptUserdataObject)value).Type.FullName;
+                } else {
+                    name = value.GetType().Name;
+                }
+                if (!globalObjects.TryGetValue(name, out var objects)) {
+                    globalObjects[name] = objects = new Dictionary<string, int>();
+                }
+                if (objects.ContainsKey(obj.Item2)) {
+                    objects[obj.Item2]++;
+                } else {
+                    objects[obj.Item2] = 1;
+                }
+            }
+            
             if (value is ScriptMap) {
                 foreach (var pair in (ScriptMap)value) {
-                    CollectGlobal(pair.Value, globalIndex);
+                    CollectGlobal(pair.Value, globalObjects, globalIndex);
                 }
             } else if (value is ScriptArray) {
                 foreach (var element in (ScriptArray)value) {
-                    CollectGlobal(element, globalIndex);
+                    CollectGlobal(element, globalObjects, globalIndex);
                 }
             } else if (value is ScriptHashSet) {
                 foreach (var element in (ScriptHashSet)value) {
-                    CollectGlobal(element, globalIndex);
+                    CollectGlobal(element, globalObjects, globalIndex);
                 }
             } else if (value is ScriptScriptBindFunctionBase) {
-                CollectGlobal(((ScriptScriptBindFunctionBase)value).BindObject, globalIndex);
+                CollectGlobal(((ScriptScriptBindFunctionBase)value).BindObject, globalObjects, globalIndex);
             } else if (value is ScriptType) {
                 var type = (ScriptType)value;
-                CollectGlobal(type.Prototype, globalIndex);
+                CollectGlobal(type.Prototype, globalObjects, globalIndex);
                 foreach (var pair in type.m_Values) {
-                    CollectGlobal(pair.Value, globalIndex);
+                    CollectGlobal(pair.Value, globalObjects, globalIndex);
                 }
                 foreach (var pair in type.m_GetProperties) {
-                    CollectGlobal(pair.Value, globalIndex);
+                    CollectGlobal(pair.Value, globalObjects, globalIndex);
                 }
             }
             if (value is ScriptInstance) {
                 var instance = (ScriptInstance)value;
                 foreach (var pair in instance) {
-                    CollectGlobal(pair.Value, globalIndex);
+                    CollectGlobal(pair.Value, globalObjects, globalIndex);
                 }
             }
             if (value is ScriptScriptFunctionBase) {
@@ -167,7 +188,7 @@ namespace Scorpio.Tools {
                     for (var i = 0; i < internalValues.Length; ++i) {
                         var internalValue = internalValues[i];
                         if (internalValue == null) { continue; }
-                        CollectGlobal(internalValue.value, globalIndex);
+                        CollectGlobal(internalValue.value, globalObjects, globalIndex);
                     }
                 }
             }
@@ -175,21 +196,22 @@ namespace Scorpio.Tools {
         public static void CollectLeak(Script script, out HashSet<(WeakReference, string)> leak, out int globalCount, out int total) {
             lock (sync) {
                 var globalIndex = new HashSet<ulong>();
+                var globalObjects = new Dictionary<string, Dictionary<string, int>>();
                 foreach (var pair in script.Global) {
-                    CollectGlobal(pair.Value, globalIndex);
+                    CollectGlobal(pair.Value, globalObjects, globalIndex);
                 }
                 foreach (var pair in ScorpioTypeManager.m_UserdataTypes) {
-                    CollectGlobal(pair.Value, globalIndex);
+                    CollectGlobal(pair.Value, globalObjects, globalIndex);
                 }
                 foreach (var pair in ScorpioTypeManager.m_Types) {
                     foreach (var v in pair.Value.m_Values) {
-                        CollectGlobal(v.Value, globalIndex);
+                        CollectGlobal(v.Value, globalObjects, globalIndex);
                     }
                     foreach (var v in pair.Value.m_InstanceMethods) {
-                        CollectGlobal(v.Value, globalIndex);
+                        CollectGlobal(v.Value, globalObjects, globalIndex);
                     }
                     foreach (var v in pair.Value.m_StaticMethods) {
-                        CollectGlobal(v.Value, globalIndex);
+                        CollectGlobal(v.Value, globalObjects, globalIndex);
                     }
                 }
                 total = AllObjects.Count;
