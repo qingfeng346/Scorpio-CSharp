@@ -151,7 +151,7 @@ namespace Scorpio.Tools {
                     objects[obj.Item2] = 1;
                 }
             }
-            
+
             if (value is ScriptMap) {
                 foreach (var pair in (ScriptMap)value) {
                     CollectGlobal(pair.Value, globalObjects, globalIndex);
@@ -193,10 +193,10 @@ namespace Scorpio.Tools {
                 }
             }
         }
-        public static void CollectLeak(Script script, out HashSet<(WeakReference, string)> leak, out int globalCount, out int total) {
+        public static void CollectLeak(Script script, out HashSet<(WeakReference, string)> leak, out Dictionary<string, Dictionary<string, int>> globalObjects, out int globalCount, out int total) {
             lock (sync) {
                 var globalIndex = new HashSet<ulong>();
-                var globalObjects = new Dictionary<string, Dictionary<string, int>>();
+                globalObjects = new Dictionary<string, Dictionary<string, int>>();
                 foreach (var pair in script.Global) {
                     CollectGlobal(pair.Value, globalObjects, globalIndex);
                 }

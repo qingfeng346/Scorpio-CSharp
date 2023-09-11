@@ -114,7 +114,7 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 获取一个long常量的索引 </summary>
         int GetConstLong(long value) {
-            if (LongMaps.TryGetValue(value, out var index)) {
+            if (!LongMaps.TryGetValue(value, out var index)) {
                 index = ConstLong.Count;
                 ConstLong.Add(value);
                 LongMaps[value] = index;

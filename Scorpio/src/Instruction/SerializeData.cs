@@ -26,19 +26,19 @@ namespace Scorpio.Instruction {
         }
         public SerializeData Serialize(ScorpioWriter writer, short version) {
             writer.Write(ConstDouble.Length);
-            Array.ForEach(ConstDouble, (value) => writer.Write(value));
+            Array.ForEach(ConstDouble, writer.Write);
             writer.Write(ConstLong.Length);
-            Array.ForEach(ConstLong, (value) => writer.Write(value));
+            Array.ForEach(ConstLong, writer.Write);
             writer.Write(ConstString.Length);
-            Array.ForEach(ConstString, (value) => writer.Write(value));
+            Array.ForEach(ConstString, writer.Write);
             writer.Write(Context);
             writer.Write(Functions.Length);
-            Array.ForEach(Functions, (value) => writer.Write(value));
+            Array.ForEach(Functions, writer.Write);
             writer.Write(Classes.Length);
-            Array.ForEach(Classes, (value) => writer.Write(value));
+            Array.ForEach(Classes, writer.Write);
             if (version > 2) {
                 writer.Write(NoContext.Length);
-                Array.ForEach(NoContext, (value) => writer.Write(value));
+                Array.ForEach(NoContext, writer.Write);
             }
             return this;
         }

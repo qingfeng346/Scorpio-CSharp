@@ -231,7 +231,7 @@ namespace ScorpioExec {
                     while (script.UpdateCoroutine ()) { }
                     script.ClearStack();
 #if SCORPIO_DEBUG
-                    script.CollectLeak(out var set, out var count, out var total);
+                    script.CollectLeak(out var set, out var globalObjects, out var count, out var total);
 #endif
                     Logger.info ("=============================");
                     Logger.info ("return value : " + value);
