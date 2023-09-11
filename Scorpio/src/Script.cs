@@ -411,6 +411,17 @@ namespace Scorpio {
         //        }
         //    }
         //}
+        void OptimizeConstString(SerializeData data) {
+            var length = data.ConstString.Length;
+            var flagLength = data.NoContext.Length;
+            for (var i = 0; i < length; ++i) {
+                if (flagLength != 0 && (data.NoContext[i] & ScriptConstValue.StringFlag) == 0) {
+                    data.ConstString[i] = null;
+                } else {
+                    data.ConstString[i] = string.Intern(data.ConstString[i]);
+                }
+            }
+        }
         /// <summary> 执行IL </summary>
         public ScriptValue Execute(SerializeData[] datas) {
             ScriptValue result = ScriptValue.Null;
@@ -423,6 +434,7 @@ namespace Scorpio {
                     contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes);
                 }
                 result = new ScriptContext(this, data.Breviary, data.Context, data.ConstDouble, data.ConstLong, data.ConstString, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
+                OptimizeConstString(data);
             }
             return result;
         }
