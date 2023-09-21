@@ -18,20 +18,20 @@ namespace Scorpio.Compile.Compiler {
         private int m_VariableIndex = 0;                                                        //当前索引
         private Dictionary<string, int> m_VariableIndexs = new Dictionary<string, int>();       //索引表
         public int AddIndex(string str) {
-            if (!m_VariableIndexs.ContainsKey(str)) {
-                m_VariableIndexs.Add(str, m_VariableIndex);
-                return m_VariableIndex++;
-            } else {
-                return m_VariableIndexs[str];
-            }
+            if (m_VariableIndexs.TryGetValue(str, out var index))
+                return index;
+            m_VariableIndexs.Add(str, m_VariableIndex);
+            return m_VariableIndex++;
         }
         public bool HasIndex(string str) {
             return m_VariableIndexs.ContainsKey(str);
         }
         public int GetIndex(string str) {
-            return m_VariableIndexs.ContainsKey(str) ? m_VariableIndexs[str] : -1;
+            if (m_VariableIndexs.TryGetValue(str, out var index))
+                return index;
+            return -1;
         }
-        public int Count { get { return m_VariableIndexs.Count; } }
+        public int Count => m_VariableIndexs.Count;
     }
     //指令执行列表
     public class ScriptExecutable {
@@ -132,19 +132,21 @@ namespace Scorpio.Compile.Compiler {
         public int[] ScriptInternals { get { return m_ParentInternal.ToArray(); } }
         public void Finished() {
             //计算局部变量是否是内部引用变量，并修改为 内部变量赋值 Opcode
-            foreach (var instruction in m_listScriptInstructions) {
+            for (var i = 0; i < m_listScriptInstructions.Count; ++i) {
+                var instruction = m_listScriptInstructions[i];
                 if (m_VariableToInternal.TryGetValue(instruction.opvalue, out var internalValue)) {
                     if (instruction.opcode == Opcode.LoadLocal) {
-                        instruction.SetOpcode(Opcode.LoadInternal, internalValue);
+                        m_listScriptInstructions[i].SetOpcode(Opcode.LoadInternal, internalValue);
                     } else if (instruction.opcode == Opcode.StoreLocal) {
-                        instruction.SetOpcode(Opcode.StoreInternal, internalValue);
+                        m_listScriptInstructions[i].SetOpcode(Opcode.StoreInternal, internalValue);
                     } else if (instruction.opcode == Opcode.StoreLocalAssign) {
-                        instruction.SetOpcode(Opcode.StoreInternalAssign, internalValue);
+                        m_listScriptInstructions[i].SetOpcode(Opcode.StoreInternalAssign, internalValue);
                     }
                 }
             }
             //重新计算操作局部变量 索引
-            foreach (var instruction in m_listScriptInstructions) {
+            for (var i = 0; i < m_listScriptInstructions.Count; ++i) {
+                var instruction = m_listScriptInstructions[i];
                 if (instruction.opcode == Opcode.LoadLocal || instruction.opcode == Opcode.StoreLocal || instruction.opcode == Opcode.StoreLocalAssign) {
                     var count = 0;
                     foreach (var pair in m_VariableToInternal) {
@@ -153,7 +155,8 @@ namespace Scorpio.Compile.Compiler {
                         }
                     }
                     if (count > 0) {
-                        instruction.opvalue -= count;
+                        m_listScriptInstructions[i].opvalue -= count;
+                        //m_listScriptInstructions[i].SetValue(instruction.opvalue - count);
                     }
                 }
             }

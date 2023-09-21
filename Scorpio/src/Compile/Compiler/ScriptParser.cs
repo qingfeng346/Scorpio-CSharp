@@ -343,8 +343,9 @@ namespace Scorpio.Compile.Compiler {
             //多返回值
             if (PeekToken().Type == TokenType.LeftBrace) {
                 ReadToken();
-                var Returns = new List<string>();
-                Returns.Add(ReadIdentifier());
+                var Returns = new List<string> {
+                    ReadIdentifier()
+                };
                 while (PeekToken().Type == TokenType.Comma) {
                     ReadToken();
                     Returns.Add(ReadIdentifier());
@@ -753,8 +754,8 @@ namespace Scorpio.Compile.Compiler {
             if (peek.Type == TokenType.LeftBrace) {
                 UndoToken();
             }
-            if (listParameters.Count > 128)
-                throw new ParserException(this, "函数参数超过最大数量128", token);
+            if (listParameters.Count > 120)
+                throw new ParserException(this, "函数参数超过最大数量120", token);
             BeginExecutable(ExecutableBlock.Function);
             foreach (var par in listParameters) {
                 AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.AddIndex(par), token.SourceLine);
@@ -763,7 +764,7 @@ namespace Scorpio.Compile.Compiler {
             var index = Functions.Count;
             Functions.Add(new ScriptFunctionData() {
                 scriptInstructions = executable.ScriptInstructions,
-                parameterCount = listParameters.Count,
+                parameterCount = (byte)listParameters.Count,
                 param = bParams,
                 variableCount = executable.VariableCount,
                 internalCount = executable.InternalCount,

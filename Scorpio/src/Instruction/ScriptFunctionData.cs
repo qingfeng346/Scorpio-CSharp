@@ -1,13 +1,13 @@
 using System.Text;
 namespace Scorpio.Instruction {
     //单个函数的信息
-    public class ScriptFunctionData {
+    public struct ScriptFunctionData {
         public ScriptInstruction[] scriptInstructions;      //命令列表
-        public int parameterCount;                          //参数个数
-        public bool param;                                  //是否是变长参数
+        public int[] internals;                             //内部变量赋值 前16位为父级索引 后16为自己索引
         public int variableCount;                           //局部变量数量
         public int internalCount;                           //内部变量数量
-        public int[] internals;                             //内部变量赋值 前16位为父级索引 后16为自己索引
+        public byte parameterCount;                         //参数个数
+        public bool param;                                  //是否是变长参数
         public string ToString(double[] constDouble, long[] constLong, string[] constString) {
             var builder = new StringBuilder();
             foreach (var inter in internals) {

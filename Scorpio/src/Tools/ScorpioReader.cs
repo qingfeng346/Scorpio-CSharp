@@ -90,7 +90,7 @@ namespace Scorpio.Tools {
                 instructions[i] = new ScriptInstruction(ReadInt32(), ReadInt32(), ReadInt32());
             }
             return new ScriptFunctionData() {
-                parameterCount = parameterCount,
+                parameterCount = (byte)parameterCount,
                 param = param,
                 variableCount = variableCount,
                 internalCount = internalCount,
