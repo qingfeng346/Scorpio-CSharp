@@ -90,9 +90,10 @@ namespace Scorpio.Runtime {
             var global = m_script.Global;
             byte tempValueType; //临时存储
             int tempIndex; //临时存储
-            ScriptInstruction instruction = null;
+            ScriptInstruction instruction = default;
             Opcode opcode = Opcode.Nop;
             int opvalue;
+            int line = 0;
             try {
 #if EXECUTE_COROUTINE
                 //进函数先调用一次 MoveNext,否则 finally 无法正常调用,会导致泄漏
@@ -105,9 +106,10 @@ namespace Scorpio.Runtime {
                         instruction = instructions[iInstruction++];
                         opvalue = instruction.opvalue;
                         opcode = instruction.opcode;
+                        line = instruction.line;
 #if SCORPIO_DEBUG
                         ScorpioProfiler.RecordStack.Breviary = m_Breviary;
-                        ScorpioProfiler.RecordStack.Line = instruction.line;
+                        ScorpioProfiler.RecordStack.Line = line;
 #endif
                         switch (instruction.optype) {
                             case OpcodeType.Load:
@@ -284,7 +286,7 @@ namespace Scorpio.Runtime {
                                     }
                                     case Opcode.LoadGlobalString: {
                                         stackObjects[++stackIndex] = global.GetValue(constString[opvalue]);
-                                        instruction.SetOpcode(Opcode.LoadGlobal, global.GetIndex(constString[opvalue]));
+                                        instructions[iInstruction - 1].SetOpcode(Opcode.LoadGlobal, global.GetIndex(constString[opvalue]));
                                         continue;
                                     }
                                     case Opcode.CopyStackTop: {
@@ -306,7 +308,7 @@ namespace Scorpio.Runtime {
                                     case Opcode.ToGlobal: {
                                         tempIndex = global.GetIndex(stackObjects[stackIndex--].stringValue);
                                         global.SetValueByIndex(tempIndex, stackObjects[stackIndex]);
-                                        instruction.SetOpcode(Opcode.LoadGlobal, tempIndex);
+                                        instructions[iInstruction - 1].SetOpcode(Opcode.LoadGlobal, tempIndex);
                                         for (var i = 0; i < opvalue; ++i) {
                                             instructions[iInstruction - i - 2].SetOpcode(Opcode.Nop);
                                         }
@@ -315,7 +317,7 @@ namespace Scorpio.Runtime {
                                     case Opcode.ToGlobalFunction: {
                                         tempIndex = global.GetIndex(stackObjects[stackIndex--].stringValue);
                                         global.SetValueByIndex(tempIndex, stackObjects[stackIndex]);
-                                        instruction.SetOpcode(Opcode.LoadGlobal, tempIndex);
+                                        instructions[iInstruction - 1].SetOpcode(Opcode.LoadGlobal, tempIndex);
                                         for (var i = 0; i < opvalue; ++i) {
                                             if (i == 0) {
                                                 instructions[iInstruction - i - 2].SetOpcode(Opcode.LoadConstNull);
@@ -446,7 +448,7 @@ namespace Scorpio.Runtime {
                                     }
                                     case Opcode.StoreGlobalStringAssign: {
                                         global.SetValue(constString[opvalue], stackObjects[stackIndex]);
-                                        instruction.SetOpcode(Opcode.StoreGlobalAssign, global.GetIndex(constString[opvalue]));
+                                        instructions[iInstruction - 1].SetOpcode(Opcode.StoreGlobalAssign, global.GetIndex(constString[opvalue]));
                                         continue;
                                     }
                                     case Opcode.StoreValueAssign: {
@@ -573,7 +575,7 @@ namespace Scorpio.Runtime {
                                     }
                                     case Opcode.StoreGlobalString: {
                                         global.SetValue(constString[opvalue], stackObjects[stackIndex--]);
-                                        instruction.SetOpcode(Opcode.StoreGlobal, global.GetIndex(constString[opvalue]));
+                                        instructions[iInstruction - 1].SetOpcode(Opcode.StoreGlobal, global.GetIndex(constString[opvalue]));
                                         continue;
                                     }
                                     default: throw new ExecutionException("unknown opcode : " + opcode);
@@ -1375,7 +1377,7 @@ namespace Scorpio.Runtime {
                                         for (var i = opvalue - 1; i >= 0; --i) {
                                             parameters[i] = stackObjects[stackIndex--];
                                         }
-                                        m_script.PushStackInfo(m_Breviary, instruction.line);
+                                        m_script.PushStackInfo(m_Breviary, line);
                                         try {
                                             stackObjects[stackIndex] = stackObjects[stackIndex].Call(default, parameters, opvalue);
                                         } finally {
@@ -1389,7 +1391,7 @@ namespace Scorpio.Runtime {
                                         }
                                         var func = stackObjects[stackIndex--];
                                         var parent = stackObjects[stackIndex--];
-                                        m_script.PushStackInfo(m_Breviary, instruction.line);
+                                        m_script.PushStackInfo(m_Breviary, line);
                                         try {
                                             stackObjects[++stackIndex] = func.Call(parent, parameters, opvalue);
                                         } finally {
@@ -1503,7 +1505,7 @@ namespace Scorpio.Runtime {
                                         }
                                         stackIndex -= funcParameterCount;
                                         var func = stackObjects[stackIndex--]; //函数对象
-                                        m_script.PushStackInfo(m_Breviary, instruction.line);
+                                        m_script.PushStackInfo(m_Breviary, line);
                                         try {
                                             stackObjects[++stackIndex] = func.Call(default, parameters, parameterIndex);
                                         } finally {
@@ -1537,7 +1539,7 @@ namespace Scorpio.Runtime {
                                         stackIndex -= funcParameterCount;
                                         var func = stackObjects[stackIndex--]; //函数对象
                                         var parent = stackObjects[stackIndex--]; //函数父级
-                                        m_script.PushStackInfo(m_Breviary, instruction.line);
+                                        m_script.PushStackInfo(m_Breviary, line);
                                         try {
                                             stackObjects[++stackIndex] = func.Call(parent, parameters, parameterIndex);
                                         } finally {
@@ -1568,7 +1570,7 @@ namespace Scorpio.Runtime {
                                         }
                                         var func = stackObjects[stackIndex--];              //函数对象
                                         var prototype = stackObjects[stackIndex--];
-                                        m_script.PushStackInfo(m_Breviary, instruction.line);
+                                        m_script.PushStackInfo(m_Breviary, line);
                                         try {
                                             stackObjects[++stackIndex] = func.Call(thisObject, parameters, opvalue, prototype.Get<ScriptType>());
                                         } finally {
@@ -1602,7 +1604,7 @@ namespace Scorpio.Runtime {
                                         stackIndex -= funcParameterCount;
                                         var func = stackObjects[stackIndex--]; //函数对象
                                         var prototype = stackObjects[stackIndex--];
-                                        m_script.PushStackInfo(m_Breviary, instruction.line);
+                                        m_script.PushStackInfo(m_Breviary, line);
                                         try {
                                             stackObjects[++stackIndex] = func.Call(thisObject, parameters, parameterIndex, prototype.Get<ScriptType>());
                                         } finally {
@@ -1909,12 +1911,12 @@ namespace Scorpio.Runtime {
                         iInstruction = tryStack[tryIndex--];
                         goto KeepOn;
                     } else {
-                        e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
+                        e.message = $"{m_Breviary}:{line}({opcode})\n  {e.message}";
                         throw;
                     }
                     //脚本系统错误
                 } catch (ExecutionException e) {
-                    e.message = $"{m_Breviary}:{instruction.line}({opcode})\n  {e.message}";
+                    e.message = $"{m_Breviary}:{line}({opcode})\n  {e.message}";
                     if (tryIndex > -1) {
                         stackObjects[stackIndex = 0] = ScriptValue.CreateValue(e);
                         iInstruction = tryStack[tryIndex--];
@@ -1929,7 +1931,7 @@ namespace Scorpio.Runtime {
                         iInstruction = tryStack[tryIndex--];
                         goto KeepOn;
                     } else {
-                        throw new ExecutionException($"{m_Breviary}:{instruction.line}({opcode}){parameters.GetParametersString(length)}", e);
+                        throw new ExecutionException($"{m_Breviary}:{line}({opcode}){parameters.GetParametersString(length)}", e);
                     }
                 }
             } catch (System.Exception) {

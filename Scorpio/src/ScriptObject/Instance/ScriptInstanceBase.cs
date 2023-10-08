@@ -78,6 +78,13 @@ namespace Scorpio {
             ScorpioUtil.Parameters[0] = obj;
             return func.Call(ThisValue, ScorpioUtil.Parameters, 1);
         }
+        public override int GetHashCode() {
+            var func = m_Prototype.GetValueNoDefault(ScriptOperator.getHashCode).Get<ScriptFunction>();
+            if (func != null) {
+                return func.Call(ThisValue, ScorpioUtil.VALUE_EMPTY, 0).ToInt32();
+            }
+            return base.GetHashCode();
+        }
         public override bool Equals(ScriptValue obj) {
             if (m_Prototype.EqualFunction != null) {
                 ScorpioUtil.Parameters[0] = obj;

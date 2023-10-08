@@ -94,22 +94,22 @@ namespace Scorpio.Userdata {
         public override bool GreaterOrEqual(ScriptValue obj) {
             return CallCompare(UserdataOperator.GreaterOrEqualIndex, obj);
         }
-        public override bool Equals(ScriptValue obj) {
-            var func = m_UserdataType.GetOperator(UserdataOperator.EqualIndex);
-            if (func != null) {
-                var parameters = ScorpioUtil.Parameters;
-                parameters[0] = ThisValue;
-                parameters[1] = obj;
-                if (func.CallNoThrow(true, null, parameters, 2, out var result)) {
-                    return (bool)result;
-                }
-            }
-            switch (obj.valueType) {
-                case ScriptValue.nullValueType: return false;
-                case ScriptValue.scriptValueType: return m_Value == obj.scriptValue.Value;
-                default: return false;
-            }
-        }
+        //public override bool Equals(ScriptValue obj) {
+        //    //var func = m_UserdataType.GetOperator(UserdataOperator.EqualIndex);
+        //    //if (func != null) {
+        //    //    var parameters = ScorpioUtil.Parameters;
+        //    //    parameters[0] = ThisValue;
+        //    //    parameters[1] = obj;
+        //    //    if (func.CallNoThrow(true, null, parameters, 2, out var result)) {
+        //    //        return (bool)result;
+        //    //    }
+        //    //}
+        //    //switch (obj.valueType) {
+        //    //    case ScriptValue.nullValueType: return false;
+        //    //    case ScriptValue.scriptValueType: return m_Value == obj.scriptValue.Value;
+        //    //    default: return false;
+        //    //}
+        //}
         bool CallCompare(int operatorIndex, ScriptValue obj) {
             var func = m_UserdataType.GetOperator(operatorIndex);
             if (func == null) throw new ExecutionException($"类[{m_ValueType.Name}]找不到[{UserdataOperator.GetOperatorByIndex(operatorIndex)}]运算符重载");

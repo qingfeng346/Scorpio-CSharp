@@ -2,6 +2,5 @@
     "defines" : [],
     "ignoreFunctions" : [],
     "staticTypes" : [],
-    "staticVariables" : ["String.csFormat"],
-    "const" : "./const.sco"
+    "staticVariables" : []
 }

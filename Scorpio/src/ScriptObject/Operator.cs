@@ -19,6 +19,7 @@ namespace Scorpio {
         public const string Equal = "==";
         public const string Constructor = "constructor";       //构造函数
         public const string Invoke = "()";
+        public const string getHashCode = "getHashCode";
         public const string toString = "toString";
     }
     //c#运算符重载
@@ -60,7 +61,7 @@ namespace Scorpio {
                 case GreaterOrEqualIndex: return ">=";
                 case LessIndex: return "<";
                 case LessOrEqualIndex: return "<=";
-                case EqualIndex: return "==";
+                case EqualIndex: return "Equals";
                 case GetItemIndex: return "[] get";
                 case SetItemIndex: return "[] set";
                 default: throw new ExecutionException($"未知的运算符索引 : {index}");
@@ -82,7 +83,8 @@ namespace Scorpio {
         public const string GreaterOrEqual = "op_GreaterThanOrEqual";   //运算符重载 >=
         public const string Less = "op_LessThan";                       //运算符重载 <
         public const string LessOrEqual = "op_LessThanOrEqual";         //运算符重载 >=
-        public const string Equal = "op_Equality";                      //运算符重载 ==
+        //public const string Equal = "op_Equality";                      //运算符重载 ==
+        public const string Equal = "Equals";                           //重载 Equals
 
         public const string GetItem = "get_Item";                       //运算符重载 [] get
         public const string SetItem = "set_Item";                       //运算符重载 [] set

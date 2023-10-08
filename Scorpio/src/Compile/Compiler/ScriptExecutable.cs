@@ -97,13 +97,11 @@ namespace Scorpio.Compile.Compiler {
             --m_StackIndex;
             Blocks.Pop();
         }
-        public ScriptInstructionCompiler AddScriptInstruction(Opcode opcode, int opvalue, int line) {
-            return AddScriptInstruction(new ScriptInstruction(opcode, opvalue, line));
-        }
         //添加一条指令
-        ScriptInstructionCompiler AddScriptInstruction(ScriptInstruction instruction) {
+        public ScriptInstructionCompiler AddScriptInstruction(Opcode opcode, int opvalue, int line) {
+            var instruction = new ScriptInstruction(opcode, opvalue, line);
             m_listScriptInstructions.Add(instruction);
-            return new ScriptInstructionCompiler() { instruction = instruction, index = m_listScriptInstructions.Count - 1};
+            return new ScriptInstructionCompiler(m_listScriptInstructions);
         }
         public int AddIndex(string str) {
             int count = m_Stacks[m_StackIndex];
@@ -136,11 +134,11 @@ namespace Scorpio.Compile.Compiler {
                 var instruction = m_listScriptInstructions[i];
                 if (m_VariableToInternal.TryGetValue(instruction.opvalue, out var internalValue)) {
                     if (instruction.opcode == Opcode.LoadLocal) {
-                        m_listScriptInstructions[i].SetOpcode(Opcode.LoadInternal, internalValue);
+                        m_listScriptInstructions[i] = instruction.SetOpcode(Opcode.LoadInternal, internalValue);
                     } else if (instruction.opcode == Opcode.StoreLocal) {
-                        m_listScriptInstructions[i].SetOpcode(Opcode.StoreInternal, internalValue);
+                        m_listScriptInstructions[i] = instruction.SetOpcode(Opcode.StoreInternal, internalValue);
                     } else if (instruction.opcode == Opcode.StoreLocalAssign) {
-                        m_listScriptInstructions[i].SetOpcode(Opcode.StoreInternalAssign, internalValue);
+                        m_listScriptInstructions[i] = instruction.SetOpcode(Opcode.StoreInternalAssign, internalValue);
                     }
                 }
             }
@@ -155,8 +153,8 @@ namespace Scorpio.Compile.Compiler {
                         }
                     }
                     if (count > 0) {
-                        m_listScriptInstructions[i].opvalue -= count;
-                        //m_listScriptInstructions[i].SetValue(instruction.opvalue - count);
+                        instruction.opvalue = instruction.opvalue - count;
+                        m_listScriptInstructions[i] = instruction;
                     }
                 }
             }

@@ -29,6 +29,9 @@ namespace Scorpio.Function {
             m_BindObject = bindObject;
         }
         public override ScriptValue BindObject => m_BindObject;
+        public override int GetHashCode() {
+            return CombineHashCodes(m_Context.GetHashCode(), m_BindObject.GetHashCode());
+        }
         public override bool Equals(ScriptValue obj) {
             var func = obj.Get<ScriptScriptBindFunctionBase>();
             return func != null && ReferenceEquals(m_Context, func.m_Context) && m_BindObject.Equals(func.m_BindObject);

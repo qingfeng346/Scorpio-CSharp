@@ -1,7 +1,7 @@
 namespace Scorpio.Instruction {
     //不能使用 struct 编译时会稍后修改内部值 
     //单条指令
-    public class ScriptInstruction {
+    public struct ScriptInstruction {
         public int opvalue;         //指令值
         public int line;            //代码在多少行
         public OpcodeType optype;   //指令类型
@@ -17,7 +17,7 @@ namespace Scorpio.Instruction {
         public void SetOpcode(Opcode opcode) {
             SetOpcode(opcode, opvalue);
         }
-        public void SetOpcode(Opcode opcode, int opvalue) {
+        public ScriptInstruction SetOpcode(Opcode opcode, int opvalue) {
             this.opcode = opcode;
             this.opvalue = opvalue;
             if (opcode == Opcode.Nop) {
@@ -35,6 +35,10 @@ namespace Scorpio.Instruction {
             } else if (opcode > Opcode.JumpBegin) {
                 this.optype = OpcodeType.Jump;
             }
+            return this;
+        }
+        public override string ToString() {
+            return $"{opcode} - {opvalue}";
         }
     }
 }
