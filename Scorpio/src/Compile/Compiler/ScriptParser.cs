@@ -764,7 +764,7 @@ namespace Scorpio.Compile.Compiler {
             var index = Functions.Count;
             Functions.Add(new ScriptFunctionData() {
                 scriptInstructions = executable.ScriptInstructions,
-                parameterCount = (byte)listParameters.Count,
+                parameterCount = listParameters.Count,
                 param = bParams,
                 variableCount = executable.VariableCount,
                 internalCount = executable.InternalCount,

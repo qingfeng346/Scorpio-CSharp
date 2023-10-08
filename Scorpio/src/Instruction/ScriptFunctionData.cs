@@ -6,7 +6,7 @@ namespace Scorpio.Instruction {
         public int[] internals;                             //内部变量赋值 前16位为父级索引 后16为自己索引
         public int variableCount;                           //局部变量数量
         public int internalCount;                           //内部变量数量
-        public byte parameterCount;                         //参数个数
+        public int parameterCount;                          //参数个数
         public bool param;                                  //是否是变长参数
         public string ToString(double[] constDouble, long[] constLong, string[] constString) {
             var builder = new StringBuilder();
