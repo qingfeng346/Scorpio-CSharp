@@ -21,6 +21,11 @@ namespace Scorpio {
             m_GetProperties = new ScorpioStringDictionary<ScriptFunction>();
         }
         public Script script => m_Script;
+#if SCORPIO_DEBUG
+        public void SetScript(Script script) {
+            m_Script = script;
+        }
+#endif
         public string TypeName { get; private set; }        //Type名称
         public virtual ScriptType Prototype { get { return m_Prototype; } set { m_Prototype = value ?? m_Script.TypeObject; } }
         public virtual ScriptFunction EqualFunction => m_EqualFunction ?? m_Prototype.EqualFunction;
