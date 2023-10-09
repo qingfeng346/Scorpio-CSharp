@@ -199,8 +199,7 @@ namespace Scorpio.Compile.Compiler {
                 if (PeekToken().Type == TokenType.Import) {
                     ReadToken();
                     var fileName = ReadString();
-                    fileName = SearchImportFile(fileName);
-                    using (var stream = File.OpenRead(fileName)) {
+                    using (var stream = File.OpenRead(SearchImportFile(fileName))) {
                         var buffer = new byte[stream.Length];
                         stream.ReadBytes(buffer);
                         parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), searchPaths, compileOption, parsers).Parse());
