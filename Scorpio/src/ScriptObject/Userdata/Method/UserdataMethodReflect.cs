@@ -72,7 +72,6 @@ namespace Scorpio.Userdata {
             m_Methods = functionMethod.ToArray();
             m_StaticMethods = functionStaticMethod.ToArray();
             m_GenericMethods = genericMethods.ToArray();
-            m_GenericMethodCount = m_GenericMethods.Length;
         }
         //添加一个扩展函数
         public void AddExtensionMethod(MethodInfo method) {

@@ -29,7 +29,6 @@ namespace Scorpio.Userdata {
             m_Methods = functionMethod.ToArray();
             m_StaticMethods = functionStaticMethod.ToArray();
             m_GenericMethods = genericMethods.ToArray();
-            m_GenericMethodCount = m_GenericMethods.Length;
         }
     }
 }

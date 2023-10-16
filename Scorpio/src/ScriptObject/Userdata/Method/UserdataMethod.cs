@@ -8,7 +8,6 @@ namespace Scorpio.Userdata {
         protected FunctionData[] m_Methods; //所有函数
         protected FunctionData[] m_StaticMethods; //所有静态函数
         protected FunctionDataGeneric[] m_GenericMethods; //所有模板函数
-        protected int m_GenericMethodCount = 0; //模板函数数量
         public string MethodName { get; protected set; } //函数名字
 
         public UserdataMethod (Type type, string methodName) {
@@ -17,7 +16,7 @@ namespace Scorpio.Userdata {
         }
         //创建一个模板函数
         public UserdataMethodGeneric MakeGenericMethod (Type[] parameters) {
-            for (var i = 0; i < m_GenericMethodCount; ++i) {
+            for (var i = 0; i < m_GenericMethods.Length; ++i) {
                 var method = m_GenericMethods[i];
                 var types = method.Method.GetGenericArguments ();
                 var length = types.Length;
