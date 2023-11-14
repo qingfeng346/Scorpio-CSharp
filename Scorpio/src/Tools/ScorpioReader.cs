@@ -26,14 +26,8 @@ namespace Scorpio.Tools {
                 internals[i] = ReadInt32();
             }
             var instructions = new ScriptInstruction[ReadInt32()];
-            if (version >= VersionInstruction) {
-                for (var i = 0; i < instructions.Length; ++i) {
-                    instructions[i] = new ScriptInstruction(ReadByte(), ReadInt32(), ReadUInt16());
-                }
-            } else {
-                for (var i = 0; i < instructions.Length; ++i) {
-                    instructions[i] = new ScriptInstruction((byte)ReadInt32(), ReadInt32(), (ushort)ReadInt32());
-                }
+            for (var i = 0; i < instructions.Length; ++i) {
+                instructions[i] = new ScriptInstruction(ReadInt32(), ReadInt32(), ReadInt32());
             }
             return new ScriptFunctionData() {
                 parameterCount = parameterCount,

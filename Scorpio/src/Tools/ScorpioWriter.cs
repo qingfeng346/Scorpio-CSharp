@@ -27,29 +27,19 @@ namespace Scorpio.Tools {
             Write(data.variableCount);
             Write(data.internalCount);
             Write(data.internals.Length);
-            Array.ForEach(data.internals, (value) => Write(value));
+            Array.ForEach(data.internals, Write);
             Write(data.scriptInstructions.Length);
-            if (version >= VersionInstruction) {
-                Array.ForEach(data.scriptInstructions, (value) => {
-                    Write((byte)value.opcode);
-                    Write((int)value.opvalue);
-                    Write((ushort)value.line);
-                });
-            } else {
-                Array.ForEach(data.scriptInstructions, (value) => {
-                    Write((int)value.opcode);
-                    Write((int)value.opvalue);
-                    Write((int)value.line);
-                });
-            }
+            Array.ForEach(data.scriptInstructions, (value) => {
+                Write((int)value.opcode);
+                Write((int)value.opvalue);
+                Write((int)value.line);
+            });
         }
         public void WriteClass(ScriptClassData data) {
             Write(data.name);
             Write(data.parent);
             Write(data.functions.Length);
-            Array.ForEach(data.functions, (value) => {
-                Write(value);
-            });
+            Array.ForEach(data.functions,Write);
         }
         public void WriteNoContext(byte[] noContext) {
             if (version >= VersionNoContext) {
