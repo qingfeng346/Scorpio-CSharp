@@ -24,25 +24,22 @@ namespace Scorpio.Instruction {
             this.Classes = parser.Classes.ToArray();
             this.NoContext = parser.GetNoContext();
         }
-        public SerializeData Serialize(ScorpioWriter writer, short version) {
+        public SerializeData Serialize(ScorpioWriter writer) {
             writer.Write(ConstDouble.Length);
             Array.ForEach(ConstDouble, writer.Write);
             writer.Write(ConstLong.Length);
             Array.ForEach(ConstLong, writer.Write);
             writer.Write(ConstString.Length);
             Array.ForEach(ConstString, writer.Write);
-            writer.Write(Context);
+            writer.WriteFunction(Context);
             writer.Write(Functions.Length);
-            Array.ForEach(Functions, writer.Write);
+            Array.ForEach(Functions, writer.WriteFunction);
             writer.Write(Classes.Length);
-            Array.ForEach(Classes, writer.Write);
-            if (version > 2) {
-                writer.Write(NoContext.Length);
-                Array.ForEach(NoContext, writer.Write);
-            }
+            Array.ForEach(Classes, writer.WriteClass);
+            writer.WriteNoContext(NoContext);
             return this;
         }
-        public SerializeData Deserialize(ScorpioReader reader, short version) {
+        public SerializeData Deserialize(ScorpioReader reader) {
             var length = reader.ReadInt32();
             var constDouble = new double[length];
             for (var i = 0; i < length; ++i) {
@@ -78,15 +75,7 @@ namespace Scorpio.Instruction {
                 classes[i] = reader.ReadClass();
             }
             Classes = classes;
-            if (version > 2) {
-                length = reader.ReadInt32();
-                NoContext = new byte[length];
-                for (var i = 0; i < length; ++i) {
-                    NoContext[i] = reader.ReadByte();
-                }
-            } else {
-                NoContext = new byte[0];
-            }
+            NoContext = reader.ReadNoContext();
             return this;
         }
     }

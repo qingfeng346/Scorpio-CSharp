@@ -15,11 +15,11 @@ namespace Scorpio.Serialize {
             using (var reader = new ScorpioReader(stream)) {
                 reader.ReadByte();      //占位符
                 reader.ReadInt32();     //占位符
-                var version = reader.ReadInt16();     //version 解析版本号
-                var number = reader.ReadInt32();
+                reader.version = reader.ReadInt16();        //version 解析版本号
+                var number = reader.ReadInt32();            //文件数量
                 var datas = new SerializeData[number];
                 for (var i = 0; i < number; ++i) {
-                    datas[i] = new SerializeData(reader.ReadString()).Deserialize(reader, version);
+                    datas[i] = new SerializeData(reader.ReadString()).Deserialize(reader);
                 }
                 return datas;
             }

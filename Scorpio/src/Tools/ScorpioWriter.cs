@@ -1,46 +1,17 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using Scorpio.Instruction;
 namespace Scorpio.Tools {
+    using static ScorpioUtil;
     public class ScorpioWriter : BinaryWriter {
+        private short version;
 #if NETSTANDARD
-        public ScorpioWriter(Stream stream) : base(stream, Script.Encoding, true) { }
+        public ScorpioWriter(Stream stream, short version) : base(stream, Script.Encoding, true) {
 #else
-        public ScorpioWriter(Stream stream) : base(stream, Script.Encoding) { }
+        public ScorpioWriter(Stream stream, short version) : base(stream, Script.Encoding) {
 #endif
-        //public ScorpioWriter(Stream output) {
-        //    m_stream = output;
-        //    m_buffer = new byte[8];
-        //}
-        //private Stream m_stream;
-        //private byte[] m_buffer;
-        //public ScorpioWriter(Stream output) {
-        //    m_stream = output;
-        //    m_buffer = new byte[8];
-        //}
-        //public void Dispose() {
-        //    m_stream = null;
-        //    m_buffer = null;
-        //}
-        //public void Write(byte value) {
-        //    m_stream.WriteByte(value);
-        //}
-        //public void Write(byte[] buffer) {
-        //    m_stream.Write(buffer, 0, buffer.Length);
-        //}
-        //public void Write(double value) {
-        //    ulong TmpValue = *(ulong*)&value;
-        //    _buffer[0] = (byte)TmpValue;
-        //    _buffer[1] = (byte)(TmpValue >> 8);
-        //    _buffer[2] = (byte)(TmpValue >> 16);
-        //    _buffer[3] = (byte)(TmpValue >> 24);
-        //    _buffer[4] = (byte)(TmpValue >> 32);
-        //    _buffer[5] = (byte)(TmpValue >> 40);
-        //    _buffer[6] = (byte)(TmpValue >> 48);
-        //    _buffer[7] = (byte)(TmpValue >> 56);
-        //    OutStream.Write(_buffer, 0, 8);
-        //}
+            this.version = version;
+        }
         public override void Write(string value) {
             if (string.IsNullOrEmpty(value)) {
                 Write(0);
@@ -50,7 +21,7 @@ namespace Scorpio.Tools {
                 Write(bytes);
             }
         }
-        public void Write(ScriptFunctionData data) {
+        public void WriteFunction(ScriptFunctionData data) {
             Write(data.parameterCount);
             Write(data.param ? (byte)1 : (byte)0);
             Write(data.variableCount);
@@ -58,19 +29,33 @@ namespace Scorpio.Tools {
             Write(data.internals.Length);
             Array.ForEach(data.internals, (value) => Write(value));
             Write(data.scriptInstructions.Length);
-            Array.ForEach(data.scriptInstructions, (value) => {
-                Write((int)value.opcode);
-                Write(value.opvalue);
-                Write(value.line);
-            });
+            if (version >= VersionInstruction) {
+                Array.ForEach(data.scriptInstructions, (value) => {
+                    Write((byte)value.opcode);
+                    Write((int)value.opvalue);
+                    Write((ushort)value.line);
+                });
+            } else {
+                Array.ForEach(data.scriptInstructions, (value) => {
+                    Write((int)value.opcode);
+                    Write((int)value.opvalue);
+                    Write((int)value.line);
+                });
+            }
         }
-        public void Write(ScriptClassData data) {
+        public void WriteClass(ScriptClassData data) {
             Write(data.name);
             Write(data.parent);
             Write(data.functions.Length);
             Array.ForEach(data.functions, (value) => {
                 Write(value);
             });
+        }
+        public void WriteNoContext(byte[] noContext) {
+            if (version >= VersionNoContext) {
+                Write(noContext.Length);
+                Array.ForEach(noContext, Write);
+            }
         }
     }
 }

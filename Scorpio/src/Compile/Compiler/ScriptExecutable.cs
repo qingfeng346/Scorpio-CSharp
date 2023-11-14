@@ -99,7 +99,7 @@ namespace Scorpio.Compile.Compiler {
         }
         //添加一条指令
         public ScriptInstructionCompiler AddScriptInstruction(Opcode opcode, int opvalue, int line) {
-            var instruction = new ScriptInstruction(opcode, opvalue, line);
+            var instruction = new ScriptInstruction(opcode, opvalue, (ushort)line);
             m_listScriptInstructions.Add(instruction);
             return new ScriptInstructionCompiler(m_listScriptInstructions);
         }
