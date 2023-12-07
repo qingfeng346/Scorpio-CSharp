@@ -97,7 +97,7 @@ namespace Scorpio.Runtime {
             try {
 #if EXECUTE_COROUTINE
                 //进函数先调用一次 MoveNext,否则 finally 无法正常调用,会导致泄漏
-                yield return null;
+                //yield return null;
 #else
             KeepOn:
                 try {
