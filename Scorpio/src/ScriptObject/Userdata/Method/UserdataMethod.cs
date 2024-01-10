@@ -10,6 +10,9 @@ namespace Scorpio.Userdata {
         protected FunctionDataGeneric[] m_GenericMethods; //所有模板函数
         public string MethodName { get; protected set; } //函数名字
 
+        public override string ToString() {
+            return MethodName;
+        }
         public UserdataMethod (Type type, string methodName) {
             m_Type = type;
             MethodName = methodName;

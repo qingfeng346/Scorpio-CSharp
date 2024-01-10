@@ -16,7 +16,7 @@ namespace Scorpio.Userdata {
             }
         }
         public override Type ValueType => ScorpioUtil.TYPE_TYPE;
-        public override string ToString() { return m_ValueType.Name; }
+        public override string ToString() { return m_ValueType.FullName; }
         public override ScriptValue GetValue(string key) {
             if (m_Enums.TryGetValue(key, out var value))
                 return value;
