@@ -1338,6 +1338,7 @@ namespace Scorpio.Compile.Compiler {
                 }
                 case TokenType.Async: {
                     if (PeekToken().Type == TokenType.LeftPar) {
+                        ReadToken();
                         ret = GetRegionOrLambda(true);
                     } else {
                         ret = new CodeFunction(ParseFunctionContent(true, out _), token.SourceLine) { async = true };
