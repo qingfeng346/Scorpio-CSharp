@@ -10,13 +10,13 @@ using Scorpio;
 public class __FactoryName : IScorpioDelegateFactory {
     private static Dictionary<Type, Func<ScriptObject, Delegate>> delegates = new Dictionary<Type, Func<ScriptObject, Delegate>>();
     public static void Initialize() {
-        ScorpioDelegateFactoryManager.SetFactory(new DelegateFactory());__DelegateList__CreateDelegate
+        ScorpioDelegateFactoryManager.AddFactory(new DelegateFactory());__DelegateList__CreateDelegate
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
         if (delegates.TryGetValue(delegateType, out var func)) {
             return func(scriptObject);
         }
-        throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);
+        return null;
     }
 }";
         private const string TemplateIf = @"using System;
@@ -24,10 +24,10 @@ using System.Collections.Generic;
 using Scorpio;
 public class __FactoryName : IScorpioDelegateFactory {
     public static void Initialize() {
-        ScorpioDelegateFactoryManager.SetFactory(new __FactoryName());__DelegateList
+        ScorpioDelegateFactoryManager.AddFactory(new __FactoryName());__DelegateList
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {__CreateDelegate
-        throw new Exception(""Delegate Type is not found : "" + delegateType + ""  scriptObject : "" + scriptObject);
+        return null;
     }
 }";
         public struct Option {

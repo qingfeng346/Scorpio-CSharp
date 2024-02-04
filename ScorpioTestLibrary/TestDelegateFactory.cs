@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Scorpio;
 public class TestDelegateFactory : IScorpioDelegateFactory {
     public static void Initialize() {
-        ScorpioDelegateFactoryManager.SetFactory(new TestDelegateFactory());
+        ScorpioDelegateFactoryManager.AddFactory(new TestDelegateFactory());
     }
     public Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
         if (delegateType == typeof(System.Action)) {
@@ -38,6 +38,6 @@ public class TestDelegateFactory : IScorpioDelegateFactory {
             return new System.Func<System.String,System.String>( (arg0) => { return scriptObject.call(ScriptValue.Null,arg0).ToString(); } );
             #endif
         }
-        throw new Exception("Delegate Type is not found : " + delegateType + "  scriptObject : " + scriptObject);
+        return null;
     }
 }

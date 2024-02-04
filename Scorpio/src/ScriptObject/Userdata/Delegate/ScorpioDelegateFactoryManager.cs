@@ -6,12 +6,19 @@ using Scorpio.Tools;
 namespace Scorpio {
     public class ScorpioDelegateFactoryManager {
 #if !SCORPIO_DYNAMIC_DELEGATE
-        private static IScorpioDelegateFactory m_Factory = null;
-        public static void SetFactory(IScorpioDelegateFactory factory) {
-            m_Factory = factory;
+        private static List<IScorpioDelegateFactory> m_Factory = new List<IScorpioDelegateFactory>();
+        public static void ClearFactory() {
+            m_Factory.Clear();
+        }
+        public static void AddFactory(IScorpioDelegateFactory factory) {
+            m_Factory.Add(factory);
         }
         public static Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
-            return m_Factory.CreateDelegate(delegateType, scriptObject);
+            for (var i = 0; i < m_Factory.Count; ++i) {
+                var dele = m_Factory[i].CreateDelegate(delegateType, scriptObject);
+                if (dele != null) return dele;
+            }
+            throw new System.Exception($"Delegate Type is not found : {delegateType}  scriptObject : {scriptObject}");
         }
 #else
         class DelegateData {
@@ -55,7 +62,8 @@ namespace Scorpio {
             }
             return m_DelegateDatas[delegateType] = data;
         }
-        public static void SetFactory(IScorpioDelegateFactory factory) { }
+        public static void ClearFactory() { }
+        public static void AddFactory(IScorpioDelegateFactory factory) { }
         public static Delegate CreateDelegate(Type delegateType, ScriptObject scriptObject) {
             var data = GetDelegateData(delegateType);
             var func = new ScriptDelegate(scriptObject);

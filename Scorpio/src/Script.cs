@@ -216,9 +216,13 @@ namespace Scorpio {
         public void PushAssembly(Assembly assembly) {
             ScorpioTypeManager.PushAssembly(assembly);
         }
-        /// <summary> 设置函数指针仓库 </summary>
-        public void SetDelegateFactory(IScorpioDelegateFactory factory) {
-            ScorpioDelegateFactoryManager.SetFactory(factory);
+        /// <summary> 添加函数指针仓库 </summary>
+        public void AddDelegateFactory(IScorpioDelegateFactory factory) {
+            ScorpioDelegateFactoryManager.AddFactory(factory);
+        }
+        /// <summary> 清空函数指针仓库 </summary>
+        public void ClearDelegateFactory() {
+            ScorpioDelegateFactoryManager.ClearFactory();
         }
         /// <summary> 设置快速反射类 </summary>
         public void SetFastReflectClass(Type type, IScorpioFastReflectClass fastReflectClass) {
