@@ -2,15 +2,9 @@
 using Scorpio.Tools;
 namespace Scorpio.Runtime {
     public class GlobalCache {
-        public double[] ConstDouble { get; private set; }
-        public long[] ConstLong { get; private set; }
-        public string[] ConstString { get; private set; }
-        public GlobalCache() { }
-        public GlobalCache(double[] doubles, long[] longs, string[] strings) {
-            ConstDouble = doubles;
-            ConstLong = longs;
-            ConstString = strings;
-        }
+        public double[] ConstDouble;
+        public long[] ConstLong;
+        public string[] ConstString;
         internal void WriteConst(ScorpioWriter writer) {
             writer.Write(ConstDouble.Length);
             Array.ForEach(ConstDouble, writer.Write);
