@@ -1,3 +1,8 @@
+## v2.7.1 (*2024-03-11*)
+* `[新增]`新增GlobalCache,支持全局**Double Long String**索引
+* `[优化]`#import 所有文件使用同一份**Double Long String**索引
+* `[注意]`使用以上特性 Serializer 需要 **4** 以上版本
+
 ## v2.7.0 (*2023-07-31*)
 * `[新增]`新增Profiler功能,方便查找内存泄露
 * `[优化]`合并**ConstString**
