@@ -1,18 +1,20 @@
-TestClass = importType("TestClass")
-print(TestClass)
-var a = new TestClass()
-var b = new TestClass()
-print(a == b)
-// tab = {}
-// tab2 = {}
-// function func1() {
-// }
-// var a = func1.bind(tab)
-// var b = func1.bind(tab2)
-var hash = new HashSet()
-hash.add(a)
-hash.add(b)
-print(hash.length())
+#import "import.im.sco"
+test()
+// TestClass = importType("TestClass")
+// print(TestClass)
+// var a = new TestClass()
+// var b = new TestClass()
+// print(a == b)
+// // tab = {}
+// // tab2 = {}
+// // function func1() {
+// // }
+// // var a = func1.bind(tab)
+// // var b = func1.bind(tab2)
+// var hash = new HashSet()
+// hash.add(a)
+// hash.add(b)
+// print(hash.length())
 
 // // function main() {
 // //     var a = func1.bind(tab)

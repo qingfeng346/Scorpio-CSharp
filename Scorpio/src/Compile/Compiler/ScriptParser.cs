@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using Scorpio.Compile.CodeDom;
@@ -6,8 +5,10 @@ using Scorpio.Compile.CodeDom.Temp;
 using Scorpio.Compile.Exception;
 using Scorpio.Instruction;
 using Scorpio.Runtime;
+using Scorpio.Serialize;
 using Scorpio.Tools;
-namespace Scorpio.Compile.Compiler {
+namespace Scorpio.Compile.Compiler
+{
     /// <summary> 编译脚本 </summary>
     public partial class ScriptParser {
         private struct TypeFunction {
@@ -15,17 +16,10 @@ namespace Scorpio.Compile.Compiler {
             public long funcIndex;
             public long funcType; //函数类型 0 普通函数 1 async 函数 2 get函数
         }
-        public List<double> ConstDouble { get; private set; } = new List<double>(); //所有的常量 double
-        private Dictionary<double, int> DoubleMaps = new Dictionary<double, int>();
-        public List<long> ConstLong { get; private set; } = new List<long>();       //所有的常量 long
-        private Dictionary<long, int> LongMaps = new Dictionary<long, int>();
-        public List<string> ConstString { get; private set; } = new List<string>(); //所有的常量 string
-        private Dictionary<string, int> StringMaps = new Dictionary<string, int>();
-        private byte[] NoContext = new byte[1024];                                  //在非Context域是否使用标识
-        private int NoContextLength = 0;
         public ScriptFunctionData Context { get; private set; }                     //解析后主执行
         public List<ScriptFunctionData> Functions { get; private set; } = new List<ScriptFunctionData>(); //定义的所有 function
         public List<ScriptClassData> Classes { get; private set; } = new List<ScriptClassData>(); //定义的所有 class
+        public GlobalCacheCompiler GlobalCache { get; private set; }
         private Stack<List<ScriptInstructionCompiler>> m_Breaks = new Stack<List<ScriptInstructionCompiler>>(); //breaks
         private Stack<List<ScriptInstructionCompiler>> m_Continues = new Stack<List<ScriptInstructionCompiler>>(); //continues
         private Stack<List<ScriptInstructionCompiler>> m_Cases = new Stack<List<ScriptInstructionCompiler>>(); //cases
@@ -34,7 +28,9 @@ namespace Scorpio.Compile.Compiler {
         private List<ScriptInstructionCompiler> m_Case = new List<ScriptInstructionCompiler>(); //case
         private List<ScriptExecutable> m_Executables = new List<ScriptExecutable>(); //指令栈
         private ScriptExecutable m_scriptExecutable; //当前指令栈
-        public int Index { get { return m_scriptExecutable.Count(); } }
+        
+        //指令索引
+        public int InstructionIndex => m_scriptExecutable.InstructionCount;
         public bool SupportCase(ExecutableBlock block) { return block == ExecutableBlock.Switch; }
         public bool SupportBreak(ExecutableBlock block) { return block == ExecutableBlock.For || block == ExecutableBlock.Foreach || block == ExecutableBlock.While || block == ExecutableBlock.Switch; }
         public bool SupportContinue(ExecutableBlock block) { return block == ExecutableBlock.For || block == ExecutableBlock.Foreach || block == ExecutableBlock.While; }
@@ -86,58 +82,12 @@ namespace Scorpio.Compile.Compiler {
             }
             return executable;
         }
-        public byte[] GetNoContext() {
-            var bytes = new byte[NoContextLength];
-            Array.Copy(NoContext, 0, bytes, 0, NoContextLength);
-            return bytes;
-        }
-        void ResizeNoContext(int count) {
-            if (NoContext.Length < count) {
-                Array.Resize(ref NoContext, Math.Max(NoContext.Length * 2, count));
-            }
-            if (NoContextLength < count) {
-                NoContextLength = count;
-            }
-        }
         /// <summary> 获取一个double常量的索引 </summary>
-        int GetConstDouble(double value) {
-            if (!DoubleMaps.TryGetValue(value, out var index)) {
-                index = ConstDouble.Count;
-                ConstDouble.Add(value);
-                DoubleMaps[value] = index;
-                ResizeNoContext(index + 1);
-            }
-            if (m_scriptExecutable.Block != ExecutableBlock.Context) {
-                NoContext[index] |= ScriptConstValue.DoubleFlag;
-            }
-            return index;
-        }
+        int GetConstDouble(double value) => GlobalCache.GetConstDouble(value);
         /// <summary> 获取一个long常量的索引 </summary>
-        int GetConstLong(long value) {
-            if (!LongMaps.TryGetValue(value, out var index)) {
-                index = ConstLong.Count;
-                ConstLong.Add(value);
-                LongMaps[value] = index;
-                ResizeNoContext(index + 1);
-            }
-            if (m_scriptExecutable.Block != ExecutableBlock.Context) {
-                NoContext[index] |= ScriptConstValue.LongFlag;
-            }
-            return index;
-        }
+        int GetConstLong(long value) => GlobalCache.GetConstLong(value);
         /// <summary> 获取一个string常量的索引 </summary>
-        int GetConstString(string value, bool force = false) {
-            if (!StringMaps.TryGetValue(value, out var index)) {
-                index = ConstString.Count;
-                ConstString.Add(value);
-                StringMaps[value] = index;
-                ResizeNoContext(index + 1);
-            }
-            if (m_scriptExecutable.Block != ExecutableBlock.Context || force) {
-                NoContext[index] |= ScriptConstValue.StringFlag;
-            }
-            return index;
-        }
+        int GetConstString(string value) => GlobalCache.GetConstString(value);
         ScriptInstructionCompiler AddScriptInstruction(Opcode opcode, int opvalue, int line = -1) {
             return m_scriptExecutable.AddScriptInstruction(opcode, opvalue, line == -1 ? PeekToken().SourceLine : line);
         }
@@ -202,7 +152,8 @@ namespace Scorpio.Compile.Compiler {
                     using (var stream = File.OpenRead(SearchImportFile(fileName))) {
                         var buffer = new byte[stream.Length];
                         stream.ReadBytes(buffer);
-                        parsers.Add(new ScriptParser(new ScriptLexer(Script.Encoding.GetString(buffer), fileName), searchPaths, compileOption, parsers).Parse());
+                        var globalCache = version >= ScorpioUtil.VersionGlobalCache ? GlobalCache : null;
+                        parsers.Add(new ScriptParser(buffer.GetString().ParseTokens(), fileName, fileName, searchPaths, compileOption, parsers, globalCache, version).Parse());
                     }
                 } else {
                     tokens.Add(ReadToken());
@@ -397,7 +348,7 @@ namespace Scorpio.Compile.Compiler {
                 ReadToken();
                 ParseCondition(false, gotos);
             }
-            gotos.SetValue(Index);
+            gotos.SetValue(InstructionIndex);
         }
         /// <summary> 解析 if 单个判断模块 </summary>
         void ParseCondition(bool condition, List<ScriptInstructionCompiler> gotos) {
@@ -411,7 +362,7 @@ namespace Scorpio.Compile.Compiler {
             ParseStatementBlock(ExecutableBlock.If);
             gotos.Add(AddScriptInstructionWithoutValue(Opcode.Jump, PeekToken().SourceLine));
             if (allow != null) {
-                allow.SetValue(Index);
+                allow.SetValue(InstructionIndex);
             }
         }
         /// <summary> 解析for语句 </summary>
@@ -471,7 +422,7 @@ namespace Scorpio.Compile.Compiler {
             //跳转到 比较 i <= max
             AddScriptInstruction(Opcode.Jump, startIndex.index, line);
             m_scriptExecutable.EndStack();
-            var endIndex = Index;
+            var endIndex = InstructionIndex;
             falseTo.SetValue(endIndex);
             //continue跳转到 i += step
             m_Continue.SetValue(stepPlusIndex);
@@ -489,7 +440,7 @@ namespace Scorpio.Compile.Compiler {
                 endStackCount += 1;
             }
             //第二部分开始索引
-            var startIndex = Index;
+            var startIndex = InstructionIndex;
             //如果是false就跳出循环
             ScriptInstructionCompiler falseTo = null;
             {
@@ -505,7 +456,7 @@ namespace Scorpio.Compile.Compiler {
             //判断完直接跳到for循环主逻辑
             var block = AddScriptInstructionWithoutValue(Opcode.Jump, token.SourceLine);
             //第三部分开始索引
-            var forIndex = Index;
+            var forIndex = InstructionIndex;
             {
                 token = ReadToken();
                 if (token.Type != TokenType.RightPar) {
@@ -515,11 +466,11 @@ namespace Scorpio.Compile.Compiler {
                 }
                 AddScriptInstruction(Opcode.Jump, startIndex, token.SourceLine); //执行完第三部分跳转到第二部分的判断
             }
-            block.SetValue(Index);
+            block.SetValue(InstructionIndex);
             ParseStatementBlock(ExecutableBlock.For);
             AddScriptInstruction(Opcode.Jump, forIndex, token.SourceLine); //执行完主逻辑跳转到第三部分逻辑
             //for结束索引
-            var endIndex = Index;
+            var endIndex = InstructionIndex;
             if (falseTo != null) {
                 falseTo.SetValue(endIndex);
             }
@@ -531,7 +482,7 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary>解析while </summary>
         void ParseWhile() {
-            var startIndex = Index;
+            var startIndex = InstructionIndex;
             ReadLeftParenthesis();
             PushObject(GetObject());
             ReadRightParenthesis();
@@ -539,7 +490,7 @@ namespace Scorpio.Compile.Compiler {
             ParseStatementBlock(ExecutableBlock.While);
             AddScriptInstruction(Opcode.Jump, startIndex, PeekToken().SourceLine);
             m_Continue.SetValue(startIndex);
-            var endIndex = Index;
+            var endIndex = InstructionIndex;
             allow.SetValue(endIndex);
             m_Break.SetValue(endIndex);
         }
@@ -550,7 +501,7 @@ namespace Scorpio.Compile.Compiler {
             PushObject(new CodeNativeObject(false, PeekToken().SourceLine));
             ReadRightParenthesis();
             ParseStatementBlock(ExecutableBlock.Switch);
-            var endIndex = Index;
+            var endIndex = InstructionIndex;
             AddScriptInstruction(Opcode.PopNumber, 2); //弹出switch值 和 false 值
             m_Break.SetValue(endIndex);
             m_Case.SetValue(endIndex);
@@ -558,7 +509,7 @@ namespace Scorpio.Compile.Compiler {
         /// <summary> 解析case </summary>
         void ParseCase() {
             foreach (var instruction in m_Cases.Peek()) {
-                instruction.SetValue(Index);
+                instruction.SetValue(InstructionIndex);
             }
             m_Cases.Peek().Clear();
             var leftIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue);
@@ -566,14 +517,14 @@ namespace Scorpio.Compile.Compiler {
             PushObject(GetObject());
             ReadColon();
             AddScriptInstructionWithoutValue(Opcode.Equal);
-            leftIndex.SetValue(Index);
+            leftIndex.SetValue(InstructionIndex);
             m_Cases.Peek().Add(AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse));
             PushObject(new CodeNativeObject(true, PeekToken().SourceLine));
         }
         /// <summary> 解析default </summary>
         void ParseDefault() {
             foreach (var instruction in m_Cases.Peek()) {
-                instruction.SetValue(Index);
+                instruction.SetValue(InstructionIndex);
             }
             m_Cases.Peek().Clear();
             ReadColon();
@@ -609,7 +560,7 @@ namespace Scorpio.Compile.Compiler {
             AddScriptInstruction(Opcode.StoreLocal, varIndex);
             ParseStatementBlock(ExecutableBlock.Foreach);
             AddScriptInstruction(Opcode.Jump, beginIndex.index, line);
-            var endIndex = Index;
+            var endIndex = InstructionIndex;
             falseTo.SetValue(endIndex);
             m_Continue.SetValue(beginIndex);
             m_Break.SetValue(endIndex);
@@ -664,7 +615,7 @@ namespace Scorpio.Compile.Compiler {
                     if (next.Type == TokenType.LeftPar || next.Type == TokenType.LeftBrace) {
                         UndoToken();
                         UndoToken();
-                        nameIndex = GetConstString(token.Lexeme.ToString(), true);
+                        nameIndex = GetConstString(token.Lexeme.ToString());
                         funcIndex = ParseFunctionContent(false, out _);
                     } else {
                         throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
@@ -672,7 +623,7 @@ namespace Scorpio.Compile.Compiler {
                 } else if (token.Type == TokenType.Function) {
                     UndoToken();
                     funcIndex = ParseFunctionContent(true, out var functionName);
-                    nameIndex = GetConstString(functionName, true);
+                    nameIndex = GetConstString(functionName);
                 } else {
                     throw new ParserException(this, "Class 开始关键字必须为[变量名称]或者[function]关键字", token);
                 }
@@ -685,8 +636,8 @@ namespace Scorpio.Compile.Compiler {
             }
             var index = Classes.Count;
             Classes.Add(new ScriptClassData() {
-                name = GetConstString(className, true),
-                parent = parent.Length == 0 ? -1 : GetConstString(parent, true),
+                name = GetConstString(className),
+                parent = parent.Length == 0 ? -1 : GetConstString(parent),
                 functions = funs.ToArray(),
             });
             return index;
@@ -786,7 +737,7 @@ namespace Scorpio.Compile.Compiler {
             var tryTo = AddScriptInstructionWithoutValue(Opcode.TryTo);
             ParseStatementBlock();
             var tryEnd = AddScriptInstructionWithoutValue(Opcode.TryEnd);
-            tryTo.SetValue(Index);
+            tryTo.SetValue(InstructionIndex);
             ReadCatch();
             ReadLeftParenthesis();
             var identifier = ReadIdentifier();
@@ -795,7 +746,7 @@ namespace Scorpio.Compile.Compiler {
             AddScriptInstruction(Opcode.StoreLocal, m_scriptExecutable.AddIndex(identifier));
             ParseStatementBlock();
             m_scriptExecutable.EndStack();
-            tryEnd.SetValue(Index);
+            tryEnd.SetValue(InstructionIndex);
         }
         /// <summary> 解析 throw </summary>
         private void ParseThrow() {
@@ -928,7 +879,7 @@ namespace Scorpio.Compile.Compiler {
                             PushObject(member.codeKey);
                             AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
                         }
-                        nullTo?.SetValue(Index);
+                        nullTo?.SetValue(InstructionIndex);
                     }
                     break;
                 }
@@ -937,12 +888,12 @@ namespace Scorpio.Compile.Compiler {
                         PushObject(oper.Left);
                         var leftIndex = AddScriptInstructionWithoutValue(Opcode.FalseLoadFalse, obj.Line);
                         PushObject(oper.Right);
-                        leftIndex.SetValue(Index);
+                        leftIndex.SetValue(InstructionIndex);
                     } else if (oper.TokenType == TokenType.Or) {
                         PushObject(oper.Left);
                         var leftIndex = AddScriptInstructionWithoutValue(Opcode.TrueLoadTrue, obj.Line);
                         PushObject(oper.Right);
-                        leftIndex.SetValue(Index);
+                        leftIndex.SetValue(InstructionIndex);
                     } else {
                         PushObject(oper.Left);
                         PushObject(oper.Right);
@@ -998,7 +949,7 @@ namespace Scorpio.Compile.Compiler {
                                 PushObject(member.codeKey);
                                 AddScriptInstructionWithoutValue(Opcode.LoadValueObject, obj.Line);
                             }
-                            memberNullTo?.SetValue(Index);
+                            memberNullTo?.SetValue(InstructionIndex);
                         } else {
                             PushObject(codeCallFunction.Member);
                         }
@@ -1034,12 +985,12 @@ namespace Scorpio.Compile.Compiler {
                         }
                         if (isCallVi) {
                             var jump = AddScriptInstructionWithoutValue(Opcode.Jump);
-                            nullTo?.SetValue(Index);
+                            nullTo?.SetValue(InstructionIndex);
                             AddScriptInstruction(Opcode.PopNumber, 2);
                             PushObject(new CodeNativeObject(null, GetSourceLine()));
-                            jump.SetValue(Index);
+                            jump.SetValue(InstructionIndex);
                         } else {
-                            nullTo?.SetValue(Index);
+                            nullTo?.SetValue(InstructionIndex);
                         }
                     }
                     break;
@@ -1090,16 +1041,16 @@ namespace Scorpio.Compile.Compiler {
                     var falseTo = AddScriptInstructionWithoutValue(Opcode.FalseTo, obj.Line);
                     PushObject(ternary.True);
                     var jump = AddScriptInstructionWithoutValue(Opcode.Jump, obj.Line);
-                    falseTo.SetValue(Index);
+                    falseTo.SetValue(InstructionIndex);
                     PushObject(ternary.False);
-                    jump.SetValue(Index);
+                    jump.SetValue(InstructionIndex);
                     break;
                 }
                 case CodeEmptyRet emptyRet: {
                     PushObject(emptyRet.Emtpy);
                     var emptyTo = AddScriptInstructionWithoutValue(Opcode.NotNullTo, obj.Line);
                     PushObject(emptyRet.Ret);
-                    emptyTo.SetValue(Index);
+                    emptyTo.SetValue(InstructionIndex);
                     break;
                 }
                 case CodeAssign assign: {

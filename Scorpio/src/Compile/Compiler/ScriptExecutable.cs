@@ -48,6 +48,7 @@ namespace Scorpio.Compile.Compiler {
         public Stack<ExecutableBlock> Blocks { get; private set; }                          //所有块类型
         public int VariableCount { get { return m_VariableIndexs.Count - m_VariableToInternal.Count; } }     //临时变量个数
         public int InternalCount { get { return m_InternalIndexs.Count; } }                 //内部变量个数
+        public int InstructionCount { get { return m_listScriptInstructions.Count; } }      //指令数量
         public ScriptExecutable(ExecutableBlock block) {
             m_StackIndex = 0;
             m_Stacks[m_StackIndex] = 0;
@@ -122,9 +123,6 @@ namespace Scorpio.Compile.Compiler {
                 }
             }
             return -1;
-        }
-        public int Count() {
-            return m_listScriptInstructions.Count;
         }
         public ScriptInstruction[] ScriptInstructions { get { return m_listScriptInstructions.ToArray(); } }
         public int[] ScriptInternals { get { return m_ParentInternal.ToArray(); } }

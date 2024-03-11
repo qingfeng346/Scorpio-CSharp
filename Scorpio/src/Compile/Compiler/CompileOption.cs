@@ -5,12 +5,12 @@ namespace Scorpio.Compile.Compiler {
     public class CompileOption {
         public static readonly CompileOption Default = new CompileOption();
         private readonly string[] EmptyArrayString = new string[0];
-        private HashSet<string> mIgnoreFunctions;    //编译忽略的全局函数
-        private IEnumerable<string> mDefines;            //全局defines
+        private HashSet<string> mIgnoreFunctions;       //编译忽略的全局函数
+        private IEnumerable<string> mDefines;           //全局defines
         private IEnumerable<string> mStaticTypes;       //静态类,类下所有函数都会把取值变量动态编译成全局索引取值,加快运行效率
         private HashSet<string> mStaticVariables;       //静态全局变量和函数,会把取值变量动态编译成全局索引取值,加快运行效率
-        private IEnumerable<string> mSearchPaths;     //搜索目录
-        private ScriptConst mScriptConst;            //全局const,把变量编译成常量
+        private IEnumerable<string> mSearchPaths;       //搜索目录
+        private ScriptConst mScriptConst;               //全局const,把变量编译成常量
         public IEnumerable<string> ignoreFunctions {
             get { return mIgnoreFunctions; }
             set { mIgnoreFunctions = new HashSet<string>(value ?? EmptyArrayString); }

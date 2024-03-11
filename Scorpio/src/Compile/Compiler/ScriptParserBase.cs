@@ -1,7 +1,8 @@
 using System.IO;
 using System.Collections.Generic;
 using Scorpio.Compile.Exception;
-namespace Scorpio.Compile.Compiler {
+namespace Scorpio.Compile.Compiler
+{
     /// <summary> 编译脚本 </summary>
     public partial class ScriptParser {
         private readonly string[] EmptyArrayString = new string[0];
@@ -11,21 +12,29 @@ namespace Scorpio.Compile.Compiler {
         private IEnumerable<string> searchPaths;    //searchPaths
         private List<string> allSearchPaths;        //import文件搜索目录searchPaths
         private HashSet<string> allDefines;         //全局defines+本文件定义的define
-        public List<ScriptParser> parsers;          //import列表
-        public ScriptParser(ScriptLexer lexer, IEnumerable<string> searchPaths, CompileOption compileOption, List<ScriptParser> parsers) {
-            this.m_listTokens = lexer.GetTokens().ToArray();
-            this.Breviary = lexer.Breviary;
+        private List<ScriptParser> parsers;          //import列表
+        private short version;
+        /// <summary> 当前解析的脚本摘要 </summary>
+        public string Breviary { get; private set; }
+        public ScriptParser(Token[] tokens, string breviary, string fileName, 
+                            IEnumerable<string> searchPaths, 
+                            CompileOption compileOption, 
+                            List<ScriptParser> parsers, 
+                            GlobalCacheCompiler globalCache,
+                            short version) {
+            m_listTokens = tokens;
+            Breviary = breviary ?? "[unknown]";
+            GlobalCache = globalCache ?? new GlobalCacheCompiler(-1);
             this.compileOption = compileOption ?? CompileOption.Default;
             this.parsers = parsers;
             this.searchPaths = searchPaths;
+            this.version = version;
             this.allSearchPaths = new List<string>(searchPaths ?? EmptyArrayString);
             this.allSearchPaths.AddRange(this.compileOption.searchPaths);
-            if (!string.IsNullOrEmpty(Breviary) && Directory.Exists(Breviary)) 
-                allSearchPaths.Add(Path.GetDirectoryName(Breviary));
+            if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName)) 
+                allSearchPaths.Add(Path.GetDirectoryName(fileName));
             this.allDefines = new HashSet<string>(this.compileOption.defines);
         }
-        /// <summary> 当前解析的脚本摘要 </summary>
-        public string Breviary { get; private set; }
         string SearchImportFile(string fileName) {
             if (this.compileOption.preprocessImportFile != null) {
                 this.compileOption.preprocessImportFile(this, fileName);
@@ -49,7 +58,7 @@ namespace Scorpio.Compile.Compiler {
             return PeekToken().SourceLine;
         }
         /// <summary> 返回第一个Token </summary>
-        public Token PeekToken() {
+        Token PeekToken() {
             if (!HasMoreTokens())
                 throw new ParserException(this, "PeekToken - 没有更多的Token", null);
             return m_listTokens[m_indexToken];

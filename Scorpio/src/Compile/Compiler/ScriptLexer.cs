@@ -63,7 +63,7 @@ namespace Scorpio.Compile.Compiler {
                 UndoChar();
             }
         }
-
+        /// <summary> 读取 // 注释 </summary>
         void ReadLineComment() {
             do {
                 ch = ReadChar();
@@ -73,6 +73,7 @@ namespace Scorpio.Compile.Compiler {
                 }
             } while (true);
         }
+        /// <summary> 读取 /* */ 注释 </summary>
         void ReadBlockComment() {
             do {
                 ch = ReadChar();
@@ -238,6 +239,7 @@ namespace Scorpio.Compile.Compiler {
                 ReadNumber();
             }
         }
+        /// <summary> ? </summary>
         void ReadQuestionMark() {
             switch (ReadChar()) {
                 case '?': AddToken(TokenType.EmptyRet, "??"); return;
@@ -370,7 +372,7 @@ namespace Scorpio.Compile.Compiler {
             }
             while (true);
         }
-        
+        /// <summary> # </summary>
         void ReadSharp() {
             m_Builder.Append(m_ch);
             do {

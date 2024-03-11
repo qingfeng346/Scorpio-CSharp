@@ -20,9 +20,9 @@ namespace Scorpio.Runtime {
 #else
         public ScriptValue Execute(ScriptValue thisObject, ScriptValue[] args, int length, InternalValue[] internalValues) {
 #endif
-            var constDouble = this.constDouble;
-            var constLong = this.constLong;
-            var constString = this.constString;
+            var constDouble = globalCache.ConstDouble;
+            var constLong = globalCache.ConstLong;
+            var constString = globalCache.ConstString;
             #region 堆栈和线程判断
 #if SCORPIO_ASSERT
             //System.Console.WriteLine($"执行命令 =>\n{m_FunctionData.ToString(constDouble, constLong, constString)}");

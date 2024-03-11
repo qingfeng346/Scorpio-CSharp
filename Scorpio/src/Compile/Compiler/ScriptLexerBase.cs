@@ -16,7 +16,6 @@ namespace Scorpio.Compile.Compiler {
             SimplePoint,            //带 @ `符号字符串
         }
         private const char END_CHAR = char.MaxValue;    //结尾字符
-        private const int BREVIARY_CHAR = 64;           //摘要的字符数
 
         private char m_ch;                              //当前解析字符
         private char ch;                                //临时保存字符
@@ -29,8 +28,7 @@ namespace Scorpio.Compile.Compiler {
         private int m_iSourceChar = 0;                  //当前行解析
         private int m_iIndex = 0;                       //当前解析
         private int m_iCacheLine = 0;                   //Simple字符串起始行
-        public ScriptLexer(string buffer, string breviary) {
-            Breviary = breviary == null || breviary.Length == 0 ? buffer.Substring(0, Math.Min(BREVIARY_CHAR, buffer.Length)) : breviary;
+        public ScriptLexer(string buffer) {
             m_FormatString = FormatString.None;
             m_strBuffer = buffer;
             m_iLength = buffer.Length;
@@ -39,6 +37,8 @@ namespace Scorpio.Compile.Compiler {
         }
         /// <summary> 整段字符串的摘要 取第一行字符串的前20个字符</summary>
         public string Breviary { get; private set; }
+        /// <summary> 文件名字, </summary>
+        public string FileName { get; private set; }
         public int SourceLine => m_iSourceLine;
         public int SourceChar => m_iSourceChar;
         void ThrowInvalidCharacterException() {

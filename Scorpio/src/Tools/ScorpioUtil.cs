@@ -5,9 +5,11 @@ using System.Runtime.CompilerServices;
 using Scorpio.Exception;
 using System.Text;
 using Scorpio.Runtime;
+using Scorpio.Compile.Compiler;
 namespace Scorpio.Tools {
     public static class ScorpioUtil {
         public const short VersionNoContext = 3;        //添加NoContext的版本
+        public const short VersionGlobalCache = 4;      //增加GlobalCache的脚本版本
         public static readonly Type TYPE_VOID = typeof (void);
         public static readonly Type TYPE_OBJECT = typeof (object);
         public static readonly Type TYPE_VALUE = typeof (ScriptValue);
@@ -181,6 +183,12 @@ namespace Scorpio.Tools {
                 return parameters[index];
             }
             throw new ExecutionException($"参数个数少于要获取的索引 index:{index} length:{length}");
+        }
+        internal static Token[] ParseTokens(this string buffer) {
+            return new ScriptLexer(buffer).GetTokens().ToArray();
+        }
+        internal static string GetString(this byte[] buffer) {
+            return Script.Encoding.GetString(buffer);
         }
     }
 }
