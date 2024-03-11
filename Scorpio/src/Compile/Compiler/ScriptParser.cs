@@ -147,9 +147,9 @@ namespace Scorpio.Compile.Compiler
             var tokens = new List<Token>();
             while (HasMoreTokens()) {
                 if (PeekToken().Type == TokenType.Import) {
-                    ReadToken();
+                    var token = ReadToken();
                     var fileName = ReadString();
-                    using (var stream = File.OpenRead(SearchImportFile(fileName))) {
+                    using (var stream = File.OpenRead(SearchImportFile(token, fileName))) {
                         var buffer = new byte[stream.Length];
                         stream.ReadBytes(buffer);
                         var globalCache = version >= ScorpioUtil.VersionGlobalCache ? GlobalCache : null;

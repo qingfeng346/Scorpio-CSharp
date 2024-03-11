@@ -35,7 +35,7 @@ namespace Scorpio.Compile.Compiler {
             get { return mSearchPaths; }
             set { mSearchPaths = value ?? EmptyArrayString; }
         }
-        public Action<ScriptParser, string> preprocessImportFile { get; set; }
+        public Action<ScriptParser, Token, string> preprocessImportFile { get; set; }
 
         public CompileOption() {
             this.ignoreFunctions = null;

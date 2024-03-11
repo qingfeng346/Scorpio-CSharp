@@ -35,9 +35,9 @@ namespace Scorpio.Compile.Compiler
                 allSearchPaths.Add(Path.GetDirectoryName(fileName));
             this.allDefines = new HashSet<string>(this.compileOption.defines);
         }
-        string SearchImportFile(string fileName) {
+        string SearchImportFile(Token token, string fileName) {
             if (this.compileOption.preprocessImportFile != null) {
-                this.compileOption.preprocessImportFile(this, fileName);
+                this.compileOption.preprocessImportFile(this, token, fileName);
             }
             if (File.Exists(fileName)) {
                 return fileName;
