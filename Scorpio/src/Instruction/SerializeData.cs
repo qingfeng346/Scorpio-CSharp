@@ -36,7 +36,7 @@ namespace Scorpio.Instruction {
             Array.ForEach(Functions, writer.WriteFunction);
             writer.Write(Classes.Length);
             Array.ForEach(Classes, writer.WriteClass);
-            if (!writeConst) {
+            if (writeConst) {
                 writer.WriteNoContext(NoContext);
             }
             return this;
@@ -62,7 +62,7 @@ namespace Scorpio.Instruction {
                 classes[i] = reader.ReadClass();
             }
             Classes = classes;
-            if (!readConst) {
+            if (readConst) {
                 NoContext = reader.ReadNoContext();
             }
             return this;

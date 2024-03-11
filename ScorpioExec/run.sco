@@ -1,5 +1,8 @@
-#import "import.im.sco"
-test()
+#import "import1.im.sco"
+#import "import2.im.sco"
+#import "import3.im.sco"
+#import "import4.im.sco"
+import1()
 // TestClass = importType("TestClass")
 // print(TestClass)
 // var a = new TestClass()

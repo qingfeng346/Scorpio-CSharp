@@ -7,11 +7,11 @@
     },
     "runil": {
       "commandName": "Project",
-      "commandLineArgs": "../../../test.il"
+      "commandLineArgs": "../../../run.il"
     },
     "pack": {
       "commandName": "Project",
-      "commandLineArgs": "pack -s ../../../test.sco -o ../../../test.il"
+      "commandLineArgs": "pack -s ../../../run.sco -o ../../../run.il"
     },
     "fast": {
       "commandName": "Project",

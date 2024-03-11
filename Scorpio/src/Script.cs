@@ -362,37 +362,35 @@ namespace Scorpio {
                 return LoadBufferByString(breviary, buffer, index, count, compileOption);
             }
         }
-        void OptimizeConstString1(SerializeData data) {
-            var length = data.ConstString.Length;
-            var flagLength = data.NoContext.Length;
-            for (var i = 0; i < length; ++i) {
-                if (flagLength == 0 || (data.NoContext[i] & ScriptConstValue.StringFlag) != 0) {
-                    data.ConstString[i] = string.Intern(data.ConstString[i]);
-                }
-            }
-        }
-        void OptimizeConstString2(SerializeData data) {
-            var length = data.ConstString.Length;
-            var flagLength = data.NoContext.Length;
-            for (var i = 0; i < length; ++i) {
-                if (flagLength != 0 && (data.NoContext[i] & ScriptConstValue.StringFlag) == 0) {
-                    data.ConstString[i] = null;
-                }
-            }
-        }
+        //void OptimizeConstString1(SerializeData data) {
+        //    var length = data.ConstString.Length;
+        //    var flagLength = data.NoContext.Length;
+        //    for (var i = 0; i < length; ++i) {
+        //        if (flagLength == 0 || (data.NoContext[i] & ScriptConstValue.StringFlag) != 0) {
+        //            data.ConstString[i] = string.Intern(data.ConstString[i]);
+        //        }
+        //    }
+        //}
+        //void OptimizeConstString2(SerializeData data) {
+        //    var length = data.ConstString.Length;
+        //    var flagLength = data.NoContext.Length;
+        //    for (var i = 0; i < length; ++i) {
+        //        if (flagLength != 0 && (data.NoContext[i] & ScriptConstValue.StringFlag) == 0) {
+        //            data.ConstString[i] = null;
+        //        }
+        //    }
+        //}
         /// <summary> 执行IL </summary>
         public ScriptValue Execute(SerializeData[] datas) {
             ScriptValue result = ScriptValue.Null;
             int length = datas.Length;
             for (var j = 0; j < length; ++j) {
-                SerializeData data = datas[j];
-                OptimizeConstString1(data);
+                var data = datas[j];
                 var contexts = new ScriptContext[data.Functions.Length];
                 for (int i = 0; i < data.Functions.Length; ++i) {
                     contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.GlobalCache, contexts, data.Classes);
                 }
                 result = new ScriptContext(this, data.Breviary, data.Context, data.GlobalCache, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
-                OptimizeConstString2(data);
             }
             return result;
         }
@@ -401,15 +399,13 @@ namespace Scorpio {
             ScriptValue result = ScriptValue.Null;
             int length = datas.Length;
             for (var j = 0; j < length; ++j) {
-                SerializeData data = datas[j];
-                OptimizeConstString1(data);
+                var data = datas[j];
                 var contexts = new ScriptContext[data.Functions.Length];
                 for (int i = 0; i < data.Functions.Length; ++i) {
                     contexts[i] = new ScriptContext(this, data.Breviary, data.Functions[i], data.GlobalCache, contexts, data.Classes);
                 }
                 refContexts.Add(contexts);
                 result = new ScriptContext(this, data.Breviary, data.Context, data.GlobalCache, contexts, data.Classes).Execute(ScriptValue.Null, null, 0, null);
-                OptimizeConstString2(data);
             }
             return result;
         }

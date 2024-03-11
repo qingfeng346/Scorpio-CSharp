@@ -8,6 +8,7 @@ using Scorpio;
 using Scorpio.Commons;
 using Scorpio.Compile.Compiler;
 using Scorpio.FastReflect;
+using Scorpio.Runtime;
 using Scorpio.Serialize;
 using ScorpioLibrary;
 
@@ -124,13 +125,16 @@ namespace ScorpioExec {
                 CurrentDirectory,
                 Path.GetDirectoryName(source)
             };
+            //GlobalCacheCompiler globalCache = new GlobalCacheCompiler(0);
+            GlobalCacheCompiler globalCache = null;
             var compileOption = ParseOption (command.GetValueDefault (ParameterOption, ""), searchPaths);
             File.WriteAllBytes (output, Serializer.SerializeBytes (
                 source,
                 FileUtil.GetFileString (source),
                 searchPaths.ToArray (),
-                compileOption));
+                compileOption, null, globalCache));
             Logger.info ($"生成IL文件  {source} -> {output}");
+            //File.WriteAllBytes($"{Path.GetDirectoryName(output)}/cache", Serializer.SerializeGlobalCache(globalCache.GlobalCache));
         }
         static void Fast (Perform perform, CommandLine command, string[] args) {
             var output = perform.GetPath (ParameterOutput);
@@ -222,6 +226,9 @@ namespace ScorpioExec {
                     }
                     script.PushSearchPath (Path.GetDirectoryName (file));
                     script.PushSearchPath (CurrentDirectory);
+                    //var globalCaches = new GlobalCache[1];
+                    //globalCaches[0] = Deserializer.DeserializeGlobalCache(File.ReadAllBytes("E:\\Scorpio-CSharp\\ScorpioExec\\cache"));
+                    //script.GlobalCaches = globalCaches;
                     var sArgs = new string[args.Length - 1];
                     Array.Copy (args, 1, sArgs, 0, sArgs.Length);
                     script.SetArgs (sArgs);

@@ -36,5 +36,18 @@ namespace Scorpio.Serialize {
                 }
             }
         }
+        public static GlobalCache DeserializeGlobalCache(byte[] data) {
+            return DeserializeGlobalCache(data, 0, data.Length);
+        }
+        public static GlobalCache DeserializeGlobalCache(byte[] data, int index, int count) {
+            using (var stream = new MemoryStream(data, index, count)) {
+                return DeserializeGlobalCache(stream);
+            }
+        }
+        public static GlobalCache DeserializeGlobalCache(Stream stream) {
+            using (var reader = new ScorpioReader(stream)) {
+                return new GlobalCache().ReadConst(reader);
+            }
+        }
     }
 }
