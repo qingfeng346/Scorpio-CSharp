@@ -10,6 +10,7 @@ namespace Scorpio.Tools {
     public static class ScorpioUtil {
         public const short VersionNoContext = 3;        //添加NoContext的版本
         public const short VersionGlobalCache = 4;      //增加GlobalCache的脚本版本
+        public const short VersionSize = 5;             //减小文件大小
         public static readonly Type TYPE_VOID = typeof (void);
         public static readonly Type TYPE_OBJECT = typeof (object);
         public static readonly Type TYPE_VALUE = typeof (ScriptValue);

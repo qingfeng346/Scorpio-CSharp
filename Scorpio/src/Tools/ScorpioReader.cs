@@ -11,32 +11,61 @@ namespace Scorpio.Tools {
 #endif
         }
         public short version;
+        private int line = 0;
         public override string ReadString() {
             var length = ReadInt32();
             if (length == 0) { return ""; }
             return Script.Encoding.GetString(ReadBytes(length));
         }
         public ScriptFunctionData ReadFunction() {
-            var parameterCount = ReadInt32();
-            var param = ReadByte() == 1;
-            var variableCount = ReadInt32();
-            var internalCount = ReadInt32();
-            var internals = new int[ReadInt32()];
-            for (var i = 0; i < internals.Length; ++i) {
-                internals[i] = ReadInt32();
+            if (version >= VersionSize) {
+                var parameterCount = ReadUInt16();
+                var param = ReadByte() == 1;
+                var variableCount = ReadUInt16();
+                var internalCount = ReadUInt16();
+                var internals = new int[ReadInt32()];
+                for (var i = 0; i < internals.Length; ++i) {
+                    internals[i] = ReadInt32();
+                }
+                var instructions = new ScriptInstruction[ReadInt32()];
+                for (var i = 0; i < instructions.Length; ++i) {
+                    var opvalue = ReadInt32();
+                    if (opvalue < 0) {
+                        line = -opvalue;
+                        opvalue = ReadInt32();
+                    }
+                    instructions[i] = new ScriptInstruction(ReadByte(), opvalue, line);
+                }
+                return new ScriptFunctionData() {
+                    parameterCount = parameterCount,
+                    param = param,
+                    variableCount = variableCount,
+                    internalCount = internalCount,
+                    internals = internals,
+                    scriptInstructions = instructions
+                };
+            } else {
+                var parameterCount = ReadInt32();
+                var param = ReadByte() == 1;
+                var variableCount = ReadInt32();
+                var internalCount = ReadInt32();
+                var internals = new int[ReadInt32()];
+                for (var i = 0; i < internals.Length; ++i) {
+                    internals[i] = ReadInt32();
+                }
+                var instructions = new ScriptInstruction[ReadInt32()];
+                for (var i = 0; i < instructions.Length; ++i) {
+                    instructions[i] = new ScriptInstruction(ReadInt32(), ReadInt32(), ReadInt32());
+                }
+                return new ScriptFunctionData() {
+                    parameterCount = parameterCount,
+                    param = param,
+                    variableCount = variableCount,
+                    internalCount = internalCount,
+                    internals = internals,
+                    scriptInstructions = instructions
+                };
             }
-            var instructions = new ScriptInstruction[ReadInt32()];
-            for (var i = 0; i < instructions.Length; ++i) {
-                instructions[i] = new ScriptInstruction(ReadInt32(), ReadInt32(), ReadInt32());
-            }
-            return new ScriptFunctionData() {
-                parameterCount = parameterCount,
-                param = param,
-                variableCount = variableCount,
-                internalCount = internalCount,
-                internals = internals,
-                scriptInstructions = instructions
-            };
         }
         public ScriptClassData ReadClass() {
             var name = ReadInt32();

@@ -6,7 +6,7 @@ using Scorpio.Tools;
 using Scorpio.Runtime;
 namespace Scorpio.Serialize {
     public class Serializer {
-        public static short DefaultVersion = 4;
+        public static short DefaultVersion = 5;
         public static SerializeData[] Serialize(string breviary, string buffer, IEnumerable<string> searchPaths, CompileOption compileOption, short? version = null, GlobalCacheCompiler globalCache = null) {
             short ver = version ?? DefaultVersion;
             var parsers = new List<ScriptParser>();
@@ -36,7 +36,7 @@ namespace Scorpio.Serialize {
                     for (var i = 0; i < length; ++i) {
                         var data = datas[i];
                         writer.Write(data.Breviary);
-                        data.Serialize(writer, ver < ScorpioUtil.VersionGlobalCache);
+                        data.Write(writer, ver < ScorpioUtil.VersionGlobalCache);
                     }
                     return stream.ToArray();
                 }

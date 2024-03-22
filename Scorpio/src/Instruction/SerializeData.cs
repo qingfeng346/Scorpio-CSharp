@@ -27,7 +27,7 @@ namespace Scorpio.Instruction {
             this.Classes = parser.Classes.ToArray();
             this.NoContext = Array.Empty<byte>();
         }
-        public SerializeData Serialize(ScorpioWriter writer, bool writeConst) {
+        public SerializeData Write(ScorpioWriter writer, bool writeConst) {
             if (writeConst) {
                 GlobalCache.WriteConst(writer);
             }
@@ -41,7 +41,7 @@ namespace Scorpio.Instruction {
             }
             return this;
         }
-        public SerializeData Deserialize(ScorpioReader reader, GlobalCache globalCache) {
+        public SerializeData Read(ScorpioReader reader, GlobalCache globalCache) {
             var readConst = globalCache == null;
             if (readConst) {
                 GlobalCache = new GlobalCache().ReadConst(reader);

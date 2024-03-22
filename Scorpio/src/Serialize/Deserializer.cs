@@ -23,14 +23,14 @@ namespace Scorpio.Serialize {
                     var number = reader.ReadInt32();            //文件数量
                     var datas = new SerializeData[number];
                     for (var i = 0; i < number; ++i) {
-                        datas[i] = new SerializeData(reader.ReadString()).Deserialize(reader, globalCache);
+                        datas[i] = new SerializeData(reader.ReadString()).Read(reader, globalCache);
                     }
                     return datas;
                 } else {
                     var number = reader.ReadInt32();            //文件数量
                     var datas = new SerializeData[number];
                     for (var i = 0; i < number; ++i) {
-                        datas[i] = new SerializeData(reader.ReadString()).Deserialize(reader, null);
+                        datas[i] = new SerializeData(reader.ReadString()).Read(reader, null);
                     }
                     return datas;
                 }
