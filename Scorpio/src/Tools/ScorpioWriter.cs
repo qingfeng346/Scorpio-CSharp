@@ -5,7 +5,6 @@ namespace Scorpio.Tools {
     using static ScorpioUtil;
     public class ScorpioWriter : BinaryWriter {
         private short version;
-        private int line = 0;
 #if NETSTANDARD
         public ScorpioWriter(Stream stream, short version) : base(stream, Script.Encoding, true) {
 #else
@@ -31,8 +30,9 @@ namespace Scorpio.Tools {
                 Write(data.internals.Length);
                 Array.ForEach(data.internals, Write);
                 Write(data.scriptInstructions.Length);
+                int line = 0;
                 Array.ForEach(data.scriptInstructions, (value) => {
-                    if (line != value.line) {
+                    if (value.line > 0 && line != value.line) {
                         line = value.line;
                         Write(-line);
                     }

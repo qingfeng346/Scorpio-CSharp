@@ -978,7 +978,7 @@ namespace Scorpio.Compile.Compiler
                         }
                         if (codeCallFunction.Variables != null) {
                             foreach (var variable in codeCallFunction.Variables.Variables) {
-                                AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.line);
+                                AddScriptInstructionWithoutValue(Opcode.CopyStackTop, obj.Line);
                                 PushObject(variable.value);
                                 AddScriptInstruction(Opcode.StoreValueString, GetConstString(variable.key.ToString()), obj.Line);
                             }
@@ -1083,7 +1083,7 @@ namespace Scorpio.Compile.Compiler
             var member = assign.member;
             var value = assign.value;
             var index = member.index;
-            var line = member.line;
+            var line = member.Line;
             // = 操作
             if (assign.AssignType == TokenType.Assign) {
                 if (member.Parent == null) {
@@ -1320,7 +1320,7 @@ namespace Scorpio.Compile.Compiler
                 default:
                     throw new ParserException(this, "Object起始关键字错误 ", token);
             }
-            ret.line = token.SourceLine;
+            ret.Line = token.SourceLine;
             ret = GetVariable(LastToken(), ret);
             if ((ret is CodeNativeObject || (ret is CodeRegion && (ret as CodeRegion).Context is CodeNativeObject)) && flag != 0) {
                 var scriptObject = ret is CodeNativeObject ? (ret as CodeNativeObject) : (ret as CodeRegion).Context as CodeNativeObject;
@@ -1382,7 +1382,7 @@ namespace Scorpio.Compile.Compiler
                     UndoToken();
                     break;
                 }
-                ret.line = token.SourceLine;
+                ret.Line = token.SourceLine;
                 lastToken = LastToken();
             }
             return ret;

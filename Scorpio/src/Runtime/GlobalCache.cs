@@ -31,7 +31,7 @@ namespace Scorpio.Runtime {
             length = reader.ReadInt32();
             var constString = new string[length];
             for (var i = 0; i < length; ++i) {
-                constString[i] = reader.ReadString();
+                constString[i] = string.Intern(reader.ReadString());
             }
             ConstString = constString;
             return this;

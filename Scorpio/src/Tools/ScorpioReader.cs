@@ -11,7 +11,6 @@ namespace Scorpio.Tools {
 #endif
         }
         public short version;
-        private int line = 0;
         public override string ReadString() {
             var length = ReadInt32();
             if (length == 0) { return ""; }
@@ -28,6 +27,7 @@ namespace Scorpio.Tools {
                     internals[i] = ReadInt32();
                 }
                 var instructions = new ScriptInstruction[ReadInt32()];
+                int line = 0;
                 for (var i = 0; i < instructions.Length; ++i) {
                     var opvalue = ReadInt32();
                     if (opvalue < 0) {
